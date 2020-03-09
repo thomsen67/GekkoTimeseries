@@ -263,7 +263,7 @@ namespace Gekko
         public static string FromBNumberToVarname(int i)
         {
             string culprit;
-            EquationHelper eh = (EquationHelper)Program.model.equations[Program.model.m2.fromBNumberToEqNumber[i]];
+            EquationHelper eh = (EquationHelper)Program.model.modelGekko.equations[Program.model.modelGekko.m2.fromBNumberToEqNumber[i]];
             culprit = eh.lhsWithLagIndicator;
             return culprit;
         }
@@ -271,7 +271,7 @@ namespace Gekko
         //will include lag indicator (¤)
         public static string FromBNumberToVarname2(int i)
         {
-            string culprit = Program.model.varsBTypeInverted[i];
+            string culprit = Program.model.modelGekko.varsBTypeInverted[i];
             return culprit;
         }
 
@@ -2921,11 +2921,11 @@ namespace Gekko
         /// <returns>Output string</returns>
         public static string GetUpperLowerCase(string var)
         {
-            if (Program.model != null && Program.model.varsAType != null)
+            if (Program.model != null && Program.model.modelGekko.varsAType != null)
             {
                 //a model is loaded
-                //ATypeData temp = (ATypeData)Program.model.varsAType[var];
-                ATypeData temp = null; Program.model.varsAType.TryGetValue(var, out temp);
+                //ATypeData temp = (ATypeData)Program.model.modelGekko.varsAType[var];
+                ATypeData temp = null; Program.model.modelGekko.varsAType.TryGetValue(var, out temp);
                 if (temp != null)
                 {
                     //var is known from the model

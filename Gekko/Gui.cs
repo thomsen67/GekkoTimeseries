@@ -1545,7 +1545,7 @@ namespace Gekko
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 2];
                 Program.guiBrowseNumber += -2;  //1 will be added later, when calling "disp". Net result: -1.
 
-                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || (Program.HasGamsEquation(var)))
+                if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var)) || (Program.HasGamsEquation(var)))
                 {
                     List<string> temp = new List<string>();
                     temp.Add(var);
@@ -1585,7 +1585,7 @@ namespace Gekko
                 if (Program.guiBrowseNumber >= Program.guiBrowseHistory.Count) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 0];
                 Program.guiBrowseNumber += 0;  //1 will be added later, when calling "disp". Net result: 1.
-                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || ( Program.HasGamsEquation(var)))
+                if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var)) || ( Program.HasGamsEquation(var)))
                 {
                     List<string> temp = new List<string>();
                     temp.Add(var);
@@ -1890,7 +1890,7 @@ namespace Gekko
                     Gui.gui.toolStripStatusLabel3a.Text = " ";
                     toolStripStatusLabel3.Image = green;
                     int goals = 0;
-                    if (Program.model != null) goals = Math.Max(Program.model.exogenized.Count, Program.model.endogenized.Count);
+                    if (Program.model != null) goals = Math.Max(Program.model.modelGekko.exogenized.Count, Program.model.modelGekko.endogenized.Count);
                     if (goals > 0)
                     {
                         this.toolStripStatusLabel2.Margin = new Padding(-5, 0, 0, -2);

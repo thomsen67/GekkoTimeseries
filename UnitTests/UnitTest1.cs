@@ -13638,25 +13638,25 @@ namespace UnitTests
             I("MODEL jul05;");  //otherwise ENDO/EXO will refuse to work
             I("ENDO a, b, c, d;");
             I("EXO x, y, z;");
-            Assert.AreEqual(Program.model.endogenized.Count, 4);
-            Assert.AreEqual(Program.model.exogenized.Count, 3);
+            Assert.AreEqual(Program.model.modelGekko.endogenized.Count, 4);
+            Assert.AreEqual(Program.model.modelGekko.exogenized.Count, 3);
             //I("ENDO;");
-            //Assert.AreEqual(Program.model.endogenized.Count, 0);
-            //Assert.AreEqual(Program.model.exogenized.Count, 3);
+            //Assert.AreEqual(Program.model.modelGekko.endogenized.Count, 0);
+            //Assert.AreEqual(Program.model.modelGekko.exogenized.Count, 3);
             //I("EXO;");
-            //Assert.AreEqual(Program.model.endogenized.Count, 0);
-            //Assert.AreEqual(Program.model.exogenized.Count, 0);
+            //Assert.AreEqual(Program.model.modelGekko.endogenized.Count, 0);
+            //Assert.AreEqual(Program.model.modelGekko.exogenized.Count, 0);
             //I("EXO?;");
             //I("EXO ?;");
             //I("ENDO?;");
             //I("ENDO ?;");
             I("ENDO a, b, c, d;");
             I("EXO x, y, z;");
-            Assert.AreEqual(Program.model.endogenized.Count, 4);
-            Assert.AreEqual(Program.model.exogenized.Count, 3);
+            Assert.AreEqual(Program.model.modelGekko.endogenized.Count, 4);
+            Assert.AreEqual(Program.model.modelGekko.exogenized.Count, 3);
             I("UNFIX;");
-            Assert.AreEqual(Program.model.endogenized.Count, 0);
-            Assert.AreEqual(Program.model.exogenized.Count, 0);
+            Assert.AreEqual(Program.model.modelGekko.endogenized.Count, 0);
+            Assert.AreEqual(Program.model.modelGekko.exogenized.Count, 0);
         }
 
         [TestMethod]

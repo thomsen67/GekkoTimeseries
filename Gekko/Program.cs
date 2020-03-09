@@ -7068,7 +7068,7 @@ namespace Gekko
         {
             //if (modelGams == null) return null;
             int r = -12345;
-            if (model.fromVariableToEquationNumber.TryGetValue(lhsName + Globals.lagIndicator + "0", out r))
+            if (Program.model.modelGekko.fromVariableToEquationNumber.TryGetValue(lhsName + Globals.lagIndicator + "0", out r))
             {
                 //r will get a value
             }
@@ -7078,20 +7078,20 @@ namespace Gekko
             }
 
             int number = r;
-            EquationHelper found = model.equations[number];  //should alway find something
+            EquationHelper found = Program.model.modelGekko.equations[number];  //should alway find something
             return found;
         }
 
         public static void EndogenizeExogenizeStuff(bool isFix)
         {
-            Program.model.m2.endogenous.Clear();
-            foreach (string var in Program.model.endogenousOriginallyInModel.Keys)
+            Program.model.modelGekko.m2.endogenous.Clear();
+            foreach (string var in Program.model.modelGekko.endogenousOriginallyInModel.Keys)
             {
-                Program.model.m2.endogenous.Add(var, "");
+                Program.model.modelGekko.m2.endogenous.Add(var, "");
             }
 
-            Program.model.m2.endoSubstitution.Clear();
-            Program.model.m2.endoSubstitutionBNumbers.Clear();
+            Program.model.modelGekko.m2.endoSubstitution.Clear();
+            Program.model.modelGekko.m2.endoSubstitutionBNumbers.Clear();
 
             if (isFix)  //we skip this for normal SIM, just as if the ENDO/EXO lists were empty even if they are not
             {
@@ -7103,8 +7103,8 @@ namespace Gekko
                 List<string> exogeni = new List<string>();
                 IEnumerator e1 = null;
                 IEnumerator e2 = null;
-                e1 = Program.model.endogenized.GetEnumerator();
-                e2 = Program.model.exogenized.GetEnumerator();
+                e1 = Program.model.modelGekko.endogenized.GetEnumerator();
+                e2 = Program.model.modelGekko.exogenized.GetEnumerator();
                 while (e1.MoveNext())
                 {
                     e2.MoveNext();
@@ -7124,8 +7124,8 @@ namespace Gekko
                 {
                     string s1 = endogeni[i];
                     string s2 = exogeni[i];
-                    //BTypeData ss1 = (BTypeData)Program.model.varsBType[s1 + Globals.lagIndicator + "0"];
-                    BTypeData ss1 = null; Program.model.varsBType.TryGetValue(s1 + Globals.lagIndicator + "0", out ss1);
+                    //BTypeData ss1 = (BTypeData)Program.model.modelGekko.varsBType[s1 + Globals.lagIndicator + "0"];
+                    BTypeData ss1 = null; Program.model.modelGekko.varsBType.TryGetValue(s1 + Globals.lagIndicator + "0", out ss1);
                     if (ss1 == null)
                     {
                         //TODO: general error handling regarding endo/exo
@@ -7135,17 +7135,17 @@ namespace Gekko
                     }
                     int s1BNumber = ss1.bNumber;
                     //int varNumber = ss1.bNumber;
-                    if (Program.model.m2.endogenous.ContainsKey(s1))
+                    if (Program.model.modelGekko.m2.endogenous.ContainsKey(s1))
                     {
                         G.Writeln2("*** ERROR: regarding endogenize: variable " + s1 + " is already endogenous");
                         throw new GekkoException();
                     }
                     else
                     {
-                        Program.model.m2.endogenous.Add(s1, "");
-                        //Program.model.endogenousBNumbers.Add(s1BNumber, "");  DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
-                        //BTypeData ss2 = (BTypeData)Program.model.varsBType[s2 + Globals.lagIndicator + "0"];
-                        BTypeData ss2 = null; Program.model.varsBType.TryGetValue(s2 + Globals.lagIndicator + "0", out ss2);
+                        Program.model.modelGekko.m2.endogenous.Add(s1, "");
+                        //Program.model.modelGekko.endogenousBNumbers.Add(s1BNumber, "");  DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
+                        //BTypeData ss2 = (BTypeData)Program.model.modelGekko.varsBType[s2 + Globals.lagIndicator + "0"];
+                        BTypeData ss2 = null; Program.model.modelGekko.varsBType.TryGetValue(s2 + Globals.lagIndicator + "0", out ss2);
                         if (ss2 == null)
                         {
                             //TODO: general error handling regarding endo/exo
@@ -7155,12 +7155,12 @@ namespace Gekko
                         }
                         int s2BNumber = ss2.bNumber;
 
-                        if (Program.model.m2.endogenous.ContainsKey(s2))
+                        if (Program.model.modelGekko.m2.endogenous.ContainsKey(s2))
                         {
-                            Program.model.m2.endogenous.Remove(s2);
-                            //Program.model.endogenousBNumbers.Remove(s2BNumber);  //DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
-                            Program.model.m2.endoSubstitution.Add(s2, s1);
-                            Program.model.m2.endoSubstitutionBNumbers.Add(s2BNumber, s1BNumber);
+                            Program.model.modelGekko.m2.endogenous.Remove(s2);
+                            //Program.model.modelGekko.endogenousBNumbers.Remove(s2BNumber);  //DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
+                            Program.model.modelGekko.m2.endoSubstitution.Add(s2, s1);
+                            Program.model.modelGekko.m2.endoSubstitutionBNumbers.Add(s2BNumber, s1BNumber);
                         }
                         else
                         {
@@ -7173,47 +7173,47 @@ namespace Gekko
 
             // ---------------------- endogenous with b-number -- end ------------------------
 
-            Program.model.m2.fromEqNumberToBNumber = G.CreateArray(Program.model.m2.endogenous.Count, -12345);  //used in newton
-            Program.model.m2.fromBNumberToEqNumber = G.CreateArray(1000000, -12345);  //slack, fix, used in newton
-            Program.model.m2.sparseInfo = new List<int>[Program.model.m2.endogenous.Count]; //used in newton
-            Program.model.m2.sparseInfoLeftRightSeparated = new List<int>[Program.model.m2.endogenous.Count]; //used for ordering
+            Program.model.modelGekko.m2.fromEqNumberToBNumber = G.CreateArray(Program.model.modelGekko.m2.endogenous.Count, -12345);  //used in newton
+            Program.model.modelGekko.m2.fromBNumberToEqNumber = G.CreateArray(1000000, -12345);  //slack, fix, used in newton
+            Program.model.modelGekko.m2.sparseInfo = new List<int>[Program.model.modelGekko.m2.endogenous.Count]; //used in newton
+            Program.model.modelGekko.m2.sparseInfoLeftRightSeparated = new List<int>[Program.model.modelGekko.m2.endogenous.Count]; //used for ordering
 
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 int varNumber = eh.bNumberLhs;
                 List<int> arl = new List<int>();
                 List<int> arl2 = new List<int>();
-                Program.model.m2.sparseInfo[eh.equationNumber] = arl;
-                Program.model.m2.sparseInfoLeftRightSeparated[eh.equationNumber] = arl2;
+                Program.model.modelGekko.m2.sparseInfo[eh.equationNumber] = arl;
+                Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber] = arl2;
 
                 int x = -12345;
-                if (Program.model.m2.endoSubstitutionBNumbers.TryGetValue(varNumber, out x))
+                if (Program.model.modelGekko.m2.endoSubstitutionBNumbers.TryGetValue(varNumber, out x))
                 {
                     varNumber = x;
                 }
 
-                Program.model.m2.fromEqNumberToBNumber[eh.equationNumber] = varNumber;
-                Program.model.m2.fromBNumberToEqNumber[varNumber] = eh.equationNumber;
+                Program.model.modelGekko.m2.fromEqNumberToBNumber[eh.equationNumber] = varNumber;
+                Program.model.modelGekko.m2.fromBNumberToEqNumber[varNumber] = eh.equationNumber;
 
                 //-------------------------
 
                 List<int> temp = new List<int>();
                 //Hmmm, using Contains() on a List<> could waste time instead of Dictionary, but these lists are probably short anyway
-                if (!Program.model.m2.sparseInfo[eh.equationNumber].Contains(varNumber))
+                if (!Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Contains(varNumber))
                 {
                     //to avoid duplicates
-                    Program.model.m2.sparseInfo[eh.equationNumber].Add(varNumber);
+                    Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Add(varNumber);
                 }
                 foreach (string s in eh.precedentsWithLagIndicator.Keys)
                 {
-                    BTypeData temp3 = (BTypeData)Program.model.varsBType[s];
+                    BTypeData temp3 = (BTypeData)Program.model.modelGekko.varsBType[s];
                     int rhsVarNumber = temp3.bNumber;
-                    if (Program.model.endogenousBNumbersOriginallyInModel.ContainsKey(rhsVarNumber))
+                    if (Program.model.modelGekko.endogenousBNumbersOriginallyInModel.ContainsKey(rhsVarNumber))
                     {
-                        if (!Program.model.m2.sparseInfo[eh.equationNumber].Contains(rhsVarNumber))
+                        if (!Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Contains(rhsVarNumber))
                         {
                             //to avoid duplicates
-                            Program.model.m2.sparseInfo[eh.equationNumber].Add(rhsVarNumber);
+                            Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Add(rhsVarNumber);
                         }
                         //if (!first && !((ArrayList)sparseInfoLeftRightSeparated[eqNumber]).Contains(varNumber1))
                         if (!temp.Contains(rhsVarNumber))
@@ -7223,8 +7223,8 @@ namespace Gekko
                         }
                     }
                 }
-                Program.model.m2.sparseInfoLeftRightSeparated[eh.equationNumber].Add(varNumber);
-                Program.model.m2.sparseInfoLeftRightSeparated[eh.equationNumber].AddRange(temp);
+                Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber].Add(varNumber);
+                Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber].AddRange(temp);
             }
         }
 
@@ -7326,12 +7326,12 @@ namespace Gekko
 
             DateTime t0 = DateTime.Now;
 
-            foreach (string endo in model.m2.endoSubstitution.Keys)
+            foreach (string endo in Program.model.modelGekko.m2.endoSubstitution.Keys)
             {
                 //slack: iterate KeyValuePair<> instead
-                string exo = model.m2.endoSubstitution[endo];
-                int exoBtype = model.varsBType[exo + Globals.lagIndicator + "0"].bNumber;
-                int endoBtype = model.varsBType[endo + Globals.lagIndicator + "0"].bNumber;
+                string exo = Program.model.modelGekko.m2.endoSubstitution[endo];
+                int exoBtype = Program.model.modelGekko.varsBType[exo + Globals.lagIndicator + "0"].bNumber;
+                int endoBtype = Program.model.modelGekko.varsBType[endo + Globals.lagIndicator + "0"].bNumber;
                 ArrayList eqsRhsExo = FindEqsWithVarOnRightHandSide(exo);
                 ArrayList eqsRhsEndo = FindEqsWithVarOnRightHandSide(endo);
                 int eqLhsEndo = FindEqWithVarOnLeftHandSide(endo);
@@ -7340,7 +7340,7 @@ namespace Gekko
                 {
                     //EquationHelper eh = (EquationHelper)equations[eq];
                     //eh.rhs.Add(exoBtype, "");
-                    List<int> al = model.m2.sparseInfoLeftRightSeparated[eq];
+                    List<int> al = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eq];
                     for (int i = 1; i < al.Count; i++)
                     {
                         int number = al[i];
@@ -7351,7 +7351,7 @@ namespace Gekko
 
                 foreach (int eq in eqsRhsEndo)
                 {
-                    List<int> al = model.m2.sparseInfoLeftRightSeparated[eq];
+                    List<int> al = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eq];
                     int toRemoveI = -12345;
                     for (int i = 1; i < al.Count; i++)
                     {
@@ -7363,35 +7363,35 @@ namespace Gekko
                     }
                     al.RemoveAt(toRemoveI);
                 }
-                List<int> al1 = model.m2.sparseInfoLeftRightSeparated[eqLhsEndo];
+                List<int> al1 = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eqLhsEndo];
                 al1[0] = exoBtype;
                 al1.Add(exoBtype);
                 //G.Writeln(exo + " " + endo + " " + eqsRhsEndo.ToString() + " " + eqsRhsExo.ToString() + eqLhsEndo);
             }
 
-            model.m2.sparseInfoSmart = new List<List<int>>();
-            model.m2.sparseInfoSmartCondensed = new List<List<int>>();  //creates an identical copy here
-            for (int i = 0; i < model.varsBType.Count; i++)
+            Program.model.modelGekko.m2.sparseInfoSmart = new List<List<int>>();
+            Program.model.modelGekko.m2.sparseInfoSmartCondensed = new List<List<int>>();  //creates an identical copy here
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
             {
-                model.m2.sparseInfoSmart.Add(null);
-                model.m2.sparseInfoSmartCondensed.Add(null);
+                Program.model.modelGekko.m2.sparseInfoSmart.Add(null);
+                Program.model.modelGekko.m2.sparseInfoSmartCondensed.Add(null);
             }
-            for (int i = 0; i < model.m2.sparseInfoLeftRightSeparated.Length; i++)
+            for (int i = 0; i < Program.model.modelGekko.m2.sparseInfoLeftRightSeparated.Length; i++)
             {
                 bool first = true;
-                List<int> vars = model.m2.sparseInfoLeftRightSeparated[i];
+                List<int> vars = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[i];
                 foreach (int var in vars)
                 {
                     if (first == true)
                     {
                         //first index is left side
-                        model.m2.sparseInfoSmart[vars[0]] = new List<int>();
-                        model.m2.sparseInfoSmartCondensed[vars[0]] = new List<int>();
+                        Program.model.modelGekko.m2.sparseInfoSmart[vars[0]] = new List<int>();
+                        Program.model.modelGekko.m2.sparseInfoSmartCondensed[vars[0]] = new List<int>();
                         first = false;
                         continue;
                     }
-                    model.m2.sparseInfoSmart[vars[0]].Add(var);
-                    model.m2.sparseInfoSmartCondensed[vars[0]].Add(var);
+                    Program.model.modelGekko.m2.sparseInfoSmart[vars[0]].Add(var);
+                    Program.model.modelGekko.m2.sparseInfoSmartCondensed[vars[0]].Add(var);
                 }
             }
 
@@ -7405,7 +7405,7 @@ namespace Gekko
 
             List<List<int>> rowsIndexes = new List<List<int>>();
             List<List<int>> columnsIndexes = new List<List<int>>();
-            for (int i = 0; i < model.m2.endogenous.Count; i++)
+            for (int i = 0; i < Program.model.modelGekko.m2.endogenous.Count; i++)
             {
                 rowsIndexes.Add(new List<int>());
                 columnsIndexes.Add(new List<int>());
@@ -7413,33 +7413,33 @@ namespace Gekko
 
             List<List<int>> rowsIndexes2 = new List<List<int>>();
             List<List<int>> columnsIndexes2 = new List<List<int>>();
-            for (int i = 0; i < model.m2.endogenous.Count; i++)
+            for (int i = 0; i < Program.model.modelGekko.m2.endogenous.Count; i++)
             {
                 rowsIndexes2.Add(new List<int>());
                 columnsIndexes2.Add(new List<int>());
             }
 
             //sparseInfoLeftRightSeparated has lhs at [0], content is b[]-type numbers
-            foreach (List<int> al2 in model.m2.sparseInfoLeftRightSeparated)
+            foreach (List<int> al2 in Program.model.modelGekko.m2.sparseInfoLeftRightSeparated)
             {
                 bool shouldAddOnRightHandSide = false;
                 int lhs2 = al2[0];
 
-                if (model.m2.endoSubstitutionBNumbers.ContainsKey(lhs2))
+                if (Program.model.modelGekko.m2.endoSubstitutionBNumbers.ContainsKey(lhs2))
                 {
                     shouldAddOnRightHandSide = true;
-                    lhs2 = model.m2.endoSubstitutionBNumbers[lhs2];
+                    lhs2 = Program.model.modelGekko.m2.endoSubstitutionBNumbers[lhs2];
                     for (int i = 1; i < al2.Count; i++)
                     {
                         if (al2[i] == lhs2) shouldAddOnRightHandSide = false;
                     }
                 }
 
-                int lhs = model.m2.fromBNumberToEqNumber[lhs2];
+                int lhs = Program.model.modelGekko.m2.fromBNumberToEqNumber[lhs2];
                 for (int i = 1; i < al2.Count; i++)
                 {
                     int rhsi2 = al2[i];
-                    int rhsi = model.m2.fromBNumberToEqNumber[rhsi2];
+                    int rhsi = Program.model.modelGekko.m2.fromBNumberToEqNumber[rhsi2];
                     PutIntoIndidenceMatrix(rowsIndexes, columnsIndexes, rowsIndexes2, columnsIndexes2, lhs, rhsi);
                 }
                 if (shouldAddOnRightHandSide == true)
@@ -7448,22 +7448,22 @@ namespace Gekko
                 }
             }
 
-            model.m2.prologue = new List<int>();
-            model.m2.epilogue = new List<int>();
-            model.m2.simulRecursive = new List<int>();
-            model.m2.simulFeedback = new List<int>();
+            Program.model.modelGekko.m2.prologue = new List<int>();
+            Program.model.modelGekko.m2.epilogue = new List<int>();
+            Program.model.modelGekko.m2.simulRecursive = new List<int>();
+            Program.model.modelGekko.m2.simulFeedback = new List<int>();
 
             List<int> simulRecursive = new List<int>();
             List<int> simulEpi = new List<int>();
 
-            FindRecursive(rowsIndexes, columnsIndexes, model.m2.prologue);
-            FindRecursive(columnsIndexes, rowsIndexes, model.m2.epilogue);  //note: should be reversed, see next statement
-            model.m2.epilogue.Reverse();
+            FindRecursive(rowsIndexes, columnsIndexes, Program.model.modelGekko.m2.prologue);
+            FindRecursive(columnsIndexes, rowsIndexes, Program.model.modelGekko.m2.epilogue);  //note: should be reversed, see next statement
+            Program.model.modelGekko.m2.epilogue.Reverse();
 
             int orderingIterations = 0;
             for (int i6 = 0; i6 < int.MaxValue; i6++)
             {
-                FindDiagonal(rowsIndexes, columnsIndexes, model.m2.simulFeedback);
+                FindDiagonal(rowsIndexes, columnsIndexes, Program.model.modelGekko.m2.simulFeedback);
                 if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer)) FindRecursive(rowsIndexes, columnsIndexes, simulRecursive);
 
                 //this one is good:
@@ -7478,7 +7478,7 @@ namespace Gekko
                     FindColsWithSum1(rowsIndexes, columnsIndexes, simulRecursive);
                 }
 
-                Heuristic(rowsIndexes, columnsIndexes, model.m2.simulFeedback);
+                Heuristic(rowsIndexes, columnsIndexes, Program.model.modelGekko.m2.simulFeedback);
 
                 bool flag = false;
                 for (int i = 0; i < columnsIndexes.Count; i++)
@@ -7495,17 +7495,17 @@ namespace Gekko
 
             if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer))
             {
-                Program.model.m2.simulFeedback.Sort();  //easier comparable to gauss-seidel inner loop
+                Program.model.modelGekko.m2.simulFeedback.Sort();  //easier comparable to gauss-seidel inner loop
             }
 
             //A little bit cheating, since these numbers will always relate to the last .m2 model
-            //But never mind, typically only shown for non-fixed model.
-            Program.model.modelInfo.endo3 = model.m2.prologue.Count + model.m2.simulFeedback.Count + simulRecursive.Count + model.m2.epilogue.Count;
-            Program.model.modelInfo.prologue = model.m2.prologue.Count;
-            Program.model.modelInfo.simultaneous = model.m2.simulFeedback.Count + simulRecursive.Count;
-            Program.model.modelInfo.simultaneousFeedback = model.m2.simulFeedback.Count;
-            Program.model.modelInfo.simultaneousRecursive = simulRecursive.Count;
-            Program.model.modelInfo.epilogue = model.m2.epilogue.Count;
+            //But never mind, typically only shown for non-fixed model
+            Program.model.modelGekko.modelInfo.endo3 = Program.model.modelGekko.m2.prologue.Count + Program.model.modelGekko.m2.simulFeedback.Count + simulRecursive.Count + Program.model.modelGekko.m2.epilogue.Count;
+            Program.model.modelGekko.modelInfo.prologue = Program.model.modelGekko.m2.prologue.Count;
+            Program.model.modelGekko.modelInfo.simultaneous = Program.model.modelGekko.m2.simulFeedback.Count + simulRecursive.Count;
+            Program.model.modelGekko.modelInfo.simultaneousFeedback = Program.model.modelGekko.m2.simulFeedback.Count;
+            Program.model.modelGekko.modelInfo.simultaneousRecursive = simulRecursive.Count;
+            Program.model.modelGekko.modelInfo.epilogue = Program.model.modelGekko.m2.epilogue.Count;
 
             for (int i = 0; i < rowsIndexes2.Count; i++)
             {
@@ -7515,7 +7515,7 @@ namespace Gekko
                 }
             }
 
-            FindRecursive(rowsIndexes2, columnsIndexes2, model.m2.simulRecursive);
+            FindRecursive(rowsIndexes2, columnsIndexes2, Program.model.modelGekko.m2.simulRecursive);
             FindRecursive(columnsIndexes2, rowsIndexes2, simulEpi);  //this one is empty and should be!! Good test also.
 
             if (!(simulEpi.Count == 0))
@@ -7537,29 +7537,29 @@ namespace Gekko
 
             WriteOrderingInfoToFile(rowsIndexes);
 
-            model.m2.fromEqNumberToBNumberRecursiveNEW = new List<int>();
-            foreach (int eq in model.m2.simulRecursive)
+            Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW = new List<int>();
+            foreach (int eq in Program.model.modelGekko.m2.simulRecursive)
             {
-                model.m2.fromEqNumberToBNumberRecursiveNEW.Add(model.m2.fromEqNumberToBNumber[eq]);
+                Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW.Add(Program.model.modelGekko.m2.fromEqNumberToBNumber[eq]);
             }
-            model.m2.fromBNumberToEqNumberRecursiveNEW = G.CreateArray(model.varsBType.Count, -12345);
-            for (int i = 0; i < model.m2.fromEqNumberToBNumberRecursiveNEW.Count; i++)
+            Program.model.modelGekko.m2.fromBNumberToEqNumberRecursiveNEW = G.CreateArray(Program.model.modelGekko.varsBType.Count, -12345);
+            for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW.Count; i++)
             {
-                int j = (int)model.m2.fromEqNumberToBNumberRecursiveNEW[i];
-                model.m2.fromBNumberToEqNumberRecursiveNEW[j] = i;
+                int j = (int)Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW[i];
+                Program.model.modelGekko.m2.fromBNumberToEqNumberRecursiveNEW[j] = i;
             }
-            model.m2.fromEqNumberToBNumberFeedbackNEW = new int[model.m2.simulFeedback.Count];
+            Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW = new int[Program.model.modelGekko.m2.simulFeedback.Count];
             int i1 = -1;
-            foreach (int eq in model.m2.simulFeedback)
+            foreach (int eq in Program.model.modelGekko.m2.simulFeedback)
             {
                 i1++;
-                model.m2.fromEqNumberToBNumberFeedbackNEW[i1] = model.m2.fromEqNumberToBNumber[eq];
+                Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[i1] = Program.model.modelGekko.m2.fromEqNumberToBNumber[eq];
             }
 
             try
             {
                 //TODO: This is a hack, but probably rare with > 1.000.000 b-elements
-                model.m2.fromBNumberToEqNumberFeedbackNEW = G.CreateArray(1000000, -12345);  //slack
+                Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW = G.CreateArray(1000000, -12345);  //slack
             }
             catch (Exception e)
             {
@@ -7567,10 +7567,10 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            for (int i = 0; i < model.m2.fromEqNumberToBNumberFeedbackNEW.Length; i++)
+            for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW.Length; i++)
             {
-                int j = model.m2.fromEqNumberToBNumberFeedbackNEW[i];
-                model.m2.fromBNumberToEqNumberFeedbackNEW[j] = i;
+                int j = Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[i];
+                Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[j] = i;
             }
 
             //at this point in feedb2.frm:
@@ -7604,7 +7604,7 @@ namespace Gekko
             //fe    4
 
             Dictionary<int, string> fromEqNumberToBNumberRecursiveHelper = new Dictionary<int, string>();
-            foreach (int i in model.m2.fromEqNumberToBNumberRecursiveNEW) fromEqNumberToBNumberRecursiveHelper.Add(i, null);
+            foreach (int i in Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW) fromEqNumberToBNumberRecursiveHelper.Add(i, null);
 
             if (Globals.useRfFr)
             {
@@ -7615,10 +7615,10 @@ namespace Gekko
                 //Corresponds to RF part of matrix
                 //never relevant for goals search, since means are feedback type.
                 CaseInsensitiveHashtable checkRecursiveHashtable = new CaseInsensitiveHashtable();
-                foreach (int varRows in model.m2.fromEqNumberToBNumberRecursiveNEW)
+                foreach (int varRows in Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW)
                 {
                     checkRecursiveHashtable.Add(varRows, "1");
-                    List<int> varsRows = model.m2.sparseInfoSmartCondensed[varRows];
+                    List<int> varsRows = Program.model.modelGekko.m2.sparseInfoSmartCondensed[varRows];
                     List<int> toRemove = new List<int>();
                     List<int> toAdd = new List<int>();
                     foreach (int varCols in varsRows)
@@ -7633,9 +7633,9 @@ namespace Gekko
                             }
                             //recursive type: look into which feedback vars have already been
                             //fed into it, and pass them on.
-                            foreach (int var2 in model.m2.sparseInfoSmartCondensed[varCols])
+                            foreach (int var2 in Program.model.modelGekko.m2.sparseInfoSmartCondensed[varCols])
                             {
-                                if (Array.IndexOf(model.m2.fromEqNumberToBNumberFeedbackNEW, var2) != -1)
+                                if (Array.IndexOf(Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW, var2) != -1)
                                 {
                                     if (!toAdd.Contains(var2))
                                     {
@@ -7655,13 +7655,13 @@ namespace Gekko
             if (Globals.stackedPrintTimings) G.Writeln2("transpose start");
             //transposing matrix
             //never relevant for goals search, since means are feedback type.
-            model.m2.sparseInfoSmartCondensedTransposed = new List<List<int>>();
-            for (int i = 0; i < model.m2.sparseInfoSmartCondensed.Count; i++)
+            Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed = new List<List<int>>();
+            for (int i = 0; i < Program.model.modelGekko.m2.sparseInfoSmartCondensed.Count; i++)
             {
-                model.m2.sparseInfoSmartCondensedTransposed.Add(null);
-                if (model.m2.sparseInfoSmartCondensed[i] != null)
+                Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed.Add(null);
+                if (Program.model.modelGekko.m2.sparseInfoSmartCondensed[i] != null)
                 {
-                    model.m2.sparseInfoSmartCondensedTransposed[i] = new List<int>();
+                    Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed[i] = new List<int>();
                 }
             }
             if (Globals.stackedPrintTimings) G.Writeln2("transpose end");
@@ -7672,14 +7672,14 @@ namespace Gekko
 
                 //Corresponds to FR part of matrix
                 //never relevant for goals search, since means are feedback type.
-                for (int i = 0; i < model.varsBType.Count; i++)
+                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
                 {
-                    if (model.m2.sparseInfoSmartCondensed[i] != null)
+                    if (Program.model.modelGekko.m2.sparseInfoSmartCondensed[i] != null)
                     {
-                        List<int> row = model.m2.sparseInfoSmartCondensed[i];
+                        List<int> row = Program.model.modelGekko.m2.sparseInfoSmartCondensed[i];
                         foreach (int j in row)
                         {
-                            if (!(model.m2.sparseInfoSmartCondensedTransposed[j]).Contains(i))
+                            if (!(Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed[j]).Contains(i))
                             {
                                 //((ArrayList)model.m2.sparseInfoSmartCondensedTransposed[j]).Add(i);
 
@@ -7690,7 +7690,7 @@ namespace Gekko
                                     //this is an extra condition, implying that we only get
                                     //RF-type array for all the first n columns
                                     //the transposed version is not identical to non-transposed
-                                    (model.m2.sparseInfoSmartCondensedTransposed[j]).Add(i);
+                                    (Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed[j]).Add(i);
                                 }
                             }
                         }
@@ -7701,33 +7701,33 @@ namespace Gekko
             }
 
             //never relevant for goals search, since means are feedback type.
-            model.m2.sparseInfoSmartTransposed = new List<List<int>>();
-            for (int i = 0; i < model.m2.sparseInfoSmart.Count; i++)
+            Program.model.modelGekko.m2.sparseInfoSmartTransposed = new List<List<int>>();
+            for (int i = 0; i < Program.model.modelGekko.m2.sparseInfoSmart.Count; i++)
             {
-                model.m2.sparseInfoSmartTransposed.Add(null);
-                if (model.m2.sparseInfoSmart[i] != null)
+                Program.model.modelGekko.m2.sparseInfoSmartTransposed.Add(null);
+                if (Program.model.modelGekko.m2.sparseInfoSmart[i] != null)
                 {
-                    model.m2.sparseInfoSmartTransposed[i] = new List<int>();
+                    Program.model.modelGekko.m2.sparseInfoSmartTransposed[i] = new List<int>();
                 }
             }
 
             //never relevant for goals search, since means are feedback type.
-            for (int i = 0; i < model.varsBType.Count; i++)
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
             {
-                if (model.m2.sparseInfoSmart[i] != null)
+                if (Program.model.modelGekko.m2.sparseInfoSmart[i] != null)
                 {
-                    List<int> row = model.m2.sparseInfoSmart[i];
+                    List<int> row = Program.model.modelGekko.m2.sparseInfoSmart[i];
                     foreach (int j in row)
                     {
-                        if (!(model.m2.sparseInfoSmartTransposed[j]).Contains(i))
+                        if (!(Program.model.modelGekko.m2.sparseInfoSmartTransposed[j]).Contains(i))
                         {
                             //if (fromEqNumberToBNumberFeedbackNEW.Contains(i))
-                            if (Array.IndexOf(model.m2.fromEqNumberToBNumberFeedbackNEW, i) != -1)
+                            if (Array.IndexOf(Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW, i) != -1)
                             {
                                 //this is an extra condition, implying that we only get
                                 //FR-type array for all the last n columns
                                 //the transposed version is not identical to non-transposed
-                                (model.m2.sparseInfoSmartTransposed[j]).Add(i);
+                                (Program.model.modelGekko.m2.sparseInfoSmartTransposed[j]).Add(i);
                             }
                         }
                     }
@@ -7747,7 +7747,7 @@ namespace Gekko
         private static int FindEqWithVarOnLeftHandSide(string endo)
         {
             int eqEndo = -12345;
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 if (G.Equal(eh.lhs, endo))
                 {
@@ -7773,10 +7773,10 @@ namespace Gekko
             {
                 res.WriteLine("Number of endogenous  = " + G.IntFormat(rowsIndexes.Count, 7));
                 res.WriteLine("----------------------------------");
-                res.WriteLine("Prologue              = " + G.IntFormat(model.m2.prologue.Count, 7));
-                res.WriteLine("Simultaneous feedback = " + G.IntFormat(model.m2.simulFeedback.Count, 7));
-                res.WriteLine("Simultanous recursive = " + G.IntFormat(model.m2.simulRecursive.Count, 7));
-                res.WriteLine("Epilogue              = " + G.IntFormat(model.m2.epilogue.Count, 7));
+                res.WriteLine("Prologue              = " + G.IntFormat(Program.model.modelGekko.m2.prologue.Count, 7));
+                res.WriteLine("Simultaneous feedback = " + G.IntFormat(Program.model.modelGekko.m2.simulFeedback.Count, 7));
+                res.WriteLine("Simultanous recursive = " + G.IntFormat(Program.model.modelGekko.m2.simulRecursive.Count, 7));
+                res.WriteLine("Epilogue              = " + G.IntFormat(Program.model.modelGekko.m2.epilogue.Count, 7));
                 res.WriteLine();
                 res.Write("The prologue variables can be considered a kind of pre-model of recursive equations feeding into ");
                 res.Write("the simultanous block. The epilogue variables can be considered a kind of recursive after-model, depending ");
@@ -7788,17 +7788,17 @@ namespace Gekko
                 res.Write("long chain of recursive equations depending only upon each other. These properties are used to reduce the ");
                 res.WriteLine("dimensionality of the problem when using the Newton method for goals/means etc.");
                 res.WriteLine("");
-                res.WriteLine("--- Prologue variables (" + model.m2.prologue.Count + ") ---");
-                PrintEquationLeftHandSideNames(model.m2.prologue, res);
+                res.WriteLine("--- Prologue variables (" + Program.model.modelGekko.m2.prologue.Count + ") ---");
+                PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.prologue, res);
                 res.WriteLine();
-                res.WriteLine("--- Simultaneous block #1 of 2: feedback variables (" + model.m2.simulFeedback.Count + ") ---");
-                PrintEquationLeftHandSideNames(model.m2.simulFeedback, res);
+                res.WriteLine("--- Simultaneous block #1 of 2: feedback variables (" + Program.model.modelGekko.m2.simulFeedback.Count + ") ---");
+                PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.simulFeedback, res);
                 res.WriteLine();
-                res.WriteLine("--- Simultaneous block #2 of 2: recursive variables (" + model.m2.simulRecursive.Count + ") ---");
-                PrintEquationLeftHandSideNames(model.m2.simulRecursive, res);
+                res.WriteLine("--- Simultaneous block #2 of 2: recursive variables (" + Program.model.modelGekko.m2.simulRecursive.Count + ") ---");
+                PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.simulRecursive, res);
                 res.WriteLine();
-                res.WriteLine("--- Epilogue variables (" + model.m2.epilogue.Count + ") ---");
-                PrintEquationLeftHandSideNames(model.m2.epilogue, res);
+                res.WriteLine("--- Epilogue variables (" + Program.model.modelGekko.m2.epilogue.Count + ") ---");
+                PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.epilogue, res);
                 res.WriteLine();
                 res.Flush();
             }
@@ -7816,8 +7816,8 @@ namespace Gekko
         {
             foreach (int i in al)
             {
-                int tmp = model.m2.fromEqNumberToBNumber[i];
-                string var = model.varsBTypeInverted[tmp];
+                int tmp = Program.model.modelGekko.m2.fromEqNumberToBNumber[i];
+                string var = Program.model.modelGekko.varsBTypeInverted[tmp];
                 TwoStrings ts = getVariableAndLag(var);
                 string var2 = G.GetUpperLowerCase(ts.s1);
                 res.WriteLine("  " + var2);
@@ -8052,7 +8052,7 @@ namespace Gekko
         private static ArrayList FindEqsWithVarOnRightHandSide(string var1)
         {
             ArrayList eqs = new ArrayList();
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 foreach (string rhsVar in eh.precedentsWithLagIndicator.Keys)
                 {
@@ -8770,9 +8770,9 @@ namespace Gekko
                 if (Program.model != null)
                 {
                     List<string> list = new List<string>();
-                    if (Program.model.dependents.ContainsKey(var))
+                    if (Program.model.modelGekko.dependents.ContainsKey(var))
                     {
-                        Dictionary<string, string> d2 = Program.model.dependents[var].storage;
+                        Dictionary<string, string> d2 = Program.model.modelGekko.dependents[var].storage;
                         if (d2 != null)
                         {
                             foreach (string d3 in d2.Keys)
@@ -9594,7 +9594,7 @@ namespace Gekko
                             sb.Append(G.Blanks(a[i].leftblanks));
                         }
                     }
-                    if (counter > 1 && a[i].type == ETokenType.Word && Program.model.varsAType.ContainsKey(a[i].s))
+                    if (counter > 1 && a[i].type == ETokenType.Word && Program.model.modelGekko.varsAType.ContainsKey(a[i].s))
                     {
                         if (!html)
                         {
@@ -10266,20 +10266,20 @@ namespace Gekko
 
                 if (Program.model != null)
                 {
-                    if (Program.model.exogenized.Count == 0 && Program.model.endogenized.Count == 0)
+                    if (Program.model.modelGekko.exogenized.Count == 0 && Program.model.modelGekko.endogenized.Count == 0)
                     {
                         G.Writeln2("No goals are set, so nothing to unfix");
                     }
                     else
                     {
                         string s = "Unfixed/cleared ";
-                        if (Program.model.exogenized != null)
+                        if (Program.model.modelGekko.exogenized != null)
                         {
-                            s += Program.model.exogenized.Count + " EXO and ";
+                            s += Program.model.modelGekko.exogenized.Count + " EXO and ";
                         }
-                        if (Program.model.endogenized != null)
+                        if (Program.model.modelGekko.endogenized != null)
                         {
-                            s += Program.model.endogenized.Count + " ENDO variables.";
+                            s += Program.model.modelGekko.endogenized.Count + " ENDO variables.";
                         }
                         Endo(null);  //--> better than clearing as above, since hasBeenEndoExoStatementsSinceLastSim flag is set
                         Exo(null);
@@ -10302,17 +10302,17 @@ namespace Gekko
                 G.Writeln2("*** ERROR: It seems no model is defined. See MODEL command.");
                 throw new GekkoException();
             }
-            if (Program.model.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
+            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
             {
                 sb.AppendLine();
                 sb.AppendLine("You may add a signature to the model file by means of");
                 sb.AppendLine("the following line somewhere in the beginning of the model file:");
                 sb.AppendLine();
-                sb.AppendLine("  // Signature: " + Program.model.modelHashTrue);
+                sb.AppendLine("  // Signature: " + Program.model.modelGekko.modelHashTrue);
                 sb.AppendLine();
                 sb.AppendLine("NOTE: You may use '()' instead of '//'.");
             }
-            if (Program.model.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
+            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
             {
                 sb.AppendLine();
                 sb.AppendLine("You may (a) revert the model equations back to their original state,");
@@ -10338,23 +10338,23 @@ namespace Gekko
             Globals.linkContainer.Add(lc.counter, lc);
 
             G.Writeln();
-            string s = Program.model.signatureFoundInFileHeader;
-            if (Program.model.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
+            string s = Program.model.modelGekko.signatureFoundInFileHeader;
+            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
             {
                 s = "[not found]";
                 G.Write("No signature was found in model file");
             }
-            else if (Program.model.signatureStatus == ESignatureStatus.Ok)
+            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.Ok)
             {
                 G.Write("The signature matches the true hash code of the model file");
             }
-            else if (Program.model.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
+            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
             {
                 G.Write("The signature does not match the true hash code of the model file");
             }
             G.Write(" ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Write(")"); G.Writeln();
             G.Writeln("- Signature in model file      : " + s);
-            G.Writeln("- True model file hash code    : " + Program.model.modelHashTrue);
+            G.Writeln("- True model file hash code    : " + Program.model.modelGekko.modelHashTrue);
         }
 
         public static void Unswap(bool print)
@@ -11282,7 +11282,7 @@ namespace Gekko
 
         public static void DecompForFlowChart(string s, GekkoTime year, int maxDepth, double prune, double factor, int depth, Dictionary<string, int> counter, List<GekkoFlowChart.FlowArrow> sw, List<GekkoFlowChart.FlowNode> sw2, Dictionary<string, int> d, string code)
         {
-            if (!Program.model.m2.endogenous.ContainsKey(s))
+            if (!Program.model.modelGekko.m2.endogenous.ContainsKey(s))
             {
                 //do nothing
             }
@@ -11686,8 +11686,8 @@ namespace Gekko
                     if ((temp1 = Math.Abs(lu[i, j])) > big) big = temp1;
                 if (big == 0.0)
                 {
-                    int endoNumber = (int)Program.model.m2.simulFeedback[i];
-                    EquationHelper eh = Program.model.equations[endoNumber];
+                    int endoNumber = (int)Program.model.modelGekko.m2.simulFeedback[i];
+                    EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                     G.Writeln();
                     G.Writeln2("*** ERROR: Trying to invert a singular matrix. This is because the equations are");
                     G.Writeln("           somehow undetermined, for instance because of an equation 'X = X',", Color.Red);
@@ -13055,7 +13055,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                if (decompOptions.expressionOld == null && !Program.model.fromVariableToEquationNumber.ContainsKey(leftSideVariable + Globals.lagIndicator + "0"))
+                if (decompOptions.expressionOld == null && !Program.model.modelGekko.fromVariableToEquationNumber.ContainsKey(leftSideVariable + Globals.lagIndicator + "0"))
                 {
                     G.Writeln2("*** ERROR: DECOMP: variable '" + leftSideVariable + "' does not exist as left-hand side variable in model");
                     throw new GekkoException();
@@ -13069,8 +13069,8 @@ namespace Gekko
                 }
                 else
                 {
-                    int eqNumber = (int)Program.model.fromVariableToEquationNumber[leftSideVariable + Globals.lagIndicator + "0"];
-                    eh = Program.model.equations[eqNumber];
+                    int eqNumber = (int)Program.model.modelGekko.fromVariableToEquationNumber[leftSideVariable + Globals.lagIndicator + "0"];
+                    eh = Program.model.modelGekko.equations[eqNumber];
                     precedents = eh.precedentsWithLagIndicator;
                 }
 
@@ -13704,8 +13704,8 @@ namespace Gekko
             //Gets equation numbers in simultaneous gauss-seidel block
             //Note that this method takes a little time: do not put inside loop!
             List<int> allSimul = new List<int>();
-            allSimul.AddRange(Program.model.m2.simulRecursive);
-            allSimul.AddRange(Program.model.m2.simulFeedback);
+            allSimul.AddRange(Program.model.modelGekko.m2.simulRecursive);
+            allSimul.AddRange(Program.model.modelGekko.m2.simulFeedback);
             allSimul.Sort();
             return allSimul;
         }
@@ -13746,8 +13746,8 @@ namespace Gekko
                 count++;
                 if (count < start) continue;
                 if (count > end) break;
-                int eqNumber = (int)Program.model.fromVariableToEquationNumber[s + Globals.lagIndicator + "0"];
-                EquationHelper eh = Program.model.equations[eqNumber];
+                int eqNumber = (int)Program.model.modelGekko.fromVariableToEquationNumber[s + Globals.lagIndicator + "0"];
+                EquationHelper eh = Program.model.modelGekko.equations[eqNumber];
                 string code = eh.csCodeRhsLongVersion;
                 s2.Append("hs = ");
                 s2.AppendLine(code + ";");
@@ -13824,7 +13824,7 @@ namespace Gekko
 
         public static string HandleModelFiles(string input, ModelCommentsHelper modelCommentsHelper)
         {
-            //As a side-effect, Program.model.varlist is filled with stuff after VARLIST$
+            //As a side-effect, Program.model.modelGekko.varlist is filled with stuff after VARLIST$
             List<string> lines = G.ExtractLinesFromText(input);
             List<string> linesNew = HandleModelFiles(lines, modelCommentsHelper);  //after this, there is no varlist stuff in linesNew
             GetModelHashAndXml(linesNew, modelCommentsHelper); //does some rough removing of comments, empty lines etc.
@@ -13899,17 +13899,17 @@ namespace Gekko
             }
 
             //The statement below makes sure that -- if a cached model is to be used -- the MODEL statement that created the cached model and the current MODEL statement are done under the same frequency
-            sb.AppendLine("SubPeriods: " + O.CurrentSubperiods().ToString());  //for instance: "Frequency: 4". Cf. Program.model.subPeriods
+            sb.AppendLine("SubPeriods: " + O.CurrentSubperiods().ToString());  //for instance: "Frequency: 4". Cf. Program.model.modelGekko.subPeriods
 
             string trueHash = Program.GetMD5Hash(sb.ToString());  //Pretty unlikely that two different .frm files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             G.WritelnGray("HASH: " + trueHash);
 
-            Program.model.modelInfo.info = "[empty]";
-            if (modelCommentsHelper.infoText != null) Program.model.modelInfo.info = modelCommentsHelper.infoText;
+            Program.model.modelGekko.modelInfo.info = "[empty]";
+            if (modelCommentsHelper.infoText != null) Program.model.modelGekko.modelInfo.info = modelCommentsHelper.infoText;
 
-            Program.model.modelInfo.date = "[empty]";
-            if (modelCommentsHelper.dateText != null) Program.model.modelInfo.date = modelCommentsHelper.dateText;
+            Program.model.modelGekko.modelInfo.date = "[empty]";
+            if (modelCommentsHelper.dateText != null) Program.model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
 
             if (modelCommentsHelper.signatureFoundInFileHeader == null)
             {
@@ -14204,7 +14204,7 @@ namespace Gekko
                     string xxxx = bv[1];
                     xxxx = xxxx.Replace(";", "");
                     int xx = int.Parse(xxxx);
-                    string xxx = Program.model.varsBTypeInverted[xx];
+                    string xxx = Program.model.modelGekko.varsBTypeInverted[xx];
                     G.Writeln("b[" + xx + "] = " + xxx);
                     return "";
                 }
@@ -16792,9 +16792,9 @@ namespace Gekko
         private static void DispHelperShowNormalEquation(bool showDetailed, string varnameWithoutFreq)
         {
             List<string> d4 = new List<string>();
-            if (Program.model.dependents.ContainsKey(varnameWithoutFreq))
+            if (Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
             {
-                Dictionary<string, string> d2 = Program.model.dependents[varnameWithoutFreq].storage;
+                Dictionary<string, string> d2 = Program.model.modelGekko.dependents[varnameWithoutFreq].storage;
                 if (d2 != null)
                 {
                     foreach (string d3 in d2.Keys)
@@ -16840,7 +16840,7 @@ namespace Gekko
                         if (s == "£") G.Writeln();
                         else
                         {
-                            if (Program.model.varsAType.ContainsKey(s))
+                            if (Program.model.modelGekko.varsAType.ContainsKey(s))
                             {
                                 //seems the word exists as variable
                                 G.WriteLink(s, "disp:" + s);
@@ -16953,7 +16953,7 @@ namespace Gekko
             }
             else
             {
-                if (Program.model?.equations != null)
+                if (Program.model.modelGekko?.equations != null)
                 {
                     note = "+++ NOTE: There is a normal model loaded, perhaps you should use 'OPTION model type = default;'?";
                 }
@@ -17471,11 +17471,11 @@ namespace Gekko
             {
                 //checks if left-hand var in model. So this ignores exo/endo commands.
                 //so the E and X only describes the model equations as they are
-                if (Program.model.endogenousOriginallyInModel != null && Program.model.endogenousOriginallyInModel.ContainsKey(var))
+                if (Program.model.modelGekko.endogenousOriginallyInModel != null && Program.model.modelGekko.endogenousOriginallyInModel.ContainsKey(var))
                 {
                     type = EEndoOrExo.Endo;
                 }
-                else if (Program.model.varsAType != null && Program.model.varsAType.ContainsKey(var))
+                else if (Program.model.modelGekko.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var))
                 {
                     type = EEndoOrExo.Exo;
                 }
@@ -18656,23 +18656,23 @@ namespace Gekko
 
             if (vars2 == null)
             {
-                Program.model.endogenized.Clear();
+                Program.model.modelGekko.endogenized.Clear();
                 return;
             }
 
             //TODO: check that manipulated vars exist in model -- no: model may be re-read etc.
 
             List<string> vars = vars2;
-            //if (vars.Count == 0) Program.model.endogenized.Clear();  //not accumulating anymore
-            Program.model.endogenized.Clear();
+            //if (vars.Count == 0) Program.model.modelGekko.endogenized.Clear();  //not accumulating anymore
+            Program.model.modelGekko.endogenized.Clear();
             foreach (string var in vars)
             {
-                if (Program.model.endogenized.ContainsKey(var))
+                if (Program.model.modelGekko.endogenized.ContainsKey(var))
                 {
                     G.Writeln2("*** ERROR: " + var + " is already endogenized");
                     throw new GekkoException();
                 }
-                else Program.model.endogenized.Add(var, "");
+                else Program.model.modelGekko.endogenized.Add(var, "");
 
             }
             G.Writeln2("Endogenized " + vars.Count + " variables");
@@ -18682,24 +18682,24 @@ namespace Gekko
         public static void PrintEndoExoLists()
         {
             G.Writeln();
-            if (Program.model == null || Program.model.endogenized == null || Program.model.endogenized.Count == 0) G.Writeln("There are 0 endogenized variables");
+            if (Program.model == null || Program.model.modelGekko.endogenized == null || Program.model.modelGekko.endogenized.Count == 0) G.Writeln("There are 0 endogenized variables");
             else
             {
-                if (Program.model.endogenized.Count == 1) G.Write("There is " + Program.model.endogenized.Count + " endogenized var: ");
-                else G.Write("There are " + Program.model.endogenized.Count + " endogenized vars: ");
+                if (Program.model.modelGekko.endogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.endogenized.Count + " endogenized var: ");
+                else G.Write("There are " + Program.model.modelGekko.endogenized.Count + " endogenized vars: ");
                 List<string> temp1 = new List<string>();
-                foreach (string s in Program.model.endogenized.Keys) temp1.Add(s);
+                foreach (string s in Program.model.modelGekko.endogenized.Keys) temp1.Add(s);
                 temp1.Sort();
                 G.PrintListWithCommas(temp1, false);
             }
             //G.Writeln();
-            if (Program.model == null || Program.model.exogenized == null || Program.model.exogenized.Count == 0) G.Writeln("There are 0 exogenized variables");
+            if (Program.model == null || Program.model.modelGekko.exogenized == null || Program.model.modelGekko.exogenized.Count == 0) G.Writeln("There are 0 exogenized variables");
             else
             {
-                if (Program.model.exogenized.Count == 1) G.Write("There is " + Program.model.exogenized.Count + " exogenized var: ");
-                else G.Write("There are " + Program.model.exogenized.Count + " exogenized vars: ");
+                if (Program.model.modelGekko.exogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.exogenized.Count + " exogenized var: ");
+                else G.Write("There are " + Program.model.modelGekko.exogenized.Count + " exogenized vars: ");
                 List<string> temp1 = new List<string>();
-                foreach (string s in Program.model.exogenized.Keys) temp1.Add(s);
+                foreach (string s in Program.model.modelGekko.exogenized.Keys) temp1.Add(s);
                 temp1.Sort();
                 G.PrintListWithCommas(temp1, false);
             }
@@ -18720,21 +18720,21 @@ namespace Gekko
 
             if (vars2 == null)
             {
-                Program.model.exogenized.Clear();
+                Program.model.modelGekko.exogenized.Clear();
                 return;
             }
 
             List<string> vars = vars2;
-            //if (vars.Count == 0) Program.model.exogenized.Clear();  //not accumulating anymore
-            Program.model.exogenized.Clear();
+            //if (vars.Count == 0) Program.model.modelGekko.exogenized.Clear();  //not accumulating anymore
+            Program.model.modelGekko.exogenized.Clear();
             foreach (string var in vars)
             {
-                if (Program.model.exogenized.ContainsKey(var))
+                if (Program.model.modelGekko.exogenized.ContainsKey(var))
                 {
                     G.Writeln2("*** ERROR: " + var + " is already exogenized");
                     throw new GekkoException();
                 }
-                else Program.model.exogenized.Add(var, "");
+                else Program.model.modelGekko.exogenized.Add(var, "");
             }
             G.Writeln2("Endogenized " + vars.Count + " variables");
             return;
@@ -18995,9 +18995,9 @@ namespace Gekko
         private static void ReadGekkoModel(string fileName, DateTime dt0, string textInputRaw)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
-            Program.model = new Model();
-            Program.model.modelInfo.fileName = fileName;
-            //this also creates Program.model.varlist if there is a varlist
+            Program.model.modelGekko = new ModelGekko();
+            Program.model.modelGekko.modelInfo.fileName = fileName;
+            //this also creates Program.model.modelGekko.varlist if there is a varlist
 
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
@@ -19027,12 +19027,12 @@ namespace Gekko
 
                         //=============================================
                         //FOR SAFETY: see mail from TKD 5/3 2013
-                        Program.model.simulateResults = new double[10];
+                        Program.model.modelGekko.simulateResults = new double[10];
                         //=============================================
 
                         G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                        Program.model.modelInfo.loadedFromMdlFile = true;
-                        Program.model.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+                        Program.model.modelGekko.modelInfo.loadedFromMdlFile = true;
+                        Program.model.modelGekko.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                     }
                     catch (Exception e)
                     {
@@ -19043,24 +19043,24 @@ namespace Gekko
                         else
                         {
                             //do nothing, we then have to parse the file
-                            Program.model.modelInfo.loadedFromMdlFile = false;
+                            Program.model.modelGekko.modelInfo.loadedFromMdlFile = false;
                         }
                     }
                 }
             }
             else
             {
-                Program.model.modelInfo.loadedFromMdlFile = false;
+                Program.model.modelGekko.modelInfo.loadedFromMdlFile = false;
             }
 
-            Program.model.modelInfo.date = modelCommentsHelper.dateText;
-            Program.model.modelInfo.info = modelCommentsHelper.infoText;
-            Program.model.signatureStatus = modelCommentsHelper.signatureStatus;
-            Program.model.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
-            Program.model.modelHashTrue = modelCommentsHelper.modelHashTrue;
+            Program.model.modelGekko.modelInfo.date = modelCommentsHelper.dateText;
+            Program.model.modelGekko.modelInfo.info = modelCommentsHelper.infoText;
+            Program.model.modelGekko.signatureStatus = modelCommentsHelper.signatureStatus;
+            Program.model.modelGekko.signatureFoundInFileHeader = modelCommentsHelper.signatureFoundInFileHeader;
+            Program.model.modelGekko.modelHashTrue = modelCommentsHelper.modelHashTrue;
 
             string parsingSeconds = null;
-            if (Program.model.modelInfo.loadedFromMdlFile)
+            if (Program.model.modelGekko.modelInfo.loadedFromMdlFile)
             {
                 //Needs to load lists into Program.list, and varlist too
                 GuiSetModelName();
@@ -19088,12 +19088,12 @@ namespace Gekko
                     //string outputPath = Globals.localTempFilesLocation;
                     //DeleteFolder(outputPath);
                     //Directory.CreateDirectory(outputPath);
-                    string protobufFileName = Globals.gekkoVersion + "_" + model.modelHashTrue + ".mdl";
+                    string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + ".mdl";
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
                     using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
                     {
                         //Serializer.Serialize(fs, m);
-                        serializer.Serialize(fs, Program.model);
+                        serializer.Serialize(fs, Program.model.modelGekko);
                     }
                     //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
                     G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
@@ -19106,10 +19106,10 @@ namespace Gekko
 
             HandleVarlist(modelCommentsHelper);
 
-            Program.model.modelInfo.timeUsedParsing = parsingSeconds;
-            Program.model.modelInfo.timeUsedTotal = G.Seconds(dt0);
+            Program.model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
+            Program.model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
 
-            Program.model.modelInfo.Print();
+            Program.model.modelGekko.modelInfo.Print();
         }
 
         public static void WalkTokens(TokenList nodes, WalkTokensHelper th)
@@ -20530,11 +20530,11 @@ namespace Gekko
                 {
                     if (s != null && fileNameTemp != null) s = s + " (" + fileNameTemp + ")";  //should always be != null, but for safety...
                 }
-                Program.model.modelInfo.varlistStatus = s;
+                Program.model.modelGekko.modelInfo.varlistStatus = s;
             }
             else
             {
-                Program.model.modelInfo.varlistStatus = "Not found inside .frm file or as 'varlist.dat' file";
+                Program.model.modelGekko.modelInfo.varlistStatus = "Not found inside .frm file or as 'varlist.dat' file";
             }
         }
 
@@ -20551,7 +20551,7 @@ namespace Gekko
             if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exotrue"));
             if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoz"));
 
-            Program.model.modelInfo.modelListHelper = modelListHelper;
+            Program.model.modelGekko.modelInfo.modelListHelper = modelListHelper;
         }
 
         private static void GetListsFromModelListHelper()
@@ -20562,31 +20562,31 @@ namespace Gekko
                 if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + s)) Program.databanks.GetGlobal().RemoveIVariable(Globals.symbolCollection + s);
             }
 
-            if (Program.model.modelInfo.modelListHelper.all != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.all.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.all != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.all.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List());
 
-            if (Program.model.modelInfo.modelListHelper.endo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.endo.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.endo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.endo.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List());
 
-            if (Program.model.modelInfo.modelListHelper.exo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exo.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exo.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List());
 
-            if (Program.model.modelInfo.modelListHelper.exod != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exod.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exod != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exod.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List());
 
-            if (Program.model.modelInfo.modelListHelper.exodjz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exodjz.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exodjz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exodjz.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List());
 
-            if (Program.model.modelInfo.modelListHelper.exoj != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoj.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exoj != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoj.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List());
 
-            if (Program.model.modelInfo.modelListHelper.exotrue != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exotrue.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exotrue != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exotrue.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List());
 
-            if (Program.model.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoz.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoz.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List());
                         
-            Program.model.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
+            Program.model.modelGekko.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 
         public static string AddExtension(string fileName, string ending)
@@ -21097,7 +21097,7 @@ namespace Gekko
                     if (s.Value.Type() != EVariableType.Series) continue;
                     if (G.GetFreqFromName(s.Key) != Program.options.freq) continue;  //filter out other freqs
                     string s2 = G.Chop_RemoveFreq(s.Key);                    
-                    if (!Program.model.varsAType.ContainsKey(s2))
+                    if (!Program.model.modelGekko.varsAType.ContainsKey(s2))
                     {
                         onlyDatabankNotModel.Add(s2);
                     }
@@ -21381,7 +21381,7 @@ namespace Gekko
 
         public static void Sim(O.Sim o)
         {
-            if (Program.model != null && Program.model.subPeriods != -12345 && Program.model.subPeriods != O.CurrentSubperiods())
+            if (Program.model != null && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
             {
                 G.Writeln2("*** ERROR: The model was not compiled/loaded with the current frequency");
                 G.Writeln("    This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
@@ -21465,9 +21465,9 @@ namespace Gekko
                 {
                     int rowYearStart = row;
                     List<IterMemory> iterMemories = null;
-                    if (Program.model.bMemory.ContainsKey(t.ToString()))
+                    if (Program.model.modelGekko.bMemory.ContainsKey(t.ToString()))
                     {
-                        iterMemories = Program.model.bMemory[t.ToString()];
+                        iterMemories = Program.model.modelGekko.bMemory[t.ToString()];
                     }
                     else
                     {
@@ -21509,7 +21509,7 @@ namespace Gekko
                         row++;
                         double bOld = bBefore[i];
                         double b = bAfter[i];
-                        double bVariance = model.bVariance[i];
+                        double bVariance = Program.model.modelGekko.bVariance[i];
 
                         tab.Set(new Coord(row, 1), "", it + 1, CellType.Number, "f6.0");
                         tab.Set(new Coord(row, 2), "", bOld, CellType.Number, "f13.4");
@@ -21557,30 +21557,30 @@ namespace Gekko
 
         private static void JacobiNull()
         {
-            Program.model.jacobiMatrix = null;
-            Program.model.jacobiMatrixDense = null;
-            //Program.model.jacobiMatrixInverted = null;  //we actually prefer to reuse this -- costly to new[] it for each fast step (it is often > 10.000 doubles)
-            Program.model.jacobiMatrixInvertedIndex = null;
+            Program.model.modelGekko.jacobiMatrix = null;
+            Program.model.modelGekko.jacobiMatrixDense = null;
+            //Program.model.modelGekko.jacobiMatrixInverted = null;  //we actually prefer to reuse this -- costly to new[] it for each fast step (it is often > 10.000 doubles)
+            Program.model.modelGekko.jacobiMatrixInvertedIndex = null;
         }
 
         public static double Lead(double[] b, int i)
         {
-            //int x = Program.model.m2.fromBNumberToEqNumber[i];
+            //int x = Program.model.modelGekko.m2.fromBNumberToEqNumber[i];
             //BTypeData data = null; model.varsBType.TryGetValue("y" + Globals.lagIndicator + "1", out data);
-            //Program.model.m2.from
+            //Program.model.modelGekko.m2.from
             //G.Writeln(x);
 
             double v = double.NaN;
 
             int type = 1;  //0 "exo" or "forward method none", 1 const, 2 growth
 
-            if (Program.model.simulateResults[8] == 0d)
+            if (Program.model.modelGekko.simulateResults[8] == 0d)
             {
                 v = b[i];
             }
-            else if (Program.model.simulateResults[8] == 1d)  //#375204390457
+            else if (Program.model.modelGekko.simulateResults[8] == 1d)  //#375204390457
             {
-                if (Program.model.terminalHelper == null)
+                if (Program.model.modelGekko.terminalHelper == null)
                 {
                     //This will switch off the smart terminal stuff, and perforn NFT
                     //just like in the old days.
@@ -21590,12 +21590,12 @@ namespace Gekko
                 }
                 else
                 {
-                    int distance = (int)Program.model.simulateResults[7];
+                    int distance = (int)Program.model.modelGekko.simulateResults[7];
                     int newI = -12345;
 
-                    if (Program.model.terminalHelper.Count > distance)
+                    if (Program.model.modelGekko.terminalHelper.Count > distance)
                     {
-                        Program.model.terminalHelper[distance].TryGetValue(i, out newI);
+                        Program.model.modelGekko.terminalHelper[distance].TryGetValue(i, out newI);
                     }
 
                     if (newI != -12345)
@@ -21611,7 +21611,7 @@ namespace Gekko
                     }
                 }
             }
-            else if (Program.model.simulateResults[8] == 2d)
+            else if (Program.model.modelGekko.simulateResults[8] == 2d)
             {
                 G.Writeln2("*** ERROR: terminal 'growth' does not work at the moment");
                 throw new GekkoException();
@@ -21638,14 +21638,14 @@ namespace Gekko
 
             HandleTerminalHelper();
 
-            bool hasEndoExo = false; if (Program.model.endogenized.Count != 0 || Program.model.exogenized.Count != 0) hasEndoExo = true;
+            bool hasEndoExo = false; if (Program.model.modelGekko.endogenized.Count != 0 || Program.model.modelGekko.exogenized.Count != 0) hasEndoExo = true;
 
             DateTime startTime = DateTime.Now;
             DateTime dtFt = DateTime.Now;
 
             bool usingFairTaylor = false;
             bool usingNewtonFairTaylor = false;
-            if (model.largestLead > 0)
+            if (Program.model.modelGekko.largestLead > 0)
             {
                 if (G.Equal(Program.options.solve_forward_method, "fair")) usingFairTaylor = true;
                 if (G.Equal(Program.options.solve_forward_method, "nfair")) usingNewtonFairTaylor = true;
@@ -21690,9 +21690,9 @@ namespace Gekko
                 foreach (string var in Globals.checkoff)
                 {
                     //slack: use .TryGetValue()
-                    if (model.varsBType.ContainsKey(var + Globals.lagIndicator + "0"))
+                    if (Program.model.modelGekko.varsBType.ContainsKey(var + Globals.lagIndicator + "0"))
                     {
-                        int bNumber = model.varsBType[var + Globals.lagIndicator + "0"].bNumber;
+                        int bNumber = Program.model.modelGekko.varsBType[var + Globals.lagIndicator + "0"].bNumber;
                         if (!checkoff.ContainsKey(bNumber)) checkoff.Add(bNumber, 0);
                     }
                 }
@@ -21706,21 +21706,21 @@ namespace Gekko
             ECompiledModelType modelType = GetModelTypeFromOptions(so);  //6 types, including Reverted (for EFTER command)
 
             //only used with ANTLR
-            if (Program.model == null || Program.model.equations.Count == 0)
+            if (Program.model == null || Program.model.modelGekko.equations.Count == 0)
             {
                 G.Writeln2("*** ERROR: It seems no model is defined: did you forget a MODEL statement?");
                 throw new GekkoException();
             }
             Globals.mayPrintConvergenceCheckVariableMissing = true;  //so that there is only 1 warning regarding this
-            if (Program.model.endogenized.Count != Program.model.exogenized.Count)
+            if (Program.model.modelGekko.endogenized.Count != Program.model.modelGekko.exogenized.Count)
             {
-                G.Writeln2("*** ERROR: different number of endogenized/exogenized variables (endo = " + Program.model.endogenized.Count + ", exo = " + Program.model.exogenized.Count + ")");
+                G.Writeln2("*** ERROR: different number of endogenized/exogenized variables (endo = " + Program.model.modelGekko.endogenized.Count + ", exo = " + Program.model.modelGekko.exogenized.Count + ")");
                 throw new GekkoException();
             }
 
-            Program.model.jacobiMatrix = null;
-            Program.model.jacobiMatrixInverted = null;
-            Program.model.jacobiMatrixInvertedIndex = null;
+            Program.model.modelGekko.jacobiMatrix = null;
+            Program.model.modelGekko.jacobiMatrixInverted = null;
+            Program.model.modelGekko.jacobiMatrixInvertedIndex = null;
 
             //TODO Cleanup: at some point clean up this, using the RAM cache idea more directly
             //if (Globals.hasBeenEndoExoStatementsSinceLastSim == 1)
@@ -21741,7 +21741,7 @@ namespace Gekko
                 //If sim is called several times for same sim options (e.g. Gauss), model will only be
                 //compiled first time.
                 //It is necessary to do compilation here, because there are some by-products from
-                //this, specifically Program.model.endogenous (the model's endogenous). These are used below
+                //this, specifically Program.model.modelGekko.endogenous (the model's endogenous). These are used below
                 //in endoPointers etc.
 
                 if (modelType != ECompiledModelType.After)
@@ -21773,34 +21773,34 @@ namespace Gekko
 
             if (Program.options.solve_gauss_dump)
             {
-                Program.model.bMemory = null;
+                Program.model.modelGekko.bMemory = null;
                 GC.Collect();
-                Program.model.bMemory = new GekkoDictionary<string, List<IterMemory>>(StringComparer.OrdinalIgnoreCase);
+                Program.model.modelGekko.bMemory = new GekkoDictionary<string, List<IterMemory>>(StringComparer.OrdinalIgnoreCase);
             }
 
-            Program.model.simulateResults = new double[10];  //fix
+            Program.model.modelGekko.simulateResults = new double[10];  //fix
 
             Databank work = Program.databanks.GetFirst();
-            Series[] timeSeriesPointers = new Series[Program.model.varsBType.Count];
-            int[] extraWritebackPointers = new int[Program.model.varsBType.Count]; //will probably become obsolete at some point
-            int[] revertedPointers = new int[Program.model.varsBType.Count];
-            int[] lagPointers = new int[Program.model.varsBType.Count];
-            int[] aNumberPointers = new int[Program.model.varsBType.Count];
-            int[] bNumberPointers = new int[Program.model.varsAType.Count];  //get from an a-number to equivalent b-number (with no lag)
+            Series[] timeSeriesPointers = new Series[Program.model.modelGekko.varsBType.Count];
+            int[] extraWritebackPointers = new int[Program.model.modelGekko.varsBType.Count]; //will probably become obsolete at some point
+            int[] revertedPointers = new int[Program.model.modelGekko.varsBType.Count];
+            int[] lagPointers = new int[Program.model.modelGekko.varsBType.Count];
+            int[] aNumberPointers = new int[Program.model.modelGekko.varsBType.Count];
+            int[] bNumberPointers = new int[Program.model.modelGekko.varsAType.Count];  //get from an a-number to equivalent b-number (with no lag)
             for (int i = 0; i < bNumberPointers.Length; i++)
             {
                 bNumberPointers[i] = -12345;  //init for safety
             }
-            int[] endoNoLagPointers = new int[Program.model.varsBType.Count];
-            int[] endoLeadPointers = new int[Program.model.varsBType.Count];
-            int[] endoPointers = new int[Program.model.varsBType.Count];
-            string[] varNamePointers = new string[Program.model.varsBType.Count];  //has dublets, a var and a lagged var just has the name here
-            int[] isDJZvarPointers = new int[Program.model.varsBType.Count];
+            int[] endoNoLagPointers = new int[Program.model.modelGekko.varsBType.Count];
+            int[] endoLeadPointers = new int[Program.model.modelGekko.varsBType.Count];
+            int[] endoPointers = new int[Program.model.modelGekko.varsBType.Count];
+            string[] varNamePointers = new string[Program.model.modelGekko.varsBType.Count];  //has dublets, a var and a lagged var just has the name here
+            int[] isDJZvarPointers = new int[Program.model.modelGekko.varsBType.Count];
             List<int> isDampedPointers = new List<int>();
-            int[] isDampedPointersArray = new int[Program.model.varsBType.Count];
+            int[] isDampedPointersArray = new int[Program.model.modelGekko.varsBType.Count];
             int i1 = 0;
 
-            foreach (BTypeData value in Program.model.varsBType.Values)
+            foreach (BTypeData value in Program.model.modelGekko.varsBType.Values)
             {
 
                 if (IsDjz(value.variable))
@@ -21819,7 +21819,7 @@ namespace Gekko
                     bNumberPointers[value.aNumber] = value.bNumber;  //used for Fair-Taylor convergence check
                 }
 
-                if (Program.model.m2.endogenous.ContainsKey(value.variable))
+                if (Program.model.modelGekko.m2.endogenous.ContainsKey(value.variable))
                 {
                     if (value.lag == 0)
                     {
@@ -21832,12 +21832,12 @@ namespace Gekko
                     endoPointers[value.bNumber] = 1;
                 }
 
-                if (value.lag == 0 && Program.model.reverted.ContainsKey(value.variable))
+                if (value.lag == 0 && Program.model.modelGekko.reverted.ContainsKey(value.variable))
                 {
                     revertedPointers[value.bNumber] = 1;
                 }
                 //for now, we ignore what the value may be (all damping is with same factor)
-                if (model.dampVariables.ContainsKey(value.variable + Globals.lagIndicator + value.lag))  //with lag indicator
+                if (Program.model.modelGekko.dampVariables.ContainsKey(value.variable + Globals.lagIndicator + value.lag))  //with lag indicator
                 {
                     isDampedPointers.Add(value.bNumber);
                     isDampedPointersArray[value.bNumber] = 1;
@@ -21845,15 +21845,15 @@ namespace Gekko
                 i1++;
             }
 
-            model.b = new double[Program.model.varsBType.Count];
-            model.bVariance = new double[Program.model.varsBType.Count];
-            model.bOld = new double[Program.model.varsBType.Count];  //used in simulation, to store previous iteration
-            for (int i = 0; i < model.varsBType.Count; i++)
+            Program.model.modelGekko.b = new double[Program.model.modelGekko.varsBType.Count];
+            Program.model.modelGekko.bVariance = new double[Program.model.modelGekko.varsBType.Count];
+            Program.model.modelGekko.bOld = new double[Program.model.modelGekko.varsBType.Count];  //used in simulation, to store previous iteration
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
             {
                 //just for safety, so an error would be found quickly if something gets messed up in referencing these arrays
-                model.b[i] = double.NaN;
-                model.bVariance[i] = double.NaN;
-                model.bOld[i] = double.NaN;
+                Program.model.modelGekko.b[i] = double.NaN;
+                Program.model.modelGekko.bVariance[i] = double.NaN;
+                Program.model.modelGekko.bOld[i] = double.NaN;
             }
 
             int number = GekkoTime.Observations(tStart, tEnd);
@@ -21861,19 +21861,19 @@ namespace Gekko
 
             Program.CreateEndoNoLagBNumbers(endoNoLagPointers);
 
-            for (int i = 0; i < Program.model.b.Length; i++)
+            for (int i = 0; i < Program.model.modelGekko.b.Length; i++)
             {
-                Program.model.bVariance[i] = double.NaN;
+                Program.model.modelGekko.bVariance[i] = double.NaN;
             }
 
             Program.CreateBVariance(timeSeriesPointers, tStart.Add(-1));
 
             int largestLag = -2;  //to get some lagged data into a[] array, for use with initializing endo variables etc.
-            if (model.largestLag > 2) largestLag = -model.largestLag;
+            if (Program.model.modelGekko.largestLag > 2) largestLag = -Program.model.modelGekko.largestLag;
 
             GekkoTime tStart0 = tStart.Add(largestLag);
 
-            GekkoTime tEnd_withRE = tEnd.Add(model.largestLead);
+            GekkoTime tEnd_withRE = tEnd.Add(Program.model.modelGekko.largestLead);
 
             int horizon2 = 0;
             if (IsStacked())
@@ -21894,7 +21894,7 @@ namespace Gekko
             int obsSimPeriodIncludingLeadsAtEnd = GekkoTime.Observations(tStart, tEnd_withRE);
             int obsWithLags = GekkoTime.Observations(tStart0, tEnd);
             int obsSimPeriod = GekkoTime.Observations(tStart, tEnd);
-            int vars = Program.model.varsAType.Count; //FIX: plus minus 1??
+            int vars = Program.model.modelGekko.varsAType.Count; //FIX: plus minus 1??
             //GC.Collect();
             double[,] a = new double[vars, obsWithLagsIncludingLeadsAtEnd]; //these zeroes will be overwritten with data or NaN.
             double[] NAN = new double[obsWithLagsIncludingLeadsAtEnd];
@@ -21943,12 +21943,12 @@ namespace Gekko
                 }
                 else throw new GekkoException();
 
-                foreach (int leadVar in model.leadedVariables.Keys)
+                foreach (int leadVar in Program.model.modelGekko.leadedVariables.Keys)
                 {
-                    //if (Program.model.m2.endogenous.ContainsKey(leadVar)) ... go from bnumber to varname #980734323
+                    //if (Program.model.modelGekko.m2.endogenous.ContainsKey(leadVar)) ... go from bnumber to varname #980734323
                     leadedVarsList.Add(leadVar);
                 }
-                G.Writeln("+++ NOTE: There are " + model.leadedVariables.Count + " variable(s) with leads: Fair-Taylor algorithm is used");
+                G.Writeln("+++ NOTE: There are " + Program.model.modelGekko.leadedVariables.Count + " variable(s) with leads: Fair-Taylor algorithm is used");
             }
 
             double[,] oldNftJacobi = null;
@@ -22011,7 +22011,7 @@ namespace Gekko
                         Array.Copy(a, aTemp, a.Length);
                         //int bNumber = bNumberPointers[leadedVarsList[shock.varNumber]];
                         int bNumber = bNumberPointers[shock.varNumber];
-                        nftDelta = Program.model.bVariance[bNumber] / 100d;
+                        nftDelta = Program.model.modelGekko.bVariance[bNumber] / 100d;
                         if (nftDelta == 0d || G.isNumericalError(nftDelta)) nftDelta = 1d;  //could be refined, perhaps looking at the level of the variable
                         aTemp[shock.varNumber, GekkoTime.Observations(tStart, shock.gt) - 1 - largestLag] += nftDelta;
                     }
@@ -22022,7 +22022,7 @@ namespace Gekko
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd.Add(-horizon2)))  //horizon2 is deducted. Is 0 for non-stacked models.
                     {
                         int distanceToEnd = GekkoTime.Observations(t, tEnd) - 1;  //0 if last period, 1 if second-last, and so on
-                        Program.model.simulateResults[7] = distanceToEnd;
+                        Program.model.modelGekko.simulateResults[7] = distanceToEnd;
 
                         if (Program.options.solve_print_details && Globals.runningOnTTComputer)
                         {
@@ -22080,13 +22080,13 @@ namespace Gekko
                         {
                             if (IsStacked())
                             {
-                                bCheck = new double[Program.model.stackedModel.b.Length];
-                                System.Array.Copy(Program.model.stackedModel.b, bCheck, Program.model.stackedModel.b.Length);
+                                bCheck = new double[Program.model.modelGekko.stackedModel.b.Length];
+                                System.Array.Copy(Program.model.modelGekko.stackedModel.b, bCheck, Program.model.modelGekko.stackedModel.b.Length);
                             }
                             else
                             {
-                                bCheck = new double[Program.model.b.Length];
-                                System.Array.Copy(Program.model.b, bCheck, Program.model.b.Length);
+                                bCheck = new double[Program.model.modelGekko.b.Length];
+                                System.Array.Copy(Program.model.modelGekko.b, bCheck, Program.model.modelGekko.b.Length);
                             }
                         }
 
@@ -22120,7 +22120,7 @@ namespace Gekko
                                     G.Writeln2("*** ERROR: You cannot use option 'forward method = stacked' together with the RES command");
                                     throw new GekkoException();
                                 }
-                                SolveRes(Program.model.b);
+                                SolveRes(Program.model.modelGekko.b);
                             }
                             else if (modelType == ECompiledModelType.Gauss || modelType == ECompiledModelType.GaussFailSafe)
                             {
@@ -22135,7 +22135,7 @@ namespace Gekko
                                     G.Writeln2("*** ERROR: Trying to solve SIM<fix> with Gauss Seidel");
                                     throw new GekkoException();
                                 }
-                                SolveGauss(usingFairTaylor || usingNewtonFairTaylor, Program.model.b, isDampedPointers, isDampedPointersArray, out culprit, modelType, t, checkoff);
+                                SolveGauss(usingFairTaylor || usingNewtonFairTaylor, Program.model.modelGekko.b, isDampedPointers, isDampedPointersArray, out culprit, modelType, t, checkoff);
                             }
                             else if (modelType == ECompiledModelType.Newton)
                             {
@@ -22144,11 +22144,11 @@ namespace Gekko
                                 nah.tStart = tStart;
                                 nah.tEnd = tEnd;
 
-                                Model tempModel = Program.model;
+                                ModelGekko tempModel = Program.model.modelGekko;
 
                                 if (IsStacked())
                                 {
-                                    Program.model = Program.model.stackedModel;
+                                    Program.model.modelGekko = Program.model.modelGekko.stackedModel;
                                     ParserOLD.OrderAndCompileModel(ECompiledModelType.Newton, false, so.isFix);
                                 }
 
@@ -22162,7 +22162,7 @@ namespace Gekko
                                     //TODO: what if exception, in that case we should also revert
                                     //TODO: what if exception, in that case we should also revert
                                     //TODO: what if exception, in that case we should also revert
-                                    Program.model = tempModel;
+                                    Program.model.modelGekko = tempModel;
                                 }
                             }
                             else throw new GekkoException();  //should be one of these
@@ -22186,7 +22186,7 @@ namespace Gekko
                             throw;
                         }
 
-                        int its = (int)Program.model.simulateResults[0];
+                        int its = (int)Program.model.modelGekko.simulateResults[0];
                         iterCounter += its;
                         if (its > iterMax) iterMax = its;
                         if (its < iterMin) iterMin = its;
@@ -22204,7 +22204,7 @@ namespace Gekko
                         simTime += (DateTime.Now - t0).TotalMilliseconds / 1000d;
 
                         bool isGaussConverged = true;
-                        if ((int)Program.model.simulateResults[0] >= Program.options.solve_gauss_itermax) isGaussConverged = false;
+                        if ((int)Program.model.modelGekko.simulateResults[0] >= Program.options.solve_gauss_itermax) isGaussConverged = false;
 
                         DateTime dt11 = DateTime.Now;
 
@@ -22217,19 +22217,19 @@ namespace Gekko
 
                         IterationPrint(ref culprit, tStart, t, modelType, output, isGaussConverged, so);
 
-                        if (Program.model.simulateResults[1] == 12345)
+                        if (Program.model.modelGekko.simulateResults[1] == 12345)
                         {
                             //abort NaN
                             double[,] a2 = FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers);
 
-                            int eqNumber = (int)Program.model.simulateResults[2];
-                            EquationHelper eh = Program.model.equations[eqNumber];
+                            int eqNumber = (int)Program.model.modelGekko.simulateResults[2];
+                            EquationHelper eh = Program.model.modelGekko.equations[eqNumber];
                             G.Writeln();
                             G.Writeln("Numerical problem encountered in equation: " + eh.lhs);
                             G.Writeln("Simulation time period: " + tStart + " " + tEnd);
                             G.Writeln("Period being simulated: " + t);
                             G.Writeln("Gauss damping factor:   " + Program.options.solve_gauss_damp);
-                            G.Writeln("Current iteration:      " + (int)Program.model.simulateResults[0]);
+                            G.Writeln("Current iteration:      " + (int)Program.model.modelGekko.simulateResults[0]);
                             Program.PrintEquationVariables(t, eh);
                             G.Write("*** ERROR: Simulation failed");
                             if (!Program.options.solve_print_iter) IterLink(output, " (", "more", ")");
@@ -22329,7 +22329,7 @@ namespace Gekko
                     //SIM<fix>
                     if (hasEndoExo)
                     {
-                        G.Writeln("+++ NOTE: " + Program.model.endogenized.Count + " ENDO/EXO vars (goals) were enforced with SIM<fix>");
+                        G.Writeln("+++ NOTE: " + Program.model.modelGekko.endogenized.Count + " ENDO/EXO vars (goals) were enforced with SIM<fix>");
                     }
                     else
                     {
@@ -22341,7 +22341,7 @@ namespace Gekko
                     //normal SIM
                     if (hasEndoExo)
                     {
-                        G.Writeln("+++ NOTE: There are " + Program.model.endogenized.Count + " ENDO/EXO vars (goals) set, you may use SIM<fix> to enforce them");
+                        G.Writeln("+++ NOTE: There are " + Program.model.modelGekko.endogenized.Count + " ENDO/EXO vars (goals) set, you may use SIM<fix> to enforce them");
                     }
                     else
                     {
@@ -22418,16 +22418,16 @@ namespace Gekko
             }
 
             Globals.hasBeenEndoExoStatementsSinceLastSim = 0;
-            Program.model.lastSimPer1 = tStart;
-            Program.model.lastSimPer2 = tEnd;
-            Program.model.lastSimStamp = Program.GetDateStamp();
+            Program.model.modelGekko.lastSimPer1 = tStart;
+            Program.model.modelGekko.lastSimPer2 = tEnd;
+            Program.model.modelGekko.lastSimStamp = Program.GetDateStamp();
 
             return;
         }
 
         private static void SetTerminalType(ETerminalCondition terminal)
         {
-            Program.model.simulateResults[8] = 0;
+            Program.model.modelGekko.simulateResults[8] = 0;
             if (G.Equal(Program.options.solve_forward_method, "stacked"))
             {
                 if (!(terminal == ETerminalCondition.Exogenous))
@@ -22435,40 +22435,40 @@ namespace Gekko
                     G.Writeln2("*** ERROR: method 'stacked' only works with terminal = exo at the moment");
                     throw new GekkoException();
                 }
-                Program.model.simulateResults[8] = 0;
+                Program.model.modelGekko.simulateResults[8] = 0;
             }
             if (G.Equal(Program.options.solve_forward_method, "none"))
             {
-                Program.model.simulateResults[8] = 0;
+                Program.model.modelGekko.simulateResults[8] = 0;
             }
             else
             {
-                if (terminal == ETerminalCondition.Exogenous) Program.model.simulateResults[8] = 0;
-                else if (terminal == ETerminalCondition.ConstantLevel) Program.model.simulateResults[8] = 1;
-                else if (terminal == ETerminalCondition.ConstantGrowthRate) Program.model.simulateResults[8] = 2;  //not working
+                if (terminal == ETerminalCondition.Exogenous) Program.model.modelGekko.simulateResults[8] = 0;
+                else if (terminal == ETerminalCondition.ConstantLevel) Program.model.modelGekko.simulateResults[8] = 1;
+                else if (terminal == ETerminalCondition.ConstantGrowthRate) Program.model.modelGekko.simulateResults[8] = 2;  //not working
             }
         }
 
         private static void HandleTerminalHelper()
         {
-            Program.model.terminalHelper = null;  //will stay like this if terminal feed=external or there are no leads
+            Program.model.modelGekko.terminalHelper = null;  //will stay like this if terminal feed=external or there are no leads
             if (G.Equal(Program.options.solve_forward_terminal_feed, "internal"))
             {
-                if (Program.model.largestLead > 0)
+                if (Program.model.modelGekko.largestLead > 0)
                 {
-                    Program.model.terminalHelper = new List<Dictionary<int, int>>();
-                    for (int i = 0; i < Program.model.largestLead; i++)
+                    Program.model.modelGekko.terminalHelper = new List<Dictionary<int, int>>();
+                    for (int i = 0; i < Program.model.modelGekko.largestLead; i++)
                     {
-                        Program.model.terminalHelper.Add(new Dictionary<int, int>());
+                        Program.model.modelGekko.terminalHelper.Add(new Dictionary<int, int>());
                     }
-                    foreach (BTypeData data in Program.model.varsBType.Values)
+                    foreach (BTypeData data in Program.model.modelGekko.varsBType.Values)
                     {
                         if (data.lag <= 0) continue;
-                        for (int i = 0; i < Program.model.largestLead; i++)
+                        for (int i = 0; i < Program.model.modelGekko.largestLead; i++)
                         {
                             if (i >= data.lag) continue;
-                            BTypeData data2 = Program.model.varsBType[data.variable + Globals.lagIndicator + i];
-                            Program.model.terminalHelper[i].Add(data.bNumber, data2.bNumber);
+                            BTypeData data2 = Program.model.modelGekko.varsBType[data.variable + Globals.lagIndicator + i];
+                            Program.model.modelGekko.terminalHelper[i].Add(data.bNumber, data2.bNumber);
                         }
                     }
                 }
@@ -22526,7 +22526,7 @@ namespace Gekko
             {
                 if (terminal != ETerminalCondition.Exogenous)
                 {
-                    for (int t2 = -largestLag + obsSimPeriod; t2 < (-largestLag + obsSimPeriod) + model.largestLead; t2++)
+                    for (int t2 = -largestLag + obsSimPeriod; t2 < (-largestLag + obsSimPeriod) + Program.model.modelGekko.largestLead; t2++)
                     {
                         //NOTE: do not use damping here: terminal values should not be damped!
                         if (terminal == ETerminalCondition.ConstantLevel)
@@ -22546,7 +22546,7 @@ namespace Gekko
 
         private static double[,] GetFtVars(int largestLag, int obsSimPeriod, double[,] a, List<int> leadedVarsList, double[,] ftVars)
         {
-            ftVars = new double[model.leadedVariables.Count, obsSimPeriod];
+            ftVars = new double[Program.model.modelGekko.leadedVariables.Count, obsSimPeriod];
             for (int lv = 0; lv < leadedVarsList.Count; lv++)
             {
                 int t3 = -1;
@@ -22842,12 +22842,12 @@ namespace Gekko
             {
                 if (isGaussConverged && (Program.options.solve_print_details || Program.options.solve_gauss_dump) && (modelType == ECompiledModelType.Gauss || modelType == ECompiledModelType.GaussFailSafe))
                 {
-                    s += "Period " + (t) + " " + Program.model.simulateResults[0] + " iterations   --   last conv.: " + culprit;
+                    s += "Period " + (t) + " " + Program.model.modelGekko.simulateResults[0] + " iterations   --   last conv.: " + culprit;
                     //G.Write(s);
                 }
                 else
                 {
-                    s += "Period " + (t) + " " + Program.model.simulateResults[0] + " iterations";
+                    s += "Period " + (t) + " " + Program.model.modelGekko.simulateResults[0] + " iterations";
                     //G.Write(s);
                 }
                 if (G.Equal(so.method, "gauss"))
@@ -22863,7 +22863,7 @@ namespace Gekko
                 }
                 if (G.Equal(so.method, "newton"))
                 {
-                    s += ",   crit = " + string.Format("{0:0.00000E+00}", Program.model.simulateResults[1]);
+                    s += ",   crit = " + string.Format("{0:0.00000E+00}", Program.model.modelGekko.simulateResults[1]);
                 }
             }
             if (Program.options.solve_print_details && G.Equal(so.method, "newton"))
@@ -22884,7 +22884,7 @@ namespace Gekko
         {
             if (IsStacked())
             {
-                Model thisModel = Program.model.stackedModel;
+                ModelGekko thisModel = Program.model.modelGekko.stackedModel;
                 for (int i = 0; i < thisModel.varsBType.Count; i++)
                 {
                     //TODO: fix this in #84750237
@@ -22903,7 +22903,7 @@ namespace Gekko
                         string[] ss2 = ss[1].Split(new string[] { Globals.lagIndicator }, StringSplitOptions.None);
                         int offset = int.Parse(ss2[0]) - 100;
                         //using the old model .varsAType
-                        int aI = Program.model.varsAType[name].aNumber;
+                        int aI = Program.model.modelGekko.varsAType[name].aNumber;
                         int tt = tInt + offset;
                         a[aI, tt] = x2;
                         //Slack: see #98327432498
@@ -22919,17 +22919,17 @@ namespace Gekko
             }
             else
             {
-                for (int i = 0; i < Program.model.varsBType.Count; i++)
+                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
                 {
                     //#84750237
-                    //This would probably be better done by comparing Program.model.b and bCheck, and if different
+                    //This would probably be better done by comparing Program.model.modelGekko.b and bCheck, and if different
                     //put it into a[]. But there are some issues with Infinity and NaN to be sorted out.
                     //For now, probably best to keep it as it is.
                     //Changing it would require investigating x.Equals(y), to see if it is appropriate for Infinity and NaN.
                     if (endoNoLagPointers[i] == 1 || revertedPointers[i] == 1 || extraWritebackPointers[i] == 1)
                     {
-                        a[aNumberPointers[i], tInt] = model.b[i];
-                        if (!hasIssuedSeedWarning && model.b[i] == Globals.missingValueSeedNumber)
+                        a[aNumberPointers[i], tInt] = Program.model.modelGekko.b[i];
+                        if (!hasIssuedSeedWarning && Program.model.modelGekko.b[i] == Globals.missingValueSeedNumber)
                         {
                             //For safety:
                             G.WritelnGray("DEBUGGING: It seems there may be a problem with initializing missing values: 0.123454321: " + varNamePointers[i] + " t: " + tInt + ".");
@@ -22940,10 +22940,10 @@ namespace Gekko
                     {
                         if (Globals.simulationCheckThatAllDataGetsFromBArrayToTimeSeries)
                         {
-                            if (Program.model.b[i] != bCheck[i])  //probably is false if left side is 0 and right side is NaN. Not good.
+                            if (Program.model.modelGekko.b[i] != bCheck[i])  //probably is false if left side is 0 and right side is NaN. Not good.
                             {
                                 //should change according to b[] arrays, but does not get written back.
-                                string var = Program.model.varsBTypeInverted[i];
+                                string var = Program.model.modelGekko.varsBTypeInverted[i];
                                 G.Writeln();
                                 G.Writeln("*** ERROR: While backwriting from SIM command -- please report this error to the Gekko editor");
                                 G.Writeln("*** ERROR: Variable: " + var);
@@ -22962,27 +22962,27 @@ namespace Gekko
             bool ftOrNft = usingFairTaylor || usingNewtonFairTaylor;
             if (IsStacked())
             {
-                Program.model.stackedModel.b = G.CreateArrayDouble(Program.model.stackedModel.varsBType.Count, double.NaN);  //slack: do we need to initialize?
-                foreach (string s in Program.model.stackedModel.varsBType.Keys)  //not too good #980753249852
+                Program.model.modelGekko.stackedModel.b = G.CreateArrayDouble(Program.model.modelGekko.stackedModel.varsBType.Count, double.NaN);  //slack: do we need to initialize?
+                foreach (string s in Program.model.modelGekko.stackedModel.varsBType.Keys)  //not too good #980753249852
                 {
                     string[] ss = s.Split(new string[] {Globals.stackedTimeSeparator}, StringSplitOptions.None);
                     string name = ss[0];
                     string[] ss2 = ss[1].Split(new string[] { Globals.lagIndicator }, StringSplitOptions.None);
                     int offset = int.Parse(ss2[0]) - 100;
-                    int aI = Program.model.varsAType[name].aNumber;
+                    int aI = Program.model.modelGekko.varsAType[name].aNumber;
                     int tt = tInt + offset;
                     double value = a[aI, tt];
-                    int bI = Program.model.stackedModel.varsBType[s].bNumber;
+                    int bI = Program.model.modelGekko.stackedModel.varsBType[s].bNumber;
                     //Slack: aI, tInt and bI could be stored in faster containers
                     //See #98327432498
-                    Program.model.stackedModel.b[bI] = value;
+                    Program.model.modelGekko.stackedModel.b[bI] = value;
                 }
 
             }
             else
             {
 
-                for (int i = 0; i < Program.model.varsBType.Count; i++)
+                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
                 {
 
                     /*
@@ -23021,7 +23021,7 @@ namespace Gekko
                             timeSeriesPointers[i] = tsNew;
                             extraWritebackPointers[i] = 1;  //to make sure it gets written back from b[] to a[,] array
 
-                            //Program.model.b[i] = setValue;
+                            //Program.model.modelGekko.b[i] = setValue;
                             //if it is a J type, and it has become endogenous, a 0 is fine as starting value (better than lagged J)
                         }
                         else
@@ -23097,7 +23097,7 @@ namespace Gekko
                         } //end switch
                     }
 
-                    Program.model.b[i] = val;
+                    Program.model.modelGekko.b[i] = val;
                 } //for each b[i]
             }
             return;
@@ -23259,7 +23259,7 @@ namespace Gekko
 
         private static void FromDatabankToA(GekkoTime tStart0, GekkoTime tEnd, Databank work, int obsWithLags, double[,] a, double[] NAN)
         {
-            foreach (ATypeData atd in Program.model.varsAType.Values)
+            foreach (ATypeData atd in Program.model.modelGekko.varsAType.Values)
             {
                 int length = -12345;
                 string var = atd.varName;
@@ -23312,8 +23312,8 @@ namespace Gekko
             DateTime dt4 = DateTime.Now;
 
             string s = O.ShowDatesAsString(tStart, tEnd);
-            string src = s + "SIM " + Path.GetFileName(Program.model.modelInfo.fileName) + " (hash " + Program.model.modelHashTrue + ")";            //string stamp = Program.GetDateStampCache();
-            foreach (ATypeData atd in Program.model.varsAType.Values)
+            string src = s + "SIM " + Path.GetFileName(Program.model.modelGekko.modelInfo.fileName) + " (hash " + Program.model.modelGekko.modelHashTrue + ")";            //string stamp = Program.GetDateStampCache();
+            foreach (ATypeData atd in Program.model.modelGekko.varsAType.Values)
             {
                 string var = atd.varName;
                 int id = atd.aNumber;
@@ -23357,7 +23357,7 @@ namespace Gekko
 
         private static bool IsDjz(string variable)
         {
-            return Program.model.varsDTypeAutoGenerated.ContainsKey(variable) || Program.model.varsJTypeAutoGenerated.ContainsKey(variable) || Program.model.varsZTypeAutoGenerated.ContainsKey(variable);
+            return Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(variable) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(variable) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(variable);
         }
 
         private static void SimCheckFirstPeriodForMissingStuff(bool usingFairTaylor, GekkoTime tStart, ErrorContainer ec, Series[] timeSeriesPointers, int[] lagPointers, int[] endoNoLagPointers, int[] endoLeadPointers, string[] varNamePointers, int[] isDJZvarPointers)
@@ -23376,7 +23376,7 @@ namespace Gekko
                 List<string> missingVariables = new List<string>();
                 List<string> exoOrLaggedEndoWithNaN = new List<string>();
 
-                for (int i = 0; i < Program.model.varsBType.Count; i++)
+                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
                 {
                     Series ts = timeSeriesPointers[i];
 
@@ -23546,61 +23546,61 @@ namespace Gekko
         private static void SolveRevertedAuto()
         {
             Object[] args2 = new Object[1];
-            args2[0] = Program.model.b;
-            Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
+            args2[0] = Program.model.modelGekko.b;
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
         }
 
         private static void SolveRevertedY()
         {
             Object[] args2 = new Object[1];
-            args2[0] = Program.model.b;
-            Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+            args2[0] = Program.model.modelGekko.b;
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
         }
 
         private static void SolveAfter()
         {
             //Parser.OrderAndCompileModel(ECompiledModelType.After, false);
             Object[] args2 = new Object[1];
-            args2[0] = Program.model.b;
-            Program.model.assemblyAfter.InvokeMember("after", BindingFlags.InvokeMethod, null, null, args2);
-            Program.model.assemblyAfter.InvokeMember("after2", BindingFlags.InvokeMethod, null, null, args2);
+            args2[0] = Program.model.modelGekko.b;
+            Program.model.modelGekko.assemblyAfter.InvokeMember("after", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyAfter.InvokeMember("after2", BindingFlags.InvokeMethod, null, null, args2);
         }
 
         private static void SolveNewton(ECompiledModelType modelType, NewtonAlgorithmHelper nah)
         {
 
             //bit of a hack
-            Program.model.m2.fromEqNumberToBNumber = Program.model.m2.fromEqNumberToBNumberFeedbackNEW;
-            Program.model.m2.fromBNumberToEqNumber = Program.model.m2.fromBNumberToEqNumberFeedbackNEW;
+            Program.model.modelGekko.m2.fromEqNumberToBNumber = Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW;
+            Program.model.modelGekko.m2.fromBNumberToEqNumber = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW;
 
             Object[] args = new Object[1];
-            args[0] = Program.model.b;
-            Program.model.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
+            args[0] = Program.model.modelGekko.b;
+            Program.model.modelGekko.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
 
             if (Globals.gradientSolve)
             {
-                SolveGradientAlgorithmUsingAlglib(Program.model.b, Program.model.m2.assemblyNewton, nah);
+                SolveGradientAlgorithmUsingAlglib(Program.model.modelGekko.b, Program.model.modelGekko.m2.assemblyNewton, nah);
             }
             else
             {
-                Program.SolveNewtonAlgorithm(Program.model.b, Program.model.m2.assemblyNewton, nah);
+                Program.SolveNewtonAlgorithm(Program.model.modelGekko.b, Program.model.modelGekko.m2.assemblyNewton, nah);
             }
 
             args = new Object[1];
-            args[0] = Program.model.b;
-            Program.model.m2.assemblyPrologueEpilogue.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
+            args[0] = Program.model.modelGekko.b;
+            Program.model.modelGekko.m2.assemblyPrologueEpilogue.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
 
             Object[] args2 = new Object[1];
-            args2[0] = Program.model.b;
+            args2[0] = Program.model.modelGekko.b;
             if (Globals.JOrderFix)
             {
-                Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
-                Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);                
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);                
             }
             else
             {
-                Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
-                Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
             }
         }
 
@@ -24604,9 +24604,9 @@ namespace Gekko
         //        }
 
         //        bool endo = false;
-        //        if (Program.model != null && Program.model.m2.endogenous != null)
+        //        if (Program.model != null && Program.model.modelGekko.m2.endogenous != null)
         //        {
-        //            endo = Program.model.m2.endogenous.ContainsKey(ts.name);
+        //            endo = Program.model.modelGekko.m2.endogenous.ContainsKey(ts.name);
         //            if (endo) G.Writeln("+++ NOTE: You are updating a left-hand side variable (" + ts.name + ")");
         //        }
 
@@ -25512,7 +25512,7 @@ namespace Gekko
                 //instance after a OPEN<edit>, etc. This is mode=data and something else.
                 //(Would probably happen very rarely anyhow, since model endogenous and databank variables must match)
                 bool ok = true;
-                foreach (string s in Program.model.endogenousOriginallyInModel.Keys)
+                foreach (string s in Program.model.modelGekko.endogenousOriginallyInModel.Keys)
                 {
                     if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
                     {
@@ -25525,40 +25525,40 @@ namespace Gekko
                 {
 
                     XmlElement modelName = doc.CreateElement("ModelName");
-                    modelName.InnerText = Path.GetFileName(Program.model.modelInfo.fileName);
+                    modelName.InnerText = Path.GetFileName(Program.model.modelGekko.modelInfo.fileName);
                     root.AppendChild(modelName);
 
                     XmlElement modelInfo = doc.CreateElement("ModelInfo");
-                    modelInfo.InnerText = Program.model.modelInfo.info;
+                    modelInfo.InnerText = Program.model.modelGekko.modelInfo.info;
                     root.AppendChild(modelInfo);
 
                     XmlElement modelDate = doc.CreateElement("ModelDate");
-                    modelDate.InnerText = Program.model.modelInfo.date;
+                    modelDate.InnerText = Program.model.modelGekko.modelInfo.date;
                     root.AppendChild(modelDate);
 
                     XmlElement modelSignature = doc.CreateElement("ModelSignature");
-                    modelSignature.InnerText = Program.model.signatureFoundInFileHeader;
+                    modelSignature.InnerText = Program.model.modelGekko.signatureFoundInFileHeader;
                     root.AppendChild(modelSignature);
 
                     XmlElement modelHash = doc.CreateElement("ModelHash");
-                    modelHash.InnerText = Program.model.modelHashTrue;
+                    modelHash.InnerText = Program.model.modelGekko.modelHashTrue;
                     root.AppendChild(modelHash);
 
                     XmlElement modelLastSimPeriod = doc.CreateElement("ModelLastSimPeriod");
-                    if (Program.model.lastSimPer1.IsNull() || Program.model.lastSimPer2.IsNull()) modelLastSimPeriod.InnerText = "";
-                    else modelLastSimPeriod.InnerText = G.FromDateToString(Program.model.lastSimPer1) + "-" + G.FromDateToString(Program.model.lastSimPer2);
+                    if (Program.model.modelGekko.lastSimPer1.IsNull() || Program.model.modelGekko.lastSimPer2.IsNull()) modelLastSimPeriod.InnerText = "";
+                    else modelLastSimPeriod.InnerText = G.FromDateToString(Program.model.modelGekko.lastSimPer1) + "-" + G.FromDateToString(Program.model.modelGekko.lastSimPer2);
                     root.AppendChild(modelLastSimPeriod);
 
                     XmlElement modelLastSimStamp = doc.CreateElement("ModelLastSimStamp");
-                    modelLastSimStamp.InnerText = Program.model.lastSimStamp;
+                    modelLastSimStamp.InnerText = Program.model.modelGekko.lastSimStamp;
                     root.AppendChild(modelLastSimStamp);
 
                     XmlElement modelLargestLag = doc.CreateElement("ModelLargestLag");
-                    modelLargestLag.InnerText = "" + Program.model.largestLag;
+                    modelLargestLag.InnerText = "" + Program.model.modelGekko.largestLag;
                     root.AppendChild(modelLargestLag);
 
                     XmlElement modelLargestLead = doc.CreateElement("ModelLargestLead");
-                    modelLargestLead.InnerText = "" + Program.model.largestLead;
+                    modelLargestLead.InnerText = "" + Program.model.modelGekko.largestLead;
                     root.AppendChild(modelLargestLead);
                 }
             }
@@ -36605,11 +36605,11 @@ namespace Gekko
             return;
         }                
 
-        //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.b[] via RSS(). These are typically the same, but what if not
+        //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.modelGekko.b[] via RSS(). These are typically the same, but what if not
         public static void SolveNewtonAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
         {            
-            double[] bTemp = new double[Program.model.b.Length];
-            Array.Copy(Program.model.b, bTemp, Program.model.b.Length);
+            double[] bTemp = new double[Program.model.modelGekko.b.Length];
+            Array.Copy(Program.model.modelGekko.b, bTemp, Program.model.modelGekko.b.Length);
 
             int iiMax = 2;
 
@@ -36632,21 +36632,21 @@ namespace Gekko
                         G.Writeln("--------------------------------------");
                     }
                     useIntelligent = false;
-                    Array.Copy(bTemp, Program.model.b, Program.model.b.Length);  //resetting
+                    Array.Copy(bTemp, Program.model.modelGekko.b, Program.model.modelGekko.b.Length);  //resetting
                 }
 
                 JacobiNull();  //mostly for safety, to make sure we do not have old stuff from other periods lying around
 
                 double krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2
                 //Ehm, RSS is divided by 2 now!
-                int n = model.m2.fromEqNumberToBNumber.Length;
+                int n = Program.model.modelGekko.m2.fromEqNumberToBNumber.Length;
                 
                 IElementalAccessVector residuals = new DenseVector(n);
                 IElementalAccessVector x0 = new DenseVector(n);
 
-                for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+                for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumber.Length; i++)
                 {
-                    x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
+                    x0.SetValue(i, b[Program.model.modelGekko.m2.fromEqNumberToBNumber[i]]);
                 }
                 RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
 
@@ -36711,8 +36711,8 @@ namespace Gekko
                             if (largest >= 0)
                             {
                                 double contributionLargest = contribution[largest] / sum;
-                                int bnum = model.m2.fromEqNumberToBNumberFeedbackNEW[largest];
-                                string var = model.varsBTypeInverted[bnum];
+                                int bnum = Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[largest];
+                                string var = Program.model.modelGekko.varsBTypeInverted[bnum];
                                 string var2 = "";
                                 int lag = 0;
                                 G.ExtractVariableAndLag(var, out var2, out lag);
@@ -36952,8 +36952,8 @@ namespace Gekko
                 }
             converged:;
                 //converged
-                Program.model.simulateResults[0] = iterations;
-                Program.model.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
+                Program.model.modelGekko.simulateResults[0] = iterations;
+                Program.model.modelGekko.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
                 return;
             metaIt:;
             }  //ii
@@ -36962,10 +36962,10 @@ namespace Gekko
         public static void SolveGradientAlgorithmUsingAlglib(double[] b, Type assembly, NewtonAlgorithmHelper nah)
         {
 
-            double[] bTemp = new double[Program.model.b.Length];
-            Array.Copy(Program.model.b, bTemp, Program.model.b.Length);
+            double[] bTemp = new double[Program.model.modelGekko.b.Length];
+            Array.Copy(Program.model.modelGekko.b, bTemp, Program.model.modelGekko.b.Length);
 
-            int n = model.m2.fromEqNumberToBNumber.Length;
+            int n = Program.model.modelGekko.m2.fromEqNumberToBNumber.Length;
 
             IElementalAccessVector residuals = new DenseVector(n);
             IElementalAccessVector x0 = new DenseVector(n);
@@ -36974,9 +36974,9 @@ namespace Gekko
             
             for (int i = 0; i < n; i++)
             {
-                x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
+                x0.SetValue(i, b[Program.model.modelGekko.m2.fromEqNumberToBNumber[i]]);
                 //Globals.gradientX0[i] = b[model.m2.fromEqNumberToBNumber[i]];
-                xstart[i] = b[model.m2.fromEqNumberToBNumber[i]];
+                xstart[i] = b[Program.model.modelGekko.m2.fromEqNumberToBNumber[i]];
             }
 
             RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)      
@@ -37002,8 +37002,8 @@ namespace Gekko
             }
 
             //converged
-            Program.model.simulateResults[0] = output.iterations;
-            Program.model.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
+            Program.model.modelGekko.simulateResults[0] = output.iterations;
+            Program.model.modelGekko.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
             return;
 
         }
@@ -37130,8 +37130,8 @@ namespace Gekko
             }
 
             //converged
-            //Program.model.simulateResults[0] = iterations;
-            //Program.model.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
+            //Program.model.modelGekko.simulateResults[0] = iterations;
+            //Program.model.modelGekko.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
                        
 
             return output;
@@ -37283,7 +37283,7 @@ namespace Gekko
                 double number = residuals.GetValue(i);
                 if (false && G.isNumericalError(number))
                 {
-                    G.Writeln("NUM ERROR ---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[i]]);
+                    G.Writeln("NUM ERROR ---> " + Program.model.modelGekko.varsBTypeInverted[Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[i]]);
                 }
                 double number2 = number * number;                
                 rssNonScaled += number2;
@@ -37317,11 +37317,11 @@ namespace Gekko
                 {
                     
                     Globals.sw.WriteLine("i = " + maxI + " " + max + " " + rssNonScaled + " " + max / rssNonScaled);
-                    Globals.sw.WriteLine("---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
+                    Globals.sw.WriteLine("---> " + Program.model.modelGekko.varsBTypeInverted[Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
                 }
 
                 //G.Writeln2("i = " + maxI + " " + max + " " + rssNonScaled + " " + max / rssNonScaled);
-                //G.Writeln("---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
+                //G.Writeln("---> " + model.varsBTypeInverted[Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
 
                 Globals.sw.Flush();
             }
@@ -37386,13 +37386,13 @@ namespace Gekko
                             //playing with conv crits don't change too much regarding steps
                             iter.SetParameters(Globals.invertRelativeConvergence * Math.Pow(10, iter2), Globals.invertAbsoluteConvergence, 1e+5, Globals.invertIterations);  //first param is relative convergence, which is OR'ed with absolute convergence (which we keep pretty strict)
 
-                            M.Setup(model.jacobiMatrix);
+                            M.Setup(Program.model.modelGekko.jacobiMatrix);
                             solver.Preconditioner = M;
                             solver.Iteration = iter;
 
                             double[] ans = null;
 
-                            ans = Blas.Default.GetArrayCopy(solver.Solve(model.jacobiMatrix, residuals, dx));
+                            ans = Blas.Default.GetArrayCopy(solver.Solve(Program.model.modelGekko.jacobiMatrix, residuals, dx));
                             if (Program.options.solve_print_details) G.Writeln("Matrix inversion took " + iter.IterationCount + " steps");
 
                             break; //no exception, so we are good to go
@@ -37475,20 +37475,20 @@ namespace Gekko
 
             double[,] lu = null;
             int[] indx;
-            if (Program.model.jacobiMatrixInvertedIndex == null)
+            if (Program.model.modelGekko.jacobiMatrixInvertedIndex == null)
             {
                 //lu = new double[n, n];
-                if (Program.model.jacobiMatrixInverted == null) Program.model.jacobiMatrixInverted = new double[n, n];  //The very first time this method is called, the array will be null
-                Array.Copy(Program.model.jacobiMatrixDense, Program.model.jacobiMatrixInverted, Program.model.jacobiMatrixDense.Length);
-                lu = Program.model.jacobiMatrixInverted;
+                if (Program.model.modelGekko.jacobiMatrixInverted == null) Program.model.modelGekko.jacobiMatrixInverted = new double[n, n];  //The very first time this method is called, the array will be null
+                Array.Copy(Program.model.modelGekko.jacobiMatrixDense, Program.model.modelGekko.jacobiMatrixInverted, Program.model.modelGekko.jacobiMatrixDense.Length);
+                lu = Program.model.modelGekko.jacobiMatrixInverted;
                 indx = new int[n];  //this one is not recycled like jacobiMatrixInverted, to add some security that we are not mistakenly using old stuff from previous periods etc.
                 LUDecompose(ref lu, ref indx);
-                Program.model.jacobiMatrixInvertedIndex = indx;
+                Program.model.modelGekko.jacobiMatrixInvertedIndex = indx;
             }
             else
             {
-                lu = Program.model.jacobiMatrixInverted;
-                indx = Program.model.jacobiMatrixInvertedIndex;
+                lu = Program.model.modelGekko.jacobiMatrixInverted;
+                indx = Program.model.modelGekko.jacobiMatrixInvertedIndex;
             }
 
             double[] b = new double[residuals.Length];
@@ -38390,12 +38390,12 @@ namespace Gekko
 
         public static double[,] PutJacobiIntoArray()
         {
-            double[,] a = new double[model.jacobiMatrix.RowCount, model.jacobiMatrix.ColumnCount];
-            for (int i = 0; i < model.jacobiMatrix.RowCount; i++)
+            double[,] a = new double[Program.model.modelGekko.jacobiMatrix.RowCount, Program.model.modelGekko.jacobiMatrix.ColumnCount];
+            for (int i = 0; i < Program.model.modelGekko.jacobiMatrix.RowCount; i++)
             {
-                for (int j = 0; j < model.jacobiMatrix.ColumnCount; j++)
+                for (int j = 0; j < Program.model.modelGekko.jacobiMatrix.ColumnCount; j++)
                 {
-                    a[i, j] = model.jacobiMatrix.GetValue(i, j);
+                    a[i, j] = Program.model.modelGekko.jacobiMatrix.GetValue(i, j);
                 }
             }
             return a;
@@ -38405,15 +38405,15 @@ namespace Gekko
         {
             int numericalProblem = -12345;
             //This puts vector x (the feedback variables) into the corresponding b[] slots
-            for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+            for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumber.Length; i++)
             {
-                model.b[model.m2.fromEqNumberToBNumber[i]] = x.GetValue(i);
+                Program.model.modelGekko.b[Program.model.modelGekko.m2.fromEqNumberToBNumber[i]] = x.GetValue(i);
             }
             numericalProblem = -12345;
-            model.r = new double[model.m2.fromEqNumberToBNumber.Length];            
+            Program.model.modelGekko.r = new double[Program.model.modelGekko.m2.fromEqNumberToBNumber.Length];            
             //Keep SimulateSimulPrologue() and SimulateResiduals() together
             SimulateSimulPrologue(assembly);
-            SimulateResiduals(model.b, model.r, assembly);
+            SimulateResiduals(Program.model.modelGekko.b, Program.model.modelGekko.r, assembly);
             if (Globals.runningOnTTComputer)
             {
                 //G.Writeln2("values of endogenous ==========> " + model.b[0] + ", " + model.b[2] + ", " + model.b[4], Color.Brown);
@@ -38421,13 +38421,13 @@ namespace Gekko
 
             
 
-            for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
+            for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumber.Length; i++)
             {
-                if (G.isNumericalError(model.r[i]))
+                if (G.isNumericalError(Program.model.modelGekko.r[i]))
                 {
                     numericalProblem = i;
                 }
-                residuals.SetValue(i, model.r[i]);                
+                residuals.SetValue(i, Program.model.modelGekko.r[i]);                
             }            
         }
 
@@ -38438,7 +38438,7 @@ namespace Gekko
                 //preparing to call simulPrologue and simulFeedbackAll
                 Globals.newtonRobustHelper1 = 0;
             }
-            assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { model.b });
+            assembly.InvokeMember("simulPrologue", BindingFlags.InvokeMethod, null, null, new Object[] { Program.model.modelGekko.b });
         }
 
         private static void FixStartingValuesNumericalError(double[] b, int numericalProblem, Type assembly)
@@ -38449,11 +38449,11 @@ namespace Gekko
             //we must try to find a region where all residuals given the endogenous
             //are valid.
             //Label1:;
-            double[] endoValuesStart = new double[model.m2.sparseInfo[numericalProblem].Count];
-            for (int iii = 0; iii < model.m2.sparseInfo[numericalProblem].Count; iii++)
+            double[] endoValuesStart = new double[Program.model.modelGekko.m2.sparseInfo[numericalProblem].Count];
+            for (int iii = 0; iii < Program.model.modelGekko.m2.sparseInfo[numericalProblem].Count; iii++)
             {
                 //Remember starting values for endogenous
-                int endo = model.m2.sparseInfo[numericalProblem][iii];
+                int endo = Program.model.modelGekko.m2.sparseInfo[numericalProblem][iii];
                 if (b[endo] == 0)
                 {
                     //could just as well have been 1d, but we choose 0.001d.
@@ -38481,12 +38481,12 @@ namespace Gekko
                     {
                         ss = -1 / ss;
                     }
-                    for (int iii = 0; iii < model.m2.sparseInfo[numericalProblem].Count; iii++)
+                    for (int iii = 0; iii < Program.model.modelGekko.m2.sparseInfo[numericalProblem].Count; iii++)
                     {
-                        int endo = model.m2.sparseInfo[numericalProblem][iii];
+                        int endo = Program.model.modelGekko.m2.sparseInfo[numericalProblem][iii];
                         b[endo] = endoValuesStart[iii] * ss;
-                        SimulateResidual(b, model.r, numericalProblem, assembly);
-                        if (!G.isNumericalError(model.r[numericalProblem]))
+                        SimulateResidual(b, Program.model.modelGekko.r, numericalProblem, assembly);
+                        if (!G.isNumericalError(Program.model.modelGekko.r[numericalProblem]))
                         {
                             return;
                         }
@@ -38515,7 +38515,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: 'OPTION solve gauss dump' cannot be set while doing Fair-Taylor (would exhaust memory)");
                     throw new GekkoException();
                 }
-                Program.model.bMemory.Add(t.ToString(), iterMemories);
+                Program.model.modelGekko.bMemory.Add(t.ToString(), iterMemories);
             }
 
             DateTime t0 = DateTime.Now;
@@ -38524,7 +38524,7 @@ namespace Gekko
 
             //This should never happen, since FIX sets Newton algo, and if FIX is not set, Gauss algo
             //is fine even if there are endo/exo
-            //if (Program.model.endogenized.Count != 0 || Program.model.exogenized.Count != 0)
+            //if (Program.model.modelGekko.endogenized.Count != 0 || Program.model.modelGekko.exogenized.Count != 0)
             //{
             //    G.Writeln("+++ ERROR: There are ENDO/EXO variables set. You should clear the goals,");
             //    G.Writeln("           or use the Newton algorithm ('OPTION solve method = newton').", Color.Red);
@@ -38536,19 +38536,19 @@ namespace Gekko
             args[0] = b;
 
             //HACK, fixme, todo, NEVER for RES-type simulation
-            if (model.m2.endogenous.ContainsKey("qJzdk"))
+            if (Program.model.modelGekko.m2.endogenous.ContainsKey("qJzdk"))
             {
                 Globals.convergenceCheckVariables = new string[] { "qJzdk" };  //emma
             }
-            else if (model.m2.endogenous.ContainsKey("ys1"))
+            else if (Program.model.modelGekko.m2.endogenous.ContainsKey("ys1"))
             {
                 Globals.convergenceCheckVariables = new string[] { "ys1" };  //adam
             }
-            else if (model.m2.endogenous.ContainsKey("fcb"))
+            else if (Program.model.modelGekko.m2.endogenous.ContainsKey("fcb"))
             {
                 Globals.convergenceCheckVariables = new string[] { "fcb" };  //adam
             }
-            else if (model.m2.endogenous.ContainsKey("e__wn_mz"))  //saffier model
+            else if (Program.model.modelGekko.m2.endogenous.ContainsKey("e__wn_mz"))  //saffier model
             {
                 Globals.convergenceCheckVariables = new string[] { "e__wn_mz" };
             }
@@ -38557,7 +38557,7 @@ namespace Gekko
             string var = Globals.convergenceCheckVariables[0];
 
             //BTypeData ti = (BTypeData)model.varsBType[var + Globals.lagIndicator + "0"];
-            BTypeData ti = null; model.varsBType.TryGetValue(var + Globals.lagIndicator + "0", out ti);
+            BTypeData ti = null; Program.model.modelGekko.varsBType.TryGetValue(var + Globals.lagIndicator + "0", out ti);
             if (ti == null)
             {
                 if (Globals.mayPrintConvergenceCheckVariableMissing == true)
@@ -38575,18 +38575,18 @@ namespace Gekko
             {
                 if (modelType == ECompiledModelType.GaussFailSafe)
                 {
-                    Program.model.simulateResults[1] = 0;
-                    Program.model.m2.assemblyPrologueEpilogueFailSafe.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.simulateResults[1] = 0;
+                    Program.model.modelGekko.m2.assemblyPrologueEpilogueFailSafe.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
                 }
                 else
                 {
-                    Program.model.simulateResults[1] = 0;
-                    Program.model.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.simulateResults[1] = 0;
+                    Program.model.modelGekko.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
                 }
 
-                if (Program.model.simulateResults[1] == 12345)
+                if (Program.model.modelGekko.simulateResults[1] == 12345)
                 {
-                    Program.model.simulateResults[0] = 0;  //no iteration has been done yet
+                    Program.model.modelGekko.simulateResults[0] = 0;  //no iteration has been done yet
                     return;  //failsafe fast return
                 }
             }
@@ -38599,7 +38599,7 @@ namespace Gekko
             int culprit2 = -12345;
             if (iterCounter < Program.options.solve_gauss_itermax && (Globals.solveUseStrictCrits || varId == -12345))
             {
-                System.Array.Copy(b, model.bOld, b.Length);  //seems quite fast -- and simplifies damping etc.
+                System.Array.Copy(b, Program.model.modelGekko.bOld, b.Length);  //seems quite fast -- and simplifies damping etc.
                 bool probing1Variable = true;  //does not seem to give any significant speedup... hmm
                 if (varId == -12345) probing1Variable = false;  //if the var name is not found
 
@@ -38608,7 +38608,7 @@ namespace Gekko
                     IterMemory iterMemory = null;
 
                     iterCounter++;
-                    Program.model.simulateResults[1] = 0;
+                    Program.model.modelGekko.simulateResults[1] = 0;
 
                     if (Program.options.solve_gauss_dump)
                     {
@@ -38629,7 +38629,7 @@ namespace Gekko
 
                     try
                     {
-                        RunOneGaussIterationWithDamping(isDampedPointers, assembly, args, model.bOld);
+                        RunOneGaussIterationWithDamping(isDampedPointers, assembly, args, Program.model.modelGekko.bOld);
                     }
                     catch
                     {
@@ -38655,9 +38655,9 @@ namespace Gekko
                         }
                     }
 
-                    if (Program.model.simulateResults[1] == 12345)
+                    if (Program.model.modelGekko.simulateResults[1] == 12345)
                     {
-                        Program.model.simulateResults[0] = iterCounter;
+                        Program.model.modelGekko.simulateResults[0] = iterCounter;
                         return;  //failsafe fast return
                     }
 
@@ -38665,7 +38665,7 @@ namespace Gekko
 
                     if (iterCounter < Program.options.solve_gauss_itermin)
                     {
-                        System.Array.Copy(b, model.bOld, b.Length);
+                        System.Array.Copy(b, Program.model.modelGekko.bOld, b.Length);
                         continue;
                     }
 
@@ -38674,7 +38674,7 @@ namespace Gekko
                     if (probing1Variable)
                     {
                         double abs; double rel1; double rel2;
-                        converged = GaussConvergenceOk(false, false, isDampedPointersArray, b[varId], model.bOld[varId], varId, true, convType, out abs, out rel1, out rel2);
+                        converged = GaussConvergenceOk(false, false, isDampedPointersArray, b[varId], Program.model.modelGekko.bOld[varId], varId, true, convType, out abs, out rel1, out rel2);
                         if (converged == false)
                         {
                             culprit2 = varId;
@@ -38683,7 +38683,7 @@ namespace Gekko
                     else
                     {
                         //int ii = 0;
-                        foreach (int j in Program.model.endogenousBNumbersOriginalInModelList)
+                        foreach (int j in Program.model.modelGekko.endogenousBNumbersOriginalInModelList)
                         {
                             //ii++;
                             if (checkoff.ContainsKey(j))
@@ -38693,7 +38693,7 @@ namespace Gekko
                             else
                             {
                                 double abs; double rel1; double rel2;
-                                bool good = GaussConvergenceOk(false, false, isDampedPointersArray, b[j], model.bOld[j], j, false, convType, out abs, out rel1, out rel2);
+                                bool good = GaussConvergenceOk(false, false, isDampedPointersArray, b[j], Program.model.modelGekko.bOld[j], j, false, convType, out abs, out rel1, out rel2);
                                 if (good == false)
                                 {
                                     culprit2 = j;
@@ -38710,8 +38710,8 @@ namespace Gekko
                     {
                         converged = false;
                         probing1Variable = false;
-                        Program.model.simulateResults[2] = culprit2;  //probably irrelevant
-                        Program.model.simulateResults[3] = iterCounter;
+                        Program.model.modelGekko.simulateResults[2] = culprit2;  //probably irrelevant
+                        Program.model.modelGekko.simulateResults[3] = iterCounter;
                         //G.Writeln("shifting");
                         //continue iterating, and now check all variables (may cost 1 superfluous iteration, but never mind)
                     }
@@ -38719,14 +38719,14 @@ namespace Gekko
 
                     if (converged == true)  //done with all simulation: SUCCESS
                     {
-                        Program.model.simulateResults[2] = culprit2;
-                        Program.model.simulateResults[4] = iterCounter;
+                        Program.model.modelGekko.simulateResults[2] = culprit2;
+                        Program.model.modelGekko.simulateResults[4] = iterCounter;
                         break;  //no more iterations
                     }
 
                     //G.Writeln("continuing");
                     //not converged if we get here
-                    System.Array.Copy(b, model.bOld, b.Length);
+                    System.Array.Copy(b, Program.model.modelGekko.bOld, b.Length);
                 }
             }
 
@@ -38764,17 +38764,17 @@ namespace Gekko
                     //TODO: Maybe the failsafe option should just count how many missings are produced
                     //      and report it.
                     //simulateResults[1] = 0;
-                    //Program.model.m2.assemblyCommonFailSafe.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
+                    //Program.model.modelGekko.m2.assemblyCommonFailSafe.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
                 }
                 else
                 {
                     //if failsafe is on, this is run without failsafe -- and may produce some missing values!
-                    Program.model.simulateResults[1] = 0;
-                    Program.model.m2.assemblyPrologueEpilogue.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.simulateResults[1] = 0;
+                    Program.model.modelGekko.m2.assemblyPrologueEpilogue.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
                 }
-                if (Program.model.simulateResults[1] == 12345)
+                if (Program.model.modelGekko.simulateResults[1] == 12345)
                 {
-                    Program.model.simulateResults[0] = iterCounter;
+                    Program.model.modelGekko.simulateResults[0] = iterCounter;
                     return;  //failsafe fast return
                 }
             }
@@ -38783,29 +38783,29 @@ namespace Gekko
             {
                 if (modelType == ECompiledModelType.GaussFailSafe)
                 {
-                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
+                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
                 }
                 else
                 {
-                    Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
+                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
                 }
             }
             else
             {
                 if (modelType == ECompiledModelType.GaussFailSafe)
                 {
-                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
                 }
                 else
                 {
-                    Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
                 }
             }
-            Program.model.simulateResults[0] = iterCounter;
+            Program.model.modelGekko.simulateResults[0] = iterCounter;
         }
 
         private static void RunOneGaussIterationWithDamping(List<int> isDampedPointers, Type assembly, Object[] args, double[] bOld)
@@ -38813,7 +38813,7 @@ namespace Gekko
             double[] b = (double[])args[0];
             //double[] simulateResults = (double[])args[1];
             assembly.InvokeMember("eqs", BindingFlags.InvokeMethod, null, null, args);
-            if (Program.model.simulateResults[1] != 12345)
+            if (Program.model.modelGekko.simulateResults[1] != 12345)
             {
                 //Do not damp if the iteration just failed -- that will just pollute the results.
                 //It is in that case better to keep the results excactly as they were when returning
@@ -38839,7 +38839,7 @@ namespace Gekko
             abs = double.NaN; rel1 = double.NaN; rel2 = double.NaN;
             if (convType == 1)
             {
-                double historicalVariance = Program.model.bVariance[j];
+                double historicalVariance = Program.model.modelGekko.bVariance[j];
                 double absCrit = Program.options.solve_gauss_conv1_abs;
                 double relCrit = Program.options.solve_gauss_conv1_rel;
                 if (isFairTaylor)
@@ -39003,7 +39003,7 @@ namespace Gekko
                 G.Writeln();
                 foreach (string var5 in vars)
                 {
-                    BTypeData temp = (BTypeData)model.varsBType[var5 + Globals.lagIndicator + "0"];
+                    BTypeData temp = (BTypeData)Program.model.modelGekko.varsBType[var5 + Globals.lagIndicator + "0"];
                     int tem2 = temp.bNumber;
                     double num = b[tem2];
                     G.Writeln(iterCounter + "  " + var5 + " = " + num);
@@ -39017,19 +39017,19 @@ namespace Gekko
             Type assembly = null;
             if (modelType == ECompiledModelType.Res)
             {
-                assembly = model.m2.assemblyRes;
+                assembly = Program.model.modelGekko.m2.assemblyRes;
             }
             else if (modelType == ECompiledModelType.Gauss)
             {
-                assembly = model.m2.assemblyGauss;
+                assembly = Program.model.modelGekko.m2.assemblyGauss;
             }
             else if (modelType == ECompiledModelType.GaussFailSafe)
             {
-                assembly = model.m2.assemblyGaussFailSafe;
+                assembly = Program.model.modelGekko.m2.assemblyGaussFailSafe;
             }
             else if (modelType == ECompiledModelType.Newton)
             {
-                assembly = model.m2.assemblyNewton;
+                assembly = Program.model.modelGekko.m2.assemblyNewton;
             }
             //else if (modelType == ECompiledModelType.After)
             //{
@@ -39134,52 +39134,52 @@ namespace Gekko
             bool lu = (Program.options.solve_newton_invert == "lu");
             if (lu)
             {
-                Program.model.jacobiMatrixDense = new double[n, n];
+                Program.model.modelGekko.jacobiMatrixDense = new double[n, n];
             }
             else
             {
-                Program.model.jacobiMatrix = new SparseRowMatrix(n, n, 5);  //seems faster
+                Program.model.modelGekko.jacobiMatrix = new SparseRowMatrix(n, n, 5);  //seems faster
             }
 
             //Keep SimulateSimulPrologue() and SimulateResiduals() together
             SimulateSimulPrologue(assembly);
-            SimulateResiduals(model.b, model.r, assembly);
+            SimulateResiduals(Program.model.modelGekko.b, Program.model.modelGekko.r, assembly);
 
-            double[] bOriginal = new double[model.b.Length];
-            Array.Copy(model.b, bOriginal, model.b.Length);
-            double[] rOriginal = new double[model.r.Length];
-            Array.Copy(model.r, rOriginal, model.r.Length);
+            double[] bOriginal = new double[Program.model.modelGekko.b.Length];
+            Array.Copy(Program.model.modelGekko.b, bOriginal, Program.model.modelGekko.b.Length);
+            double[] rOriginal = new double[Program.model.modelGekko.r.Length];
+            Array.Copy(Program.model.modelGekko.r, rOriginal, Program.model.modelGekko.r.Length);
 
             int counter = -1;
-            foreach (int j in model.m2.fromEqNumberToBNumberFeedbackNEW)
+            foreach (int j in Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW)
             {
                 counter++;
-                int eq_j = model.m2.fromBNumberToEqNumberFeedbackNEW[j];
-                model.b[j] += delta;
+                int eq_j = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[j];
+                Program.model.modelGekko.b[j] += delta;
 
                 //Keep SimulateSimulPrologue() and SimulateResiduals() together
                 SimulateSimulPrologue(assembly);
-                SimulateResiduals(model.b, model.r, assembly);
+                SimulateResiduals(Program.model.modelGekko.b, Program.model.modelGekko.r, assembly);
 
-                foreach (int i in model.m2.fromEqNumberToBNumberFeedbackNEW)
+                foreach (int i in Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW)
                 {
-                    int eq_i = model.m2.fromBNumberToEqNumberFeedbackNEW[i];
-                    double grad = (model.r[eq_i] - rOriginal[eq_i]) / delta;
+                    int eq_i = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[i];
+                    double grad = (Program.model.modelGekko.r[eq_i] - rOriginal[eq_i]) / delta;
                     if (grad != 0d)
                     {
                         if (lu)
                         {
-                            Program.model.jacobiMatrixDense[eq_i, eq_j] = grad;
+                            Program.model.modelGekko.jacobiMatrixDense[eq_i, eq_j] = grad;
                         }
                         else
                         {
-                            Program.model.jacobiMatrix.SetValue(eq_i, eq_j, grad);
+                            Program.model.modelGekko.jacobiMatrix.SetValue(eq_i, eq_j, grad);
                         }
                     }
                 }
 
-                Array.Copy(bOriginal, model.b, model.b.Length);
-                Array.Copy(rOriginal, model.r, model.r.Length);
+                Array.Copy(bOriginal, Program.model.modelGekko.b, Program.model.modelGekko.b.Length);
+                Array.Copy(rOriginal, Program.model.modelGekko.r, Program.model.modelGekko.r.Length);
             }
         }
 
@@ -39249,21 +39249,21 @@ namespace Gekko
                 //frml _i x1 = 0.22*x1 + 0.33*x2 + 1;
                 //frml _i x2 = 0.44*x1 + 0.55*x2 + 1;
 
-                //Program.model.jacobiMatrixDense = new double[3, 3];
-                //Program.model.jacobiMatrixDense[0, 0] = 9;
-                //Program.model.jacobiMatrixDense[0, 1] = -1;
-                //Program.model.jacobiMatrixDense[0, 2] = 2;
-                //Program.model.jacobiMatrixDense[1, 0] = -2;
-                //Program.model.jacobiMatrixDense[1, 1] = 8;
-                //Program.model.jacobiMatrixDense[1, 2] = 4;
-                //Program.model.jacobiMatrixDense[2, 0] = 1;
-                //Program.model.jacobiMatrixDense[2, 1] = 1;
-                //Program.model.jacobiMatrixDense[2, 2] = 8;
+                //Program.model.modelGekko.jacobiMatrixDense = new double[3, 3];
+                //Program.model.modelGekko.jacobiMatrixDense[0, 0] = 9;
+                //Program.model.modelGekko.jacobiMatrixDense[0, 1] = -1;
+                //Program.model.modelGekko.jacobiMatrixDense[0, 2] = 2;
+                //Program.model.modelGekko.jacobiMatrixDense[1, 0] = -2;
+                //Program.model.modelGekko.jacobiMatrixDense[1, 1] = 8;
+                //Program.model.modelGekko.jacobiMatrixDense[1, 2] = 4;
+                //Program.model.modelGekko.jacobiMatrixDense[2, 0] = 1;
+                //Program.model.modelGekko.jacobiMatrixDense[2, 1] = 1;
+                //Program.model.modelGekko.jacobiMatrixDense[2, 2] = 8;
 
 
 
-                int n = Program.model.jacobiMatrixDense.GetLength(0);
-                double[,] ja = Program.model.jacobiMatrixDense;
+                int n = Program.model.modelGekko.jacobiMatrixDense.GetLength(0);
+                double[,] ja = Program.model.modelGekko.jacobiMatrixDense;
 
                 double[,] minusU = new double[n, n];
                 double[,] DL = new double[n, n];
@@ -39282,7 +39282,7 @@ namespace Gekko
                 //alglib.inv.rmatrixinverse(ref DL, n);
                 //double[,] g = MultiplyMatrix(DL, minusU);
 
-                ////Array.Copy(Program.model.jacobiMatrixDense, j, Program.model.jacobiMatrixDense.Length);
+                ////Array.Copy(Program.model.modelGekko.jacobiMatrixDense, j, Program.model.modelGekko.jacobiMatrixDense.Length);
                 //double[] lambda = new double[n];
                 //double[] lambdai = new double[n];
                 //double[,] vl = new double[n, n];
@@ -39318,26 +39318,26 @@ namespace Gekko
         private static void ComputeGradientAndPutIntoFF(double delta, int j, int i, Type assembly, bool lu)
         {
             //int eq = simulFeedbackVarBtypeInverted[i];
-            int eq = model.m2.fromBNumberToEqNumberFeedbackNEW[i];
-            double val0 = model.r[eq];
-            model.b[j] += delta;
-            SimulateResidual(model.b, model.r, eq, assembly);
-            double val1 = model.r[eq];
-            model.b[j] += -delta;
+            int eq = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[i];
+            double val0 = Program.model.modelGekko.r[eq];
+            Program.model.modelGekko.b[j] += delta;
+            SimulateResidual(Program.model.modelGekko.b, Program.model.modelGekko.r, eq, assembly);
+            double val1 = Program.model.modelGekko.r[eq];
+            Program.model.modelGekko.b[j] += -delta;
             double grad = (val1 - val0) / delta;
-            model.r[eq] = val0;
+            Program.model.modelGekko.r[eq] = val0;
             if (grad != 0d)
             {
                 //int ii = simulFeedbackVarBtypeInverted[j];
-                int ii = model.m2.fromBNumberToEqNumberFeedbackNEW[j];
+                int ii = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[j];
                 int jj = eq;
                 if (lu)
                 {
-                    Program.model.jacobiMatrixDense[jj, ii] = grad;
+                    Program.model.modelGekko.jacobiMatrixDense[jj, ii] = grad;
                 }
                 else
                 {
-                    Program.model.jacobiMatrix.SetValue(jj, ii, grad);
+                    Program.model.modelGekko.jacobiMatrix.SetValue(jj, ii, grad);
                 }
             }
         }
@@ -39346,9 +39346,9 @@ namespace Gekko
         {
             bool flagSimulProlo = false;
             //slack: should create array with feedb vars first
-            for (int i3 = 0; i3 < model.m2.simulRecursive.Count; i3++)
+            for (int i3 = 0; i3 < Program.model.modelGekko.m2.simulRecursive.Count; i3++)
             {
-                int simProloEndo = model.m2.sparseInfo[(int)model.m2.simulRecursive[i3]][0];  //could be 0,4,5,7
+                int simProloEndo = Program.model.modelGekko.m2.sparseInfo[(int)Program.model.modelGekko.m2.simulRecursive[i3]][0];  //could be 0,4,5,7
                 if (endo == simProloEndo) flagSimulProlo = true;  //the var is a feedback var
             }
             return flagSimulProlo;
@@ -39362,9 +39362,9 @@ namespace Gekko
         {
             bool flagFeedback = false;
             //slack: should create array with feedb vars first
-            for (int i3 = 0; i3 < model.m2.simulFeedback.Count; i3++)
+            for (int i3 = 0; i3 < Program.model.modelGekko.m2.simulFeedback.Count; i3++)
             {
-                int feedbEndo = model.m2.sparseInfo[(int)model.m2.simulFeedback[i3]][0];  //could be 0,4,5,7
+                int feedbEndo = Program.model.modelGekko.m2.sparseInfo[(int)Program.model.modelGekko.m2.simulFeedback[i3]][0];  //could be 0,4,5,7
                 if (endo == feedbEndo) flagFeedback = true;  //the var is a feedback var
             }
             return flagFeedback;
@@ -41656,12 +41656,12 @@ namespace Gekko
 
         public static void CreateBVariance(Series[] timeSeriesPointers, GekkoTime t0)
         {
-            foreach (int i in Program.model.endogenousBNumbersOriginalInModelList)
+            foreach (int i in Program.model.modelGekko.endogenousBNumbersOriginalInModelList)
             {
                 Series ts = timeSeriesPointers[i];
                 //string variable = varNamePointers[i];
                 double d = CalculateHistoricalVarianceForVariable(ts, t0);
-                Program.model.bVariance[i] = d;
+                Program.model.modelGekko.bVariance[i] = d;
             }
         }
 
@@ -41837,8 +41837,8 @@ namespace Gekko
             {
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //filter other freqs
                 string s = G.Chop_RemoveFreq(ss);
-                if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.model.varsAType.ContainsKey(s))
+                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
+                if (Program.model.modelGekko.varsAType.ContainsKey(s))
                 {
                     bothModelAndDatabank.Add(s);
                 }
@@ -41857,9 +41857,9 @@ namespace Gekko
                 }
             }
 
-            foreach (string s in Program.model.varsAType.Keys)
+            foreach (string s in Program.model.modelGekko.varsAType.Keys)
             {
-                if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
+                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
                 if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
                 {
                 }
@@ -41887,7 +41887,7 @@ namespace Gekko
                 {
                     onlyVarlistNotDatabank.Add(s);
                 }
-                if (Program.model.varsAType.ContainsKey(s))
+                if (Program.model.modelGekko.varsAType.ContainsKey(s))
                 {
                 }
                 else
@@ -42011,8 +42011,8 @@ namespace Gekko
 
             foreach (string s in Program.databanks.GetFirst().storage.Keys)
             {
-                if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.model.varsAType.ContainsKey(s))
+                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
+                if (Program.model.modelGekko.varsAType.ContainsKey(s))
                 {
                     bothModelAndDatabank.Add(s);
                 }
@@ -42022,9 +42022,9 @@ namespace Gekko
                 }
             }
 
-            foreach (string s in Program.model.varsAType.Keys)
+            foreach (string s in Program.model.modelGekko.varsAType.Keys)
             {
-                if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
+                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
                 if (Program.databanks.GetFirst().storage.ContainsKey(s))
                 {
                 }
@@ -42107,7 +42107,7 @@ namespace Gekko
             if (split)
             {
                 List<string> d = new List<string>();
-                foreach (EquationHelper eh in Program.model.equations)
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
                 {
                     string block = eh.modelBlock;
                     if (!d.Contains(block)) d.Add(block);
@@ -42141,7 +42141,7 @@ namespace Gekko
             List<string> after_i_type = new List<string>();
             List<string> after_d_type = new List<string>();
 
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 if (block != null && !G.Equal(block, eh.modelBlock)) continue; //out-filtering those that are not in chosen block
                 string var = eh.lhs;
@@ -43032,14 +43032,14 @@ namespace Gekko
 
         public static void CreateEndoNoLagBNumbers(int[] endoNoLagPointers)
         {
-            Program.model.endogenousBNumbersOriginalInModelList = new List<int>();
-            for (int i = 0; i < Program.model.varsBType.Count; i++)
+            Program.model.modelGekko.endogenousBNumbersOriginalInModelList = new List<int>();
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
             {
                 if (endoNoLagPointers[i] != 1)
                 {
                     continue;
                 }
-                Program.model.endogenousBNumbersOriginalInModelList.Add(i);
+                Program.model.modelGekko.endogenousBNumbersOriginalInModelList.Add(i);
             }
         }
 
@@ -43052,7 +43052,7 @@ namespace Gekko
         public static void PrintEquationVariables(GekkoTime t, string var1)
         {
             bool success = false;
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 if (G.Equal(eh.lhs, var1))
                 {

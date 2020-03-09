@@ -7375,9 +7375,9 @@ namespace Gekko
                     if (kvp.Value.Type() != EVariableType.Series) continue;  //only series
                     if (G.GetFreqFromName(s) != Program.options.freq) continue;
                     string s2 = G.Chop_RemoveFreq(s);
-                    if (!Program.model.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
+                    if (!Program.model.modelGekko.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
                 }
-                foreach (string s in Program.model.varsAType.Keys)
+                foreach (string s in Program.model.modelGekko.varsAType.Keys)
                 {
                     if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a")) onlyModelNotDatabank.Add(s);
                 }

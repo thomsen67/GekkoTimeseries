@@ -72,7 +72,7 @@ namespace Gekko
     public static class ParserOLD
     {       
 
-        public static void CreateASTNodesForModel(CT ast, ASTNode equationNode, int depth, WalkHelper wh, Model model)
+        public static void CreateASTNodesForModel(CT ast, ASTNode equationNode, int depth, WalkHelper wh, ModelGekko model)
         {
             if (ast.Text == "ASTVAL")
             {
@@ -362,9 +362,9 @@ namespace Gekko
             DateTime t0 = DateTime.Now;
             string cacheKey = GetCacheKey(isFix);
 
-            if (Program.model.m2cache.lru.ContainsKey(cacheKey))  //MODEL statement should always issue a real compile, because in that case, Program.model.m2 is newly created
+            if (Program.model.modelGekko.m2cache.lru.ContainsKey(cacheKey))  //MODEL statement should always issue a real compile, because in that case, Program.model.modelGekko.m2 is newly created
             {
-                Program.model.m2 = (Model2)Program.model.m2cache.lru[cacheKey];
+                Program.model.modelGekko.m2 = (Model2)Program.model.modelGekko.m2cache.lru[cacheKey];
                 G.WritelnGray("¤¤¤ Got in cache: "+cacheKey);
             }
             else
@@ -372,7 +372,7 @@ namespace Gekko
                 
                 G.WritelnGray("¤¤¤ Has to do .m2 stuff: "+cacheKey);
                 newM2 = true;
-                Program.model.m2 = new Model2();  //deleting everything here, this is most safe rather than reusing the object
+                Program.model.modelGekko.m2 = new Model2();  //deleting everything here, this is most safe rather than reusing the object
 
                 if (Program.IsStacked())
                 {
@@ -415,7 +415,7 @@ namespace Gekko
 
             if (isCalledFromModelStatement) PrintInfoFilesCreateVarsEtc(isCalledFromModelStatement);  //so the "endogenous" are endogenous in original model without ENDO/EXO.
 
-            if (newM2) Program.model.m2cache.lru.Add(cacheKey, Program.model.m2);
+            if (newM2) Program.model.modelGekko.m2cache.lru.Add(cacheKey, Program.model.modelGekko.m2);
         }
 
         private static void StackedTimeStuff()
@@ -423,7 +423,7 @@ namespace Gekko
             //Remember Globals.stackedTImePeriods...
             //Remember endoexostuff...
 
-            Model modelTemp = new Model();
+            ModelGekko modelTemp = new ModelGekko();
 
             modelTemp.largestLag = 0;
             modelTemp.largestLead = 0;            
@@ -441,7 +441,7 @@ namespace Gekko
             
             for (int i = 0; i < Program.options.solve_forward_stacked_horizon; i++)
             {
-                foreach (EquationHelper eh in Program.model.equations)
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
                 {
                     equationCounter++;
                     modelTemp.endogenousOriginallyInModel.Add(eh.lhs + Globals.stackedTimeSeparator + (100 + i), "");
@@ -453,7 +453,7 @@ namespace Gekko
                     bool first = true;
                     foreach (string s in vars)
                     {
-                        int bNumberOriginal = Program.model.varsBType[s].bNumber;
+                        int bNumberOriginal = Program.model.modelGekko.varsBType[s].bNumber;
 
                         string varName = null;
                         int varLag = 0;
@@ -511,7 +511,7 @@ namespace Gekko
             Dictionary<string, string> endoTemp = new Dictionary<string, string>();
             for (int i = 0; i < Program.options.solve_forward_stacked_horizon; i++)
             {
-                foreach (EquationHelper eh in Program.model.equations)
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
                 {
                     List<int> bNumbers = new List<int>();
                     List<int> bNumbersNew = new List<int>();                                                      
@@ -527,7 +527,7 @@ namespace Gekko
                     modelTemp.endogenousBNumbersOriginallyInModel.Add(ehTemp.bNumberLhs, "");
                     ehTemp.precedentsWithLagIndicator = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                    bNumbersNew.Add(Program.model.varsBType[eh.lhsWithLagIndicator].bNumber);
+                    bNumbersNew.Add(Program.model.modelGekko.varsBType[eh.lhsWithLagIndicator].bNumber);
 
                     foreach (string s in eh.precedentsWithLagIndicator.Keys)
                     {
@@ -536,7 +536,7 @@ namespace Gekko
                         G.ExtractVariableAndLag(s, out varName, out varLag);
                         ehTemp.precedentsWithLagIndicator.Add(varName + Globals.stackedTimeSeparator + (100 + i + varLag) + Globals.lagIndicator + "0", "");                                                
                         bNumbers.Add(modelTemp.varsBType[varName + Globals.stackedTimeSeparator + (100 + i + varLag) + Globals.lagIndicator + "0"].bNumber);
-                        bNumbersNew.Add(Program.model.varsBType[s].bNumber);
+                        bNumbersNew.Add(Program.model.modelGekko.varsBType[s].bNumber);
                     }                    
 
                     string codeLhs = eh.csCodeLhsGauss;
@@ -563,8 +563,8 @@ namespace Gekko
             if (Globals.stackedPrintTimings) G.Writeln2("Folding out eqs again end");
             //Model oldModel = Program.model;
             //Program.model = modelTemp;
-            //Program.model.oldModel = oldModel;  //in order to be able to revert to this old model when done
-            Program.model.stackedModel = modelTemp;
+            //Program.model.modelGekko.oldModel = oldModel;  //in order to be able to revert to this old model when done
+            Program.model.modelGekko.stackedModel = modelTemp;
         }
 
         
@@ -576,9 +576,9 @@ namespace Gekko
             //       like this, we can use the same dll for a model with SIM and any endo/exo goals set -- the 
             //       difference only kick in regarding SIM<fix>            
             List<string> temp1 = new List<string>();
-            if (isFix) foreach (string s in Program.model.endogenized.Keys) temp1.Add(s.ToLower());
+            if (isFix) foreach (string s in Program.model.modelGekko.endogenized.Keys) temp1.Add(s.ToLower());
             List<string> temp2 = new List<string>();
-            if (isFix) foreach (string s in Program.model.exogenized.Keys) temp2.Add(s.ToLower());
+            if (isFix) foreach (string s in Program.model.modelGekko.exogenized.Keys) temp2.Add(s.ToLower());
             temp1.Sort();
             temp2.Sort();
             StringBuilder ss = new StringBuilder("ENDO-EXO-info. Endogenized: ");
@@ -676,7 +676,7 @@ namespace Gekko
             ASTNode equationNode = new ASTNode(null);  //unknown text for now
             wh.print = false;
             //takes 0.1 sec for dec09
-            CreateASTNodesForModel(t, equationNode, 0, wh, Program.model); //creates a List<> of equations, with a tree of EquationNodes for each equation
+            CreateASTNodesForModel(t, equationNode, 0, wh, Program.model.modelGekko); //creates a List<> of equations, with a tree of EquationNodes for each equation
 
             if (wh.print) wh.writer.Close();
 
@@ -687,14 +687,14 @@ namespace Gekko
 
             WalkerHelper2 wh2 = new WalkerHelper2();
             wh2.vals = vals;
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 //call of recursive method
                 wh2.rightHandSideCsCode = new StringBuilder2();  //clearing it for each equation, contains long, short and human versions
                 wh2.leftHandSideCsCodeGauss = new StringBuilder();  //clearing it for each equation
                 wh2.leftHandSideCsCodeJacobi = new StringBuilder();  //clearing it for each equation
                 wh2.leftHandSideHumanReadable = new StringBuilder(); //clearing it for each equation
-                EmitCsCodeForModel(eh, eh.equationsNodeRoot, 0, wh2, Program.model, 0, true); //last arg is lag
+                EmitCsCodeForModel(eh, eh.equationsNodeRoot, 0, wh2, Program.model.modelGekko, 0, true); //last arg is lag
 
                 if (Globals.printAST) AST2(eh.equationsNodeRoot, 0);
 
@@ -713,12 +713,12 @@ namespace Gekko
 
             //move reverted equations, and compact the others (and renumber them).
             List<EquationHelper> equationsNew = new List<EquationHelper>();
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 if (eh.equationType == EEquationType.RevertedY)
                 {
-                    eh.equationNumber = Program.model.equationsReverted.Count;
-                    Program.model.equationsReverted.Add(eh);
+                    eh.equationNumber = Program.model.modelGekko.equationsReverted.Count;
+                    Program.model.modelGekko.equationsReverted.Add(eh);
                 }
                 else
                 {
@@ -726,17 +726,17 @@ namespace Gekko
                     equationsNew.Add(eh);
                 }
             }
-            Program.model.equations = equationsNew;
+            Program.model.modelGekko.equations = equationsNew;
 
             WalkerHelper2 wh3 = new WalkerHelper2();
             wh3.vals = wh2.vals;  //otherwise the will not be available
-            foreach (EquationHelper eh in Program.model.equationsReverted)
+            foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
             {
                 //call of recursive method
                 wh3.rightHandSideCsCode = new StringBuilder2();  //clearing it for each equation
                 wh3.leftHandSideCsCodeGauss = new StringBuilder();  //clearing it for each equation
                 wh3.leftHandSideCsCodeJacobi = new StringBuilder();  //clearing it for each equation
-                EmitCsCodeForModel(eh, eh.equationsNodeRoot, 0, wh3, Program.model, 0, true);  //last arg is lag
+                EmitCsCodeForModel(eh, eh.equationsNodeRoot, 0, wh3, Program.model.modelGekko, 0, true);  //last arg is lag
                 if (Globals.printAST) AST2(eh.equationsNodeRoot, 0);
                 //TODO: could be nice to also have it human readable, by calling PrintVariable...() with humanReadable=true
                 eh.csCodeRhs = wh3.rightHandSideCsCode.shortVersion.ToString();
@@ -754,17 +754,17 @@ namespace Gekko
             int afterVars = 0;
             int after2Vars = 0;
 
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
-                if (Program.model.endogenousOriginallyInModel.ContainsKey(eh.lhs))
+                if (Program.model.modelGekko.endogenousOriginallyInModel.ContainsKey(eh.lhs))
                 {
                     G.Writeln2("*** ERROR: when finding endogenous: it seems variable '" + eh.lhs + "' appears multiple times on left-hand side");
                     throw new GekkoException();
                 }
                 else
                 {
-                    Program.model.endogenousOriginallyInModel.Add(eh.lhs, "");
-                    Program.model.endogenousBNumbersOriginallyInModel.Add(eh.bNumberLhs, "");
+                    Program.model.modelGekko.endogenousOriginallyInModel.Add(eh.lhs, "");
+                    Program.model.modelGekko.endogenousBNumbersOriginallyInModel.Add(eh.bNumberLhs, "");
                 }
                 if ((eh.equationType == EEquationType.RevertedAutoGenerated || eh.equationType == EEquationType.RevertedY)) throw new GekkoException(); //sanity check
                 if (eh.isAfterModel && !eh.isAfter2Model) afterVars++;
@@ -774,7 +774,7 @@ namespace Gekko
 
             int sumVars = nonAfterVars + afterVars + after2Vars;
 
-            if (Program.model.fatalEndogenousError)
+            if (Program.model.modelGekko.fatalEndogenousError)
             {
                 //this error should never happen -- should be caught above when checking endogenous
                 //just to be 100% sure we are not going on with some inconsistency regarding endogenous vars
@@ -782,14 +782,14 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
-                Program.model.fromVariableToEquationNumber.Add(eh.lhsWithLagIndicator, eh.equationNumber);
+                Program.model.modelGekko.fromVariableToEquationNumber.Add(eh.lhsWithLagIndicator, eh.equationNumber);
             }
 
-            foreach (EquationHelper eh in Program.model.equationsReverted)
+            foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
             {
-                if (Program.model.reverted.ContainsKey(eh.lhs))
+                if (Program.model.modelGekko.reverted.ContainsKey(eh.lhs))
                 {
                     G.Writeln2("*** ERROR: The variable '" + eh.lhs + "' seems to appear as a reverted equation several times.");
                     G.Writeln("           This may be because the variable is both auto-generated by means of formula codes,");
@@ -798,7 +798,7 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.model.reverted.Add(eh.lhs, "");
+                    Program.model.modelGekko.reverted.Add(eh.lhs, "");
                 }
 
                 if (!(eh.equationType == EEquationType.RevertedAutoGenerated || eh.equationType == EEquationType.RevertedY)) throw new GekkoException(); //sanity check
@@ -814,20 +814,20 @@ namespace Gekko
             //FIXME not working
             //FIXME not working
             //FIXME not working
-            foreach (EquationHelper eh in Program.model.equations)
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
             {
                 foreach (string p in eh.precedentsWithLagIndicator.Keys)
                 {
                     string p2 = G.ExtractOnlyVariableIgnoreLag(p);
-                    if (Program.model.dependents.ContainsKey(p2))
+                    if (Program.model.modelGekko.dependents.ContainsKey(p2))
                     {
                     }
                     else
                     {
                         DependentsHelper d = new DependentsHelper();
-                        Program.model.dependents.Add(p2, d);
+                        Program.model.modelGekko.dependents.Add(p2, d);
                     }
-                    Dictionary<string, string> yy = Program.model.dependents[p2].storage;
+                    Dictionary<string, string> yy = Program.model.modelGekko.dependents[p2].storage;
                     if (!yy.ContainsKey(eh.lhs))
                     {
                         yy.Add(eh.lhs, "");
@@ -835,19 +835,19 @@ namespace Gekko
                 }
             }
 
-            int xnumberTotal = Program.model.varsAType.Count;
-            int xnumberOfEndo = Program.model.endogenousOriginallyInModel.Count;
-            int xnumberOfDjz = Program.model.varsJTypeAutoGenerated.Count + Program.model.varsDTypeAutoGenerated.Count + Program.model.varsZTypeAutoGenerated.Count;
+            int xnumberTotal = Program.model.modelGekko.varsAType.Count;
+            int xnumberOfEndo = Program.model.modelGekko.endogenousOriginallyInModel.Count;
+            int xnumberOfDjz = Program.model.modelGekko.varsJTypeAutoGenerated.Count + Program.model.modelGekko.varsDTypeAutoGenerated.Count + Program.model.modelGekko.varsZTypeAutoGenerated.Count;
             int xnumberOfExoTrue = xnumberTotal - xnumberOfEndo - xnumberOfDjz;
 
-            Program.model.modelInfo.total = xnumberTotal;
-            Program.model.modelInfo.endo = xnumberOfEndo;
-            Program.model.modelInfo.exoTrue = xnumberOfExoTrue;
-            Program.model.modelInfo.exoDJZ = xnumberOfDjz;
-            Program.model.modelInfo.endo2 = sumVars;
-            Program.model.modelInfo.endoNoAfter = nonAfterVars;
-            Program.model.modelInfo.endoAfter = afterVars;
-            Program.model.modelInfo.endoAfter2 = after2Vars;
+            Program.model.modelGekko.modelInfo.total = xnumberTotal;
+            Program.model.modelGekko.modelInfo.endo = xnumberOfEndo;
+            Program.model.modelGekko.modelInfo.exoTrue = xnumberOfExoTrue;
+            Program.model.modelGekko.modelInfo.exoDJZ = xnumberOfDjz;
+            Program.model.modelGekko.modelInfo.endo2 = sumVars;
+            Program.model.modelGekko.modelInfo.endoNoAfter = nonAfterVars;
+            Program.model.modelGekko.modelInfo.endoAfter = afterVars;
+            Program.model.modelGekko.modelInfo.endoAfter2 = after2Vars;
 
             return;
         }
@@ -1122,7 +1122,7 @@ namespace Gekko
             //------------------- printing of info files etc. -----------------------------------------------
             if (true)
             {
-                ArrayList al = new ArrayList(Program.model.varsAType.Keys);
+                ArrayList al = new ArrayList(Program.model.modelGekko.varsAType.Keys);
                 al.Sort(StringComparer.InvariantCulture);
 
                 
@@ -1137,9 +1137,9 @@ namespace Gekko
 
                 foreach (string var in al)
                 {
-                    if (Program.model.m2.endogenous.ContainsKey(var))
+                    if (Program.model.modelGekko.m2.endogenous.ContainsKey(var))
                     {
-                        Program.model.numberOfEndo++;
+                        Program.model.modelGekko.numberOfEndo++;
                         endo.Add(var);
                     }
                 }
@@ -1152,13 +1152,13 @@ namespace Gekko
 
                 foreach (string var in al)
                 {
-                    if (!Program.model.m2.endogenous.ContainsKey(var))
+                    if (!Program.model.modelGekko.m2.endogenous.ContainsKey(var))
                     {
                         exo.Add(var);
                     }
-                    if (!Program.model.m2.endogenous.ContainsKey(var) && !Program.model.varsJTypeAutoGenerated.ContainsKey(var) && !Program.model.varsDTypeAutoGenerated.ContainsKey(var) && !Program.model.varsZTypeAutoGenerated.ContainsKey(var))
+                    if (!Program.model.modelGekko.m2.endogenous.ContainsKey(var) && !Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(var) && !Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(var) && !Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(var))
                     {
-                        Program.model.numberOfExo++;
+                        Program.model.modelGekko.numberOfExo++;
                         exotrue.Add(var);
                     }
                 }
@@ -1166,20 +1166,20 @@ namespace Gekko
 
                 foreach (string var in al)
                 {
-                    if (Program.model.varsJTypeAutoGenerated.ContainsKey(var) || Program.model.varsDTypeAutoGenerated.ContainsKey(var) || Program.model.varsZTypeAutoGenerated.ContainsKey(var))
+                    if (Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(var) || Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(var) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(var))
                     {
-                        Program.model.numberOfDjz++;
+                        Program.model.modelGekko.numberOfDjz++;
                         exodjz.Add(var);
                     }
-                    if (Program.model.varsJTypeAutoGenerated.ContainsKey(var))
+                    if (Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(var))
                     {
                         exoj.Add(var);
                     }
-                    if (Program.model.varsDTypeAutoGenerated.ContainsKey(var))
+                    if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(var))
                     {
                         exod.Add(var);
                     }
-                    if (Program.model.varsZTypeAutoGenerated.ContainsKey(var))
+                    if (Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(var))
                     {
                         exoz.Add(var);
                     }
@@ -1286,9 +1286,9 @@ namespace Gekko
             // ===== Gauss-type
             // =====
 
-            if ((modelType == ECompiledModelType.Gauss && Program.model.m2.assemblyGauss == null) ||
-                (modelType == ECompiledModelType.GaussFailSafe && Program.model.m2.assemblyGaussFailSafe == null) ||
-                (modelType == ECompiledModelType.Res && Program.model.m2.assemblyRes == null))
+            if ((modelType == ECompiledModelType.Gauss && Program.model.modelGekko.m2.assemblyGauss == null) ||
+                (modelType == ECompiledModelType.GaussFailSafe && Program.model.modelGekko.m2.assemblyGaussFailSafe == null) ||
+                (modelType == ECompiledModelType.Res && Program.model.modelGekko.m2.assemblyRes == null))
             {
                 didWork = true;
                 StringBuilder codeGauss = new StringBuilder();
@@ -1320,23 +1320,23 @@ namespace Gekko
 
                     if (Globals.fastGauss)
                     {
-                        foreach (int endoNumber in Program.model.m2.prologue)
+                        foreach (int endoNumber in Program.model.modelGekko.m2.prologue)
                         {
-                            EquationHelper eh = Program.model.equations[endoNumber];
+                            EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                             prologue.Add(eh);
                         }
 
                         if (Program.options.solve_gauss_reorder)
                         {
-                            foreach (int endoNumber in Program.model.m2.simulRecursive)
+                            foreach (int endoNumber in Program.model.modelGekko.m2.simulRecursive)
                             {
-                                EquationHelper eh = Program.model.equations[endoNumber];
+                                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                                 eqs.Add(eh);
                             }
 
-                            foreach (int endoNumber in Program.model.m2.simulFeedback)
+                            foreach (int endoNumber in Program.model.modelGekko.m2.simulFeedback)
                             {
-                                EquationHelper eh = Program.model.equations[endoNumber];
+                                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                                 eqs.Add(eh);
                             }
                         }
@@ -1345,12 +1345,12 @@ namespace Gekko
 
                             //This is old code: it is checked that the
                             //ArrayList al = new ArrayList();
-                            //al.AddRange(Program.model.m2.simulRecursive);
-                            //al.AddRange(Program.model.m2.simulFeedback);
+                            //al.AddRange(Program.model.modelGekko.m2.simulRecursive);
+                            //al.AddRange(Program.model.modelGekko.m2.simulFeedback);
                             //SortedList<int, EquationHelper> sorted = new SortedList<int, EquationHelper>();
                             //foreach (int eq in al)
                             //{
-                            //    EquationHelper eh = Program.model.equations[eq];
+                            //    EquationHelper eh = Program.model.modelGekko.equations[eq];
                             //    sorted.Add(eh.equationNumber, eh);
                             //}
                             //for (int i = 0; i < sorted.Count; i++)
@@ -1361,22 +1361,22 @@ namespace Gekko
                             List<int> allSimul = Program.GetLeftsideBNumbers();
                             foreach (int i in allSimul)
                             {
-                                eqs.Add(Program.model.equations[i]);
+                                eqs.Add(Program.model.modelGekko.equations[i]);
                             }
 
                         }
 
-                        foreach (int endoNumber in Program.model.m2.epilogue)
+                        foreach (int endoNumber in Program.model.modelGekko.m2.epilogue)
                         {
-                            EquationHelper eh = Program.model.equations[endoNumber];
+                            EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                             epilogue.Add(eh);
                         }
 
-                        //G.Writeln(Program.model.equations.Count + " == " + (prologue.Count + eqs.Count + epilogue.Count));
-                        if (Program.model.equations.Count - (prologue.Count + eqs.Count + epilogue.Count) != 0) throw new GekkoException();
+                        //G.Writeln(Program.model.modelGekko.equations.Count + " == " + (prologue.Count + eqs.Count + epilogue.Count));
+                        if (Program.model.modelGekko.equations.Count - (prologue.Count + eqs.Count + epilogue.Count) != 0) throw new GekkoException();
                     }
 
-                    List<EquationHelper> gaussEquations = Program.model.equations;
+                    List<EquationHelper> gaussEquations = Program.model.modelGekko.equations;
                     if (Globals.fastGauss) gaussEquations = eqs;
 
                     foreach (EquationHelper eh in gaussEquations)
@@ -1397,8 +1397,8 @@ namespace Gekko
                         if (modelType == ECompiledModelType.GaussFailSafe)  //cannot be jacobi failsafe...
                         {
                             codeGauss.AppendLine("if(Double.IsInfinity(" + eh.csCodeLhsGauss + ") || Double.IsNaN(" + eh.csCodeLhsGauss + ")) {");
-                            codeGauss.AppendLine("Program.model.simulateResults[1] = 12345;");
-                            codeGauss.AppendLine("Program.model.simulateResults[2] = " + eh.equationNumber + ";");
+                            codeGauss.AppendLine("Program.model.modelGekko.simulateResults[1] = 12345;");
+                            codeGauss.AppendLine("Program.model.modelGekko.simulateResults[2] = " + eh.equationNumber + ";");
                             codeGauss.AppendLine("return;");
                             codeGauss.AppendLine("}");
                         }
@@ -1436,16 +1436,16 @@ namespace Gekko
                     if (modelType == ECompiledModelType.Gauss)
                     {
                         //Assembly temp = Assembly.LoadFile(@"c:\Users\Thomas\AppData\Local\Temp\gauss.dll");
-                        //Program.model.m2.assemblyGauss = temp.GetType("Gekko." + type);
-                        Program.model.m2.assemblyGauss = cr.CompiledAssembly.GetType("Gekko." + type);
+                        //Program.model.modelGekko.m2.assemblyGauss = temp.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyGauss = cr.CompiledAssembly.GetType("Gekko." + type);
                     }
                     else if (modelType == ECompiledModelType.GaussFailSafe)
                     {
-                        Program.model.m2.assemblyGaussFailSafe = cr.CompiledAssembly.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyGaussFailSafe = cr.CompiledAssembly.GetType("Gekko." + type);
                     }
                     else if (modelType == ECompiledModelType.Res)
                     {
-                        Program.model.m2.assemblyRes = cr.CompiledAssembly.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyRes = cr.CompiledAssembly.GetType("Gekko." + type);
                     }
                     else throw new GekkoException();  //must be one of these
                 }
@@ -1456,7 +1456,7 @@ namespace Gekko
             // ===== Newton-type
             // =====
 
-            if ((modelType == ECompiledModelType.Newton && Program.model.m2.assemblyNewton == null))
+            if ((modelType == ECompiledModelType.Newton && Program.model.modelGekko.m2.assemblyNewton == null))
             {
                 didWork = true;
                 StringBuilder codeNewton = new StringBuilder();
@@ -1471,10 +1471,10 @@ namespace Gekko
 
                     codeNewton.AppendLine("public static void simulPrologue(double[] b)");
                     codeNewton.AppendLine("{");
-                    foreach (int endoNumber in Program.model.m2.simulRecursive)
+                    foreach (int endoNumber in Program.model.modelGekko.m2.simulRecursive)
                     {
                         StringBuilder sb = new StringBuilder();
-                        EquationHelper eh = Program.model.equations[endoNumber];
+                        EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                         sb.Append(eh.csCodeLhsGauss);
                         sb.Append(" = ");
                         sb.AppendLine(eh.csCodeRhs);
@@ -1489,11 +1489,11 @@ namespace Gekko
                     codeNewton.AppendLine("public static void simulFeedbackAll(double[] b, double[] r, double[] scale)");
                     codeNewton.AppendLine("{");
 
-                    for (int i = 0; i < Program.model.m2.simulFeedback.Count; i++)
+                    for (int i = 0; i < Program.model.modelGekko.m2.simulFeedback.Count; i++)
                     {
                         StringBuilder sb = new StringBuilder();
-                        int endoNumber = (int)Program.model.m2.simulFeedback[i];
-                        EquationHelper eh = Program.model.equations[endoNumber];
+                        int endoNumber = (int)Program.model.modelGekko.m2.simulFeedback[i];
+                        EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                         sb.Append("r[" + i + "] = ");
                         sb.Append(eh.csCodeLhsGauss);
                         sb.Append(" -( ");
@@ -1512,11 +1512,11 @@ namespace Gekko
                     codeNewton.AppendLine("switch(n)");
                     codeNewton.AppendLine("{");
 
-                    for (int i = 0; i < Program.model.m2.simulFeedback.Count; i++)
+                    for (int i = 0; i < Program.model.modelGekko.m2.simulFeedback.Count; i++)
                     {
                         StringBuilder sb = new StringBuilder();
-                        int endoNumber = (int)Program.model.m2.simulFeedback[i];
-                        EquationHelper eh = Program.model.equations[endoNumber];
+                        int endoNumber = (int)Program.model.modelGekko.m2.simulFeedback[i];
+                        EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                         sb.AppendLine("case " + i + ":");
                         sb.Append("r[" + i + "] = ");
                         sb.Append(eh.csCodeLhsGauss);
@@ -1546,11 +1546,11 @@ namespace Gekko
                     ReferencedAssembliesGekko(compilerParams);
                     compilerParams.GenerateExecutable = false;
                     string s = codeNewton.ToString();
-                    //CompilerResults cr = Program.model.iCodeCompiler.CompileAssemblyFromFile(compilerParams, Globals.localTempFilesLocation + "\\" + type + ".cs");
+                    //CompilerResults cr = Program.model.modelGekko.iCodeCompiler.CompileAssemblyFromFile(compilerParams, Globals.localTempFilesLocation + "\\" + type + ".cs");
                     CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
                     if (modelType == ECompiledModelType.Newton)
                     {
-                        Program.model.m2.assemblyNewton = cr.CompiledAssembly.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyNewton = cr.CompiledAssembly.GetType("Gekko." + type);
                     }
                     else throw new GekkoException();  //must be one of these
                 }
@@ -1562,8 +1562,8 @@ namespace Gekko
             // ===== Reverted (auto-JZ and Y-equations) -- put in .model, not .model.m2, because it is common for all EXO/ENDO set.
             // =====
 
-            if ((!failSafe && Program.model.assemblyReverted == null) ||
-               (failSafe && Program.model.assemblyRevertedFailSafe == null))
+            if ((!failSafe && Program.model.modelGekko.assemblyReverted == null) ||
+               (failSafe && Program.model.modelGekko.assemblyRevertedFailSafe == null))
             {
 
                 didWork = true;
@@ -1580,7 +1580,7 @@ namespace Gekko
                         @"{");
 
                     EmitRevertedEquations(code);  //Same code with and without failsafe. Could maybe introduce failsafe here, for the Y-equations. But never mind for now.
-                    //Are static given model, in principle they could be shared for Program.model, and not Program.model.m2 (but maybe not worth the trouble and risk of errors)
+                    //Are static given model, in principle they could be shared for Program.model.modelGekko, and not Program.model.modelGekko.m2 (but maybe not worth the trouble and risk of errors)
 
                     code.AppendLine("}");  //class
                     code.AppendLine("}");  //namespace
@@ -1604,11 +1604,11 @@ namespace Gekko
 
                     if (!failSafe)
                     {
-                        Program.model.assemblyReverted = cr.CompiledAssembly.GetType("Gekko.Reverted");
+                        Program.model.modelGekko.assemblyReverted = cr.CompiledAssembly.GetType("Gekko.Reverted");
                     }
                     else
                     {
-                        Program.model.assemblyRevertedFailSafe = cr.CompiledAssembly.GetType("Gekko.RevertedFailSafe");
+                        Program.model.modelGekko.assemblyRevertedFailSafe = cr.CompiledAssembly.GetType("Gekko.RevertedFailSafe");
                     }
                 }
             }
@@ -1618,8 +1618,8 @@ namespace Gekko
             // ===== Prologue/Epilogue (depends upon ENDO/EXO set, so put in .m2)
             // =====
 
-            if ((!failSafe && Program.model.m2.assemblyPrologueEpilogue == null) ||
-                (failSafe && Program.model.m2.assemblyPrologueEpilogueFailSafe == null))
+            if ((!failSafe && Program.model.modelGekko.m2.assemblyPrologueEpilogue == null) ||
+                (failSafe && Program.model.modelGekko.m2.assemblyPrologueEpilogueFailSafe == null))
             {
                 didWork = true;
                 StringBuilder code = new StringBuilder();
@@ -1658,11 +1658,11 @@ namespace Gekko
 
                     if (failSafeString == "")
                     {
-                        Program.model.m2.assemblyPrologueEpilogue = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogue");
+                        Program.model.modelGekko.m2.assemblyPrologueEpilogue = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogue");
                     }
                     else
                     {
-                        Program.model.m2.assemblyPrologueEpilogueFailSafe = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogueFailSafe");
+                        Program.model.modelGekko.m2.assemblyPrologueEpilogueFailSafe = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogueFailSafe");
                     }
                 }
             }
@@ -1671,8 +1671,8 @@ namespace Gekko
             // ===== After (put in .model, not .model.m2, because it is common for all EXO/ENDO set.)
             // =====
             // TODO: after introduction of M2 object, checking for failsafe here is probably not necessay at all
-            if (modelType == ECompiledModelType.After && ((!failSafe && Program.model.assemblyAfter == null) ||
-                (failSafe && Program.model.assemblyAfterFailSafe == null)))
+            if (modelType == ECompiledModelType.After && ((!failSafe && Program.model.modelGekko.assemblyAfter == null) ||
+                (failSafe && Program.model.modelGekko.assemblyAfterFailSafe == null)))
             {
                 //TODO: does not always have to be done, but for now we just keep it.
                 didWork = true;
@@ -1687,7 +1687,7 @@ namespace Gekko
                 public class " + "After" + failSafeString +
                         @"{");
 
-                    EmitAfter(failSafeString, code);    //Are static given model, after() and after2() methods, , in principle they could be shared for Program.model, and not Program.model.m2 (but maybe not worth the trouble and risk of errors)
+                    EmitAfter(failSafeString, code);    //Are static given model, after() and after2() methods, , in principle they could be shared for Program.model.modelGekko, and not Program.model.modelGekko.m2 (but maybe not worth the trouble and risk of errors)
 
                     code.AppendLine("}");  //class
                     code.AppendLine("}");  //namespace
@@ -1711,11 +1711,11 @@ namespace Gekko
 
                     if (failSafeString == "")
                     {
-                        Program.model.assemblyAfter = cr.CompiledAssembly.GetType("Gekko.After");
+                        Program.model.modelGekko.assemblyAfter = cr.CompiledAssembly.GetType("Gekko.After");
                     }
                     else
                     {
-                        Program.model.assemblyAfterFailSafe = cr.CompiledAssembly.GetType("Gekko.AfterFailSafe");
+                        Program.model.modelGekko.assemblyAfterFailSafe = cr.CompiledAssembly.GetType("Gekko.AfterFailSafe");
                     }
                 }
             }  //finished After
@@ -1724,7 +1724,7 @@ namespace Gekko
                 string duration = G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds);
                 if (isCalledFromModelStatement)
                 {
-                    Program.model.modelInfo.lastCompileDuration = duration;
+                    Program.model.modelGekko.modelInfo.lastCompileDuration = duration;
                 }
                 else
                 {
@@ -1758,9 +1758,9 @@ namespace Gekko
             codeCommon.AppendLine("public static void epilogue(double[] b)");
             codeCommon.AppendLine("{");
 
-            foreach (int endoNumber in Program.model.m2.epilogue)
+            foreach (int endoNumber in Program.model.modelGekko.m2.epilogue)
             {
-                EquationHelper eh = Program.model.equations[endoNumber];
+                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
 
                 codeCommon.Append(eh.csCodeLhsGauss);
                 codeCommon.Append(" = ");
@@ -1770,8 +1770,8 @@ namespace Gekko
                 if (failsafe != "")
                 {
                     codeCommon.AppendLine("if(Double.IsInfinity(" + eh.csCodeLhsGauss + ") || Double.IsNaN(" + eh.csCodeLhsGauss + ")) {");
-                    codeCommon.AppendLine("Program.model.simulateResults[1] = 12345;");
-                    codeCommon.AppendLine("Program.model.simulateResults[2] = " + eh.equationNumber + ";");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[1] = 12345;");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[2] = " + eh.equationNumber + ";");
                     codeCommon.AppendLine("return;");
                     codeCommon.AppendLine("}");
                 }
@@ -1784,9 +1784,9 @@ namespace Gekko
             codeCommon.AppendLine("public static void prologue(double[] b)");
             codeCommon.AppendLine("{");
 
-            foreach (int endoNumber in Program.model.m2.prologue)
+            foreach (int endoNumber in Program.model.modelGekko.m2.prologue)
             {
-                EquationHelper eh = Program.model.equations[endoNumber];
+                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                 codeCommon.Append(eh.csCodeLhsGauss);
                 codeCommon.AppendLine(" = ");
                 codeCommon.AppendLine(eh.csCodeRhs);
@@ -1796,8 +1796,8 @@ namespace Gekko
                 if (failsafe != "")
                 {
                     codeCommon.AppendLine("if(Double.IsInfinity(" + eh.csCodeLhsGauss + ") || Double.IsNaN(" + eh.csCodeLhsGauss + ")) {");
-                    codeCommon.AppendLine("Program.model.simulateResults[1] = 12345;");
-                    codeCommon.AppendLine("Program.model.simulateResults[2] = " + eh.equationNumber + ";");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[1] = 12345;");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[2] = " + eh.equationNumber + ";");
                     codeCommon.AppendLine("return;");
                     codeCommon.AppendLine("}");
                 }
@@ -1808,14 +1808,14 @@ namespace Gekko
         private static void EmitAfter(string failsafe, StringBuilder codeCommon)
         {
             //This is for safety: EmitAfter must not depend upon stuff in .m2!
-            Model2 temp = Program.model.m2;
-            Program.model.m2 = null;
+            Model2 temp = Program.model.modelGekko.m2;
+            Program.model.modelGekko.m2 = null;
 
             try
             {
                 int count = 0, count2 = 0;
                 codeCommon.AppendLine("public static void after(double[] b) {");
-                foreach (EquationHelper eh in Program.model.equations)
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
                 {
                     if (eh.isAfterModel && !eh.isAfter2Model)  //if both are set, it is considered after2
                     {
@@ -1830,7 +1830,7 @@ namespace Gekko
                 codeCommon.AppendLine();
 
                 codeCommon.AppendLine("public static void after2(double[] b) {");
-                foreach (EquationHelper eh in Program.model.equations)
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
                 {
                     if (eh.isAfter2Model)  //eh.isAfterModel may or not be true here --> in any case it is considered after2
                     {
@@ -1849,20 +1849,20 @@ namespace Gekko
             }
             finally
             {
-                Program.model.m2 = temp;
+                Program.model.modelGekko.m2 = temp;
             }
         }
 
         private static void EmitRevertedEquations(StringBuilder code)
         {
             //This is for safety: EmitAfter must not depend upon stuff in .m2!
-            Model2 temp = Program.model.m2;
-            Program.model.m2 = null;
+            Model2 temp = Program.model.modelGekko.m2;
+            Program.model.modelGekko.m2 = null;
 
             try
             {
                 code.AppendLine("public static void revertedAuto(double[] b) {");
-                foreach (EquationHelper eh in Program.model.equationsReverted)
+                foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
                 {
                     if (eh.equationCode == "AUTOGENERATED")
                     {
@@ -1875,7 +1875,7 @@ namespace Gekko
                 code.AppendLine("}");  //end of reverted()
 
                 code.AppendLine("public static void revertedY(double[] b) {");
-                foreach (EquationHelper eh in Program.model.equationsReverted)
+                foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
                 {
                     if (!(eh.equationCode == "AUTOGENERATED"))
                     {
@@ -1893,7 +1893,7 @@ namespace Gekko
             }
             finally
             {
-                Program.model.m2 = temp;
+                Program.model.modelGekko.m2 = temp;
             }
         }
 
@@ -1907,7 +1907,7 @@ namespace Gekko
             return wh;
         }
 
-        public static void EmitCsCodeForModel(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, Model model, int subTreeLag, bool isModel)
+        public static void EmitCsCodeForModel(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel)
         {
             bool visitChildren = true;
             int numberOfRightParentheses = 0;
@@ -2000,7 +2000,7 @@ namespace Gekko
                             if (G.Equal(function, "dlogy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
                             if (arguments != 1)
@@ -2060,7 +2060,7 @@ namespace Gekko
                             if (G.Equal(function, "pchy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
                             if (arguments != 1)
@@ -2173,7 +2173,7 @@ namespace Gekko
                             if (G.Equal(function, "dify") || G.Equal(function, "diffy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
 
                             if (arguments != 1)
@@ -2584,7 +2584,7 @@ namespace Gekko
                             if (G.Equal(wh2.leftSideFunction, "dlogy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNode("*", true);
                             ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
@@ -2605,7 +2605,7 @@ namespace Gekko
                             if (G.Equal(wh2.leftSideFunction, "pchy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNode("*", true);
                             ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
@@ -2630,7 +2630,7 @@ namespace Gekko
                             if (G.Equal(wh2.leftSideFunction, "dify") || G.Equal(wh2.leftSideFunction, "diffy"))
                             {
                                 lag = O.CurrentSubperiods();
-                                Program.model.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
+                                Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
                             root1 = new ASTNode("+", true);
                             ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
@@ -3101,7 +3101,7 @@ namespace Gekko
         }
 
 
-        private static void HandlePowFunction(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, Model model, int subTreeLag, bool isModel, bool function)
+        private static void HandlePowFunction(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel, bool function)
         {
             wh2.rightHandSideCsCode.Append("O.Pow(", EEmitType.computerReadable);
             wh2.rightHandSideCsCode.Append("Pow(", EEmitType.humanReadable);
@@ -3122,7 +3122,7 @@ namespace Gekko
             wh2.rightHandSideCsCode.Append(")");
         }        
 
-        private static void AddToDictionary(Dictionary<string, string> ht, string name, Model model)
+        private static void AddToDictionary(Dictionary<string, string> ht, string name, ModelGekko model)
         {
             if (ht.ContainsKey(name))
             {
@@ -3134,7 +3134,7 @@ namespace Gekko
             }
         }
 
-        private static void EmitCsDoVariableStuff(EquationHelper eh, WalkerHelper2 wh2, Model model, bool isModel, string variable3, int lag, bool isBaseBank, string absoluteTime, string namedBank)
+        private static void EmitCsDoVariableStuff(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, bool isModel, string variable3, int lag, bool isBaseBank, string absoluteTime, string namedBank)
         {
             printVariableAsBType(eh, wh2, model, variable3, lag, false, false, isModel, isBaseBank, absoluteTime, namedBank); //false=rightside
             //doing model frml
@@ -3177,7 +3177,7 @@ namespace Gekko
 
         }
 
-        private static void ExtractDJZAndEquationTypeFromEquationCode(EquationHelper eh, Model model, bool isModel)
+        private static void ExtractDJZAndEquationTypeFromEquationCode(EquationHelper eh, ModelGekko model, bool isModel)
         {
             string code = eh.equationCode;
 
@@ -3300,7 +3300,7 @@ namespace Gekko
             return;
         }
 
-        private static void printVariableAsBType(EquationHelper eh, WalkerHelper2 wh2, Model model, string variable, int lag, bool leftSide, bool humanReadable, bool isModel, bool isBaseBank, string absoluteTime, string namedBank)
+        private static void printVariableAsBType(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, string variable, int lag, bool leftSide, bool humanReadable, bool isModel, bool isBaseBank, string absoluteTime, string namedBank)
         {
             if (isModel)  //for equations in model/frm
             {

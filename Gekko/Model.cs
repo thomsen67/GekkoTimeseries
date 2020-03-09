@@ -98,10 +98,17 @@ namespace Gekko
         public Type assemblyPrologueEpilogueFailSafe = null;
         //public Type assemblyEigen = null;        
         
-    }    
+    }
 
     [ProtoContract]
     public class Model
+    {
+        public ModelGekko modelGekko;
+        public ModelGams modelGams;
+    }
+
+    [ProtoContract]
+    public class ModelGekko
     {
         //[ProtoMember(1)]  --> we don't serialize this: takes only about 0.7 sec to recreate for dec09 (gauss simulation) when it is missing. Reading from file, unzipping .dll files will eat up a lot of that
         public Model2 m2 = new Model2();
@@ -207,8 +214,8 @@ namespace Gekko
         public double[] bOld = null;
         public ESignatureStatus signatureStatus;
         public string signatureFoundInFileHeader;
-        public Model oldModel = null; //used when doing stacked time
-        public Model stackedModel = null; //used when doing stacked time
+        public ModelGekko oldModel = null; //used when doing stacked time
+        public ModelGekko stackedModel = null; //used when doing stacked time
         public List<Dictionary<int, int>> terminalHelper = null;
 
         public GekkoTime lastSimPer1 = GekkoTime.tNull;
@@ -218,7 +225,7 @@ namespace Gekko
         [ProtoMember(29)]
         public int subPeriods = -12345;  //1 for a, 4 for q, 12 for m. The value -12345 means inactive. This is only relevant regarding the pchy() function
 
-        public Model()
+        public ModelGekko()
         { 
         }   
     }
@@ -306,10 +313,10 @@ namespace Gekko
             string extra = "";
             if (timeUsedParsing != null)
             {
-                extra = " (parse: " + timeUsedParsing + ", compile: " + Program.model.modelInfo.lastCompileDuration + ")";
+                extra = " (parse: " + timeUsedParsing + ", compile: " + Program.model.modelGekko.modelInfo.lastCompileDuration + ")";
             }
             string note = "";
-            if (Program.model.largestLead > 0) note = " (NOTE: Forward-looking model)";
+            if (Program.model.modelGekko.largestLead > 0) note = " (NOTE: Forward-looking model)";
 
             Table tab = new Table();
 
@@ -331,23 +338,23 @@ namespace Gekko
                 tab.CurRow.Next();
             }
                         
-            if (Program.model.signatureStatus == ESignatureStatus.Ok)
+            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.Ok)
             {
-                tab.CurRow.SetText(1, "Signature : OK (" + Program.model.signatureFoundInFileHeader + ")");
+                tab.CurRow.SetText(1, "Signature : OK (" + Program.model.modelGekko.signatureFoundInFileHeader + ")");
                 tab.CurRow.Next();
             }
-            else if (Program.model.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
+            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
             {
                 tab.CurRow.SetText(1, "Signature : NOT FOUND in model file (see the SIGN command)");
                 tab.CurRow.Next();                
             }
-            else if (Program.model.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
+            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
             {
-                tab.CurRow.SetText(1, "Signature : INVALID SIGNATURE (" + Program.model.signatureFoundInFileHeader + "): See the SIGN command");
+                tab.CurRow.SetText(1, "Signature : INVALID SIGNATURE (" + Program.model.modelGekko.signatureFoundInFileHeader + "): See the SIGN command");
                 tab.CurRow.Next();                
             }
             
-            tab.CurRow.SetText(1, "Lags      : Largest lag = " + Program.model.largestLag + ", largest lead = " + Program.model.largestLead + note);
+            tab.CurRow.SetText(1, "Lags      : Largest lag = " + Program.model.modelGekko.largestLag + ", largest lead = " + Program.model.modelGekko.largestLead + note);
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.Next();
             tab.CurRow.SetText(1, "Total vars     = " + G.IntFormat(this.total, 7) + "     " + "Endogenous  = " + G.IntFormat(this.endo2, 7) + "     " + "Endogenous   = " + G.IntFormat(this.endo3, 7));
