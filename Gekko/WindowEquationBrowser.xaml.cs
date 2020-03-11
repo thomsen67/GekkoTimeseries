@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gekko
 {
@@ -81,7 +83,7 @@ namespace Gekko
         {
             List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[name];
             string s = xx2[0].lhs + " = " + xx2[0].rhs;
-            return s;
+            return s;            
         }
 
         public void EquationBrowserSetLabel(string variableName)
@@ -148,12 +150,81 @@ namespace Gekko
 
 
         public void EquationBrowserSetEquationButtons(string eqName, string firstText, List<string> firstList)
+        {            
+            EquationBrowserSetEquationButtons1(eqName, firstText, firstList);
+            //Dispatching the color update
+            //So first non-colored buttons are shown, and then the background thread colors them
+            //If the coloring is very time-consuming, scrolling down with arrows may freeze a bit. To solve this,
+            //a background worker thread that is no longer relevant would need to be killed
+            //or we could wait 0.5 second before any coloring?
+            this.Dispatcher.BeginInvoke(new Action(() => EquationBrowserSetEquationButtons2(eqName)), System.Windows.Threading.DispatcherPriority.Background);            
+        }
+
+        public void EquationBrowserSetEquationButtons2(string eqName)
         {
+            List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
+            ModelGamsEquation equation = equations[0]; //always only 1
+                        
+            {
+
+                string op = "d";
+                GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);
+                string residualName = "residual___";
+                int funcCounter = 0;
+
+                string s1 = Program.EquationLhsRhs(equation.lhs, equation.rhs, true) + ";";
+                if (equation.expressions == null || equation.expressions.Count == 0)
+                {
+                    Globals.expressions = null;  //maybe not necessary
+                    Program.CallEval(equation.conditionals, s1);
+                    equation.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                    Globals.expressions = null;  //maybe not necessary   
+                }
+
+                if (equation.expressions.Count != equation.expressionVariablesWithSets.Count)
+                {
+                    G.Writeln2("*** ERROR: Internal error #8973428374");
+                    throw new GekkoException();
+                }
+
+                //fixme: [0] must be counter
+                DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per1, equation.expressions[0], Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
+
+                double max = 0d;
+                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                {
+                    double v = kvp.Value.GetDataSimple(per1);
+                    if (G.isNumericalError(v)) v = 0d;
+                    else v = Math.Abs(v);
+                    max = Math.Max(v, max);
+                }
+
+                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
+                {
+                    string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
+                    double v = kvp.Value.GetDataSimple(per1);
+
+                    Button b = null;
+                    _buttons.TryGetValue(ss5, out b);
+                    if (b != null)
+                    {
+                        int i1 = 240;
+                        int i2 = 255;
+                        int ii = i2 - (int)((i2 - i1) * Math.Abs(v) / max);
+                        b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
+                    }
+                }
+            }
+        }
+
+        public void EquationBrowserSetEquationButtons1(string eqName, string firstText, List<string> firstList)
+        {
+            
+
             this._activeEquation = eqName;
             this.windowEquationBrowserLabel.Inlines.Clear();
 
-            List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
-            ModelGamsEquation equation = equations[0]; //always only 1
+            
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
             //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
@@ -174,7 +245,7 @@ namespace Gekko
             foreach (string s in firstList)
             {
                 if (s == "residual___") continue;
-                string ss5 = s.Replace("¤[0]", "").Replace("¤", "");
+                string ss5 = G.ReplaceTurtle(s);
 
                 Button b = new Button();
                 b.Content = ss5;
@@ -183,8 +254,8 @@ namespace Gekko
                 b.Resources.Add(typeof(Border), cStyle);
                 b.Padding = new Thickness(3 + 1, 1 + .5, 3 + 1, 2 + .5);
                 b.Margin = new Thickness(4, 2.5, 4, 2.5);
-                
-                int ii = 255;                                
+
+                int ii = 255;
                 b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
 
                 int ii2 = 200;
@@ -198,39 +269,8 @@ namespace Gekko
                 _buttons.Add(ss5, b);
             }
 
-            if (false)
-            {
-                string op = "d";
-                GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);                
-                string residualName = "residual___";
-                int funcCounter = 0;
-
-                //fixme: [0] must be counter
-                DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per1, equation.expressions[0], Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
-
-                double max = 0d;
-                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
-                {
-                    double v = kvp.Value.GetDataSimple(per1);
-                    if (G.isNumericalError(v)) v = 0d;
-                    else v = Math.Abs(v);
-                    max = Math.Max(v, max);
-                }
-
-                foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
-                {
-                    string ss5 = Program.DecompGetNameFromContrib(kvp.Key);
-                    double v = kvp.Value.GetDataSimple(per1);
-                    Button b = _buttons[ss5];
-                    int i1 = 240;
-                    int i2 = 255;
-                    int ii = i1 + (int)((i2 - i1) * Math.Abs(v) / max);
-                    b.Background = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii), Convert.ToByte(ii), Convert.ToByte(ii)));
-                }
-            }
-
-
-        }
+            
+        }       
     }
 
     public class EquationListItem

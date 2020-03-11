@@ -12897,6 +12897,8 @@ namespace Gekko
 
         public static ModelGamsEquation DecompEvalGams(string eqname, string varname)
         {
+            //find the equation, either looking up eqname or varname
+
             List<ModelGamsEquation> eqs = null;
             ModelGamsEquation found = null;
             if (eqname != null)
@@ -12936,7 +12938,6 @@ namespace Gekko
             if (found.expressions == null || found.expressions.Count == 0)
             {
                 Globals.expressions = null;  //maybe not necessary
-                //Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression   
                 CallEval(found.conditionals, s1);
                 found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
                 Globals.expressions = null;  //maybe not necessary
@@ -17517,186 +17518,11 @@ namespace Gekko
             if (Globals.runningOnTTComputer)
             {
 
-
                 if (text == "python")
                 {
                     string s = Python();
                     G.Writeln2(s);
                 }                
-                else if (text.StartsWith("find"))
-                {
-                    string variableName = text.Substring("find ".Length).Trim();
-
-                    Globals.itemHandler = new ItemHandler();
-
-                    if (false)
-                    {
-
-                        string firstText = null;
-                        List<string> firstList = new List<string>();
-                        string firstEqName = null;
-
-                        bool firstFirst = true;
-
-                        variableName = text.Substring("find ".Length).Trim();
-                        List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
-                        foreach (List m2 in m1.list)  //foreach GAMS equation
-                        {
-                            string eqName = null;
-                            bool first = true;
-                            List<List<string>> results = new List<List<string>>();
-
-                            int counter = 0;
-                            foreach (IVariable m3 in m2.list) //foreach sub-eq (first item is name)
-                            {
-                                counter++;
-                                if (first)
-                                {
-                                    eqName = (m3 as ScalarString).string2;
-                                }
-                                else
-                                {
-                                    bool found = false;
-                                    foreach (ScalarString ss in (m3 as List).list) //foreach variable (first item is name)
-                                    {
-                                        string[] ss2 = ss.string2.Split('¤');
-                                        string ss3 = ss2[0];
-                                        if (ss2.Length > 1 && ss2[1] == "[0]")
-                                        {
-                                            if (G.Equal(variableName, ss3))
-                                            {
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    if (found)
-                                    {
-                                        List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
-                                        string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
-
-                                        string bool1 = "";
-                                        string bool2 = "";
-                                        string tt = "tx0";
-                                        if (eqName == "E_qY_tot")
-                                        {
-                                            bool1 = Globals.protectSymbol;
-                                            bool2 = Globals.protectSymbol;
-                                        }
-                                        else if (eqName == "E_vCalvo")
-                                        {
-                                            tt = "tx0e";
-                                        }
-                                        else if (eqName == "E_vCalvo_tEnd")
-                                        {
-                                            tt = "tend";
-                                        }
-
-                                        Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, bool1, bool2, tt, xx, "Black"));
-
-                                        if (firstFirst)
-                                        {
-                                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-                                            firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-                                            firstList.AddRange(yy);
-                                            firstEqName = eqName;
-                                        }
-                                        firstFirst = false;
-
-
-                                    }
-                                }
-                                first = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        string firstText = null;
-                        List<string> firstList = new List<string>();
-                        string firstEqName = null;
-
-                        bool firstFirst = true;
-                                                
-                        //List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
-                        foreach (KeyValuePair<string, List<ModelGamsEquation>>kvp in Program.model.modelGams.equationsByEqname)
-                        {
-                            string eqName = kvp.Value[0].nameGams;
-                            
-                            List<List<string>> results = new List<List<string>>();
-
-                            int counter = 0;
-                            foreach (EquationVariablesGams m3 in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
-                            {
-                                if (m3 == null) continue;
-                                counter++;                                
-                                {
-                                    bool found = false;
-                                    foreach (string ss in m3.equationVariables) //foreach variable (first item is name)
-                                    {
-                                        string[] ss2 = ss.Split('¤');
-                                        string ss3 = ss2[0];
-                                        if (ss2.Length > 1 && ss2[1] == "[0]")
-                                        {
-                                            if (G.Equal(variableName, ss3))
-                                            {
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    if (found)
-                                    {
-                                        //List<string> yy = m3;
-                                        string xx = G.GetListWithCommas(m3.equationVariables).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
-
-                                        string bool1 = "";
-                                        string bool2 = "";
-                                        string tt = "tx0";
-                                        if (eqName == "E_qY_tot")
-                                        {
-                                            bool1 = Globals.protectSymbol;
-                                            bool2 = Globals.protectSymbol;
-                                        }
-                                        else if (eqName == "E_vCalvo")
-                                        {
-                                            tt = "tx0e";
-                                        }
-                                        else if (eqName == "E_vCalvo_tEnd")
-                                        {
-                                            tt = "tend";
-                                        }
-
-                                        Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black"));
-
-                                        if (firstFirst)
-                                        {
-                                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-                                            firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-                                            firstList.AddRange(m3.equationVariables);
-                                            firstEqName = eqName;
-                                        }
-                                        firstFirst = false;
-
-
-                                    }
-                                }
-                                
-                            }
-                        }
-                    }
-
-                    WindowEquationBrowser eb = new WindowEquationBrowser();
-                    eb.Title = variableName + " - " + "Gekko equations";
-                    eb.EquationBrowserSetEquationButtons("E_Vy", "a1", new List<string>() { "b1", "b2" });
-                    eb.EquationBrowserSetLabel(variableName);
-
-                    eb.ShowDialog();
-                    eb.Close();
-
-                }
                 else if (text.StartsWith("sha"))
                 {
                     string filePath = @"c:\tools\sha";
@@ -17717,10 +17543,89 @@ namespace Gekko
             }
 
             if (nocr) G.Write(text);
-            else G.Writeln(text);                              
+            else G.Writeln(text);
         }
 
-        
+        public static void Find(O.Find o)
+        {
+
+            List<string> vars = O.Restrict(o.iv, false, false, false, true);
+            string variableName = vars[0];
+
+            Globals.itemHandler = new ItemHandler();
+
+            string firstText = null;
+            List<string> firstList = new List<string>();
+            string firstEqName = null;
+
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
+            {
+                string eqName = kvp.Value[0].nameGams;
+
+                List<List<string>> results = new List<List<string>>();
+
+                int counter = 0;
+                foreach (EquationVariablesGams eqVarsGams in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
+                {
+                    if (eqVarsGams == null) continue;
+                    counter++;
+                    {
+                        bool found = false;
+                        foreach (string ss in eqVarsGams.equationVariables) //foreach variable (first item is name)
+                        {
+                            string[] ss2 = ss.Split('¤');
+                            string ss3 = ss2[0];
+                            if (ss2.Length > 1 && ss2[1] == "[0]")
+                            {
+                                if (G.Equal(variableName, ss3))
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            //List<string> yy = m3;
+                            string xx = G.ReplaceTurtle(G.GetListWithCommas(eqVarsGams.equationVariables)).Replace(", residual___", "");
+
+                            string bool1 = "";
+                            string bool2 = "";
+                            string tt = "tx0";
+                            if (eqName == "E_qY_tot")
+                            {
+                                bool1 = Globals.protectSymbol;
+                                bool2 = Globals.protectSymbol;
+                            }
+                            else if (eqName == "E_vCalvo")
+                            {
+                                tt = "tx0e";
+                            }
+                            else if (eqName == "E_vCalvo_tEnd")
+                            {
+                                tt = "tend";
+                            }
+
+                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black"));
+
+                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
+                            firstText = xx2[0].lhs + " = " + xx2[0].rhs;
+                            firstList.AddRange(eqVarsGams.equationVariables);
+                            firstEqName = eqName;
+                        }
+                    }
+                }
+            }
+
+            WindowEquationBrowser eb = new WindowEquationBrowser();
+            eb.Title = variableName + " - " + "Gekko equations";
+            eb.EquationBrowserSetEquationButtons("E_Vy", "a1", new List<string>() { "b1", "b2" });
+            eb.EquationBrowserSetLabel(variableName);
+            eb.ShowDialog();
+            eb.Close();
+
+        }
         
 
         private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
@@ -19669,7 +19574,6 @@ namespace Gekko
             {
                 ReadGamsModelHelper(textInputRaw, fileName, o);
                 Sniff2();
-                //Sneeze();
 
                 DateTime t1 = DateTime.Now;
 

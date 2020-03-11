@@ -5952,10 +5952,16 @@ namespace Gekko.Parser.Gek
                             node.Code.A("" + Globals.labelCounter + " = 0;");
                             node.Code.A(node[0].Code);  //dates
                             if (node[1][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[1][0].Text + "`;");
-
                             node.Code.A("o" + Num(node) + ".iv = " + node[2].Code + ";" + G.NL);
-
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
+                        }
+                        break;
+                    case "ASTFIND":
+                        {
+                            node.Code.A("O.Find o" + Num(node) + " = new O.Find();" + G.NL);
+                            GetCodeFromAllChildren(node, node[0]);  //options                            
+                            node.Code.A("o" + Num(node) + ".iv = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
                     case "ASTINI":

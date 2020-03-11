@@ -8868,6 +8868,20 @@ namespace Gekko
             }
         }
 
+        public class Find
+        {
+            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
+            public List iv = null;            
+            public string opt_prtcode = null;
+
+            public void Exe()
+            {
+                G.CheckLegalPeriod(this.t1, this.t2);
+                Program.Find(this);
+            }
+        }
+
         public class Show
         {
             public IVariable input = null;

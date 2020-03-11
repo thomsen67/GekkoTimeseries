@@ -108,6 +108,11 @@ namespace Gekko
             }            
         }
 
+        public static string ReplaceTurtle(string s)
+        {
+            return s.Replace("¤[0]", "").Replace("¤", "");
+        }
+
         public static bool IsDebugSession
         {
             //Cannot get this to work...

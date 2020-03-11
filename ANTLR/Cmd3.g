@@ -365,6 +365,7 @@ ASTCOMPARE2;
     ASTFILENAMEQUOTES;
     ASTFILENAMESTAR;
     ASTFINDMISSINGDATA;
+    ASTFIND;
     ASTFLAT;
     ASTFOR;
     ASTFORDATE;
@@ -1121,6 +1122,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+    FIND      = 'FIND'     ;
 	PYTHON      = 'PYTHON'     ;
 	DEP = 'DEP';
 	BROWSER      = 'BROWSER'     ;
@@ -1751,6 +1753,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("find"               , FIND  );
 										d.Add("python"               , PYTHON  );
 										d.Add("dep"               , DEP  );
                                         d.Add("browser"         , BROWSER);
@@ -1828,7 +1831,7 @@ d.Add("Y" ,Y);
                                         d.Add("language"  , LANGUAGE      );
                                         d.Add("last"  , LAST      );
                                         d.Add("lev"  , LEV      );
-                                        d.Add("LINEAR",LINEAR);
+                                        d.Add("LINEAR",LINEAR);                                        
                                         d.Add("lines"    , LINES   );
                                         d.Add("list"    , LIST      );
 										d.Add("map"    , MAP      );
@@ -2536,7 +2539,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | exo                  SEMICOLON!
 						  | exit                 SEMICOLON!
 						  | findmissingdata      SEMICOLON!
-						  | for2
+						  | find                 SEMICOLON!
+                          | for2
 						  | functionDef          SEMICOLON!
 						  | global               SEMICOLON!
 						  | goto2                SEMICOLON!
@@ -2889,6 +2893,18 @@ decompOpt2:					ISNOTQUAL
                             ;
 
 eval:						EVAL expression -> ^({token("ASTEVAL¤"+($expression.text), ASTEVAL, input.LT(1).Line)} expression);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// FIND
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+find:                       FIND findOpt1? seqOfBankvarnamesOnly1 -> ^({token("ASTFIND", ASTFIND, input.LT(1).Line)} ^(ASTOPT_ findOpt1?) seqOfBankvarnamesOnly1);
+
+findOpt1:					ISNOTQUAL
+						  | leftAngle2          findOpt1h* RIGHTANGLE -> ^(ASTOPT1 findOpt1h*)							
+						  | leftAngleNo2 dates? findOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) findOpt1h*)
+                            ;
+findOpt1h:				    name -> ^(ASTOPT_STRING_PRTCODE name);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DELETE
@@ -4239,6 +4255,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  FIND|
   PYTHON|
   BROWSER|
   FOR|
