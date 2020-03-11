@@ -1511,10 +1511,10 @@ namespace Gekko
             Border b = (Border)(tb.Parent);
             DockPanel dp = (DockPanel)(b.Parent);
             Grid g = (Grid)(dp.Parent);
-            
+
             int col = (int)dp.GetValue(Grid.ColumnProperty);
             int row = (int)dp.GetValue(Grid.RowProperty);
-            
+
             int x = -12345;
             int y = -12345;
             CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
@@ -1523,33 +1523,33 @@ namespace Gekko
 
             if (c != null && c.cellType == CellType.Text)
             {
-                string var = c.CellText.TextData[0];
-
-                string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
-                                
-                DecompOptions2 d = this.decompOptions2.Clone();                                
-
-                //if (d.isSubst)
-                //{
-                //    //d.variable is the same
-                //    d.subst.Add(var2);
-                //    d.isSubWindow = true;
-                //}
-                //else
-                //{
+                if (true)
+                {
+                    string var = c.CellText.TextData[0];
+                    O.Find o = new O.Find();                    
+                    List m = new List(new List<string>() { var });
+                    o.iv = m;
+                    o.opt_prtcode = this.decompOptions2.operatorHelper.guiDecompOperator;
+                    o.t1 = this.decompOptions2.t1;
+                    o.t2 = this.decompOptions2.t2;
+                    o.Exe();
+                }
+                else
+                {
+                    string var = c.CellText.TextData[0];
+                    string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
+                    DecompOptions2 d = this.decompOptions2.Clone();
                     d.variable = var2;
                     d.isSubWindow = true;
-                //}
-                                
-                CrossThreadStuff.Decomp2(d);
+                    CrossThreadStuff.Decomp2(d);
+                }
             }
             else
             {
                 G.Writeln("*** ERROR: Unexpected link error");
                 throw new GekkoException();
-
             }
-        }    
+        }
 
         private void Cell_Enter(object sender, MouseEventArgs e)
         {

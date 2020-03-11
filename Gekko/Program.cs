@@ -17560,9 +17560,9 @@ namespace Gekko
 
             foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
             {
-                string eqName = kvp.Value[0].nameGams;
+                string eqName = kvp.Value[0].nameGams;  //has only 1
 
-                List<List<string>> results = new List<List<string>>();
+                //List<List<string>> results = new List<List<string>>();
 
                 int counter = 0;
                 foreach (EquationVariablesGams eqVarsGams in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
@@ -17610,9 +17610,13 @@ namespace Gekko
                             Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black"));
 
                             List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
-                            firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-                            firstList.AddRange(eqVarsGams.equationVariables);
-                            firstEqName = eqName;
+
+                            if (firstText == null)
+                            {
+                                firstText = xx2[0].lhs + " = " + xx2[0].rhs;                                
+                                firstEqName = eqName;
+                                firstList.AddRange(eqVarsGams.equationVariables);
+                            }
                         }
                     }
                 }
@@ -17620,7 +17624,7 @@ namespace Gekko
 
             WindowEquationBrowser eb = new WindowEquationBrowser();
             eb.Title = variableName + " - " + "Gekko equations";
-            eb.EquationBrowserSetEquationButtons("E_Vy", "a1", new List<string>() { "b1", "b2" });
+            eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             eb.EquationBrowserSetLabel(variableName);
             eb.ShowDialog();
             eb.Close();

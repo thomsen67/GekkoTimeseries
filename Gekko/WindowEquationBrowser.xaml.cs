@@ -55,28 +55,16 @@ namespace Gekko
             this.windowEquationBrowserLabel.Inlines.Add(ss);
         }
 
-        private void ActiveCasesView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void EquationBrowser_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
             windowEquationBrowserLabel.Inlines.Clear();
             windowEquationBrowserLabel.Inlines.Add(item.Name);
-
             string s = GetEquationText(item.Name);
-
-            List m = Program.databanks.GetFirst().GetIVariable("#m") as List;
-            List m3 = null;
-            foreach (List m1 in m.list)
-            {
-                if (G.Equal((m1.list[0] as ScalarString).string2, item.Name))
-                {
-                    m3 = m1.list[1] as List;
-                }
-            }
-            if (m3 != null)
-            {
-                List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
-                this.EquationBrowserSetEquationButtons(item.Name, s, yy);
-            }
+            List<ModelGamsEquation> eqs = Program.model.modelGams.equationsByEqname[item.Name];
+            ModelGamsEquation eq = eqs[0];  //only returns 1
+            int i = 0;  //TODO TODO TODO!!! qwerty         
+            this.EquationBrowserSetEquationButtons(item.Name, s, eq.expressionVariablesWithSets[i].equationVariables);
         }
 
         private static string GetEquationText(string name)

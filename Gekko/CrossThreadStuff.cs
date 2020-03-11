@@ -48,7 +48,6 @@ namespace Gekko
             else
             {
                 // It's on the same thread, no need for Invoke
-
                 Decomp.DecompGetFuncExpressionsAndRecalc(o);
             }
         }        
