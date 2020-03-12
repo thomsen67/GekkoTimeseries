@@ -1480,7 +1480,7 @@ namespace Gekko
             else
             {
                 //G.Writeln("cell " + row + " " + col);
-                this.equation.Background = Brushes.White;
+                //this.equation.Background = Brushes.LightYellow;
                 //this.equation.Foreground = Brushes.White;
 
                 int x; int y;
@@ -1594,7 +1594,7 @@ namespace Gekko
                     {
                         if (c.cellType == CellType.Text)
                         {
-                            this.equation.Background = Brushes.LightYellow;
+                            //this.equation.Background = Brushes.LightYellow;
                             //G.Writeln(c.CellText.TextData[0]);
                             string var = c.CellText.TextData[0];
 

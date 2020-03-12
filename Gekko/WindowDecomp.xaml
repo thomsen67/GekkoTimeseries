@@ -75,12 +75,10 @@
             <StatusBarItem>
                 <TextBlock Name="statusText"></TextBlock>
             </StatusBarItem>
-
         </StatusBar>
+        
         <StackPanel Orientation="Horizontal">
             <StackPanel>
-
-
                 <Grid Name="grid0" Height="153" Width="838" ShowGridLines="False" Margin="10,10,10,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10" />
@@ -369,7 +367,7 @@
                         <TextBox                        
                      Text="Equation"                        
                      Margin="0"
-                     VerticalAlignment="Center"
+                     VerticalAlignment="Center" Background="LightYellow"
                      Height="120" Grid.Row="1" Name="equation" FontFamily="Courier New" AutoWordSelection="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ToolTip="Equation. The field shows variable labels when mouse hovers over a variable name (first column)">
                         </TextBox>
                     </Grid>
