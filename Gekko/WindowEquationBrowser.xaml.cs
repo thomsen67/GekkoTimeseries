@@ -55,6 +55,17 @@ namespace Gekko
             this.windowEquationBrowserLabel.Inlines.Add(ss);
         }
 
+
+        private void btnOk_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;            
+        }
+
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+        }
+
         private void EquationBrowser_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
@@ -207,12 +218,8 @@ namespace Gekko
 
         public void EquationBrowserSetEquationButtons1(string eqName, string firstText, List<string> firstList)
         {
-            
-
             this._activeEquation = eqName;
-            this.windowEquationBrowserLabel.Inlines.Clear();
-
-            
+            this.windowEquationBrowserLabel.Inlines.Clear();            
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
             //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)

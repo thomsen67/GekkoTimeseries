@@ -17546,7 +17546,7 @@ namespace Gekko
             else G.Writeln(text);
         }
 
-        public static void Find(O.Find o)
+        public static string Find(O.Find o)  //returns equation name
         {
 
             List<string> vars = O.Restrict(o.iv, false, false, false, true);
@@ -17622,12 +17622,17 @@ namespace Gekko
                 }
             }
 
+            string rv = null;
             WindowEquationBrowser eb = new WindowEquationBrowser();
             eb.Title = variableName + " - " + "Gekko equations";
             eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
             eb.EquationBrowserSetLabel(variableName);
-            eb.ShowDialog();
+            bool? b = eb.ShowDialog();
+            rv = eb._activeEquation;
+            if (b != true) rv = null;  //only when OK is pressed (or Enter)
             eb.Close();
+
+            return rv;
 
         }
         

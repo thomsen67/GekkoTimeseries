@@ -13,49 +13,49 @@
         <Style x:Key="ListViewStyle" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left" />
         </Style>
-        <Style x:Key="ItemContStyle" TargetType="ListViewItem">            
+        <Style x:Key="ItemContStyle" TargetType="ListViewItem">
             <!--<Setter Property="Height" Value="25" />-->
             <Setter Property="Padding" Value="0,4" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />            
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="Border.BorderThickness" Value="0,0,0,.5" />
-            <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />            
+            <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />
         </Style>
     </Window.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" SelectionChanged="EquationBrowser_SelectionChanged" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView">
-            
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="100" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Sub" Width="70" DisplayMemberBinding="{Binding Sub}" />
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Dep" Width="40" DisplayMemberBinding="{Binding Dep}" />
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Lhs" Width="40" DisplayMemberBinding="{Binding Lhs}" />
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Per" Width="50" DisplayMemberBinding="{Binding Per}" />
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Vars" Width="500" DisplayMemberBinding="{Binding Vars}" />
-                    
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-
-        <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch">
-            <!--<StackPanel Orientation="Vertical">-->
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom" Margin="10,10,10,10">
+            <Button x:Name="btnOk" Content="OK" Click="btnOk_Click" IsDefault="true" Padding="30, 6, 30, 6" Margin="5 5 5 5"></Button>
+            <Button x:Name="btnCancel" Content="Cancel" Click="btnCancel_Click" IsCancel="true" Padding="30, 6, 30, 6" Margin="5 5 5 5"></Button>
+        </StackPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" SelectionChanged="EquationBrowser_SelectionChanged" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="100" DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Sub" Width="70" DisplayMemberBinding="{Binding Sub}" />
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Dep" Width="40" DisplayMemberBinding="{Binding Dep}" />
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Lhs" Width="40" DisplayMemberBinding="{Binding Lhs}" />
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Per" Width="50" DisplayMemberBinding="{Binding Per}" />
+                        <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Vars" Width="500" DisplayMemberBinding="{Binding Vars}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
+            <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow">
+                <TextBlock Name="windowEquationBrowserLabel"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="WrapWithOverflow"></TextBlock>
+            </ScrollViewer>
+            <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" />            
+            <ScrollViewer Grid.Row="4" HorizontalAlignment="Stretch">
                 <WrapPanel Name="windowEquationBrowserButtons" Margin="10"></WrapPanel>
-                <!--<TextBlock Name="windowEquationBrowserText"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="WrapWithOverflow"> </TextBlock>-->                
-            <!--</StackPanel>-->
-        </ScrollViewer>
-        <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" />
-        <ScrollViewer Grid.Row="4" HorizontalAlignment="Stretch"  Background="LightYellow">
-            <TextBlock Name="windowEquationBrowserLabel"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="WrapWithOverflow"></TextBlock>
-        </ScrollViewer>
+            </ScrollViewer>            
+        </Grid>        
+    </DockPanel>
 
-    </Grid>
 </Window>

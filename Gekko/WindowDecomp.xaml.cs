@@ -1487,10 +1487,10 @@ namespace Gekko
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
                 string s = FindEquationText2(this.decompOptions2);
-                if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                 equation.Text = s;
             }
-        }
+        }        
 
         private void Mouse_Enter(object sender, MouseEventArgs e)
         {
@@ -1523,25 +1523,43 @@ namespace Gekko
 
             if (c != null && c.cellType == CellType.Text)
             {
-                if (true)
+
+                // ---------------------------------------
+                // FIND
+                // ---------------------------------------
+                string var = c.CellText.TextData[0];
+                O.Find o = new O.Find();
+                List m = new List(new List<string>() { var });
+                o.iv = m;
+                o.opt_prtcode = this.decompOptions2.prtOptionLower;
+                o.t1 = this.decompOptions2.t1;
+                o.t2 = this.decompOptions2.t2;
+                o.Exe();
+
+                if (o.rv != null)
                 {
-                    string var = c.CellText.TextData[0];
-                    O.Find o = new O.Find();                    
-                    List m = new List(new List<string>() { var });
-                    o.iv = m;
-                    o.opt_prtcode = this.decompOptions2.operatorHelper.guiDecompOperator;
-                    o.t1 = this.decompOptions2.t1;
-                    o.t2 = this.decompOptions2.t2;
-                    o.Exe();
-                }
-                else
-                {
-                    string var = c.CellText.TextData[0];
-                    string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
-                    DecompOptions2 d = this.decompOptions2.Clone();
-                    d.variable = var2;
-                    d.isSubWindow = true;
-                    CrossThreadStuff.Decomp2(d);
+                    // ---------------------------------------
+                    // DECOMP
+                    // ---------------------------------------
+                    O.Decomp2 o0 = new O.Decomp2();
+                    o0.type = @"ASTDECOMP3";
+                    o0.label = o.rv;
+                    o0.t1 = o.t1;
+                    o0.t2 = o.t2;
+                    o0.opt_prtcode = o.opt_prtcode;
+
+                    o0.decompItems = new List<DecompItems>();                    
+
+                    o0.select.Add(O.ExplodeIvariablesSeq(false, new
+                     List(new List<IVariable> { new ScalarString(var) })));
+
+                    o0.from.Add(O.ExplodeIvariablesSeq(false,
+                     new List(new List<IVariable> { new ScalarString(o.rv) })));
+
+                    o0.endo.Add(O.ExplodeIvariablesSeq(false, new List(new
+                     List<IVariable> { new ScalarString(var) })));
+
+                    o0.Exe();
                 }
             }
             else
@@ -1649,7 +1667,7 @@ namespace Gekko
                 else
                 {
                     string s = FindEquationText2(this.decompOptions2);
-                    if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                    //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                     equation.Text = s;
                 }
             }
@@ -2002,16 +2020,13 @@ namespace Gekko
 
         private string FindEquationText2(DecompOptions2 decompOptions)
         {
-            if (decompOptions.expressionOld != null)
+            string rv = null;
+            foreach (Link link in decompOptions.link)
             {
-                return decompOptions.expressionOld;
+                rv += "[" + link.eqname + "]:" + G.NL;
+                rv += link.expressionText + G.NL + G.NL;
             }
-            else
-            {
-                EquationHelper eh = Program.FindEquationByMeansOfVariableName(this.decompOptions2.variable);
-                if (eh == null) return ""; //probably only when model is changed while UDVALG window is open (this is illegal anyway, and a popup will appear)
-                else return ((EquationHelper)eh).equationText;
-            }
+            return rv;
         }
 
         private void radioButton1_Checked(object sender, RoutedEventArgs e)

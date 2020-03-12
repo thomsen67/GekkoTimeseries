@@ -8874,11 +8874,12 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
             public List iv = null;            
             public string opt_prtcode = null;
+            public string rv = null; //return value
 
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Find(this);
+                this.rv = Program.Find(this);
             }
         }
 
