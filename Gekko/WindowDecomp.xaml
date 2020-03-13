@@ -726,7 +726,7 @@
 
             <Label Name="flowText" Content="                                 Flowchart tracking: right-click a time period below"/>
 
-            <ScrollViewer VerticalScrollBarVisibility= "Auto" HorizontalScrollBarVisibility="Auto"  Height="350" Width="810" Margin="10,0,0,0" Focusable="False" Name="scrollView1" BorderThickness="10">
+            <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility= "Auto" HorizontalScrollBarVisibility="Auto"  Height="350" Width="810" Margin="10,0,0,0" Focusable="False" Name="scrollView1" BorderThickness="10">
                 <Border BorderThickness="0" BorderBrush="Black" Name="canvasBorder">
                     <Canvas HorizontalAlignment="Left" VerticalAlignment="Top" Height="{Binding ElementName=grid1, Path=ActualHeight}" Width="{Binding ElementName=grid1, Path=ActualWidth}" Name="canvas">
                         <DockPanel Canvas.Left="{Binding ElementName=frezenBorder, Path=ActualWidth}" Canvas.Top="{Binding ElementName=frezenBorder2, Path=ActualHeight}" Name="dockPanel1">
