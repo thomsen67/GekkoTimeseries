@@ -19,7 +19,10 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="Border.BorderThickness" Value="0,0,0,.5" />
             <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />
+            <EventSetter Event="MouseEnter" Handler="OnEquationListMouseEnter" />
         </Style>
+        
+
     </Window.Resources>
 
     <DockPanel>
@@ -35,7 +38,7 @@
                 <RowDefinition Height="5" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" SelectionChanged="EquationBrowser_SelectionChanged" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView">
+            <ListView Margin="10" ItemsSource="{Binding Items}" ItemContainerStyle="{StaticResource ItemContStyle}" SelectionMode="Single" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView">            
                 <ListView.View>
                     <GridView>
                         <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="100" DisplayMemberBinding="{Binding Name}" />

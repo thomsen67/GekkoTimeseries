@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -24,49 +25,52 @@ namespace Gekko
     public partial class WindowEquationBrowser
     {
 
-        public string _activeEquation = null;
-        public GekkoDictionary<string, Button> _buttons = new GekkoDictionary<string, Button>(StringComparer.OrdinalIgnoreCase);
+        public string _activeEquation = null; //this always has a non-null value
+        public string _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
+        public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);
 
         public WindowEquationBrowser()
         {            
             InitializeComponent();
-        }        
-
-        public void OnButtonClick(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            string s = b.Content.ToString();
-            Program.Tell("find " + s, false);
         }
 
-        public void OnButtonMouseEnter(object sender, MouseEventArgs e)
+        public void OnVariableButtonToggle(object sender, RoutedEventArgs e)
         {
-            Button b = sender as Button;
+            ToggleButton b = sender as ToggleButton;
+            string s = b.Content.ToString();
+            this.EquationBrowserSetLabel(s);
+            this._activeVariable = s;
+        }
+
+        public void OnVariableButtonUntoggle(object sender, RoutedEventArgs e)
+        {            
+            this._activeVariable = null;
+            this.EquationBrowserSetEquation(_activeEquation);
+        }
+
+        public void OnVariableButtonEnter(object sender, MouseEventArgs e)
+        {            
+            ToggleButton b = sender as ToggleButton;
             string s = b.Content.ToString();
             this.EquationBrowserSetLabel(s);
         }
 
-        public void OnButtonMouseLeave(object sender, MouseEventArgs e)
-        {
-            Button b = sender as Button;
+        public void OnVariableButtonLeave(object sender, MouseEventArgs e)
+        {            
+            ToggleButton b = sender as ToggleButton;
             string s = b.Content.ToString();
-            string ss = GetEquationText(_activeEquation);
-            this.windowEquationBrowserLabel.Inlines.Clear();
-            this.windowEquationBrowserLabel.Inlines.Add(ss);
+            string ss = null;
+            if (_activeVariable != null)
+            {
+                this.EquationBrowserSetLabel(_activeVariable);
+            }
+            else
+            {
+                this.EquationBrowserSetEquation(_activeEquation);
+            }
         }
 
-
-        private void btnOk_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;            
-        }
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = false;
-        }
-
-        private void EquationBrowser_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
             windowEquationBrowserLabel.Inlines.Clear();
@@ -78,6 +82,35 @@ namespace Gekko
             this.EquationBrowserSetEquationButtons(item.Name, s, eq.expressionVariablesWithSets[i].equationVariables);
         }
 
+        private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
+        {
+            ListViewItem x = sender as ListViewItem;
+            EquationListItem y = x.Content as EquationListItem;
+            string s = y.Name;
+        }
+
+        private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void EquationBrowserSetEquation(string eq)
+        {
+            string ss = GetEquationText(eq);
+            this.windowEquationBrowserLabel.Inlines.Clear();
+            this.windowEquationBrowserLabel.Inlines.Add(ss);
+        }
+
+        private void btnOk_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;            
+        }
+
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+        }
+        
         private static string GetEquationText(string name)
         {
             List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[name];
@@ -203,7 +236,7 @@ namespace Gekko
                     string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
                     double v = kvp.Value.GetDataSimple(per1);
 
-                    Button b = null;
+                    ToggleButton b = null;
                     _buttons.TryGetValue(ss5, out b);
                     if (b != null)
                     {
@@ -219,6 +252,7 @@ namespace Gekko
         public void EquationBrowserSetEquationButtons1(string eqName, string firstText, List<string> firstList)
         {
             this._activeEquation = eqName;
+            this._activeVariable = null;
             this.windowEquationBrowserLabel.Inlines.Clear();            
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
@@ -242,7 +276,10 @@ namespace Gekko
                 if (s == "residual___") continue;
                 string ss5 = G.ReplaceTurtle(s);
 
-                Button b = new Button();
+                //Button b = new Button();
+
+                ToggleButton b = new ToggleButton();
+
                 b.Content = ss5;
                 var cStyle = new System.Windows.Style(typeof(Border));
                 cStyle.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(4)));
@@ -256,11 +293,14 @@ namespace Gekko
                 int ii2 = 200;
                 b.BorderBrush = new SolidColorBrush(Color.FromRgb(Convert.ToByte(ii2), Convert.ToByte(ii2), Convert.ToByte(ii2)));
                 b.BorderThickness = new Thickness(1);
-                b.Click += this.OnButtonClick;
+                //b.Click += this.OnButtonClick;
 
-                b.MouseEnter += this.OnButtonMouseEnter;
-                b.MouseLeave += this.OnButtonMouseLeave;
-                this.windowEquationBrowserButtons.Children.Add(b);
+                b.MouseEnter += this.OnVariableButtonEnter;
+                b.MouseLeave += this.OnVariableButtonLeave;
+                b.Checked += this.OnVariableButtonToggle;
+                b.Unchecked += this.OnVariableButtonUntoggle;
+
+                this.windowEquationBrowserButtons.Children.Add(b);                
                 _buttons.Add(ss5, b);
             }
 

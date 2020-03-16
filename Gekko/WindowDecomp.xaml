@@ -681,29 +681,8 @@
                     <RowDefinition Height="5" />
                     <RowDefinition Height="*" />                    
                 </Grid.RowDefinitions>
-                                
-                
-                    <Grid Grid.Row="0" Height="130">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="10" />
-                            <RowDefinition Height="120" />
-                        </Grid.RowDefinitions>
-                        <DockPanel>
-                            <Border></Border>
-                        </DockPanel>
-                        <TextBox                        
-                     Text="Equation"                        
-                     Margin="0"
-                     VerticalAlignment="Center" Background="LightYellow"
-                     Height="120" Grid.Row="1" Name="equation" FontFamily="Courier New" AutoWordSelection="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" ToolTip="Equation. The field shows variable labels when mouse hovers over a variable name (first column)">
-                        </TextBox>
-                    </Grid>
-                                
-                <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
 
-                <Label Name="flowText" Content="                                 Flowchart tracking: right-click a time period below"/>
-
-                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility= "Auto" HorizontalScrollBarVisibility="Auto"  Height="350" Width="810" Margin="10,0,0,0" Focusable="False" Name="scrollView1" BorderThickness="10">
+                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility= "Auto" HorizontalScrollBarVisibility="Auto"  Height="350" Width="810" Margin="10,0,0,0" Focusable="False" Name="scrollView1" BorderThickness="10">
                     <Border BorderThickness="0" BorderBrush="Black" Name="canvasBorder">
                         <Canvas HorizontalAlignment="Left" VerticalAlignment="Top" Height="{Binding ElementName=grid1, Path=ActualHeight}" Width="{Binding ElementName=grid1, Path=ActualWidth}" Name="canvas">
                             <DockPanel Canvas.Left="{Binding ElementName=frezenBorder, Path=ActualWidth}" Canvas.Top="{Binding ElementName=frezenBorder2, Path=ActualHeight}" Name="dockPanel1">
@@ -726,6 +705,15 @@
                         </Canvas>
                     </Border>
                 </ScrollViewer>
+
+                <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />                
+
+                <ScrollViewer Grid.Row="2" HorizontalAlignment="Stretch"  Background="LightYellow" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <TextBlock Name="equation"  FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="WrapWithOverflow"></TextBlock>
+                </ScrollViewer>
+
+                <!--<Label Name="flowText" Content="                                 Flowchart tracking: right-click a time period below"/>-->
+                
             </Grid>
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
             <ListView Grid.Column="2" Name="listView" HorizontalAlignment="Left" 

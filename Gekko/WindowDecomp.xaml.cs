@@ -1758,7 +1758,7 @@ namespace Gekko
                 //
                 // NOTE:
                 //
-                flowText.Visibility = Visibility.Collapsed;
+                //flowText.Visibility = Visibility.Collapsed;
 
                 //TODO: what is this? delete?
                 //TODO: what is this? delete?
@@ -1844,8 +1844,8 @@ namespace Gekko
                 checkBox1.Opacity = 1.0;
                 checkBox2.IsEnabled = true;
                 checkBox2.Opacity = 1.0;
-                flowText.Opacity = 0.5;
-                flowText.Visibility = Visibility.Visible;
+                //flowText.Opacity = 0.5;
+                //flowText.Visibility = Visibility.Visible;
             }
 
             if (this.decompOptions2.operatorHelper.guiDecompIsRef)
@@ -1889,7 +1889,7 @@ namespace Gekko
             {
                 checkBox1.IsEnabled = false;  //shares
                 checkBox1.Opacity = 0.5;
-                flowText.Visibility = Visibility.Collapsed;
+                //flowText.Visibility = Visibility.Collapsed;
             }
 
             //hmmm but prtOptionLower cannot have x etc....??
