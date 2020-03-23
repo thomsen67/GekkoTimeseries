@@ -32,6 +32,9 @@ namespace Gekko
         public WindowEquationBrowser()
         {            
             InitializeComponent();
+            //qwerty
+            this.windowEquationBrowserListView.SelectedIndex = 0;
+            this.windowEquationBrowserListView.Focus();            
         }
 
         public void OnVariableButtonToggle(object sender, RoutedEventArgs e)
@@ -73,25 +76,29 @@ namespace Gekko
         private void OnEquationListSelectLine(object sender, SelectionChangedEventArgs e)
         {
             EquationListItem item = e.AddedItems[0] as EquationListItem;
-            windowEquationBrowserLabel.Inlines.Clear();
-            windowEquationBrowserLabel.Inlines.Add(item.Name);
-            string s = GetEquationText(item.Name);
-            List<ModelGamsEquation> eqs = Program.model.modelGams.equationsByEqname[item.Name];
-            ModelGamsEquation eq = eqs[0];  //only returns 1
+            this.EquationBrowserSetEquationAndButtons(item.Name);
+            this._activeEquation = item.Name;            
+        }
+
+        private void EquationBrowserSetEquationAndButtons(string eqName)
+        {
+            ModelGamsEquation eq = Program.model.modelGams.equationsByEqname[eqName][0]; //only returns 1            
             int i = 0;  //TODO TODO TODO!!! qwerty         
-            this.EquationBrowserSetEquationButtons(item.Name, s, eq.expressionVariablesWithSets[i].equationVariables);
+            string s = GetEquationText(eqName);
+            this.EquationBrowserSetEquationButtons(eqName, s, eq.expressionVariablesWithSets[i].equationVariables);
         }
 
         private void OnEquationListMouseEnter(object sender, MouseEventArgs e)
         {
             ListViewItem x = sender as ListViewItem;
-            EquationListItem y = x.Content as EquationListItem;
-            string s = y.Name;
+            EquationListItem item = x.Content as EquationListItem;            
+            this.EquationBrowserSetEquationAndButtons(item.Name);
         }
 
         private void OnEquationListMouseLeave(object sender, MouseEventArgs e)
         {
-
+            this.EquationBrowserSetEquationAndButtons(_activeEquation);            
+            this._activeVariable = null;  //if a variable is selected/fixed, this is removed when hovering over equ list            
         }
 
         private void EquationBrowserSetEquation(string eq)
@@ -251,14 +258,15 @@ namespace Gekko
 
         public void EquationBrowserSetEquationButtons1(string eqName, string firstText, List<string> firstList)
         {
-            this._activeEquation = eqName;
-            this._activeVariable = null;
-            this.windowEquationBrowserLabel.Inlines.Clear();            
+            //this._activeEquation = eqName;
+            //this._activeVariable = null;
+            this.windowEquationBrowserLabel.Inlines.Clear();
+            this.windowEquationBrowserLabel.Inlines.Add(firstText);
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
             //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
 
-            this.windowEquationBrowserLabel.Inlines.Add(firstText);
+
             //eb.windowEquationBrowserText.LineHeight = 12d;
             //eb.windowEquationBrowserText.LineStackingStrategy = System.Windows.LineStackingStrategy.BlockLineHeight;
 
@@ -310,7 +318,7 @@ namespace Gekko
 
     public class EquationListItem
     {
-        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor)
+        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor, bool isSelected)
         {
             Name = name;
             Sub = sub;
@@ -319,6 +327,7 @@ namespace Gekko
             Per = per;
             Vars = vars;
             LineColor = lineColor;
+            isSelected = isSelected;
         }
 
         public string Name { get; set; }
@@ -334,6 +343,8 @@ namespace Gekko
         public string Vars { get; set; }
 
         public string LineColor { get; set; }
+
+        public bool IsSelected { get; set; }
     }
 
     public class ItemHandler

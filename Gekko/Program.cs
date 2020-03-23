@@ -17558,6 +17558,8 @@ namespace Gekko
             List<string> firstList = new List<string>();
             string firstEqName = null;
 
+            int lineCounter = 0;
+
             foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
             {
                 string eqName = kvp.Value[0].nameGams;  //has only 1
@@ -17607,7 +17609,8 @@ namespace Gekko
                                 tt = "tend";
                             }
 
-                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black"));
+                            Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black", lineCounter == 3));
+                            lineCounter++;
 
                             List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
 
@@ -17626,7 +17629,9 @@ namespace Gekko
             WindowEquationBrowser eb = new WindowEquationBrowser();
             eb.Title = variableName + " - " + "Gekko equations";
             eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
-            eb.EquationBrowserSetLabel(variableName);
+            //eb.EquationBrowserSetLabel(variableName);
+            eb._activeEquation = firstEqName;
+            eb._activeVariable = null;
             bool? b = eb.ShowDialog();
             rv = eb._activeEquation;
             if (b != true) rv = null;  //only when OK is pressed (or Enter)
