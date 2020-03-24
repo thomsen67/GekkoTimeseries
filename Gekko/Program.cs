@@ -3636,7 +3636,7 @@ namespace Gekko
                     }
                     ts2.meta.label = ts1.label;
                     ts2.meta.stamp = ts1.stamp;
-                    ts2.meta.source = ts1.source;
+                    ts2.meta.source = ts1.source;                    
 
                     deserializedDatabank.AddIVariableWithOverwrite(ts2);
                 }
@@ -4057,7 +4057,7 @@ namespace Gekko
                                     ts = FindOrCreateTimeSeriesInDataBank(databank, varName, freq);
                                 }
                                 if (label != null && label != "") ts.meta.label = label;
-                                if (expr != null && expr != "") ts.meta.source = expr;
+                                if (expr != null && expr != "") ts.meta.source = expr;                                
                                 if (stamp != null && stamp != "") ts.meta.stamp = stamp;
                                 //datalines = 0;
                                 nextState = 3;
@@ -11263,6 +11263,7 @@ namespace Gekko
                 {
                     string label = ts.meta.label;
                     string source = ts.meta.source;
+                    string units = ts.meta.units;
                     if (label != null && label.Trim() != "")
                     {
                         ss += "Series label: " + label + "\n";
@@ -11270,6 +11271,10 @@ namespace Gekko
                     if (source != null && source.Trim() != "")
                     {
                         ss += "Series source: " + source + "\n";
+                    }
+                    if (units != null && units.Trim() != "")
+                    {
+                        ss += "Series units: " + units + "\n";
                     }
                 }
             }
@@ -16753,15 +16758,8 @@ namespace Gekko
                 //ts.stamp = "20-1-2016 10:34";
 
                 if (!G.NullOrBlanks(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
-
-                if (!G.NullOrBlanks(ts.meta.source))
-                {
-                    string src2 = ts.meta.source.Trim();
-                    if (src2 != "")
-                    {
-                        G.Writeln("Series source: " + src2);
-                    }
-                }
+                if (!G.NullOrBlanks(ts.meta.source)) G.Writeln("Series source: " + ts.meta.source);
+                if (!G.NullOrBlanks(ts.meta.units)) G.Writeln("Series units: " + ts.meta.units);
 
                 bool eqsPrinted = false;
                 List<MapMultidimItem> keys = null;
@@ -19545,11 +19543,7 @@ namespace Gekko
 
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o);
             GekkoDictionary<string, string> dependents = tup.Item1;
-            string dependentsHash = tup.Item2.ToString();
-            if(dependentsHash.Trim()!="")
-            {
-
-            }
+            string dependentsHash = tup.Item2.ToString();            
             string modelHash = Program.HandleModelFilesGams(textInputRaw + dependentsHash);
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
@@ -19706,7 +19700,8 @@ namespace Gekko
             //hashHelper: will get the format: "--- dependents ---<NL>a;b;c<NL>c,d,e<NL>"
             //the dependents list does not change the model per se, but it changes how DISP and other commands
             //like DECOMP show stuff.
-            StringBuilder hashHelper = new StringBuilder();  
+            StringBuilder hashHelper = new StringBuilder();
+            hashHelper.AppendLine();
             hashHelper.AppendLine("--- dependents ---");
 
             IVariable lhsList = o.opt_dep;

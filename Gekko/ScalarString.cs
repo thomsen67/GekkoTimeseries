@@ -481,7 +481,11 @@ namespace Gekko
                 case EVariableType.Date:
                     {
                         return Operators.StringDate.Add(this, (ScalarDate)x, false);
-                    }                  
+                    }
+                case EVariableType.Null:
+                    {
+                        return new ScalarString(this.string2);  //string + null = string, see #9785278992347
+                    }
                 default:
                     {
                         G.Writeln2("*** ERROR: Type error regarding add.");                        
@@ -516,6 +520,10 @@ namespace Gekko
                 case EVariableType.Date:
                     {
                         return Operators.StringDate.Add(this, (ScalarDate)x, false);
+                    }
+                case EVariableType.Null:
+                    {
+                        return new ScalarString(this.string2);  //string + null = string, see #9785278992347
                     }
                 default:
                     {

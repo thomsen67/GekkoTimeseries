@@ -84,8 +84,19 @@ namespace Gekko
                         
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            switch (input.Type())
+            {
+                case EVariableType.String:
+                    {
+                        //we allow null + string = string, see #9785278992347
+                        return new ScalarString(((ScalarString)input).string2);
+                    }
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+                        throw new GekkoException();
+                    }
+            }            
         }
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
@@ -96,10 +107,20 @@ namespace Gekko
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            switch (x.Type())
+            {
+                case EVariableType.String:
+                    {
+                        //we allow null + string = string, see #9785278992347
+                        return new ScalarString(((ScalarString)x).string2);
+                    }
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+                        throw new GekkoException();
+                    }
+            }            
         }
-
 
         public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
