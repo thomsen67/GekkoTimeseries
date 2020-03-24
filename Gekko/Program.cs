@@ -19543,7 +19543,14 @@ namespace Gekko
             Program.model = new Model();
             Program.model.modelGams = new ModelGams();
 
-            string modelHash = Program.HandleModelFilesGams(textInputRaw);
+            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o);
+            GekkoDictionary<string, string> dependents = tup.Item1;
+            string dependentsHash = tup.Item2.ToString();
+            if(dependentsHash.Trim()!="")
+            {
+
+            }
+            string modelHash = Program.HandleModelFilesGams(textInputRaw + dependentsHash);
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
 
@@ -19585,8 +19592,9 @@ namespace Gekko
                 //do nothing, also no writing of .mdl file of course
             }
             else
-            {
-                ReadGamsModelHelper(textInputRaw, fileName, o);
+            {                
+
+                ReadGamsModelHelper(textInputRaw, fileName, dependents, o);
                 Sniff2();
 
                 DateTime t1 = DateTime.Now;
@@ -19616,7 +19624,7 @@ namespace Gekko
             
         }
 
-        private static void ReadGamsModelHelper(string textInputRaw, string fileName, O.Model o)
+        private static void ReadGamsModelHelper(string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, O.Model o)
         {
             StringBuilder sb1 = new StringBuilder();
             sb1.AppendLine();
@@ -19638,11 +19646,7 @@ namespace Gekko
             TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
-                        
-            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o);
-            GekkoDictionary<string, string> dependents = tup.Item1;
-            StringBuilder dependentsHash = tup.Item2;
-
+            
             List<string> problems = new List<string>();
 
             int counter = 0;
@@ -19699,7 +19703,10 @@ namespace Gekko
         private static Tuple<GekkoDictionary<string, string>, StringBuilder> GetDependentsGams(O.Model o)
         {
             GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            StringBuilder hashHelper = new StringBuilder();  //will get the format: "--- dependents ---<NL>a;b;c<NL>c,d,e<NL>"
+            //hashHelper: will get the format: "--- dependents ---<NL>a;b;c<NL>c,d,e<NL>"
+            //the dependents list does not change the model per se, but it changes how DISP and other commands
+            //like DECOMP show stuff.
+            StringBuilder hashHelper = new StringBuilder();  
             hashHelper.AppendLine("--- dependents ---");
 
             IVariable lhsList = o.opt_dep;

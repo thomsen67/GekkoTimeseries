@@ -10664,6 +10664,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ModelGamsLhsDependent()
         {
+            Program.Flush();  //wipe out existing models
 
             // ------------------------------------------------------------
             // default model, the "right" vars are first on the lhs
