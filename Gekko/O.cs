@@ -7346,7 +7346,7 @@ namespace Gekko
                         //isSimple can never be true with READ ... TO ...
                         //Do not do this with READ<first> or READ<ref>, only with READ.                    
                         Program.MulbkClone();
-                        if (Program.model != null && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
+                        if (G.HasModelGekko() && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
                         {
                             //only in sim or mixed mode, if a model is existing
                             CreateMissingModelVariables();

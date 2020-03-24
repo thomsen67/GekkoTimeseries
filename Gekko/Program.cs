@@ -8767,7 +8767,7 @@ namespace Gekko
                 }
 
 
-                if (Program.model != null)
+                if (G.HasModelGekko())
                 {
                     List<string> list = new List<string>();
                     if (Program.model.modelGekko.dependents.ContainsKey(var))
@@ -10264,7 +10264,7 @@ namespace Gekko
             else
             {
 
-                if (Program.model != null)
+                if (G.HasModelGekko())
                 {
                     if (Program.model.modelGekko.exogenized.Count == 0 && Program.model.modelGekko.endogenized.Count == 0)
                     {
@@ -10297,7 +10297,7 @@ namespace Gekko
         public static void Sign()
         {
             StringBuilder sb = new StringBuilder();
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: It seems no model is defined. See MODEL command.");
                 throw new GekkoException();
@@ -12740,7 +12740,7 @@ namespace Gekko
                 else
                 {
 
-                    if (Program.model == null)
+                    if (!G.HasModelGekko())
                     {
                         G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
                         throw new GekkoException();
@@ -13050,7 +13050,7 @@ namespace Gekko
 
                 string leftSideVariable = G.GetUpperLowerCase(var2);
 
-                if (Program.model == null)
+                if (!G.HasModelGekko())
                 {
                     G.Writeln2("*** ERROR: DECOMP: There does not seem to be any model defined");
                     throw new GekkoException();
@@ -16775,7 +16775,7 @@ namespace Gekko
 
                 if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
 
-                if (Program.model != null)
+                if (G.HasModelGekko())
                 {
                     DispHelperShowNormalEquation(showDetailed, varnameWithoutFreq);
                 }
@@ -17481,7 +17481,7 @@ namespace Gekko
         {
             EEndoOrExo type = EEndoOrExo.Unknown;
             if (var == null) return type;
-            if (Program.model != null)
+            if (G.HasModelGekko())
             {
                 //checks if left-hand var in model. So this ignores exo/endo commands.
                 //so the E and X only describes the model equations as they are
@@ -18635,7 +18635,7 @@ namespace Gekko
 
         public static void Endo(List<string> vars2)
         {
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model is defined for endogenization");
                 throw new GekkoException();
@@ -18671,7 +18671,7 @@ namespace Gekko
         public static void PrintEndoExoLists()
         {
             G.Writeln();
-            if (Program.model == null || Program.model.modelGekko.endogenized == null || Program.model.modelGekko.endogenized.Count == 0) G.Writeln("There are 0 endogenized variables");
+            if (!G.HasModelGekko() || Program.model.modelGekko.endogenized == null || Program.model.modelGekko.endogenized.Count == 0) G.Writeln("There are 0 endogenized variables");
             else
             {
                 if (Program.model.modelGekko.endogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.endogenized.Count + " endogenized var: ");
@@ -18682,7 +18682,7 @@ namespace Gekko
                 G.PrintListWithCommas(temp1, false);
             }
             //G.Writeln();
-            if (Program.model == null || Program.model.modelGekko.exogenized == null || Program.model.modelGekko.exogenized.Count == 0) G.Writeln("There are 0 exogenized variables");
+            if (!G.HasModelGekko() || Program.model.modelGekko.exogenized == null || Program.model.modelGekko.exogenized.Count == 0) G.Writeln("There are 0 exogenized variables");
             else
             {
                 if (Program.model.modelGekko.exogenized.Count == 1) G.Write("There is " + Program.model.modelGekko.exogenized.Count + " exogenized var: ");
@@ -18699,7 +18699,7 @@ namespace Gekko
         public static void Exo(List<string> vars2)
         {
             //TODO: check that manipulated vars exist in model -- no: model may be re-read etc.
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model is defined for exogenization");
                 throw new GekkoException();
@@ -18791,7 +18791,7 @@ namespace Gekko
 
         public static void Info(GekkoTime tStart, GekkoTime tEnd, List list2)
         {
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: DIP<info> command requires a model -- seems no model is defined");
                 throw new GekkoException();
@@ -19638,66 +19638,10 @@ namespace Gekko
             TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
-
-            GekkoDictionary<string, string> dependents = null;
-            IVariable lhsList = o.opt_dep;
-            if (lhsList != null)
-            {
-                //A variable #dependents exists
-                dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                List lhsList_list = lhsList as List;
-                if (lhsList_list == null)
-                {
-                    G.Writeln2("*** ERROR: Variable #dependents should be of list type");
-                    throw new GekkoException();
-                }
-                int c = 0;
-                foreach (IVariable x in lhsList_list.list)
-                {
-                    c++;
-                    if (x.Type() != EVariableType.List)
-                    {
-                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": should be of list type");
-                        throw new GekkoException();
-                    }
-                    List x_list = x as List;
-
-                    List<string> ss = null;
-
-                    try
-                    {
-                        ss = Program.GetListOfStringsFromList(x_list);
-                    }
-                    catch
-                    {
-                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": all elements should be strings");
-                        throw;
-                    }
-
-                    if (ss.Count < 2)
-                    {
-                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": must have > 1 elements");
-                        throw new GekkoException();
-                    }
-                    string lhs = ss[0];
-                    for (int i = 1; i < ss.Count; i++)
-                    {
-                        //The ss list has this form for each line:
-                        //qG; E_qG; E_qG_tot    --> first the lhs name, then the equations where it is a lhs variable
-                        //Since each equation can only have 1 lhs, the eqnames (E_qG etc.) can at most appear 1 time in
-                        //the ss list.
-
-                        string temp = null; dependents.TryGetValue(ss[i], out temp);
-                        if (temp != null)
-                        {
-                            G.Writeln2("*** ERROR: #dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
-                            throw new GekkoException();
-                        }
-                        dependents.Add(ss[i], lhs);
-                    }
-                }
-            }
+                        
+            Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o);
+            GekkoDictionary<string, string> dependents = tup.Item1;
+            StringBuilder dependentsHash = tup.Item2;
 
             List<string> problems = new List<string>();
 
@@ -19750,6 +19694,77 @@ namespace Gekko
                     sw.Write(sb2);
                 }
             }
+        }
+
+        private static Tuple<GekkoDictionary<string, string>, StringBuilder> GetDependentsGams(O.Model o)
+        {
+            GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            StringBuilder hashHelper = new StringBuilder();  //will get the format: "--- dependents ---<NL>a;b;c<NL>c,d,e<NL>"
+            hashHelper.AppendLine("--- dependents ---");
+
+            IVariable lhsList = o.opt_dep;
+            if (lhsList != null)
+            {                
+                List lhsList_list = lhsList as List;
+                if (lhsList_list == null)
+                {
+                    G.Writeln2("*** ERROR: Variable #dependents should be of list type");
+                    throw new GekkoException();
+                }
+                int c = 0;
+                foreach (IVariable x in lhsList_list.list)
+                {
+                    c++;
+                    if (x.Type() != EVariableType.List)
+                    {
+                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": should be of list type");
+                        throw new GekkoException();
+                    }
+                    List x_list = x as List;
+
+                    List<string> ss = null;
+
+                    try
+                    {
+                        ss = Program.GetListOfStringsFromList(x_list);
+                    }
+                    catch
+                    {
+                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": all elements should be strings");
+                        throw;
+                    }
+
+                    foreach (string s in ss)
+                    {
+                        hashHelper.Append(s.ToLower()).Append(";");
+                    }
+                    hashHelper.AppendLine();
+
+                    if (ss.Count < 2)
+                    {
+                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": must have > 1 elements");
+                        throw new GekkoException();
+                    }
+                    string lhs = ss[0];
+                    for (int i = 1; i < ss.Count; i++)
+                    {
+                        //The ss list has this form for each line:
+                        //qG; E_qG; E_qG_tot    --> first the lhs name, then the equations where it is a lhs variable
+                        //Since each equation can only have 1 lhs, the eqnames (E_qG etc.) can at most appear 1 time in
+                        //the ss list.
+
+                        string temp = null; dependents.TryGetValue(ss[i], out temp);
+                        if (temp != null)
+                        {
+                            G.Writeln2("*** ERROR: #dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
+                            throw new GekkoException();
+                        }
+                        dependents.Add(ss[i], lhs);
+                    }
+                }
+            }
+
+            return new Tuple<GekkoDictionary<string, string>, StringBuilder>(dependents, hashHelper);
         }
 
         //private static void Sneeze()
@@ -19818,7 +19833,7 @@ namespace Gekko
         //    Program.databanks.GetFirst().AddIVariable("#m", mm1);
         //    WriteGbk(Program.databanks.GetFirst(), GekkoTime.tNull, GekkoTime.tNull, @"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\model.gbk", false, null, null, true, false);
         //}
-        
+
 
         private static void Sniff2()
         {
@@ -21058,7 +21073,7 @@ namespace Gekko
         public static void Trimvars()
         {
             //ErrorIfDatabanksSwapped();
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model is defined for trimming, cf. MODEL command.");
                 throw new GekkoException();
@@ -21137,7 +21152,7 @@ namespace Gekko
                 all = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             }
 
-            if (Program.model == null || replace)
+            if (!G.HasModelGekko() || replace)
             {
             }
             else
@@ -21304,7 +21319,7 @@ namespace Gekko
                 G.Writeln();
                 G.Writeln("------------------------ Report: Find missing data -------------------------------");
                 G.Writeln();
-                if (Program.model == null)
+                if (!G.HasModelGekko())
                 {
                     G.Writeln();
                     G.Writeln("No model seems to be loaded -- result cannot be split into exogenous, endogenous etc. variables");
@@ -21359,7 +21374,7 @@ namespace Gekko
 
         public static void Sim(O.Sim o)
         {
-            if (Program.model != null && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
+            if (G.HasModelGekko() && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
             {
                 G.Writeln2("*** ERROR: The model was not compiled/loaded with the current frequency");
                 G.Writeln("    This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
@@ -21381,7 +21396,7 @@ namespace Gekko
 
             //New entry to SIM
             //ErrorIfDatabanksSwapped();
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model seems to be defined (see MODEL statement)");
                 throw new GekkoException();
@@ -21419,7 +21434,7 @@ namespace Gekko
 
         public static void Itershow(List<string> vars, GekkoTime t1, GekkoTime t2)
         {
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model seems to be defined, see MODEL command.");
                 throw new GekkoException();
@@ -21608,7 +21623,7 @@ namespace Gekko
 
             Globals.simCounter = 0;
             //ErrorIfDatabanksSwapped();
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: It seems no model is defined -- simulation cannot be performed");
                 throw new GekkoException();
@@ -21684,7 +21699,7 @@ namespace Gekko
             ECompiledModelType modelType = GetModelTypeFromOptions(so);  //6 types, including Reverted (for EFTER command)
 
             //only used with ANTLR
-            if (Program.model == null || Program.model.modelGekko.equations.Count == 0)
+            if (!G.HasModelGekko() || Program.model.modelGekko.equations.Count == 0)
             {
                 G.Writeln2("*** ERROR: It seems no model is defined: did you forget a MODEL statement?");
                 throw new GekkoException();
@@ -25484,7 +25499,7 @@ namespace Gekko
             date.InnerText = now;
             root.AppendChild(date);
 
-            if (Program.model != null && !isCloseCommand)
+            if (G.HasModelGekko() && !isCloseCommand)
             {
                 //We do not want to put model info into XML if it is a CLOSE command triggering the bank write, for
                 //instance after a OPEN<edit>, etc. This is mode=data and something else.
@@ -41764,7 +41779,7 @@ namespace Gekko
 
         public static void CompareModelDatabankVarlist()
         {
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model seems to be loaded, cf. the MODEL statement.");
                 G.Writeln("*** ERROR: The comparison could not be performed.");
@@ -41976,7 +41991,7 @@ namespace Gekko
             GekkoTime tStart = Globals.globalPeriodStart;
             GekkoTime tEnd = Globals.globalPeriodEnd;
 
-            if (Program.model == null)
+            if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model seems to be loaded, cf. the MODEL statement.");
                 G.Writeln("*** ERROR: The comparison could not be performed.");

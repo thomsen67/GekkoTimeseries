@@ -1657,7 +1657,7 @@ namespace Gekko
                 CompareUtility3Way gui = new CompareUtility3Way();
                 gui.ShowDialog();
                 gui.Close();
-                if (Program.model != null) G.Writeln("Output is in file 'compare.txt'");
+                if (G.HasModelGekko()) G.Writeln("Output is in file 'compare.txt'");
             }
             catch
             {
@@ -1890,7 +1890,7 @@ namespace Gekko
                     Gui.gui.toolStripStatusLabel3a.Text = " ";
                     toolStripStatusLabel3.Image = green;
                     int goals = 0;
-                    if (Program.model != null) goals = Math.Max(Program.model.modelGekko.exogenized.Count, Program.model.modelGekko.endogenized.Count);
+                    if (G.HasModelGekko()) goals = Math.Max(Program.model.modelGekko.exogenized.Count, Program.model.modelGekko.endogenized.Count);
                     if (goals > 0)
                     {
                         this.toolStripStatusLabel2.Margin = new Padding(-5, 0, 0, -2);

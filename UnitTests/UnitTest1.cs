@@ -10685,7 +10685,6 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
             Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
 
-
             // ------------------------------------------------------------
             // Now pC is first in the qC equations, but pC is lagged,
             // which is detected

@@ -2926,7 +2926,7 @@ namespace Gekko
         /// <returns>Output string</returns>
         public static string GetUpperLowerCase(string var)
         {
-            if (Program.model != null && Program.model.modelGekko.varsAType != null)
+            if (HasModelGekko() && Program.model.modelGekko.varsAType != null)
             {
                 //a model is loaded
                 //ATypeData temp = (ATypeData)Program.model.modelGekko.varsAType[var];
@@ -2938,6 +2938,11 @@ namespace Gekko
                 }
             }
             return var;
+        }
+
+        public static bool HasModelGekko()
+        {
+            return Program.model != null && Program.model.modelGekko != null;
         }
 
         public static void PrintListWithCommasToFile(StreamWriter file, List<string> list)

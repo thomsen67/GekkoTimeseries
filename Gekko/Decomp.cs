@@ -880,7 +880,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (Program.model == null)
+                    if (!G.HasModelGekko())
                     {
                         G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
                         throw new GekkoException();
