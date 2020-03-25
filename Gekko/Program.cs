@@ -906,9 +906,14 @@ namespace Gekko
         [ProtoMember(26)]
         public bool isAfter2Model = false; //if equation is after AFTER2$ Here, both isAfterModel and isAfter2Model are true at same time
         [ProtoMember(27)]
-        public string modelBlock = "";
+        public string modelBlock = "";                
+        [ProtoMember(28)]
+        public int largestLag = 0; //always 0 or positive        
+        [ProtoMember(29)]
+        public int largestLead = 0; //always 0 or positive        
 
-        public List<Func<GekkoSmpl, IVariable>> expressions = null;  //do not protobuf this
+        public List<Func<GekkoSmpl, IVariable>> expressions = null; //do not protobuf this
+
     }
 
     /// <summary>
