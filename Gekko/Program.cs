@@ -22102,16 +22102,9 @@ namespace Gekko
                                     throw new GekkoException();
                                 }
                                 SolveAfter();
-                                if (Globals.JOrderFix)
-                                {
-                                    SolveRevertedY();
-                                    SolveRevertedAuto();                                    
-                                }
-                                else
-                                {
-                                    SolveRevertedAuto();
-                                    SolveRevertedY();
-                                }
+                                SolveRevertedT();
+                                SolveRevertedY();
+                                SolveRevertedAuto();                                
                             }
                             else if (modelType == ECompiledModelType.Res)
                             {
@@ -23557,6 +23550,13 @@ namespace Gekko
             Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
         }
 
+        private static void SolveRevertedT()
+        {
+            Object[] args2 = new Object[1];
+            args2[0] = Program.model.modelGekko.b;
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args2);
+        }
+
         private static void SolveAfter()
         {
             //Parser.OrderAndCompileModel(ECompiledModelType.After, false);
@@ -23592,16 +23592,11 @@ namespace Gekko
 
             Object[] args2 = new Object[1];
             args2[0] = Program.model.modelGekko.b;
-            if (Globals.JOrderFix)
-            {
-                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
-                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);                
-            }
-            else
-            {
-                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
-                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
-            }
+
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);                
+            
         }
 
         private static ECompiledModelType GetModelTypeFromOptions(SimOptions so)
@@ -38779,32 +38774,21 @@ namespace Gekko
                 }
             }
 
-            if (Globals.JOrderFix)
+
+            if (modelType == ECompiledModelType.GaussFailSafe)
             {
-                if (modelType == ECompiledModelType.GaussFailSafe)
-                {
-                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
-                }
-                else
-                {
-                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
-                }
+                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
             }
             else
             {
-                if (modelType == ECompiledModelType.GaussFailSafe)
-                {
-                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
-                }
-                else
-                {
-                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
-                    Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
-                }
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
             }
+
+
             Program.model.modelGekko.simulateResults[0] = iterCounter;
         }
 

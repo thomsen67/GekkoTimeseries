@@ -11333,8 +11333,6 @@ namespace UnitTests
         {
             //TODO: Test what happens if <target> is used on file without gekkoimport, and vice versa
 
-            Databank work = First();
-
             //======================== See Test__Ols for the same results
             //            Coefficients:
             //(Intercept)           x1           x2           x3           x4

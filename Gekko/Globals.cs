@@ -130,11 +130,7 @@ namespace Gekko
         public static bool fixLookup = true;
         //public static bool seriesSpeedup = false; 
 
-        public static bool useIndexerAlone = false;
-
-        //public static bool assignmentFix = true;
-
-        public static bool JOrderFix = true;
+        public static bool useIndexerAlone = false;               
 
         public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
