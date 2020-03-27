@@ -21462,7 +21462,8 @@ namespace Gekko
 
             so.isStatic = GetYesNoNullLocalOption(o.opt_static);  //works faster as an enumeration
 
-            string before = Program.model.modelGekko.beforeGcm.Replace("beforegcm$", "").Replace("beforegcm;", "");
+            string before = null;
+            if (Program.model.modelGekko.beforeGcm != null) before = Program.model.modelGekko.beforeGcm.Replace("beforegcm$", "").Replace("beforegcm;", "");
             if (!G.NullOrBlanks(before))
             {
                 ScalarDate t1 = new ScalarDate(o.t1);
@@ -21476,7 +21477,8 @@ namespace Gekko
 
             Program.SimFast(o.t1, o.t2, so);
 
-            string after = Program.model.modelGekko.afterGcm.Replace("aftergcm$", "").Replace("aftergcm;", "");
+            string after = null;
+            if (Program.model.modelGekko.afterGcm != null) after = Program.model.modelGekko.afterGcm.Replace("aftergcm$", "").Replace("aftergcm;", "");
             if (!G.NullOrBlanks(after))
             {                
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimestart", new ScalarDate(o.t1));
