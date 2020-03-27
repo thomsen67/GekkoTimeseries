@@ -8790,6 +8790,10 @@ namespace Gekko
 
                     EquationHelper eq = Program.FindEquationByMeansOfVariableName(var);
 
+                    //TODO: Here we could find variables from T-equations and show these
+                    //      Will probably imply some looping through eqs.
+                    //      qwerty
+
                     if (eq != null && eq.equationCode != null)
                     {
                         foreach (string s in eq.precedentsWithLagIndicator.Keys)
@@ -19064,6 +19068,13 @@ namespace Gekko
                 ParserOLD.EmitModelFromANTLR(textInput, fileName);
                 parsingSeconds = G.Seconds(t1);
 
+                if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
+                {
+                    G.Writeln2("*** ERROR: There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest");
+                    G.Writeln("           lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables", Color.Red);
+                    throw new GekkoException();
+                }
+
                 ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.
 
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
@@ -21645,7 +21656,7 @@ namespace Gekko
 
             bool usingFairTaylor = false;
             bool usingNewtonFairTaylor = false;
-            if (Program.model.modelGekko.largestLead > 0)
+            if (Program.model.modelGekko.largestLeadOutsideRevertedPart > 0)
             {
                 if (G.Equal(Program.options.solve_forward_method, "fair")) usingFairTaylor = true;
                 if (G.Equal(Program.options.solve_forward_method, "nfair")) usingNewtonFairTaylor = true;
@@ -21873,14 +21884,14 @@ namespace Gekko
 
             GekkoTime tStart0 = tStart.Add(largestLag);
 
-            GekkoTime tEnd_withRE = tEnd.Add(Program.model.modelGekko.largestLead);
+            GekkoTime tEnd_withRE = tEnd.Add(Program.model.modelGekko.largestLeadOutsideRevertedPart);
 
             int horizon2 = 0;
             if (IsStacked())
             {
                 horizon2 = Program.options.solve_forward_stacked_horizon - 1;
                 tEnd_withRE = tEnd_withRE.Add(horizon2);  //horizon2=0 is the same as normal newton
-            }
+            }            
 
             //DateTime dt1 = DateTime.Now;
             //G.Writeln("Code up to a[] load: used " + (dt1 - startTime).TotalMilliseconds / 1000d);
@@ -22102,7 +22113,7 @@ namespace Gekko
                                     throw new GekkoException();
                                 }
                                 SolveAfter();
-                                SolveRevertedT();
+                                SolveRevertedX();
                                 SolveRevertedY();
                                 SolveRevertedAuto();                                
                             }
@@ -22447,17 +22458,17 @@ namespace Gekko
             Program.model.modelGekko.terminalHelper = null;  //will stay like this if terminal feed=external or there are no leads
             if (G.Equal(Program.options.solve_forward_terminal_feed, "internal"))
             {
-                if (Program.model.modelGekko.largestLead > 0)
+                if (Program.model.modelGekko.largestLeadOutsideRevertedPart > 0)
                 {
                     Program.model.modelGekko.terminalHelper = new List<Dictionary<int, int>>();
-                    for (int i = 0; i < Program.model.modelGekko.largestLead; i++)
+                    for (int i = 0; i < Program.model.modelGekko.largestLeadOutsideRevertedPart; i++)
                     {
                         Program.model.modelGekko.terminalHelper.Add(new Dictionary<int, int>());
                     }
                     foreach (BTypeData data in Program.model.modelGekko.varsBType.Values)
                     {
                         if (data.lag <= 0) continue;
-                        for (int i = 0; i < Program.model.modelGekko.largestLead; i++)
+                        for (int i = 0; i < Program.model.modelGekko.largestLeadOutsideRevertedPart; i++)
                         {
                             if (i >= data.lag) continue;
                             BTypeData data2 = Program.model.modelGekko.varsBType[data.variable + Globals.lagIndicator + i];
@@ -22519,7 +22530,7 @@ namespace Gekko
             {
                 if (terminal != ETerminalCondition.Exogenous)
                 {
-                    for (int t2 = -largestLag + obsSimPeriod; t2 < (-largestLag + obsSimPeriod) + Program.model.modelGekko.largestLead; t2++)
+                    for (int t2 = -largestLag + obsSimPeriod; t2 < (-largestLag + obsSimPeriod) + Program.model.modelGekko.largestLeadOutsideRevertedPart; t2++)
                     {
                         //NOTE: do not use damping here: terminal values should not be damped!
                         if (terminal == ETerminalCondition.ConstantLevel)
@@ -23550,11 +23561,11 @@ namespace Gekko
             Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
         }
 
-        private static void SolveRevertedT()
+        private static void SolveRevertedX()
         {
             Object[] args2 = new Object[1];
             args2[0] = Program.model.modelGekko.b;
-            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args2);
         }
 
         private static void SolveAfter()
@@ -23593,7 +23604,7 @@ namespace Gekko
             Object[] args2 = new Object[1];
             args2[0] = Program.model.modelGekko.b;
 
-            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args2);
             Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
             Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);                
             
@@ -38777,13 +38788,13 @@ namespace Gekko
 
             if (modelType == ECompiledModelType.GaussFailSafe)
             {
-                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args);
                 Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
                 Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
             }
             else
             {
-                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedT", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args);
                 Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
                 Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
             }

@@ -130,7 +130,8 @@ namespace Gekko
         public int largestLag = 0;  //always 0 or positive        
         [ProtoMember(6)]
         public int largestLead = 0;  //always 0 or positive
-        //[ProtoMember(7)]
+        [ProtoMember(7)]
+        public int largestLeadOutsideRevertedPart = 0;  //always 0 or positive, does not count leads in RevertedX, RevertedY, RevertedAuto equations. Corresponds to .leadedVariables.
         public string modelHashTrue = null;
         [ProtoMember(8)]
         public bool fatalEndogenousError = false;  //set true if two equal auto-generated J-factors        
@@ -173,7 +174,7 @@ namespace Gekko
         [ProtoMember(18)]
         public GekkoDictionary<string, ATypeData> varsAType = new GekkoDictionary<string, ATypeData>(StringComparer.OrdinalIgnoreCase);
         [ProtoMember(19)]
-        public GekkoDictionary<int, int> leadedVariables = new GekkoDictionary<int, int>();
+        public GekkoDictionary<int, int> leadedVariables = new GekkoDictionary<int, int>();  //note: corresponds to .largestLeadOutsideRevertedPart rather than .largestLead
         //corresponds to endo when no EXO/ENDO is done (cf. endogenous).
         [ProtoMember(20)]       
         public GekkoDictionary<string, string> endogenousOriginallyInModel = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //only keys are used
@@ -315,7 +316,8 @@ namespace Gekko
                 extra = " (parse: " + timeUsedParsing + ", compile: " + Program.model.modelGekko.modelInfo.lastCompileDuration + ")";
             }
             string note = "";
-            if (Program.model.modelGekko.largestLead > 0) note = " (NOTE: Forward-looking model)";
+            if (Program.model.modelGekko.largestLeadOutsideRevertedPart > 0) note += " (NOTE: Forward-looking model)";
+            if (Program.model.modelGekko.largestLead > Program.model.modelGekko.largestLeadOutsideRevertedPart) note += " (NOTE: has table vars with lead = "+ Program.model.modelGekko.largestLead + ")";
 
             Table tab = new Table();
 
@@ -353,7 +355,7 @@ namespace Gekko
                 tab.CurRow.Next();                
             }
             
-            tab.CurRow.SetText(1, "Lags      : Largest lag = " + Program.model.modelGekko.largestLag + ", largest lead = " + Program.model.modelGekko.largestLead + note);
+            tab.CurRow.SetText(1, "Lags      : Largest lag = " + Program.model.modelGekko.largestLag + ", largest lead = " + Program.model.modelGekko.largestLeadOutsideRevertedPart + note);
             tab.CurRow.SetBottomBorder(1, 1);
             tab.CurRow.Next();
             tab.CurRow.SetText(1, "Total vars     = " + G.IntFormat(this.total, 7) + "     " + "Endogenous  = " + G.IntFormat(this.endo2, 7) + "     " + "Endogenous   = " + G.IntFormat(this.endo3, 7));
