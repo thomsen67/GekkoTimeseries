@@ -5403,6 +5403,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("o" + Num(node) + ".t1 = G.GetStartDate(o" + Num(node) + ".t1);" + G.NL;
                             //node.Code.A("o" + Num(node) + ".t2 = G.GetEndDate(o" + Num(node) + ".t2);" + G.NL;
                             GetCodeFromAllChildren(node);  //gets dates and options
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

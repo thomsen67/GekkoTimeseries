@@ -10328,6 +10328,8 @@ namespace Gekko
             public string opt_static = null;
             public string opt_after = null;
             public string opt_res = null;
+            public P p = null;
+
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);

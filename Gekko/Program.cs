@@ -13817,23 +13817,51 @@ namespace Gekko
         {
             List<string> output = new List<string>();
             List<string> outputVarlist = new List<string>();
-            bool varlistFlag = false;
+            List<string> outputBeforeGcm = new List<string>();
+            List<string> outputAfterGcm = new List<string>();
+
+            bool outputVarlistFlag = false;
+            bool outputBeforeGcmFlag = false;
+            bool outputAfterGcmFlag = false;
             foreach (string line in input)
             {
                 string line2 = line.Trim();
                 if (line2.ToLower().StartsWith("varlist$") || line2.ToLower().StartsWith("varlist;"))
                 {
-                    varlistFlag = true;
+                    outputVarlistFlag = true;
+                    outputBeforeGcmFlag = false;
+                    outputAfterGcmFlag = false;                    
                 }
-                if (varlistFlag) outputVarlist.Add(line);
+                else if (line2.ToLower().StartsWith("beforegcm$") || line2.ToLower().StartsWith("beforegcm;"))
+                {
+                    outputVarlistFlag = false;
+                    outputBeforeGcmFlag = true;
+                    outputAfterGcmFlag = false;
+                }
+                else if (line2.ToLower().StartsWith("aftergcm$") || line2.ToLower().StartsWith("aftergcm;"))
+                {
+                    outputVarlistFlag = false;
+                    outputBeforeGcmFlag = false;
+                    outputAfterGcmFlag = true;
+                }
+                if (outputVarlistFlag) outputVarlist.Add(line);
+                else if (outputBeforeGcmFlag) outputBeforeGcm.Add(line);
+                else if (outputAfterGcmFlag) outputAfterGcm.Add(line);
                 else output.Add(line);
             }
-            StringBuilder sVarlist = new StringBuilder();
-            foreach (string line in outputVarlist)
-            {
-                sVarlist.AppendLine(line);
-            }
-            modelCommentsHelper.varlist = sVarlist.ToString();
+
+            StringBuilder temp1 = new StringBuilder();
+            foreach (string line in outputVarlist) temp1.AppendLine(line);            
+            modelCommentsHelper.cutout_varlist = temp1.ToString();
+
+            StringBuilder temp2 = new StringBuilder();
+            foreach (string line in outputBeforeGcm) temp2.AppendLine(line);
+            modelCommentsHelper.cutout_beforeGcm = temp2.ToString();
+
+            StringBuilder temp3 = new StringBuilder();
+            foreach (string line in outputAfterGcm) temp3.AppendLine(line);
+            modelCommentsHelper.cutout_afterGcm = temp3.ToString();
+
             return output;
         }
 
@@ -19110,6 +19138,16 @@ namespace Gekko
 
             HandleVarlist(modelCommentsHelper);
 
+            if (!G.NullOrEmpty(modelCommentsHelper.cutout_beforeGcm))
+            {
+                Program.model.modelGekko.beforeGcm = modelCommentsHelper.cutout_beforeGcm;
+            }
+
+            if (!G.NullOrEmpty(modelCommentsHelper.cutout_afterGcm))
+            {
+                Program.model.modelGekko.afterGcm = modelCommentsHelper.cutout_afterGcm;
+            }
+
             Program.model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
             Program.model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
 
@@ -20511,10 +20549,10 @@ namespace Gekko
 
             string fileNameTemp = null;
             bool foundInFrm = false;
-            if (modelCommentsHelper.varlist != null && modelCommentsHelper.varlist.Length > 0)
+            if (modelCommentsHelper.cutout_varlist != null && modelCommentsHelper.cutout_varlist.Length > 0)
             {
                 foundInFrm = true;
-                varList = new StringBuilder(modelCommentsHelper.varlist);
+                varList = new StringBuilder(modelCommentsHelper.cutout_varlist);
             }
             else
             {
@@ -21388,10 +21426,16 @@ namespace Gekko
         public static bool IsStacked()
         {
             return G.Equal(Program.options.solve_forward_method, "stacked");
-        }        
+        }
 
         public static void Sim(O.Sim o)
         {
+            if (!G.HasModelGekko())
+            {
+                G.Writeln2("*** ERROR: No model seems to be defined (see MODEL statement)");
+                throw new GekkoException();
+            }
+
             if (G.HasModelGekko() && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
             {
                 G.Writeln2("*** ERROR: The model was not compiled/loaded with the current frequency");
@@ -21410,15 +21454,7 @@ namespace Gekko
                 Program.Res(o.t1, o.t2);
                 return;
             }
-
-
-            //New entry to SIM
-            //ErrorIfDatabanksSwapped();
-            if (!G.HasModelGekko())
-            {
-                G.Writeln2("*** ERROR: No model seems to be defined (see MODEL statement)");
-                throw new GekkoException();
-            }
+            
             if (!G.IsUnitTesting()) Gekko.Gui.gui.textBox1.SuspendLayout();
             SimOptions so = new SimOptions();
             so.method = Program.options.solve_method;
@@ -21426,10 +21462,29 @@ namespace Gekko
 
             so.isStatic = GetYesNoNullLocalOption(o.opt_static);  //works faster as an enumeration
 
+            string before = Program.model.modelGekko.beforeGcm.Replace("beforegcm$", "").Replace("beforegcm;", "");
+            if (!G.NullOrBlanks(before))
             {
-                Program.SimFast(o.t1, o.t2, so);
+                ScalarDate t1 = new ScalarDate(o.t1);
+                ScalarDate t2 = new ScalarDate(o.t2);
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimestart", new ScalarDate(o.t1));
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimeend", new ScalarDate(o.t2));
+                Program.obeyCommandCalledFromGUI(before, o.p);
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimestart");
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimeend");
             }
 
+            Program.SimFast(o.t1, o.t2, so);
+
+            string after = Program.model.modelGekko.afterGcm.Replace("aftergcm$", "").Replace("aftergcm;", "");
+            if (!G.NullOrBlanks(after))
+            {                
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimestart", new ScalarDate(o.t1));
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimeend", new ScalarDate(o.t2));
+                Program.obeyCommandCalledFromGUI(after, o.p);
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimestart");
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimeend");
+            }
 
             if (!G.IsUnitTesting()) Gekko.Gui.gui.textBox1.ResumeLayout();
         }
@@ -45013,7 +45068,10 @@ namespace Gekko
         public int dateCounter = 0;
         public int signatureCounter = 0;
         public string modelHashTrue = null;
-        public string varlist;
+        public string cutout_varlist;
+        public string cutout_beforeGcm;
+        public string cutout_afterGcm;        
+
     }
 
     public class RunStatusData : INotifyPropertyChanged, IComparable<RunStatusData>
