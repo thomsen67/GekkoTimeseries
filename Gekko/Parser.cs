@@ -3403,25 +3403,17 @@ namespace Gekko
 
                     if (lag >= 1)
                     {
-                        wh2.rightHandSideCsCode.shortVersion.Append("Gekko.Program.Lead(b, " + data.bNumber + ")");                        
+                        wh2.rightHandSideCsCode.shortVersion.Append("Gekko.Program.Lead(b, " + data.bNumber + ")");
                     }
                     else
                     {
                         //normal way for non-lead variables
                         wh2.rightHandSideCsCode.shortVersion.Append("b[" + data.bNumber + "]");
                     }
-                    if (lag == 0 && !Globals.showZero)
-                    {
-                        //This is probably so that equations can be GENR'ed
-                        wh2.rightHandSideCsCode.longVersion.Append("databank.GetVariable(" + Globals.QT + variable + Globals.QT + ").GetDataNonLight(t)");
-                        wh2.rightHandSideCsCode.humanVersion.Append(variable);
-                    }
-                    else
-                    {
-                        //This is probably so that equations can be GENR'ed
-                        wh2.rightHandSideCsCode.longVersion.Append("databank.GetVariable(" + Globals.QT + variable + Globals.QT + ").GetData(t.Add(" + lag + "))");
-                        wh2.rightHandSideCsCode.humanVersion.Append(variable + "[" + lag + "]");
-                    }
+
+                    //This is probably so that equations can be GENR'ed
+                    wh2.rightHandSideCsCode.longVersion.Append("O.PredictGetValue(`" + variable + "`, gt.Add(" + lag + "))");
+                    wh2.rightHandSideCsCode.humanVersion.Append(variable + "[" + lag + "]");
                 }
             }
             else  //for genr and prt statements

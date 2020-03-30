@@ -913,6 +913,7 @@ namespace Gekko
         public int largestLead = 0; //always 0 or positive        
 
         public List<Func<GekkoSmpl, IVariable>> expressions = null; //do not protobuf this
+        public Action<string, GekkoTime> predictAction = null; //do not protobuf this
 
     }
 
@@ -13679,6 +13680,46 @@ namespace Gekko
             }
         }
 
+        public static void CreatePredictActions(string code)
+        {
+            StringBuilder s2 = new StringBuilder();
+            s2.AppendLine("using System;");
+            s2.AppendLine("using System.Collections.Generic;");
+            s2.AppendLine("using System.Text;");
+            s2.AppendLine("namespace Gekko");
+            s2.AppendLine("{");
+            s2.AppendLine("    public class TranslatedCode");
+            s2.AppendLine("    {");
+            s2.AppendLine("public static void PredictActions()");
+            s2.AppendLine("{");
+            s2.AppendLine(code + ";");
+            s2.AppendLine("}");  //method Predict()
+            s2.AppendLine("}");  //class TranslatedCode
+            s2.AppendLine("}");  //namespace Gekko
+            s2.Replace("`", Globals.QT);
+            CompilerParameters compilerParams = new CompilerParameters();
+            compilerParams = new CompilerParameters();
+            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.GenerateInMemory = true;
+            compilerParams.IncludeDebugInformation = false;
+            compilerParams.ReferencedAssemblies.Add("system.dll");
+            compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+            compilerParams.GenerateExecutable = false;
+            CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2.ToString());
+            if (cr.Errors.HasErrors)
+            {
+                throw new GekkoException();
+            }
+
+//            Globals.predictActions[0] = (name, gt) => {
+//                double d =
+//(((((((O.PredictGetValue("fCp", gt.Add(0))) + (O.PredictGetValue("fCo", gt.Add(0)))) + (O.PredictGetValue("fIm", gt.Add(0)))) + (O.PredictGetValue("fIb", gt.Add(0)))) + (O.PredictGetValue("fIt", gt.Add(0)))) + (O.PredictGetValue("fIl", gt.Add(0)))) - (O.PredictGetValue("fM", gt.Add(0)))) + (O.PredictGetValue("fE", gt.Add(0))); O.PredictSetValue(name, gt, d);
+//            };
+
+            Object[] args = new Object[0];
+            cr.CompiledAssembly.GetType("Gekko.TranslatedCode").InvokeMember("PredictActions", BindingFlags.InvokeMethod, null, null, args);            
+        }
+
 
         private static void CreatePrtSnippetDll(out CompilerResults cr, string s, string s3)
         {
@@ -13817,36 +13858,36 @@ namespace Gekko
         {
             List<string> output = new List<string>();
             List<string> outputVarlist = new List<string>();
-            List<string> outputBeforeGcm = new List<string>();
-            List<string> outputAfterGcm = new List<string>();
+            List<string> outputRunBefore = new List<string>();
+            List<string> outputRunAfter = new List<string>();
 
             bool outputVarlistFlag = false;
-            bool outputBeforeGcmFlag = false;
-            bool outputAfterGcmFlag = false;
+            bool outputRunBeforeFlag = false;
+            bool outputRunAfterFlag = false;
             foreach (string line in input)
             {
                 string line2 = line.Trim();
                 if (line2.ToLower().StartsWith("varlist$") || line2.ToLower().StartsWith("varlist;"))
                 {
                     outputVarlistFlag = true;
-                    outputBeforeGcmFlag = false;
-                    outputAfterGcmFlag = false;                    
+                    outputRunBeforeFlag = false;
+                    outputRunAfterFlag = false;                    
                 }
-                else if (line2.ToLower().StartsWith("beforegcm$") || line2.ToLower().StartsWith("beforegcm;"))
+                else if (line2.ToLower().StartsWith("runbefore$") || line2.ToLower().StartsWith("runbefore;"))
                 {
                     outputVarlistFlag = false;
-                    outputBeforeGcmFlag = true;
-                    outputAfterGcmFlag = false;
+                    outputRunBeforeFlag = true;
+                    outputRunAfterFlag = false;
                 }
-                else if (line2.ToLower().StartsWith("aftergcm$") || line2.ToLower().StartsWith("aftergcm;"))
+                else if (line2.ToLower().StartsWith("runafter$") || line2.ToLower().StartsWith("runafter;"))
                 {
                     outputVarlistFlag = false;
-                    outputBeforeGcmFlag = false;
-                    outputAfterGcmFlag = true;
+                    outputRunBeforeFlag = false;
+                    outputRunAfterFlag = true;
                 }
                 if (outputVarlistFlag) outputVarlist.Add(line);
-                else if (outputBeforeGcmFlag) outputBeforeGcm.Add(line);
-                else if (outputAfterGcmFlag) outputAfterGcm.Add(line);
+                else if (outputRunBeforeFlag) outputRunBefore.Add(line);
+                else if (outputRunAfterFlag) outputRunAfter.Add(line);
                 else output.Add(line);
             }
 
@@ -13855,12 +13896,12 @@ namespace Gekko
             modelCommentsHelper.cutout_varlist = temp1.ToString();
 
             StringBuilder temp2 = new StringBuilder();
-            foreach (string line in outputBeforeGcm) temp2.AppendLine(line);
-            modelCommentsHelper.cutout_beforeGcm = temp2.ToString();
+            foreach (string line in outputRunBefore) temp2.AppendLine(line);
+            modelCommentsHelper.cutout_runbefore = temp2.ToString();
 
             StringBuilder temp3 = new StringBuilder();
-            foreach (string line in outputAfterGcm) temp3.AppendLine(line);
-            modelCommentsHelper.cutout_afterGcm = temp3.ToString();
+            foreach (string line in outputRunAfter) temp3.AppendLine(line);
+            modelCommentsHelper.cutout_runafter = temp3.ToString();
 
             return output;
         }
@@ -16467,8 +16508,7 @@ namespace Gekko
 
             return rv;  //see https://stackoverflow.com/questions/970911/net-remove-dots-from-the-path
         }
-
-
+        
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, O.Disp o)
         {
             Disp(tStart, tEnd, list, false, false, false, o);
@@ -19138,14 +19178,14 @@ namespace Gekko
 
             HandleVarlist(modelCommentsHelper);
 
-            if (!G.NullOrEmpty(modelCommentsHelper.cutout_beforeGcm))
+            if (!G.NullOrEmpty(modelCommentsHelper.cutout_runbefore))
             {
-                Program.model.modelGekko.beforeGcm = modelCommentsHelper.cutout_beforeGcm;
+                Program.model.modelGekko.runBefore = modelCommentsHelper.cutout_runbefore;
             }
 
-            if (!G.NullOrEmpty(modelCommentsHelper.cutout_afterGcm))
+            if (!G.NullOrEmpty(modelCommentsHelper.cutout_runafter))
             {
-                Program.model.modelGekko.afterGcm = modelCommentsHelper.cutout_afterGcm;
+                Program.model.modelGekko.runAfter = modelCommentsHelper.cutout_runafter;
             }
 
             Program.model.modelGekko.modelInfo.timeUsedParsing = parsingSeconds;
@@ -21463,7 +21503,7 @@ namespace Gekko
             so.isStatic = GetYesNoNullLocalOption(o.opt_static);  //works faster as an enumeration
 
             string before = null;
-            if (Program.model.modelGekko.beforeGcm != null) before = Program.model.modelGekko.beforeGcm.Replace("beforegcm$", "").Replace("beforegcm;", "");
+            if (Program.model.modelGekko.runBefore != null) before = Program.model.modelGekko.runBefore.Replace("runbefore$", "").Replace("runbefore;", "");
             if (!G.NullOrBlanks(before))
             {
                 ScalarDate t1 = new ScalarDate(o.t1);
@@ -21478,7 +21518,7 @@ namespace Gekko
             Program.SimFast(o.t1, o.t2, so);
 
             string after = null;
-            if (Program.model.modelGekko.afterGcm != null) after = Program.model.modelGekko.afterGcm.Replace("aftergcm$", "").Replace("aftergcm;", "");
+            if (Program.model.modelGekko.runAfter != null) after = Program.model.modelGekko.runAfter.Replace("runafter$", "").Replace("runafter;", "");
             if (!G.NullOrBlanks(after))
             {                
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimestart", new ScalarDate(o.t1));
@@ -45071,8 +45111,8 @@ namespace Gekko
         public int signatureCounter = 0;
         public string modelHashTrue = null;
         public string cutout_varlist;
-        public string cutout_beforeGcm;
-        public string cutout_afterGcm;        
+        public string cutout_runbefore;
+        public string cutout_runafter;        
 
     }
 

@@ -365,6 +365,7 @@ ASTCOMPARE2;
     ASTFILENAMEQUOTES;
     ASTFILENAMESTAR;
     ASTFINDMISSINGDATA;
+	ASTPREDICT;
     ASTFIND;
     ASTFLAT;
     ASTFOR;
@@ -1122,6 +1123,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	PREDICT      = 'PREDICT'     ;
     FIND      = 'FIND'     ;
 	PYTHON      = 'PYTHON'     ;
 	DEP = 'DEP';
@@ -1753,6 +1755,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+										d.Add("predict"               , PREDICT  );
                                         d.Add("find"               , FIND  );
 										d.Add("python"               , PYTHON  );
 										d.Add("dep"               , DEP  );
@@ -2561,6 +2564,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | option				 SEMICOLON!
 						  | pause                SEMICOLON!
 						  | pipe				 SEMICOLON!
+						  | predict              SEMICOLON!
 						  | sheetImport          SEMICOLON!  //maybe necessary that it is before print
 						  | print                SEMICOLON!
 						  | procedureDef         SEMICOLON!
@@ -3224,6 +3228,19 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | CONTINUE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONTINUE yesNo?)						
 						  | STOP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STOP yesNo?)											
 						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// PREDICT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+predict:				    PREDICT predictOpt1? seqOfBankvarnames -> ^({token("ASTPREDICT", ASTPREDICT, input.LT(1).Line)} ^(ASTOPT_ predictOpt1?) seqOfBankvarnames);
+
+predictOpt1:			    ISNOTQUAL
+						  | leftAngle2          predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 predictOpt1h*)							
+						  | leftAngleNo2 dates? predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) predictOpt1h*)
+                            ;
+predictOpt1h:				;
+
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PROCEDURE CALL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4255,6 +4272,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  PREDICT|
   FIND|
   PYTHON|
   BROWSER|

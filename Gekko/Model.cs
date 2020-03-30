@@ -226,10 +226,10 @@ namespace Gekko
         public int subPeriods = -12345;  //1 for a, 4 for q, 12 for m. The value -12345 means inactive. This is only relevant regarding the pchy() function
 
         [ProtoMember(30)]
-        public string beforeGcm = null;
+        public string runBefore = null;
 
         [ProtoMember(31)]
-        public string afterGcm = null;
+        public string runAfter = null;
 
         public ModelGekko()
         { 

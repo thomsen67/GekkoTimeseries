@@ -340,6 +340,8 @@ namespace Gekko
 
         public static bool smart1 = true;
 
+        public static List<Action<string, GekkoTime>> predictActions = null;
+
         //public static string functionT1Cs = "t";
         //public static string functionT2Cs = "GekkoTime t";
         

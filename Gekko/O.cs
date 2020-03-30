@@ -2191,6 +2191,26 @@ namespace Gekko
             
         }
 
+        public static void PredictSetValue(string name, GekkoTime gt, double d)
+        {
+            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.GetFreq(Program.options.freq), O.ECreatePossibilities.Can, false);
+            Series ts = iv as Series;
+            ts.SetData(gt, d);
+        }
+
+        public static double PredictGetValue(string name, GekkoTime gt)
+        {
+            //We do not allow searching of vars in databanks
+            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.GetFreq(Program.options.freq), O.ECreatePossibilities.NoneReturnNull, false);
+            if (iv == null)
+            {
+                G.Writeln2("*** ERROR: PREDICT: Series '" + name + "' does not exist in first-position databank");
+                throw new GekkoException();
+            }
+            Series ts = iv as Series;
+            return ts.GetDataSimple(gt);
+        }
+
         //public static IVariable GetIVariableFromString(string dbName, string varName, string freq, string[] indexes, ECreatePossibilities type)
         //{
         //    //type is only relevant for series, ignored for others
@@ -8834,6 +8854,105 @@ namespace Gekko
                     Program.Delete(this.names);
                 }
             }
+        }
+
+        public class Predict
+        {
+            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
+            public List iv = null;
+            //public string type = null;
+
+            public void Exe()
+            {
+                G.CheckLegalPeriod(this.t1, this.t2);
+                List<string> vars = O.Restrict(this.iv, false, false, false, false);
+
+                if (!G.HasModelGekko())
+                {
+                    G.Writeln2("*** ERROR: PREDICT does not work without a Gekko model (cf. MODEL)");
+                    throw new GekkoException();
+                }
+
+                List<EquationHelper> eqs = new List<EquationHelper>();
+
+                foreach (string s in vars)
+                {
+                    bool found = false;
+                    foreach (EquationHelper eh in Program.model.modelGekko.equations)
+                    {
+                        if (G.Equal(eh.lhs, s))
+                        {
+                            eqs.Add(eh);
+                            found = true;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
+                        {
+                            if (G.Equal(eh.lhs, s))
+                            {
+                                eqs.Add(eh);
+                                found = true;
+                            }
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        G.Writeln2("*** ERROR: PREDICT could not find equation corresponding to variable '" + s + "'");
+                        throw new GekkoException();
+                    }
+                }
+
+                bool ok = true;
+                int counter = -1;
+                foreach (EquationHelper eh in eqs)
+                {
+                    if(eh.predictAction ==null)
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if (!ok)
+                {
+                    
+                    counter = -1;
+                    StringBuilder sb = new StringBuilder();
+                    foreach (EquationHelper eh in eqs)
+                    {
+                        counter++;
+                        string s = "Globals.predictActions[" + counter + "] = (name, gt) => { double d = " + eh.csCodeRhsLongVersion + "; O.PredictSetValue(name, gt, d); };";
+                        sb.AppendLine(s);
+                    }
+
+                    Globals.predictActions = new List<Action<string, GekkoTime>>();
+                    foreach (EquationHelper eh in eqs)
+                    {
+                        Globals.predictActions.Add(null);
+                    }
+                    Program.CreatePredictActions(sb.ToString());
+
+                    counter = -1;
+                    foreach (EquationHelper eh in eqs)
+                    {
+                        counter++;
+                        eh.predictAction = Globals.predictActions[counter];
+                    }
+                }
+                                
+                foreach (EquationHelper eh in eqs)
+                {                    
+                    foreach (GekkoTime gt in new GekkoTimeIterator(this.t1, this.t2))
+                    {
+                        eh.predictAction(eh.lhs, gt);
+                    }
+                }
+            }            
         }
 
         public class Disp
