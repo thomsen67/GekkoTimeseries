@@ -6242,6 +6242,7 @@ namespace UnitTests
             I("cy = c/y;");
             I("time 2001 2010;");   //.6 y = .4 y.1 + i + g
             I("sim;");
+            I("predict <2005 2006> g;");
             _AssertSeries(First(), "y", 2001, 1d / 0.6d * (0.4d * 100d + 10d * 1.02d + 10d * 1.03d), 0.0001d);
             double ylag3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2002, 1));
             double ylag2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2003, 1));
@@ -6251,6 +6252,9 @@ namespace UnitTests
             double ylead2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2007, 1));
             double ylead3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2008, 1));
             _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);
+            _AssertSeries(First(), "g", 2004, 10d * 1.03d * 1.03d * 1.03d * 1.03d, sharedDelta);
+            _AssertSeries(First(), "g", 2004, 10d * 1.03d * 1.03d * 1.03d * 1.03d * 1.03d, sharedDelta);
+
 
             if (false)
             {

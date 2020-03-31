@@ -3235,11 +3235,15 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 
 predict:				    PREDICT predictOpt1? seqOfBankvarnames -> ^({token("ASTPREDICT", ASTPREDICT, input.LT(1).Line)} ^(ASTOPT_ predictOpt1?) seqOfBankvarnames);
 
-predictOpt1:			    ISNOTQUAL
-						  | leftAngle2          predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 predictOpt1h*)							
-						  | leftAngleNo2 dates? predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) predictOpt1h*)
+//predictOpt1:			    ISNOTQUAL
+//						  | leftAngle2          predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 predictOpt1h*)							
+//						  | leftAngleNo2 dates? predictOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) predictOpt1h*)
+//                            ;
+//predictOpt1h:				;
+
+predictOpt1:			    ISNOTQUAL						  
+						  | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?))
                             ;
-predictOpt1h:				;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PROCEDURE CALL

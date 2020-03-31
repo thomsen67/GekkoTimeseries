@@ -13711,11 +13711,6 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-//            Globals.predictActions[0] = (name, gt) => {
-//                double d =
-//(((((((O.PredictGetValue("fCp", gt.Add(0))) + (O.PredictGetValue("fCo", gt.Add(0)))) + (O.PredictGetValue("fIm", gt.Add(0)))) + (O.PredictGetValue("fIb", gt.Add(0)))) + (O.PredictGetValue("fIt", gt.Add(0)))) + (O.PredictGetValue("fIl", gt.Add(0)))) - (O.PredictGetValue("fM", gt.Add(0)))) + (O.PredictGetValue("fE", gt.Add(0))); O.PredictSetValue(name, gt, d);
-//            };
-
             Object[] args = new Object[0];
             cr.CompiledAssembly.GetType("Gekko.TranslatedCode").InvokeMember("PredictActions", BindingFlags.InvokeMethod, null, null, args);            
         }

@@ -8876,29 +8876,28 @@ namespace Gekko
 
                 List<EquationHelper> eqs = new List<EquationHelper>();
 
+                List<List<EquationHelper>> lists = new List<List<EquationHelper>>();
+                lists.Add(Program.model.modelGekko.equations);
+                lists.Add(Program.model.modelGekko.equationsReverted);
+                lists.Add(Program.model.modelGekko.equationsNotRunAtAll);
+
                 foreach (string s in vars)
                 {
                     bool found = false;
-                    foreach (EquationHelper eh in Program.model.modelGekko.equations)
-                    {
-                        if (G.Equal(eh.lhs, s))
-                        {
-                            eqs.Add(eh);
-                            found = true;
-                        }
-                    }
-
-                    if (!found)
-                    {
-                        foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
+                    foreach (List<EquationHelper> equs in lists)
+                    {                        
+                        foreach (EquationHelper eh in equs)
                         {
                             if (G.Equal(eh.lhs, s))
                             {
                                 eqs.Add(eh);
                                 found = true;
+                                goto label1;
                             }
-                        }
+                        }                    
                     }
+
+                label1:;
 
                     if (!found)
                     {
@@ -8907,11 +8906,10 @@ namespace Gekko
                     }
                 }
 
-                bool ok = true;
-                int counter = -1;
+                bool ok = true; //if all are already "Action"-ed, there is no need to compile etc.          
                 foreach (EquationHelper eh in eqs)
                 {
-                    if(eh.predictAction ==null)
+                    if (eh.predictAction == null)
                     {
                         ok = false;
                         break;
@@ -8921,7 +8919,7 @@ namespace Gekko
                 if (!ok)
                 {
                     
-                    counter = -1;
+                    int counter = -1;
                     StringBuilder sb = new StringBuilder();
                     foreach (EquationHelper eh in eqs)
                     {

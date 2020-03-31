@@ -195,6 +195,8 @@ namespace Gekko
         public List<EquationHelper> equations = new List<EquationHelper>();
         [ProtoMember(25)]
         public List<EquationHelper> equationsReverted = new List<EquationHelper>();
+        [ProtoMember(32)]
+        public List<EquationHelper> equationsNotRunAtAll = new List<EquationHelper>();
         [ProtoMember(26)]
         public GekkoDictionary<string, DependentsHelper> dependents = new GekkoDictionary<string, DependentsHelper>(StringComparer.OrdinalIgnoreCase);
         [ProtoMember(27)]
