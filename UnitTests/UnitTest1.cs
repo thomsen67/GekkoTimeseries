@@ -6220,6 +6220,20 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Browser()
+        {
+            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
+            return;
+
+            Program.Flush(); //wipes out existing cached models
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Doc_browser';");
+            Globals.browserLimit = true;
+            I("DOC<browser>;");
+            Globals.browserLimit = false;
+        }
+
+        [TestMethod]
         public void _Test_ModelRunAfter()
         {
             for (int i = 0; i < 3; i++)

@@ -8517,14 +8517,20 @@ namespace Gekko
             List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError, true) as List;
             List<string> vars = O.GetListOfStringsFromIVariable(ml);
 
-            if (Globals.runningOnTTComputer)
+            if (Globals.browserLimit)
+            {                
+                vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };                
+                Globals.browserLimit = false;  //for safety
+            }
+            else if (Globals.runningOnTTComputer)
             {
                 DialogResult result = MessageBox.Show("Only a few vars?", "Vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result == DialogResult.Yes)
                 {
                     vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };
-                }
+                }                
             }
+
 
             vars.Sort(StringComparer.OrdinalIgnoreCase);
 
@@ -8645,7 +8651,10 @@ namespace Gekko
                 sb.AppendLine("</tr>");
                 sb.AppendLine("</table>");
 
-                List<string> varExpl = Program.GetVariableExplanation(var);
+                //List<string> varExpl = Program.GetVariableExplanation(var);
+                string explanation2 = Program.GetVariableExplanationAugmented(var, G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator)).Trim();
+                List<string> varExpl = Program.CreateListOfStringsFromString(explanation2);
+
                 foreach (string line in varExpl)
                 {
                     if (line != "")
