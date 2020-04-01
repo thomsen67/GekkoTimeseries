@@ -6222,45 +6222,72 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ModelRunAfter()
         {
-            Program.Flush(); //wipes out existing cached models
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("MODEL runafter1;");
-            I("time 2000 2000;");            
-            I("c = 80;");
-            I("i = 10;");            
-            I("g = 10;");
-            I("time 2001 2010;");
-            I("c %= 1;");
-            I("i %= 2;");
-            I("g %= 3;");
-            I("time 2000 2010;");
-            I("y = c + i + g;");
-            I("dc = 0;");
-            I("jc = 0;");
-            I("zc = 0;");
-            I("cy = c/y;");
-            I("time 2001 2010;");   //.6 y = .4 y.1 + i + g
-            I("sim;");
-            I("predict <2005 2006> g;");
-            _AssertSeries(First(), "y", 2001, 1d / 0.6d * (0.4d * 100d + 10d * 1.02d + 10d * 1.03d), 0.0001d);
-            double ylag3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2002, 1));
-            double ylag2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2003, 1));
-            double ylag1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2004, 1));
-            double ylag0 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2005, 1));
-            double ylead1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2006, 1));
-            double ylead2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2007, 1));
-            double ylead3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2008, 1));
-            _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);
-            _AssertSeries(First(), "g", 2004, 10d * 1.03d * 1.03d * 1.03d * 1.03d, sharedDelta);
-            _AssertSeries(First(), "g", 2004, 10d * 1.03d * 1.03d * 1.03d * 1.03d * 1.03d, sharedDelta);
-
-
-            if (false)
+            for (int i = 0; i < 3; i++)
             {
-                I("plot <1995 2015> y, c, i, g, ye;");
-                I("pause;");
-            }
+                Program.Flush(); //wipes out existing cached models
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+                if (i == 0) I("MODEL runafter1;");
+                else if (i == 1) I("MODEL runafter2;");
+                else if (i == 2) I("MODEL runafter3;");
+                I("time 2000 2000;");
+                I("c = 80;");
+                I("i = 10;");
+                I("g = 10;");
+                I("time 2001 2010;");
+                I("c %= 1;");
+                I("i %= 2;");
+                I("g %= 3;");
+                I("time 2000 2010;");
+                I("y = c + i + g;");
+                I("dc = 0;");
+                I("jc = 0;");
+                I("zc = 0;");
+                I("cy = c/y;");
+                I("time 2001 2010;");   //.6 y = .4 y.1 + i + g
+                I("sim;");
+
+                if (i == 0)
+                {
+                    I("predict <2005 2006> g;");
+                    _AssertSeries(First(), "y", 2001, 1d / 0.6d * (0.4d * 100d + 10d * 1.02d + 10d * 1.03d), 0.0001d);
+                    double ylag3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2002, 1));
+                    double ylag2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2003, 1));
+                    double ylag1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2004, 1));
+                    double ylag0 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2005, 1));
+                    double ylead1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2006, 1));
+                    double ylead2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2007, 1));
+                    double ylead3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2008, 1));
+                    _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);
+                    _AssertSeries(First(), "g", 2004, 10d * 1.03d * 1.03d * 1.03d * 1.03d, sharedDelta);
+                    double y = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2005, 1));
+                    _AssertSeries(First(), "g", 2005, 0.5 * y + 100d, sharedDelta);
+                }
+                else if (i == 1)
+                {                    
+                    _AssertSeries(First(), "y", 2001, 1d / 0.6d * (0.4d * 100d + 10d * 1.02d + 10d * 1.03d), 0.0001d);
+                    double ylag3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2002, 1));
+                    double ylag2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2003, 1));
+                    double ylag1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2004, 1));
+                    double ylag0 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2005, 1));
+                    double ylead1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2006, 1));
+                    double ylead2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2007, 1));
+                    double ylead3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2008, 1));
+                    _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);                    
+                }
+                else if (i == 2)
+                {
+                    _AssertSeries(First(), "y", 2001, 1d / 0.6d * (0.4d * 100d + 10d * 1.02d + 10d * 1.03d), 0.0001d);
+                    double ylag3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2002, 1));
+                    double ylag2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2003, 1));
+                    double ylag1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2004, 1));
+                    double ylag0 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2005, 1));
+                    double ylead1 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2006, 1));
+                    double ylead2 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2007, 1));
+                    double ylead3 = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2008, 1));
+                    _AssertSeries(First(), "ye", 2005, (ylag3 + ylag2 + ylag1 + ylag0 + ylead1 + ylead2 + ylead3) / 7d, sharedDelta);
+                }
+            }            
         }
 
 

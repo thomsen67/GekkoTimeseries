@@ -864,7 +864,10 @@ namespace Gekko
 
         private static bool EquationIsNotRunAtAll(EquationHelper eh)
         {
-            return eh.equationType == EEquationType.Z;
+            //a bit of a hack here.
+            //problem is that equations are run in different batches during parsing, and 
+            //EEquationType.Z is not set from the beginning. Therefore we also test the equation code.
+            return eh.equationType == EEquationType.Z || IsEquationTypeZ(eh.equationCode);
         }
 
         public static void PrintModelParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
@@ -3248,14 +3251,14 @@ namespace Gekko
             {
                 eh.equationType = EEquationType.RevertedY;  //for instance "Y"-type eqs, with J- or Z-vars on left side
                 return;
-            }            
-            else if (G.Equal(code.Substring(0, 1), "z")) //FRML z... for ignored variables (used in PREDICT)
+            }
+            else if (IsEquationTypeZ(code)) //FRML z... for ignored variables (used in PREDICT)
             {
                 eh.equationType = EEquationType.Z;
                 return;
             }
             else if (G.Equal(code.Substring(0, 1), "i")) //FRML i... is not endorsed or used, but there may be some instances
-            {                
+            {
                 eh.equationType = EEquationType.I; //understood as FRML _i...
                 return;
             }
@@ -3263,7 +3266,7 @@ namespace Gekko
             {
                 eh.equationType = EEquationType.D; //understood as FRML _d...
                 return;
-            }            
+            }
             else if (code.Substring(0, 1) == "_")
             {
                 //ok
@@ -3333,6 +3336,11 @@ namespace Gekko
             return;
         }
 
+        private static bool IsEquationTypeZ(string code)
+        {
+            return G.Equal(code.Substring(0, 1), "z");
+        }
+
         private static void PrintEquationCodeWarning(EquationHelper eh)
         {
             if (false)
@@ -3345,6 +3353,17 @@ namespace Gekko
 
         private static void printVariableAsBType(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, string variable, int lag, bool leftSide, bool humanReadable, bool isModel, bool isBaseBank, string absoluteTime, string namedBank)
         {
+            if (EquationIsNotRunAtAll(eh))
+            {
+                //these equations are not part of the model at all, only used for PREDICT
+                //so they are not counted regarding lags, leads, etc.
+                if (!leftSide)
+                {
+                    LongVersionAndHumanVersion(wh2, variable, lag);  //so PREDICT has some code
+                }
+                return;
+            }
+
             if (isModel)  //for equations in model/frm
             {
                 //ATypeData dataA = model.varsAType[variable];
@@ -3359,13 +3378,8 @@ namespace Gekko
                     dataA.varName = variable;  //only reason to add this is when we want to get the right lower/uppercase of the variable
                     model.varsAType.Add(variable, dataA);
                 }
-
-                if (EquationIsNotRunAtAll(eh))
-                {
-                    //these equations are not part of the model at all, only used for PREDICT
-                    //so they are not counted regarding lags, leads, etc.
-                }
-                else
+                
+                if (true)
                 {
 
                     if (lag < 0)
@@ -3438,8 +3452,7 @@ namespace Gekko
                     }
 
                     //This is probably so that equations can be GENR'ed
-                    wh2.rightHandSideCsCode.longVersion.Append("O.PredictGetValue(`" + variable + "`, gt.Add(" + lag + "))");
-                    wh2.rightHandSideCsCode.humanVersion.Append(variable + "[" + lag + "]");
+                    LongVersionAndHumanVersion(wh2, variable, lag);
                 }
             }
             else  //for genr and prt statements
@@ -3496,6 +3509,12 @@ namespace Gekko
                     if (!wh2.allReferencedTimeSeriesOrListsBase.Contains(variable)) wh2.allReferencedTimeSeriesOrListsBase.Add(variable);
                 }
             }
+        }
+
+        private static void LongVersionAndHumanVersion(WalkerHelper2 wh2, string variable, int lag)
+        {
+            wh2.rightHandSideCsCode.longVersion.Append("O.PredictGetValue(`" + variable + "`, gt.Add(" + lag + "))");
+            wh2.rightHandSideCsCode.humanVersion.Append(variable + "[" + lag + "]");
         }
 
         //

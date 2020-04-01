@@ -13703,9 +13703,10 @@ namespace Gekko
             compilerParams.GenerateInMemory = true;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
-            compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+            ParserOLD.ReferencedAssembliesGekko(compilerParams);
             compilerParams.GenerateExecutable = false;
-            CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2.ToString());
+            string code2 = s2.ToString();
+            CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code2);
             if (cr.Errors.HasErrors)
             {
                 throw new GekkoException();
