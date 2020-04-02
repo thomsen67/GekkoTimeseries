@@ -21513,11 +21513,11 @@ namespace Gekko
             {
                 ScalarDate t1 = new ScalarDate(o.t1);
                 ScalarDate t2 = new ScalarDate(o.t2);
-                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimestart", new ScalarDate(o.t1));
-                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimeend", new ScalarDate(o.t2));
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt1", new ScalarDate(o.t1));
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt2", new ScalarDate(o.t2));
                 Program.obeyCommandCalledFromGUI(before, o.p);
-                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimestart");
-                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimeend");
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt1");
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }
 
             Program.SimFast(o.t1, o.t2, so);
@@ -21526,11 +21526,11 @@ namespace Gekko
             if (Program.model.modelGekko.runAfter != null) after = Program.model.modelGekko.runAfter.Replace("runafter$", "").Replace("runafter;", "");
             if (!G.NullOrBlanks(after))
             {                
-                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimestart", new ScalarDate(o.t1));
-                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simtimeend", new ScalarDate(o.t2));
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt1", new ScalarDate(o.t1));
+                Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt2", new ScalarDate(o.t2));
                 Program.obeyCommandCalledFromGUI(after, o.p);
-                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimestart");
-                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simtimeend");
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt1");
+                Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }
 
             if (!G.IsUnitTesting()) Gekko.Gui.gui.textBox1.ResumeLayout();
@@ -22215,7 +22215,7 @@ namespace Gekko
                                     throw new GekkoException();
                                 }
                                 SolveAfter();
-                                SolveRevertedX();
+                                SolveRevertedT();
                                 SolveRevertedY();
                                 SolveRevertedAuto();                                
                             }
@@ -23660,14 +23660,14 @@ namespace Gekko
         {
             Object[] args2 = new Object[1];
             args2[0] = Program.model.modelGekko.b;
-            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("reverted" + Globals.equationCodeY.ToUpper(), BindingFlags.InvokeMethod, null, null, args2);
         }
 
-        private static void SolveRevertedX()
+        private static void SolveRevertedT()
         {
             Object[] args2 = new Object[1];
             args2[0] = Program.model.modelGekko.b;
-            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("reverted" + Globals.equationCodeT.ToUpper(), BindingFlags.InvokeMethod, null, null, args2);
         }
 
         private static void SolveAfter()
@@ -23706,8 +23706,8 @@ namespace Gekko
             Object[] args2 = new Object[1];
             args2[0] = Program.model.modelGekko.b;
 
-            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args2);
-            Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("reverted" + Globals.equationCodeT.ToUpper(), BindingFlags.InvokeMethod, null, null, args2);
+            Program.model.modelGekko.assemblyReverted.InvokeMember("reverted" + Globals.equationCodeY.ToUpper(), BindingFlags.InvokeMethod, null, null, args2);
             Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);                
             
         }
@@ -38890,14 +38890,14 @@ namespace Gekko
 
             if (modelType == ECompiledModelType.GaussFailSafe)
             {
-                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args);
-                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("reverted" + Globals.equationCodeT.ToUpper(), BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("reverted" + Globals.equationCodeY.ToUpper(), BindingFlags.InvokeMethod, null, null, args);
                 Program.model.modelGekko.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
             }
             else
             {
-                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedX", BindingFlags.InvokeMethod, null, null, args);
-                Program.model.modelGekko.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("reverted" + Globals.equationCodeT.ToUpper(), BindingFlags.InvokeMethod, null, null, args);
+                Program.model.modelGekko.assemblyReverted.InvokeMember("reverted" + Globals.equationCodeY.ToUpper(), BindingFlags.InvokeMethod, null, null, args);
                 Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
             }
 

@@ -103,6 +103,10 @@ namespace Gekko
         //CODE: function val f(val %x); return %x + 1; end; %y = 0; for(val %i = 1 to 2e6); %y = f(%y); end; prt %y;
         public static bool browserLimit = false;
 
+        public static string equationCodeY = "y";
+        public static string equationCodeT = "t";
+        public static string equationCodeP = "p";
+
         public static DecompOptions2 uglyHack_decompOptions2 = null;
         public static string uglyHack_name = null;
         public static bool isAgeHierarchy = true;
