@@ -102,10 +102,11 @@ namespace Gekko
         }
 
         private void EquationBrowserSetEquation(string eq)
-        {
-            string ss = GetEquationText(eq);
+        {            
+            string s = WindowDecomp.EquationText(eq, GetEquationText(eq));
+            
             this.windowEquationBrowserLabel.Inlines.Clear();
-            this.windowEquationBrowserLabel.Inlines.Add(ss);
+            this.windowEquationBrowserLabel.Inlines.Add(s);
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
@@ -261,7 +262,11 @@ namespace Gekko
             //this._activeEquation = eqName;
             //this._activeVariable = null;
             this.windowEquationBrowserLabel.Inlines.Clear();
-            this.windowEquationBrowserLabel.Inlines.Add(firstText);
+
+            string s7 = WindowDecomp.EquationText(eqName, firstText);
+            this.windowEquationBrowserLabel.Inlines.Add(s7);
+
+            //this.windowEquationBrowserLabel.Inlines.Add(firstText);
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
             //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)

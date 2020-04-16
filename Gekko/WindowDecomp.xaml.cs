@@ -2018,14 +2018,21 @@ namespace Gekko
             }
         }
 
-        private string FindEquationText2(DecompOptions2 decompOptions)
+        public static string FindEquationText2(DecompOptions2 decompOptions)
         {
-            string rv = null;
+            string rv = "";
             foreach (Link link in decompOptions.link)
             {
-                rv += "[" + link.eqname + "]:" + G.NL;
-                rv += link.expressionText + G.NL + G.NL;
+                rv += EquationText(link.eqname, link.expressionText);
             }
+            return rv;
+        }
+
+        public static string EquationText(string eqname, string expressionText)
+        {
+            string rv = "";
+            rv += "[" + eqname + "]:" + G.NL;
+            rv += expressionText + G.NL + G.NL;
             return rv;
         }
 

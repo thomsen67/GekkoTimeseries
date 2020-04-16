@@ -373,9 +373,9 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
                             }
-                            else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "var2")))  //Note: we cannot have both of these in the same tree, they are always separate
+                            else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2")))  //Note: we cannot have both of these in the same tree, they are always separate
                             {
-                                //node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "var2"): when using VAR2 for eval, we allow the right-hand side to create uncontrolled sets, so that VAR2 deleteme = y[#a] - (x[#a]) will get #a as a set (normally they are only fetched from the LHS)
+                                //node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2"): when using VAR_KDUSJFLQO2 for eval, we allow the right-hand side to create uncontrolled sets, so that VAR_KDUSJFLQO2 deleteme = y[#a] - (x[#a]) will get #a as a set (normally they are only fetched from the LHS)
 
                                 ASTNode tmp = node2;
                                 if (node2.Text == "ASTLEFTSIDE")
@@ -1918,7 +1918,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     //must probably always be so
                                     ASTNode gparent = node.Parent.Parent;
-                                    if (G.Equal(gparent[3].Text, "var2"))
+                                    if (G.Equal(gparent[3].Text, "VAR_KDUSJFLQO2"))
                                     {
                                         gparent.loopCodeCs = node[1].Code.ToString();
                                     }
@@ -3953,7 +3953,7 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 string methodName = null;
-                                if (G.Equal(type, "var2"))
+                                if (G.Equal(type, "VAR_KDUSJFLQO2"))
                                 {
                                     methodName = "Evalcode" + ++Globals.counter;
                                     node.Code.A("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
@@ -3967,7 +3967,7 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
 
-                                if (G.Equal(type, "var2"))
+                                if (G.Equal(type, "VAR_KDUSJFLQO2"))
                                 {
                                     
                                     StringBuilder sb7 = new StringBuilder();
@@ -4041,7 +4041,7 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
 
-                                if (G.Equal(type, "var2"))
+                                if (G.Equal(type, "VAR_KDUSJFLQO2"))
                                 {
                                     node.Code.A("Globals.expressions = " + methodName + ";" + G.NL);
                                 }
@@ -6709,7 +6709,7 @@ namespace Gekko.Parser.Gek
                     if (parent.Text == "ASTASSIGNMENT")
                     {                        
                         type = parent[3].Text;
-                        if (G.Equal(type, "var2")) type = "var";
+                        if (G.Equal(type, "VAR_KDUSJFLQO2")) type = "var";
                         break;
                     }
                     parent = parent.Parent;

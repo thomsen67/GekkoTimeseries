@@ -20068,7 +20068,7 @@ namespace Gekko
                     c = "$ (" + conditionals + ")";
                 }
                 string s = c + " = " + statement;
-                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
+                Program.obeyCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
 
                 if (Globals.expressions == null)
                 {

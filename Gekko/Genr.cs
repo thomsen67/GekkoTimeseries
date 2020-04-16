@@ -15,33 +15,36 @@ namespace Gekko
             //[[commandStart]]0
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-
-            O.Decomp2 o0 = new O.Decomp2();
-            o0.type = @"ASTDECOMP3";
-            o0.label = @"pBnp";
-            o0.t1 = Globals.globalPeriodStart;
-            o0.t2 = Globals.globalPeriodEnd;
-
-            o0.opt_prtcode = O.ConvertToString((new ScalarString("m")));
+            O.Assignment o0 = new O.Assignment();
+            o0.opt_source = @"<[code]>VAR_KDUSJFLQO2 x=1";
 
 
-
-            o0.select.Add(O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("pBnp") })));
-
-            o0.from.Add(O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("E_pBnp") })));
-
-            o0.endo.Add(O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("pBnp") })));
-
-
-
-
-
-            o0.Exe();
+            Action assign_20 = () =>
+            {
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar18 = i19;
+                O.AdjustT0(smpl, 2);
+                O.Lookup(smpl, null, null, "x", null, ivTmpvar18, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                ;
+            };
+            Func<bool> check_20 = () =>
+            {
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar18 = i19;
+                O.AdjustT0(smpl, 2);
+                if (ivTmpvar18.Type() != EVariableType.Series) return false;
+                O.Dynamic1(smpl);
+                O.Lookup(smpl, null, null, "x", null, ivTmpvar18, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                ;
+                return O.Dynamic2(smpl);
+            };
+            O.RunAssigmentMaybeDynamic(smpl, assign_20, check_20, o0);
 
             //[[commandEnd]]0
         }
 
 
+        public static readonly ScalarVal i19 = new ScalarVal(1d, 0);
 
         public static void CodeLines(P p)
         {

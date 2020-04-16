@@ -1430,7 +1430,7 @@ Y2                    = 'Y2'                       ;
     V= 'V'             ;
     VAL              = 'VAL'             ;
 	VAR              = 'VAR'             ;
-    VAR2              = 'VAR2'             ;
+    VAR_KDUSJFLQO2   = 'VAR_KDUSJFLQO2'             ;  //strange name, but otherwise we get that for instance "var2 = 5;" will fail
     VALUE            = 'VALUE'             ;
     VERS             = 'VERS'            ;
     VERSION             = 'VERSION'            ;
@@ -2067,7 +2067,7 @@ d.Add("Y" ,Y);
                                         d.Add("v"    , V    );
                                         d.Add("val"     , VAL    );
 										d.Add("var"     , VAR    );
-                                        d.Add("var2"     , VAR2    );
+                                        d.Add("VAR_KDUSJFLQO2"     , VAR_KDUSJFLQO2    );
                                         d.Add("value"   , VALUE    );
                                         d.Add("vers"    , VERS    );
                                         d.Add("version"    , VERSION    );
@@ -2677,7 +2677,7 @@ assignmentTypeNotEmpty:     SER
 						  | MAP 
 						  | MATRIX 
 						  | VAR 
-                          | VAR2
+                          | VAR_KDUSJFLQO2
 						  | -> ASTPLACEHOLDER  //may be empty
 						    ;
 
@@ -4748,7 +4748,7 @@ ident2: 					Ident |
   U|
   VALUE|
   VAR|
-  VAR2|
+  VAR_KDUSJFLQO2|
   VERSION|
   VERS|
   VOID|
@@ -5204,7 +5204,7 @@ ident3: 					Ident |
   U|
   VALUE|
   VAR|
-  VAR2|
+  VAR_KDUSJFLQO2|
   VERSION|
   VERS|
   VOID|
