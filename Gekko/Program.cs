@@ -8578,7 +8578,7 @@ namespace Gekko
             int listI = -12345;
             for (int i = 0; i < lines.Count; i++)
             {
-                if (lines[i].Trim().StartsWith("OLS estimation"))
+                if (lines[i].Trim().StartsWith(Globals.ols1))
                 {
                     if (listI != -12345)
                     {
@@ -8586,7 +8586,9 @@ namespace Gekko
                         int fat = 5;
                         var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
                         var tags2 = new List<string>() { "//" };
-                        List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), fat, tags1, tags2, null, null).storage;
+                        string depLine = lines[listI + 1].Trim();
+                        depLine = depLine.Replace(Globals.ols2, "").Trim();
+                        List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
 
                         //List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
                         string varLine = null;
@@ -8652,8 +8654,8 @@ namespace Gekko
                 sb.AppendLine("</table>");
 
                 //List<string> varExpl = Program.GetVariableExplanation(var);
-                string explanation2 = Program.GetVariableExplanationAugmented(var, G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator)).Trim();
-                List<string> varExpl = Program.CreateListOfStringsFromString(explanation2);
+                //string explanation2 = Program.GetVariableExplanationAugmented(var, G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator)).Trim();
+                List<string> varExpl = Program.GetVariableExplanationAugmented(var);
 
                 foreach (string line in varExpl)
                 {
@@ -11260,40 +11262,103 @@ namespace Gekko
 
         public static string FlowInsertLabel(string s)
         {
-            return GetVariableExplanationAugmented(s, G.ExtractOnlyVariableIgnoreLag(s, Globals.leftParenthesisIndicator));
+            string rv = "";
+            foreach (string s2 in GetVariableExplanationAugmented(s))
+            {
+                rv += s2 + G.NL;
+            }
+            return rv;
         }
 
-        public static string GetVariableExplanationAugmented(string variableNameWithLag, string variableNameWithoutLag)
+        public static List<string> GetVariableExplanationNEW(string variableName, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd)
         {
-            string ss = G.PrettifyTimeseriesHash(variableNameWithLag, true, false) + "\n";
-            List<string> varExpl = Program.GetVariableExplanation(variableNameWithoutLag);
-            //if (Program.unfoldedVariableList == null) varExpl.Add("[Label not found: no model varlist loaded]");
+            List<string> rv = new List<string>();
+            IVariable iv = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReturnNull, false);
+            Series ts = null;
+            if (iv != null) ts = iv as Series;
+            if (printName)
+            {
+                rv.Add("Series: " + variableName);
+            }
+            List<string> varExpl = Program.GetVariableExplanation(variableName);
             foreach (string line in varExpl)
             {
                 if (line != "")
                 {
-                    ss += line + "\n";
+                    rv.Add(line);
                 }
             }
+
             try
-            {
-                Series ts = Program.databanks.GetFirst().GetIVariable(variableNameWithoutLag + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;
-                if (ts != null)
+            {                
+                
+                if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless)
                 {
-                    string label = ts.meta.label;
-                    string source = ts.meta.source;
-                    string units = ts.meta.units;
-                    if (label != null && label.Trim() != "")
+                    if (!G.NullOrBlanks(ts.meta.label))
                     {
-                        ss += "Series label: " + label + "\n";
+                        rv.Add("Label: " + ts.meta.label);
                     }
-                    if (source != null && source.Trim() != "")
+                    else
                     {
-                        ss += "Series source: " + source + "\n";
+                        if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.label))
+                        {
+                            rv.Add("Label: " + ts.mmi.parent.meta.label);
+                        }
                     }
-                    if (units != null && units.Trim() != "")
+
+                    if (!G.NullOrBlanks(ts.meta.source))
                     {
-                        ss += "Series units: " + units + "\n";
+                        rv.Add("Source: " + ts.meta.source);
+                    }
+                    else
+                    {
+                        if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.source))
+                        {
+                            rv.Add("Source: " + ts.mmi.parent.meta.source);
+                        }
+                    }
+
+                    if (!G.NullOrBlanks(ts.meta.units))
+                    {
+                        rv.Add("Units: " + ts.meta.units);
+                    }
+                    else
+                    {
+                        if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.units))
+                        {
+                            rv.Add("Units: " + ts.mmi.parent.meta.units);
+                        }
+                    }
+                }
+
+                if (printData)
+                {
+
+                    rv.Add("-----------------------------------------------");
+                    rv.Add("Period        value        %");
+
+                    int counter = 0;
+
+                    //must be able to handle TIME where freq does not match the series freq
+                    foreach (GekkoTime gt in new GekkoTimeIterator(Program.ConvertFreqs(tStart, tEnd, ts.freq)))
+                    {
+                        counter++;
+                        string sss = gt.ToString() + " ";
+
+                        double n1 = ts.GetDataSimple(gt);
+                        double n0 = ts.GetDataSimple(gt.Add(-1));
+
+                        double level1 = n1;
+                        double pch1 = ((n1 / n0 - 1) * 100d);
+
+                        if (n1 == n0) pch1 = 0d;
+
+                        string levelFormatted;
+                        string pchFormatted;
+                        Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
+
+                        sss += levelFormatted + " " + pchFormatted + " ";
+                        rv.Add(sss);
                     }
                 }
             }
@@ -11301,7 +11366,15 @@ namespace Gekko
             {
                 //no need to fail on this
             }
-            return ss;
+            return rv;
+        }
+
+        public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag)
+        {
+            string ss = "";
+            string var2 = G.ExtractOnlyVariableIgnoreLag(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
+            List<string> ss2 = Program.GetVariableExplanationNEW(var2, true, false, GekkoTime.tNull, GekkoTime.tNull);
+            return ss2;
         }
 
         public static void DecompForFlowChart(string s, GekkoTime year, int maxDepth, double prune, double factor, int depth, Dictionary<string, int> counter, List<GekkoFlowChart.FlowArrow> sw, List<GekkoFlowChart.FlowNode> sw2, Dictionary<string, int> d, string code)
@@ -16826,22 +16899,25 @@ namespace Gekko
                     }
                 }
 
-                List<string> varExpl = Program.GetVariableExplanation(varnameWithoutFreq);
-                foreach (string line in varExpl)
-                {
-                    if (line != "")
-                    {
-                        G.Writeln(line);
-                    }
-                }
+                //List<string> varExpl = Program.GetVariableExplanation(varnameWithoutFreq);
+                //foreach (string line in varExpl)
+                //{
+                //    if (line != "")
+                //    {
+                //        G.Writeln(line);
+                //    }
+                //}
 
                 //ts.label = "BNP i faste priser";
                 //ts.expression = "SERIES y = c + i + g;";
                 //ts.stamp = "20-1-2016 10:34";
 
-                if (!G.NullOrBlanks(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
-                if (!G.NullOrBlanks(ts.meta.source)) G.Writeln("Series source: " + ts.meta.source);
-                if (!G.NullOrBlanks(ts.meta.units)) G.Writeln("Series units: " + ts.meta.units);
+                //if (!G.NullOrBlanks(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
+                //if (!G.NullOrBlanks(ts.meta.source)) G.Writeln("Series source: " + ts.meta.source);
+                //if (!G.NullOrBlanks(ts.meta.units)) G.Writeln("Series units: " + ts.meta.units);
+
+                List<string> expls = Program.GetVariableExplanationNEW(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull);
+                foreach (string expl in expls) G.Writeln(expl);
 
                 bool eqsPrinted = false;
                 List<MapMultidimItem> keys = null;
@@ -16984,10 +17060,13 @@ namespace Gekko
 
             string ss = "SERIES";
             if (ts.type == ESeriesType.ArraySuper) ss = "ARRAY-SERIES";
-
-                G.Writeln2("==========================================================================================");
+            G.Writeln2("==========================================================================================");
             G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
-            if (!G.NullOrBlanks(ts.meta.label)) G.Writeln(ts.meta.label);
+
+            List<string> expls = Program.GetVariableExplanationNEW(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull);
+            foreach (string expl in expls) G.Writeln(expl);
+
+            //if (!G.NullOrBlanks(ts.meta.label)) G.Writeln(ts.meta.label);
 
             if (ts.type == ESeriesType.ArraySuper)
             {
@@ -17001,7 +17080,7 @@ namespace Gekko
                     Series parent = ts.mmi.parent;
                     if (parent != null)
                     {
-                        if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
+                        //if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
                         if (parent.meta.fix == EFixedType.Parameter)
                         {
                             G.Writeln("Fixed (parameter)");
@@ -17712,6 +17791,8 @@ namespace Gekko
             //eb.EquationBrowserSetLabel(variableName);
             eb._activeEquation = firstEqName;
             eb._activeVariable = null;
+            eb._t1 = o.t1;
+            eb._t2 = o.t2;
             bool? b = eb.ShowDialog();
             rv = eb._activeEquation;
             if (b != true) rv = null;  //only when OK is pressed (or Enter)
@@ -29604,8 +29685,8 @@ namespace Gekko
                 flat += ", polydf = " + (poly - (flatStart.Count + flatEnd.Count));
             }
 
-            G.Writeln2(" OLS estimation " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")" + flat);
-            G.Writeln(" Dep. variable = " + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
+            G.Writeln2(" " + Globals.ols1 + " " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")" + flat);
+            G.Writeln(" " + Globals.ols2 + "" + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
 
 

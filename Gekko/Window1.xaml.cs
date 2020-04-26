@@ -994,7 +994,12 @@ namespace Gekko
                             }
                             else
                             {
-                                this.equation.Text = Program.GetVariableExplanationAugmented(var2, G.ExtractOnlyVariableIgnoreLag(var2, Globals.leftParenthesisIndicator)).Trim();                                                                                                 
+                                string txt = "";
+                                foreach (string s in Program.GetVariableExplanationAugmented(var2))
+                                {
+                                    txt += s + G.NL;
+                                }
+                                this.equation.Text = txt;
                             }
                         }
                     }

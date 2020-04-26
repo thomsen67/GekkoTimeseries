@@ -27,6 +27,8 @@ namespace Gekko
 
         public string _activeEquation = null; //this always has a non-null value
         public string _activeVariable = null; //this may be null, if no variable button is active, else it has a value.
+        public GekkoTime _t1 = GekkoTime.tNull;
+        public GekkoTime _t2 = GekkoTime.tNull;
         public GekkoDictionary<string, ToggleButton> _buttons = new GekkoDictionary<string, ToggleButton>(StringComparer.OrdinalIgnoreCase);
 
         public WindowEquationBrowser()
@@ -128,66 +130,13 @@ namespace Gekko
 
         public void EquationBrowserSetLabel(string variableName)
         {
-            IVariable iv = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReturnNull, false);
+            List<string> ss = Program.GetVariableExplanationNEW(variableName, true, true, _t1, _t2);
             this.windowEquationBrowserLabel.Inlines.Clear();
-            this.windowEquationBrowserLabel.Inlines.Add("Name: " + variableName + G.NL);
-
-            if (iv != null)
+            foreach (string s in ss)
             {
-                Series ts = iv as Series;
-                if (ts != null)
-                {
-                    if (ts.type == ESeriesType.Normal)
-                    {
-                        if (!G.NullOrBlanks(ts.meta.label))
-                        {
-                            this.windowEquationBrowserLabel.Inlines.Add("Label: " + ts.meta.label + G.NL);
-                        }
-                        else
-                        {
-                            if (ts.mmi.parent != null)
-                            {
-                                if (!G.NullOrBlanks(ts.mmi.parent.meta.label))
-                                {
-                                    this.windowEquationBrowserLabel.Inlines.Add("Label: " + ts.mmi.parent.meta.label + G.NL);
-                                }
-                            }
-                        }
-                    }
-
-                    GekkoTime tStart = new GekkoTime(EFreq.A, 2015, 1);
-                    GekkoTime tEnd = new GekkoTime(EFreq.A, 2025, 1);
-
-                    this.windowEquationBrowserLabel.Inlines.Add("-----------------------------------------------" + G.NL);
-                    this.windowEquationBrowserLabel.Inlines.Add("Period        value        %" + G.NL);
-
-                    int counter = 0;
-
-                    //must be able to handle TIME where freq does not match the series freq
-                    foreach (GekkoTime gt in new GekkoTimeIterator(Program.ConvertFreqs(tStart, tEnd, ts.freq)))
-                    {
-                        counter++;
-                        this.windowEquationBrowserLabel.Inlines.Add(gt.ToString() + " ");
-
-                        double n1 = ts.GetDataSimple(gt);
-                        double n0 = ts.GetDataSimple(gt.Add(-1));
-
-                        double level1 = n1;
-                        double pch1 = ((n1 / n0 - 1) * 100d);
-
-                        if (n1 == n0) pch1 = 0d;
-
-                        string levelFormatted;
-                        string pchFormatted;
-                        Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
-
-                        this.windowEquationBrowserLabel.Inlines.Add(levelFormatted + " " + pchFormatted + " ");
-                        this.windowEquationBrowserLabel.Inlines.Add(G.NL);
-                    }
-                }
+                this.windowEquationBrowserLabel.Inlines.Add(s + G.NL);
             }
         }
-
 
         public void EquationBrowserSetEquationButtons(string eqName, string firstText, List<string> firstList)
         {            
@@ -208,7 +157,7 @@ namespace Gekko
             {
 
                 string op = "d";
-                GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);
+                
                 string residualName = "residual___";
                 int funcCounter = 0;
 
@@ -228,12 +177,12 @@ namespace Gekko
                 }
 
                 //fixme: [0] must be counter
-                DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per1, equation.expressions[0], Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
+                DecompData dd = Gekko.Decomp.DecompLowLevel(_t1, _t1, equation.expressions[0], Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
 
                 double max = 0d;
                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                 {
-                    double v = kvp.Value.GetDataSimple(per1);
+                    double v = kvp.Value.GetDataSimple(_t1);
                     if (G.isNumericalError(v)) v = 0d;
                     else v = Math.Abs(v);
                     max = Math.Max(v, max);
@@ -242,7 +191,7 @@ namespace Gekko
                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)
                 {
                     string ss5 = G.ReplaceTurtle(Program.DecompGetNameFromContrib(kvp.Key));
-                    double v = kvp.Value.GetDataSimple(per1);
+                    double v = kvp.Value.GetDataSimple(_t1);
 
                     ToggleButton b = null;
                     _buttons.TryGetValue(ss5, out b);

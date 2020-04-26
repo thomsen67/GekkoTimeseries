@@ -96,8 +96,7 @@ namespace Gekko
         //public const double special_value2 = 1e6d;
         //public static int disableStartingValuesFix = 0;        
         // ----------------------------------------------------------------
-
-
+        
         //Using GekkoArg instead of IVariable as function parameters
         //with both false and true: below code is about 12.6 sec in debug mode --> 166.000 per second
         //CODE: function val f(val %x); return %x + 1; end; %y = 0; for(val %i = 1 to 2e6); %y = f(%y); end; prt %y;
@@ -686,6 +685,9 @@ namespace Gekko
 
         public static bool setPrintMute = false;
         public static bool doNotSaveUserSettings = false;
+
+        public static string ols1 = "OLS estimation";
+        public static string ols2 = "Dep. variable = ";
 
         public static CompilerOptions co = new CompilerOptions();
         public static string compilerOptions = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?

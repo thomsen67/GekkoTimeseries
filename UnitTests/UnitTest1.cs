@@ -6222,8 +6222,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Browser()
         {
-            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
-            return;
+            //Assert.Inconclusive(Globals.unitTestIntegrationMessage);
+            //return;
 
             Program.Flush(); //wipes out existing cached models
             I("RESET;");

@@ -1312,6 +1312,8 @@ namespace Gekko
 
         public static string PrettifyTimeseriesHash(string s, bool isVarName, bool isInverse)
         {
+            //This is most probably obsolete now: it transforms x___a into x[a]
+
             if (s == null) return null;
             if (!isVarName && isInverse) throw new GekkoException();
             if (isInverse)

@@ -1659,7 +1659,12 @@ namespace Gekko
                             }
                             else
                             {
-                                this.equation.Text = Program.GetVariableExplanationAugmented(var2, G.ExtractOnlyVariableIgnoreLag(var2, Globals.leftParenthesisIndicator)).Trim();                                                                                                 
+                                string txt = "";
+                                foreach (string s in Program.GetVariableExplanationAugmented(var2))
+                                {
+                                    txt += s + G.NL;
+                                }
+                                this.equation.Text = txt;
                             }
                         }
                     }
@@ -2031,7 +2036,8 @@ namespace Gekko
         public static string EquationText(string eqname, string expressionText)
         {
             string rv = "";
-            rv += "[" + eqname + "]:" + G.NL;
+            rv += "Equation: " + eqname + "" + G.NL;
+            rv += "------------------------------------------" + G.NL;
             rv += expressionText + G.NL + G.NL;
             return rv;
         }
