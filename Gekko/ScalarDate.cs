@@ -151,13 +151,13 @@ namespace Gekko
                     break;
                 case EVariableType.Date:
                     {
-                        int obs = GekkoTime.Observations(((ScalarDate)x).date, this.date) - 1;
-                        if (obs < 0)
-                        {
-                            G.Writeln();
-                            G.Writeln("*** ERROR: Subtraction of two dates gave negative number of observations: " + obs);
-                            throw new GekkoException();
-                        }
+                        int obs = GekkoTime.Observations(((ScalarDate)x).date, this.date) - 1; //can be negative, we allow this
+                        //if (obs < 0)
+                        //{
+                        //    G.Writeln();
+                        //    G.Writeln("*** ERROR: Subtraction of two dates gave negative number of observations: " + obs);
+                        //    throw new GekkoException();
+                        //}
                         return new ScalarVal(obs);
                     }
                     break;

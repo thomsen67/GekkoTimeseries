@@ -43,23 +43,23 @@ namespace Gekko
 
         public static void DecompStart(O.Decomp2 o)
         {
-            
+
             //In general, uncontrolled sets produce a list of equations. Hard to prune these, it is a bit like the lag problem, only lazy 
             //  eval might help.
             //In an equation like y[#a] = x[#a] + 5, there will be 100 equations if #a is 1..100. For each of these, lags are tried. So
             //it is checked if x[31][2000] affects y[31][2001] --> a lag. If such a lag is detected, x[#a][-1] is added to the variables
             //that contribute.
 
-            //DecompStart()                              --> This is the starting point
-            //  DecompGetFuncExpressions()               --> May use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
-            //                                               DecompEvalGams() finds the equation, translates to Gekko, and returns a 
-            //                                               ModelGamsEquation object with element.expressions containing the expression(s).
-            //                                               In an eq like y[#i] = 2*x[#i], n expressions are returned corresponding to the elements of #i
-            //  WindowDecomp.RecalcCellsWithNewType();   --> Can also be called when clicking
-            //    DecompMain()                           --> Main calculation, calls lowLevel, Pivot and makeGui.
-            //      DecompLowLevel()                     --> actual calculation of data, expression(s) is argument
-            //      DecompPivotToTable()                 --> putting the data into a table
-            //  WindowDecomp.MakeGuiTable2()             --> shows the table in GUI
+            //DecompStart()                                --> This is the starting point
+            //  DecompGetFuncExpressionsAndRecalc()        --> 
+            //    DecompEvalGams() or DecompEvalGekko()    --> CallEval() --> I("VAR deleteme = y - (x1 + x2);")
+            //                                                 This is put into link.expressions
+            //    WindowDecomp.RecalcCellsWithNewType();   --> Can also be called when clicking
+            //      DecompMain()                           --> Main calculation, calls lowLevel, Pivot and makeGui.
+            //        DecompLowLevel()                     --> actual calculation of data, expression(s) is argument
+            //        [inversion]                          --> inverts to calculate results               
+            //        DecompPivotToTable()                 --> putting the data into a table
+            //      WindowDecomp.MakeGuiTable2()             --> shows the table in GUI
             //
             //CLICKING: Mouse_Down(), cf. #98732498724
             //        
@@ -242,8 +242,8 @@ namespace Gekko
 
             //MAIN varnames are: decompOptions2.link[parentI].varnames
 
-            // decompDatas
-            // Example: DECOMP x[#a] in e1 link y[#a] in e2
+            // decompDatas THE TEXT BELOW IS OBSOLETE
+            // Example: DECOMP x[#a] from e1, e2 endo x[#a], y[#a];
             // 1. dimension corresponds to main chosen decomp variables (x[#a], could be stated like x[18], x[19]).
             //    This dimension corresponds to super = 0, 1 here.
             // 2. dimension is the folded raw link equations (including main equation with number 0). The folded link
@@ -555,6 +555,7 @@ namespace Gekko
                 }
                 else
                 {
+                    // not ASTDECOMP3
 
                     //Takes the link equations, skipping the first one (which is the "normal" equation)
                     //Example: decomp y in e1 link c in e2
