@@ -3720,17 +3720,9 @@ namespace Gekko
                     GekkoTime firstSource = GekkoTime.tNull;
                     GekkoTime lastSource = GekkoTime.tNull;
 
-                    if (true)
-                    {
-                        //takes a bit of time but not that much
-                        firstSource = tsSource.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
-                        lastSource = tsSource.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
-                    }
-                    else
-                    {
-                        firstSource = tsSource.GetPeriodFirst(); //takes a bit of time, but then we get the real period 
-                        lastSource = tsSource.GetPeriodLast(); //takes a bit of time, but then we get the real period
-                    }
+                    //takes a bit of time but not that much
+                    firstSource = tsSource.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
+                    lastSource = tsSource.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period                                        
 
                     //only for printing out the period
                     maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastSource.super);
@@ -28906,7 +28898,7 @@ namespace Gekko
                 EFreq eFreq0 = ts_rhs.freq;
                 EFreq eFreq1 = ts_lhs.freq;
 
-                GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries
+                GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries.
                 GekkoTime last = ts_rhs.GetPeriodLast(); //end of high-freq timeseries
 
                 double vsum = double.NaN;

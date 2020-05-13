@@ -3811,7 +3811,17 @@ namespace Gekko
             }
             else if (G.Equal(s2, "perStart"))
             {
-                return new ScalarDate(ts.GetPeriodFirst());
+                G.Writeln2("*** ERROR: From Gekko 3.1.4 and onwards, the use of fromSeries('perStart') is obsolete.");
+                G.Writeln("           Please use fromSeries('dataStart') instead. This is more precise, but", System.Drawing.Color.Red);
+                G.Writeln("           beware that in some cases, fromSeries('dataStart') may return a different (tighter)'.", System.Drawing.Color.Red);
+                G.Writeln("           date. In existing programs, changing 'perStart' to 'dataStart' may change the results,", System.Drawing.Color.Red);
+                G.Writeln("           but in all imaginable cases, this is a change for the better. The use of", System.Drawing.Color.Red);
+                G.Writeln("           fromSeries('dataStart') has a small speed penalty compared to 'perStart', but in", System.Drawing.Color.Red);
+                G.Writeln("           most cases, this should not be noticable. The hazard of 'perStart' compared to ", System.Drawing.Color.Red);
+                G.Writeln("           'dataStart' is no longer deemed worth the speed reward of the former, which is", System.Drawing.Color.Red);
+                G.Writeln("           the reason for this change. Apologies for the inconvenience.", System.Drawing.Color.Red);
+                throw new GekkoException();
+                //return new ScalarDate(ts.GetPeriodFirst());
             }
             else if (G.Equal(s2, "dataStart"))
             {
@@ -3825,7 +3835,17 @@ namespace Gekko
             }
             else if (G.Equal(s2, "perEnd"))
             {
-                return new ScalarDate(ts.GetPeriodLast());
+                G.Writeln2("*** ERROR: From Gekko 3.1.4 and onwards, the use of fromSeries('perEnd') is obsolete.");
+                G.Writeln("           Please use fromSeries('dataEnd') instead. This is more precise, but", System.Drawing.Color.Red);
+                G.Writeln("           beware that in some cases, fromSeries('dataEnd') may return a different (tighter)'.", System.Drawing.Color.Red);
+                G.Writeln("           date. In existing programs, changing 'perEnd' to 'dataEnd' may change the results,", System.Drawing.Color.Red);
+                G.Writeln("           but in all imaginable cases, this is a change for the better. The use of", System.Drawing.Color.Red);
+                G.Writeln("           fromSeries('dataEnd') has a small speed penalty compared to 'perEnd', but in", System.Drawing.Color.Red);
+                G.Writeln("           most cases, this should not be noticable. The hazard of 'perEnd' compared to ", System.Drawing.Color.Red);
+                G.Writeln("           'dataEnd' is no longer deemed worth the speed reward of the former, which is", System.Drawing.Color.Red);
+                G.Writeln("           the reason for this change. Apologies for the inconvenience.", System.Drawing.Color.Red);
+                throw new GekkoException();
+                //return new ScalarDate(ts.GetPeriodLast());
             }
             else if (G.Equal(s2, "dataEnd"))
             {
