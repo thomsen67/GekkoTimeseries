@@ -13027,8 +13027,8 @@ namespace Gekko
             if (found.expressions == null || found.expressions.Count == 0)
             {
                 Globals.expressions = null;  //maybe not necessary
-                CallEval(found.conditionals, s1);
-                found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                Program.CallEval(found.conditionals, s1);
+                found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here, similar to found.expressions = Globals.expressions
                 Globals.expressions = null;  //maybe not necessary
             }
             else

@@ -393,18 +393,49 @@ namespace Gekko
             if (track) MessageBox.Show("1");
             Globals.guiRecentFoldersCache.Capacity = 20;
             if (track) MessageBox.Show("2");
+
+
+            Configuration config = null;
             try
             {
                 //no need to fail here if the user.config file has become corrupt (it will not fail if the file is just missing)
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+                config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
                 if (track) MessageBox.Show("3");
                 Globals.userSettingsPath = config.FilePath;
             }
-            catch
+            catch (ConfigurationException e)
             {
-                if (track) MessageBox.Show("3");
-                Globals.userSettingsPath = "[unknown]";  //only used in Help --> About... menu.
-            }            
+                if (track) MessageBox.Show("3a");
+                string fileName = null;
+
+                fileName = e.Filename;
+
+                //if (config != null && !G.NullOrEmpty(config.FilePath))
+                //{
+                //    fileName = config.FilePath;
+                //}
+                //else
+                //{
+                //    try
+                //    {
+                //        fileName = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                //    }
+                //    catch { }
+                //}
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("+++ WARNING: An internal Gekko config file could not be read.");
+                sb.AppendLine("These user settings files are used to store window positions, ");
+                sb.AppendLine("last working folder location and other non-critical information. ");
+                sb.AppendLine("Therefore, if this error poses a problem, you may try to delete ");
+                sb.AppendLine("the user.config file without loss of any vital information (the ");
+                sb.AppendLine("file may be corrupted).");
+                sb.AppendLine("File:");
+                sb.AppendLine("  " + fileName);
+                MessageBox.Show(sb.ToString());
+                Globals.userSettingsPath = fileName; //only used in Help --> About... menu.               
+            }
+            catch { }
+
             if (track) MessageBox.Show("4");
             DateTime t0 = DateTime.Now;
 

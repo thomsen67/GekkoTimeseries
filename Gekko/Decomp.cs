@@ -50,16 +50,8 @@ namespace Gekko
             //it is checked if x[31][2000] affects y[31][2001] --> a lag. If such a lag is detected, x[#a][-1] is added to the variables
             //that contribute.
 
-            //DecompStart()                                --> This is the starting point
-            //  DecompGetFuncExpressionsAndRecalc()        --> 
-            //    DecompEvalGams() or DecompEvalGekko()    --> CallEval() --> I("VAR deleteme = y - (x1 + x2);")
-            //                                                 This is put into link.expressions
-            //    WindowDecomp.RecalcCellsWithNewType();   --> Can also be called when clicking
-            //      DecompMain()                           --> Main calculation, calls lowLevel, Pivot and makeGui.
-            //        DecompLowLevel()                     --> actual calculation of data, expression(s) is argument
-            //        [inversion]                          --> inverts to calculate results               
-            //        DecompPivotToTable()                 --> putting the data into a table
-            //      WindowDecomp.MakeGuiTable2()             --> shows the table in GUI
+            //See source code documentation
+
             //
             //CLICKING: Mouse_Down(), cf. #98732498724
             //        

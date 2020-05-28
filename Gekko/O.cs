@@ -9045,6 +9045,8 @@ namespace Gekko
 
         public class Decomp2
         {
+            //See source code documentation
+
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set  
             public string type = null;
@@ -9067,6 +9069,7 @@ namespace Gekko
 
             public void Exe()
             {
+                //See source code documentation
                 Decomp.DecompStart(this);
             }
 
