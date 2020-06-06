@@ -394,7 +394,7 @@ namespace Gekko
                         double[,] mEndo = new double[endo.Count, endo.Count];
                         double[,] mExo = new double[endo.Count, exo.Count];
 
-                        int c = -1;
+                        int row = -1;
                         for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
                         {
                             //In some cases, there is no interaction between the sets, for instance in
@@ -406,31 +406,29 @@ namespace Gekko
                             //simultaneous (like for time, t).
                             for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
                             {
-                                c++;
+                                row++;
                                 foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
                                 {
                                     double d = kvp.Value.GetDataSimple(t);
                                     if (endo.ContainsKey(kvp.Key))
-                                    {
-                                        int i1 = c;
-                                        int i2 = endo[kvp.Key];
-                                        if (!(i1 < mEndo.GetLength(0) && i2 < mEndo.GetLength(1)))
+                                    {                                        
+                                        int col = endo[kvp.Key];
+                                        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
                                         {
                                             G.Writeln2("*** ERROR: DECOMP matrix invert problem");
                                             throw new GekkoException();
                                         }
-                                        mEndo[i1, i2] = d;
+                                        mEndo[row, col] = d;
                                     }
                                     else if (exo.ContainsKey(kvp.Key))
-                                    {
-                                        int i1 = c;
-                                        int i2 = exo[kvp.Key];
-                                        if (!(i1 < mExo.GetLength(0) && i2 < mExo.GetLength(1)))
+                                    {                                     
+                                        int col = exo[kvp.Key];
+                                        if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
                                         {
                                             G.Writeln2("*** ERROR: DECOMP matrix invert problem");
                                             throw new GekkoException();
                                         }
-                                        mExo[i1, i2] = d;
+                                        mExo[row, col] = d;
                                     }
                                     else
                                     {
