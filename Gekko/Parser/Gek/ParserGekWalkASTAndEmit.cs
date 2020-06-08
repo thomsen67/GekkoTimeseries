@@ -2201,40 +2201,35 @@ namespace Gekko.Parser.Gek
 
                             string record = null;
                             string alter = null;
-                            string play = null;                            
-                            bool first = true;
+                            string play = null;                                                        
+
                             foreach(ASTNode child in node[0].ChildrenIterator())
                             {
-                                if (first)
+                                if (child.Text == "ASTDATES_BLOCK")
                                 {
-                                    string ss = child.Code.ToString();                                 
+                                    //handle BLOCK time ...
+                                    
+                                    string ss = child.Code.ToString();
                                     if (ss != null)
                                     {
                                         string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
-                                        if (sss[0] == "" && sss[1] == "")
-                                        {
-                                            //do nothing, not time is given
-                                        }
-                                        else
-                                        {
-                                            int n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
-                                            alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
-                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
-                                            n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                            alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
-                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                        }
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
+                                        alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
+                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                        alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
+                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                    }
+                                    else
+                                    {
+                                        G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                        throw new GekkoException();
                                     }
                                 }
-                                else
+                                else if (child.Text == "ASTBLOCKOPTION")
                                 {
-                                    //normal options
-
-                                    
-                                    
-
                                     StringBuilder s = new StringBuilder();
                                     string o = "";
                                     CreateOptionVariable(child, true, s, ref o);
@@ -2247,7 +2242,7 @@ namespace Gekko.Parser.Gek
                                         alter += s.ToString();                                //Program.options.freq = EFreq.Q;
                                         alter += "Program.AdjustFreq();" + G.NL;              //Program.AdjustFreq();
                                         play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
-                                        // global perStart
+                                                                                              // global perStart
                                         n = ++Globals.counter;
                                         record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
                                         play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
@@ -2264,7 +2259,11 @@ namespace Gekko.Parser.Gek
                                         play += o + " = record" + n + ";" + G.NL;             //Program.options.... = record117
                                     }
                                 }
-                                first = false;
+                                else
+                                {
+                                    G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                    throw new GekkoException();
+                                }                                
                             }
                             node.Code.A(record);
                             node.Code.A(alter);

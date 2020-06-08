@@ -5104,8 +5104,10 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 1.3 "));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.2193 "));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.27 "));
-            
+
+            //--------------------------------------------------------
             //test of freq, must also change global time (and back)
+            //--------------------------------------------------------
 
             I("RESET;");
             I("TIME 2001 2003;");            
@@ -5133,11 +5135,11 @@ namespace UnitTests
             _AssertSeries(First(), "xx!q", EFreq.Q, 2002, 3, double.NaN, sharedDelta);
 
             I("RESET; option freq q; time 2001q3 2002q2;");
-            I("BLOCK time 2001q3 2002q2, freq a; yy = 3; END;");
-            _AssertSeries(First(), "yy!a", EFreq.A, 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "yy!a", EFreq.A, 2001, 1, 3, sharedDelta);
-            _AssertSeries(First(), "yy!a", EFreq.A, 2002, 1, 3, sharedDelta);
-            _AssertSeries(First(), "yy!a", EFreq.A, 2003, 1, double.NaN, sharedDelta);
+            I("BLOCK freq m, time 2001m3 2002m2, solve method = newton; yy = 3; END;");
+            _AssertSeries(First(), "yy!m", EFreq.M, 2001, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy!m", EFreq.M, 2001, 3, 3, sharedDelta);
+            _AssertSeries(First(), "yy!m", EFreq.M, 2002, 2, 3, sharedDelta);
+            _AssertSeries(First(), "yy!m", EFreq.M, 2002, 3, double.NaN, sharedDelta);
             I("xx = 2;");
             _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 2, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 3, 2, sharedDelta);
@@ -19711,9 +19713,9 @@ namespace UnitTests
             I("string %s = fromSeries(fY, 'stamp');");
             _AssertScalarString(First(), "%s", "04/28/ 8");
 
-            I("date %d = fromSeries(fY, 'perStart');                   //first obs");
+            I("date %d = fromSeries(fY, 'dataStart');                   //first obs");
             _AssertScalarDate(First(), "%d", EFreq.A, 1998, 1);
-            I("date %d = fromSeries(fY, 'perEnd');                     //last obs");
+            I("date %d = fromSeries(fY, 'dataEnd');                     //last obs");
             _AssertScalarDate(First(), "%d", EFreq.A, 2079, 1);
             I("string %s = fromSeries(fY, 'freq');                     //freq of timeseries");
             _AssertScalarString(First(), "%s", "a");
