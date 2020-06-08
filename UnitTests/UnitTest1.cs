@@ -5104,6 +5104,45 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 1.3 "));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.2193 "));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.27 "));
+            
+            //test of freq, must also change global time (and back)
+
+            I("RESET;");
+            I("TIME 2001 2003;");            
+            I("BLOCK freq q; xx = 2; END;");
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 1, 2, sharedDelta);            
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2003, 4, 2, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+            I("yy = 3;");
+            _AssertSeries(First(), "yy!a", EFreq.A, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2001, 1, 3, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2003, 1, 3, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2004, 1, double.NaN, sharedDelta);
+
+            I("RESET; option freq q; time 2001q3 2002q2;");            
+            I("BLOCK freq a; yy = 3; END;");
+            _AssertSeries(First(), "yy!a", EFreq.A, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2001, 1, 3, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2002, 1, 3, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2003, 1, double.NaN, sharedDelta);
+            I("xx = 2;");
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 3, 2, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2002, 2, 2, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2002, 3, double.NaN, sharedDelta);
+
+            I("RESET; option freq q; time 2001q3 2002q2;");
+            I("BLOCK time 2001q3 2002q2, freq a; yy = 3; END;");
+            _AssertSeries(First(), "yy!a", EFreq.A, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2001, 1, 3, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2002, 1, 3, sharedDelta);
+            _AssertSeries(First(), "yy!a", EFreq.A, 2003, 1, double.NaN, sharedDelta);
+            I("xx = 2;");
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2001, 3, 2, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2002, 2, 2, sharedDelta);
+            _AssertSeries(First(), "xx!q", EFreq.Q, 2002, 3, double.NaN, sharedDelta);
 
         }
 

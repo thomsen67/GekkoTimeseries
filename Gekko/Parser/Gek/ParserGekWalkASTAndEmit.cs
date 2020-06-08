@@ -2230,25 +2230,46 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
+                                    //normal options
+
+                                    
+                                    
+
                                     StringBuilder s = new StringBuilder();
                                     string o = "";
                                     CreateOptionVariable(child, true, s, ref o);
-                                    int n = ++Globals.counter;
-                                    record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
-                                    alter += s.ToString();                                //Program.options.freq = EFreq.Q;
-                                    play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+
+                                    if (o == "Program.options.freq")
+                                    {
+                                        //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
+                                        alter += s.ToString();                                //Program.options.freq = EFreq.Q;
+                                        alter += "Program.AdjustFreq();" + G.NL;              //Program.AdjustFreq();
+                                        play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                        // global perStart
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
+                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
+                                        // global perEnd
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                    }
+                                    else
+                                    {
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options....;
+                                        alter += s.ToString();                                //Program.options.... = ...;
+                                        play += o + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                                    }
                                 }
                                 first = false;
                             }
                             node.Code.A(record);
                             node.Code.A(alter);
-                            //node.Code.A("try {" + G.NL);
-                            GetCodeFromAllChildren(node, node[1][0]);
-                            //node.Code.A("}" + G.NL);
-                            //node.Code.A("finally {" + G.NL);
+                            GetCodeFromAllChildren(node, node[1][0]);                            
                             node.Code.A(play);
-                            //node.Code.A("}" + G.NL);
-
                         }
                         break;
 
@@ -4803,7 +4824,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A(s.ToString());
                                 if (o == "freq")
                                 {
-                                    //node.Code.A(Globals.clearTsCsCode + G.NL);
+                                    //see also #89073589324
                                     node.Code.A("Program.AdjustFreq();");
                                 }                                
                                 else if (o == "interface_sound_type")

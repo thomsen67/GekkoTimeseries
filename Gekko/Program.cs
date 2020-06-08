@@ -8209,7 +8209,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: Strange error in cmd convert -- please report this to the developer");
+                            G.Writeln2("*** ERROR: Strange error in gcm file -- please report this to the developer");
                             //throw new GekkoException();
                             throw;
                         }
@@ -28893,7 +28893,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Cannot find: " + yRhs);
                 }
 
-                if (method == null) method = "total";
+                if (method == null) method = "repeat";
 
                 EFreq eFreq0 = ts_rhs.freq;
                 EFreq eFreq1 = ts_lhs.freq;
