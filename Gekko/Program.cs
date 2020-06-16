@@ -35757,7 +35757,7 @@ namespace Gekko
 
                 if (!G.NullOrBlanks(dashtype)) s += " dashtype " + dashtype;
                 if (!G.NullOrBlanks(linewidth)) s += " linewidth " + linewidth;
-                if (!G.NullOrBlanks(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
+                if (!G.NullOrBlanks(linecolor)) s += " linecolor rgb \"" + linecolor.ToLower() + "\"";  //in gnuplot, the linecolor must be lower-case
                 if (!G.NullOrBlanks(pointtype)) s += " pointtype " + pointtype;
                 if (!G.NullOrBlanks(pointtype)) s += " pointsize " + pointsize;
                 if (!G.NullOrBlanks(fillstyle)) s += " fillstyle " + fillstyle;
