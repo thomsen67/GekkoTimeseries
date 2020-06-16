@@ -1079,8 +1079,8 @@ namespace Gekko
         /// <summary>
         /// Container for all the stuff related to the current model
         /// </summary>
-        public static Model model = null;
-
+        public static Model model = new Gekko.Model();
+        
         //public static ModelGams modelGams = null;
 
         //these should be cleared with closeall
