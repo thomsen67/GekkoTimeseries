@@ -628,9 +628,16 @@ namespace Gekko
             if (efreq == EFreq.D)
             {
                 //see also #98032743029847
-                DateTime dt1 = new DateTime(t1.super, t1.sub, t1.subsub);
-                DateTime dt2 = new DateTime(t2.super, t2.sub, t2.subsub);
-                return (dt2 - dt1).Days + 1;
+                if (t1.super < 1 || t1.super > 9999 || t2.super < 1 || t2.super > 9999)
+                {
+                    return int.MaxValue;  //does not make any sense anyhow
+                }
+                else
+                {
+                    DateTime dt1 = new DateTime(t1.super, t1.sub, t1.subsub);
+                    DateTime dt2 = new DateTime(t2.super, t2.sub, t2.subsub);
+                    return (dt2 - dt1).Days + 1;
+                }
             }
             else
             {

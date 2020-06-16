@@ -2089,7 +2089,14 @@ namespace Gekko
 
         public static int DaysInMonth(int y, int m)
         {
-            return DateTime.DaysInMonth(y, m);
+            if (y >= 1 && y <= 9999)
+            {
+                return DateTime.DaysInMonth(y, m);
+            }
+            else
+            {
+                return 30;  //does not make any sense anyway, but undated freq can have periods outside 1..9999
+            }
         }
         
 

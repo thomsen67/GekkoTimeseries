@@ -2594,29 +2594,27 @@ namespace Gekko
                 if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
                 {
                     int i = O.ConvertToInt(indexes[0]);
-                    if (IsLagOrLead(i))
+                    if (this.freq != EFreq.U && IsLagOrLead(i))
                     {
-                        G.Writeln2("*** ERROR: You cannot use lags or lead on left-hand side of an expression");
+                        G.Writeln2("*** ERROR: You cannot use index in range -99..99 on a left-hand side series, unless it is of undated freq");
                         throw new GekkoException();
+                    }
+
+                    if (this.freq == EFreq.A || this.freq == EFreq.U)
+                    {
+                        double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
+                        GekkoTime t = new GekkoTime(this.freq, i, 1);
+                        this.SetData(t, d);
+                        if (Program.options.series_failsafe)
+                        {
+                            //only for debugging                        
+                            O.ReportSeriesMissingValue(this, t, t);
+                        }
                     }
                     else
                     {
-                        if (this.freq == EFreq.A || this.freq == EFreq.U)
-                        {
-                            double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
-                            GekkoTime t = new GekkoTime(this.freq, i, 1);
-                            this.SetData(t, d);
-                            if (Program.options.series_failsafe)
-                            {
-                                //only for debugging                        
-                                O.ReportSeriesMissingValue(this, t, t);
-                            }
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqString(this.freq) + " SERIES with [" + i + "]");
-                            throw new GekkoException();
-                        }
+                        G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqString(this.freq) + " SERIES with [" + i + "]");
+                        throw new GekkoException();
                     }
                 }
                 else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
@@ -2631,7 +2629,7 @@ namespace Gekko
                     }
                 }
                 else
-                {                    
+                {
                     G.Writeln2("*** ERROR: A normal series " + this.GetNameAndFreqPretty(true) + " on the left-hand side must be []-indexed with date or val");
                     throw new GekkoException();
                 }
