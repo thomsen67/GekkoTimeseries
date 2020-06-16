@@ -2158,11 +2158,14 @@ namespace Gekko
                     //This is a lag or lead, [-...] or [+...]
                     //TODO: Broken lags!!
 
-                    if (!IsLagOrLead(i))
-                    {
-                        G.Writeln2("*** ERROR: lags or leads should be in the interval [-99, 99].");
-                        throw new GekkoException();
-                    }
+                    //We remove this restriction. The users at Hawaii have long lags on quarterly or monthly data,
+                    //so no need to do any restrictions about lag/lead allowed ranges.
+
+                    //if (!IsLagOrLead(i))
+                    //{
+                    //    G.Writeln2("*** ERROR: lags or leads should be in the interval [-99, 99].");
+                    //    throw new GekkoException();
+                    //}
 
                     if (this.type == ESeriesType.Timeless)
                     {
@@ -2182,7 +2185,7 @@ namespace Gekko
                 }
                 else
                 {
-                    //not a lag or lead, [-...] or [+...]
+                    //not a lag or lead (that is, [-...] or [+...])
 
                     if (!t.IsNull())
                     {
