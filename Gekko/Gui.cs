@@ -354,6 +354,8 @@ namespace Gekko
             StartupExeAndIniStuff();
             CrossThreadStuff.Mode();
 
+            Gui.gui.gekkoToolStripMenuItem.Checked = true;
+
             Program.StartPulse();  //regarding remote.gcm
         }
 
@@ -2978,6 +2980,34 @@ namespace Gekko
         private void toolStripButton6_Click_1(object sender, EventArgs e)
         {
             Gui.CloseAllDecompUdvalg(true);
+        }                
+        
+        private void gekkoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //gekko
+            Program.options.interface_edit_style = "gekko";            
+            CrossThreadStuff.SetChecked();
+        }
+
+        private void gekko2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //gekko2
+            Program.options.interface_edit_style = "gekko2";
+            CrossThreadStuff.SetChecked();
+        }
+
+        private void rSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //rs
+            Program.options.interface_edit_style = "rs";
+            CrossThreadStuff.SetChecked();
+        }
+
+        private void rS2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //rs2
+            Program.options.interface_edit_style = "rs2";
+            CrossThreadStuff.SetChecked();
         }
     }
 }

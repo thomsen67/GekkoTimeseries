@@ -370,6 +370,38 @@ namespace Gekko
         }
 
         //weird delegate pattern, but it works!
+        delegate void CopyButtonCallbackEnabled(bool status);
+        public static void CopyButtonEnabled(bool status)
+        {
+            if (G.IsUnitTesting()) return;
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new CopyButtonCallbackEnabled(CopyButtonEnabled), new object[] { status });
+            }
+            else
+            {
+                Gui.gui.toolStripButton4.Enabled = status;
+            }
+        }
+
+
+        delegate void SetCheckedCallback();
+        public static void SetChecked()
+        {
+            if (G.IsUnitTesting()) return;
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new SetCheckedCallback(SetChecked), new object[] { });
+            }
+            else
+            {                
+                O.SetChecked();
+            }
+        }
+
+        //weird delegate pattern, but it works!
         delegate void CloseGraphCallback(Graph g);
         public static void CloseGraph(Graph g)
         {
@@ -478,22 +510,7 @@ namespace Gekko
         }
 
 
-
-        //weird delegate pattern, but it works!
-        delegate void CopyButtonCallbackEnabled(bool status);
-        public static void CopyButtonEnabled(bool status)
-        {
-            if (G.IsUnitTesting()) return;
-            if (Gui.gui.InvokeRequired)
-            {
-                // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new CopyButtonCallbackEnabled(CopyButtonEnabled), new object[] { status });
-            }
-            else
-            {
-                Gui.gui.toolStripButton4.Enabled = status;
-            }
-        }
+        
 
         //weird delegate pattern, but it works!
         delegate void CutButtonCallbackEnabled(bool status);

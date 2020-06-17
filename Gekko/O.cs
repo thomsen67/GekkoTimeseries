@@ -1973,6 +1973,37 @@ namespace Gekko
             return ml;
         }
 
+        public static void SetChecked()
+        {
+            Gui.gui.gekkoToolStripMenuItem.Checked = false;
+            Gui.gui.gekko2ToolStripMenuItem.Checked = false;
+            Gui.gui.rSToolStripMenuItem.Checked = false;
+            Gui.gui.rS2ToolStripMenuItem.Checked = false;
+            string s = Program.options.interface_edit_style;
+            if (G.Equal(s, "gekko"))
+            {
+                Gui.gui.gekkoToolStripMenuItem.Checked = true;
+            }
+            else if (G.Equal(s, "gekko2"))
+            {
+                Gui.gui.gekko2ToolStripMenuItem.Checked = true;
+            }
+            else if (G.Equal(s, "rs"))
+            {
+                Gui.gui.rSToolStripMenuItem.Checked = true;
+            }
+            else if (G.Equal(s, "rs2"))
+            {
+                Gui.gui.rS2ToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: type should be 'gekko', 'gekko2', 'rs', or 'rs2'");
+                throw new GekkoException();
+            }
+        }
+
+
 
         private static IVariable LookupHelperFindVariableInSpecificBank(string varnameWithFreq, LookupSettings settings, Databank db)
         {

@@ -4821,42 +4821,46 @@ namespace Gekko.Parser.Gek
                                 StringBuilder s = new StringBuilder();
                                 CreateOptionVariable(node, false, s, ref o);
                                 node.Code.A(s.ToString());
-                                if (o == "freq")
+                                if (G.Equal(o, "freq"))
                                 {
                                     //see also #89073589324
                                     node.Code.A("Program.AdjustFreq();");
-                                }                                
-                                else if (o == "interface_sound_type")
+                                }
+                                else if (G.Equal(o, "interface_sound_type"))
                                 {
                                     if (!p.hasBeenCmdFile)
                                     {
                                         node.Code.A("Program.PlaySound();");
                                     }
                                 }
-                                else if (o == "folder_menu" || o == "menu_startfile")
+                                else if (G.Equal(o, "interface_edit_style"))
+                                {
+                                    node.Code.A("CrossThreadStuff.SetChecked();");
+                                }
+                                else if (G.Equal(o, "folder_menu") || G.Equal(o, "menu_startfile"))
                                 {
                                     node.Code.A("CrossThreadStuff.RestartMenuBrowser();");
                                 }
-                                else if (o == "interface_zoom")
+                                else if (G.Equal(o, "interface_zoom"))
                                 {
                                     node.Code.A("CrossThreadStuff.Zoom();");
                                 }
-                                else if (o == "folder_working")
-                                {                                    
+                                else if (G.Equal(o, "folder_working"))
+                                {
                                     node.Code.A("CrossThreadStuff.WorkingFolder(``);");
                                 }
-                                else if (o == "interface_remote")
+                                else if (G.Equal(o, "interface_remote"))
                                 {
                                     node.Code.A("Program.RemoteInit();");
                                 }
-                                else if (o == "solve_gauss_reorder")
+                                else if (G.Equal(o, "solve_gauss_reorder"))
                                 {
                                     node.Code.A("G.Writeln();");
                                     node.Code.A("G.Writeln(`+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.`);");
                                     node.Code.A("G.Writeln(`+++       (In command files, place this option before any MODEL statements).`);");
 
                                 }
-                                else if (o == "series_dyn")
+                                else if (G.Equal(o, "series_dyn"))
                                 {
                                     node.Code.A("G.Writeln();");
                                     node.Code.A("G.Writeln(`*** ERROR: Deprecated option`);");
@@ -4867,39 +4871,34 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("G.Writeln();");
                                     node.Code.A("throw new GekkoException();");
                                 }
-                                
-                                //if (o == "databank_file_format")
-                                //{
-                                //    node.Code.A("Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = true;");
-                                //}
-                                else if (o == "timefilter_type")  //TODO: only issue if really avg
-                                {                                    
+                                else if (G.Equal(o, "timefilter_type"))  //TODO: only issue if really avg
+                                {
                                     node.Code.A("G.Writeln2(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
                                 }
-                                else if (o == "solve_forward_nfair_damp" || o == "solve_forward_fair_damp" || o == "solve_gauss_damp")
-                                {                                    
+                                else if (G.Equal(o, "solve_forward_nfair_damp") || G.Equal(o, "solve_forward_fair_damp") || G.Equal(o, "solve_gauss_damp"))
+                                {
                                     node.Code.A("G.Writeln2(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
                                 }
-                                else if (o == "r_exe_path")
-                                {                                    
+                                else if (G.Equal(o, "r_exe_path"))
+                                {
                                     node.Code.A("G.Writeln2(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
                                 }
-                                else if (o == "series_array_ignoremissing")
+                                else if (G.Equal(o, "series_array_ignoremissing"))
                                 {
                                     node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series array print missing = skip;' and 'OPTION series array calc missing = zero;' instead`);");
                                     node.Code.A("throw new GekkoException();");
                                 }
-                                else if (o == "table_ignoremissingvars")
+                                else if (G.Equal(o, "table_ignoremissingvars"))
                                 {
                                     node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series normal table missing = m;' instead`);");
                                     node.Code.A("throw new GekkoException();");
                                 }
-                                else if (o == "series_data_ignoremissing")
+                                else if (G.Equal(o, "series_data_ignoremissing"))
                                 {
                                     node.Code.A("G.Writeln2(`*** ERROR: This option can no longer be used.`);");
                                     node.Code.A("throw new GekkoException();");
                                 }
-    }
+                            }
                         }
                         break;
                     case "ASTOPT1":  //PRT-type statement
