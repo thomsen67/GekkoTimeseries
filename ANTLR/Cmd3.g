@@ -1278,6 +1278,7 @@ Y2                    = 'Y2'                       ;
     PCH              = 'PCH'             ;     //  --> don't activate this function --> will give problems (DLOG etc. are not stated either, they are recognized as idents)
     PCIM             = 'PCIM'       ;
     PCIMSTYLE        = 'PCIMSTYLE'       ;
+	STYLE = 'STYLE';
     PCTPRT           = 'PCTPRT'          ;
     PDEC             = 'PDEC';
     PERIOD           = 'PERIOD'          ;
@@ -1912,6 +1913,7 @@ d.Add("Y" ,Y);
                                         d.Add("pch"     , PCH        );
                                         d.Add("pcim"    , PCIM );
                                         d.Add("pcimstyle"               , PCIMSTYLE );
+										d.Add("style"               , STYLE );
                                         d.Add("pctprt"  , PCTPRT    );
                                         d.Add("pdec"    , PDEC    );
                                         d.Add("period"  , PERIOD    );
@@ -3902,6 +3904,7 @@ optionType:
 			 | INTERFACE CSV NDEC '='? Integer -> INTERFACE CSV NDEC ^(ASTINTEGER Integer)
 			 | INTERFACE CSV PDEC '='? Integer -> INTERFACE CSV PDEC ^(ASTINTEGER Integer)			 
 			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)
+			 | INTERFACE EDIT STYLE '='? name -> INTERFACE EDIT STYLE ^(ASTSTRINGSIMPLE name)
 			 | INTERFACE EXCEL LANGUAGE '='? optionInterfaceExcelLanguage -> INTERFACE EXCEL LANGUAGE ^(ASTSTRINGSIMPLE optionInterfaceExcelLanguage)
              | INTERFACE EXCEL MODERNLOOK '='? yesNoSimple -> INTERFACE EXCEL MODERNLOOK ^(ASTBOOL yesNoSimple)             		 
              | INTERFACE HELP COPYLOCAL '='? yesNoSimple -> INTERFACE HELP COPYLOCAL ^(ASTBOOL yesNoSimple)			 
@@ -4630,6 +4633,7 @@ ident2: 					Ident |
   PATH|
   PCH|
   PCIMSTYLE|
+  STYLE|
   PCIM|
   PCTPRT|
   PDEC|
@@ -5086,6 +5090,7 @@ ident3: 					Ident |
   PATH|
   PCH|
   PCIMSTYLE|
+  STYLE|
   PCIM|
   PCTPRT|
   PDEC|

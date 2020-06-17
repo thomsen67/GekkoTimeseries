@@ -91,7 +91,8 @@ namespace Gekko
         public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
         public int interface_csv_ndec = 100;
         public int interface_csv_pdec = 100;        
-        public string interface_debug = "dialog";  //or "none"        
+        public string interface_debug = "dialog";  //or "none"  
+        public string interface_edit_style = "gekko";  // gekko | gekko2 | rs | rs2
         public string interface_excel_language = "danish";
         public bool interface_excel_modernlook = true;
         public bool interface_help_copylocal = true;        
