@@ -2999,14 +2999,14 @@ namespace Gekko
         private void rSToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //rs
-            Program.options.interface_edit_style = "rs";
+            Program.options.interface_edit_style = "rstudio";
             CrossThreadStuff.SetChecked();
         }
 
         private void rS2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //rs2
-            Program.options.interface_edit_style = "rs2";
+            Program.options.interface_edit_style = "rstudio2";
             CrossThreadStuff.SetChecked();
         }
     }

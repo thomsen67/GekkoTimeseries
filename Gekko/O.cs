@@ -1988,17 +1988,17 @@ namespace Gekko
             {
                 Gui.gui.gekko2ToolStripMenuItem.Checked = true;
             }
-            else if (G.Equal(s, "rs"))
+            else if (G.Equal(s, "rstudio"))
             {
                 Gui.gui.rSToolStripMenuItem.Checked = true;
             }
-            else if (G.Equal(s, "rs2"))
+            else if (G.Equal(s, "rstudio2"))
             {
                 Gui.gui.rS2ToolStripMenuItem.Checked = true;
             }
             else
             {
-                G.Writeln2("*** ERROR: type should be 'gekko', 'gekko2', 'rs', or 'rs2'");
+                G.Writeln2("*** ERROR: type should be 'gekko', 'gekko2', 'rstudio', or 'rstudio2'");
                 throw new GekkoException();
             }
         }

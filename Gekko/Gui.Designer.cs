@@ -806,7 +806,7 @@ namespace Gekko
             // 
             this.rSToolStripMenuItem.Name = "rSToolStripMenuItem";
             this.rSToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
-            this.rSToolStripMenuItem.Text = "RS";
+            this.rSToolStripMenuItem.Text = "RStudio";
             this.rSToolStripMenuItem.ToolTipText = "[Enter] issues new line, [Ctrl+Enter] executes. New line after [Ctrl+Enter]";
             this.rSToolStripMenuItem.Click += new System.EventHandler(this.rSToolStripMenuItem_Click);
             // 
@@ -814,7 +814,7 @@ namespace Gekko
             // 
             this.rS2ToolStripMenuItem.Name = "rS2ToolStripMenuItem";
             this.rS2ToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
-            this.rS2ToolStripMenuItem.Text = "RS2";
+            this.rS2ToolStripMenuItem.Text = "RStudio2";
             this.rS2ToolStripMenuItem.ToolTipText = "[Enter] issues new line, [Ctrl+Enter] executes. No new line after [Ctrl+Enter]";
             this.rS2ToolStripMenuItem.Click += new System.EventHandler(this.rS2ToolStripMenuItem_Click);
             // 
@@ -1347,21 +1347,17 @@ namespace Gekko
             }
         }
 
-        private void richTextBox1_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        public enum EEditorStyle
         {
-            ////It is possible to catch key events here, since textbox2 typically has the focus.
-            //// Determine whether the key entered is the F1 key. If it is, display Help.
-            //if (e.KeyCode == Keys.F1 && (e.Alt || e.Control || e.Shift))
-            //{
-            //    // Display a pop-up Help topic to assist the user.
-            //    Help.ShowPopup(textBox1, "Enter your name.", new Point(textBox1.Bottom, textBox1.Right));
-            //}
-            //else if (e.KeyCode == Keys.F2 && e.Modifiers == Keys.Alt)
-            //{
-            //    // Display a pop-up Help topic to provide additional assistance to the user.
-            //    Help.ShowPopup(textBox1, "Enter your first name followed by your last name. Middle name is optional.",
-            //        new Point(textBox1.Top, this.textBox1.Left));
-            //}
+            Gekko,
+            Gekko2,
+            RStudio,
+            RStudio2
+        }
+
+        private void richTextBox1_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {            
+            EEditorStyle style = GetEditorStyle();
 
             bool isLessThanSign = false;
             if (!e.Control && !e.Alt && !e.Shift && e.KeyCode == Keys.OemBackslash) isLessThanSign = true;
@@ -1372,61 +1368,11 @@ namespace Gekko
             bool isCtrlSpace = false;
             if (e.Control && !e.Alt && !e.Shift && e.KeyCode == Keys.Space) isCtrlSpace = true;
 
-            if (e.KeyCode == Keys.F1)
+            if (!e.Control && e.KeyCode == Keys.Return)  //Pure enter (not Ctrl+Enter)
             {
-                Program.Help("I_OVERVIEW");
-            }
-            else if ((e.KeyData == (Keys.ControlKey | Keys.Enter)))
-            {
-                string insertText = "\n";
-                int selectionIndex = textBox2.SelectionStart;
-                textBox2.Text = textBox2.Text.Insert(selectionIndex, insertText);
-                textBox2.SelectionStart = selectionIndex + insertText.Length;
-            }
-            else if (e.KeyCode == Keys.F2)
-            {
-                WindowOpenDatabanks wd = new WindowOpenDatabanks();
-                wd.ShowDialog();
-            }
-            else if (e.Control && e.KeyCode == Keys.V)
-            {
-                textBox2.Paste(DataFormats.GetFormat(DataFormats.Text));  //to avoid formatting, colors etc., when pasting from e.g. Word examples, mails etc.
-                e.Handled = true;
-            }
-            else if (e.Control && e.KeyCode == Keys.C)
-            {
-                if (this.textBox2.SelectedText != null)
-                {
-                    Clipboard.SetText(this.textBox2.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
-                }
-                e.Handled = true;
-            }
-            else if (e.Control && e.KeyCode == Keys.M)
-            {
-                CrossThreadStuff.SetTab("main", true);
-            }
-            //else if (e.Control && e.KeyCode == Keys.H)
-            //{
-            //    CrossThreadStuff.SetTab("help", true);
-            //}
-            else if (e.Control && e.KeyCode == Keys.O)
-            {
-                CrossThreadStuff.SetTab("output", true);
-            }
-            else if (e.Control && e.KeyCode == Keys.U)
-            {
-                CrossThreadStuff.SetTab("menu", true);
-            }
-            else if (e.Control && e.KeyCode == Keys.R)
-            {
-                e.Handled = true;  //ignore -- else will right-justify
-            }
-            else if (e.Control && e.KeyCode == Keys.L)
-            {
-                e.Handled = true;  //ignore -- else will left-justify
-            }
-            else if (!e.Control && e.KeyCode == Keys.Return)  //Pure enter (Ctrl+Enter is equal to F2)
-            {
+                //
+                // Enter
+                //                
                 if (Globals.windowIntellisense != null && Globals.windowIntellisense.IsOpen && Globals.windowIntellisense.listBox1.SelectedItem != null)
                 {
                     textBox2.SelectedText = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
@@ -1435,106 +1381,117 @@ namespace Gekko
                 }
                 else
                 {
-                    if (Globals.windowIntellisense != null) Globals.windowIntellisense.IsOpen = false; //if intellise window was open but nothing was selected before enter was hit
-
-                    Globals.startOfLinePositionWhenLastEnterPressed = -12345;
-                    Globals.endOfLinePositionWhenLastEnterPressed = -12345;
-
-                    //Program.ShowPeriodInStatusField("");
-
-                    string s2 = null;
-
-                    string selected = textBox2.SelectedText;
-
-                    int line2;
-                    int firstChar;
-                    int column2;
-                    TextInputHelper(out line2, out firstChar, out column2);
-                    Globals.startOfLinePositionWhenLastEnterPressed = firstChar;
-                    Globals.commandMemory.lengthWhenLastEnterPressed = Globals.commandMemory.storage.ToString().Length;
-
-
-                    if (selected != "")
+                    if (style == EEditorStyle.Gekko)
                     {
-                        s2 = selected;
-                        e.Handled = true;  //otherwise the text block is deleted
+                        GekkoEnter(e);
                     }
                     else
                     {
-                        //not in selection mode
-                        //does not (and should not) handle & sign in relation to line breaks
-                        //Strange: needed after the textbox is rtf type.......
-
-                        //TODO: can give error with multi-line input (line>size)
-                        if (textBox2.Lines.Length > line2)  //must be so, otherwise we get error
-                        {
-                            s2 = textBox2.Lines[line2];
-                            if (Globals.startOfLinePositionWhenLastEnterPressed != -12345) Globals.endOfLinePositionWhenLastEnterPressed = Globals.startOfLinePositionWhenLastEnterPressed + s2.Length;
-                            bool isAtLastColumn = false;
-                            if (s2.Length == column2) isAtLastColumn = true;
-                            bool isAtLastRow = false;
-                            if (line2 + 1 == textBox2.Lines.Length) isAtLastRow = true;
-                            if (!isAtLastColumn)
-                            {                                
-                                //in the middle of a line --> never no new line
-                                e.Handled = true;
-                            }
-                            else if (!isAtLastRow)
-                            {
-                                //at the end of the non-last line -> no new line, but maybe semicolon
-                                if (s2.Trim() != "" && !s2.Trim().EndsWith(";"))
-                                {
-                                    textBox2.SelectedText = ";";
-                                    s2 = s2 + ";";
-                                }
-                                e.Handled = true;
-                            }
-                            else
-                            {
-                                //at the end of the last line -> new line and semicolon
-                                if (s2.Trim() != "" && !s2.Trim().EndsWith(";"))
-                                {
-                                    textBox2.SelectedText = ";";
-                                    s2 = s2 + ";";
-                                }
-                            }
-                        }
-                    }  //if selection mode
-
-                    if (s2 != null)
-                    {
-                        //try
-                        //{
-                            //Commands.obeyCommand(s2);
-                            this.StartThread(s2, true);
-                        //}
-                        //catch (Exception e2)
-                        //{
-                        //    Program.PrintExceptionAndFinishThread(e2, s2, null);
-                        //}
-                        //Program.ShowPeriodInStatusField("");
+                        GekkoCtrlEnter();
+                        e.Handled = true;  //else we get 1 line too many
                     }
-                    else
-                    {
-                        //Just silently ignore this empty command
-                    }
-                }  //if intellisense open
-            }  //if enter key (both command return and intellisense select)
+                }
+            }
+            else if ((e.KeyData == (Keys.Control | Keys.Enter)))
+            {
+                //
+                // Ctrl+Enter
+                //                
+                if (style == EEditorStyle.Gekko)
+                {
+                    GekkoCtrlEnter();
+                }
+                else
+                {
+                    GekkoEnter(e);
+                }
+            }
+            else if (e.KeyCode == Keys.F1)
+            {
+                //
+                // F1
+                //
+                Program.Help("I_OVERVIEW");
+            }            
+            else if (e.KeyCode == Keys.F2)
+            {
+                //
+                // F2
+                //
+                WindowOpenDatabanks wd = new WindowOpenDatabanks();
+                wd.ShowDialog();
+            }
+            else if (e.Control && e.KeyCode == Keys.V)
+            {
+                //
+                // Ctrl+V
+                //
+                textBox2.Paste(DataFormats.GetFormat(DataFormats.Text));  //to avoid formatting, colors etc., when pasting from e.g. Word examples, mails etc.
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.C)
+            {
+                //
+                // Ctrl+C
+                //
+                if (this.textBox2.SelectedText != null)
+                {
+                    Clipboard.SetText(this.textBox2.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
+                }
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.M)
+            {
+                //
+                // Ctrl+M
+                //
+                CrossThreadStuff.SetTab("main", true);
+            }            
+            else if (e.Control && e.KeyCode == Keys.O)
+            {
+                //
+                // Ctrl+O
+                //
+                CrossThreadStuff.SetTab("output", true);
+            }
+            else if (e.Control && e.KeyCode == Keys.U)
+            {
+                //
+                // Ctrl+U
+                //
+                CrossThreadStuff.SetTab("menu", true);
+            }
+            else if (e.Control && e.KeyCode == Keys.R)
+            {
+                //
+                // Ctrl+R
+                //
+                e.Handled = true;  //ignore -- else will right-justify
+            }
+            else if (e.Control && e.KeyCode == Keys.L)
+            {
+                //
+                // Ctrl+L
+                //
+                e.Handled = true;  //ignore -- else will left-justify
+            }            
             else if (isNormalSpace || isLessThanSign)
             {
+                //
+                // Space or '<'
+                //
                 bool ok = true;
                 string keyword = null;
                 if (isNormalSpace) keyword = "space";
                 else if (isLessThanSign) keyword = "less";
                 else ok = false;
                 if (ok) StartIntellisense(keyword, Program.options.interface_suggestions);
-            }
-            else if (isCtrlSpace)
-            {
-                //StartIntellisense("space", "all");
-            }
+            }            
             else if (e.KeyCode == Keys.Down)
             {
+                //
+                // Arrow down
+                //
                 if (Globals.windowIntellisense != null && Globals.windowIntellisense.IsOpen)
                 {
                     if (Globals.windowIntellisense.listBox1.SelectedIndex < Globals.windowIntellisense.listBox1.Items.Count - 1)
@@ -1548,6 +1505,9 @@ namespace Gekko
             }
             else if (e.KeyCode == Keys.Up)
             {
+                //
+                // Arrow up
+                //
                 if (Globals.windowIntellisense != null && Globals.windowIntellisense.IsOpen)
                 {
                     if (Globals.windowIntellisense.listBox1.SelectedIndex > 0)
@@ -1557,15 +1517,127 @@ namespace Gekko
                     }
                     e.Handled = true;
                 }
-            }
-            else if (e.KeyCode == Keys.Return)
-            {
-                //see above
-            }
+            }            
             else
             {
                 if (Globals.windowIntellisense != null) Globals.windowIntellisense.IsOpen = false;
             }
+        }
+
+        private void GekkoCtrlEnter()
+        {
+            string insertText = "\n";
+            int selectionIndex = textBox2.SelectionStart;
+            textBox2.Text = textBox2.Text.Insert(selectionIndex, insertText);
+            textBox2.SelectionStart = selectionIndex + insertText.Length;
+        }
+
+        private void GekkoEnter(KeyEventArgs e)
+        {
+            if (Globals.windowIntellisense != null) Globals.windowIntellisense.IsOpen = false; //if intellise window was open but nothing was selected before enter was hit
+            HandleEditorNewline(e);
+        }
+
+        private void HandleEditorNewline(KeyEventArgs e)
+        {
+            Globals.startOfLinePositionWhenLastEnterPressed = -12345;
+            Globals.endOfLinePositionWhenLastEnterPressed = -12345;
+
+            //Program.ShowPeriodInStatusField("");
+
+            string s2 = null;
+
+            string selected = textBox2.SelectedText;
+
+            int line2;
+            int firstChar;
+            int column2;
+            TextInputHelper(out line2, out firstChar, out column2);
+            Globals.startOfLinePositionWhenLastEnterPressed = firstChar;
+            Globals.commandMemory.lengthWhenLastEnterPressed = Globals.commandMemory.storage.ToString().Length;
+
+
+            if (selected != "")
+            {
+                s2 = selected;
+                e.Handled = true;  //otherwise the text block is deleted
+            }
+            else
+            {
+                //not in selection mode
+                //does not (and should not) handle & sign in relation to line breaks
+                //Strange: needed after the textbox is rtf type.......
+
+                //TODO: can give error with multi-line input (line>size)
+                if (textBox2.Lines.Length > line2)  //must be so, otherwise we get error
+                {
+                    s2 = textBox2.Lines[line2];
+                    if (Globals.startOfLinePositionWhenLastEnterPressed != -12345) Globals.endOfLinePositionWhenLastEnterPressed = Globals.startOfLinePositionWhenLastEnterPressed + s2.Length;
+                    bool isAtLastColumn = false;
+                    if (s2.Length == column2) isAtLastColumn = true;
+                    bool isAtLastRow = false;
+                    if (line2 + 1 == textBox2.Lines.Length) isAtLastRow = true;
+                    if (!isAtLastColumn)
+                    {
+                        //in the middle of a line --> never no new line
+                        e.Handled = true;
+                    }
+                    else if (!isAtLastRow)
+                    {
+                        //at the end of the non-last line -> no new line, but maybe semicolon
+                        if (s2.Trim() != "" && !s2.Trim().EndsWith(";"))
+                        {
+                            textBox2.SelectedText = ";";
+                            s2 = s2 + ";";
+                        }
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        //at the end of the last line -> new line and semicolon
+                        if (s2.Trim() != "" && !s2.Trim().EndsWith(";"))
+                        {
+                            textBox2.SelectedText = ";";
+                            s2 = s2 + ";";
+                        }
+                    }
+                }
+            }  //if selection mode
+
+            if (s2 != null)
+            {
+                this.StartThread(s2, true);
+            }
+            else
+            {
+                //Just silently ignore this empty command
+            }
+        }
+
+        private static EEditorStyle GetEditorStyle()
+        {
+            EEditorStyle style = EEditorStyle.Gekko;
+            if (G.Equal(Program.options.interface_edit_style, "gekko"))
+            {
+                //do nothing
+            }
+            else if (G.Equal(Program.options.interface_edit_style, "gekko2"))
+            {
+                style = EEditorStyle.Gekko2;
+            }
+            else if (G.Equal(Program.options.interface_edit_style, "rstudio"))
+            {
+                style = EEditorStyle.RStudio;
+            }
+            else if (G.Equal(Program.options.interface_edit_style, "rstudio2"))
+            {
+                style = EEditorStyle.RStudio2;
+            }
+            else
+            {
+                //do nothing
+            }
+            return style;
         }
 
         private void StartIntellisense(string keyword, string type)
