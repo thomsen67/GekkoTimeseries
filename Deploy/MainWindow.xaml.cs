@@ -191,18 +191,7 @@ namespace Deploy
                 File.Copy(@"c:\tools\tmp\Gekko_files\Gekko.zip", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Gekko.zip", true);
 
                 System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha.bat");
-
-                //MessageBox.Show(@"Go to c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\ and run sha.bat now");
-
-                //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\fciv.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\InstallerForGekko.msi -sha1 > sha1.txt");
-                //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\fciv.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\setup.exe -sha1 > sha2.txt");
-                //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\fciv.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Gekko.zip -sha1 > sha3.txt");
-
-                //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha.bat");
-
-                //string ss = File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha1.txt") + " " + File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha2.txt") + " " + File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha3.txt");
-
-
+                
                 string[] ss1 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha1.txt");
                 string[] ss2 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha2.txt");
                 string[] ss3 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha3.txt");
