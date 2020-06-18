@@ -1120,6 +1120,7 @@ namespace Gekko
         }
 
         private void textBox2_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+
         {
 
         }
@@ -2985,7 +2986,8 @@ namespace Gekko
         private void gekkoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //gekko
-            Program.options.interface_edit_style = "gekko";            
+            Program.options.interface_edit_style = "gekko";
+            G.Writeln2("option interface edit style = gekko");
             CrossThreadStuff.SetChecked();
         }
 
@@ -2993,6 +2995,7 @@ namespace Gekko
         {
             //gekko2
             Program.options.interface_edit_style = "gekko2";
+            G.Writeln2("option interface edit style = gekko2");
             CrossThreadStuff.SetChecked();
         }
 
@@ -3000,6 +3003,7 @@ namespace Gekko
         {
             //rs
             Program.options.interface_edit_style = "rstudio";
+            G.Writeln2("option interface edit style = rstudio");
             CrossThreadStuff.SetChecked();
         }
 
@@ -3007,6 +3011,7 @@ namespace Gekko
         {
             //rs2
             Program.options.interface_edit_style = "rstudio2";
+            G.Writeln2("option interface edit style = rstudio2");
             CrossThreadStuff.SetChecked();
         }
     }

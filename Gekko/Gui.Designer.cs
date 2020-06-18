@@ -94,8 +94,8 @@ namespace Gekko
             this.gekko2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rS2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.commandHistoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearCommandHistoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.commandHistoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.utilitiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.makebatFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -784,7 +784,6 @@ namespace Gekko
             this.editorStyleToolStripMenuItem.Name = "editorStyleToolStripMenuItem";
             this.editorStyleToolStripMenuItem.Size = new System.Drawing.Size(280, 30);
             this.editorStyleToolStripMenuItem.Text = "Editor style";
-            this.editorStyleToolStripMenuItem.ToolTipText = "Choose how the lower part of the main window works";
             // 
             // gekkoToolStripMenuItem
             // 
@@ -818,19 +817,19 @@ namespace Gekko
             this.rS2ToolStripMenuItem.ToolTipText = "[Enter] issues new line, [Ctrl+Enter] executes. No new line after [Ctrl+Enter]";
             this.rS2ToolStripMenuItem.Click += new System.EventHandler(this.rS2ToolStripMenuItem_Click);
             // 
-            // commandHistoryToolStripMenuItem
-            // 
-            this.commandHistoryToolStripMenuItem.Name = "commandHistoryToolStripMenuItem";
-            this.commandHistoryToolStripMenuItem.Size = new System.Drawing.Size(280, 30);
-            this.commandHistoryToolStripMenuItem.Text = "Command history...";
-            this.commandHistoryToolStripMenuItem.Click += new System.EventHandler(this.commandHistoryToolStripMenuItem_Click);
-            // 
             // clearCommandHistoryToolStripMenuItem
             // 
             this.clearCommandHistoryToolStripMenuItem.Name = "clearCommandHistoryToolStripMenuItem";
             this.clearCommandHistoryToolStripMenuItem.Size = new System.Drawing.Size(280, 30);
             this.clearCommandHistoryToolStripMenuItem.Text = "Clear command history";
             this.clearCommandHistoryToolStripMenuItem.Click += new System.EventHandler(this.clearCommandHistoryToolStripMenuItem_Click);
+            // 
+            // commandHistoryToolStripMenuItem
+            // 
+            this.commandHistoryToolStripMenuItem.Name = "commandHistoryToolStripMenuItem";
+            this.commandHistoryToolStripMenuItem.Size = new System.Drawing.Size(280, 30);
+            this.commandHistoryToolStripMenuItem.Text = "Command history...";
+            this.commandHistoryToolStripMenuItem.Click += new System.EventHandler(this.commandHistoryToolStripMenuItem_Click);
             // 
             // utilitiesToolStripMenuItem
             // 
@@ -1381,14 +1380,14 @@ namespace Gekko
                 }
                 else
                 {
-                    if (style == EEditorStyle.Gekko)
+                    if (style == EEditorStyle.Gekko || style == EEditorStyle.Gekko2)
                     {
                         GekkoEnter(e);
+                        if (style == EEditorStyle.Gekko2) GoToNextLine(e);
                     }
                     else
                     {
-                        GekkoCtrlEnter();
-                        e.Handled = true;  //else we get 1 line too many
+                        //do nothing: Enter will just automatically issue newline in editor                        
                     }
                 }
             }
@@ -1397,13 +1396,14 @@ namespace Gekko
                 //
                 // Ctrl+Enter
                 //                
-                if (style == EEditorStyle.Gekko)
+                if (style == EEditorStyle.Gekko || style == EEditorStyle.Gekko2)
                 {
-                    GekkoCtrlEnter();
+                    //do nothing: Ctrl+Enter will just automatically issue newline in editor
                 }
                 else
                 {
                     GekkoEnter(e);
+                    if (style == EEditorStyle.RStudio) GoToNextLine(e);
                 }
             }
             else if (e.KeyCode == Keys.F1)
@@ -1524,12 +1524,16 @@ namespace Gekko
             }
         }
 
-        private void GekkoCtrlEnter()
+        private void GoToNextLine(KeyEventArgs e)
         {
             string insertText = "\n";
-            int selectionIndex = textBox2.SelectionStart;
-            textBox2.Text = textBox2.Text.Insert(selectionIndex, insertText);
-            textBox2.SelectionStart = selectionIndex + insertText.Length;
+            try
+            {
+                int selectionIndex = textBox2.SelectionStart;
+                int j = textBox2.Text.IndexOf('\n', selectionIndex + 0);
+                if (j >= 0 && j + 0 < textBox2.Text.Length) textBox2.SelectionStart = j + 1;
+            }
+            catch { };  //no need to fail on this
         }
 
         private void GekkoEnter(KeyEventArgs e)
