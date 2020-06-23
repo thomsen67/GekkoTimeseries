@@ -1088,20 +1088,19 @@ namespace Gekko
                 {
                     if (ph.isOneLinerFromGui == false)
                     {
+                        string fn = ph.fileName;
+                        if (fn == null || fn == "")
                         {
-                            string fn = ph.fileName;
-                            if (fn == null || fn == "")
-                            {
-                                G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
-                            }
-                            else
-                            {
-                                G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNo + " pos " + positionNo);
-                            }
-
-                            string e2 = errorMessage.Replace("Der blev udløst en undtagelse af typen ", "");
-                            G.Writeln("           " + e2);
+                            G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
                         }
+                        else
+                        {
+                            G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNo + " pos " + positionNo);
+                        }
+
+                        string e2 = errorMessage.Replace("Der blev udløst en undtagelse af typen ", "");
+                        G.Writeln("           " + e2);
+
                     }
                     else
                     {

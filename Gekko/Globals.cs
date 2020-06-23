@@ -595,6 +595,8 @@ namespace Gekko
 
         public static string userSettingsPath = "";
 
+        public static string stopHelper = "calling_non_existing_function";
+
         public static string linkSeparator1 = "#";
         public static char linkSeparator2 = ':';
 

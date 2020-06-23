@@ -1392,10 +1392,9 @@ namespace Gekko.Parser.Gek
 
                     case "ASTSTOP":
                         {
-                            node.Code.A("Program.Stop(p);" + G.NL);
-                            //#9807235423 return problem
-                            //node.Code.A("return true;" + G.NL;  //probably superfluous
-                            node.Code.A("return;" + G.NL);  //probably superfluous
+                            //node.Code.A("Program.Stop(p);" + G.NL);                            
+                            //node.Code.A("return;" + G.NL);  //probably superfluous                            
+                            node.Code.A("O.StopHelper(smpl, p);" + G.NL);
                         }
                         break;
 
@@ -6418,6 +6417,8 @@ namespace Gekko.Parser.Gek
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
         }
+
+        
 
         private static string MaybeControlledSet(ASTNode node)
         {

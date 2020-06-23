@@ -5904,7 +5904,17 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with " + (n - 2) + " arguments");
+                if (name == Globals.stopHelper)
+                {
+                    G.Writeln2("-------------------------------------------------------------", Color.Red);
+                    G.Writeln("------------ The job was stopped by STOP command ------------", Color.Red);
+                    G.Writeln("-------------------------------------------------------------", Color.Red);
+                    G.Writeln();
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with " + (n - 2) + " arguments");
+                }
             }
         }
 
@@ -7075,6 +7085,20 @@ namespace Gekko
         }
 
         // -------------------- type checks end ----------------------------
+
+        public static void Stop(P p)
+        {
+            Globals.threadIsInProcessOfAborting = true;
+            p.hasSeenStopCommand = true;
+            throw new GekkoException();
+        }
+
+        public static void StopHelper(GekkoSmpl smpl, P p)
+        {
+            //Globals.threadIsInProcessOfAborting = true;
+            p.hasSeenStopCommand = true;
+            O.FunctionLookupNew2(Globals.stopHelper)(smpl, p, false, null, null);
+        }
 
         public static int ConvertToInt(IVariable a)
         {
@@ -10218,6 +10242,8 @@ namespace Gekko
 
                 }
             }
+
+            
 
             public static List<int> GetBankNumbers(string tableOrGraphGlobalOperator, List<string> operators)
             {               

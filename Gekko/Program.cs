@@ -1139,115 +1139,112 @@ namespace Gekko
 
         public static void PrintExceptionAndFinishThread(Exception e2, P p)
         {
-            if (!Globals.threadIsInProcessOfAborting)
-            {
+            if (!Globals.threadIsInProcessOfAborting && !p.hasSeenStopCommand)  //STOP should not show errors
+            {            
 
                 string eType = e2.GetType().Name;
 
-                if (true)
+                if (FindException(e2, "lexer error"))
                 {
-
-                    if (FindException(e2, "lexer error"))
-                    {
-                        ParseHelper ph = new ParseHelper();
-                        string s2 = p.GetStackCommandFileText(p.GetDepth());
-                        string s3 = "";
-                        if (s2 != null) s3 = s2;
-                        ParserOLD.PrintModelParserErrors(Program.CreateListOfStringsFromString(e2.Message), Program.CreateListOfStringsFromString(s3), ph);
-                    }
-                    if (FindException(e2, "***") || FindException(e2, "+++"))
-                    {
-                        //for instance "*** ERROR: blablabla" or "+++ NOTE: blablabla"
-                        //if *** we know that it is a Gekko-generated error text
-                        G.Writeln("    " + e2.Message);
-                    }
-                    string ramProblem = "";
-                    if (FindException(e2, "System.OutOfMemoryException"))
-                    {
-                        G.Writeln2("*** ERROR: Out of memory (RAM). Please close some unnessecary programs if possible.");
-                        Process[] processlist = Process.GetProcesses();
-                        int counter = 0;
-                        foreach (Process theprocess in processlist)
-                        {
-                            counter++;
-                            ramProblem += "#" + counter;
-                            try
-                            {
-                                ramProblem += " name:" + theprocess.ProcessName;
-                            }
-                            catch { };
-                            try
-                            {
-                                ramProblem += " id:" + theprocess.Id;
-                            }
-                            catch { };
-                            try
-                            {
-                                ramProblem += " ram:" + theprocess.WorkingSet64 / 1024;
-                            }
-                            catch { };
-                            try
-                            {
-                                ramProblem += " maxram:" + theprocess.PeakWorkingSet64 / 1024;
-                            }
-                            catch { };
-                            try
-                            {
-                                ramProblem += " created:" + theprocess.StartTime.ToString().Replace(" ", "_");
-                            }
-                            catch { };
-                            ramProblem += G.NL;
-                        }
-                    }
-                    
-                    if (FindException(e2, "GekkoException"))
-                    {
-                        G.Write("*** ERROR: The command failed");
-                    }
-                    else
-                    {
-                        G.Write("*** ERROR: The command failed due to internal Gekko error");
-                    }
-                    string s = "";
-
-                    if (ramProblem != "")
-                    {
-                        s += "NOTE: Since this is a RAM problem, the error report contains information on the active processes";
-                        s += "running on the computer. If you do not wish this information to be contained in the error report,";
-                        s += "please delete the section below 'The following is a list of active processes' before sending";
-                        s += "the report to the Gekko editor (active processes are usually not sensitive information, and";
-                        s += "no content of these processes is used (only their RAM usage etc.)" + G.NL + G.NL;
-                        s += e2.ToString() + G.NL;
-                        s += G.NL + "The following is a list of active processes:" + G.NL + ramProblem;
-                    }
-                    else
-                    {
-                        s += G.NL + e2.ToString();
-                    }
-
-                    if (Globals.errorMemory != null)
-                    {
-                        s += G.NL + G.NL + "---------------------------------------------------------------------" + G.NL;
-                        List<string> xx = G.ExtractLinesFromText(Globals.errorMemory.ToString());
-                        for (int i = 0; i < xx.Count; i++)
-                        {
-                            if (i > 30) continue;  //so that we don't accidentally get 100's of lines from user output pasted in. The intention is to only get a copy of messages since last error message.
-                            s += xx[i] + G.NL;
-                        }
-                    }
-
-                    if (Globals.lastDynamicCsCode != null)
-                    {
-                        //this is nice to have to trace the error if this sort of problem appears!
-                        s += G.NL + G.NL + "----------------------------- Non-compiling cs code: ----------------------------------" + G.NL;
-                        s += Globals.lastDynamicCsCode;
-                        s += G.NL;
-                    }
-
-                    LinkContainer lc = new LinkContainer(s);
-                    Globals.linkContainer.Add(lc.counter, lc);
-                    G.Write(" ("); G.WriteLink("more", "stacktrace:" + lc.counter); G.Write(")"); G.Writeln();
+                    ParseHelper ph = new ParseHelper();
+                    string s2 = p.GetStackCommandFileText(p.GetDepth());
+                    string s3 = "";
+                    if (s2 != null) s3 = s2;
+                    ParserOLD.PrintModelParserErrors(Program.CreateListOfStringsFromString(e2.Message), Program.CreateListOfStringsFromString(s3), ph);
                 }
+                if (FindException(e2, "***") || FindException(e2, "+++"))
+                {
+                    //for instance "*** ERROR: blablabla" or "+++ NOTE: blablabla"
+                    //if *** we know that it is a Gekko-generated error text
+                    G.Writeln("    " + e2.Message);
+                }
+                string ramProblem = "";
+                if (FindException(e2, "System.OutOfMemoryException"))
+                {
+                    G.Writeln2("*** ERROR: Out of memory (RAM). Please close some unnessecary programs if possible.");
+                    Process[] processlist = Process.GetProcesses();
+                    int counter = 0;
+                    foreach (Process theprocess in processlist)
+                    {
+                        counter++;
+                        ramProblem += "#" + counter;
+                        try
+                        {
+                            ramProblem += " name:" + theprocess.ProcessName;
+                        }
+                        catch { };
+                        try
+                        {
+                            ramProblem += " id:" + theprocess.Id;
+                        }
+                        catch { };
+                        try
+                        {
+                            ramProblem += " ram:" + theprocess.WorkingSet64 / 1024;
+                        }
+                        catch { };
+                        try
+                        {
+                            ramProblem += " maxram:" + theprocess.PeakWorkingSet64 / 1024;
+                        }
+                        catch { };
+                        try
+                        {
+                            ramProblem += " created:" + theprocess.StartTime.ToString().Replace(" ", "_");
+                        }
+                        catch { };
+                        ramProblem += G.NL;
+                    }
+                }
+
+                if (FindException(e2, "GekkoException"))
+                {
+                    G.Write("*** ERROR: The command failed");
+                }
+                else
+                {
+                    G.Write("*** ERROR: The command failed due to internal Gekko error");
+                }
+                string s = "";
+
+                if (ramProblem != "")
+                {
+                    s += "NOTE: Since this is a RAM problem, the error report contains information on the active processes";
+                    s += "running on the computer. If you do not wish this information to be contained in the error report,";
+                    s += "please delete the section below 'The following is a list of active processes' before sending";
+                    s += "the report to the Gekko editor (active processes are usually not sensitive information, and";
+                    s += "no content of these processes is used (only their RAM usage etc.)" + G.NL + G.NL;
+                    s += e2.ToString() + G.NL;
+                    s += G.NL + "The following is a list of active processes:" + G.NL + ramProblem;
+                }
+                else
+                {
+                    s += G.NL + e2.ToString();
+                }
+
+                if (Globals.errorMemory != null)
+                {
+                    s += G.NL + G.NL + "---------------------------------------------------------------------" + G.NL;
+                    List<string> xx = G.ExtractLinesFromText(Globals.errorMemory.ToString());
+                    for (int i = 0; i < xx.Count; i++)
+                    {
+                        if (i > 30) continue;  //so that we don't accidentally get 100's of lines from user output pasted in. The intention is to only get a copy of messages since last error message.
+                        s += xx[i] + G.NL;
+                    }
+                }
+
+                if (Globals.lastDynamicCsCode != null)
+                {
+                    //this is nice to have to trace the error if this sort of problem appears!
+                    s += G.NL + G.NL + "----------------------------- Non-compiling cs code: ----------------------------------" + G.NL;
+                    s += Globals.lastDynamicCsCode;
+                    s += G.NL;
+                }
+
+                LinkContainer lc = new LinkContainer(s);
+                Globals.linkContainer.Add(lc.counter, lc);
+                G.Write(" ("); G.WriteLink("more", "stacktrace:" + lc.counter); G.Write(")"); G.Writeln();
+
             }
             Gui.gui.ThreadFinished();  //removes the job from the stack of jobs, otherwise we will wait for this halted job forever. Could use thread stop instead??
         }
@@ -1267,22 +1264,10 @@ namespace Gekko
             {
                 G.Writeln();
                 G.Writeln("-------------------------------------------------------------", Color.Red);
-                G.Writeln("------------ The job was stopped by the user ----------------", Color.Red);
-                if (p.hasSeenStopCommand)
-                {
-                    G.Writeln("--------------- (STOP command line) -------------------------", Color.Red);
-                }
-                else
-                {
-                    G.Writeln("---------------- (Red stop button) --------------------------", Color.Red);
-                }
+                G.Writeln("------------ The job was stopped by the user ----------------", Color.Red);                
+                G.Writeln("---------------- (Red stop button) --------------------------", Color.Red);                
                 G.Writeln("-------------------------------------------------------------", Color.Red);
-                G.Writeln();
-                if (p.hasSeenStopCommand)
-                {
-                    G.Writeln("+++ NOTE: You may use the EXIT command to (stop and) terminate the Gekko application");
-                    G.Writeln();
-                }
+                G.Writeln();                
             }
             if (Globals.applicationIsInProcessOfAborting)
             {
@@ -10205,7 +10190,7 @@ namespace Gekko
         public static void WriteErrorMessage(int lineNumber, string problemLine, string text, string fileName)
         {
             if (Globals.threadIsInProcessOfAborting) return;
-            G.Writeln(text, Color.Black, true);
+            G.Writeln(text, Color.Red, true);  //will also be red for a STOP command, but without counting as an error
             G.Writeln("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + G.ReplaceGlueNew(problemLine), Color.Blue, true);
         }
 
@@ -26859,13 +26844,6 @@ namespace Gekko
             return ts;
         }
 
-        public static void Stop(P p)
-        {
-            Globals.threadIsInProcessOfAborting = true;
-            p.hasSeenStopCommand = true;
-            throw new GekkoException();
-        }
-
         public static void Exit()
         {
             Globals.applicationIsInProcessOfAborting = true;
@@ -27512,7 +27490,10 @@ namespace Gekko
             {
                 commandLines = CreateListOfStringsFromString(fileText);
             }
-            //commandText = commandLines2[lineNumber2 - 1];
+            if (p.hasSeenStopCommand)
+            {
+                lineNumber2++;  //else it reports the line before the STOP command                
+            }
         }
 
         public static void Flush()

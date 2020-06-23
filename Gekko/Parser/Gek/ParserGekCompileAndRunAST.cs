@@ -262,7 +262,7 @@ namespace Gekko.Parser.Gek
             if (Globals.threadIsInProcessOfAborting)
             {
                 throw e;
-            }
+            }                    
 
             if (p.hasWrittenRunTimeErrorOnce) return;  //We now write a stack first time an error is encountered
             p.hasWrittenRunTimeErrorOnce = true;
@@ -306,7 +306,7 @@ namespace Gekko.Parser.Gek
                         temp.Add(exception);
                         ParserOLD.PrintModelLexerErrors(temp, Globals.cmdFileLines, new ParseHelper());
                     }
-
+                    
                     if (originalFileName == "" && commandLines.Count == 1)  //more-liners get file-type error messages
                     {
                         if (lexer == true) G.Writeln("*** ERROR: Problem parsing/lexing command line:");
@@ -322,15 +322,18 @@ namespace Gekko.Parser.Gek
                         string lineNumber3 = "" + lineNumber;
                         if (lineNumber == 0) lineNumber3 = "[unknown]";
 
+                        string s2 = "*** ERROR: ";
+                        if (p.hasSeenStopCommand) s2 = null;  //do not issue an error here
+                        
                         if (originalFileName == null || originalFileName == "")
                         {
                             //text block user input
-                            text = "*** ERROR: User input block, line " + lineNumber3 + ":";
+                            text = s2 + "User input block, line " + lineNumber3 + ":";
                         }
                         else
                         {
                             //file
-                            text = "*** ERROR: " + xx + " file '" + originalFileName + "', line " + lineNumber3;
+                            text = s2 + xx + " file '" + originalFileName + "', line " + lineNumber3;
                         }
 
                         Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);
