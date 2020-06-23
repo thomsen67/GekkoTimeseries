@@ -20780,6 +20780,36 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\RES\';");
             I("RUN test_res.cmd;");
             CheckFullDatabank(0.0001, 0.0001, 1990, 2009);  //must be < 0.0001% or < 0.0001 absolute. Quite strict.
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\';");
+            I("TIME 2001 2003;");
+            I("x <2000 2000> = 10;");
+            I("y <2000 2000> = 100;");
+            I("z <2000 2000> = 1000;");
+            I("x <2001 2004 dyn> = x[-1] + 1;");
+            I("y <2001 2004 dyn> = y[-1] + 1;");
+            I("z <2001 2004 dyn> = z[-1] + 1;");
+            I("model lead1;");            
+            I("sim<res>;");
+            _AssertSeries(First(), "y!a", 2001, 33d, sharedDelta);  //10 + 11 + 12
+            _AssertSeries(First(), "y!a", 2002, 36d, sharedDelta);  //11 + 12 + 13
+            _AssertSeries(First(), "y!a", 2003, 39d, sharedDelta);  //12 + 13 + 14
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\';");
+            I("TIME 2001 2003;");
+            I("x <2000 2000> = 10;");
+            I("y <2000 2000> = 100;");
+            I("z <2000 2000> = 1000;");
+            I("x <2001 2004 dyn> = x[-1] + 1;");
+            I("y <2001 2004 dyn> = y[-1] + 1;");
+            I("z <2001 2004 dyn> = z[-1] + 1;");
+            I("model lead2;");
+            I("sim<res>;");
+            _AssertSeries(First(), "y!a", 2001, 33d, sharedDelta);  //10 + 11 + 12
+            _AssertSeries(First(), "y!a", 2002, 36d, sharedDelta);  //11 + 12 + 13
+            _AssertSeries(First(), "y!a", 2003, 39d, sharedDelta);  //12 + 13 + 14
         }
 
         [TestMethod]

@@ -21807,7 +21807,12 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            HandleTerminalHelper();
+            if (!G.Equal(so.method, "res"))  
+            {
+                //don't do any terminal logic regarding SIM<res>
+                //question is: what about SIM<after>??
+                HandleTerminalHelper();
+            }
 
             bool hasEndoExo = false; if (Program.model.modelGekko.endogenized.Count != 0 || Program.model.modelGekko.exogenized.Count != 0) hasEndoExo = true;
 
@@ -22631,8 +22636,10 @@ namespace Gekko
                         for (int i = 0; i < Program.model.modelGekko.largestLeadOutsideRevertedPart; i++)
                         {
                             if (i >= data.lag) continue;
-                            BTypeData data2 = Program.model.modelGekko.varsBType[data.variable + Globals.lagIndicator + i];
-                            Program.model.modelGekko.terminalHelper[i].Add(data.bNumber, data2.bNumber);
+                            //BTypeData data2 = Program.model.modelGekko.varsBType[data.variable + Globals.lagIndicator + i];
+                            BTypeData data2 = null;
+                            Program.model.modelGekko.varsBType.TryGetValue(data.variable + Globals.lagIndicator + i, out data2);
+                            if (data2 != null) Program.model.modelGekko.terminalHelper[i].Add(data.bNumber, data2.bNumber);
                         }
                     }
                 }
