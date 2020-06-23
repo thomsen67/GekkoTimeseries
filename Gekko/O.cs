@@ -7089,14 +7089,14 @@ namespace Gekko
         public static void Stop(P p)
         {
             Globals.threadIsInProcessOfAborting = true;
-            p.hasSeenStopCommand = true;
+            p.hasSeenStopCommand = 1;
             throw new GekkoException();
         }
 
         public static void StopHelper(GekkoSmpl smpl, P p)
         {
             //Globals.threadIsInProcessOfAborting = true;
-            p.hasSeenStopCommand = true;
+            p.hasSeenStopCommand = 1;
             O.FunctionLookupNew2(Globals.stopHelper)(smpl, p, false, null, null);
         }
 

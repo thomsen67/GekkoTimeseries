@@ -1139,8 +1139,8 @@ namespace Gekko
 
         public static void PrintExceptionAndFinishThread(Exception e2, P p)
         {
-            if (!Globals.threadIsInProcessOfAborting && !p.hasSeenStopCommand)  //STOP should not show errors
-            {            
+            if (!Globals.threadIsInProcessOfAborting && !(p.hasSeenStopCommand > 0))  //STOP should not show errors
+            {
 
                 string eType = e2.GetType().Name;
 
@@ -27388,6 +27388,7 @@ namespace Gekko
                     string fileCalled;
                     List<string> commandLines2;
                     GetErrorLineAndText(p, i, out lineNumber2, out fileCalled, out commandLines2);
+                    
                     string lineNumber3 = "" + lineNumber2;
                     if (lineNumber2 == 0) lineNumber3 = "[unknown]";
 
@@ -27424,7 +27425,24 @@ namespace Gekko
                         else
                         {
                             StackHelper sh = new StackHelper();
-                            sh.line = "    " + fileCalled + " (run-time error in line " + lineNumber3 + ")";
+
+                            string lineNumber4 = lineNumber3;
+
+                            if (p.hasSeenStopCommand > 0)
+                            {
+                                //
+                                // a hack to make STOP line correct
+                                //                                
+                                int line7 = -12345;
+                                int.TryParse(lineNumber3, out line7);
+                                if (line7 != -12345)
+                                {
+                                    line7++;
+                                    lineNumber4 = "" + line7;
+                                }
+                            }                            
+
+                            sh.line = "    " + fileCalled + " (run-time error in line " + lineNumber4 + ")";
                             sh.file = fileCalled;
                             sh.line2 = lineNumber2;
                             stackLines.Add(sh);
@@ -27490,9 +27508,10 @@ namespace Gekko
             {
                 commandLines = CreateListOfStringsFromString(fileText);
             }
-            if (p.hasSeenStopCommand)
-            {
+            if (p.hasSeenStopCommand == 1)
+            {                
                 lineNumber2++;  //else it reports the line before the STOP command                
+                p.hasSeenStopCommand = 2;  //no adjustments for callee command files (this is a bit of a hack)
             }
         }
 
@@ -44313,7 +44332,7 @@ namespace Gekko
         public DateTime timeAtLastUserInteraction = DateTime.Now;
         public DateTime startingTime = DateTime.Now;
         public bool hasBeenCompilationError = false;
-        public bool hasSeenStopCommand = false;
+        public int hasSeenStopCommand = 0; //if 0, no STOP is encountered. Can also be 1 or 2.
         private GekkoDictionary<string, int> commandFileCounter = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private GekkoDictionary<string, string> commandFileCounterTainted = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public int numberOfServiceMessages = 0;
@@ -44322,6 +44341,12 @@ namespace Gekko
         {
             return stack[i];
         }
+
+        public string GetLastFileSentToANTLR(int i)
+        {
+            return stackFileSentToAntlr[i];
+        }
+        
 
         public bool IsSimple() {
             if (this.isOneLinerFromGui && this.counter <= 1)

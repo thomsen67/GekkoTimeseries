@@ -323,7 +323,7 @@ namespace Gekko.Parser.Gek
                         if (lineNumber == 0) lineNumber3 = "[unknown]";
 
                         string s2 = "*** ERROR: ";
-                        if (p.hasSeenStopCommand) s2 = null;  //do not issue an error here
+                        if (p.hasSeenStopCommand > 0) s2 = null;  //do not issue an error here
                         
                         if (originalFileName == null || originalFileName == "")
                         {
