@@ -719,7 +719,7 @@ namespace Gekko
                     eh.equationNumber = Program.model.modelGekko.equationsReverted.Count;
                     Program.model.modelGekko.equationsReverted.Add(eh);
                 }
-                else if (EquationIsNotRunAtAll(eh))  //will be true for RevertedZ, only used n PREDICT
+                else if (EquationIsNotRunAtAll(eh))  //will be true for RevertedP, only used n PREDICT
                 {
                     eh.equationNumber = Program.model.modelGekko.equationsNotRunAtAll.Count;
                     Program.model.modelGekko.equationsNotRunAtAll.Add(eh);
@@ -866,7 +866,7 @@ namespace Gekko
         {
             //a bit of a hack here.
             //problem is that equations are run in different batches during parsing, and 
-            //EEquationType.Z is not set from the beginning. Therefore we also test the equation code.
+            //EEquationType.RevertedP is not set from the beginning. Therefore we also test the equation code.
             return eh.equationType == EEquationType.RevertedP || IsEquationTypeP(eh.equationCode);
         }
 

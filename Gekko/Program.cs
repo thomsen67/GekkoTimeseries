@@ -8331,28 +8331,14 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: JSON: est_filename not found"); throw new GekkoException();
             }
-
-            //string settings_flowchart_filename = null;
-            //try { settings_flowchart_filename = (string)jsonTree["flowchart_filename"]; } catch { }
-            //if (settings_flowchart_filename == null)
-            //{
-            //    G.Writeln2("*** ERROR: JSON: flowchart_filename not found"); throw new GekkoException();
-            //}
-
+            
             string settings_icon_filename = null;
             try { settings_icon_filename = (string)jsonTree["icon_filename"]; } catch { }
             if (settings_icon_filename == null)
             {
                 G.Writeln2("*** ERROR: JSON: icon_filename not found"); throw new GekkoException();
             }
-
-            //string settings_logo_filename = null;
-            //try { settings_logo_filename = (string)jsonTree["logo_filename"]; } catch { }
-            //if (settings_logo_filename == null)
-            //{
-            //    G.Writeln2("*** ERROR: JSON: logo_filename not found"); throw new GekkoException();
-            //}
-
+            
             string settings_vars_foldername = null;
             try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
             if (settings_vars_foldername == null)
@@ -8402,6 +8388,27 @@ namespace Gekko
                 G.Writeln2("*** ERROR: JSON: print_end not found"); throw new GekkoException();
             }
 
+            //string include_y_type = null;
+            //try { include_y_type = (string)jsonTree["include_y_type"]; } catch { }
+            //if (include_y_type == null)
+            //{
+            //    G.Writeln2("*** ERROR: JSON: include_y_type"); throw new GekkoException();
+            //}
+
+            //string include_t_type = null;
+            //try { include_t_type = (string)jsonTree["include_t_type"]; } catch { }
+            //if (include_t_type == null)
+            //{
+            //    G.Writeln2("*** ERROR: JSON: include_t_type"); throw new GekkoException();
+            //}
+
+            string include_p_type = null;
+            try { include_p_type = (string)jsonTree["include_p_type"]; } catch { }
+            if (include_p_type == null)
+            {
+                G.Writeln2("*** ERROR: JSON: include_p_type"); throw new GekkoException();
+            }
+
             bool settings_show_source = true;
             try { settings_show_source = (bool)jsonTree["show_source"]; } catch { }
             
@@ -8425,9 +8432,7 @@ namespace Gekko
             files.Add(settings_css_filename);
             files.Add(settings_dok_filename);
             files.Add(settings_est_filename);
-            //files.Add(settings_flowchart_filename);
             files.Add(settings_icon_filename);
-            //files.Add(settings_logo_filename);
             files.Add(browserFolder);
             files.Add(settings_vars_foldername);
             foreach (string file in files)
@@ -8449,9 +8454,7 @@ namespace Gekko
             List<string> filesToCopy = new List<string>();
             filesToCopy.Add(settings_index_filename);
             filesToCopy.Add(settings_css_filename);
-            //filesToCopy.Add(settings_flowchart_filename);
             filesToCopy.Add(settings_icon_filename);
-            //filesToCopy.Add(settings_logo_filename);
             foreach (object o in settings_ekstrafiler)
             {
                 string s = null;
@@ -8494,9 +8497,42 @@ namespace Gekko
             List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError, true) as List;
             List<string> vars = O.GetListOfStringsFromIVariable(ml);
 
+            if (G.Equal(include_p_type, "yes"))
+            {
+                GekkoDictionary<string, string> temp = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s in vars) temp.Add(s, null);
+                foreach (EquationHelper eh in Program.model.modelGekko.equationsNotRunAtAll)
+                {
+                    if (eh.equationType != EEquationType.RevertedP) continue;
+                    if (!temp.ContainsKey(eh.lhs)) temp.Add(eh.lhs, null);
+                    foreach (string s12 in eh.precedentsWithLagIndicator.Keys)
+                    {
+                        string s13 = G.ExtractOnlyVariableIgnoreLag(s12);
+                        if (!temp.ContainsKey(s13)) temp.Add(s13, null);
+                    }
+                }
+                vars.Clear();
+                foreach (string s14 in temp.Keys) vars.Add(s14);
+            }
+
+            if (false)
+            {
+                List<string> ss9 = new List<string>();
+                foreach (string s in vars)
+                {
+                    if (s.ToLower().StartsWith("phk")) ss9.Add(s);
+                }
+                //MessageBox.Show(ss9);                
+                List<EquationHelper> p = Program.model.modelGekko.equationsNotRunAtAll;
+                List<EquationHelper> yt = Program.model.modelGekko.equationsReverted;
+                //here we could use .lhsvariable and .precedentsWithLagIndicator to
+                //obtain variables for p-type equations.
+                return;  //qwerty
+            }
+
             if (Globals.browserLimit)
             {                
-                vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };                
+                vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon", "phk2", "phk3", "JNTPPIK" };  //phk2 is t-type, phk3 is p-type and JNTPPIK is y-type. The y-type is not shown
                 Globals.browserLimit = false;  //for safety
             }
             else if (Globals.runningOnTTComputer)
@@ -8776,12 +8812,34 @@ namespace Gekko
                         }
                         list.Sort(StringComparer.InvariantCulture);
                     }
-
+                    
                     EquationHelper eq = Program.FindEquationByMeansOfVariableName(var);
 
-                    //TODO: Here we could find variables from T-equations and show these
-                    //      Will probably imply some looping through eqs.
-                    //      qwerty
+                    if (eq == null)
+                    {
+                        for (int i = 0; i < Program.model.modelGekko.equationsReverted.Count; i++)
+                        {
+                            EquationHelper eh = Program.model.modelGekko.equationsReverted[i];
+                            if (G.Equal(var, eh.lhs))
+                            {
+                                eq = eh;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (eq == null)
+                    {
+                        for (int i = 0; i < Program.model.modelGekko.equationsNotRunAtAll.Count; i++)
+                        {
+                            EquationHelper eh = Program.model.modelGekko.equationsNotRunAtAll[i];
+                            if (G.Equal(var, eh.lhs))
+                            {
+                                eq = eh;
+                                break;
+                            }
+                        }
+                    }
 
                     if (eq != null && eq.equationCode != null)
                     {
@@ -8837,6 +8895,14 @@ namespace Gekko
                     if (eq != null)
                     {
                         StringBuilder sb2 = new StringBuilder();
+                        if (eq.equationType == EEquationType.RevertedAutoGenerated || eq.equationType == EEquationType.RevertedP || eq.equationType == EEquationType.RevertedT || eq.equationType == EEquationType.RevertedY)
+                        {
+                            sb2.AppendLine("----------------------------------------------");
+                            sb2.AppendLine("    Note that this equation is run *after*");
+                            sb2.AppendLine("    the model itself is solved.");
+                            sb2.AppendLine("----------------------------------------------");
+                            sb2.AppendLine("");
+                        }
                         string equationText = eq.equationText;
                         if (jNameAutoGen) equationText += G.NL + G.NL + "J-led: " + jName;
                         InsertLinksIntoEquation(equationText, true, sb2);
@@ -34661,11 +34727,12 @@ namespace Gekko
                     o.opt_filename = AddExtension(o.opt_filename, ".emf");
                     extension = "emf";
                 }
-                if (extension != "emf" && extension != "png" && extension != "svg" && extension != "pdf")
+                if (!G.Equal(extension, "emf") && !G.Equal(extension, "png") && !G.Equal(extension, "svg") && !G.Equal(extension, "pdf"))
                 {
                     G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png, svg or pdf");
                     throw new GekkoException();
                 }
+                extension = extension.ToLower().Trim();  //gnuplot does not like upper-case file types
             }
 
             //bool isInside = true;

@@ -43,14 +43,12 @@ namespace Gekko
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            return double.NaN;
         }
 
-        public string ConvertToString()
+        public string ConvertToString()   //see also #9785278992347
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            return null;  //or should it be ""?
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)

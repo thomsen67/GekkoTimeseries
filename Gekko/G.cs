@@ -2928,6 +2928,16 @@ namespace Gekko
             return rounded;
         }
 
+        public static bool IsLeapYear(int year)
+        {
+            if (year < 1 || year > 9999)
+            {
+                G.Writeln2("*** ERROR: year must be between 1-9999");
+                throw new GekkoException();
+            }
+            return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+        }
+
         /// <summary>
         /// Converts e.g. "fxo" to "fXo" is a model is loaded
         /// </summary>

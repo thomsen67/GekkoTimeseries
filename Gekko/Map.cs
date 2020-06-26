@@ -49,11 +49,11 @@ namespace Gekko
         // ----------------------------------------------------     
 
         //!!!This has nothing to do #m1+#m2 etc., see Add(GekkoSmpl t, IVariable x) instead.
-        //   This method is just to avoid x.list.Add(...)
+        //   This method is just to avoid x.list.Add(...)        
         public void Add(string s, IVariable x)
         {
             if (this.storage == null) this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-            this.storage.Add(s, x);
+            AddIvariableHelper(s, x);
         }
 
         public int Count()
@@ -89,7 +89,15 @@ namespace Gekko
         public void AddIVariable(string name, IVariable x, bool isSimpleName)
         {
             //Simpler than the corresponding method in Databank.cs            
-            if (!isSimpleName) G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));                     
+            if (!isSimpleName) G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));
+            AddIvariableHelper(name, x);
+        }
+
+        private void AddIvariableHelper(string name, IVariable x)
+        {
+            //See also #0893543895
+            Series x_ts = x as Series;
+            if (x != null) x_ts.name = name;
             this.storage.Add(name, x);
         }
 
