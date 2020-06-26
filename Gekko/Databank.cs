@@ -242,6 +242,9 @@ namespace Gekko
                 }
                 ts.meta.parentDatabank = this;
                 ts.SetDirty(true);
+                //for instance when cloning from x to y, the y object will have x as name. Therefor we set the name here.                
+                //often this name is already correct here, but for cloning (COPY command) etc. we need to set the name right.
+                ts.name = name;
             }
             this.storage.Add(name, x);
         }        
