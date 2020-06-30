@@ -2712,7 +2712,7 @@ seriesOpt1h:                D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
 					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
-						  | DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)	
+						  | DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)							  
 						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
 						  ;						  
 

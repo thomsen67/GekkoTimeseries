@@ -237,6 +237,8 @@ namespace UnitTests
         {
             Globals.threadIsInProcessOfAborting = false;
             Globals.applicationIsInProcessOfAborting = false;
+            Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;       
         }
 
         //
@@ -2176,6 +2178,79 @@ namespace UnitTests
             {
                 I("PRT <n> {'%a*'};");  //should unfold
             }
+        }
+
+        [TestMethod]
+        public void _Test_SeriesDynamicLaggedEndogenousCheck()
+        {
+            //NOTE: left-side functions like dif(x) = ... are implemented exactly like
+            //      for instance x <d>= ... , so with these, the lagged endogenous is always
+            //      active like x <dyn> = x[-1] + ... .
+                        
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("x <dyn> = x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("x <static> = x[-1] + 1;");  //<static> could be omitted here
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("x = x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // -------------
+
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x <dyn> = x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+            
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x <static> = x[-1] + 1;");  //runs without looping over years
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            FAIL("x = x[-1] + 1;");
+
+            // --------------
+
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            FAIL("dif(x) = x[-1] + 1;");
+            FAIL("x <d>= x[-1] + 1;");
+            FAIL("x ^= x[-1] + 1;");
+
+            FAIL("x = dif(x) + 1;");
+            FAIL("x = diff(x) + 1;");
+            FAIL("x = pch(x) + 1;");
+            FAIL("x = dlog(x) + 1;");
+
+            //fixed years??
+
+
         }
 
         [TestMethod]

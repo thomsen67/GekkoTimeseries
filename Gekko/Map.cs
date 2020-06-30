@@ -97,7 +97,7 @@ namespace Gekko
         {
             //See also #0893543895
             Series x_ts = x as Series;
-            if (x != null) x_ts.name = name;
+            if (x_ts != null) x_ts.name = name;
             this.storage.Add(name, x);
         }
 
