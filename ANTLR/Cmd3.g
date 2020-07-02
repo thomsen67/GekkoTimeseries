@@ -1374,6 +1374,7 @@ Y2                    = 'Y2'                       ;
     STAMP            = 'STAMP'           ;
     STARTFILE        = 'STARTFILE'           ;
     STATIC           = 'STATIC'          ;
+	CHECK           = 'CHECK'          ;
     STEP             = 'STEP';
     STOP             = 'STOP'            ;
     STRING2          = 'STRING'         ;
@@ -2021,6 +2022,7 @@ d.Add("Y" ,Y);
                                         d.Add("stamp"   , STAMP    );
                                         d.Add("startfile"  , STARTFILE    );
                                         d.Add("static"  , STATIC    );
+										d.Add("check"  , CHECK    );
                                         d.Add("step"   , STEP    );
                                         d.Add("stop"    , STOP      );
                                         d.Add("string"    , STRING2      );
@@ -2958,9 +2960,10 @@ docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 // DOWNLOAD
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-download:                   DOWNLOAD downloadOpt1? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, input.LT(1).Line)} url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?);
+download:                   DOWNLOAD downloadOpt1? url fileName? (DUMP '=' fileName2)? -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, input.LT(1).Line)} url ^(ASTHANDLEFILENAME fileName?) ^(ASTHANDLEFILENAME2 fileName2?) downloadOpt1?);
 downloadOpt1:               ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
 downloadOpt1h:              ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
+                          | KEY EQUAL expression -> ^(ASTOPT_STRING_KEY expression)
 						    ;
 
 url:                        expression;
@@ -3599,7 +3602,12 @@ sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expressi
 						  | MATRIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_MATRIX yesNo?)		
 						  | LIST (EQUAL yesNo)? -> ^(ASTOPT_STRING_LIST yesNo?)		
 						  | MAP (EQUAL yesNo)? -> ^(ASTOPT_STRING_MAP yesNo?)		
-						  | MISSING (EQUAL yesNo)? -> ^(ASTOPT_STRING_MISSING yesNo?)		
+						  | MISSING (EQUAL yesNo)? -> ^(ASTOPT_STRING_MISSING yesNo?)	
+						  
+						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
+  						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
+						  | CSV (EQUAL yesNo)? -> ^(ASTOPT_STRING_CSV yesNo?)
+						  | PRN (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRN yesNo?)
 						  ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3970,6 +3978,7 @@ optionType:
 			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	//obsolete, delete in 3.3.x versions
 
 			 | SERIES DYN '='? yesNoSimple -> SERIES DYN ^(ASTBOOL yesNoSimple)
+			 | SERIES DYN CHECK '='? yesNoSimple -> SERIES DYN  CHECK ^(ASTBOOL yesNoSimple)
 			 | SERIES FAILSAFE '='? yesNoSimple -> SERIES FAILSAFE ^(ASTBOOL yesNoSimple)			 			 
 			 | SERIES NORMAL PRINT MISSING '=' optionSeriesMissing -> SERIES NORMAL PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)			 
              | SERIES NORMAL CALC MISSING '=' optionSeriesMissing -> SERIES NORMAL CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
@@ -4161,6 +4170,7 @@ fileNameStar:               fileName
 						  | star -> ASTFILENAMESTAR
 						    ;
 
+fileName2:                   fileName;  //just an alias
 
 exportType:                 D -> ASTOPD
 						  | P  -> ASTOPP
@@ -4715,6 +4725,7 @@ ident2: 					Ident |
   STAMP|
   STARTFILE|
   STATIC|
+  CHECK|
   STEPS|
   STEP|
   STRIP|
@@ -5172,6 +5183,7 @@ ident3: 					Ident |
   STAMP|
   STARTFILE|
   STATIC|
+  CHECK|
   STEPS|
   STEP|
   STRIP|

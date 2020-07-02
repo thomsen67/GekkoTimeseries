@@ -2196,7 +2196,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
-            I("x <static> = x[-1] + 1;");  //<static> could be omitted here
+            I("x <dyn=no> = x[-1] + 1;");  //<dyn=no> could be omitted here
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
@@ -2224,7 +2224,7 @@ namespace UnitTests
             
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
             I("option series dyn check = yes;");
-            I("x <static> = x[-1] + 1;");  //runs without looping over years
+            I("x <dyn=no> = x[-1] + 1;");  //runs without looping over years
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
@@ -2237,16 +2237,18 @@ namespace UnitTests
 
             // --------------
 
-            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
-            I("option series dyn check = yes;");
-            FAIL("dif(x) = x[-1] + 1;");
-            FAIL("x <d>= x[-1] + 1;");
-            FAIL("x ^= x[-1] + 1;");
-
-            FAIL("x = dif(x) + 1;");
-            FAIL("x = diff(x) + 1;");
-            FAIL("x = pch(x) + 1;");
-            FAIL("x = dlog(x) + 1;");
+            if (false)
+            {
+                I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+                I("option series dyn check = yes;");
+                FAIL("dif(x) = x[-1] + 1;");
+                FAIL("x <d>= x[-1] + 1;");
+                FAIL("x ^= x[-1] + 1;");
+                FAIL("x = dif(x) + 1;");
+                FAIL("x = diff(x) + 1;");
+                FAIL("x = pch(x) + 1;");
+                FAIL("x = dlog(x) + 1;");
+            }
 
             //fixed years??
 
@@ -7014,10 +7016,26 @@ namespace UnitTests
             _AssertMatrix(First(), "#corr", 3, 3, 1d, d);
         }
 
+        [TestMethod]
+        public void _Test_DownloadJobindsats()
+        {
+            Databank work = First();
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("%key = ' " + Private.jobindsatsKey + "';");
+
+            //I("%s = 'https://api.jobindsats.dk/v1/data/Y01A02/csv?area=Hele landet,Albertslund&period=2018M02,2018M01&dimension=_alderA,_kon';");
+            //I("DOWNLOAD <key = %key> %s dump = data.csv;");
+
+            I("%s = 'https://api.jobindsats.dk/v1/data/Y05C02/json?period=2017M01&area=Hele%20landet';");
+            I("DOWNLOAD <key = %key> %s dump = data.csv;");
+
+            I("SHEET <import list csv> #m file=data.csv;");
+        }
 
 
         [TestMethod]
-        public void _Test_Statistikbanken()
+        public void _Test_DownloadDst()
         {
             Databank work = First();
             I("RESET;");

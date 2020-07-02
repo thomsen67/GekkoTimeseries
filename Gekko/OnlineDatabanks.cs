@@ -32,7 +32,7 @@ namespace Gekko
             httpWebRequest.UseDefaultCredentials = true;  //to be able to access sumdatabasen from inside DST
             httpWebRequest.Credentials = CredentialCache.DefaultNetworkCredentials;  //seems necessary together with the above
             httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"
-                        
+            
             Dictionary<string, object> jsonTree = null;
             try
             {
@@ -198,6 +198,88 @@ namespace Gekko
                     Program.ReadPx(Program.databanks.GetFirst(), o1.opt_array, true, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);
                 }
             }
-        }        
+        }
+
+        public static void DownloadJobindsats(O.Download o1)
+        {            
+            try
+            {
+                //In principle, it would be better to omit this and instead port Gekko for
+                //the .NET Framework 4.6.
+                ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2, must be used after 10/12 2019. This probably requires that the user has .NET 4.5 to run the DOWNLOAD.
+            }
+            catch
+            {
+                //no reason to fail on this
+            }
+                        
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(o1.dbUrl);
+            httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max        
+            httpWebRequest.ContentType = "text/json";
+            httpWebRequest.Method = "POST";            
+            httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"            
+            httpWebRequest.Headers.Add("Authorization", o1.opt_key);
+            
+            StreamWriter streamWriter = null;
+            try
+            {
+                streamWriter = new StreamWriter(httpWebRequest.GetRequestStream());
+            }
+            catch (Exception e)
+            {
+                //May get something like this: System.Net.WebException: Der kunne ikke oprettes forbindelse til fjernserveren ---> System.Net.Sockets.SocketException: Det blev forsøgt at få adgang til en socket på en måde, der er forbudt af den pågældende sockets adgangstilladelser 91.208.143.3:80
+                G.Writeln2("*** ERROR: Connection failed with the following error:");
+                G.Writeln("           " + e.Message);
+                throw;
+            }
+            
+            string outputLines = null;
+
+            DateTime t0 = DateTime.Now;
+
+            G.Writeln2("--> Download of data file start...");
+            HttpWebResponse httpResponse = null;
+            try
+            {
+                //Actually downloading the px file
+                httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            }
+            catch (Exception e)
+            {
+                bool is405 = false; if (e.Message.Contains("405")) is405 = true;
+                bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
+                //timeout errors and the like
+                G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
+                G.Writeln("           " + e.Message);
+                if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
+                if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'");
+                if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
+                throw;
+            }
+
+            Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");
+
+            //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
+            //Setting UTF8 here will fail!           
+            //This encoding stuff is probably necessary
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream(), encoding))
+            {
+                outputLines = streamReader.ReadToEnd();  //encoded as Windows-1252                    
+            }
+
+            double length = Math.Round((double)outputLines.Length / 1000000d, 1);
+            string size = "size " + length + " MB, ";
+            if (length == 0.0) size = "size < 0.1 MB, ";
+
+            G.Writeln("--> Download of data file ended (" + size + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ")");
+
+            string source = o1.dbUrl + ", " + o1.fileName;
+
+            using (FileStream fs = Program.WaitForFileStream(o1.fileName2, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            {
+                res.Write(outputLines);
+            }
+        }
     }
 }

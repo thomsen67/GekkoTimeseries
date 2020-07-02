@@ -2992,7 +2992,28 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-            TableLight inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);
+            //TableLight inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);            
+                        
+            EDataFormat fileType = EDataFormat.Xlsx;
+            if (G.Equal(o.opt_xls, "yes")) fileType = EDataFormat.Xls;
+            else if (G.Equal(o.opt_xlsx, "yes")) fileType = EDataFormat.Xlsx;
+            else if (G.Equal(o.opt_csv, "yes")) fileType = EDataFormat.Csv;
+            else if (G.Equal(o.opt_prn, "yes")) fileType = EDataFormat.Prn;
+            //else
+            //{
+            //    G.Writeln2("*** ERROR: SHEET<import> must be used with file type xlsx, xls, csv or prn");
+            //    throw new GekkoException();
+            //}
+
+            TableLight inputTable = null;
+            if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
+            {
+                inputTable = ReadCsvPrn(fileType, fileName);
+            }
+            else if (fileType == EDataFormat.Xls || fileType == EDataFormat.Xlsx)
+            {
+                inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);
+            }            
 
             bool transpose = false;  //corresponding to row-wise reading
             if (G.Equal(o.opt_cols, "yes"))

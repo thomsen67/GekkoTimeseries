@@ -3982,6 +3982,9 @@ namespace Gekko
 
             try
             {
+                //check_20() just checks if the RHS is a timeseries or not. If not, there is not point
+                //in looping over periods anyway.
+                //
                 if ((Program.options.series_dyn || G.Equal(o.opt_dyn, "yes")) && check_20())
                 {
                     GekkoTime tt1_20 = smpl.t1;
@@ -7504,12 +7507,20 @@ namespace Gekko
         public class Download
         {
             public string dbUrl = null;  //path to server
-            public string fileName = null;  //json file
-            public string fileName2 = null;  //dump file (for instance px)            
-            public string opt_array = null;  //not in use
+            public string fileName = null;  //json file for statistikbanken
+            public string fileName2 = null;  //dump file (px for statistikbanken, csv for jobindsats)            
+            public string opt_array = null;  //arrays yes or no (statistikbanken)
+            public string opt_key = null;  //only used for jobindsats
             public void Exe()
             {
-                OnlineDatabanks.Download(this);
+                if ( G.Contains(this.dbUrl, "jobindsats"))
+                {
+                    OnlineDatabanks.DownloadJobindsats(this);
+                }
+                else
+                {
+                    OnlineDatabanks.Download(this);
+                }
             }
         }
 
@@ -7633,7 +7644,12 @@ namespace Gekko
             public string opt_matrix = null;
             public string opt_list = null;
             public string opt_map = null;
-            public string opt_missing = null;  //used for matrix   
+            public string opt_missing = null;  //used for matrix 
+            // -------------
+            public string opt_xls = null;
+            public string opt_xlsx = null;
+            public string opt_csv = null;
+            public string opt_prn = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
