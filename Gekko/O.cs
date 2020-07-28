@@ -5529,6 +5529,17 @@ namespace Gekko
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
                     //if x or y does not have frequency corresponding to t, we will get an error here
+                    // ---------------------------------------------
+                    // #890345340857
+                    // HMMMMMMMMMMMMMMMMMMM
+                    // HMMMMMMMMMMMMMMMMMMM
+                    // HMMMMMMMMMMMMMMMMMMM
+                    // shouldn't we check G.IsBothNumericalError(d1, d2)) like above??
+                    // fix this, and if IsBoth is hit, issue a warning that this has changed 
+                    // kind of like the <dyn> fix, make sure the warning is shown.
+                    // kind of like special warning.
+                    // provide a function that provides old behavior.
+                    // ---------------------------------------------
                     if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
                     else rv_series.SetData(t, 0d);  //else it would be missing
                 }

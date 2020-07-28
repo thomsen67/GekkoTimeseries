@@ -32,7 +32,8 @@ namespace Gekko
             httpWebRequest.UseDefaultCredentials = true;  //to be able to access sumdatabasen from inside DST
             httpWebRequest.Credentials = CredentialCache.DefaultNetworkCredentials;  //seems necessary together with the above
             httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"
-            
+            if (o1.opt_key != null) httpWebRequest.Headers.Add("Authorization", o1.opt_key);
+
             Dictionary<string, object> jsonTree = null;
             try
             {
@@ -219,7 +220,14 @@ namespace Gekko
             httpWebRequest.Method = "POST";            
             httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"            
             httpWebRequest.Headers.Add("Authorization", o1.opt_key);
-            
+
+            string jsonCode = null;
+            if (o1.fileName != null)
+            {
+                string input = Program.options.folder_working + "\\" + o1.fileName;
+                jsonCode = Program.GetTextFromFileWithWait(input); //also removes some kinds of funny characters
+            }
+
             StreamWriter streamWriter = null;
             try
             {
@@ -232,53 +240,60 @@ namespace Gekko
                 G.Writeln("           " + e.Message);
                 throw;
             }
-            
-            string outputLines = null;
 
-            DateTime t0 = DateTime.Now;
-
-            G.Writeln2("--> Download of data file start...");
-            HttpWebResponse httpResponse = null;
-            try
+            using (streamWriter)
             {
-                //Actually downloading the px file
-                httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            }
-            catch (Exception e)
-            {
-                bool is405 = false; if (e.Message.Contains("405")) is405 = true;
-                bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
-                //timeout errors and the like
-                G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
-                G.Writeln("           " + e.Message);
-                if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
-                if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'");
-                if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
-                throw;
-            }
+                streamWriter.Write(jsonCode);
+                streamWriter.Flush();
+                streamWriter.Close();
 
-            Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");
+                string outputLines = null;
 
-            //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
-            //Setting UTF8 here will fail!           
-            //This encoding stuff is probably necessary
-            using (var streamReader = new StreamReader(httpResponse.GetResponseStream(), encoding))
-            {
-                outputLines = streamReader.ReadToEnd();  //encoded as Windows-1252                    
-            }
+                DateTime t0 = DateTime.Now;
 
-            double length = Math.Round((double)outputLines.Length / 1000000d, 1);
-            string size = "size " + length + " MB, ";
-            if (length == 0.0) size = "size < 0.1 MB, ";
+                G.Writeln2("--> Download of data file start...");
+                HttpWebResponse httpResponse = null;
+                try
+                {
+                    //Actually downloading the json/csv file
+                    httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                }
+                catch (Exception e)
+                {
+                    bool is405 = false; if (e.Message.Contains("405")) is405 = true;
+                    bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
+                    //timeout errors and the like
+                    G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
+                    G.Writeln("           " + e.Message);
+                    if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
+                    if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'https://api.jobindsats.dk/v1/data/...' instead of 'https://api.jobindsats.dk/v1/data/...'");
+                    if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
+                    throw;
+                }
 
-            G.Writeln("--> Download of data file ended (" + size + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ")");
+                Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");
 
-            string source = o1.dbUrl + ", " + o1.fileName;
+                //It seems the px file is in ANSI/win 1252: the file also reports this at the top: CHARSET="ANSI"; CODEPAGE = "Windows-1252";
+                //Setting UTF8 here will fail!           
+                //This encoding stuff is probably necessary
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream(), encoding))
+                {
+                    outputLines = streamReader.ReadToEnd();  //encoded as Windows-1252                    
+                }
 
-            using (FileStream fs = Program.WaitForFileStream(o1.fileName2, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter res = G.GekkoStreamWriter(fs))
-            {
-                res.Write(outputLines);
+                double length = Math.Round((double)outputLines.Length / 1000000d, 1);
+                string size = "size " + length + " MB, ";
+                if (length == 0.0) size = "size < 0.1 MB, ";
+
+                G.Writeln("--> Download of data file ended (" + size + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ")");
+
+                string source = o1.dbUrl + ", " + o1.fileName;
+
+                using (FileStream fs = Program.WaitForFileStream(o1.fileName2, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter res = G.GekkoStreamWriter(fs))
+                {
+                    res.Write(outputLines);
+                }
             }
         }
     }

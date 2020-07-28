@@ -7025,12 +7025,17 @@ namespace UnitTests
             I("%key = ' " + Private.jobindsatsKey + "';");
 
             //I("%s = 'https://api.jobindsats.dk/v1/data/Y01A02/csv?area=Hele landet,Albertslund&period=2018M02,2018M01&dimension=_alderA,_kon';");
-            //I("DOWNLOAD <key = %key> %s dump = data.csv;");
+            //I("DOWNLOAD <key = %key> %s dump = output.csv;");
+            //I("SHEET <import list csv> #m file=output.csv;");
 
-            I("%s = 'https://api.jobindsats.dk/v1/data/Y05C02/json?period=2017M01&area=Hele%20landet';");
-            I("DOWNLOAD <key = %key> %s dump = data.csv;");
+            //I("%s = 'https://api.jobindsats.dk/v1/data/Y05C02/json?period=2017M01&area=Hele%20landet';");
+            //I("DOWNLOAD <key = %key> %s dump = output.json;");
 
-            I("SHEET <import list csv> #m file=data.csv;");
+            I("%s = 'https://api.jobindsats.dk/v1/data/Y36C01/json?';");
+            I("DOWNLOAD <key = %key> %s input.json dump = output.json;");
+
+
+
         }
 
 
@@ -16099,6 +16104,52 @@ namespace UnitTests
             _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 3, 9d, sharedDelta);
             _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             _AssertSeries(First(), "x5!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+
+        }
+
+        [TestMethod]
+        public void _Test_If_Series()
+        {
+            // Testing IF and logical operators etc.
+            // For series, *all* observations must obey the IF
+            I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 2, 3, 3;");
+            I("if (x1 == x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 50d, sharedDelta);
+            I("if (x1 < x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 50d, sharedDelta);
+            I("if (x1 <= x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 100d, sharedDelta);
+            I("if (x1 > x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 50d, sharedDelta);
+            I("if (x1 >= x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 50d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 1, 2, 3;");
+            I("if (x1 == x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 100d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 2, 3, 4;");
+            I("if (x1 < x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 100d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 2, 3, 3;");
+            I("if (x1 <= x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 100d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x1 = 2, 3, 4; x2 = 1, 2, 3;");
+            I("if (x1 > x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 100d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x1 = 2, 3, 4; x2 = 1, 2, 4;");
+            I("if (x1 >= x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 100d, sharedDelta);
+
+            // --- period: IF on series obeys the global time setting ---
+
+            I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 2, 3, 3;");
+            I("TIME 2003 2003;");
+            I("if (x1 == x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 100d, sharedDelta);
 
         }
 
