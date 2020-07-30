@@ -1152,6 +1152,30 @@ namespace Gekko
         {
             return (m - 1) / (GekkoTimeStuff.numberOfMonths / GekkoTimeStuff.numberOfQuarters) + 1;
         }
+
+        public static void Convert12(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t1, out GekkoTime t2)
+        {
+            t1 = smpl.t1;
+            t2 = smpl.t2;
+            if (t1.freq != desiredFreq)
+            {
+                //for instance x!q = ... ; where global freq is !a
+                t1 = GekkoTime.ConvertFreqsFirst(desiredFreq, t1);
+                t2 = GekkoTime.ConvertFreqsLast(desiredFreq, t2);
+            }
+        }
+
+        public static void Convert03(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t0, out GekkoTime t3)
+        {
+            t0 = smpl.t0;
+            t3 = smpl.t3;            
+            if (t0.freq != desiredFreq)
+            {
+                //for instance x!q = ... ; where global freq is !a
+                t0 = GekkoTime.ConvertFreqsFirst(desiredFreq, t0);
+                t3 = GekkoTime.ConvertFreqsLast(desiredFreq, t3);
+            }
+        }
     }
 
     public class GekkoTimeIterator : IEnumerable<GekkoTime>
@@ -1162,17 +1186,25 @@ namespace Gekko
 
         public GekkoTimeIterator(Tuple<GekkoTime, GekkoTime> tuple) : this(tuple.Item1, tuple.Item2) { }       
 
-        public GekkoTimeIterator(GekkoTime startDate, GekkoTime endDate)
+        public GekkoTimeIterator(GekkoTime t1, GekkoTime t2)
         {
-            _StartDate = startDate;
-            _EndDate = endDate;
-            if (startDate.freq != endDate.freq)
+            _StartDate = t1;
+            _EndDate = t2;
+            if (t1.freq != t2.freq)
             {
                 G.Writeln2("*** ERROR: Mismatch of frequencies in time iterator");
                 throw new GekkoException();
             }
-            _freq = startDate.freq;
+            _freq = t1.freq;
         }
+
+        public GekkoTimeIterator(EFreq convertToThisFreq, GekkoTime t1, GekkoTime t2)
+        {
+            //This is for the case where we want to "cast" to another freq than the freq of t1 and t2
+            _StartDate = GekkoTime.ConvertFreqsFirst(convertToThisFreq, t1);
+            _EndDate = GekkoTime.ConvertFreqsLast(convertToThisFreq, t2);
+            _freq = convertToThisFreq;
+        }        
 
         public IEnumerator<GekkoTime> GetEnumerator()
         {

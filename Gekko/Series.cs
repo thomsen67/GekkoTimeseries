@@ -1422,7 +1422,7 @@ namespace Gekko
             {
                 rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
 
-                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+                if (x1_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0;
                     GekkoTime window2 = smpl.t3;
@@ -1476,22 +1476,27 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
             // ----------------------------------------------------------------------------
+
+            bool simpleFreq = true;
+            if (x1_series.freq != smpl.t0.freq) simpleFreq = false;  //for instance PRT <2001q1 2003q4> pch(x!a). We use .t0 here since it is used afterwards
+
+            GekkoTime t0 = smpl.t0;
+            GekkoTime t3 = smpl.t3;
+            if (!simpleFreq)
+            {
+                GekkoTime.Convert03(smpl, x1_series.freq, out t0, out t3);
+            }
             
-            //#9083245058
-
-            int xx = -lag;
-            if (Globals.lagfix) xx = 0;  //the return should have no lags, it is only the internals that are lagged
-
             //Functions like d() and pch() where lag is used
             Series rv_series;
-            rv_series = new Series(ESeriesType.Light, smpl.t0.Add(xx), smpl.t3); //should return a seies corresponding to t0-t3
+            rv_series = new Series(ESeriesType.Light, t0, t3); //should return a series corresponding to t0-t3
 
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
-                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+                if (x1_series.type != ESeriesType.Timeless)
                 {
-                    GekkoTime window1 = smpl.t0.Add(xx); //should return a seies corresponding to t0-t3                    
-                    GekkoTime window2 = smpl.t3;
+                    GekkoTime window1 = t0; //should return a series corresponding to t0-t3                    
+                    GekkoTime window2 = t3;
 
                     int ia1 = rv_series.ResizeDataArray(window1);  //t0
                     int ia2 = rv_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ia1, array is enlarged not moved around
@@ -1514,7 +1519,7 @@ namespace Gekko
                 }
                 else
                 {
-                    foreach (GekkoTime t in smpl.Iterate03())
+                    foreach (GekkoTime t in new GekkoTimeIterator(t0, t3))
                     {
                         //timeless will just be 0 for dif()?
                         rv_series.SetData(t, a(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-lag))));
@@ -1577,7 +1582,7 @@ namespace Gekko
                 // x2 is a VAL or MATRIX 1x1
                 // ---------------------------
 
-                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+                if (x1_series.type != ESeriesType.Timeless)
                 {
                     int ia1 = rv_series.ResizeDataArray(window1);
                     int ia2 = rv_series.ResizeDataArray(window2);
@@ -1656,7 +1661,7 @@ namespace Gekko
                 //So for practical purposes, Func<> here does not cost performance.
                 //If raw arrays were being used over large samples, perhaps the difference would manifest.
 
-                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless && x2_series.type != ESeriesType.Timeless)
+                if (x1_series.type != ESeriesType.Timeless && x2_series.type != ESeriesType.Timeless)
                 {
                     int ia1 = rv_series.ResizeDataArray(window1);
                     int ia2 = rv_series.ResizeDataArray(window2);
@@ -2482,7 +2487,7 @@ namespace Gekko
             if (this.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
             {
                 Series y_series = y as Series;
-                if (Globals.bugfix_speedup && this.type != ESeriesType.Timeless && y_series.type != ESeriesType.Timeless)
+                if (this.type != ESeriesType.Timeless && y_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0;
                     GekkoTime window2 = smpl.t3;

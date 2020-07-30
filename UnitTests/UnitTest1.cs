@@ -5927,6 +5927,121 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void _Test_Freq()
+        {
+            //In principle, Gekko should be able to run regardless of freq settings
+
+            Table tab = null; int counter = -12345;
+
+            //value on rhs -----------------------            
+
+            I("reset; time 2001 2003;");
+            I("x!q = 2;"); //should run over 2001q1-2003q4       
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 2d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 2d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);            
+            I("x!q <m>= 10;"); //should run over 2001q1-2003q4       
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 12d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 12d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+            I("PRT <n> pch(x!q);"); //should show 2001q1-2003q4
+            tab = Globals.lastPrtOrMulprtTable; counter = 0;
+            TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!q)");            
+            TestCell(ref counter, tab, 2, 1, CellType.Text, "2001");
+            TestCell(ref counter, tab, 3, 1, CellType.Text, "q1");
+            TestCell(ref counter, tab, 3, 2, CellType.Number, double.NaN, sharedDelta);
+            TestCell(ref counter, tab, 4, 1, CellType.Text, "q2");
+            TestCell(ref counter, tab, 4, 2, CellType.Number, 0d, sharedDelta);
+
+            I("reset; time 2001 2003; option freq = q;");
+            I("x!a = 2;"); //should run over 2001-2003          
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+            I("x!a <m>= 10;"); //should run over 2001-2003          
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 12d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 12d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+            I("PRT <n> pch(x!a);"); //should show 2001-2003
+            tab = Globals.lastPrtOrMulprtTable; counter = 0;
+            TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!a)");
+            TestCell(ref counter, tab, 2, 1, CellType.Text, "2001");            
+            TestCell(ref counter, tab, 2, 2, CellType.Number, double.NaN, sharedDelta);
+            TestCell(ref counter, tab, 3, 1, CellType.Text, "2002");
+            TestCell(ref counter, tab, 3, 2, CellType.Number, 0d, sharedDelta);
+
+            //list on rhs -----------------------
+
+            I("reset; time 2001 2003;");
+            I("x!q = 1,2,3,4,5,6,7,8,9,10,11,12;"); //should run over 2001q1-2003q4    
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 1d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 12d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+            I("x!q <m>= 11,12,13,14,15,16,17,18,19,20,21,22;"); //should run over 2001q1-2003q4    
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 12d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 34d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003; option freq = q;");
+            I("x!a = 1,2,3;"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 1, 1d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
+            I("x!a <m>= 11,12,13;"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 1, 12d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 1, 16d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
+
+            //matrix on rhs -----------------------
+
+            I("reset; time 2001 2003;");
+            I("x!q = [1,2,3,4,5,6,7,8,9,10,11,12];"); //should run over 2001q1-2003q4    
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 1d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 12d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+            I("x!q <m>= [11,12,13,14,15,16,17,18,19,20,21,22];"); //should run over 2001q1-2003q4    
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 12d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 34d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003; option freq = q;");
+            I("x!a = [1,2,3];"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 1, 1d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
+            I("x!a <m>= [11,12,13];"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 1, 12d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 1, 26d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
+
+            //series on rhs -----------------------
+
+            I("reset; time 2001 2003;");
+            I("x!a = 2;"); //should run over 2001-2003     
+            I("x!q = 2;"); //should run over 2001q1-2003q4       
+            I("x!a = 2 * x!q;"); //should fail
+            I("x!q = 2 * x!a;"); //should fail
+            I("x!a <m>= 2 * x!q;"); //should fail
+            I("x!q <m>= 2 * x!a;"); //should fail
+            I("option freq = q;");
+            I("x!a = 2 * x!q;"); //should fail
+            I("x!q = 2 * x!a;"); //should fail
+            I("x!a <m>= 2 * x!q;"); //should fail
+            I("x!q <m>= 2 * x!a;"); //should fail
+        }
 
         [TestMethod]
         public void _Test_For()
@@ -17809,7 +17924,14 @@ namespace UnitTests
             Cell c = tab.Get(row, col);
             Assert.AreEqual(c.cellType, type);
             Assert.AreEqual(type, CellType.Number);
-            Assert.AreEqual(c.number, d, crit);
+            if (double.IsNaN(c.number) && double.IsNaN(d))
+            {
+                //good
+            }
+            else
+            {
+                Assert.AreEqual(c.number, d, crit);
+            }
             counter++;
         }
 

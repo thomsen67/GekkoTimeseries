@@ -391,6 +391,11 @@ namespace Gekko
             return new GekkoTimeIterator(this.t1, this.t2);
         }
 
+        public GekkoTimeIterator Iterate12(EFreq convertToThisFreq)
+        {
+            return new GekkoTimeIterator(convertToThisFreq, this.t1, this.t2);
+        }
+
         public static GekkoSmpl Global()
         {
             GekkoSmpl smpl = new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
