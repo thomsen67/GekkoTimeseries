@@ -5931,10 +5931,10 @@ namespace UnitTests
         public void _Test_Freq()
         {
             //In principle, Gekko should be able to run regardless of freq settings
-
+                        
             Table tab = null; int counter = -12345;
 
-            //value on rhs -----------------------            
+            //value on rhs -----------------------                 
 
             I("reset; time 2001 2003;");
             I("x!q = 2;"); //should run over 2001q1-2003q4       
@@ -6041,6 +6041,20 @@ namespace UnitTests
             I("x!q = 2 * x!a;"); //should fail
             I("x!a <m>= 2 * x!q;"); //should fail
             I("x!q <m>= 2 * x!a;"); //should fail
+
+            //Tests the hack where a lag where t0 is 1 less than t1 is "translated" into
+            //t0 being 12 less than t1 (because the freq is monthly)
+            I("reset; time 2001 2003;");
+            I("x = 3,4,5;");
+            I("option freq m; time 2002m11 2003m11;");
+            I("prt<n> pch(x!a + 0);");
+            tab = Globals.lastPrtOrMulprtTable; counter = 0;
+            TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!a + 0)");
+            TestCell(ref counter, tab, 2, 1, CellType.Text, "2002");
+            TestCell(ref counter, tab, 2, 2, CellType.Number, (4d / 3d - 1) * 100d, sharedDelta);
+            TestCell(ref counter, tab, 3, 1, CellType.Text, "2003");
+            TestCell(ref counter, tab, 3, 2, CellType.Number, (5d / 4d - 1) * 100d, sharedDelta);
+
         }
 
         [TestMethod]

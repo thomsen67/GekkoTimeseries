@@ -1476,15 +1476,12 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
             // ----------------------------------------------------------------------------
-
-            bool simpleFreq = true;
-            if (x1_series.freq != smpl.t0.freq) simpleFreq = false;  //for instance PRT <2001q1 2003q4> pch(x!a). We use .t0 here since it is used afterwards
-
+                        
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
-            if (!simpleFreq)
+            if (t0.freq != x1_series.freq)
             {
-                GekkoTime.Convert03(smpl, x1_series.freq, out t0, out t3);
+                O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
             }
             
             //Functions like d() and pch() where lag is used

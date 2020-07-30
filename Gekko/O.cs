@@ -4019,6 +4019,10 @@ namespace Gekko
 
         private static void HelperListdata(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, List rhs_list)
         {
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+            if (t1.freq != lhs_series.freq) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+
             bool lastElementStar = false;
             IVariable last = rhs_list.list[rhs_list.list.Count - 1];
             ScalarVal last_val = last as ScalarVal;
@@ -4027,7 +4031,7 @@ namespace Gekko
                 lastElementStar = last_val.hasRepStar;
             }
 
-            int n = smpl.Observations12();
+            int n = GekkoTime.Observations(t1, t2);
 
             if (rhs_list.list.Count < n)
             {
@@ -4068,7 +4072,7 @@ namespace Gekko
             {
                 for (int i = 0; i < n; i++)
                 {
-                    lhs_series.SetData(smpl.t1.Add(i), rhs_data[i + Globals.smplOffset]);
+                    lhs_series.SetData(t1.Add(i), rhs_data[i + Globals.smplOffset]);
                 }
             }
             else
@@ -4105,22 +4109,18 @@ namespace Gekko
             OperatorHelper1(smpl, lhs_series, null, d, out lhsData, out lhsDataOriginal, out rhsData);
             OperatorHelper2(smpl, lhs_series.freq, operatorType, lhsData, lhsDataOriginal, rhsData);
 
-            if (lhs_series.freq == smpl.t1.freq)
-            {
-                lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.smplOffset);
-            }
-            else
-            {
-                GekkoTime t1, t2;
-                GekkoTime.Convert12(smpl, lhs_series.freq, out t1, out t2);
-                lhs_series.SetDataSequence(t1, t2, lhsData, Globals.smplOffset);
-            }
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+            if (t1.freq != lhs_series.freq) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);            
+
+            lhs_series.SetDataSequence(t1, t2, lhsData, Globals.smplOffset);
         }
 
         private static void OperatorHelper1(GekkoSmpl smpl, Series lhs_series, Series rhs_series, double rhs_scalar, out double[] lhsData, out double[] lhsDataOriginal, out double[] rhsData)
         {
-            GekkoTime t1, t2;
-            GekkoTime.Convert12(smpl, lhs_series.freq, out t1, out t2);
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+            if (t1.freq != lhs_series.freq) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);                        
 
             rhsData = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
             lhsDataOriginal = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
@@ -4145,9 +4145,10 @@ namespace Gekko
         }
 
         private static void OperatorHelper1a(GekkoSmpl smpl, Series lhs_series, out double[] lhsData, out double[] lhsDataOriginal)
-        {
-            GekkoTime t1, t2;
-            GekkoTime.Convert12(smpl, lhs_series.freq, out t1, out t2);
+        {            
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+            if (t1.freq != lhs_series.freq) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);            
 
             lhsDataOriginal = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
             lhsData = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
@@ -4162,9 +4163,10 @@ namespace Gekko
         }
 
         private static void OperatorHelper2(GekkoSmpl smpl, EFreq lhs_series_freq, ESeriesUpdTypes operatorType, double[] lhsData, double[] lhsDataOriginal, double[] rhsData)
-        {
-            GekkoTime t1, t2;
-            GekkoTime.Convert12(smpl, lhs_series_freq, out t1, out t2);            
+        {            
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+            if (t1.freq != lhs_series_freq) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);            
 
             int i = Globals.smplOffset;  //offset = 2
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
@@ -4203,7 +4205,23 @@ namespace Gekko
             }
 
             return;
-        }        
+        }
+
+        public static void Helper_Convert03(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t0, out GekkoTime t3)
+        {
+            //This is just to keep the fleible freq stuff assembled in one place
+            //Flexible freq stuff is for instance x!a <2001q2 2003q3> = 1, 2, 3;
+            //If there are problems with flexible freqs, these methods can be used for tracking
+            GekkoTime.Convert03(smpl, desiredFreq, out t0, out t3);
+        }
+
+        public static void Helper_Convert12(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t1, out GekkoTime t2)
+        {
+            //This is just to keep the fleible freq stuff assembled in one place
+            //Flexible freq stuff is for instance x!a <2001q2 2003q3> = 1, 2, 3;
+            //If there are problems with flexible freqs, these methods can be used for tracking
+            GekkoTime.Convert12(smpl, desiredFreq, out t1, out t2);
+        }
 
         // =====================================================================
         //                   Operator helper end
