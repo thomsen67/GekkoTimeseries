@@ -1417,15 +1417,18 @@ namespace Gekko
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
             // ----------------------------------------------------------------------------
 
+            GekkoTime t0 = smpl.t0;
+            GekkoTime t3 = smpl.t3;
+
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
-                rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                rv_series = new Series(ESeriesType.Light, t0, t3);
 
                 if (x1_series.type != ESeriesType.Timeless)
                 {
-                    GekkoTime window1 = smpl.t0;
-                    GekkoTime window2 = smpl.t3;
+                    GekkoTime window1 = t0;
+                    GekkoTime window2 = t3;
 
                     int ia1 = rv_series.ResizeDataArray(window1); //t0
                     int ia2 = rv_series.ResizeDataArray(window2);  //t3
@@ -1443,7 +1446,7 @@ namespace Gekko
                 }
                 else
                 {
-                    foreach (GekkoTime t in smpl.Iterate03())
+                    foreach (GekkoTime t in new GekkoTimeIterator(t0, t3))
                     {
                         rv_series.SetData(t, a(x1_series.GetData(smpl, t)));
                     }
@@ -1479,10 +1482,7 @@ namespace Gekko
 
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
-            if (O.FlexFreq(t0, x1_series.freq))
-            {
-                O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
-            }
+            if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);            
 
             //Functions like d() and pch() where lag is used
             Series rv_series;
@@ -1556,10 +1556,14 @@ namespace Gekko
         }
         
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
-        {            
+        {
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() and GetStartEndPeriod() which are safe
             // ----------------------------------------------------------------------------
+
+            GekkoTime t0 = smpl.t0;
+            GekkoTime t3 = smpl.t3;
+            if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
 
             if (x1_series.type == ESeriesType.ArraySuper)
             {
@@ -1571,7 +1575,7 @@ namespace Gekko
                 GekkoTime window1, window2, windowNew1, windowNew2;
                 InitWindows(out window1, out window2, out windowNew1, out windowNew2);
 
-                GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
+                GetStartEndPeriod(t0, t3, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
 
                 rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
 
@@ -1637,13 +1641,17 @@ namespace Gekko
                 GekkoTime window1, window2, windowNew1, windowNew2;
                 InitWindows(out window1, out window2, out windowNew1, out windowNew2);
 
+                GekkoTime t0 = smpl.t0;
+                GekkoTime t3 = smpl.t3;
+                if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
+
                 //if smpl freq and x1/x2_series freq are the same,
                 //these windows will just be smpl.t0 to smpl.t3
                 //both for normal and light series. So common
                 //window will also be .t0 to .t3.
                 //-------------------------------------
-                GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
-                GetStartEndPeriod(smpl, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
+                GetStartEndPeriod(t0, t3, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
+                GetStartEndPeriod(t0, t3, x2_series, ref windowNew1, ref windowNew2); //if light series, the returned period corresponds to array size, else smpl window is used
                 FindCommonWindow(ref window1, ref window2, windowNew1, windowNew2);
                 //-------------------------------------
 
@@ -1973,7 +1981,7 @@ namespace Gekko
             }
         }
 
-        private static void GetStartEndPeriod(GekkoSmpl smpl, Series x1, ref GekkoTime window1, ref GekkoTime window2)
+        private static void GetStartEndPeriod(GekkoTime t0, GekkoTime t3, Series x1, ref GekkoTime window1, ref GekkoTime window2)
         {
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
@@ -1989,7 +1997,7 @@ namespace Gekko
                     //#08753205743
                     GekkoTime wwwindow1 = GekkoTime.tNull;
                     GekkoTime wwwindow2 = GekkoTime.tNull;
-                    GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref wwwindow1, ref wwwindow2);
+                    GekkoTime.ConvertFreqs(x1.freq, t0, t3, ref wwwindow1, ref wwwindow2);
                     if (window1.IsSamePeriod(wwwindow1) && window2.IsSamePeriod(wwwindow2))
                     {
                         //G.Writeln("----> window test ok", Color.Gray);
@@ -2004,7 +2012,7 @@ namespace Gekko
             }
             else
             {
-                GekkoTime.ConvertFreqs(x1.freq, smpl.t0, smpl.t3, ref window1, ref window2);
+                GekkoTime.ConvertFreqs(x1.freq, t0, t3, ref window1, ref window2);
             }
         }
 
