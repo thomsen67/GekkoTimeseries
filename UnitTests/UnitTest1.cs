@@ -5933,7 +5933,7 @@ namespace UnitTests
             //In principle, Gekko should be able to run regardless of freq settings
                         
             Table tab = null; int counter = -12345;
-
+            
             //value on rhs -----------------------                 
 
             I("reset; time 2001 2003;");
@@ -6080,6 +6080,12 @@ namespace UnitTests
             TestCell(ref counter, tab, 2, 2, CellType.Number, (4d / 3d - 1) * 100d, sharedDelta);
             TestCell(ref counter, tab, 3, 1, CellType.Text, "2003");
             TestCell(ref counter, tab, 3, 2, CellType.Number, (5d / 4d - 1) * 100d, sharedDelta);
+
+            //TODO TODO
+            //TODO TODO
+            //TODO TODO
+
+            //test expressions like option freq a; x1!q = (x!q + x!q)/2 + 0; ...
 
         }
 

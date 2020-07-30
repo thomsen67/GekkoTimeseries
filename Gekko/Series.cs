@@ -1476,14 +1476,14 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
             // ----------------------------------------------------------------------------
-                        
+
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
-            if (t0.freq != x1_series.freq)
+            if (O.FlexFreq(t0, x1_series.freq))
             {
                 O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
             }
-            
+
             //Functions like d() and pch() where lag is used
             Series rv_series;
             rv_series = new Series(ESeriesType.Light, t0, t3); //should return a series corresponding to t0-t3
@@ -1509,7 +1509,7 @@ namespace Gekko
                         if (b)
                         {
                             if (G.isNumericalError(d1)) d1 = 0d;
-                            if (G.isNumericalError(d2)) d2 = 0d;                            
+                            if (G.isNumericalError(d2)) d2 = 0d;
                         }
                         arraya[i + ia1] = a(d1, d2);
                     }
@@ -1540,7 +1540,7 @@ namespace Gekko
                     if (b)
                     {
                         if (G.isNumericalError(d1)) d1 = 0d;
-                        if (G.isNumericalError(d2)) d2 = 0d;                        
+                        if (G.isNumericalError(d2)) d2 = 0d;
                     }
                     temp[i] = a(d1, d2);
                 }
@@ -1554,7 +1554,7 @@ namespace Gekko
             }
             return rv_series;
         }
-
+        
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
         {            
             // ----------------------------------------------------------------------------
