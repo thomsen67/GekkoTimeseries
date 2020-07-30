@@ -5991,56 +5991,82 @@ namespace UnitTests
 
             I("reset; time 2001 2003; option freq = q;");
             I("x!a = 1,2,3;"); //should run over 2001-2003       
-            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 1, 1d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2003, 1, 3d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
             I("x!a <m>= 11,12,13;"); //should run over 2001-2003       
-            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 1, 12d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2003, 1, 16d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 12d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 16d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             //matrix on rhs -----------------------
 
             I("reset; time 2001 2003;");
-            I("x!q = [1,2,3,4,5,6,7,8,9,10,11,12];"); //should run over 2001q1-2003q4    
+            I("x!q = t([1,2,3,4,5,6,7,8,9,10,11,12]);"); //should run over 2001q1-2003q4    
             _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 1d, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 12d, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
-            I("x!q <m>= [11,12,13,14,15,16,17,18,19,20,21,22];"); //should run over 2001q1-2003q4    
+            I("x!q <m>= t([11,12,13,14,15,16,17,18,19,20,21,22]);"); //should run over 2001q1-2003q4    
             _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 12d, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 34d, sharedDelta);
             _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
 
             I("reset; time 2001 2003; option freq = q;");
-            I("x!a = [1,2,3];"); //should run over 2001-2003       
-            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 1, 1d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2003, 1, 3d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
-            I("x!a <m>= [11,12,13];"); //should run over 2001-2003       
-            _AssertSeries(First(), "x!a", 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 1, 12d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2003, 1, 26d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2004, 1, double.NaN, sharedDelta);
+            I("x!a = t([1,2,3]);"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+            I("x!a <m>= t([11,12,13]);"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 12d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 16d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // 1 x 1 matrix
+
+            I("reset; time 2001 2003;");
+            I("x!q = [11];"); //should run over 2001q1-2003q4    
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 11d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 11d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+            I("x!q <m>= [12];"); //should run over 2001q1-2003q4    
+            _AssertSeries(First(), "x!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2001, 1, 23d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2003, 4, 23d, sharedDelta);
+            _AssertSeries(First(), "x!q", EFreq.Q, 2004, 1, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003; option freq = q;");
+            I("x!a = [11];"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 11d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+            I("x!a <m>= [12];"); //should run over 2001-2003       
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 23d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 23d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             //series on rhs -----------------------
 
             I("reset; time 2001 2003;");
-            I("x!a = 2;"); //should run over 2001-2003     
-            I("x!q = 2;"); //should run over 2001q1-2003q4       
-            I("x!a = 2 * x!q;"); //should fail
-            I("x!q = 2 * x!a;"); //should fail
-            I("x!a <m>= 2 * x!q;"); //should fail
-            I("x!q <m>= 2 * x!a;"); //should fail
+            I("x!a = 1;");
+            I("x!q = 2;");
+            FAIL("x!a = 2 * x!q;"); //should fail
+            FAIL("x!q = 2 * x!a;"); //should fail
+            FAIL("x!a <m>= 2 * x!q;"); //should fail
+            FAIL("x!q <m>= 2 * x!a;"); //should fail
             I("option freq = q;");
-            I("x!a = 2 * x!q;"); //should fail
-            I("x!q = 2 * x!a;"); //should fail
-            I("x!a <m>= 2 * x!q;"); //should fail
-            I("x!q <m>= 2 * x!a;"); //should fail
+            FAIL("x!a = 2 * x!q;"); //should fail
+            FAIL("x!q = 2 * x!a;"); //should fail
+            FAIL("x!a <m>= 2 * x!q;"); //should fail
+            FAIL("x!q <m>= 2 * x!a;"); //should fail
 
             //Tests the hack where a lag where t0 is 1 less than t1 is "translated" into
             //t0 being 12 less than t1 (because the freq is monthly)

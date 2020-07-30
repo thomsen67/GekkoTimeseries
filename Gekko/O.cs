@@ -3557,7 +3557,8 @@ namespace Gekko
                                                 //not so fast running, could be improved
                                                 OperatorHelperSeries(smpl, lhs_series, rhs_series_beware, operatorType);
                                             }
-                                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                            //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                            LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                                         }
                                         break;
                                     case ESeriesType.Timeless:
@@ -3588,9 +3589,19 @@ namespace Gekko
 
                                                 if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                                 {
-                                                    foreach (GekkoTime t in smpl.Iterate12())
+                                                    if (smpl.t1.freq != lhs_series.freq)
                                                     {
-                                                        lhs_series.SetData(t, d);
+                                                        foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq))
+                                                        {
+                                                            lhs_series.SetData(t, d);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        foreach (GekkoTime t in smpl.Iterate12())
+                                                        {
+                                                            lhs_series.SetData(t, d);
+                                                        }
                                                     }
                                                 }
                                                 else
@@ -3598,7 +3609,9 @@ namespace Gekko
                                                     OperatorHelperScalar(smpl, lhs_series, operatorType, d);
                                                 }
                                             }
-                                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                            //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                            LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
+
                                         }
                                         break;
                                     case ESeriesType.ArraySuper:
@@ -3632,7 +3645,8 @@ namespace Gekko
                                             removeFirst = lhs != null;
                                             //lhs_series = clone;
                                             //AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
-                                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                            //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                            LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                                         }
                                         break;
                                     default:
@@ -3655,6 +3669,7 @@ namespace Gekko
 
                                 if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                 {
+                                    //this is very similar to the same code regarding 1 x 1 MATRIX
                                     if (lhs_series.freq == smpl.t1.freq)
                                     {
                                         //same freq
@@ -3670,8 +3685,10 @@ namespace Gekko
                                 {
                                     OperatorHelperScalar(smpl, lhs_series, operatorType, d);
                                 }
+
+                                //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                                 
-                                G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                             }
                             break;
                         
@@ -3706,7 +3723,8 @@ namespace Gekko
 
                                 HelperListdata(smpl, lhs_series, operatorType, rhs_list);
 
-                                G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
                             }
                             break;
                         case EVariableType.Map:
@@ -3728,7 +3746,6 @@ namespace Gekko
                                 // stuff below also handles array-timeseries just fine     
 
                                 Matrix rhs_matrix = rhs as Matrix;
-                                //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
                                 if (rhs_matrix.data.Length == 1)
                                 {
@@ -3736,30 +3753,42 @@ namespace Gekko
 
                                     if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                     {
-                                        foreach (GekkoTime t in smpl.Iterate12())
+                                        //this is very similar to the same code regarding VAL
+                                        if (lhs_series.freq == smpl.t1.freq)
                                         {
-                                            lhs_series.SetData(t, d);
+                                            //same freq
+                                            foreach (GekkoTime t in smpl.Iterate12()) lhs_series.SetData(t, d);
                                         }
+                                        else
+                                        {
+                                            //different freqs, for instance x!q = 2 when global freq is !a                                        
+                                            foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);
+                                        }
+
                                     }
                                     else
                                     {
                                         OperatorHelperScalar(smpl, lhs_series, operatorType, d);
                                     }
-
                                 }
                                 else
-                                {
-                                    int n = smpl.Observations12();
+                                {                                    
+                                    GekkoTime t1 = smpl.t1;
+                                    GekkoTime t2 = smpl.t2;
+                                    if (t1.freq != lhs_series.freq) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+                                    int n = GekkoTime.Observations(t1, t2);
+
                                     if (n != rhs_matrix.data.GetLength(0) || 1 != rhs_matrix.data.GetLength(1))
                                     {
                                         G.Writeln2("*** ERROR: Expected " + n + " x 1 matrix, got " + rhs_matrix.data.GetLength(0) + " x " + rhs_matrix.data.GetLength(1));
                                         throw new GekkoException();
                                     }
+
                                     if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                     {
                                         for (int i = 0; i < rhs_matrix.data.GetLength(0); i++)
                                         {
-                                            lhs_series.SetData(smpl.t1.Add(i), rhs_matrix.data[i, 0]);
+                                            lhs_series.SetData(t1.Add(i), rhs_matrix.data[i, 0]);
                                         }
                                     }
                                     else
@@ -3767,7 +3796,7 @@ namespace Gekko
                                         //rhs_matrix.data[i, 0]
 
                                         //int offset = 1;                                    
-                                        double[] rhsData = new double[smpl.Observations12() + Globals.smplOffset];
+                                        double[] rhsData = new double[n + Globals.smplOffset];
                                         for (int i = 0; i < n; i++)
                                         {
                                             rhsData[i + Globals.smplOffset] = rhs_matrix.data[i, 0];
@@ -3779,10 +3808,9 @@ namespace Gekko
                                         }
                                         OperatorHelperSequence(smpl, lhs_series, rhsData, operatorType);
                                     }
-
                                 }
                                 
-                                G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
 
                             }
                             break;
@@ -3806,7 +3834,11 @@ namespace Gekko
                     if (keep)
                     {
                         GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
-                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t3.Add(1), tLast))  //why t3 and not t2?
+
+                        GekkoTime t3 = smpl.t3; //why t3 and not t2? Never mind, t2 and t3 are equal most of the time
+                        if (t3.freq != lhs_series.freq) t3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, t3);
+
+                        foreach (GekkoTime t in new GekkoTimeIterator(t3.Add(1), tLast)) 
                         {
                             //runs after the <...> period or globals period until data ends
                             //so the updates outside of sample.
@@ -3825,6 +3857,16 @@ namespace Gekko
 
             return;
 
+        }
+
+        private static void LookupHelperLeftside_message(GekkoSmpl smpl, EFreq lhs_series_freq, string varnameWithFreq)
+        {
+            string s;
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+            if (t1.freq != lhs_series_freq) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);
+            s = t1 + "-" + t2;
+            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + s + " ", smpl.p);            
         }
 
         public static void ReportSeriesMissingValue(Series lhs_series, GekkoTime t1, GekkoTime t2)
@@ -4100,7 +4142,10 @@ namespace Gekko
             double[] lhsData = null, lhsDataOriginal = null;
             OperatorHelper1a(smpl, lhs_series, out lhsData, out lhsDataOriginal);
             OperatorHelper2(smpl, lhs_series.freq, operatorType, lhsData, lhsDataOriginal, rhsData);
-            lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.smplOffset);
+            GekkoTime t1 = smpl.t1;
+            GekkoTime t2 = smpl.t2;
+            if (t1.freq != lhs_series.freq) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
+            lhs_series.SetDataSequence(t1, t2, lhsData, Globals.smplOffset);
         }
 
         private static void OperatorHelperScalar(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, double d)
