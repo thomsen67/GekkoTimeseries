@@ -11050,6 +11050,26 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ModelGamsTestCacheAndFullMakroModel()
+        {
+            Program.Flush();  //wipe out existing models
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("MODEL <gms> model_10_08_2020.gmy;");  //just test that it does not crash
+            Assert.AreEqual(Program.model.modelGams.equationsByEqname.Count, 694);
+            Assert.AreEqual(Program.model.modelGams.equationsByVarname.Count, 386);
+            // ----------- now we repeat it, just to test that it is read
+            // ----------- allright from cache
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("MODEL <gms> model_10_08_2020.gmy;");  //just test that it does not crash
+            Assert.AreEqual(Program.model.modelGams.equationsByEqname.Count, 694);
+            Assert.AreEqual(Program.model.modelGams.equationsByVarname.Count, 386);
+        }
+
+        [TestMethod]
         public void _Test_ModelGamsLhsDependent()
         {
             Program.Flush();  //wipe out existing models
