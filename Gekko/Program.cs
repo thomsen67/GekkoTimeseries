@@ -10259,7 +10259,7 @@ namespace Gekko
                 Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
             }
 
-            int i = 0;
+            int i = 0; 
             foreach (Graph g in Globals.windowsGraph)
             {
                 i++;
