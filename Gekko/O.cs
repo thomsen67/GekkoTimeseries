@@ -4255,6 +4255,8 @@ namespace Gekko
         public static void Helper_Convert03(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t0, out GekkoTime t3)
         {
             //1 of 3
+            //This method is special compared to Helper_Convert12. The thing is that Helper_Convert03 handles the lag problem,
+            //and we have to deal with flexible freqs here.
             //This is just to keep the fleible freq stuff assembled in one place
             //Flexible freq stuff is for instance x!a <2001q2 2003q3> = 1, 2, 3;
             //If there are problems with flexible freqs, these methods can be used for tracking

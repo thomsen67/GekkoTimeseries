@@ -1419,6 +1419,7 @@ namespace Gekko
 
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
+            if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
 
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)

@@ -19841,7 +19841,7 @@ namespace Gekko
             {                
 
                 ReadGamsModelHelper(textInputRaw, fileName, dependents, o);
-                Sniff2();
+                if(Globals.runningOnTTComputer) Sniff2();
 
                 DateTime t1 = DateTime.Now;
 

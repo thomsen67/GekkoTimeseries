@@ -1166,7 +1166,7 @@ namespace Gekko
         }
 
         public static void Convert03(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t0, out GekkoTime t3)
-        {
+        {            
             t0 = smpl.t0;
             t3 = smpl.t3;            
             if (t0.freq != desiredFreq)
