@@ -318,32 +318,6 @@ namespace Gekko
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
             G.WriteDirs("small", false);
-                        
-
-            if (Globals.isBetaVersion)
-            {
-                G.Writeln();
-                G.Writeln("  +--------------------------------------------+", Color.Red);
-                G.Writeln("  |       This is a not fully tested           |", Color.Red);
-                G.Writeln("  |   BETA VERSION of the up-coming Gekko 3.0. |", Color.Red);
-                G.Writeln("  |  Please do not use it for serious purposes |", Color.Red);
-                G.Writeln("  +--------------------------------------------+", Color.Red);
-                G.Writeln();
-                //Program.Pause("This is an untested BETA VERSION" + G.NL + "Please do not use it for serious purposes");
-                if (Globals.runningOnTTComputer)
-                {
-                    G.Writeln("BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA ", Color.Red);
-                    G.Writeln("BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA ", Color.Red);
-                    G.Writeln("BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA ", Color.Red);
-                    G.Writeln("BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA ", Color.Red);
-                    G.Writeln("BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA BETA ", Color.Red);
-                    G.Writeln();
-                }
-                else
-                {
-                    Program.Pause("BETA VERSION -- no guarantees");
-                }
-            }
             
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();

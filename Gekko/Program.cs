@@ -11284,17 +11284,9 @@ namespace Gekko
         }
 
         public static void Stamp()
-        {
-
-            if (!Globals.runningOnTTComputer)
-            {
+        {                        
                 G.Writeln2("*** ERROR: Please use: TELL currentDateTime();");
-                throw new GekkoException();
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Please use: TELL currentDateTime();");
-            }
+                throw new GekkoException();            
         }
 
         public static void FlowChart(string s, string code, GekkoTime period)
@@ -14577,16 +14569,10 @@ namespace Gekko
                 {
                     string sub = s2;
                     if (G.Equal(sub, "deploy"))
-                    {                        
+                    {
                         //Deploy
-                        if (Globals.runningOnTTComputer)
-                        {
-                            G.Writeln2("Use 'deploy' from Total Commander prompt");
-                            G.Writeln(@"Also see c:\Thomas\Gekko\GekkoCS\Deploy\!seher");
-                            //Deploy.MainWindow w = new Deploy.MainWindow();
-                            //w.SetStartupPath(Application.StartupPath);
-                            //w.ShowDialog();
-                        }
+                        G.Writeln2("Use 'deploy' from Total Commander prompt");
+                        G.Writeln(@"Also see c:\Thomas\Gekko\GekkoCS\Deploy\!seher");
                         return "";   //no need for the parser to chew on this afterwards!
                     }
                 }
@@ -15845,19 +15831,7 @@ namespace Gekko
                     }
                 }
             }
-
-            if (false && Globals.runningOnTTComputer)
-            {
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\handleobey_" + inputFileLines2.Count + ".gcm", Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    foreach (string s in inputFileLines2)
-                    {
-                        sw.WriteLine(s);
-                    }
-                }
-            }
-
+            
             return inputFileLines2;
         }
 
@@ -38698,12 +38672,6 @@ namespace Gekko
             //Keep SimulateSimulPrologue() and SimulateResiduals() together
             SimulateSimulPrologue(assembly);
             SimulateResiduals(Program.model.modelGekko.b, Program.model.modelGekko.r, assembly);
-            if (Globals.runningOnTTComputer)
-            {
-                //G.Writeln2("values of endogenous ==========> " + model.b[0] + ", " + model.b[2] + ", " + model.b[4], Color.Brown);
-            }
-
-            
 
             for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumber.Length; i++)
             {
@@ -43133,7 +43101,7 @@ namespace Gekko
         {            
             if (G.Equal(startEnd, "start"))
             {
-                return GekkoTime.ConvertFreqsFirst(tsFreq, t);
+                return GekkoTime.ConvertFreqsFirst(tsFreq, t, null);
             }
             else if (G.Equal(startEnd, "end"))
             {

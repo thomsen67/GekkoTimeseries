@@ -5936,8 +5936,18 @@ namespace UnitTests
 
             //Tests the hack where a lag where t0 is 1 less than t1 is "translated" into
             //t0 being 12 less than t1 (because the freq is monthly)
+
             I("reset; time 2001 2003;");
-            I("x = 3,4,5;");
+            I("x = 3, 4, 5;");
+            I("option freq m; time 2002m11 2003m11;");
+            I("y!a = pch(x!a + 0);");  //should be m, 4/3-1, 5/4-1 (in %)
+            _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, (4d / 3d - 1) * 100d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, (5d / 4d - 1) * 100d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("x = 3, 4, 5;");
             I("option freq m; time 2002m11 2003m11;");
             I("prt<n> pch(x!a + 0);");
             tab = Globals.lastPrtOrMulprtTable; counter = 0;

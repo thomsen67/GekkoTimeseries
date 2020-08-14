@@ -6,7 +6,13 @@ using System.Text;
 
 namespace Gekko
 {
-    
+
+    public class FreqHelper
+    {
+        public GekkoTime t1;
+        public int offset = 0;
+    }
+
     public enum EFreq 
     {
         //========================================================================================================
@@ -667,11 +673,11 @@ namespace Gekko
 
         public static void ConvertFreqs(EFreq freq, GekkoTime t1, GekkoTime t2, ref GekkoTime tt1, ref GekkoTime tt2)
         {
-            tt1 = ConvertFreqsFirst(freq, t1);
+            tt1 = ConvertFreqsFirst(freq, t1, null);
             tt2 = ConvertFreqsLast(freq, t2);
         }
 
-        public static GekkoTime ConvertFreqsFirst(EFreq freq, GekkoTime t1)
+        public static GekkoTime ConvertFreqsFirst(EFreq freq, GekkoTime t, FreqHelper freqHelper)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -679,8 +685,23 @@ namespace Gekko
 
             //See also #09834753425, converting from GekkoTime to DateTime
 
-            GekkoTime tt1 = t1;
-            if (freq == t1.freq)
+            GekkoTime tt = t;
+
+            int offset = 0;
+            if (freqHelper != null)
+            {
+                //This object is only <> null when we are converting smpl.t0.
+                //For instance, if smpl.t0 = 2020m9 and smpl.t1 = 2020m12, this corresponds to
+                //to 3 lags to account for "the lag problem", for instance in y = pch(x + 0), where the pch()
+                //triggers a lag.
+                //Naively, converting smpl.t0 til annual would become 2020, and the 3 lags would disappear.
+                //So instead, when there is frequency conversion, we transform t1 to annual (still 2020), and
+                //the subtract 3 periods from this.
+                //Therefore, we start setting tt = freqHelper.t1, and then do the offset at the very end.
+                tt = freqHelper.t1;
+            }
+            
+            if (freq == t.freq)
             {
                 //do nothing
             }
@@ -691,112 +712,117 @@ namespace Gekko
                 {
                     //From Q or M or D to A freq is just the annual part of the date
 
-                    if (t1.freq == EFreq.Q)
+                    if (t.freq == EFreq.Q)
                     {
-                        tt1 = new GekkoTime(EFreq.A, t1.super, 1);
+                        tt = new GekkoTime(EFreq.A, t.super, 1);
                     }
-                    else if (t1.freq == EFreq.M || t1.freq == EFreq.D)
+                    else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
-                        tt1 = new GekkoTime(EFreq.A, t1.super, 1);
+                        tt = new GekkoTime(EFreq.A, t.super, 1);
                     }
-                    else if (t1.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
-                        tt1 = new GekkoTime(EFreq.A, t1.super, 1);
+                        tt = new GekkoTime(EFreq.A, t.super, 1);
                     }
 
                 }
                 else if (freq == EFreq.Q)
                 {
-                    if (t1.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
                         //from A to Q sets q1 for start year and q4 for end year
-                        tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
+                        tt = new GekkoTime(EFreq.Q, t.super, 1);
                     }
-                    else if (t1.freq == EFreq.M || t1.freq == EFreq.D)
+                    else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
                         //from M or D to Q finds corresponding Q
-                        tt1 = new GekkoTime(EFreq.Q, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));  //first m                        
+                        tt = new GekkoTime(EFreq.Q, t.super, GekkoTime.FromMonthToQuarter(t.sub));  //first m                        
                     }                    
-                    else if (t1.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
-                        tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
+                        tt = new GekkoTime(EFreq.Q, t.super, 1);
                     }
                 }
                 else if (freq == EFreq.M)
                 {
-                    if (t1.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
                         //from A to M sets m1 for start year, and m12 for end year
-                        tt1 = new GekkoTime(EFreq.M, t1.super, 1);
+                        tt = new GekkoTime(EFreq.M, t.super, 1);
                     }
-                    else if (t1.freq == EFreq.Q)
+                    else if (t.freq == EFreq.Q)
                     {
                         //from Q to M sets mx for start q, and my for end q
-                        tt1 = new GekkoTime(EFreq.M, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));
+                        tt = new GekkoTime(EFreq.M, t.super, GekkoTime.FromQuarterToMonthStart(t.sub));
                     }
-                    else if (t1.freq == EFreq.D)
+                    else if (t.freq == EFreq.D)
                     {
                         //from D to M sets month directly
-                        tt1 = new GekkoTime(EFreq.M, t1.super, t1.sub);
+                        tt = new GekkoTime(EFreq.M, t.super, t.sub);
                     }
-                    else if (t1.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
-                        tt1 = new GekkoTime(EFreq.M, t1.super, 1);
+                        tt = new GekkoTime(EFreq.M, t.super, 1);
                     }
                 }
                 else if (freq == EFreq.D)
                 {
-                    if (t1.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
                         //from A to D sets first day
-                        tt1 = new GekkoTime(EFreq.D, t1.super, 1, 1);
+                        tt = new GekkoTime(EFreq.D, t.super, 1, 1);
                     }
-                    else if (t1.freq == EFreq.Q)
+                    else if (t.freq == EFreq.Q)
                     {
                         //from Q to D sets first day
-                        tt1 = new GekkoTime(EFreq.D, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub), 1);
+                        tt = new GekkoTime(EFreq.D, t.super, GekkoTime.FromQuarterToMonthStart(t.sub), 1);
                     }
-                    else if (t1.freq == EFreq.M)
+                    else if (t.freq == EFreq.M)
                     {
                         //from M to D sets first day
-                        tt1 = new GekkoTime(EFreq.D, t1.super, t1.sub, 1);
+                        tt = new GekkoTime(EFreq.D, t.super, t.sub, 1);
                     }                    
-                    else if (t1.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
-                        tt1 = new GekkoTime(EFreq.D, t1.super, 1, 1);
+                        tt = new GekkoTime(EFreq.D, t.super, 1, 1);
                     }
                 }
                 else if (freq == EFreq.U)
                 {
                     //From Q or M to U freq is just the annual part of the date
 
-                    if (t1.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
-                        tt1 = new GekkoTime(EFreq.U, t1.super, 1);
+                        tt = new GekkoTime(EFreq.U, t.super, 1);
                     }
-                    else if (t1.freq == EFreq.Q)
+                    else if (t.freq == EFreq.Q)
                     {
-                        tt1 = new GekkoTime(EFreq.U, t1.super, 1);
+                        tt = new GekkoTime(EFreq.U, t.super, 1);
                     }
-                    else if (t1.freq == EFreq.M || t1.freq == EFreq.D)
+                    else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
-                        tt1 = new GekkoTime(EFreq.U, t1.super, 1);
+                        tt = new GekkoTime(EFreq.U, t.super, 1);
                     }
                 }
             }
 
-            return tt1;
+            if (freqHelper != null)
+            {
+                tt = tt.Add(-freqHelper.offset);
+            }
+
+            return tt;
         }
 
-        public static GekkoTime ConvertFreqsLast(EFreq freq, GekkoTime t2)
+        public static GekkoTime ConvertFreqsLast(EFreq freq, GekkoTime t)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
 
-            GekkoTime tt2 = t2;
+            GekkoTime tt = t;
 
-            if (freq == t2.freq)
+            if (freq == t.freq)
             {
                 //do nothing
             }
@@ -807,103 +833,103 @@ namespace Gekko
                 {
                     //From Q or M to A freq is just the annual part of the date
 
-                    if (t2.freq == EFreq.Q)
+                    if (t.freq == EFreq.Q)
                     {
-                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
+                        tt = new GekkoTime(EFreq.A, t.super, 1);
                     }
-                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
+                    else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
-                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
+                        tt = new GekkoTime(EFreq.A, t.super, 1);
                     }
-                    else if (t2.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
-                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
+                        tt = new GekkoTime(EFreq.A, t.super, 1);
                     }
 
                 }
                 else if (freq == EFreq.Q)
                 {
-                    if (t2.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
                         //from A to Q sets q1 for start year and q4 for end year                        
-                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
+                        tt = new GekkoTime(EFreq.Q, t.super, GekkoTimeStuff.numberOfQuarters);
                     }
-                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
+                    else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
                         //from M to Q finds corresponding Q                        
-                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
+                        tt = new GekkoTime(EFreq.Q, t.super, GekkoTime.FromMonthToQuarter(t.sub));  //last m                 
                     }
-                    else if (t2.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
-                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
+                        tt = new GekkoTime(EFreq.Q, t.super, GekkoTimeStuff.numberOfQuarters);
                     }
                 }
                 else if (freq == EFreq.M)
                 {
-                    if (t2.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
                         //from A to M sets m1 for start year, and m12 for end year                        
-                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
+                        tt = new GekkoTime(EFreq.M, t.super, GekkoTimeStuff.numberOfMonths);
                     }
-                    else if (t2.freq == EFreq.Q)
+                    else if (t.freq == EFreq.Q)
                     {
                         //from Q to M sets mx for start q, and my for end q                        
-                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
+                        tt = new GekkoTime(EFreq.M, t.super, GekkoTime.FromQuarterToMonthEnd(t.sub));
                     }
-                    else if (t2.freq == EFreq.D)
+                    else if (t.freq == EFreq.D)
                     {
                         //from D to M sets month directly
-                        tt2 = new GekkoTime(EFreq.M, t2.super, t2.sub);
+                        tt = new GekkoTime(EFreq.M, t.super, t.sub);
                     }
-                    else if (t2.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
-                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
+                        tt = new GekkoTime(EFreq.M, t.super, GekkoTimeStuff.numberOfMonths);
                     }
                 }
                 else if (freq == EFreq.D)
                 {
-                    if (t2.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
                         //from A to D sets last day of year
-                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
+                        tt = new GekkoTime(EFreq.D, t.super, GekkoTimeStuff.numberOfMonths, 31);
                     }
-                    else if (t2.freq == EFreq.Q)
+                    else if (t.freq == EFreq.Q)
                     {
                         //from Q to D sets last day of quarter
-                        int month = GekkoTime.FromQuarterToMonthEnd(t2.sub);
-                        tt2 = new GekkoTime(EFreq.D, t2.super, month, G.DaysInMonth(t2.super, month));
+                        int month = GekkoTime.FromQuarterToMonthEnd(t.sub);
+                        tt = new GekkoTime(EFreq.D, t.super, month, G.DaysInMonth(t.super, month));
                     }
-                    else if (t2.freq == EFreq.M)
+                    else if (t.freq == EFreq.M)
                     {
                         //from M to D sets last day of month                        
-                        tt2 = new GekkoTime(EFreq.D, t2.super, t2.sub, G.DaysInMonth(t2.super, t2.sub));
+                        tt = new GekkoTime(EFreq.D, t.super, t.sub, G.DaysInMonth(t.super, t.sub));
                     }
-                    else if (t2.freq == EFreq.U)
+                    else if (t.freq == EFreq.U)
                     {
                         //from U to D sets last day of year
-                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
+                        tt = new GekkoTime(EFreq.D, t.super, GekkoTimeStuff.numberOfMonths, 31);
                     }
                 }
                 else if (freq == EFreq.U)
                 {
                     //From Q or M or D to U freq is just the annual part of the date
 
-                    if (t2.freq == EFreq.A)
+                    if (t.freq == EFreq.A)
                     {
-                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                        tt = new GekkoTime(EFreq.U, t.super, 1);
                     }
-                    else if (t2.freq == EFreq.Q)
+                    else if (t.freq == EFreq.Q)
                     {
-                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                        tt = new GekkoTime(EFreq.U, t.super, 1);
                     }
-                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
+                    else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
-                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                        tt = new GekkoTime(EFreq.U, t.super, 1);
                     }
                 }
             }
 
-            return tt2;
+            return tt;
         }
 
         private void CheckSameFreq(GekkoTime gt2)
@@ -1160,20 +1186,32 @@ namespace Gekko
             if (t1.freq != desiredFreq)
             {
                 //for instance x!q = ... ; where global freq is !a
-                t1 = GekkoTime.ConvertFreqsFirst(desiredFreq, t1);
+                t1 = GekkoTime.ConvertFreqsFirst(desiredFreq, t1, null);
                 t2 = GekkoTime.ConvertFreqsLast(desiredFreq, t2);
             }
         }
 
         public static void Convert03(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t0, out GekkoTime t3)
         {            
-            t0 = smpl.t0;
-            t3 = smpl.t3;            
+            t0 = smpl.t0; //is returned         
+            t3 = smpl.t3; //is returned
+            GekkoTime t1 = smpl.t1;
+
             if (t0.freq != desiredFreq)
             {
+                FreqHelper freqHelper = null;
+                int offset = GekkoTime.Observations(t0, t1) - 1; //lag before conversion
+                if (offset > 0)  //cannot be negative
+                {
+                    freqHelper = new FreqHelper();  //This object is not created if were are not using flexible freqs
+                    freqHelper.offset = offset;
+                    freqHelper.t1 = t1;
+                }
+
                 //for instance x!q = ... ; where global freq is !a
-                t0 = GekkoTime.ConvertFreqsFirst(desiredFreq, t0);
-                t3 = GekkoTime.ConvertFreqsLast(desiredFreq, t3);
+                t0 = GekkoTime.ConvertFreqsFirst(desiredFreq, t0, freqHelper);
+                t3 = GekkoTime.ConvertFreqsLast(desiredFreq, t3);               
+                
             }
         }
     }
@@ -1201,7 +1239,7 @@ namespace Gekko
         public GekkoTimeIterator(EFreq convertToThisFreq, GekkoTime t1, GekkoTime t2)
         {
             //This is for the case where we want to "cast" to another freq than the freq of t1 and t2
-            _StartDate = GekkoTime.ConvertFreqsFirst(convertToThisFreq, t1);
+            _StartDate = GekkoTime.ConvertFreqsFirst(convertToThisFreq, t1, null);
             _EndDate = GekkoTime.ConvertFreqsLast(convertToThisFreq, t2);
             _freq = convertToThisFreq;
         }        

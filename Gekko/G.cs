@@ -2185,12 +2185,7 @@ namespace Gekko
             catch
             {
                 version = Globals.gekkoVersion;
-            };  //fail silently
-            
-            if (Globals.isBetaVersion)
-            {
-                version += " (version 3.0 beta #" + end + ") - NO GUARANTEES!";
-            }
+            };  //fail silently                        
                         
             return version;
         }
