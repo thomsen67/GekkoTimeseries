@@ -1419,7 +1419,7 @@ namespace Gekko
 
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
-            if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
+            if (O.UseFlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
 
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
@@ -1483,7 +1483,7 @@ namespace Gekko
 
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
-            if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);            
+            if (O.UseFlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);            
 
             //Functions like d() and pch() where lag is used
             Series rv_series;
@@ -1564,7 +1564,7 @@ namespace Gekko
 
             GekkoTime t0 = smpl.t0;
             GekkoTime t3 = smpl.t3;
-            if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
+            if (O.UseFlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
 
             if (x1_series.type == ESeriesType.ArraySuper)
             {
@@ -1644,7 +1644,7 @@ namespace Gekko
 
                 GekkoTime t0 = smpl.t0;
                 GekkoTime t3 = smpl.t3;
-                if (O.FlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
+                if (O.UseFlexFreq(t0, x1_series.freq)) O.Helper_Convert03(smpl, x1_series.freq, out t0, out t3);
 
                 //if smpl freq and x1/x2_series freq are the same,
                 //these windows will just be smpl.t0 to smpl.t3

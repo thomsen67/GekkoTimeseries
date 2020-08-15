@@ -690,14 +690,18 @@ namespace Gekko
             int offset = 0;
             if (freqHelper != null)
             {
-                //This object is only <> null when we are converting smpl.t0.
+                //This object is only <> null when we are converting smpl.t0 to some foreign frequency.
+                //So conversion of smpl.t1 is exempt from the following code.
                 //For instance, if smpl.t0 = 2020m9 and smpl.t1 = 2020m12, this corresponds to
-                //to 3 lags to account for "the lag problem", for instance in y = pch(x + 0), where the pch()
-                //triggers a lag.
+                //to 3 lags to account for "the lag problem", for instance in y!a = pch(x!a + 0), where the pch()
+                //triggers a lag (and 2 lags are always put in), but where the global frequency is set to for instance monthly.
                 //Naively, converting smpl.t0 til annual would become 2020, and the 3 lags would disappear.
-                //So instead, when there is frequency conversion, we transform t1 to annual (still 2020), and
-                //the subtract 3 periods from this.
-                //Therefore, we start setting tt = freqHelper.t1, and then do the offset at the very end.
+                //So instead, when there is frequency conversion for smpl.t0, we transform .t1 (not .t0) to annual (result is still 2020), and
+                //then subtract 3 periods from this annual date.
+                //Below, we start setting tt = freqHelper.t1, and then do the offset at the very end.
+                //
+                //All this could be handled more elegantly if .t0 was an offset instead of a date.
+
                 tt = freqHelper.t1;
             }
             

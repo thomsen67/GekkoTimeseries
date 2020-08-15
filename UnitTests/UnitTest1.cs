@@ -5933,30 +5933,7 @@ namespace UnitTests
             //In principle, Gekko should be able to run regardless of freq settings
                         
             Table tab = null; int counter = -12345;
-
-            //Tests the hack where a lag where t0 is 1 less than t1 is "translated" into
-            //t0 being 12 less than t1 (because the freq is monthly)
-
-            I("reset; time 2001 2003;");
-            I("x = 3, 4, 5;");
-            I("option freq m; time 2002m11 2003m11;");
-            I("y!a = pch(x!a + 0);");  //should be m, 4/3-1, 5/4-1 (in %)
-            _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
-            _AssertSeries(First(), "y!a", 2002, (4d / 3d - 1) * 100d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2003, (5d / 4d - 1) * 100d, sharedDelta);
-            _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
-
-            I("reset; time 2001 2003;");
-            I("x = 3, 4, 5;");
-            I("option freq m; time 2002m11 2003m11;");
-            I("prt<n> pch(x!a + 0);");
-            tab = Globals.lastPrtOrMulprtTable; counter = 0;
-            TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!a + 0)");
-            TestCell(ref counter, tab, 2, 1, CellType.Text, "2002");
-            TestCell(ref counter, tab, 2, 2, CellType.Number, (4d / 3d - 1) * 100d, sharedDelta);
-            TestCell(ref counter, tab, 3, 1, CellType.Text, "2003");
-            TestCell(ref counter, tab, 3, 2, CellType.Number, (5d / 4d - 1) * 100d, sharedDelta);
-
+            
             //value on rhs -----------------------                 
 
             I("reset; time 2001 2003;");
@@ -6091,13 +6068,30 @@ namespace UnitTests
             FAIL("x!a <m>= 2 * x!q;"); //should fail
             FAIL("x!q <m>= 2 * x!a;"); //should fail
 
-            
 
-            //TODO TODO
-            //TODO TODO
-            //TODO TODO
+            //Tests the functionality where there is a mix of flexible freqs and the lag problem.
+            //It seems this is solved.
 
-            //test expressions like option freq a; x1!q = (x!q + x!q)/2 + 0; ...
+            I("reset; time 2001 2003;");
+            I("x = 3, 4, 5;");
+            I("option freq m; time 2002m11 2003m11;");
+            I("y!a = pch(x!a + 0);");  //should be m, 4/3-1, 5/4-1 (in %)
+            _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, (4d / 3d - 1) * 100d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, (5d / 4d - 1) * 100d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
+
+            I("reset; time 2001 2003;");
+            I("x = 3, 4, 5;");
+            I("option freq m; time 2002m11 2003m11;");
+            I("prt<n> pch(x!a + 0);");
+            tab = Globals.lastPrtOrMulprtTable; counter = 0;
+            TestCell(ref counter, tab, 1, 2, CellType.Text, "pch(x!a + 0)");
+            TestCell(ref counter, tab, 2, 1, CellType.Text, "2002");
+            TestCell(ref counter, tab, 2, 2, CellType.Number, (4d / 3d - 1) * 100d, sharedDelta);
+            TestCell(ref counter, tab, 3, 1, CellType.Text, "2003");
+            TestCell(ref counter, tab, 3, 2, CellType.Number, (5d / 4d - 1) * 100d, sharedDelta);
+
 
         }
 
