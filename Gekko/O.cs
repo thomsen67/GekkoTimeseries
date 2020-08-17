@@ -7559,7 +7559,7 @@ namespace Gekko
                 }
                 foreach (string s in Program.model.modelGekko.varsAType.Keys)
                 {
-                    if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a")) onlyModelNotDatabank.Add(s);
+                    if (!Program.databanks.GetFirst().ContainsIVariable(s + "!" + G.GetFreq(Program.options.freq))) onlyModelNotDatabank.Add(s);
                 }
                 if (G.Equal(Program.options.interface_mode, "sim"))
                 {
