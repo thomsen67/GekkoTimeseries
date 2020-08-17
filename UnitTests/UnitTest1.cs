@@ -6068,9 +6068,10 @@ namespace UnitTests
             FAIL("x!a <m>= 2 * x!q;"); //should fail
             FAIL("x!q <m>= 2 * x!a;"); //should fail
 
-
+            //--------------------------------------------------------------------------------
             //Tests the functionality where there is a mix of flexible freqs and the lag problem.
             //It seems this is solved.
+            //--------------------------------------------------------------------------------
 
             I("reset; time 2001 2003;");
             I("x = 3, 4, 5;");
@@ -6091,8 +6092,6 @@ namespace UnitTests
             TestCell(ref counter, tab, 2, 2, CellType.Number, (4d / 3d - 1) * 100d, sharedDelta);
             TestCell(ref counter, tab, 3, 1, CellType.Text, "2003");
             TestCell(ref counter, tab, 3, 2, CellType.Number, (5d / 4d - 1) * 100d, sharedDelta);
-
-
         }
 
         [TestMethod]
@@ -13174,18 +13173,29 @@ namespace UnitTests
             I("VAL %v = percentile(a, 1.0);");
             _AssertScalarVal(First(), "%v", 7.0d, sharedDelta);  //same as max
 
-            //percentile()
+            //ismiss()
             I("RESET; TIME 2000 2002;");
             I("VAL %v = m();");
             I("SER xx = (m(), 1, m());");
+            I("SER xx2 = (1, m(), 3);");
             I("VAL %v1 = 0;");
             I("VAL %v2 = 0;");
             I("IF(ismiss(%v)==1); VAL %v1 = 1; END;");
             I("IF(ismiss(xx[2002])==1); VAL %v2 = 1; END;");
             _AssertScalarVal(First(), "%v1", 1.0d, sharedDelta);
             _AssertScalarVal(First(), "%v2", 1.0d, sharedDelta);
-
-
+            I("yy1 <99 2003> = ismiss(xx2);");
+            _AssertSeries(First(), "yy1!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy1!a", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "yy1!a", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "yy1!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "yy1!a", 2003, double.NaN, sharedDelta);
+            I("yy2 <99 2003> = 1 - ismiss(xx2);");
+            _AssertSeries(First(), "yy2!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy2!a", 2000, 1d, sharedDelta);
+            _AssertSeries(First(), "yy2!a", 2001, 0d, sharedDelta);
+            _AssertSeries(First(), "yy2!a", 2002, 1d, sharedDelta);
+            _AssertSeries(First(), "yy2!a", 2003, double.NaN, sharedDelta);
         }
 
         [TestMethod]

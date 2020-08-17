@@ -1368,13 +1368,24 @@ namespace Gekko
         {
             if (x.Type() == EVariableType.Series)
             {
-                G.Writeln2("*** ERROR: SERIES not expected in ismiss()");
-                throw new GekkoException();
+                Series x_series = x as Series;
+                GekkoTime t1 = x_series.GetRealDataPeriodFirst();
+                GekkoTime t2 = x_series.GetRealDataPeriodLast();
+                Series rv = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    bool b = G.isNumericalError(x_series.GetDataSimple(t));
+                    if (b) rv.SetData(t, 1d);
+                    else rv.SetData(t, 0d);
+                }
+                return rv;
             }
-            double d = x.ConvertToVal();
-            bool b = G.isNumericalError(d);
-            if (b) return Globals.scalarVal1;
-            return Globals.scalarVal0;
+            else
+            {                
+                bool b = G.isNumericalError(x.ConvertToVal());
+                if (b) return Globals.scalarVal1;
+                return Globals.scalarVal0;
+            }
         }
 
         public static IVariable maxc(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
