@@ -7549,7 +7549,7 @@ namespace Gekko
             {
                 List<string> onlyDatabankNotModel = new List<string>();
                 List<string> onlyModelNotDatabank = new List<string>();
-                foreach ( KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
+                foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
                 {
                     string s = kvp.Key;
                     if (kvp.Value.Type() != EVariableType.Series) continue;  //only series
@@ -7560,36 +7560,48 @@ namespace Gekko
                 foreach (string s in Program.model.modelGekko.varsAType.Keys)
                 {
                     if (!Program.databanks.GetFirst().ContainsIVariable(s + "!" + G.GetFreq(Program.options.freq))) onlyModelNotDatabank.Add(s);
+                    //if (!Program.databanks.GetFirst().ContainsIVariable(s + "!" + "a")) onlyModelNotDatabank.Add(s);
                 }
-                if (G.Equal(Program.options.interface_mode, "sim"))
+
+                //See #8904327598432
+                if (onlyDatabankNotModel.Count > 0)
                 {
-                    //See #8904327598432
-                    if (onlyDatabankNotModel.Count > 0)
+                    Action a = () =>
                     {
-                        G.Write("+++ WARNING: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyDatabankNotModel).counter); G.Writeln(")", Globals.warningColor);
-                        G.Writeln("             You may use 'DELETE<nonmodel>' to remove those superfluous timeseries.");
-                    }
-                    if (onlyModelNotDatabank.Count > 0)
-                    {
-                        G.Write("+++ WARNING: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyModelNotDatabank).counter); G.Writeln(")", Globals.warningColor);
-                        G.Writeln("             You may use 'CREATE #all;' to create these timeseries.");
-                    }
+                        string s = null;
+                        s += G.NL; //to avoid annoying visible blank
+                            s += "Note: You may use 'DELETE<nonmodel>;' to remove the following superfluous timeseries:" + G.NL;
+                        s += G.NL;
+                        onlyDatabankNotModel.Sort(StringComparer.OrdinalIgnoreCase);
+                        foreach (string ss in onlyDatabankNotModel)
+                        {
+                            s += ss + G.NL;
+                        }
+                        Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                        Program.Cls("output");
+                        G.Writeln(s, ETabs.Output);
+                    };
+                    G.Writeln("+++ NOTE: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                 }
-                else
+
+                if (onlyModelNotDatabank.Count > 0)
                 {
-                    //See #8904327598432
-                    if (onlyDatabankNotModel.Count > 0)
+                    Action a = () =>
                     {
-
-                        G.Write("+++ NOTE: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyDatabankNotModel).counter); G.Writeln(")");
-                        G.Writeln("          You may use 'DELETE<nonmodel>' to remove those superfluous timeseries.");
-                    }
-                    if (onlyModelNotDatabank.Count > 0)
-                    {
-
-                        G.Write("+++ NOTE: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyModelNotDatabank).counter); G.Writeln(")", Globals.warningColor);
-                        G.Writeln("          You may use 'CREATE #all;' to create these timeseries.");
-                    }
+                        string s = null;
+                        s += G.NL; //to avoid annoying visible blank
+                            s += "Note: You may use 'CREATE #all;' to create the following timeseries:" + G.NL;
+                        s += G.NL;
+                        onlyModelNotDatabank.Sort(StringComparer.OrdinalIgnoreCase);
+                        foreach (string ss in onlyModelNotDatabank)
+                        {
+                            s += ss + G.NL;
+                        }
+                        Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                        Program.Cls("output");
+                        G.Writeln(s, ETabs.Output);
+                    };
+                    G.Writeln("+++ NOTE: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                 }
             }
 
