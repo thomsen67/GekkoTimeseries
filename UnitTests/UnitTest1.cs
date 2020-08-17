@@ -6408,7 +6408,38 @@ namespace UnitTests
             _AssertSeries(m2, "ts", 2010, 1d, sharedDelta);
             _AssertSeries(m2, "ts", 2011, 2d, sharedDelta);
             _AssertSeries(m2, "ts", 2012, double.NaN, sharedDelta);
+        }
 
+        [TestMethod]
+        public void _Test_MinMax()
+        {
+            I("RESET; time 2001 2003;");
+            I("%x = 1;");
+            I("#x = [2];");
+            I("x = 3, 4, 5;");
+            I("%min = min(%x, #x, x[2001]);");
+            _AssertScalarVal(First(), "%min", 1d);
+
+            I("RESET; time 2001 2003;");
+            I("%x = 1;");
+            I("#x = [2];");
+            I("x = 3, 4, 5;");
+            I("%max = max(%x, #x, x[2001]);");
+            _AssertScalarVal(First(), "%max", 3d);
+
+            I("RESET;");
+            I("%min = min(2, 1, 3, 5, 4);");
+            _AssertScalarVal(First(), "%min", 1d);
+            I("RESET;");
+            I("%min = min(2, 1, 3, m(), 4);");
+            _AssertScalarVal(First(), "%min", double.NaN);
+            I("RESET;");
+            I("%max = max(2, 1, 3, 5, 4);");
+            _AssertScalarVal(First(), "%max", 5d);
+            I("RESET;");
+            I("%max = max(2, 1, 3, m(), 4);");
+            _AssertScalarVal(First(), "%max", double.NaN);
+            
         }
 
         // --------------------------------------------------------------------------------

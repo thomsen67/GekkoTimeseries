@@ -7570,7 +7570,7 @@ namespace Gekko
                     {
                         string s = null;
                         s += G.NL; //to avoid annoying visible blank
-                            s += "Note: You may use 'DELETE<nonmodel>;' to remove the following superfluous timeseries:" + G.NL;
+                        s += "Note: You may use 'DELETE<nonmodel>;' to remove the following superfluous timeseries:" + G.NL;
                         s += G.NL;
                         onlyDatabankNotModel.Sort(StringComparer.OrdinalIgnoreCase);
                         foreach (string ss in onlyDatabankNotModel)
@@ -7590,7 +7590,7 @@ namespace Gekko
                     {
                         string s = null;
                         s += G.NL; //to avoid annoying visible blank
-                            s += "Note: You may use 'CREATE #all;' to create the following timeseries:" + G.NL;
+                        s += "Note: You may use 'CREATE #all;' to create the following timeseries:" + G.NL;
                         s += G.NL;
                         onlyModelNotDatabank.Sort(StringComparer.OrdinalIgnoreCase);
                         foreach (string ss in onlyModelNotDatabank)

@@ -731,22 +731,7 @@ namespace Gekko
             }
             return new ScalarString(rv);
         }
-
-        ////just to test against user defined function
-        ////is this used at all???
-        //public static IVariable sum_test_method(GekkoSmpl smpl, IVariable x1, IVariable x2)
-        //{
-        //    double y1 = x1.GetValOLD(null);//uuu
-        //    double y2 = x2.GetValOLD(null);//uuu            
-        //    double y = y1 + y2;
-        //    return new ScalarVal(y);
-        //}
-
-        //public static IVariable test(GekkoSmpl t, IVariable x1)
-        //{
-        //    return x1.Indexer(t, O.EIndexerType.IndexerLag, new ScalarVal(-2d));
-        //}
-
+        
         //!NOTE: do not delete, use for unit tests
         public static IVariable helper_error(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
@@ -1295,6 +1280,31 @@ namespace Gekko
             int n2 = O.ConvertToInt(x2);
             Matrix m = new Matrix(n1, n2);
             return m;
+        }
+
+        public static IVariable min(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
+        {
+            //Right now we only implement it for scalars, so _t1 and _t2 are not used.
+            //Later on, perhaps for series etc.
+            //See also max()
+            double min = double.MaxValue;
+            foreach (IVariable item in items)
+            {
+                min = Math.Min(min, item.ConvertToVal());
+            }
+            return new ScalarVal(min);
+        }
+
+        public static IVariable max(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
+        {
+            //Right now we only implement it for scalars, so _t1 and _t2 are not used.
+            //See also min()
+            double max = double.MinValue;
+            foreach (IVariable item in items)
+            {
+                max = Math.Max(max, item.ConvertToVal());
+            }
+            return new ScalarVal(max);
         }
 
         public static IVariable sumr(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
