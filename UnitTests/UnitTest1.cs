@@ -6439,7 +6439,14 @@ namespace UnitTests
             I("RESET;");
             I("%max = max(2, 1, 3, m(), 4);");
             _AssertScalarVal(First(), "%max", double.NaN);
-            
+
+            I("RESET; time 2001 2003;");            
+            I("%min = min(2001q4, 2002q1);");
+            _AssertScalarDate(First(), "%min", EFreq.Q, 2001, 4);
+            I("%max = max(2001q4, 2002q1);");
+            _AssertScalarDate(First(), "%max", EFreq.Q, 2002, 1);
+            FAIL("%x = min(2001q4, 2002);");
+            FAIL("%x = min(2001, 2002q1);");
         }
 
         // --------------------------------------------------------------------------------

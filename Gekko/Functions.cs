@@ -1319,24 +1319,79 @@ namespace Gekko
             //Right now we only implement it for vals, so _t1 and _t2 are not used.
             //Later on, perhaps for dates, series etc.
             //See also max()
-            double min = double.MaxValue;
+
+            bool hasDate = false;
             foreach (IVariable item in items)
             {
-                min = Math.Min(min, item.ConvertToVal());
+                if (item.Type() == EVariableType.Date)
+                {
+                    hasDate = true; break;
+                }
             }
-            return new ScalarVal(min);
+
+            if (hasDate)
+            {
+                GekkoTime gt = GekkoTime.tNull;
+                foreach (IVariable item in items)
+                {
+                    GekkoTime item_date = item.ConvertToDate(O.GetDateChoices.Strict);
+                    if (gt.IsNull()) gt = item_date;
+                    else
+                    {
+                        if (item_date.StrictlySmallerThan(gt)) gt = item_date;
+                    }
+                }
+                return new ScalarDate(gt);
+            }
+            else
+            {
+
+                double min = double.MaxValue;
+                foreach (IVariable item in items)
+                {
+                    min = Math.Min(min, item.ConvertToVal());
+                }
+                return new ScalarVal(min);
+            }
         }
 
         public static IVariable max(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
         {
             //Right now we only implement it for vals, so _t1 and _t2 are not used.
             //See also min()
-            double max = double.MinValue;
+
+            bool hasDate = false;
             foreach (IVariable item in items)
             {
-                max = Math.Max(max, item.ConvertToVal());
+                if (item.Type() == EVariableType.Date)
+                {
+                    hasDate = true; break;
+                }
             }
-            return new ScalarVal(max);
+
+            if (hasDate)
+            {
+                GekkoTime gt = GekkoTime.tNull;
+                foreach (IVariable item in items)
+                {
+                    GekkoTime item_date = item.ConvertToDate(O.GetDateChoices.Strict);
+                    if (gt.IsNull()) gt = item_date;
+                    else
+                    {
+                        if (item_date.StrictlyLargerThan(gt)) gt = item_date;
+                    }
+                }
+                return new ScalarDate(gt);
+            }
+            else
+            {
+                double max = double.MinValue;
+                foreach (IVariable item in items)
+                {
+                    max = Math.Max(max, item.ConvertToVal());
+                }
+                return new ScalarVal(max);
+            }
         }
 
         public static IVariable sumr(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
