@@ -1298,7 +1298,7 @@ namespace Gekko
             GekkoTime dt1 = dx1;
             if (dy1.StrictlyLargerThan(dt1)) dt1 = dy1;
             GekkoTime dt2 = dx2;
-            if (dy2.StrictlySmallerThan(dt2)) dt2 = dy2;
+            if (dy2.StrictlySmallerThan(dt2)) dt2 = dy2;            
             List m = new List();
             m.list = new List<IVariable>();
             if (dt1.StrictlyLargerThan(dt2))  //no overlap at all
@@ -2082,6 +2082,11 @@ namespace Gekko
             {
                 t1 = O.ConvertToDate(_t1);
                 t2 = O.ConvertToDate(_t2);
+                if (t1.StrictlyLargerThan(t2))
+                {
+                    G.Writeln2("*** ERROR: Local time period <...> must be increasing");
+                    throw new GekkoException();
+                }
             }
         }
 
@@ -3865,6 +3870,8 @@ namespace Gekko
 
         public static IVariable fromseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+
             Series ts = null;
 
             if (x1.Type() == EVariableType.Series)
@@ -3941,20 +3948,35 @@ namespace Gekko
                 }
                 return new ScalarDate(gt);
             }
-
             else if (G.Equal(s2, "dataStartTruncate"))
             {
-                
-                GekkoTime gt = ts.GetRealDataPeriodFirst();
-                if (gt.IsNull())
+                //   . . . . d d d d d d d . . . . . (data)
+                //          xx1         xx2
+                //
+                //   . . . . . . . p p p p p . . . . . (period)
+                //                yy1     yy2
+
+                GekkoTime xx1 = ts.GetRealDataPeriodFirst();
+                GekkoTime xx2 = ts.GetRealDataPeriodLast();
+
+                if (xx1.IsNull())
                 {
-                    G.Writeln2("*** ERROR: 'dataStart': The series has no data or is timeless");
+                    G.Writeln2("*** ERROR: 'dataStartTruncate': The series has no data or is timeless");
                     throw new GekkoException();
                 }
-                return new ScalarDate(gt);
+
+                GekkoTime yy1 = t1;
+                GekkoTime yy2 = t2;
+
+                IVariable z = new ScalarDate(xx1);
+                if (yy1.StrictlyLargerThan(xx1)) z = new ScalarDate(yy1);
+                if (yy1.StrictlyLargerThan(xx2))
+                {
+                    z = new GekkoNull();
+                }
+
+                return z;
             }
-
-
             else if (G.Equal(s2, "perEnd"))
             {
                 G.Writeln2("*** ERROR: From Gekko 3.1.4 and onwards, the use of fromSeries('perEnd') is obsolete.");
@@ -3978,6 +4000,35 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 return new ScalarDate(gt);
+            }
+            else if (G.Equal(s2, "dataEndTruncate"))
+            {
+                //   . . . . d d d d d d d . . . . . (data)
+                //          xx1         xx2
+                //
+                //   . . . p p p p p . . . . . . . . (period)
+                //        yy1     yy2
+
+                GekkoTime xx1 = ts.GetRealDataPeriodFirst();
+                GekkoTime xx2 = ts.GetRealDataPeriodLast();
+
+                if (xx2.IsNull())
+                {
+                    G.Writeln2("*** ERROR: 'dataEndTruncate': The series has no data or is timeless");
+                    throw new GekkoException();
+                }
+
+                GekkoTime yy1 = t1;
+                GekkoTime yy2 = t2;
+
+                IVariable z = new ScalarDate(xx2);
+                if (yy2.StrictlySmallerThan(xx2)) z = new ScalarDate(yy2);
+                if (yy2.StrictlySmallerThan(xx1))
+                {
+                    z = new GekkoNull();
+                }
+
+                return z;
             }
             else if (G.Equal(s2, "freq"))
             {

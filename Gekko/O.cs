@@ -3168,6 +3168,15 @@ namespace Gekko
                                 }
                             }
                             break;
+                        case EVariableType.Null:
+                            {
+                                //---------------------------------------------------------
+                                // %x = NULL
+                                //---------------------------------------------------------                            
+                                G.Writeln2("*** ERROR: Null-value on right-hand side");
+                                throw new GekkoException();
+                            }
+                            break;
                         default:
                             {
                                 G.Writeln2("*** ERROR: Expected variable to be series, val, date, string, list, map or matrix");
