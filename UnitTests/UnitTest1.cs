@@ -13227,6 +13227,37 @@ namespace UnitTests
             _AssertSeries(First(), "yy2!a", 2001, 0d, sharedDelta);
             _AssertSeries(First(), "yy2!a", 2002, 1d, sharedDelta);
             _AssertSeries(First(), "yy2!a", 2003, double.NaN, sharedDelta);
+
+            //truncate()
+            I("RESET; TIME 2011 2015;");
+            I("#m = truncate(2001, 2010);");            
+            Assert.AreEqual(((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0].Type(), EVariableType.Null);
+            Assert.AreEqual(((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1].Type(), EVariableType.Null);
+            I("RESET; TIME 2011 2015;");
+            I("#m = truncate(2001, 2013);");
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0] as ScalarDate).date.super, 2011);
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1] as ScalarDate).date.super, 2013);
+            I("RESET; TIME 2011 2015;");
+            I("#m = truncate(2001, 2019);");
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0] as ScalarDate).date.super, 2011);
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1] as ScalarDate).date.super, 2015);
+            I("RESET; TIME 2011 2015;");
+            I("#m = truncate(2013, 2014);");
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0] as ScalarDate).date.super, 2013);
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1] as ScalarDate).date.super, 2014);
+            I("RESET; TIME 2011 2015;");
+            I("#m = truncate(2013, 2019);");
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0] as ScalarDate).date.super, 2013);
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1] as ScalarDate).date.super, 2015);
+            I("RESET; TIME 2011 2015;");
+            I("#m = truncate(2016, 2019);");
+            Assert.AreEqual(((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0].Type(), EVariableType.Null);
+            Assert.AreEqual(((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1].Type(), EVariableType.Null);
+
+            I("RESET; TIME 2050 2055;");
+            I("#m = truncate(<2011 2015>, 2001, 2013);");
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0] as ScalarDate).date.super, 2011);
+            Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1] as ScalarDate).date.super, 2013);
         }
 
         [TestMethod]

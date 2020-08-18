@@ -1282,10 +1282,42 @@ namespace Gekko
             return m;
         }
 
+        public static IVariable truncate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            //overlapping windows of dates
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime dx1 = x1.ConvertToDate(O.GetDateChoices.Strict);
+            GekkoTime dx2 = x2.ConvertToDate(O.GetDateChoices.Strict);
+            if (dx1.StrictlyLargerThan(dx2))
+            {
+                G.Writeln2("*** ERROR: First date must be smaller than or equal to second date");
+                throw new GekkoException();
+            }
+            GekkoTime dy1 = t1;
+            GekkoTime dy2 = t2;
+            GekkoTime dt1 = dx1;
+            if (dy1.StrictlyLargerThan(dt1)) dt1 = dy1;
+            GekkoTime dt2 = dx2;
+            if (dy2.StrictlySmallerThan(dt2)) dt2 = dy2;
+            List m = new List();
+            m.list = new List<IVariable>();
+            if (dt1.StrictlyLargerThan(dt2))  //no overlap at all
+            {
+                m.list.Add(new GekkoNull());
+                m.list.Add(new GekkoNull());
+            }
+            else
+            {
+                m.list.Add(new ScalarDate(dt1));
+                m.list.Add(new ScalarDate(dt2));                
+            }
+            return m;
+        }
+
         public static IVariable min(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
         {
-            //Right now we only implement it for scalars, so _t1 and _t2 are not used.
-            //Later on, perhaps for series etc.
+            //Right now we only implement it for vals, so _t1 and _t2 are not used.
+            //Later on, perhaps for dates, series etc.
             //See also max()
             double min = double.MaxValue;
             foreach (IVariable item in items)
@@ -1297,7 +1329,7 @@ namespace Gekko
 
         public static IVariable max(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
         {
-            //Right now we only implement it for scalars, so _t1 and _t2 are not used.
+            //Right now we only implement it for vals, so _t1 and _t2 are not used.
             //See also min()
             double max = double.MinValue;
             foreach (IVariable item in items)
@@ -3854,6 +3886,20 @@ namespace Gekko
                 }
                 return new ScalarDate(gt);
             }
+
+            else if (G.Equal(s2, "dataStartTruncate"))
+            {
+                
+                GekkoTime gt = ts.GetRealDataPeriodFirst();
+                if (gt.IsNull())
+                {
+                    G.Writeln2("*** ERROR: 'dataStart': The series has no data or is timeless");
+                    throw new GekkoException();
+                }
+                return new ScalarDate(gt);
+            }
+
+
             else if (G.Equal(s2, "perEnd"))
             {
                 G.Writeln2("*** ERROR: From Gekko 3.1.4 and onwards, the use of fromSeries('perEnd') is obsolete.");
