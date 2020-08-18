@@ -20134,6 +20134,12 @@ namespace UnitTests
             _AssertScalarDate(First(), "%d", EFreq.A, 1998, 1);
             I("date %d = fromSeries(fY, 'dataEnd');                     //last obs");
             _AssertScalarDate(First(), "%d", EFreq.A, 2079, 1);
+
+            I("date %d = fromSeries(<2001 2010>, fY, 'dataStartTruncate');                   //first obs");
+            _AssertScalarDate(First(), "%d", EFreq.A, 2001, 1);
+            I("date %d = fromSeries(<2001 2010>, fY, 'dataEndTruncate');                     //last obs");
+            _AssertScalarDate(First(), "%d", EFreq.A, 2010, 1);
+
             I("string %s = fromSeries(fY, 'freq');                     //freq of timeseries");
             _AssertScalarString(First(), "%s", "a");
             I("string %s = gekkoVersion();                               //for instance '1.8.1'");
