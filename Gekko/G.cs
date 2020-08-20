@@ -302,6 +302,7 @@ namespace Gekko
             lag = key.Substring(indx + 1, key.Length - (indx + 1));
         }
 
+        
         public static AllFreqsHelper ConvertDateFreqsToAllFreqs(GekkoTime t1, GekkoTime t2)
         {
             //Also see #345632473

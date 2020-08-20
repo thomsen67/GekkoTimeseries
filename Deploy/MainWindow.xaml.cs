@@ -30,28 +30,11 @@ namespace Deploy
         //For some reason, the full 7z files need to be present in the folder, whereas for the Gekko installation, this
         //is not necessary. A mystery ... so we had to install z-zip to make it work. Never mind.
         public static string zip = @"c:\Program Files\7-Zip\7z.dll";
+        public static string tools = @"c:\tools\tmp\Gekko_files";
 
         public MainWindow()
         {
             InitializeComponent();
-
-            MessageBox.Show("1");
-            string ssha1 = null;
-            using (FileStream fs = new FileStream(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\InstallerForGekko.msi", FileMode.Open))
-            using (BufferedStream bs = new BufferedStream(fs))
-            {
-                using (System.Security.Cryptography.SHA1Managed sha1 = new System.Security.Cryptography.SHA1Managed())
-                {
-                    byte[] hash = sha1.ComputeHash(bs);
-                    StringBuilder formatted = new StringBuilder(2 * hash.Length);
-                    foreach (byte b in hash)
-                    {
-                        formatted.AppendFormat("{0:X2}", b);
-                    }
-                    ssha1 = formatted.ToString().ToLower();
-                }
-            }
-            MessageBox.Show("2 + " + ssha1);
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -84,24 +67,13 @@ namespace Deploy
         {
             try
             {                
-                
-                System.IO.DirectoryInfo di = new DirectoryInfo(@"c:\tools\tmp\Gekko_files\");
-                foreach (FileInfo file in di.GetFiles())
-                {
-                    file.Delete();
-                }
-                foreach (DirectoryInfo dir in di.GetDirectories())
-                {
-                    dir.Delete(true);
-                }
-                
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", @"c:\tools\tmp\Gekko_files\InstallerForGekko.msi", true);
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", @"c:\tools\tmp\Gekko_files\Setup.exe", true);
-                MessageBox.Show("Wipe and copying 2 files ok");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", tools + @"\InstallerForGekko.msi", true);
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", tools + @"\Setup.exe", true);
+                MessageBox.Show(@"Copying 2 files ok");
             }
             catch
             {
-                MessageBox.Show("*** ERROR: Copying files failed");
+                MessageBox.Show("*** ERROR: Copying 2 files failed");
             }
             
             //string version = null;
@@ -144,7 +116,7 @@ namespace Deploy
             else
             {
                 MessageBox.Show("Version number illegal");
-                throw new Exception();
+                version = null;
             }
             return version;
         }
@@ -182,7 +154,7 @@ namespace Deploy
             try
             {
                 string dir = @"c:\Program Files (x86)\Gekko\";
-                string zip = @"c:\tools\tmp\Gekko_files\Gekko.zip";
+                string zip = tools + @"\Gekko.zip";
                 File.Delete(zip);
                 ZipFile.CreateFromDirectory(dir, zip); //deflate: ZipFile.ExtractToDirectory()
             }
@@ -195,58 +167,89 @@ namespace Deploy
 
         private void button5_Click(object sender, RoutedEventArgs e)
         {
-            try
+
+            string version = GetVersion();
+            if (version == null)
             {
-                File.Copy(@"c:\tools\tmp\Gekko_files\InstallerForGekko.msi", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\InstallerForGekko.msi", true);
-                File.Copy(@"c:\tools\tmp\Gekko_files\Setup.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Setup.exe", true);
-                File.Copy(@"c:\tools\tmp\Gekko_files\Gekko.zip", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Gekko.zip", true);
-
-                System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha.bat");
-                
-                string[] ss1 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha1.txt");
-                string[] ss2 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha2.txt");
-                string[] ss3 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha3.txt");
-
-                string[] filtered1 = ss1.Where(s => !s.Trim().StartsWith("//")).ToArray();
-                string[] filtered2 = ss2.Where(s => !s.Trim().StartsWith("//")).ToArray();
-                string[] filtered3 = ss3.Where(s => !s.Trim().StartsWith("//")).ToArray();
-
-                string t1 = filtered1[0].Replace(@" c:\thomas\gekko\gekkocs\diverse\sha1\", "    ");
-                string t2 = filtered2[0].Replace(@" c:\thomas\gekko\gekkocs\diverse\sha1\", "    ");
-                string t3 = filtered3[0].Replace(@" c:\thomas\gekko\gekkocs\diverse\sha1\", "    ");
-
-                string txt = null;
-
-                txt += "<strong>Gekko " + GetVersion() + " </strong>" + "\r\n";
-                txt += "<ul>" + "\r\n";
-                txt += "  <li>" + t1 + "</li>" + "\r\n";
-                txt += "  <li>" + t2 + "</li>" + "\r\n";
-                txt += "  <li>" + t3 + "</li>" + "\r\n";
-                txt += "</ul>" + "\r\n";
-
-                System.IO.File.WriteAllText(@"c:\tools\tmp\Gekko_files\sha.txt", txt);
-                MessageBox.Show(@"SHA ok, copied to c:\tools\tmp\Gekko_files");
+                MessageBox.Show("Problem with version number, SHA1 aborted");
+                return;
             }
-            catch (Exception exception)
+
+            File.Delete(tools + @"\sha.txt"); //for safety
+
+            string sha1 = ComputeSha1(tools + @"\InstallerForGekko.msi");
+            string sha2 = ComputeSha1(tools + @"\Setup.exe");
+            string sha3 = ComputeSha1(tools + @"\Gekko.zip");
+
+            if (sha1 == null || sha2 == null || sha3 == null)
             {
-                MessageBox.Show("*** ERROR: SHA failed");
+                MessageBox.Show("Problem with SHA1, not computed, aborting...");
+                return;
             }
+
+            string txt = null;
+            txt += "<strong>Gekko " + version + " </strong>" + "\r\n";
+            txt += "<ul>" + "\r\n";
+            txt += "  <li>" + sha1 + "    " + "InstallerForGekko.msi" + "</li>" + "\r\n";
+            txt += "  <li>" + sha2 + "    " + "Setup.exe" + "</li>" + "\r\n";
+            txt += "  <li>" + sha3 + "    " + "Gekko.zip" + "</li>" + "\r\n";
+            txt += "</ul>" + "\r\n";
+
+            System.IO.File.WriteAllText(tools + @"\sha.txt", txt);
+
+            this.textBoxSha1.Text = sha1 + " = " + "InstallerForGekko.msi" + "\n";
+            this.textBoxSha1.Text += sha2 + " = " + "Setup.exe" + "\n";
+            this.textBoxSha1.Text += sha3 + " = " + "Gekko.zip";
+
+            MessageBox.Show(@"SHA ok, copied to " + tools);
+
+        }
+
+        private static string ComputeSha1(string fileName)
+        {
+            string ssha1 = null;
+            if (!File.Exists(fileName))
+            {
+                MessageBox.Show("File " + fileName + " does not exist, aborting...");
+                return null;
+            }
+            using (FileStream fs = new FileStream(fileName, FileMode.Open))
+            using (BufferedStream bs = new BufferedStream(fs))
+            {
+                using (System.Security.Cryptography.SHA1Managed sha1 = new System.Security.Cryptography.SHA1Managed())
+                {
+                    byte[] hash = sha1.ComputeHash(bs);
+                    StringBuilder formatted = new StringBuilder(2 * hash.Length);
+                    foreach (byte b in hash)
+                    {
+                        formatted.AppendFormat("{0:X2}", b);
+                    }
+                    ssha1 = formatted.ToString().ToLower();
+                }
+            }
+            return ssha1;
         }
 
         private void button6_Click(object sender, RoutedEventArgs e)
         {
+            string version = GetVersion();
+            if (version == null)
+            {
+                MessageBox.Show("Could not zip source, illegal version number");
+                return;
+            }
             try
             {
                 string dir = @"c:\Thomas\Gekko\GekkoCS\";
-                string zip = @"c:\Thomas\Gekko\" + GetVersion() + ".zip";
+                string zip = @"c:\Thomas\Gekko\" + version + ".zip";
                 //File.Delete(zip);  //let it fail, could type wrong number
                 ZipFile.CreateFromDirectory(dir, zip); //deflate: ZipFile.ExtractToDirectory()
             }
             catch
             {                
-                MessageBox.Show("Zipping of " + GetVersion() + ".zip failed -- exists already?");
+                MessageBox.Show("Zipping of " + version + ".zip failed -- exists already?");
             }
-            MessageBox.Show("Finished zipping of " + GetVersion() + ".zip");
+            MessageBox.Show("Finished zipping of " + version + ".zip");
         }
 
         private void textBox9_TextChanged(object sender, TextChangedEventArgs e)
@@ -359,6 +362,20 @@ namespace Deploy
         private void textBox12_TextChanged(object sender, TextChangedEventArgs e)
         {
 
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            System.IO.DirectoryInfo di = new DirectoryInfo(tools + @"\");
+            foreach (FileInfo file in di.GetFiles())
+            {
+                file.Delete();
+            }
+            foreach (DirectoryInfo dir in di.GetDirectories())
+            {
+                dir.Delete(true);
+            }
+            MessageBox.Show("Folder " + tools + " is now wiped (empty)");
         }
     }
 }
