@@ -11689,6 +11689,7 @@ namespace UnitTests
             Series xx2 = O.GetIVariableFromString("pcp!a", O.ECreatePossibilities.NoneReportError) as Series;
             Series xx3 = O.GetIVariableFromString("bul1!a", O.ECreatePossibilities.NoneReportError) as Series;
 
+            Globals.unitTestScreenOutput.Clear();
             I("OLS <2000 2010> dlog(lna1) = dlog(pcp), dlog(pcp.1), bul1, bul1.1;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.144517"));  //stupid test, must be done better...
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.613875"));
@@ -11775,6 +11776,73 @@ namespace UnitTests
             //     4          -0.3509
             //     5           0.0298
 
+            I("RESET; TIME 2001 2005;");
+            I("y = 1, 3, 2, 5, 6;");
+            I("x1 = 1, 2, 3, 4, 5;");
+            I("x2 = 1, 0, 2, 1, 2;");
+            Globals.unitTestScreenOutput.Clear();            
+            I("OLS y = x1, x2;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.51579"));  //stupid test...
+
+            //missings at start
+
+            Globals.unitTestScreenOutput.Clear();
+            I("y[2001] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("y[2001] = 1;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1 missing values at start of sample"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("y[2001] = m();");
+            I("y[2002] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("y[2001] = 1;");
+            I("y[2002] = 3;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2 missing values at start of sample"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("x2[2001] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("x2[2001] = 1;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1 missing values at start of sample"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("x2[2001] = m();");
+            I("x2[2002] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("x2[2001] = 1;");
+            I("x2[2002] = 0;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2 missing values at start of sample"));
+
+            //missings at end
+
+            Globals.unitTestScreenOutput.Clear();
+            I("y[2005] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("y[2005] = 6;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1 missing values at end of sample"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("y[2005] = m();");
+            I("y[2004] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("y[2005] = 6;");
+            I("y[2004] = 5;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2 missing values at end of sample"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("x2[2005] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("x2[2005] = 2;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1 missing values at end of sample"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("x2[2005] = m();");
+            I("x2[2004] = m();");
+            FAIL("OLS y = x1, x2;");
+            I("x2[2005] = 2;");
+            I("x2[2004] = 1;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2 missing values at end of sample"));
         }
 
         [TestMethod]

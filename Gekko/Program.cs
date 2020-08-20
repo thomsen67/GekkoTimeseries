@@ -29405,7 +29405,7 @@ namespace Gekko
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
-            OLSResults ols = OLSHelper(y, x, restrict, scaling, n, m, k, df, false);
+            OLSResults ols = OLSHelper(o.t1, o.t2, y, x, xOriginal, restrict, scaling, n, m, k, df, false);
             //---------------------------------------------------------------------
             //---------------------------------------------------------------------
             //---------------------------------------------------------------------
@@ -30049,7 +30049,7 @@ namespace Gekko
                 OLSResults ols7 = null;
                 try
                 {
-                    ols7 = OLSHelper(y7, x7, restrict7, scaling, n7, m, k, df7, true);
+                    ols7 = OLSHelper(GekkoTime.tNull, GekkoTime.tNull, y7, x7, null, restrict7, scaling, n7, m, k, df7, true);
                 }
                 catch
                 {
@@ -30132,7 +30132,7 @@ namespace Gekko
             return "R2: " + Math.Round(ols.r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(ols.see, 6) + "    " + "DW: " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero);
         }
 
-        private static OLSResults OLSHelper(double[] y, double[,] x, double[,] restrict_input, double[] scaling, int n, int m, int k, int df, bool calledFromRecursive)
+        private static OLSResults OLSHelper(GekkoTime t1, GekkoTime t2, double[] y, double[,] x, double[,] xOriginal, double[,] restrict_input, double[] scaling, int n, int m, int k, int df, bool calledFromRecursive)
         {
             OLSResults ols = new OLSResults();
 
@@ -30153,13 +30153,42 @@ namespace Gekko
             ols.beta = null;
             int info2 = -12345;
             try
-            {                
+            {
                 alglib.lsfit.lsfitlinearc(y, x, restrict_input, n, m, k, ref info2, ref ols.beta, rep);
             }
             catch (Exception e)
             {
                 if (calledFromRecursive == false)
                 {
+                    int missingsAtStart = OLSHelper_missingsStart(y, xOriginal);
+                    int missingsAtEnd = OLSHelper_missingsEnd(y, xOriginal);
+
+                    if (missingsAtStart > 0 || missingsAtEnd > 0)
+                    {
+                        G.Writeln();
+                    }
+
+                    if (missingsAtStart > 0)
+                    {
+                        G.Writeln("*** ERROR: " + missingsAtStart + " missing values at start of sample");                        
+                    }
+
+                    if (missingsAtEnd > 0)
+                    {
+                        G.Writeln("*** ERROR: " + missingsAtEnd + " missing values at end of sample");
+                    }
+
+                    if (missingsAtStart > 0 || missingsAtEnd > 0)
+                    {                        
+                        t1 = t1.Add(missingsAtStart);
+                        t2 = t2.Add(-missingsAtEnd);
+                        if (t1.SmallerThanOrEqual(t2))
+                        {
+                            G.Writeln("           Suggested OLS period: <" + t1.ToString() + " " + t2.ToString() + ">", Color.Red);
+                        }
+                        throw new GekkoException();
+                    }
+
                     if (e.Message != null && e.Message != "")
                     {
                         G.Writeln2("*** ERROR: " + e.Message);
@@ -30282,6 +30311,58 @@ namespace Gekko
 
             return ols;
 
+        }
+
+        private static int OLSHelper_missingsStart(double[] y, double[,] xOriginal)
+        {
+            int missingsAtStart = 0;
+            for (int i = 0; i < y.Length; i++)
+            {
+                if (G.isNumericalError(y[i]))
+                {
+                    missingsAtStart++;
+                    goto Label1;
+                }
+                int nn = xOriginal.GetLength(1);
+                for (int ii = 0; ii < nn; ii++)
+                {
+                    if (G.isNumericalError(xOriginal[i, ii]))
+                    {
+                        missingsAtStart++;
+                        goto Label1;
+                    }
+                }
+                break;  //no more missings
+            Label1:;
+            }
+
+            return missingsAtStart;
+        }
+
+        private static int OLSHelper_missingsEnd(double[] y, double[,] xOriginal)
+        {
+            int missingsAtEnd = 0;
+            for (int i = y.Length - 1; i >= 0; i--)
+            {
+                if (G.isNumericalError(y[i]))
+                {
+                    missingsAtEnd++;
+                    goto Label1;
+                }
+                int nn = xOriginal.GetLength(1);
+                for (int ii = 0; ii < nn; ii++)
+                {
+                    if (G.isNumericalError(xOriginal[i, ii]))
+                    {
+                        missingsAtEnd++;
+                        goto Label1;
+                    }
+                }
+                break;  //no more missings
+            Label1:;
+            }
+
+            return missingsAtEnd;
         }
 
         private static int GetDigits(double coeff, int i)

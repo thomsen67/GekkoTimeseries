@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.IO.Compression;
+//using System.IO.Compression.FileSystem;
 using System.Net;
 using SevenZip;
 
@@ -26,12 +28,30 @@ namespace Deploy
         //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
         //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll";
         //For some reason, the full 7z files need to be present in the folder, whereas for the Gekko installation, this
-        //is not necessary. A mistory ... so we had to install z-zip to make it work. Never mind.
+        //is not necessary. A mystery ... so we had to install z-zip to make it work. Never mind.
         public static string zip = @"c:\Program Files\7-Zip\7z.dll";
 
         public MainWindow()
         {
             InitializeComponent();
+
+            MessageBox.Show("1");
+            string ssha1 = null;
+            using (FileStream fs = new FileStream(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\InstallerForGekko.msi", FileMode.Open))
+            using (BufferedStream bs = new BufferedStream(fs))
+            {
+                using (System.Security.Cryptography.SHA1Managed sha1 = new System.Security.Cryptography.SHA1Managed())
+                {
+                    byte[] hash = sha1.ComputeHash(bs);
+                    StringBuilder formatted = new StringBuilder(2 * hash.Length);
+                    foreach (byte b in hash)
+                    {
+                        formatted.AppendFormat("{0:X2}", b);
+                    }
+                    ssha1 = formatted.ToString().ToLower();
+                }
+            }
+            MessageBox.Show("2 + " + ssha1);
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -77,20 +97,13 @@ namespace Deploy
                 
                 File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", @"c:\tools\tmp\Gekko_files\InstallerForGekko.msi", true);
                 File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", @"c:\tools\tmp\Gekko_files\Setup.exe", true);
-                MessageBox.Show("Copying files ok");
+                MessageBox.Show("Wipe and copying 2 files ok");
             }
             catch
             {
                 MessageBox.Show("*** ERROR: Copying files failed");
             }
-            //string user = "user";
-            //string pwd = textBox7.Text;
-            //if (pwd == null || pwd == "")
-            //{
-            //    MessageBox.Show("No FTP pwd");
-            //    return;
-            //}
-
+            
             //string version = null;
             //string[] ss = textBox2.Text.Split('.');
             //int x1, x2, x3 = 0;
@@ -168,18 +181,16 @@ namespace Deploy
         {
             try
             {
-                string sevenzPath = zip;
-                SevenZipExtractor.SetLibraryPath(sevenzPath);
-                SevenZipCompressor tmp = new SevenZipCompressor();
-                tmp.ArchiveFormat = OutArchiveFormat.Zip;
-                tmp.CompressionLevel = CompressionLevel.Normal;                
-                tmp.CompressDirectory(@"c:\Program Files (x86)\Gekko\", @"c:\tools\tmp\Gekko_files\Gekko.zip", true);
-                MessageBox.Show("Zipping of Gekko program dir ok");
+                string dir = @"c:\Program Files (x86)\Gekko\";
+                string zip = @"c:\tools\tmp\Gekko_files\Gekko.zip";
+                File.Delete(zip);
+                ZipFile.CreateFromDirectory(dir, zip); //deflate: ZipFile.ExtractToDirectory()
             }
-            catch (Exception e2)
+            catch
             {
-                MessageBox.Show("*** ERROR: Zipping of Gekko program dir failed");
+                MessageBox.Show("Zipping of Gekko.zip failed");
             }
+            MessageBox.Show("Finished zipping of Gekko.zip");
         }
 
         private void button5_Click(object sender, RoutedEventArgs e)
@@ -226,18 +237,16 @@ namespace Deploy
         {
             try
             {
-                string sevenzPath = zip;
-                SevenZipExtractor.SetLibraryPath(sevenzPath);
-                SevenZipCompressor tmp = new SevenZipCompressor();
-                tmp.ArchiveFormat = OutArchiveFormat.Zip;
-                tmp.CompressionLevel = CompressionLevel.Normal;
-                tmp.CompressDirectory(@"c:\Thomas\Gekko\GekkoCS\", @"c:\Thomas\Gekko\" + GetVersion() + ".zip", true);
-                MessageBox.Show("Zipping of Gekko " + GetVersion() + ".zip" + "  ok -- REMOVE .git and TestResults folders!");
+                string dir = @"c:\Thomas\Gekko\GekkoCS\";
+                string zip = @"c:\Thomas\Gekko\" + GetVersion() + ".zip";
+                //File.Delete(zip);  //let it fail, could type wrong number
+                ZipFile.CreateFromDirectory(dir, zip); //deflate: ZipFile.ExtractToDirectory()
             }
             catch
-            {
-                MessageBox.Show("*** ERROR: Zipping of Gekko source failed");
+            {                
+                MessageBox.Show("Zipping of " + GetVersion() + ".zip failed -- exists already?");
             }
+            MessageBox.Show("Finished zipping of " + GetVersion() + ".zip");
         }
 
         private void textBox9_TextChanged(object sender, TextChangedEventArgs e)
