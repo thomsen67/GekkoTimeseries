@@ -35,6 +35,8 @@ namespace Deploy
         public MainWindow()
         {
             InitializeComponent();
+            this.Top = 10;
+            this.Left = 10;
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -482,8 +484,7 @@ namespace Deploy
             list.Add("f145630ea51af460770a81351919032b3efc9219", path + @"GAMS.net4.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\GAMS.net4.dll");
             list.Add("45ca532a64d10c1f56635a11ec7973ee8bc7cf73", path + @"SevenZipSharp.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\SevenZipSharp.dll");
             list.Add("774584ff54b38da5d3b3ee02e30908dacab175c5", path + @"zip\7z.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll");            
-            list.Add("2fae4c913ff299e61bbbc0f1bfe9d34a52465b50", path + @"X12A.EXE", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\X12A.EXE");
-            list.Add("8d23d455ad5692486c19512dadcff72539585249", path + @"Interop.IWshRuntimeLibrary.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\obj\Debug\Interop.IWshRuntimeLibrary.dll");            
+            list.Add("2fae4c913ff299e61bbbc0f1bfe9d34a52465b50", path + @"X12A.EXE", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\X12A.EXE");            
             list.Add("5fbaa5eef965a7df1985b3e48aa377c53c6d2b59", path + @"EPPlus.dll", @"C:\Thomas\Gekko\GekkoCS\packages\EPPlus.4.5.2.1\lib\net40\EPPlus.dll");
             list.Add("24c2c7a0d6c9918f037393c2a17e28a49d340df1", path + @"protobuf-net.dll", @"C:\Thomas\Gekko\GekkoCS\packages\protobuf-net.2.4.4\lib\net40\protobuf-net.dll");
             list.Add("bf8056fd232c261f75c5dec7fd81dcfb4e5ab0a6", path + @"wshom.ocx", @"C:\Windows\SysWOW64\wshom.ocx");
@@ -530,7 +531,7 @@ namespace Deploy
                 }
             }
 
-            MessageBox.Show("Tested " + list.storage.Count + " signatures, all OK!" + "   errors = " + errors + "\n" + sb.ToString());
+            MessageBox.Show("Checked " + list.storage.Count + " exe/dll file signatures, there were " + errors + " errors" + "\n" + sb.ToString());
         }
     }
 
