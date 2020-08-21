@@ -16,7 +16,7 @@ using System.IO;
 using System.IO.Compression;
 //using System.IO.Compression.FileSystem;
 using System.Net;
-using SevenZip;
+//using SevenZip;
 
 namespace Deploy
 {
@@ -156,7 +156,7 @@ namespace Deploy
                 string dir = @"c:\Program Files (x86)\Gekko\";
                 string zip = tools + @"\Gekko.zip";
                 File.Delete(zip);
-                ZipFile.CreateFromDirectory(dir, zip); //deflate: ZipFile.ExtractToDirectory()
+                ZipFile.CreateFromDirectory(dir, zip);
             }
             catch
             {
@@ -208,24 +208,32 @@ namespace Deploy
         private static string ComputeSha1(string fileName)
         {
             string ssha1 = null;
-            if (!File.Exists(fileName))
+            try
             {
-                MessageBox.Show("File " + fileName + " does not exist, aborting...");
-                return null;
-            }
-            using (FileStream fs = new FileStream(fileName, FileMode.Open))
-            using (BufferedStream bs = new BufferedStream(fs))
-            {
-                using (System.Security.Cryptography.SHA1Managed sha1 = new System.Security.Cryptography.SHA1Managed())
+
+                if (!File.Exists(fileName))
                 {
-                    byte[] hash = sha1.ComputeHash(bs);
-                    StringBuilder formatted = new StringBuilder(2 * hash.Length);
-                    foreach (byte b in hash)
-                    {
-                        formatted.AppendFormat("{0:X2}", b);
-                    }
-                    ssha1 = formatted.ToString().ToLower();
+                    MessageBox.Show("File " + fileName + " does not exist, aborting...");
+                    return null;
                 }
+                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                using (BufferedStream bs = new BufferedStream(fs))
+                {
+                    using (System.Security.Cryptography.SHA1Managed sha1 = new System.Security.Cryptography.SHA1Managed())
+                    {
+                        byte[] hash = sha1.ComputeHash(bs);
+                        StringBuilder formatted = new StringBuilder(2 * hash.Length);
+                        foreach (byte b in hash)
+                        {
+                            formatted.AppendFormat("{0:X2}", b);
+                        }
+                        ssha1 = formatted.ToString().ToLower();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Could not get SHA1 of this: " + fileName);
             }
             return ssha1;
         }
@@ -242,10 +250,14 @@ namespace Deploy
             {
                 string dir = @"c:\Thomas\Gekko\GekkoCS\";
                 string zip = @"c:\Thomas\Gekko\" + version + ".zip";
-                //File.Delete(zip);  //let it fail, could type wrong number
-                ZipFile.CreateFromDirectory(dir, zip); //deflate: ZipFile.ExtractToDirectory()
+                if(File.Exists(zip))
+                {
+                    MessageBox.Show("File " + zip + " already exists, aborting");
+                    return;
+                }                
+                ZipHelper.CreateFromDirectory(dir, zip, fileName => !(fileName.Contains(@"\.vs\") || fileName.Contains(@"\.git\") || fileName.Contains(@"\TestResults\")));
             }
-            catch
+            catch (Exception ee)
             {                
                 MessageBox.Show("Zipping of " + version + ".zip failed -- exists already?");
             }
@@ -376,6 +388,159 @@ namespace Deploy
                 dir.Delete(true);
             }
             MessageBox.Show("Folder " + tools + " is now wiped (empty)");
+        }
+
+        public static class ZipHelper
+        {
+            //Note that the three following are equivalent:         
+            // ----------------------------------------------------------------------------
+            //ZipFile.CreateFromDirectory(dir, zip);
+            //ZipFile.CreateFromDirectory(dir, zip, CompressionLevel.Optimal, false);
+            //ZipHelper.CreateFromDirectory(dir, zip, fileName => true)
+            // ----------------------------------------------------------------------------
+
+            public static void CreateFromDirectory(
+                string sourceDirectoryName
+            , string destinationArchiveFileName
+            , CompressionLevel compressionLevel
+            , bool includeBaseDirectory
+            , Encoding entryNameEncoding
+            , Predicate<string> filter // Add this parameter
+            )
+            {
+                if (string.IsNullOrEmpty(sourceDirectoryName))
+                {
+                    throw new ArgumentNullException("sourceDirectoryName");
+                }
+                if (string.IsNullOrEmpty(destinationArchiveFileName))
+                {
+                    throw new ArgumentNullException("destinationArchiveFileName");
+                }
+                var filesToAdd = Directory.GetFiles(sourceDirectoryName, "*", SearchOption.AllDirectories);
+                var entryNames = GetEntryNames(filesToAdd, sourceDirectoryName, includeBaseDirectory);
+                using (var zipFileStream = new FileStream(destinationArchiveFileName, FileMode.Create))
+                {
+                    using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
+                    {
+                        for (int i = 0; i < filesToAdd.Length; i++)
+                        {
+                            // Add the following condition to do filtering:
+                            if (!filter(filesToAdd[i]))
+                            {
+                                continue;
+                            }
+                            archive.CreateEntryFromFile(filesToAdd[i], entryNames[i], compressionLevel);
+                        }
+                    }
+                }
+            }
+
+            //Default without parameters is: ZipFile.CreateFromDirectory(dir, zip) = ZipFile.CreateFromDirectory(dir, zip, CompressionLevel.Optimal, false);
+            public static void CreateFromDirectory(string sourceDirectoryName, string destinationArchiveFileName, Predicate<string> filter)
+            {                
+                ZipHelper.CreateFromDirectory(sourceDirectoryName, destinationArchiveFileName, CompressionLevel.Optimal, false, Encoding.UTF8, filter);
+            }
+
+            //Default without parameters is: ZipFile.CreateFromDirectory(dir, zip) = ZipFile.CreateFromDirectory(dir, zip, CompressionLevel.Optimal, false);
+            public static void CreateFromDirectory(string sourceDirectoryName, string destinationArchiveFileName, CompressionLevel compressionLevel, Predicate<string> filter)
+            {
+                ZipHelper.CreateFromDirectory(sourceDirectoryName, destinationArchiveFileName, compressionLevel, false, Encoding.UTF8, filter);
+            }
+
+            private static string[] GetEntryNames(string[] names, string sourceFolder, bool includeBaseName)
+            {
+                if (names == null || names.Length == 0)
+                    return new string[0];
+
+                if (includeBaseName)
+                    sourceFolder = System.IO.Path.GetDirectoryName(sourceFolder);
+
+                int length = string.IsNullOrEmpty(sourceFolder) ? 0 : sourceFolder.Length;
+                if (length > 0 && sourceFolder != null && sourceFolder[length - 1] != System.IO.Path.DirectorySeparatorChar && sourceFolder[length - 1] != System.IO.Path.AltDirectorySeparatorChar)
+                    length++;
+
+                var result = new string[names.Length];
+                for (int i = 0; i < names.Length; i++)
+                {
+                    result[i] = names[i].Substring(length);
+                }
+
+                return result;
+            }
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+                        
+            //string sha = ComputeSha1(s);
+
+            string path = @"c:\Program Files (x86)\Gekko\";           
+            
+            Helper list = new Helper();
+            
+            list.Add("f8e4147d9b68dd9917253f1266b5c42764401045", path + @"Antlr3.Runtime.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\Antlr3.Runtime.dll");
+            list.Add("f145630ea51af460770a81351919032b3efc9219", path + @"GAMS.net4.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\GAMS.net4.dll");
+            list.Add("45ca532a64d10c1f56635a11ec7973ee8bc7cf73", path + @"SevenZipSharp.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\SevenZipSharp.dll");
+            list.Add("774584ff54b38da5d3b3ee02e30908dacab175c5", path + @"zip\7z.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll");            
+            list.Add("2fae4c913ff299e61bbbc0f1bfe9d34a52465b50", path + @"X12A.EXE", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\X12A.EXE");
+            list.Add("8d23d455ad5692486c19512dadcff72539585249", path + @"Interop.IWshRuntimeLibrary.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\obj\Debug\Interop.IWshRuntimeLibrary.dll");            
+            list.Add("5fbaa5eef965a7df1985b3e48aa377c53c6d2b59", path + @"EPPlus.dll", @"C:\Thomas\Gekko\GekkoCS\packages\EPPlus.4.5.2.1\lib\net40\EPPlus.dll");
+            list.Add("24c2c7a0d6c9918f037393c2a17e28a49d340df1", path + @"protobuf-net.dll", @"C:\Thomas\Gekko\GekkoCS\packages\protobuf-net.2.4.4\lib\net40\protobuf-net.dll");
+            list.Add("bf8056fd232c261f75c5dec7fd81dcfb4e5ab0a6", path + @"wshom.ocx", @"C:\Windows\SysWOW64\wshom.ocx");
+            // -----
+            list.Add("7e23879c4950f3e26491d319bfadf1205ddde958", path + @"gnuplot\intl.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\intl.dll");
+            list.Add("ef43fb9e1b652375a5de8a2dd7fb2fd9fdf30407", path + @"gnuplot\libcairo-2.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libcairo-2.dll");
+            list.Add("cf436334dd73053e77305428507fc8c70da33a74", path + @"gnuplot\libffi-6.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libffi-6.dll");
+            list.Add("125a2fcf210d4abb78fc8b43c6360c94c74917ab", path + @"gnuplot\libglib-2.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libglib-2.0-0.dll");
+            list.Add("428ddf59ca447dfa379085b2f55c93d1dabc8395", path + @"gnuplot\libgmodule-2.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libgmodule-2.0-0.dll");
+            list.Add("e6b7b69c7bfb8e6863335ab1f0db2ad96c6212a4", path + @"gnuplot\libgobject-2.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libgobject-2.0-0.dll");
+            list.Add("e47fc318b894553016c471d0141554e185f93d79", path + @"gnuplot\libiconv-2.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libiconv-2.dll");
+            list.Add("e7bd3cc831e063f1f1e0610505541dd1dbcb352d", path + @"gnuplot\libpango-1.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpango-1.0-0.dll");
+            list.Add("bd2d99f7ce9620c2df101d9f64aed5629829ab25", path + @"gnuplot\libpangocairo-1.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpangocairo-1.0-0.dll");
+            list.Add("6c2ed1be5ec1c71ccfd8c6be7371b32891964d57", path + @"gnuplot\libpangowin32-1.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpangowin32-1.0-0.dll");
+            list.Add("ef4b4a15387f98b6695adf8615f243f3535e2891", path + @"gnuplot\libpng14-14.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpng14-14.dll");
+            list.Add("81fe3c0c24277725723e1dbc63ce10fd235ebf60", path + @"gnuplot\wgnuplot.exe", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\wgnuplot.exe");
+            list.Add("e771b8b319bfe5c85588b4817b50294a39d218db", path + @"gnuplot\wgnuplot51.exe", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\wgnuplot51.exe");
+            list.Add("cbbce727fd8447487c7fc68051b24df17d043649", path + @"gnuplot\zlib1.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\zlib1.dll");
+            // -----
+            list.Add("8f00ce31b60e5d6fdf70e29eefe61fb08c5bd180", path + @"XmlNotepad\FontBuilder.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\FontBuilder.dll");
+            list.Add("617a4eece6cee8707cc7adda24dee9c648938797", path + @"XmlNotepad\Microsoft.XmlNotepad.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\Microsoft.XmlNotepad.dll");
+            list.Add("61575949a7ef494ecac64b450045872e522c870f", path + @"XmlNotepad\XmlDiffPatch.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlDiffPatch.dll");
+            list.Add("e52b237d30be81cb9227d7d63894e5652808b08a", path + @"XmlNotepad\XmlDiffPatch.View.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlDiffPatch.View.dll");
+            list.Add("8d8b81f6311eac9623762fee5ba2031a815b9ae1", path + @"XmlNotepad\XmlNotepad.exe", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlNotepad.exe");
+            list.Add("dbdbb8aaa6b17493c45193f33db3d02375bbcf59", path + @"XmlNotepad\XmlNotepadRegistration.exe", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlNotepadRegistration.exe");
+
+            int errors = 0;
+            StringBuilder sb = new StringBuilder();
+            
+            foreach (string[] ss in list.storage)
+            {
+                string shaGekkoDir = ComputeSha1(ss[1]);                
+                if (ss[0] != shaGekkoDir)
+                {                    
+                    errors++;
+                    sb.AppendLine(ss[1]);
+                }
+
+                string shaSource = ComputeSha1(ss[2]);
+                if (ss[0] != shaSource)
+                {                    
+                    errors++;
+                    sb.AppendLine(ss[2]);
+                }
+            }
+
+            MessageBox.Show("Tested " + list.storage.Count + " signatures, all OK!" + "   errors = " + errors + "\n" + sb.ToString());
+        }
+    }
+
+    public class Helper
+    {
+        public List<string[]> storage = new List<string[]>();
+        public void Add(string s1, string s2, string s3)
+        {
+            string[] temp = new string[] { s1, s2, s3 };
+            storage.Add(temp);
         }
     }
 }

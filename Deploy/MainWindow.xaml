@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="703.517" Width="696.333">
     <Grid>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="44" Margin="276,543,0,0" VerticalAlignment="Top" Width="254"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="44" Margin="14,617,0,0" VerticalAlignment="Top" Width="254"/>
 
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,15,0,0" TextWrapping="Wrap" Text="Deployment of Gekko" VerticalAlignment="Top" Width="317" FontWeight="Bold" BorderThickness="0"/>
         <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="23" Margin="14,36,0,0" TextWrapping="Wrap" Text="Compile help files (Help+Manual) -- NB: choose right version!" VerticalAlignment="Top" Width="359" BorderThickness="0"/>
@@ -26,16 +26,18 @@
         <Button x:Name="button4" Content="Zip and copy 1 file" HorizontalAlignment="Left" Margin="499,273,0,0" VerticalAlignment="Top" Width="129" Click="button4_Click" Height="19"/>
         <TextBox x:Name="textBox10" HorizontalAlignment="Left" Height="21" Margin="14,343,0,0" TextWrapping="Wrap" Text="SHA1 of 3 files" VerticalAlignment="Top" Width="359"/>
         <Button x:Name="button5" Content="SHA1" HorizontalAlignment="Left" Margin="392,346,0,0" VerticalAlignment="Top" Width="75" Click="button5_Click" Height="19"/>
-        <TextBox x:Name="textBox11" HorizontalAlignment="Left" Height="20" Margin="14,401,0,0" TextWrapping="Wrap" Text="Zip source code (maybe, remove \git subfolder)" VerticalAlignment="Top" Width="359"/>
+        <TextBox x:Name="textBox11" HorizontalAlignment="Left" Height="20" Margin="14,401,0,0" TextWrapping="Wrap" Text="Zip source code" VerticalAlignment="Top" Width="359"/>
         <Button x:Name="button6" Content="Zip source" HorizontalAlignment="Left" Margin="392,401,0,0" VerticalAlignment="Top" Width="75" Click="button6_Click" Height="17"/>
         <TextBox x:Name="textBox7" HorizontalAlignment="Left" Height="23" Margin="16,309,0,0" TextWrapping="Wrap" Text="Test the new Gekko a bit, including help files" VerticalAlignment="Top" Width="359"/>
         <TextBox x:Name="textBox12" HorizontalAlignment="Left" Height="162" Margin="14,439,0,0" TextWrapping="Wrap" Text="Git commit &quot;release x.x.x&quot;.&#xD;&#xA;Upload 3 files from c:\tools\tmp\gekko_files to \downloads\....&#xD;&#xA;Goto t-t.dk/gekko/admin, and update 3 pages:&#xD;&#xA;1. Installer - signature/checksums:&#xA;  copy c:\tools\tmp\gekko_files\sha.txt into txt version of page&#xA;2. Change-log: Update from git show log&#xA;3. Download - devel versions: condensate changelog into version on devel page&#xA;&#xA;&#xA;&#xA;" VerticalAlignment="Top" Width="220" TextChanged="textBox12_TextChanged"/>
-        <TextBox x:Name="textBox13" HorizontalAlignment="Left" Height="20" Margin="297,556,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="button7" Content="TOKEN" HorizontalAlignment="Left" Margin="437,555,0,0" VerticalAlignment="Top" Width="75" Click="button7_Click" Height="17"/>
+        <TextBox x:Name="textBox13" HorizontalAlignment="Left" Height="20" Margin="35,630,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="button7" Content="TOKEN" HorizontalAlignment="Left" Margin="175,629,0,0" VerticalAlignment="Top" Width="75" Click="button7_Click" Height="17"/>
         <Button x:Name="button8" Content="Uninstall Gekko" HorizontalAlignment="Left" Margin="392,129,0,0" VerticalAlignment="Top" Width="135" Click="button8_Click"/>
-        <TextBox x:Name="textBox1_Copy" HorizontalAlignment="Left" Height="23" Margin="16,373,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="359" BorderThickness="0" Text="See box bottom-left below"/>
+        <TextBox x:Name="textBox1_Copy" HorizontalAlignment="Left" Height="23" Margin="16,373,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="359" BorderThickness="0" Text="See two boxes below"/>
         <TextBox x:Name="textBoxSha1" Foreground="Blue" BorderThickness="0" HorizontalAlignment="Left" Height="72" Margin="486,347,0,0" Text="" VerticalAlignment="Top" Width="194" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
         <Button Content="Wipe" HorizontalAlignment="Left" Margin="392,247,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_1"/>
+        <TextBox Text="Before release, do a Bitdefender check on Gekko.zip, also upload it to VirusTotal.com for testing." HorizontalAlignment="Left" Height="110" Margin="258,439,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="319"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="530,373,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_2"/>
 
     </Grid>
 </Window>
