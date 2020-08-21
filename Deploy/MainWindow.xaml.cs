@@ -56,8 +56,7 @@ namespace Deploy
                     MessageBox.Show("ERROR: the .msi file seems too old (> 15 minutes)");
                     return;
                 }
-                System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi");
-                MessageBox.Show("Installation ok");
+                System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi");                
             }
             catch
             {
