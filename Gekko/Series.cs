@@ -2191,12 +2191,18 @@ namespace Gekko
                         if (indexerType == O.EIndexerType.Dot) ii = -i;
                         //BEWARE: Be careful when using .dataOffsetLag! #772439872435
                         temp.dataOffsetLag = this.dataOffsetLag + ii;
+
+                        if (ii <= -1)
+                        {
+                            //a lag
+                        }
+
                         rv = temp;
                     }
                 }
                 else
                 {
-                    //not a lag or lead (that is, [-...] or [+...])
+                    //not a lag or lead (so different from [-...] or [+...])
 
                     if (!t.IsNull())
                     {

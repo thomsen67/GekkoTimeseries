@@ -2182,27 +2182,28 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_SeriesDynamicLaggedEndogenousCheck()
-        {
-            //NOTE: left-side functions like dif(x) = ... are implemented exactly like
-            //      for instance x <d>= ... , so with these, the lagged endogenous is always
-            //      active like x <dyn> = x[-1] + ... .
-                        
-            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
-            I("x <dyn> = x[-1] + 1;");
-            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+        {           
 
-            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
-            I("x <dyn=no> = x[-1] + 1;");  //<dyn=no> could be omitted here
-            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+            //
+            //                                    none       <dyn>     <dyn=no>
+            // -------------------------------------------------------------------------
+            // option series dyn check = no          a           b            c
+            // option series dyn check = yes         d           e            f
+            // -------------------------------------------------------------------------
+            //
+            // x = x[-1] + 1
+            // a: vector, b: iter, c: vector
+            // d: FAIL,   e: iter, f: vector
+            //
+            // x = f(x, -1) + 1  --> something where the lag is not detected
+            // a: vector, b: iter, c: vector
+            // d: vector, e: iter, f: vector
+            //
+            // x = x + 1
+            // a: vector, b: iter, c: vector
+            // d: vector, e: iter, f: vector
 
+            // (a)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
             I("x = x[-1] + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
@@ -2211,8 +2212,30 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            // -------------
+            // (b)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("x <dyn> = x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
+            // (c)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("x <dyn=no> = x[-1] + 1;");  //<dyn=no> could be omitted here
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (d)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            FAIL("x = x[-1] + 1;");            
+
+            // (e)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
             I("option series dyn check = yes;");
             I("x <dyn> = x[-1] + 1;");
@@ -2221,26 +2244,43 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
-            
+
+            // (f)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
             I("option series dyn check = yes;");
-            I("x <dyn=no> = x[-1] + 1;");  //runs without looping over years
+            I("x <dyn=no> = x[-1] + 1;");  //<dyn=no> could be omitted here
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
-
-            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
-            I("option series dyn check = yes;");
-            FAIL("x = x[-1] + 1;");
+            
 
             // --------------
 
             if (false)
             {
+                //pch(), dlog(), dif(), pchy(), dlogy(), dify(), lag(), movsum(), movavg()
+                //Indexer() in series where the series is not array-series, and where there is
+                //a lag like [-1] or a lag like .1.
+                //LHS functions pch(), dlog() and dif() are NOT made by putting x[-1] on the RHS,
+                //so there is no need to handle these functions in a special way. Nither with operators
+                //<d>, ^ etc.
+                //Stuff like x = dif(x) + ... is strange in the first place, and finding out if there is
+                //a x lurking somrewhere inside a RHS dif(...) is a bit hard anyway. So maybe for simplicity:
+                //
+                // <dyn> testing ignores all functions except a lag()-function on the RHS.
+                // So beware about stuff like x = 0.5*dif(x) + ... where there there is an implicit
+                // endogenous lag via dif(x).
+                // So we get a handle on the LHS object, 
+
+
+
                 I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
                 I("option series dyn check = yes;");
+                //The rhs functions can be found from 
+                //lag indicator in metadata. The lhs functions must be easy.
+                //put a list of these functions in help.
                 FAIL("dif(x) = x[-1] + 1;");
                 FAIL("x <d>= x[-1] + 1;");
                 FAIL("x ^= x[-1] + 1;");
@@ -2248,10 +2288,8 @@ namespace UnitTests
                 FAIL("x = diff(x) + 1;");
                 FAIL("x = pch(x) + 1;");
                 FAIL("x = dlog(x) + 1;");
+                //fixed years??
             }
-
-            //fixed years??
-
 
         }
 
