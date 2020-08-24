@@ -8258,19 +8258,12 @@ namespace Gekko
 
         public static void PrecedentsHelper(string variableName, IVariable iv, Databank db)
         {
-            if (false)
+            if (Globals.precedents != null && iv != null)
             {
-                Program.AddToPrecedents(db, variableName);
-            }
-            else
-            {
-                if (Globals.precedents != null && iv != null)
+                Series rv_series = iv as Series;
+                if (rv_series != null)
                 {
-                    Series rv_series = iv as Series;
-                    if (rv_series != null)
-                    {
-                        Program.AddToPrecedents(db, rv_series.GetName());
-                    }
+                    Program.AddToPrecedents(db, rv_series.GetName());
                 }
             }
         }

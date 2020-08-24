@@ -3927,7 +3927,7 @@ namespace Gekko.Parser.Gek
                                 if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
 
                                 GekkoSB sb = new GekkoSB();
-
+                                                                
                                 string ass = "O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL; //note: using a hack later on
 
                                 if (node.Parent.Text == null || node.Parent.Text == "ASTFUNCTIONDEFCODE" || node.Parent.Text == "ASTPROCEDUREDEFCODE" || node.Parent.Text == "ASTMAPITEM")  //the last convers function/procedure, but also IF and FOR indentation
@@ -3989,6 +3989,9 @@ namespace Gekko.Parser.Gek
                                         node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
                                     }
                                 }
+
+                                //is set after any array-series loop, for we get this after the foreach (...)
+                                node.Code.A("Globals.precedentsSeries = null;" + G.NL);  //wiping it out
 
                                 if (G.Equal(type, "VAR_KDUSJFLQO2"))
                                 {

@@ -158,7 +158,7 @@ namespace Gekko
         //data ignoremissing is obsolete
 
         public bool series_dyn = false;
-        public bool series_dyn_check = false;
+        public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
         public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip

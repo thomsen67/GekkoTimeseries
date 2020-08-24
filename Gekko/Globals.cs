@@ -146,7 +146,8 @@ namespace Gekko
 
         public static int decompPerLag = -2;
                 
-        public static GekkoDictionary<string, int> precedents = null;  //important that it starts out as null
+        public static GekkoDictionary<string, int> precedents = null;  //used in DECOMP, important that it starts out as null
+        public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
 
         public static bool autoSigils = false; //adds sigils in "ACCEPT val v = ...", for loop "FOR string s = ...", function/proc-def "FUNCTION val f(string s, ...)", assign "string s = ..."
 

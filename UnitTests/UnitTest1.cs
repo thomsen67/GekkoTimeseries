@@ -2182,29 +2182,24 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_SeriesDynamicLaggedEndogenousCheck()
-        {           
+        {
 
-            //
-            //                                    none       <dyn>     <dyn=no>
+            //                                              block=yes     block=no
+            //                                     none       <dyn>       <dyn=no>
             // -------------------------------------------------------------------------
             // option series dyn check = no          a           b            c
             // option series dyn check = yes         d           e            f
             // -------------------------------------------------------------------------
-            //
-            // x = x[-1] + 1
+            //            
             // a: vector, b: iter, c: vector
             // d: FAIL,   e: iter, f: vector
             //
-            // x = f(x, -1) + 1  --> something where the lag is not detected
-            // a: vector, b: iter, c: vector
-            // d: vector, e: iter, f: vector
-            //
-            // x = x + 1
-            // a: vector, b: iter, c: vector
-            // d: vector, e: iter, f: vector
+            // x = sim(x) + 1 will not trigger, even if sim() is essentially a hidden lag
+            // x = x + 1 will not trigger
 
             // (a)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
             I("x = x[-1] + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
@@ -2214,6 +2209,7 @@ namespace UnitTests
 
             // (b)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
             I("x <dyn> = x[-1] + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
@@ -2223,6 +2219,7 @@ namespace UnitTests
 
             // (c)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
             I("x <dyn=no> = x[-1] + 1;");  //<dyn=no> could be omitted here
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
@@ -2234,6 +2231,9 @@ namespace UnitTests
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
             I("option series dyn check = yes;");
             FAIL("x = x[-1] + 1;");            
+            I("reset; time 2001 2003; x = 100, 90, 80; y = 1, 2, 3; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x = y[-1] + 1;");  //this must pass
 
             // (e)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
@@ -2254,8 +2254,11 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
-            
 
+            // ----------------------------------
+            // using BLOCK instead of <dyn>
+            // ----------------------------------
+            
             // --------------
 
             if (false)

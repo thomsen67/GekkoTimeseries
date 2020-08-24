@@ -2195,6 +2195,22 @@ namespace Gekko
                         if (ii <= -1)
                         {
                             //a lag
+                            //add this series object to Globals.precedentsSeries if
+                            //the series object is not already there
+
+                            if (Program.options.series_dyn_check)
+                            {
+
+                                if (Globals.precedentsSeries == null)
+                                {
+                                    Globals.precedentsSeries = new Dictionary<Series, int>();
+                                }
+
+                                if (!Globals.precedentsSeries.ContainsKey(this))
+                                {
+                                    Globals.precedentsSeries.Add(this, 0);
+                                }
+                            }
                         }
 
                         rv = temp;
