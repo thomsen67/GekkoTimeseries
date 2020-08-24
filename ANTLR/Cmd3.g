@@ -49,6 +49,7 @@ tokens {
 	ASTDECOMPGROUP1d;
 	ASTFORTYPE2;
 	ASTNAKEDLISTMISS;
+	ASTPARENTDIRECTORY;
 	ASTLOCAL;
 	ASTARGS;
 	ASTCOLON;
@@ -4162,6 +4163,7 @@ fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);  
 fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);      //stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
 fileNamePartHelper:         name
 						  | identDigit  //cathes stuff like \05banker\bank etc.
+						  | doubleDot -> ASTPARENTDIRECTORY  //catches stuff like \..\bank
 						    ;
 slashHelper1:               GLUEBACKSLASH | DIV;
 slashHelper2:               BACKSLASH | DIV;

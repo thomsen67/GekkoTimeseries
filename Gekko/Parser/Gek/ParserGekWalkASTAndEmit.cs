@@ -2556,7 +2556,11 @@ namespace Gekko.Parser.Gek
                             node.Code.CA(node[0].Code);
                         }
                         break;
-
+                    case "ASTPARENTDIRECTORY":
+                        {
+                            node.Code.A("(new ScalarString(`..`))");
+                        }
+                        break;
                     case "ASTFUNCTION_Q":
                     case "ASTFUNCTIONNAKED_Q":
                     case "ASTOBJECTFUNCTION_Q":
