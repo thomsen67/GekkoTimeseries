@@ -2184,6 +2184,40 @@ namespace UnitTests
         public void _Test_SeriesDynamicLaggedEndogenousCheck()
         {
 
+            I("reset; time 2001 2003; x = 100, 90, 80; xx = series(1); xx[a] = 10, 11, 12; xx[b] = 20, 21, 22; time 2002 2003;");
+
+            I("x[2002] <dyn> = 2;");
+            FAIL("x[2002] = x[-1];"); //fails as expected            
+            I("xx[a] = xx[b][-1] + 1;");
+            FAIL("xx[a] = xx[a][-1] + 1;"); //fail because of missing <dyn>
+            I("xx[a] <dyn> = xx[a][-1] + 1;");
+            I("#i = a, b;"); //fail because of missing <dyn>
+            FAIL("xx[#i] = xx[#i][-1] + 1;"); //fail
+            I("xx[#i] <dyn> = xx[#i][-1] + 1;"); //fail
+
+            //x[a] = x[a][-1] + 1
+            //x[a] <dyn> = x[a][-1] + 1
+
+            //these 4 also with <dyn>
+            //dif(x) = x[-1] + 1
+            //pch(x) = x[-1] + 1
+            //dlob(x) = x[-1] + 1
+            //log(x) = x[-1] + 1
+
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x = x[-1] + 1;");
+
+
+            //The test in OPTION series dyn check = yes (default) will only check for lags on the RHS, where
+            //the lagged variable appears on the LHS. And only for > 1 pers. The lags must be either
+            //x[-1], x.1 or lag(x, 1).
+            //Left-side functions pch(), dlog() and dif() work dynamically per default, so no problems with
+            //them. 
+            //But pch(), dlog(), dif(), pchy(), dlogy(), dify(), movsum(), movavg() on the RHS will not
+            //raise the dyn error, even if there is an x inside that is also present on the LHS.
+            //Also, user defined functions may not get checked                
+
             //                                              block=yes     block=no
             //                                     none       <dyn>       <dyn=no>
             // -------------------------------------------------------------------------
@@ -2230,7 +2264,7 @@ namespace UnitTests
             // (d)
             I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
             I("option series dyn check = yes;");
-            FAIL("x = x[-1] + 1;");            
+            FAIL("x = x[-1] + 1;");
             I("reset; time 2001 2003; x = 100, 90, 80; y = 1, 2, 3; time 2002 2003;");
             I("option series dyn check = yes;");
             I("x = y[-1] + 1;");  //this must pass
@@ -2359,7 +2393,69 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);            
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // -------------------------
+            // Check that lag(x, 1) works same way, or x.lag(1)
+            // -------------------------
+
+            // (a)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("x = x.lag(1) + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (b)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("x <dyn> = x.lag(1) + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (c)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("x <dyn=no> = x.lag(1) + 1;");  //<dyn=no> could be omitted here
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (d)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            FAIL("x = x.lag(1) + 1;");
+            I("reset; time 2001 2003; x = 100, 90, 80; y = 1, 2, 3; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x = y.lag(1) + 1;");  //this must pass
+
+            // (e)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x <dyn> = x.lag(1) + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (f)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x <dyn=no> = x.lag(1) + 1;");  //<dyn=no> could be omitted here
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             // ---------------------
             // --- some other checks
@@ -2371,41 +2467,29 @@ namespace UnitTests
 
             // --------------
 
-            if (true)
-            {
-                //The test in OPTION series dyn check = yes (default) will only check for lags on the RHS, where
-                //the lagged variable appears on the LHS. And only for > 1 pers. The lags must be either
-                //x[-1], x.1 or lag(x, 1).
-                //Left-side functions pch(), dlog() and dif() work dynamically per default, so no problems with
-                //them. 
-                //But pch(), dlog(), dif(), pchy(), dlogy(), dify(), movsum(), movavg() on the RHS will not
-                //raise the dyn error, even if there is an x inside that is also present on the LHS.
-                //Also, user defined functions may not get checked                
+            // Some other tests
 
-                I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");                
-                //The rhs functions can be found from 
-                //lag indicator in metadata. The lhs functions must be easy.
-                //put a list of these functions in help.
-                FAIL("dif(x) = x[-1] + 1;");
-                FAIL("x <d>= x[-1] + 1;");
-                FAIL("x ^= x[-1] + 1;");
-                I("x = dif(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
-                I("x = diff(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
-                I("x = pch(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
-                I("x = dlog(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
-                // -----
-                I("reset; time 2001 2003; x = 100, 90, 80;");
-                I("x = x - x[2002];");  //not a lag so legal
-                _AssertSeries(First(), "x!a", 2001, 10d, sharedDelta);
-                _AssertSeries(First(), "x!a", 2002, 0d, sharedDelta);
-                _AssertSeries(First(), "x!a", 2003, -10d, sharedDelta);
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");            
+            FAIL("dif(x) = x[-1] + 1;");
+            FAIL("x <d>= x[-1] + 1;");
+            FAIL("x ^= x[-1] + 1;");
+            I("x = dif(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+            I("x = diff(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+            I("x = pch(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+            I("x = dlog(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+                                    // -----
+            I("reset; time 2001 2003; x = 100, 90, 80;");
+            I("x = x - x[2002];");  //not a lag so legal
+            _AssertSeries(First(), "x!a", 2001, 10d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, -10d, sharedDelta);
 
-                I("reset; time 2001 2003; x = 100, 90, 80;");
-                I("x <dyn> = x - x[2002];");
-                _AssertSeries(First(), "x!a", 2001, 10d, sharedDelta);
-                _AssertSeries(First(), "x!a", 2002, 0d, sharedDelta);
-                _AssertSeries(First(), "x!a", 2003, 80d, sharedDelta);  //this is strange, but right, if done with <dyn>. AREMOS would work this way.
-            }
+            I("reset; time 2001 2003; x = 100, 90, 80;");
+            I("x <dyn> = x - x[2002];");
+            _AssertSeries(First(), "x!a", 2001, 10d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 80d, sharedDelta);  //this is strange, but actually ok, if done with <dyn>. AREMOS would work this way.
+
         }
 
         [TestMethod]

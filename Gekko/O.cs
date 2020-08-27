@@ -2961,11 +2961,22 @@ namespace Gekko
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y, or #m.x = (1, 2, 3).
             //Assignment is the hardest part of Lookup()
 
+            bool isArraySubSeries = false;
+            if (arraySubSeries != null) isArraySubSeries = true;
+
             if (smpl.lhsAssignmentType == assignmantTypeLhs.Active)
             {
                 //active
-                if (G.Chop_HasSigil(varnameWithFreq)) smpl.lhsAssignmentType = assignmantTypeLhs.Nonseries;
-                else smpl.lhsAssignmentType = assignmantTypeLhs.Series;
+                if (isArraySubSeries)
+                {
+                    //in this case, varnameWithFreq will be null, but we are sure it is a series
+                    smpl.lhsAssignmentType = assignmantTypeLhs.Series;
+                }
+                else
+                {
+                    if (G.Chop_HasSigil(varnameWithFreq)) smpl.lhsAssignmentType = assignmantTypeLhs.Nonseries;
+                    else smpl.lhsAssignmentType = assignmantTypeLhs.Series;
+                }
                 return;  //is just a probe on the type of the lhs, so we return without changing anything!
             }
 
@@ -2982,9 +2993,6 @@ namespace Gekko
                 List rhs_list = rhs as List;
                 
             }
-
-            bool isArraySubSeries = false;
-            if (arraySubSeries != null) isArraySubSeries = true;
             
             if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
