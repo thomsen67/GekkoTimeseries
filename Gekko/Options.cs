@@ -157,7 +157,7 @@ namespace Gekko
         //array ignoremissing is obsolete
         //data ignoremissing is obsolete
 
-        public bool series_dyn = false;
+        public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
         public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;

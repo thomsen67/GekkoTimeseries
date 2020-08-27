@@ -2578,6 +2578,12 @@ namespace Gekko.Parser.Gek
                                 isQuestion = true;
                             }
 
+                            bool isObjectFunction = false;
+                            if (node.Text.Contains("OBJECTFUNCTION"))
+                            {
+                                isObjectFunction = true;
+                            }
+
                             string functionNameLower = GetFunctionName(node);
                             if (functionNameLower == "null") functionNameLower = "null2";  //cannot have the name Functions.null(...)
                             else if (functionNameLower == "int") functionNameLower = "int2";  //cannot have the name Functions.int(...)
@@ -2779,13 +2785,20 @@ namespace Gekko.Parser.Gek
                                                         lagIndex = int.Parse(meta.Substring(1, meta.Length - 2));
                                                     }
                                                 }
-
                                             }
                                         }
                                         else
                                         {
                                             //ignore
                                         }
+                                    }
+
+                                    if (lagIndex != -12345 && isObjectFunction)
+                                    {
+                                        //if we compare lag(x, 3) and x.lag(3), the former would have the 
+                                        //lag index at position 1, and the latter at position 0. Therefore,
+                                        //we deduct 1 if it is an object function.
+                                        lagIndex--;
                                     }
 
                                     List<string> args = new List<string>();

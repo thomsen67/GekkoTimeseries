@@ -1264,6 +1264,7 @@ namespace Gekko
         {
             //This method is also called when exceptions arise in unit testing (FAIL() method)
             StopPipeAndMute(1);
+            Program.options.series_dyn = null;  //this is because if there is a runtime error inside af BLOCK series dyn = ... ; ... ; END; it is best to have dyn switched off afterwards. If the program has a RESET/RESTART, this does not matter, but if not, setting = null guards agains <dyn> surprises after the runtime error. This option is special in that it can only be set in a BLOCK, not in an OPTION.
 
             if (Globals.threadIsInProcessOfAborting)
             {

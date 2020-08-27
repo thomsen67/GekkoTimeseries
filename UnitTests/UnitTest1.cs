@@ -2257,43 +2257,155 @@ namespace UnitTests
 
             // ----------------------------------
             // using BLOCK instead of <dyn>
-            // ----------------------------------
-            
+            // ----------------------------------                       
+
+            // (b)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("block series dyn = yes; x = x[-1] + 1; end;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (c)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("block series dyn = no; x = x[-1] + 1; end;");  //<dyn=no> could be omitted here
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (e)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("block series dyn = yes; x = x[-1] + 1; end;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (f)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("block series dyn = no; x = x[-1] + 1; end;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // -------------------------
+            // Check that x.1 works same way
+            // -------------------------
+
+            // (a)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("x = x.1 + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (b)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("x <dyn> = x.1 + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (c)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = no;");
+            I("x <dyn=no> = x.1 + 1;");  //<dyn=no> could be omitted here
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (d)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            FAIL("x = x.1 + 1;");
+            I("reset; time 2001 2003; x = 100, 90, 80; y = 1, 2, 3; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x = y.1 + 1;");  //this must pass
+
+            // (e)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x <dyn> = x.1 + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // (f)
+            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
+            I("option series dyn check = yes;");
+            I("x <dyn=no> = x.1 + 1;");  //<dyn=no> could be omitted here
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);            
+
+            // ---------------------
+            // --- some other checks
+            // ---------------------
+
+            I("reset; time 2001 2003; x = 1;");
+            I("x <2002 2002> = x[-1] + 1;");  //will be ok without dyn markings, since it is only 1 period
+            FAIL("x <2002 2003> = x[-1] + 1;");  //2 periods
+
             // --------------
 
-            if (false)
+            if (true)
             {
-                //pch(), dlog(), dif(), pchy(), dlogy(), dify(), lag(), movsum(), movavg()
-                //Indexer() in series where the series is not array-series, and where there is
-                //a lag like [-1] or a lag like .1.
-                //LHS functions pch(), dlog() and dif() are NOT made by putting x[-1] on the RHS,
-                //so there is no need to handle these functions in a special way. Nither with operators
-                //<d>, ^ etc.
-                //Stuff like x = dif(x) + ... is strange in the first place, and finding out if there is
-                //a x lurking somrewhere inside a RHS dif(...) is a bit hard anyway. So maybe for simplicity:
-                //
-                // <dyn> testing ignores all functions except a lag()-function on the RHS.
-                // So beware about stuff like x = 0.5*dif(x) + ... where there there is an implicit
-                // endogenous lag via dif(x).
-                // So we get a handle on the LHS object, 
+                //The test in OPTION series dyn check = yes (default) will only check for lags on the RHS, where
+                //the lagged variable appears on the LHS. And only for > 1 pers. The lags must be either
+                //x[-1], x.1 or lag(x, 1).
+                //Left-side functions pch(), dlog() and dif() work dynamically per default, so no problems with
+                //them. 
+                //But pch(), dlog(), dif(), pchy(), dlogy(), dify(), movsum(), movavg() on the RHS will not
+                //raise the dyn error, even if there is an x inside that is also present on the LHS.
+                //Also, user defined functions may not get checked                
 
-
-
-                I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
-                I("option series dyn check = yes;");
+                I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");                
                 //The rhs functions can be found from 
                 //lag indicator in metadata. The lhs functions must be easy.
                 //put a list of these functions in help.
                 FAIL("dif(x) = x[-1] + 1;");
                 FAIL("x <d>= x[-1] + 1;");
                 FAIL("x ^= x[-1] + 1;");
-                FAIL("x = dif(x) + 1;");
-                FAIL("x = diff(x) + 1;");
-                FAIL("x = pch(x) + 1;");
-                FAIL("x = dlog(x) + 1;");
-                //fixed years??
-            }
+                I("x = dif(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+                I("x = diff(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+                I("x = pch(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+                I("x = dlog(x) + 1;");  //not done putting x[-1] on RHS, so legan and will be run non-dynamically
+                // -----
+                I("reset; time 2001 2003; x = 100, 90, 80;");
+                I("x = x - x[2002];");  //not a lag so legal
+                _AssertSeries(First(), "x!a", 2001, 10d, sharedDelta);
+                _AssertSeries(First(), "x!a", 2002, 0d, sharedDelta);
+                _AssertSeries(First(), "x!a", 2003, -10d, sharedDelta);
 
+                I("reset; time 2001 2003; x = 100, 90, 80;");
+                I("x <dyn> = x - x[2002];");
+                _AssertSeries(First(), "x!a", 2001, 10d, sharedDelta);
+                _AssertSeries(First(), "x!a", 2002, 0d, sharedDelta);
+                _AssertSeries(First(), "x!a", 2003, 80d, sharedDelta);  //this is strange, but right, if done with <dyn>. AREMOS would work this way.
+            }
         }
 
         [TestMethod]
@@ -2305,7 +2417,7 @@ namespace UnitTests
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x = x[-1] + 1;");
+            I("x <dyn = no> = x[-1] + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
@@ -2340,7 +2452,7 @@ namespace UnitTests
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x ^= x[-1] + 1;");
+            I("x <dyn = no> ^= x[-1] + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 201d, sharedDelta);
@@ -2370,7 +2482,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             // ========================================
-            // ======== with dyn option ===========
+            // ======== with BLOCK dyn ================
             // ========================================
 
             I("reset;");
@@ -2499,12 +2611,24 @@ namespace UnitTests
             I("time 2001 2003;");
             I("#m = (x = 100);");
             I("time 2002 2003;");
-            I("#m.x = #m.x[-1] + 1;");
+            I("#m.x <dyn = no> = #m.x[-1] + 1;");
             m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(m, "x!a", 2002, 101d, sharedDelta);
             _AssertSeries(m, "x!a", 2003, 101d, sharedDelta);
+            _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("#m = (x = 100);");
+            I("time 2002 2003;");
+            I("#m.x <dyn> = #m.x.1 + 1;");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(m, "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(m, "x!a", 2003, 102d, sharedDelta);
             _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
 
             I("reset;");
@@ -8009,13 +8133,13 @@ namespace UnitTests
             I("{#m} = (100, 110, 120);");
             I("CLONE;");
 
-            I("SERIES<2011 2012> gdp1 = gdp1[-1] * 1.01;");  //1% growth
+            I("SERIES<2011 2012 dyn=no> gdp1 = gdp1[-1] * 1.01;");  //not 1% growth, 1% up compared to what it was before (no dynamics)
             I("FOR date %t = 2011 to 2012; SERIES gdp2[%t] = gdp2[%t-1] * 1.01; END;");  //1% growth
 
             _AssertSeries(First(), "gdp1", 2009, double.NaN, sharedDelta);
             _AssertSeries(First(), "gdp1", 2010, 100d, sharedDelta);
             _AssertSeries(First(), "gdp1", 2011, 100d * 1.01d, sharedDelta);
-            _AssertSeries(First(), "gdp1", 2012, 110d * 1.01d, sharedDelta);  //Beware: lagged endo does not accumulate anymore, use %= etc.
+            _AssertSeries(First(), "gdp1", 2012, 110d * 1.01d, sharedDelta);  //Beware: made with <dyn=no>
             _AssertSeries(First(), "gdp1", 2013, double.NaN, sharedDelta);
 
             _AssertSeries(First(), "gdp2", 2009, double.NaN, sharedDelta);

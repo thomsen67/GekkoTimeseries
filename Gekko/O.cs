@@ -2956,7 +2956,7 @@ namespace Gekko
             LookupHelperLeftside(smpl, null, null, null, rhs, arraySubSeries, type, options);
         }
 
-        private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries, EVariableType lhsType, O.Assignment options)
+        private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries, EVariableType lhsType, O.Assignment o)
         {
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y, or #m.x = (1, 2, 3).
             //Assignment is the hardest part of Lookup()
@@ -3415,8 +3415,8 @@ namespace Gekko
                                 if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                 {
                                     Matrix m = rhs.DeepClone(null) as Matrix;
-                                    if (options.opt_colnames != null) m.colnames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_colnames).ToArray()));
-                                    if (options.opt_rownames != null) m.rownames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_rownames).ToArray()));
+                                    if (o.opt_colnames != null) m.colnames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
+                                    if (o.opt_rownames != null) m.rownames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
                                     G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                 }
@@ -3478,8 +3478,8 @@ namespace Gekko
                     else lhs_series = lhs as Series;
 
                     //TODO: error if more than 1 is set
-                    ESeriesUpdTypes operatorType = GetOperatorType(options);
-                    bool keep = false; if (options != null && G.Equal(options.opt_keep, "p")) keep = true;
+                    ESeriesUpdTypes operatorType = GetOperatorType(o);
+                    bool keep = false; if (o != null && G.Equal(o.opt_keep, "p")) keep = true;
 
                     Series original = null;
                     if (keep || false)
@@ -3492,10 +3492,10 @@ namespace Gekko
                     if (!isArraySubSeries)
                     {
                         lhs_series.meta.stamp = Program.GetDateStamp();
-                        if (options?.opt_label != null) lhs_series.meta.label = O.ConvertToString(options.opt_label);
-                        if (options?.opt_source != null) lhs_series.meta.source = O.ConvertToString(options.opt_source);
-                        if (options?.opt_units != null) lhs_series.meta.units = O.ConvertToString(options.opt_units);
-                        if (options?.opt_stamp != null) lhs_series.meta.stamp = O.ConvertToString(options.opt_stamp);  //will override
+                        if (o?.opt_label != null) lhs_series.meta.label = O.ConvertToString(o.opt_label);
+                        if (o?.opt_source != null) lhs_series.meta.source = O.ConvertToString(o.opt_source);
+                        if (o?.opt_units != null) lhs_series.meta.units = O.ConvertToString(o.opt_units);
+                        if (o?.opt_stamp != null) lhs_series.meta.stamp = O.ConvertToString(o.opt_stamp);  //will override
 
                         if (!G.NullOrEmpty(lhs_series.meta.source))
                         {
@@ -3520,40 +3520,48 @@ namespace Gekko
 
                                 if (Program.options.series_dyn_check)
                                 {
-                                    if (options.opt_dyn == null)  //<dyn> or BLOCK series dyn have not been set
+                                    if (CheckDyn2(o))
                                     {
+                                        //Neither <dyn> nor BLOCK series dyn have not been set
+                                        //options can be == null, in that case there is no <...>-field
                                         if (Globals.precedentsSeries != null)
                                         {
                                             if (Globals.precedentsSeries.ContainsKey(lhs_series))
                                             {
-                                                G.Writeln2("*** ERROR: It seems the left-hand side variable appears with a lag on the right-hand side,");
-                                                G.Writeln("           but without <dyn> or being inside a BLOCK series dyn = yes;.", Color.Red);
-                                                Action a = () =>
+                                                int obs = smpl.Observations12();
+                                                if (obs > 1)
                                                 {
-                                                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                                                    Program.Cls("output");
-                                                    G.Writeln("In an expression like for instance x = x[-1] + 1, Gekko will not accumulate the 'lagged endogenous'", ETabs.Output);
-                                                    G.Writeln("x[-1], and therefore the expression will not per default imply that x augments with 1 for each period. ", ETabs.Output);
-                                                    G.Writeln("This is because Gekko runs such series expressions in a vector-like fashion,  without explicitly", ETabs.Output);
-                                                    G.Writeln("looping over the time period. However, such explicit looping can be used in one of the following two ways:", ETabs.Output);
-                                                    G.Writeln("(1) dyn keyword: x <dyn> = x[-1] + 1; ", ETabs.Output);
-                                                    G.Writeln("(2) dyn block:   block series dyn = yes; x = x[-1] + 1; end;", ETabs.Output);
-                                                    G.Writeln("In order to help the user to 'dynamize' such expressions, if 'option series dyn check = yes', Gekko will check", ETabs.Output);
-                                                    G.Writeln("if the left-hand side series (above: x) appears lagged on the right-hand side (above: x[-1]). If so, Gekko will ", ETabs.Output);
-                                                    G.Writeln("abort with an error if none of (1) or (2) are used.", ETabs.Output);
-                                                    G.Writeln("In this way, 'option series dyn check = yes' guards against unintended errors where lagged endogenous variables appear", ETabs.Output);
-                                                    G.Writeln("on the right-hand side, but where the user forgets to 'dynamize' the expression.", ETabs.Output);
-                                                    G.Writeln("", ETabs.Output);
-                                                    G.Writeln("The option has been implemented in Gekko 3.1.7 and onwards, and it may break existing code in the sense that Gekko may", ETabs.Output);
-                                                    G.Writeln("abort a program that hitherto ran without errors. This can typically be fixed by adding a <dyn> to the expression, but ", ETabs.Output);
-                                                    G.Writeln("beware that this may alter the results. If an endogenous lag was NOT intended to be accumulating, you can use <dyn = no>,", ETabs.Output);
-                                                    G.Writeln("for instance x <dyn = no> x = x[-1] + 1, and in this case the program will run exactly as in Gekko < 3.1.7. Alternatively,", ETabs.Output);
-                                                    G.Writeln("the user can set 'option series dyn = no', which will also replicate Gekko < 3.1.7 behavior.", ETabs.Output);
-                                                    G.Writeln("", ETabs.Output);
-                                                    G.Writeln("Still, it is recommended to use the 'dyn' check as implemented in 3.1.7 to guard against such errors.", ETabs.Output);
-                                                };
-                                                G.Writeln("           Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")", Color.Red);
-                                                throw new GekkoException();
+                                                    G.Writeln2("*** ERROR: It seems the left-hand side variable appears with a lag on the right-hand side,");
+                                                    G.Writeln("           over a period of " + obs + " > 1 observation. When 'OPTION series dyn check = yes',", Color.Red);
+                                                    G.Writeln("           in such an expression, you must use <dyn> option or put the expression inside a", Color.Red);
+                                                    G.Writeln("           dyn block (BLOCK series dyn = yes; ...; END;)", Color.Red);
+                                                    Action a = () =>
+                                                    {
+                                                        Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                                                        Program.Cls("output");
+                                                        G.Writeln("In an expression like for instance x = x[-1] + 1, Gekko will not accumulate the 'lagged endogenous'", ETabs.Output);
+                                                        G.Writeln("x[-1], and therefore the expression will not per default imply that x augments with 1 for each period. ", ETabs.Output);
+                                                        G.Writeln("This is because Gekko runs such series expressions in a vector-like fashion,  without explicitly", ETabs.Output);
+                                                        G.Writeln("looping over the time period. However, such explicit looping can be used in one of the following two ways:", ETabs.Output);
+                                                        G.Writeln("(1) dyn keyword: x <dyn> = x[-1] + 1; ", ETabs.Output);
+                                                        G.Writeln("(2) dyn block:   block series dyn = yes; x = x[-1] + 1; end;", ETabs.Output);
+                                                        G.Writeln("In order to help the user to 'dynamize' such expressions, if 'option series dyn check = yes', Gekko will check", ETabs.Output);
+                                                        G.Writeln("if the left-hand side series (above: x) appears lagged on the right-hand side (above: x[-1]). If so, Gekko will ", ETabs.Output);
+                                                        G.Writeln("abort with an error if none of (1) or (2) are used.", ETabs.Output);
+                                                        G.Writeln("In this way, 'option series dyn check = yes' guards against unintended errors where lagged endogenous variables appear", ETabs.Output);
+                                                        G.Writeln("on the right-hand side, but where the user forgets to 'dynamize' the expression.", ETabs.Output);
+                                                        G.Writeln("", ETabs.Output);
+                                                        G.Writeln("The option has been implemented in Gekko 3.1.7 and onwards, and it may break existing code in the sense that Gekko may", ETabs.Output);
+                                                        G.Writeln("abort a program that hitherto ran without errors. This can typically be fixed by adding a <dyn> to the expression, but ", ETabs.Output);
+                                                        G.Writeln("beware that this may alter the results. If an endogenous lag was NOT intended to be accumulating, you can use <dyn = no>,", ETabs.Output);
+                                                        G.Writeln("for instance x <dyn = no> x = x[-1] + 1, and in this case the program will run exactly as in Gekko < 3.1.7. Alternatively,", ETabs.Output);
+                                                        G.Writeln("the user can set 'option series dyn = no', which will also replicate Gekko < 3.1.7 behavior.", ETabs.Output);
+                                                        G.Writeln("", ETabs.Output);
+                                                        G.Writeln("Still, it is recommended to use the 'dyn' check as implemented in 3.1.7 to guard against such errors.", ETabs.Output);
+                                                    };
+                                                    G.Writeln("           Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")", Color.Red);
+                                                    throw new GekkoException();
+                                                }
                                             }
                                         }
                                     }
@@ -3907,7 +3915,7 @@ namespace Gekko
 
             return;
 
-        }
+        }        
 
         private static void LookupHelperLeftside_message(GekkoSmpl smpl, EFreq lhs_series_freq, string varnameWithFreq)
         {
@@ -4076,7 +4084,7 @@ namespace Gekko
                 //check_20() just checks if the RHS is a timeseries or not. If not, there is no point
                 //in looping over periods anyway.
                 //
-                if ((Program.options.series_dyn || G.Equal(o.opt_dyn, "yes")) && check_20())
+                if (CheckDyn1(o) && check_20())  //o.opt_dyn can be null
                 {
                     GekkoTime tt1_20 = smpl.t1;
                     GekkoTime tt2_20 = smpl.t2;
@@ -4106,8 +4114,26 @@ namespace Gekko
             }
         }
 
-        
+        //See also CheckDyn2()
+        private static bool CheckDyn1(Assignment o)
+        {
+            //If this is true, and there are series on both sides of '=',
+            //the assignment will be run period for period
+            //It is true if either inside BLOCK series dyn = yes, or if using <dyn> local option.
+            return Program.options.series_dyn == true || G.Equal(o.opt_dyn, "yes");
+        }
 
+        //See also CheckDyn1()
+        private static bool CheckDyn2(Assignment o)
+        {
+            //If Program.options.series_dyn_check = true, and the condition below is true,
+            //Gekko will fail with an error if it meets lagged endogenous like x = x[-1] + 1.
+            //The condition is true if there is no BLOCK series dyn = yes|no set and there
+            //is no <dyn> or <dyn = yes|no> set.
+            //So BLOCK series dyn = yes|no or any <dyn> or <dyn = yes|no> will trigger condition = false.
+            //Therefore the condition is true if nothing has been done regarding dynamics.
+            return Program.options.series_dyn == null && (o == null || o.opt_dyn == null);
+        }
 
         private static void HelperListdata(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, List rhs_list)
         {
