@@ -3552,7 +3552,7 @@ namespace Gekko
                                                     G.Writeln("           Gekko version >= 3.1.7, this error may come out of the blue. In that case, see the", Color.Red);
                                                     G.Writeln("           'Backwards incompatibility, or how to ignore' section in the above link.", Color.Red);
                                                     G.Writeln();
-                                                    throw new GekkoException();
+                                                    throw new GekkoException(); 
                                                 }
                                             }
                                         }
