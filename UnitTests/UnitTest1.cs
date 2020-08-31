@@ -2183,32 +2183,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_SeriesDynamicLaggedEndogenousCheck()
         {
-
-            I("reset; time 2001 2003; x = 100, 90, 80; xx = series(1); xx[a] = 10, 11, 12; xx[b] = 20, 21, 22; time 2002 2003;");
-
-            I("x[2002] <dyn> = 2;");
-            FAIL("x[2002] = x[-1];"); //fails as expected            
-            I("xx[a] = xx[b][-1] + 1;");
-            FAIL("xx[a] = xx[a][-1] + 1;"); //fail because of missing <dyn>
-            I("xx[a] <dyn> = xx[a][-1] + 1;");
-            I("#i = a, b;"); //fail because of missing <dyn>
-            FAIL("xx[#i] = xx[#i][-1] + 1;"); //fail
-            I("xx[#i] <dyn> = xx[#i][-1] + 1;"); //fail
-
-            //x[a] = x[a][-1] + 1
-            //x[a] <dyn> = x[a][-1] + 1
-
-            //these 4 also with <dyn>
-            //dif(x) = x[-1] + 1
-            //pch(x) = x[-1] + 1
-            //dlob(x) = x[-1] + 1
-            //log(x) = x[-1] + 1
-
-            I("reset; time 2001 2003; x = 100, 90, 80; time 2002 2003;");
-            I("option series dyn check = yes;");
-            I("x = x[-1] + 1;");
-
-
+            
             //The test in OPTION series dyn check = yes (default) will only check for lags on the RHS, where
             //the lagged variable appears on the LHS. And only for > 1 pers. The lags must be either
             //x[-1], x.1 or lag(x, 1).
@@ -2228,7 +2203,7 @@ namespace UnitTests
             // a: vector, b: iter, c: vector
             // d: FAIL,   e: iter, f: vector
             //
-            // x = sim(x) + 1 will not trigger, even if sim() is essentially a hidden lag
+            // x = f(x) + 1 will not trigger, even if f() is essentially a hidden lag for instance using matrix pack, shift, unpack
             // x = x + 1 will not trigger
 
             // (a)
@@ -2489,6 +2464,28 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2001, 10d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 0d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 80d, sharedDelta);  //this is strange, but actually ok, if done with <dyn>. AREMOS would work this way.
+
+            // ---------------------
+            // Some more funny tests
+            // ---------------------
+
+            I("reset; time 2001 2003; x = 100, 90, 80; xx = series(1); xx[a] = 10, 11, 12; xx[b] = 20, 21, 22; time 2002 2003;");
+
+            I("x[2002] <dyn> = 2;");
+            FAIL("x[2002] = x[-1];"); //fails as expected            
+            I("xx[a] = xx[b][-1] + 1;");
+            FAIL("xx[a] = xx[a][-1] + 1;"); //fail because of missing <dyn>
+            I("xx[a] <dyn> = xx[a][-1] + 1;");
+            I("#i = a, b;"); //fail because of missing <dyn>
+            FAIL("xx[#i] = xx[#i][-1] + 1;"); //fail
+            I("xx[#i] <dyn> = xx[#i][-1] + 1;"); //fail
+
+            // These ought maybe to be checked regarding results, also with <dyn>.
+            // but probably ok.
+            I("x = dif(x);");  //this will pass because no lag is detected
+            I("x = movavg(x, 2);");  //this will pass because no lag is detected
+            I("dif(x) = dif(x);");  //this will pass because no lag is detected
+            I("dif(x) = movavg(x, 2);");  //this will pass because no lag is detected
 
         }
 

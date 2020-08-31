@@ -318,6 +318,21 @@ namespace Gekko
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
             G.WriteDirs("small", false);
+
+            if (Globals.gekkoVersion == "3.1.7" || Globals.gekkoVersion == "3.1.8" || Globals.gekkoVersion == "3.1.9" || Globals.gekkoVersion == "3.1.10")
+            {
+                Action a = () =>
+                {
+                    Program.Help("i_dynamic_statements");
+                };
+
+                G.Writeln("+++ NOTE: Starting with the Gekko 3.1.7 version, dynamic statements with lagged dependent/endogenous");
+                G.Writeln("    variables like for instance x = x[-1] + 1 need to be decorated with either <dyn> or <dyn = no>");
+                G.Writeln("    in order to run without errors. Such errors may break existing programs written for Gekko");
+                G.Writeln("    versions 3.1.6 or earlier. See more on " + G.GetLinkAction("this help page", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " on dynamics checking, dynamics errors,");
+                G.Writeln("    and how to suppress or fix such errors.");
+                G.Writeln();
+            }
             
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();
