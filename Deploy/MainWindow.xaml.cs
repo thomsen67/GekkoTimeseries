@@ -482,64 +482,89 @@ namespace Deploy
             //seems ok, sha1 exists on net
             list.Add("f8e4147d9b68dd9917253f1266b5c42764401045", path + @"Antlr3.Runtime.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\Antlr3.Runtime.dll");
 
+            //same as 2.4.2
             list.Add("f145630ea51af460770a81351919032b3efc9219", path + @"GAMS.net4.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\GAMS.net4.dll");
 
+            //same as 2.4.2
             list.Add("45ca532a64d10c1f56635a11ec7973ee8bc7cf73", path + @"SevenZipSharp.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\SevenZipSharp.dll");
 
-            //ok
+            //seems ok, sha1 exists on net
             list.Add("774584ff54b38da5d3b3ee02e30908dacab175c5", path + @"zip\7z.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll");
 
             //ok, taken from this EViews link: http://www.eviews.com/download/older/censusx12.html
             list.Add("2fae4c913ff299e61bbbc0f1bfe9d34a52465b50", path + @"X12A.EXE", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\X12A.EXE");
 
+            //same as 2.4.2
             list.Add("5fbaa5eef965a7df1985b3e48aa377c53c6d2b59", path + @"EPPlus.dll", @"C:\Thomas\Gekko\GekkoCS\packages\EPPlus.4.5.2.1\lib\net40\EPPlus.dll");
 
+            //!!! hmm?
             list.Add("24c2c7a0d6c9918f037393c2a17e28a49d340df1", path + @"protobuf-net.dll", @"C:\Thomas\Gekko\GekkoCS\packages\protobuf-net.2.4.4\lib\net40\protobuf-net.dll");
 
+            //same as 2.4.2
             list.Add("bf8056fd232c261f75c5dec7fd81dcfb4e5ab0a6", path + @"wshom.ocx", @"C:\Windows\SysWOW64\wshom.ocx");
 
             // -----
 
+            //same as 2.4.2
             list.Add("7e23879c4950f3e26491d319bfadf1205ddde958", path + @"gnuplot\intl.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\intl.dll");
 
+            //same as 2.4.2
             list.Add("ef43fb9e1b652375a5de8a2dd7fb2fd9fdf30407", path + @"gnuplot\libcairo-2.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libcairo-2.dll");
 
+            //same as 2.4.2
             list.Add("cf436334dd73053e77305428507fc8c70da33a74", path + @"gnuplot\libffi-6.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libffi-6.dll");
 
+            //same as 2.4.2
             list.Add("125a2fcf210d4abb78fc8b43c6360c94c74917ab", path + @"gnuplot\libglib-2.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libglib-2.0-0.dll");
 
+            //same as 2.4.2
             list.Add("428ddf59ca447dfa379085b2f55c93d1dabc8395", path + @"gnuplot\libgmodule-2.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libgmodule-2.0-0.dll");
 
+            //same as 2.4.2
             list.Add("e6b7b69c7bfb8e6863335ab1f0db2ad96c6212a4", path + @"gnuplot\libgobject-2.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libgobject-2.0-0.dll");
 
+            //same as 2.4.2
             list.Add("e47fc318b894553016c471d0141554e185f93d79", path + @"gnuplot\libiconv-2.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libiconv-2.dll");
 
+            //same as 2.4.2
             list.Add("e7bd3cc831e063f1f1e0610505541dd1dbcb352d", path + @"gnuplot\libpango-1.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpango-1.0-0.dll");
 
+            //same as 2.4.2
             list.Add("bd2d99f7ce9620c2df101d9f64aed5629829ab25", path + @"gnuplot\libpangocairo-1.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpangocairo-1.0-0.dll");
 
+            //same as 2.4.2
             list.Add("6c2ed1be5ec1c71ccfd8c6be7371b32891964d57", path + @"gnuplot\libpangowin32-1.0-0.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpangowin32-1.0-0.dll");
 
+            //same as 2.4.2
             list.Add("ef4b4a15387f98b6695adf8615f243f3535e2891", path + @"gnuplot\libpng14-14.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\libpng14-14.dll");
 
+            //same as 2.4.2
             list.Add("81fe3c0c24277725723e1dbc63ce10fd235ebf60", path + @"gnuplot\wgnuplot.exe", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\wgnuplot.exe");
 
+            //same as 2.4.2
             list.Add("e771b8b319bfe5c85588b4817b50294a39d218db", path + @"gnuplot\wgnuplot51.exe", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\wgnuplot51.exe");
 
+            //same as 2.4.2
             list.Add("cbbce727fd8447487c7fc68051b24df17d043649", path + @"gnuplot\zlib1.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gnuplot\zlib1.dll");
 
             // -----
 
+            //same as 2.4.2
             list.Add("8f00ce31b60e5d6fdf70e29eefe61fb08c5bd180", path + @"XmlNotepad\FontBuilder.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\FontBuilder.dll");
 
+            //same as 2.4.2
             list.Add("617a4eece6cee8707cc7adda24dee9c648938797", path + @"XmlNotepad\Microsoft.XmlNotepad.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\Microsoft.XmlNotepad.dll");
 
+            //same as 2.4.2
             list.Add("61575949a7ef494ecac64b450045872e522c870f", path + @"XmlNotepad\XmlDiffPatch.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlDiffPatch.dll");
 
+            //same as 2.4.2
             list.Add("e52b237d30be81cb9227d7d63894e5652808b08a", path + @"XmlNotepad\XmlDiffPatch.View.dll", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlDiffPatch.View.dll");
 
+            //same as 2.4.2
             list.Add("8d8b81f6311eac9623762fee5ba2031a815b9ae1", path + @"XmlNotepad\XmlNotepad.exe", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlNotepad.exe");
 
+            //same as 2.4.2
             list.Add("dbdbb8aaa6b17493c45193f33db3d02375bbcf59", path + @"XmlNotepad\XmlNotepadRegistration.exe", @"C:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\XmlNotepad\XmlNotepadRegistration.exe");
 
             int errors = 0;
