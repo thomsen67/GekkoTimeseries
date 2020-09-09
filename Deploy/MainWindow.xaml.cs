@@ -497,7 +497,8 @@ namespace Deploy
             //same as 2.4.2
             list.Add("5fbaa5eef965a7df1985b3e48aa377c53c6d2b59", path + @"EPPlus.dll", @"C:\Thomas\Gekko\GekkoCS\packages\EPPlus.4.5.2.1\lib\net40\EPPlus.dll");
 
-            //!!! hmm?
+            //ok, taken from here: https://www.nuget.org/packages/protobuf-net/2.0.0.594
+            //but the file in \packages is newer.
             list.Add("24c2c7a0d6c9918f037393c2a17e28a49d340df1", path + @"protobuf-net.dll", @"C:\Thomas\Gekko\GekkoCS\packages\protobuf-net.2.4.4\lib\net40\protobuf-net.dll");
 
             //same as 2.4.2

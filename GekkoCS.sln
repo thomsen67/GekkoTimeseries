@@ -33,6 +33,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ML", "ML\ML.pyproj", "{2868
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deploy", "Deploy\Deploy.csproj", "{0CD98102-1592-44C2-9D82-88DD484F9A60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arrow", "Arrow\Arrow.csproj", "{DEC59EAE-A7D4-4693-A805-31BA9680A527}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -209,6 +211,22 @@ Global
 		{0CD98102-1592-44C2-9D82-88DD484F9A60}.Release-Mono|Any CPU.Build.0 = Release|Any CPU
 		{0CD98102-1592-44C2-9D82-88DD484F9A60}.Release-Mono|x86.ActiveCfg = Release|Any CPU
 		{0CD98102-1592-44C2-9D82-88DD484F9A60}.Release-Mono|x86.Build.0 = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Debug|x86.Build.0 = Debug|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release|x86.ActiveCfg = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release|x86.Build.0 = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release32bit|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release32bit|Any CPU.Build.0 = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release32bit|x86.ActiveCfg = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release32bit|x86.Build.0 = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release-Mono|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release-Mono|Any CPU.Build.0 = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release-Mono|x86.ActiveCfg = Release|Any CPU
+		{DEC59EAE-A7D4-4693-A805-31BA9680A527}.Release-Mono|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
