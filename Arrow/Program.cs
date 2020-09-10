@@ -17,8 +17,7 @@ namespace Arrow
     public class Program
     {
         public static string _file = @"c:\Thomas\Desktop\gekko\testing\test.arrow";
-
-        //[STAThread]
+                
         public static void Main(string[] args)
         {
             //DataFrame project in .NET
@@ -105,13 +104,19 @@ namespace Arrow
             DataFrame df = new DataFrame(
                   new PrimitiveDataFrameColumn<int>("Foo", 10),
                   new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
-            
 
+            
             string s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
-            dt1 = DateTime.Now;
-            var batches = df.ToArrowRecordBatches();
-            WriteArrow(batches, _file);
+            Task<bool> xx = Xxx(null);
+            bool xxy = xx.Result;
+            
+
+            //dt1 = DateTime.Now;
+            //var batches = df.ToArrowRecordBatches();
+            //WriteArrow(batches, _file);
+            
+
             string s2 = "Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
             if (false)
@@ -121,7 +126,15 @@ namespace Arrow
 
             dt1 = DateTime.Now;
             Task<RecordBatch> tt = ReadArrowAsync(_file);
-            RecordBatch rb = tt.Result;
+            RecordBatch rb = null;
+            try
+            {
+                rb = tt.Result;
+            }
+            catch (Exception e)
+            {
+
+            }
             DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
             string s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
             //IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
@@ -138,18 +151,70 @@ namespace Arrow
             }
         }
 
+        public static async Task<bool> Xxx(string[] args)
+        {
+            // Use a specific memory pool from which arrays will be allocated (optional)
+
+            File.Delete(_file);
+
+            var memoryAllocator = new NativeMemoryAllocator(alignment: 64);
+
+            // Build a record batch using the Fluent API
+
+            var recordBatch = new RecordBatch.Builder(memoryAllocator)
+                .Append("Column A", false, col => col.Int32(array => array.AppendRange(Enumerable.Range(0, 10))))
+                .Append("Column B", false, col => col.Float(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => Convert.ToSingle(x * 2)))))
+                .Append("Column C", false, col => col.String(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => $"Item {x + 1}"))))
+                .Append("Column D", false, col => col.Boolean(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => x % 2 == 0))))
+                .Build();
+
+            // Print memory allocation statistics
+
+            var stream = new MemoryStream();
+            var writer = new ArrowFileWriter(
+                stream,
+                recordBatch.Schema,
+                leaveOpen: true);
+
+            await writer.WriteRecordBatchAsync(recordBatch);
+            await writer.WriteEndAsync();
+
+            using (FileStream file = new FileStream(_file, FileMode.Create, System.IO.FileAccess.Write)) stream.WriteTo(file);
+
+
+            // Write record batch to a file
+
+            //using (var stream = File.OpenWrite(_file))
+            //using (var writer = new ArrowFileWriter(stream, recordBatch.Schema))
+            //{
+            //    await writer.WriteRecordBatchAsync(recordBatch);
+            //    await writer.WriteEndAsync();
+            //}
+
+
+            return true;
+
+        }
+
         public static void WriteArrow(IEnumerable<RecordBatch> batches, string fileName)
         {
+            //DataFrame ddf7 = DataFrame.FromArrowRecordBatch(b);
+            File.Delete(fileName);
+            //using (var stream = File.OpenWrite(fileName))
+            
             using (var stream = File.OpenWrite(fileName))
-            using (var writer = new ArrowFileWriter(stream, batches.First().Schema))
+            using (var writer = new ArrowStreamWriter(stream, batches.First().Schema))
             {
                 foreach (RecordBatch b in batches)
                 {
-                    //DataFrame ddf7 = DataFrame.FromArrowRecordBatch(b);
-                    writer.WriteRecordBatchAsync(b).Wait();
+                    writer.WriteRecordBatchAsync(b);
+                    //writer.WriteRecordBatchAsync(b);
                 }
-                writer.WriteEndAsync().Wait();
+                writer.WriteEndAsync();
+                //writer.WriteEndAsync();
+
             }
+
         }
 
         public static async Task Main2(string[] args)
@@ -171,6 +236,7 @@ namespace Arrow
             MemoryStream ms = new MemoryStream();
             ArrowStreamWriter writer = new ArrowStreamWriter(ms, recordBatch.Schema);
             await writer.WriteRecordBatchAsync(recordBatch);
+            //await writer.WriteEndAsync();
             //Hmmm, it seems the "magic" ARROW1 is not present at the start of the file
             using (FileStream file = new FileStream(_file, FileMode.Create, System.IO.FileAccess.Write)) ms.WriteTo(file);
 
