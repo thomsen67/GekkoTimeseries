@@ -83,8 +83,10 @@ namespace Arrow
                 indexColumn.Add<string>(t.super.ToString());
             }
             //list.Add(indexColumn);
+            int counter = 0;
             foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
+                counter++;
                 PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(kvp.Key, n);
                 foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
                 {
@@ -95,14 +97,22 @@ namespace Arrow
                 //df2.Add<PrimitiveDataFrameColumn<double>>(list);
                 //newColumns.Add(xx);
                 list.Add(column);
+                if (counter > 10) break;
             }                        
-            DataFrame df = new DataFrame(list);
-            MessageBox.Show("Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d);
+            DataFrame df777 = new DataFrame(list);
+
+            
+            DataFrame df = new DataFrame(
+                  new PrimitiveDataFrameColumn<int>("Foo", 10),
+                  new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
+            
+
+            string s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
             dt1 = DateTime.Now;
             var batches = df.ToArrowRecordBatches();
             WriteArrow(batches, _file);
-            MessageBox.Show("Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d);
+            string s2 = "Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
             if (false)
             {
@@ -113,7 +123,7 @@ namespace Arrow
             Task<RecordBatch> tt = ReadArrowAsync(_file);
             RecordBatch rb = tt.Result;
             DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
-            MessageBox.Show("Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d);
+            string s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
             //IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
         }
 
@@ -138,7 +148,7 @@ namespace Arrow
                     //DataFrame ddf7 = DataFrame.FromArrowRecordBatch(b);
                     writer.WriteRecordBatchAsync(b).Wait();
                 }
-                writer.WriteEndAsync();
+                writer.WriteEndAsync().Wait();
             }
         }
 
