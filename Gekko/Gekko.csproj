@@ -430,10 +430,6 @@
       <Project>{80843646-B8DD-4BEE-8B8C-5E59E9900463}</Project>
       <Name>ANTLR</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Deploy\Deploy.csproj">
-      <Project>{0cd98102-1592-44c2-9d82-88dd484f9a60}</Project>
-      <Name>Deploy</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GekkoFlowChart\GekkoFlowChart.csproj">
       <Project>{348405FA-5AAC-4F8B-BB47-211CAD2294AC}</Project>
       <Name>GekkoFlowChart</Name>

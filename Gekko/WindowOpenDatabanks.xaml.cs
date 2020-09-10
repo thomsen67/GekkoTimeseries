@@ -20,11 +20,11 @@ namespace Gekko
 	/// </summary>
 	public partial class WindowOpenDatabanks : System.Windows.Window
 	{
-        private ObservableCollection<Task> _list = new ObservableCollection<Task>();
-        ListViewDragDropManager<Task> dragMgr;
+        private ObservableCollection<GekkoTask> _list = new ObservableCollection<GekkoTask>();
+        ListViewDragDropManager<GekkoTask> dragMgr;
         //Dictionary<string, string> databankAliases = new Dictionary<string, string>();
 
-        public ObservableCollection<Task> list
+        public ObservableCollection<GekkoTask> list
         {
             get
             {
@@ -55,13 +55,13 @@ namespace Gekko
 			// type parameter matches the ListViewDragManager's type
 			// parameter (in this case, both have a type parameter of Task).
 
-            list = new ObservableCollection<Task>();
+            list = new ObservableCollection<GekkoTask>();
             RefreshList();
 
 			this.listView.ItemsSource = list;            
 
 			// This is all that you need to do, in order to use the ListViewDragManager.
-			this.dragMgr = new ListViewDragDropManager<Task>( this.listView );			
+			this.dragMgr = new ListViewDragDropManager<GekkoTask>( this.listView );			
             this.dragMgr.ListView = this.listView;
             this.dragMgr.ShowDragAdorner = true;
             this.dragMgr.DragAdornerOpacity = 0.5d;  //so that e.g. "Work" can still be seen underneath
@@ -118,7 +118,7 @@ namespace Gekko
                 string prot = null;
                 if (databank.editable) prot = Globals.protectSymbol;
                 else prot = "";
-                list.Add(new Task(s, Program.GetDatabankFilename(databank), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
+                list.Add(new GekkoTask(s, Program.GetDatabankFilename(databank), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
 
             }
             //unswap.IsEnabled = Program.AreDatabanksSwapped();
@@ -141,7 +141,7 @@ namespace Gekko
 		#region dragMgr_ProcessDrop
 
 		// Performs custom drop logic for the top ListView.
-		void dragMgr_ProcessDrop( object sender, ProcessDropEventArgs<Task> e )
+		void dragMgr_ProcessDrop( object sender, ProcessDropEventArgs<GekkoTask> e )
 		{
 			// This shows how to customize the behavior of a drop.
 			// Here we perform a swap, instead of just moving the dropped item.
@@ -154,8 +154,8 @@ namespace Gekko
             int higherIdx = Math.Max(e.OldIndex, e.NewIndex);
             int lowerIdx = Math.Min(e.OldIndex, e.NewIndex);
 
-            Task t_from = list[e.OldIndex];
-            Task t_to = list[e.NewIndex];
+            GekkoTask t_from = list[e.OldIndex];
+            GekkoTask t_to = list[e.NewIndex];
 
             string aliasFromOld = t_from.AliasName;
             string aliasToOld = t_to.AliasName;
@@ -282,7 +282,7 @@ namespace Gekko
             if( e.Effects == DragDropEffects.None )
 				return;
 
-			Task task = e.Data.GetData( typeof( Task ) ) as Task;
+			GekkoTask task = e.Data.GetData( typeof( GekkoTask ) ) as GekkoTask;
 			if( sender == this.listView )
 			{
 				if( this.dragMgr.IsDragInProgress )

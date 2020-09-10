@@ -44,7 +44,7 @@ namespace Gekko
     [ProtoInclude(7, typeof(List))]
     [ProtoInclude(8, typeof(Range))]            //HMMM is an IVariable, but could never be protobuffed
     [ProtoInclude(9, typeof(GekkoNull))]        //---> this is a real reference to NULL, do not change!!
-    [ProtoInclude(10, typeof(DataFrame))]
+    [ProtoInclude(10, typeof(GekkoDataFrame))]
     [ProtoInclude(11, typeof(GekkoNull))]       //---> the following are for backwards compatibility, can be changed
     [ProtoInclude(12, typeof(GekkoNull))]
     [ProtoInclude(13, typeof(GekkoNull))]

@@ -9361,6 +9361,14 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Arrow()
+        {
+            Globals.unitTestScreenOutput.Clear();
+            I(@"sys'c:\Progra~1\R\R-3.6.2\bin\Rscript -e ""Sys.info()""';");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("build 18363"));
+        }
+
+        [TestMethod]
         public void _Test_ExcelTransposed()
         {
             //Visual test has been performed regarding the placement of dates in the Excel case (there was a bug originally)

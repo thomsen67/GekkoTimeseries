@@ -17716,29 +17716,11 @@ namespace Gekko
         {            
             if (Globals.runningOnTTComputer)
             {
-
                 if (text == "python")
                 {
                     string s = Python();
                     G.Writeln2(s);
                 }                
-                else if (text.StartsWith("sha"))
-                {
-                    string filePath = @"c:\tools\sha";
-
-                    string[] files = Directory.GetFiles(filePath);
-
-                    G.Writeln("");
-                    foreach (string file in files)
-                    {
-                        using (FileStream fs = File.OpenRead(file))
-                        {
-                            SHA1 sha = new SHA1Managed();
-                            G.Writeln(Path.GetFileName(file) + " = " + BitConverter.ToString(sha.ComputeHash(fs)).Replace("-", "").ToLower());
-                        }
-
-                    }
-                }
             }
 
             if (nocr) G.Write(text);

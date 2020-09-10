@@ -70,12 +70,12 @@ namespace Gekko
 
         public StatusBar _status = null;
         public TextBlock _statusText = null;
-        private ObservableCollection<Task> _list = new ObservableCollection<Task>();
-        ListViewDragDropManager<Task> dragMgr;
+        private ObservableCollection<GekkoTask> _list = new ObservableCollection<GekkoTask>();
+        ListViewDragDropManager<GekkoTask> dragMgr;
 
         public DecompOptions2 decompOptions2 = null;
 
-        public ObservableCollection<Task> taskList
+        public ObservableCollection<GekkoTask> taskList
         {
             get
             {
@@ -93,7 +93,7 @@ namespace Gekko
         private void OnButtonClick(object sender, RoutedEventArgs e)
         {            
             Button cmb = sender as Button;            
-            Task task = cmb.DataContext as Task;
+            GekkoTask task = cmb.DataContext as GekkoTask;
 
             bool isTree = false;
             if (task.Pivot_TaskType == TaskType.Filters) isTree = true;            
@@ -219,7 +219,7 @@ namespace Gekko
             if (e.AddedItems.Count < 1) return;  //why does this happen?????????
             ComboBox cmb = sender as ComboBox;
             string chosen = e.AddedItems[0] as string;
-            Task task = cmb.DataContext as Task;
+            GekkoTask task = cmb.DataContext as GekkoTask;
             string text = task.Pivot_Text;
             int ii = -12345;
             TaskType type = TaskType.None;
@@ -256,9 +256,9 @@ namespace Gekko
             {
                 MessageBox.Show("*** ERROR");
             }
-            List<Task> m = new List<Task>();
+            List<GekkoTask> m = new List<GekkoTask>();
             int i2 = 0;
-            foreach (Task t in taskList)
+            foreach (GekkoTask t in taskList)
             {
                 if (t.I == ii)
                 {
@@ -269,13 +269,13 @@ namespace Gekko
                     {
                         filters = GetAllPossibleValuesForListFilter(chosen, decompOptions2);  //we need to set the chosen values to all values (so the filter has no effect to begin with)
                     }
-                    m.Add(new Task(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null, filters, decompOptions2));
+                    m.Add(new GekkoTask(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null, filters, decompOptions2));
                 }                
                 m.Add(t);
                 t.I = i2++;                
             }
             taskList.Clear();
-            foreach (Task t in m) taskList.Add(t);
+            foreach (GekkoTask t in m) taskList.Add(t);
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(type);
             RecalcCellsWithNewType(false);
@@ -354,28 +354,28 @@ namespace Gekko
 
             taskList.Clear();
             int i = 0;
-            taskList.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, null, decompOptions2));
+            taskList.Add(new GekkoTask(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, null, decompOptions2));
             foreach (string s in this.decompOptions2.rows)
             {
-                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null, null, decompOptions2));
+                taskList.Add(new GekkoTask(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null, null, decompOptions2));
             }
             //taskList[taskList.Count - 1].LineColor = "Black";
 
-            taskList.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, null, decompOptions2));
+            taskList.Add(new GekkoTask(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, null, decompOptions2));
             foreach (string s in this.decompOptions2.cols)
             {
-                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, null, decompOptions2));
+                taskList.Add(new GekkoTask(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, null, decompOptions2));
             }
             //taskList[taskList.Count - 1].LineColor = "Black";
 
-            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.freeFilter, null, decompOptions2));
+            taskList.Add(new GekkoTask(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.freeFilter, null, decompOptions2));
             foreach (FrameFilter ff in this.decompOptions2.filters)
             {
-                taskList.Add(new Task(G.HandleInternalIdentifyer1(ff.name), "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, ff.selected, decompOptions2));
+                taskList.Add(new GekkoTask(G.HandleInternalIdentifyer1(ff.name), "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, ff.selected, decompOptions2));
             }
             //taskList[taskList.Count - 1].LineColor = "Black";
 
-            taskList.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, null, decompOptions2));
+            taskList.Add(new GekkoTask("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, null, decompOptions2));
             
 
             for (int i2 = 0; i2 < taskList.Count; i2++)
@@ -465,13 +465,13 @@ namespace Gekko
             // type parameter matches the ListViewDragManager's type
             // parameter (in this case, both have a type parameter of Task).
 
-            taskList = new ObservableCollection<Task>();
+            taskList = new ObservableCollection<GekkoTask>();
             RefreshList();
 
             this.listView.ItemsSource = taskList;
 
             // This is all that you need to do, in order to use the ListViewDragManager.
-            this.dragMgr = new ListViewDragDropManager<Task>(this.listView);
+            this.dragMgr = new ListViewDragDropManager<GekkoTask>(this.listView);
             this.dragMgr.ListView = this.listView;
             this.dragMgr.ShowDragAdorner = true;
             this.dragMgr.DragAdornerOpacity = 0.5d;  //so that e.g. "Work" can still be seen underneath
@@ -495,7 +495,7 @@ namespace Gekko
             if (e.Effects == DragDropEffects.None)
                 return;
 
-            Task task = e.Data.GetData(typeof(Task)) as Task;
+            GekkoTask task = e.Data.GetData(typeof(GekkoTask)) as GekkoTask;
             if (sender == this.listView)
             {
                 if (this.dragMgr.IsDragInProgress)
@@ -517,10 +517,10 @@ namespace Gekko
         }
 
 
-        void DragAndDrop(object sender, ProcessDropEventArgs<Task> e)
+        void DragAndDrop(object sender, ProcessDropEventArgs<GekkoTask> e)
         {
             e.Effects = DragDropEffects.Move;            
-            List<Task> m = new List<Task>();
+            List<GekkoTask> m = new List<GekkoTask>();
             TaskType type = TaskType.None;
 
             for (int i = 0; i < e.ItemsSource.Count; i++)
@@ -559,7 +559,7 @@ namespace Gekko
             }
             int i2 = 0;
             e.ItemsSource.Clear();
-            foreach (Task t in m)
+            foreach (GekkoTask t in m)
             {
                 e.ItemsSource.Add(t); //must clear and reuse existing object, a new object will fail to update
                 t.I = i2++;
@@ -569,7 +569,7 @@ namespace Gekko
             RecalcCellsWithNewType(false);            
         }
 
-        private void PutGuiPivotSelectionIntoDecompOptions(ObservableCollection<Task> collection)
+        private void PutGuiPivotSelectionIntoDecompOptions(ObservableCollection<GekkoTask> collection)
         {
             decompOptions2.rows.Clear();
             decompOptions2.cols.Clear();
@@ -578,7 +578,7 @@ namespace Gekko
             int state = 1;
             for (int i = 0; i < collection.Count; i++)
             {
-                Task task = collection[i];
+                GekkoTask task = collection[i];
                 if (i != task.I) throw new GekkoException();  //check can be removed at some point
                 if (task.Pivot_Text == Globals.internalPivotCols)
                 {
@@ -2299,14 +2299,14 @@ namespace Gekko
         private void ListButton1_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            Task task = button.DataContext as Task;            
+            GekkoTask task = button.DataContext as GekkoTask;            
             MessageBox.Show("Add new row item");            
         }
 
         private void ListButton2_Click(object sender, RoutedEventArgs e)
         {            
             ToggleButton button = sender as ToggleButton;
-            Task task = button.DataContext as Task;
+            GekkoTask task = button.DataContext as GekkoTask;
             string s = G.HandleInternalIdentifyer2(task.Pivot_Text);            
             if (task.Pivot_TaskType == TaskType.Rows)
             {
@@ -2327,18 +2327,18 @@ namespace Gekko
             RecalcCellsWithNewType(false);            
         }
 
-        private void RemoveFromObservableCollection(Task task)
+        private void RemoveFromObservableCollection(GekkoTask task)
         {
-            List<Task> m = new List<Task>();
+            List<GekkoTask> m = new List<GekkoTask>();
             int i = 0;
-            foreach (Task t in taskList)
+            foreach (GekkoTask t in taskList)
             {
                 if (task.I == t.I) continue;
                 m.Add(t);
                 t.I = i++;
             }
             taskList.Clear();
-            foreach (Task t in m) taskList.Add(t);
+            foreach (GekkoTask t in m) taskList.Add(t);
         }
     }
 

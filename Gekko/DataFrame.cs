@@ -7,17 +7,17 @@ using ProtoBuf;
 namespace Gekko
 {
     [ProtoContract]
-    public class DataFrame : IVariable
+    public class GekkoDataFrame : IVariable
     {
         [ProtoMember(1)]
         public double val;
         
-        private DataFrame()
+        private GekkoDataFrame()
         {
             //only because protobuf needs it, not for outside use
         }
 
-        public DataFrame(double d)
+        public GekkoDataFrame(double d)
         {
             this.val = d;
         }                

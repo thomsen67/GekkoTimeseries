@@ -11118,7 +11118,7 @@ namespace Gekko
 
                 if (false && Globals.runningOnTTComputer)
                 {
-                    DataFrame f = new DataFrame(123d);
+                    GekkoDataFrame f = new GekkoDataFrame(123d);
                     Program.databanks.GetFirst().AddIVariable("#df", f);
                 }
                 

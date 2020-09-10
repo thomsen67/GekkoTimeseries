@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Gekko
 {
-    public class Task : INotifyPropertyChanged
+    public class GekkoTask : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -39,7 +39,7 @@ namespace Gekko
         public DecompOptions2 decompOptions2;
 
         //pivot
-        public Task(string text, string rowColor, string visible3, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist, List<string> filterSelected, DecompOptions2 decompOptions2)
+        public GekkoTask(string text, string rowColor, string visible3, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist, List<string> filterSelected, DecompOptions2 decompOptions2)
         {
             this.pivot_text = text;
             this.pivot_buttonVisible1 = visible1;
@@ -56,7 +56,7 @@ namespace Gekko
         }
 
         //non-pivot
-        public Task(string AliasName, string FileName, string FileNameWithPath, string Size, string Period, string Info1, string Date, string RowColor, string prot, int i)
+        public GekkoTask(string AliasName, string FileName, string FileNameWithPath, string Size, string Period, string Info1, string Date, string RowColor, string prot, int i)
         {
             this.aliasName = AliasName;
             this.fileName = FileName;

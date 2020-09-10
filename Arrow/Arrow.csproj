@@ -127,5 +127,11 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gekko\Gekko.csproj">
+      <Project>{977bf459-f717-4c88-992e-d68159d95f45}</Project>
+      <Name>Gekko</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
