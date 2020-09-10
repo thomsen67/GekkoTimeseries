@@ -8,7 +8,9 @@ using Apache.Arrow.Ipc;
 using Apache.Arrow.Memory;
 using System.IO;
 using Microsoft.Data.Analysis;
-//using Gekko;
+
+using Gekko;
+using System.Windows.Forms;
 
 namespace Arrow
 {
@@ -16,6 +18,7 @@ namespace Arrow
     {
         public static string _file = @"c:\Thomas\Desktop\gekko\testing\test.arrow";
 
+        //[STAThread]
         public static void Main(string[] args)
         {
             //DataFrame project in .NET
@@ -53,25 +56,65 @@ namespace Arrow
             //}
             //// Filter rows based on equality
             //PrimitiveDataFrameColumn<bool> boolFilter = df.Columns["Strings"].ElementwiseEquals("Bar");
-            //DataFrame filtered = df.Filter(boolFilter);            
+            //DataFrame filtered = df.Filter(boolFilter);       
 
-            var df = new DataFrame(
-              new PrimitiveDataFrameColumn<int>("Foo", 10),
-              new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
+            Gekko.Globals.arrow = true;  //so that messages are not shown
+            Gekko.Program.databanks.storage.Add(new Databank("Work"));
+            O.Read o0 = new O.Read();            
+            o0.type = @"read";
+            o0.fileName = @"c:\Thomas\Desktop\gekko\testing\jul05";
+            o0.opt_first = "yes";
+            o0.Exe();
+            Databank db = Gekko.Program.databanks.GetFirst();
+            string s = Globals.unitTestScreenOutput.ToString();
 
+            int t1 = 1970;
+            int t2 = 2020;
+            int n = t2 - t1 + 1;
+            int k = db.storage.Count;
+
+            DateTime dt1 = DateTime.Now;
+            List<DataFrameColumn> list = new List<DataFrameColumn>(k);
+            //List<DataFrameColumn> newColumns = new List<DataFrameColumn>(n);
+            
+            StringDataFrameColumn indexColumn = new StringDataFrameColumn("time", n);
+            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
+            {
+                indexColumn.Add<string>(t.super.ToString());
+            }
+            //list.Add(indexColumn);
+            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+            {
+                PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(kvp.Key, n);
+                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
+                {
+                    Series ts = kvp.Value as Series;
+                    column.Add<double>(ts.GetDataSimple(t));
+                }
+                //df2.Add<PrimitiveDataFrameColumn<double>>(xx);
+                //df2.Add<PrimitiveDataFrameColumn<double>>(list);
+                //newColumns.Add(xx);
+                list.Add(column);
+            }                        
+            DataFrame df = new DataFrame(list);
+            MessageBox.Show("Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d);
+
+            dt1 = DateTime.Now;
             var batches = df.ToArrowRecordBatches();
-
             WriteArrow(batches, _file);
+            MessageBox.Show("Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d);
 
             if (false)
             {
                 Task t = Main2(args);
             }
 
+            dt1 = DateTime.Now;
             Task<RecordBatch> tt = ReadArrowAsync(_file);
             RecordBatch rb = tt.Result;
             DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
-            IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
+            MessageBox.Show("Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d);
+            //IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
         }
 
         public static async Task<RecordBatch> ReadArrowAsync(string filename)
@@ -95,7 +138,7 @@ namespace Arrow
                     //DataFrame ddf7 = DataFrame.FromArrowRecordBatch(b);
                     writer.WriteRecordBatchAsync(b).Wait();
                 }
-                writer.WriteEndAsync().Wait();
+                writer.WriteEndAsync();
             }
         }
 
