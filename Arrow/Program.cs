@@ -16,7 +16,7 @@ namespace Arrow
 {
     public class Program
     {
-        public static string _file = @"c:\Thomas\Desktop\gekko\testing\test.arrow";
+        public static string _fileName = @"c:\Thomas\Desktop\gekko\testing\test.arrow";
                 
         public static void Main(string[] args)
         {
@@ -57,10 +57,14 @@ namespace Arrow
             //PrimitiveDataFrameColumn<bool> boolFilter = df.Columns["Strings"].ElementwiseEquals("Bar");
             //DataFrame filtered = df.Filter(boolFilter);       
 
-            DateTime dt1 = DateTime.Now;
-            if (false)
-            {
+            string s, s0, s1, s2, s3;
 
+            DateTime dt1 = DateTime.Now;
+
+            if (true)
+            {
+                dt1 = DateTime.Now;
+                Globals.unitTestScreenOutput.Clear();
                 Gekko.Globals.arrow = true;  //so that messages are not shown
                 Gekko.Program.databanks.storage.Add(new Databank("Work"));
                 O.Read o0 = new O.Read();
@@ -69,85 +73,90 @@ namespace Arrow
                 o0.opt_first = "yes";
                 o0.Exe();
                 Databank db = Gekko.Program.databanks.GetFirst();
-                string s = Globals.unitTestScreenOutput.ToString();
+                s = Globals.unitTestScreenOutput.ToString();
+                s0 = "Read gbk took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
-                int t1 = 1970;
-                int t2 = 2020;
+
+                dt1 = DateTime.Now;
+                int t1 = 1998;
+                int t2 = 2079;
                 int n = t2 - t1 + 1;
                 int k = db.storage.Count;
-
                 
-                List<DataFrameColumn> list = new List<DataFrameColumn>(k);
-                //List<DataFrameColumn> newColumns = new List<DataFrameColumn>(n);
+                List<DataFrameColumn> list = new List<DataFrameColumn>(k);                
 
                 StringDataFrameColumn indexColumn = new StringDataFrameColumn("time", n);
-                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
+                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
                 {
                     indexColumn.Add<string>(t.super.ToString());
                 }
                 //list.Add(indexColumn);
+                
                 int counter = 0;
                 foreach (KeyValuePair<string, IVariable> kvp in db.storage)
                 {
                     counter++;
                     PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(kvp.Key, n);
-                    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
+                    int i = -1;
+                    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
                     {
+                        i++;
                         Series ts = kvp.Value as Series;
-                        column.Add<double>(ts.GetDataSimple(t));
+                        //column.Add<double>(ts.GetDataSimple(t));
+                        column[i] = ts.GetDataSimple(t);
                     }
                     //df2.Add<PrimitiveDataFrameColumn<double>>(xx);
                     //df2.Add<PrimitiveDataFrameColumn<double>>(list);
                     //newColumns.Add(xx);
                     list.Add(column);
-                    if (counter > 10) break;
+                    //if (counter > 10) break;
                 }
                 DataFrame df777 = new DataFrame(list);
+                s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
+                //DataFrame df = new DataFrame(new PrimitiveDataFrameColumn<int>("Foo", 10), new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
+                //RecordBatch recordBatch = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64))
+                //.Append("Column A", false, col => col.Int32(array => array.AppendRange(Enumerable.Range(0, 10))))
+                //.Append("Column B", false, col => col.Float(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => Convert.ToSingle(x * 2)))))
+                //.Append("Column C", false, col => col.String(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => $"Item {x + 1}"))))
+                //.Append("Column D", false, col => col.Boolean(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => x % 2 == 0))))
+                //.Build();
+                                               
 
-                DataFrame df = new DataFrame(
-                      new PrimitiveDataFrameColumn<int>("Foo", 10),
-                      new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
-
-
-                string s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
                 dt1 = DateTime.Now;
-                Task<bool> xx = Xxx(null);
-                bool xxy = xx.Result;
+                //WriteArrow(recordBatch);
+                WriteArrow(df777.ToArrowRecordBatches().First());
+                //bool temp = task.Result; //actually runs it
 
                 //dt1 = DateTime.Now;
                 //var batches = df.ToArrowRecordBatches();
                 //WriteArrow(batches, _file);
 
 
-                string s2 = "Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                s2 = "Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
             }
-                        
 
-            if (false)
+            if (true)
             {
-                Task t = Main2(args);
+                dt1 = DateTime.Now;
+                RecordBatch rb = ReadArrow(_fileName);
+                DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
+                s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                //IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
             }
 
-            dt1 = DateTime.Now;
-            Task<RecordBatch> tt = ReadArrowAsync(_file);
-            RecordBatch rb = null;
-            try
-            {
-                rb = tt.Result;
-            }
-            catch (Exception e)
-            {
+            Console.WriteLine(s);
+            Console.WriteLine(s0);
+            Console.WriteLine(s1);
+            Console.WriteLine(s2);
+            Console.WriteLine(s3);
 
-            }
-            DataFrame df2 = DataFrame.FromArrowRecordBatch(rb);
-            string s3 = "Read arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
-            //IEnumerable<RecordBatch> rb2 = df2.ToArrowRecordBatches();
+            int ii = 1;
         }
 
-        public static async Task<RecordBatch> ReadArrowAsync(string filename)
+        public static RecordBatch ReadArrow(string filename)
         {
             using (var stream = File.OpenRead(filename))
             using (var reader = new ArrowFileReader(stream))
@@ -163,48 +172,18 @@ namespace Arrow
             }
         }
 
-        public static async Task<bool> Xxx(string[] args)
+        public static async void WriteArrow(RecordBatch recordBatch)
         {
             // Use a specific memory pool from which arrays will be allocated (optional)
 
-            File.Delete(_file);
-
-            var memoryAllocator = new NativeMemoryAllocator(alignment: 64);
-
-            // Build a record batch using the Fluent API
-
-            var recordBatch = new RecordBatch.Builder(memoryAllocator)
-                .Append("Column A", false, col => col.Int32(array => array.AppendRange(Enumerable.Range(0, 10))))
-                .Append("Column B", false, col => col.Float(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => Convert.ToSingle(x * 2)))))
-                .Append("Column C", false, col => col.String(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => $"Item {x + 1}"))))
-                .Append("Column D", false, col => col.Boolean(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => x % 2 == 0))))
-                .Build();
-
-            // Print memory allocation statistics
-
-            var stream = new MemoryStream();
-            var writer = new ArrowFileWriter(
-                stream,
-                recordBatch.Schema,
-                leaveOpen: true);
-
+            File.Delete(_fileName);
+                        
+            MemoryStream stream = new MemoryStream();
+            ArrowFileWriter writer = new ArrowFileWriter(stream, recordBatch.Schema, leaveOpen: true);
             await writer.WriteRecordBatchAsync(recordBatch);
             await writer.WriteEndAsync();
-
-            using (FileStream file = new FileStream(_file, FileMode.Create, System.IO.FileAccess.Write)) stream.WriteTo(file);
-
-
-            // Write record batch to a file
-
-            //using (var stream = File.OpenWrite(_file))
-            //using (var writer = new ArrowFileWriter(stream, recordBatch.Schema))
-            //{
-            //    await writer.WriteRecordBatchAsync(recordBatch);
-            //    await writer.WriteEndAsync();
-            //}
-
-
-            return true;
+            using (FileStream fileStream = new FileStream(_fileName, FileMode.Create, System.IO.FileAccess.Write)) stream.WriteTo(fileStream);
+            
 
         }
 
@@ -228,31 +207,7 @@ namespace Arrow
             }
 
         }
-
-        public static async Task Main2(string[] args)
-        {
-            // Use a specific memory pool from which arrays will be allocated (optional)
-
-            var memoryAllocator = new NativeMemoryAllocator(alignment: 64);
-
-            // Build a record batch using the Fluent API
-
-            RecordBatch recordBatch = new RecordBatch.Builder(memoryAllocator)
-                .Append("Column A", false, col => col.Int32(array => array.AppendRange(Enumerable.Range(0, 10))))
-                .Append("Column B", false, col => col.Float(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => Convert.ToSingle(x * 2)))))
-                .Append("Column C", false, col => col.String(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => $"Item {x + 1}"))))
-                .Append("Column D", false, col => col.Boolean(array => array.AppendRange(Enumerable.Range(0, 10).Select(x => x % 2 == 0))))
-                .Build();
-
-            File.Delete(_file);
-            MemoryStream ms = new MemoryStream();
-            ArrowStreamWriter writer = new ArrowStreamWriter(ms, recordBatch.Schema);
-            await writer.WriteRecordBatchAsync(recordBatch);
-            //await writer.WriteEndAsync();
-            //Hmmm, it seems the "magic" ARROW1 is not present at the start of the file
-            using (FileStream file = new FileStream(_file, FileMode.Create, System.IO.FileAccess.Write)) ms.WriteTo(file);
-
-        }
+        
 
     }
 }
