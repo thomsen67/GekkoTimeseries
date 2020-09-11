@@ -57,67 +57,74 @@ namespace Arrow
             //PrimitiveDataFrameColumn<bool> boolFilter = df.Columns["Strings"].ElementwiseEquals("Bar");
             //DataFrame filtered = df.Filter(boolFilter);       
 
-            Gekko.Globals.arrow = true;  //so that messages are not shown
-            Gekko.Program.databanks.storage.Add(new Databank("Work"));
-            O.Read o0 = new O.Read();            
-            o0.type = @"read";
-            o0.fileName = @"c:\Thomas\Desktop\gekko\testing\jul05";
-            o0.opt_first = "yes";
-            o0.Exe();
-            Databank db = Gekko.Program.databanks.GetFirst();
-            string s = Globals.unitTestScreenOutput.ToString();
-
-            int t1 = 1970;
-            int t2 = 2020;
-            int n = t2 - t1 + 1;
-            int k = db.storage.Count;
-
             DateTime dt1 = DateTime.Now;
-            List<DataFrameColumn> list = new List<DataFrameColumn>(k);
-            //List<DataFrameColumn> newColumns = new List<DataFrameColumn>(n);
-            
-            StringDataFrameColumn indexColumn = new StringDataFrameColumn("time", n);
-            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
+            if (false)
             {
-                indexColumn.Add<string>(t.super.ToString());
-            }
-            //list.Add(indexColumn);
-            int counter = 0;
-            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
-            {
-                counter++;
-                PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(kvp.Key, n);
+
+                Gekko.Globals.arrow = true;  //so that messages are not shown
+                Gekko.Program.databanks.storage.Add(new Databank("Work"));
+                O.Read o0 = new O.Read();
+                o0.type = @"read";
+                o0.fileName = @"c:\Thomas\Desktop\gekko\testing\jul05";
+                o0.opt_first = "yes";
+                o0.Exe();
+                Databank db = Gekko.Program.databanks.GetFirst();
+                string s = Globals.unitTestScreenOutput.ToString();
+
+                int t1 = 1970;
+                int t2 = 2020;
+                int n = t2 - t1 + 1;
+                int k = db.storage.Count;
+
+                
+                List<DataFrameColumn> list = new List<DataFrameColumn>(k);
+                //List<DataFrameColumn> newColumns = new List<DataFrameColumn>(n);
+
+                StringDataFrameColumn indexColumn = new StringDataFrameColumn("time", n);
                 foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
                 {
-                    Series ts = kvp.Value as Series;
-                    column.Add<double>(ts.GetDataSimple(t));
+                    indexColumn.Add<string>(t.super.ToString());
                 }
-                //df2.Add<PrimitiveDataFrameColumn<double>>(xx);
-                //df2.Add<PrimitiveDataFrameColumn<double>>(list);
-                //newColumns.Add(xx);
-                list.Add(column);
-                if (counter > 10) break;
-            }                        
-            DataFrame df777 = new DataFrame(list);
+                //list.Add(indexColumn);
+                int counter = 0;
+                foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                {
+                    counter++;
+                    PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(kvp.Key, n);
+                    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 1970, 1), new GekkoTime(EFreq.A, 2020, 1)))
+                    {
+                        Series ts = kvp.Value as Series;
+                        column.Add<double>(ts.GetDataSimple(t));
+                    }
+                    //df2.Add<PrimitiveDataFrameColumn<double>>(xx);
+                    //df2.Add<PrimitiveDataFrameColumn<double>>(list);
+                    //newColumns.Add(xx);
+                    list.Add(column);
+                    if (counter > 10) break;
+                }
+                DataFrame df777 = new DataFrame(list);
 
-            
-            DataFrame df = new DataFrame(
-                  new PrimitiveDataFrameColumn<int>("Foo", 10),
-                  new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
 
-            
-            string s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                DataFrame df = new DataFrame(
+                      new PrimitiveDataFrameColumn<int>("Foo", 10),
+                      new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
 
-            Task<bool> xx = Xxx(null);
-            bool xxy = xx.Result;
-            
 
-            //dt1 = DateTime.Now;
-            //var batches = df.ToArrowRecordBatches();
-            //WriteArrow(batches, _file);
-            
+                string s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
-            string s2 = "Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                dt1 = DateTime.Now;
+                Task<bool> xx = Xxx(null);
+                bool xxy = xx.Result;
+
+                //dt1 = DateTime.Now;
+                //var batches = df.ToArrowRecordBatches();
+                //WriteArrow(batches, _file);
+
+
+                string s2 = "Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+
+            }
+                        
 
             if (false)
             {
@@ -145,8 +152,13 @@ namespace Arrow
             using (var stream = File.OpenRead(filename))
             using (var reader = new ArrowFileReader(stream))
             {
-                var recordBatch = await reader.ReadNextRecordBatchAsync();
-                //Debug.WriteLine("Read record batch with {0} column(s)", recordBatch.ColumnCount);
+                //--->hmm cannot get async version to work, but recordBatches are for splitting very large datasets into batches of rows, 
+                //so maybe not that important? But how are we sure all batches are read, if we only call "readNext"?
+                //var recordBatch = await reader.ReadNextRecordBatchAsync(); 
+                //See under usage here: https://github.com/apache/arrow/tree/master/csharp
+                //In the following the non-async version:
+                var recordBatch = reader.ReadNextRecordBatch();
+                string s = "Read record batch with " + recordBatch.ColumnCount + " {0} column(s)";
                 return recordBatch;
             }
         }
