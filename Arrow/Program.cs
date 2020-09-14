@@ -33,6 +33,8 @@ namespace Arrow
             //If RAM is supposed to be shared, arrow uses Googles gRPC library
             //Compression with LZ4 should probably be the standard, but how to do this from C#? See https://ursalabs.org/blog/2020-feather-v2/
 
+            string s = null, s0 = null, s1 = null, s2 = null, s3 = null;
+
             // --------> example
             DataFrame df = null;
             if (true)
@@ -61,8 +63,7 @@ namespace Arrow
                 PrimitiveDataFrameColumn<bool> boolFilter = df.Columns["Strings"].ElementwiseEquals("Bar");
                 DataFrame filtered = df.Filter(boolFilter);
             }
-
-            string s, s0, s1, s2, s3;
+                        
 
             DateTime dt1 = DateTime.Now;
 
