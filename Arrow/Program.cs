@@ -88,8 +88,6 @@ namespace Arrow
                 int n = t2 - t1 + 1;
                 int k = db.storage.Count + 1;
 
-
-
                 List<DataFrameColumn> list = new List<DataFrameColumn>(k);
 
                 StringDataFrameColumn indexColumn = null;
@@ -137,17 +135,18 @@ namespace Arrow
                 s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
 
                 RecordBatch recordBatch = null;
-                if (false)
-                {
-                    //DataFrame df = new DataFrame(new PrimitiveDataFrameColumn<int>("Foo", 10), new PrimitiveDataFrameColumn<int>("Bar", Enumerable.Range(1, 10)));
+                if (true)
+                {                    
+                    List<int> xxA = new List<int>() { 1, 2, 3, 4, 5 };
+                    List<double> xxB = new List<double>() { 1.1d, 2.1d, 3.1d, 4.1d, 5.1d };
+                    List<string> xxC = new List<string>() { "a", "b", "c", "d", "e" };
                     recordBatch = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64))
-                    .Append("_Column A", false, col => col.Int32(array => array.AppendRange(Enumerable.Range(0, n))))
-                    .Append("Column B", false, col => col.Float(array => array.AppendRange(Enumerable.Range(0, n).Select(x => Convert.ToSingle(x * 2)))))
-                    .Append("Column C", false, col => col.String(array => array.AppendRange(Enumerable.Range(0, n).Select(x => $"Item {x + 1}"))))
-                    .Append("Column D", false, col => col.Boolean(array => array.AppendRange(Enumerable.Range(0, n).Select(x => x % 2 == 0))))
+                    .Append("Column A", false, col => col.Int32(array => array.AppendRange(xxA)))
+                    .Append("Column B", false, col => col.Double(array => array.AppendRange(xxB)))
+                    .Append("Column C", false, col => col.String(array => array.AppendRange(xxC)))
                     .Build();
+                    WriteArrow(recordBatch);
                     DataFrame xxx = DataFrame.FromArrowRecordBatch(recordBatch);
-                    WriteArrow(recordBatch);                    
                 }
 
                 dt1 = DateTime.Now;
