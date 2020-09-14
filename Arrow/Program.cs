@@ -37,7 +37,7 @@ namespace Arrow
 
             // --------> example
             DataFrame df = null;
-            if (true)
+            if (false)
             {
                 PrimitiveDataFrameColumn<DateTime> dateTimes = new PrimitiveDataFrameColumn<DateTime>("DateTimes"); // Default length is 0.
                 PrimitiveDataFrameColumn<int> ints = new PrimitiveDataFrameColumn<int>("Ints", 3); // Makes a column of length 3. Filled with nulls initially
@@ -68,6 +68,67 @@ namespace Arrow
             DateTime dt1 = DateTime.Now;
 
             if (true)
+            {
+
+                dt1 = DateTime.Now;
+                Globals.unitTestScreenOutput.Clear();
+                Gekko.Globals.arrow = true;  //so that messages are not shown
+                Gekko.Program.databanks.storage.Add(new Databank("Work"));
+                O.Read o0 = new O.Read();
+                o0.type = @"read";
+                o0.fileName = @"c:\Thomas\Desktop\gekko\testing\jul05";
+                o0.opt_first = "yes";
+                o0.Exe();
+                Databank db = Gekko.Program.databanks.GetFirst();
+                s = Globals.unitTestScreenOutput.ToString();
+                s0 = "Read gbk took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                
+                dt1 = DateTime.Now;
+                int t1 = 1998;
+                int t2 = 2079;
+                int n = t2 - t1 + 1;
+                int k = db.storage.Count + 1;
+
+                RecordBatch.Builder recordBatchBuilder = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64));
+                List<double> data = new List<double>();
+                for (int i = 0; i < n; i++)
+                {
+                    data.Add(double.NaN);
+                }                
+                
+                    List<string> dates = new List<string>();                    
+                    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
+                    {                        
+                        dates.Add(t.super.ToString());                        
+                    }
+
+                recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));
+
+
+                int counter = 0;
+                foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                {
+                    counter++;
+                    PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(G.Chop_RemoveFreq(kvp.Key), n);
+                    int i = -1;
+                    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
+                    {
+                        i++;
+                        Series ts = kvp.Value as Series;
+                        data[i] = ts.GetDataSimple(t);
+                    }
+                    recordBatchBuilder.Append(G.Chop_RemoveFreq(kvp.Key), false, col => col.Double(array => array.AppendRange(data)));
+                }
+                RecordBatch recordBatch = recordBatchBuilder.Build();
+
+                DataFrame df777 = DataFrame.FromArrowRecordBatch(recordBatch);
+                WriteArrow(recordBatch);
+                //df777 = df;
+                s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                
+            }
+
+            if (false)
             {
                 dt1 = DateTime.Now;
                 Globals.unitTestScreenOutput.Clear();
