@@ -120,12 +120,13 @@ namespace Arrow
                     recordBatchBuilder.Append(G.Chop_RemoveFreq(kvp.Key), false, col => col.Double(array => array.AppendRange(data)));
                 }
                 RecordBatch recordBatch = recordBatchBuilder.Build();
-
                 DataFrame df777 = DataFrame.FromArrowRecordBatch(recordBatch);
                 WriteArrow(recordBatch);
                 //df777 = df;
                 s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+                //df777.Columns["AAA"][3] = 777d;
                 
+
             }
 
             if (false)
