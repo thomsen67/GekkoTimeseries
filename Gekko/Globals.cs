@@ -278,7 +278,10 @@ namespace Gekko
 
         public static string r_fileName = null;
         public static List<string> r_fileContent = null;
-                
+
+        public static string python_fileName = null;
+        public static List<string> python_fileContent = null;
+
         public static bool useCache = false;  //also makes sure vars GetTimeSeries is outside time loop in SERIES statement! See #9875235      
         public static bool useDotFunctionalityInParser = false;
         

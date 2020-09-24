@@ -20,11 +20,17 @@ namespace Arrow
 
         public static void Main(string[] args)
         {
-        //DataFrame project in .NET
-        //See this thread: https://github.com/dotnet/runtime/issues/24920
-        //Eric Erhardt from MS has been involved in arrow/C#
-        //https://devblogs.microsoft.com/dotnet/an-introduction-to-dataframe/    
-        https://devblogs.microsoft.com/dotnet/net-for-apache-spark-in-memory-dataframe-support/
+            if (true) Run();
+            else UnitTests();
+        }
+
+        private static void Run()
+        {
+            //DataFrame project in .NET
+            //See this thread: https://github.com/dotnet/runtime/issues/24920
+            //Eric Erhardt from MS has been involved in arrow/C#
+            //https://devblogs.microsoft.com/dotnet/an-introduction-to-dataframe/    
+            //https://devblogs.microsoft.com/dotnet/net-for-apache-spark-in-memory-dataframe-support/
             //See this: https://stackoverflow.com/questions/56231247/numpy-pandas-counterpart-in-net-or-netcore/56280314#56280314
             //or better this: https://www.nuget.org/packages/Microsoft.Data.Analysis/
             //github: https://github.com/dotnet/corefxlab/tree/master/src/Microsoft.Data.Analysis            
@@ -32,6 +38,8 @@ namespace Arrow
             //regarding R, see also EViews: https://www.eviews.com/download/whitepapers/Using%20R%20with%20EViews.pdf
             //If RAM is supposed to be shared, arrow uses Googles gRPC library
             //Compression with LZ4 should probably be the standard, but how to do this from C#? See https://ursalabs.org/blog/2020-feather-v2/
+
+            //dataframes in R vs Python: https://towardsdatascience.com/python-and-r-for-data-wrangling-examples-for-both-including-speed-up-considerations-f2ec2bb53a86
 
             string s = null, s0 = null, s1 = null, s2 = null, s3 = null;
 
@@ -63,7 +71,7 @@ namespace Arrow
                 PrimitiveDataFrameColumn<bool> boolFilter = df.Columns["Strings"].ElementwiseEquals("Bar");
                 DataFrame filtered = df.Filter(boolFilter);
             }
-                        
+
 
             DateTime dt1 = DateTime.Now;
 
@@ -82,7 +90,7 @@ namespace Arrow
                 Databank db = Gekko.Program.databanks.GetFirst();
                 s = Globals.unitTestScreenOutput.ToString();
                 s0 = "Read gbk took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
-                
+
                 dt1 = DateTime.Now;
                 int t1 = 1998;
                 int t2 = 2079;
@@ -94,13 +102,13 @@ namespace Arrow
                 for (int i = 0; i < n; i++)
                 {
                     data.Add(double.NaN);
-                }                
-                
-                    List<string> dates = new List<string>();                    
-                    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
-                    {                        
-                        dates.Add(t.super.ToString());                        
-                    }
+                }
+
+                List<string> dates = new List<string>();
+                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
+                {
+                    dates.Add(t.super.ToString());
+                }
 
                 recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));
 
@@ -125,7 +133,7 @@ namespace Arrow
                 //df777 = df;
                 s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
                 //df777.Columns["AAA"][3] = 777d;
-                
+
 
             }
 
@@ -199,7 +207,7 @@ namespace Arrow
 
                 RecordBatch recordBatch = null;
                 if (true)
-                {                    
+                {
                     List<int> xxA = new List<int>() { 1, 2, 3, 4, 5 };
                     List<double> xxB = new List<double>() { 1.1d, 2.1d, 3.1d, 4.1d, 5.1d };
                     List<string> xxC = new List<string>() { "a", "b", "c", "d", "e" };
@@ -214,7 +222,7 @@ namespace Arrow
 
                 dt1 = DateTime.Now;
                 IEnumerable<RecordBatch> rb = df777.ToArrowRecordBatches();
-                RecordBatch first = rb.First();                
+                RecordBatch first = rb.First();
 
                 WriteArrow(first);
                 s2 = "Write arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
@@ -290,7 +298,30 @@ namespace Arrow
             }
 
         }
-        
+
+        public static void UnitTests()
+        {
+            //reset;
+            //time 2020 2022;
+            //x1 = 1, 2, 3;
+            //x2 = series(1);
+            //x2[a] = 2, 3, 4;
+            //x2[b] = 3, 4, 5;
+            //x3 = series(2);
+            //x3[i1, j1] = 4, 5, 6;
+            //x3[i1, j2] = 5, 6, 7;
+            //option freq q;
+            //time 2020q1 2020q3;
+            //x4 = 6, 7, 8;
+            //x5 = series(1);
+            //x5[a] = 8, 9, 10;
+            //x5[b] = 9, 10, 11;
+            //x6 = series(2);
+            //x6[i1, j1] = 10, 11, 12;
+            //x6[i1, j2] = 11, 12, 13;
+
+
+        }
 
     }
 }

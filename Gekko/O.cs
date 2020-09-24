@@ -10953,8 +10953,7 @@ namespace Gekko
         {            
             public string fileName = null;
             public void Exe()
-            {
-                //Globals.r_fileName = this.fileName;
+            {                
                 Globals.r_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName));
             }
         }
@@ -10965,71 +10964,10 @@ namespace Gekko
             public string opt_target = null;
             public void Exe()
             {
-                string all = null;
-                List<string> r_exportItems = Restrict(names, true, true, false, false);  //only matrices, #x
-                foreach (string s in r_exportItems)
-                {
-                    string rawS = G.Chop_RemoveBank(s).Replace(Globals.symbolCollection.ToString(), "");
-                    
-                    IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError, true);
-                    //IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + s, out iv);
-                    if (iv != null && iv.Type() == EVariableType.Matrix)
-                    {
-                        Matrix m = (Matrix)iv;
-                        string xxx = Program.MatrixFromGekkoToR<double>(rawS, m.data);
-                        all += xxx + G.NL;
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Could not find matrix " + s);
-                        throw new GekkoException();
-                    }
-                }
-                if (this.opt_target == null)
-                {
-                    //insert at top
-                    List<string> l2 = new List<string>();
-                    l2.Add(all);
-                    if (Globals.r_fileContent != null) l2.AddRange(Globals.r_fileContent);
-                    Globals.r_fileContent = l2;
-                }
-                else
-                {
-                    bool hit = false;
-                    List<string> l2 = new List<string>();
-                    if (Globals.r_fileContent == null)
-                    {
-                        G.Writeln2("*** ERROR: the R_FILE is empty");
-                        throw new GekkoException();
-                    }
-                    foreach (string line in Globals.r_fileContent)
-                    {
-                        l2.Add(line);                        
-                        if (line.TrimStart().ToLower().StartsWith("gekkoimport "))
-                        {
-                            string[] ss = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                            if (ss.Length > 1)
-                            {
-                                if (G.IsIdent(ss[1]))
-                                {
-                                    string foundBlock = ss[1];
-                                    if(G.Equal(this.opt_target,foundBlock)) {
-                                        l2.Add(all);
-                                        hit = true;
-                                    }
-                                }
-                            }
-                        }                        
-                    }
-                    if (hit == false)
-                    {
-                        G.Writeln2("*** ERROR: Could not find statement 'gekkoimport " + this.opt_target + "' in the R file");
-                        throw new GekkoException();
-                    }
-                    Globals.r_fileContent = l2;
-                }
-            }
+                Program.ROrPythonExport(this, null, 0);
+            }            
         }
+
         public class R_run
         {
             public string opt_mute = null;
@@ -11038,6 +10976,36 @@ namespace Gekko
                 Program.RunR(this);
             }
         }
+
+
+        public class Python_file
+        {
+            public string fileName = null;
+            public void Exe()
+            {
+                Globals.python_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName));
+            }
+        }
+
+        public class Python_export
+        {
+            public List names = null;
+            public string opt_target = null;
+            public void Exe()
+            {
+                Program.ROrPythonExport(null, this, 1);
+            }
+        }
+
+        public class Python_run
+        {
+            public string opt_mute = null;
+            public void Exe()
+            {
+                Program.RunPython(this);
+            }
+        }
+
 
         public class Sys
         {

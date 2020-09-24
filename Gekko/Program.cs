@@ -10599,6 +10599,80 @@ namespace Gekko
             return s;
         }
 
+        public static void ROrPythonExport(O.R_export o, O.Python_export o2, int type)
+        {
+            //type 0 = R, type 1 = Python
+            List<string> fileContent = Globals.r_fileContent;
+            string programName = "R";
+            if (type == 1)
+            {
+                fileContent = Globals.python_fileContent;
+                programName = "Python";                
+            }
+            string all = null;
+            List<string> r_exportItems = O.Restrict(o.names, true, true, false, false);  //only matrices, #x
+            foreach (string s in r_exportItems)
+            {
+                string rawS = G.Chop_RemoveBank(s).Replace(Globals.symbolCollection.ToString(), "");
+                IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true);
+                if (iv != null && iv.Type() == EVariableType.Matrix)
+                {
+                    Matrix m = (Matrix)iv;
+                    string xxx = Program.MatrixFromGekkoToR<double>(rawS, m.data);
+                    all += xxx + G.NL;
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Could not find matrix " + s);
+                    throw new GekkoException();
+                }
+            }
+            if (o.opt_target == null)
+            {
+                //insert at top
+                List<string> l2 = new List<string>();
+                l2.Add(all);
+                if (Globals.r_fileContent != null) l2.AddRange(Globals.r_fileContent);
+                Globals.r_fileContent = l2;
+            }
+            else
+            {
+                bool hit = false;
+                List<string> l2 = new List<string>();
+                if (Globals.r_fileContent == null)
+                {
+                    G.Writeln2("*** ERROR: the " + programName.ToUpper() + "_FILE is empty");
+                    throw new GekkoException();
+                }
+                foreach (string line in Globals.r_fileContent)
+                {
+                    l2.Add(line);
+                    if (line.TrimStart().ToLower().StartsWith("gekkoimport "))
+                    {
+                        string[] ss = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        if (ss.Length > 1)
+                        {
+                            if (G.IsIdent(ss[1]))
+                            {
+                                string foundBlock = ss[1];
+                                if (G.Equal(o.opt_target, foundBlock))
+                                {
+                                    l2.Add(all);
+                                    hit = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (hit == false)
+                {
+                    G.Writeln2("*** ERROR: Could not find statement 'gekkoimport " + o.opt_target + "' in the " + programName + " file");
+                    throw new GekkoException();
+                }
+                Globals.r_fileContent = l2;
+            }
+        }
+
         public static void RunR(Gekko.O.R_run o)
         {
             //This is just a rename, can be remove at some point in the future
@@ -10824,10 +10898,68 @@ namespace Gekko
             //WaitForFileDelete(
         }
 
-        public static string Python()
-        {            
-            string cmd = "p.py";
-            string args = "";
+        public static void RunPython(Gekko.O.Python_run o)
+        {
+            string RFileName = Globals.localTempFilesLocation + "\\tempPyFile.py";
+            string RExportFileName = Globals.localTempFilesLocation + "\\tempPy2Gekko.txt";
+            List<string> lines2 = new List<string>();
+
+            string def1 = "#gekkoexport function def start";
+            string def2 = "#gekkoexport function def end";
+
+            lines2.Add(def1);
+            lines2.Add("import numpy as np");
+            lines2.Add("def gekkoexport(input, name)");            
+            lines2.Add("  filename = '" + RExportFileName.Replace("\\", "\\\\") + "'");
+            lines2.Add("  rows, cols = a.shape");            
+            lines2.Add("  f = open('" + RFileName + "')");
+            lines2.Add("  f.write('name = ' + name + '\\n', 'a')");
+            lines2.Add("  f.write('rows = ' + rows + '\\n', 'a')");
+            lines2.Add("  f.write('cols = ' + cols + '\\n', 'a')");
+            lines2.Add("  for i in range(0, rows):");
+            lines2.Add("    for j in range(0, cols):");
+            lines2.Add("      f.write(a[i, j] + '\\n', 'a')");            
+            lines2.Add("  f.close()");
+            lines2.Add("}");
+            lines2.Add(def2);
+            string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
+
+            using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(f);
+                foreach (string s2 in Globals.r_fileContent)
+                {
+                    if (s2.TrimStart().ToLower().StartsWith("gekkoimport ")) continue;
+                    sw.WriteLine(s2);
+                }
+                sw.Flush();
+                sw.Close();
+            }
+
+            //Make python2gekko.txt file that Python later on fills into
+            using (FileStream fs = WaitForFileStream(RExportFileName, GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.WriteLine("Python2Gekko version 1.0");
+                sw.WriteLine("-------------------");
+                sw.Flush();
+                sw.Close();
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             string pythonPathUsedHere = null;
             if (Program.options.python_exe_folder.Trim() == "")
@@ -10835,16 +10967,16 @@ namespace Gekko
                 //no path stated manually
                 if (Globals.detectedPythonPath == null || Globals.detectedPythonPath == "[[PythonDetectFailed]]")
                 {
-                    //do not do this every time R is called!
-                    string pythonPath = null;  // ---> look in regedit
+                    //do not do this every time Python is called!
+                    string pythonPath = GetPythonPath();
                     if (pythonPath == null || pythonPath.Trim() == "") Globals.detectedPythonPath = "[[PythonDetectFailed]]";
-                    else Globals.detectedPythonPath = pythonPath + "\\bin\\R.exe";
+                    else Globals.detectedPythonPath = pythonPath;
                 }
                 else
                 {
                     //either second etc. time, or previous detect fail                    
                 }
-                pythonPathUsedHere = Globals.detectedRPath;
+                pythonPathUsedHere = Globals.detectedPythonPath;
             }
             else
             {
@@ -10860,9 +10992,199 @@ namespace Gekko
                 }
             }
 
-            //Now RPathUsedHere should be either
-            // - A file path ending with "\R.exe"
-            // - "[[RDetectFailed]]"
+            //Now pythonPathUsedHere should be either
+            // - A file path ending with "\python.exe"
+            // - "[[PythonDetectFailed]]"
+
+            if (pythonPathUsedHere == "[[PythonDetectFailed]]")
+            {
+                G.Writeln2("*** ERROR: python.exe path could not be auto-detected.");
+                G.Writeln("           Please state the python.exe path manually with OPTION python exe folder = ...");
+                throw new GekkoException();
+            }
+
+            //Now pythonPathUsedHere is a file path ending with "\R.exe"            
+
+            Process process = new Process();
+
+            //It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
+            process.StartInfo.FileName = pythonPathUsedHere;
+            process.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            try
+            {
+                process.Start();
+            }
+            catch (Exception e)
+            {
+                if (!File.Exists(process.StartInfo.FileName))
+                {
+
+                    if (Program.options.python_exe_folder.Trim() == "")
+                    {
+                        //auto-detect
+                        G.Writeln2("*** ERROR: Error message: " + e.Message);
+                        G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
+                        G.Writeln("           You may try to manually set \"OPTION python exe folder = ... , if you know the");
+                        G.Writeln("           python.exe location.");
+                        G.Writeln("           To locate your python.exe file location, you may try this:");
+                        G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
+                        G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
+                    }
+                    else
+                    {
+                        //stated manually
+                        G.Writeln2("*** ERROR: Error message: " + e.Message);
+                        G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
+                        G.Writeln("           You may try to set \"OPTION python exe path = '';\" (or remove the option),");
+                        G.Writeln("           which will make Gekko try to auto-detect the python.exe path.");
+                        G.Writeln("           To locate your python.exe file location, you may try this:");
+                        G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
+                        G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
+                    }                    
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Error message: " + e.Message);
+                    G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " exists, but R fails");
+                }
+                throw new GekkoException();
+            }
+
+            process.WaitForExit();
+
+            if (!G.Equal(o.opt_mute, "yes") && File.Exists(RFileName + ".txt"))
+            {
+                string s3 = GetTextFromFileWithWait(RFileName + ".txt");
+                List<string> ss = G.ExtractLinesFromText(s3);
+                bool skip = true;  //avoid the method and the R header in input
+                G.Writeln();
+                foreach (string s2 in ss)
+                {
+                    if (!skip) G.Writeln(s2);
+                    if (s2.Contains(def2)) skip = false;
+                }
+                G.Writeln();
+            }
+
+            string s = Program.GetTextFromFileWithWait(RExportFileName);
+            List<string> lines = G.ExtractLinesFromText(s);
+            string data = null;
+            string name = null;
+            int rows = -12345;
+            int cols = -12345;
+            bool first = true;
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("Python2Gekko")) continue;
+                if (line.StartsWith("---"))
+                {
+                    if (first)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    else
+                    {
+                        string[] ss = data.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        Matrix m = new Matrix(rows, cols);
+
+                        int cnt = -1;
+                        foreach (string s2 in ss)
+                        {
+                            cnt++;
+                            double d = double.NaN;
+                            if (s2 != "NA") d = G.ParseIntoDouble(s2);
+                            m.data[cnt / cols, cnt % cols] = d;
+                        }
+
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name, m);
+
+                        data = null;
+                        name = null;
+                        rows = -12345;
+                        cols = -12345;
+                        continue;
+                    }
+                }
+                if (line.StartsWith("name ="))
+                {
+                    name = line.Split('=')[1].Trim();
+                    continue;
+                }
+                if (line.StartsWith("rows ="))
+                {
+                    rows = int.Parse(line.Split('=')[1].Trim());
+                    continue;
+                }
+                if (line.StartsWith("cols ="))
+                {
+                    cols = int.Parse(line.Split('=')[1].Trim());
+                    continue;
+                }
+                data += line + " ";
+            }            
+        }
+
+        public static string GetPythonPath()
+        {
+            //https://gis.stackexchange.com/questions/44411/how-can-i-programmatically-get-the-path-of-python-exe-used-by-arcmap
+            IDictionary environmentVariables = Environment.GetEnvironmentVariables();
+            string pathVariable = environmentVariables["Path"] as string;
+            if (pathVariable != null)
+            {
+                string[] allPaths = pathVariable.Split(';');
+                foreach (var path in allPaths)
+                {
+                    string pythonPathFromEnv = path + "\\python.exe";
+                    if (File.Exists(pythonPathFromEnv))
+                        return pythonPathFromEnv;
+                }
+            }
+            return null;
+        }
+
+        public static string Python()
+        {            
+            string cmd = "p.py";
+            string args = "";
+
+            string pythonPathUsedHere = null;
+            if (Program.options.python_exe_folder.Trim() == "")
+            {
+                //no path stated manually
+                if (Globals.detectedPythonPath == null || Globals.detectedPythonPath == "[[PythonDetectFailed]]")
+                {
+                    //do not do this every time Python is called!
+                    string pythonPath = GetPythonPath();
+                    if (pythonPath == null || pythonPath.Trim() == "") Globals.detectedPythonPath = "[[PythonDetectFailed]]";
+                    else Globals.detectedPythonPath = pythonPath;
+                }
+                else
+                {
+                    //either second etc. time, or previous detect fail                    
+                }
+                pythonPathUsedHere = Globals.detectedPythonPath;
+            }
+            else
+            {
+                //overrides
+                if (Program.options.python_exe_folder.ToLower().EndsWith("\\python.exe"))
+                {
+                    pythonPathUsedHere = Program.options.python_exe_folder;
+                }
+                else
+                {
+                    if (Program.options.python_exe_folder.EndsWith("\\")) pythonPathUsedHere = Program.options.python_exe_folder + "python.exe";
+                    else pythonPathUsedHere = Program.options.python_exe_folder + "\\python.exe";
+                }
+            }
+
+            //Now pythonPathUsedHere should be either
+            // - A file path ending with "\python.exe"
+            // - "[[PythonDetectFailed]]"
 
             if (pythonPathUsedHere == "[[PythonDetectFailed]]")
             {
@@ -10879,8 +11201,7 @@ namespace Gekko
             start.RedirectStandardOutput = true;// Any output, generated by application will be redirected back
             start.RedirectStandardError = true; // Any error in standard output will be redirected back (for example exceptions)
             start.WindowStyle = ProcessWindowStyle.Hidden;  //???
-
-
+            
             try
             {
                 using (Process process = Process.Start(start))
@@ -10903,9 +11224,11 @@ namespace Gekko
                         //auto-detect
                         G.Writeln2("*** ERROR: Error message: " + e.Message);
                         G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
-                        G.Writeln("           You may try to manually set \"OPTION python exe folder = ... , if you know the python.exe location.");
-                        G.Writeln("           python.exe file locations may be similar to this:");
-                        G.Writeln("             c:\\Users\\[username]\\AppData\\Local\\Programs\\Python\\Python36\\python.exe");
+                        G.Writeln("           You may try to manually set \"OPTION python exe folder = ... , if you know the");
+                        G.Writeln("           python.exe location.");
+                        G.Writeln("           To locate your python.exe file location, you may try this:");
+                        G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
+                        G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
                     }
                     else
                     {
@@ -10914,8 +11237,9 @@ namespace Gekko
                         G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
                         G.Writeln("           You may try to set \"OPTION python exe path = '';\" (or remove the option),");
                         G.Writeln("           which will make Gekko try to auto-detect the python.exe path.");
-                        G.Writeln("           python.exe file locations may be similar to this:");
-                        G.Writeln("             c:\\Users\\[your-name]\\AppData\\Local\\Programs\\Python\\Python36\\python.exe");
+                        G.Writeln("           To locate your python.exe file location, you may try this:");
+                        G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
+                        G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
                     }
                 }
                 else
