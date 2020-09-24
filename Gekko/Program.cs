@@ -10784,8 +10784,13 @@ namespace Gekko
 
             //It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
             //r.StartInfo.FileName = RPathUsedHere;
+
+            G.Writeln2("----- R start -----");
+
             string ss7 = "\"\"" + RPathUsedHere + "\" --no-save \"" + RFileName + "\"\"";
             Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"));
+
+            G.Writeln("------ R end ------");
 
 
             //r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
@@ -10793,62 +10798,70 @@ namespace Gekko
 
             //sys'c:\Progra~1\R\R-3.6.2\bin\i386\rscript.exe --no-save test.r';
 
-            try
+            if (false)
             {
-                r.Start();
-            }
-            catch (Exception e)
-            {
-                if (!File.Exists(r.StartInfo.FileName))
+
+                try
                 {
-                    if (Program.options.r_exe_folder.Trim() == "")
+                    r.Start();
+                }
+                catch (Exception e)
+                {
+                    if (!File.Exists(r.StartInfo.FileName))
                     {
-                        //auto-detect
-                        G.Writeln2("*** ERROR: Error message: " + e.Message);
-                        G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
-                        G.Writeln("           You may try to manually set \"OPTION r exe folder = ... , if you know the R.exe location.");
-                        G.Writeln("           R.exe file locations may be similar to these:");
-                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
-                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
-                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
-                        G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
+                        if (Program.options.r_exe_folder.Trim() == "")
+                        {
+                            //auto-detect
+                            G.Writeln2("*** ERROR: Error message: " + e.Message);
+                            G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
+                            G.Writeln("           You may try to manually set \"OPTION r exe folder = ... , if you know the R.exe location.");
+                            G.Writeln("           R.exe file locations may be similar to these:");
+                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
+                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
+                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
+                            G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
+                        }
+                        else
+                        {
+                            //stated manually
+                            G.Writeln2("*** ERROR: Error message: " + e.Message);
+                            G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
+                            G.Writeln("           You may try to set \"OPTION r exe path = '';\" (or remove the option),");
+                            G.Writeln("           which will make Gekko try to auto-detect the R.exe path.");
+                            G.Writeln("           R.exe file locations may be similar to these:");
+                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
+                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
+                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
+                            G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
+                        }
                     }
                     else
                     {
-                        //stated manually
                         G.Writeln2("*** ERROR: Error message: " + e.Message);
-                        G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
-                        G.Writeln("           You may try to set \"OPTION r exe path = '';\" (or remove the option),");
-                        G.Writeln("           which will make Gekko try to auto-detect the R.exe path.");
-                        G.Writeln("           R.exe file locations may be similar to these:");
-                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
-                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
-                        G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
-                        G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
+                        G.Writeln("*** ERROR: The file " + RPathUsedHere + " exists, but R fails");
                     }
+                    throw new GekkoException();
                 }
-                else
-                {
-                    G.Writeln2("*** ERROR: Error message: " + e.Message);
-                    G.Writeln("*** ERROR: The file " + RPathUsedHere + " exists, but R fails");
-                }
-                throw new GekkoException();
             }
 
-            r.WaitForExit();
-
-            if (!G.Equal(o.opt_mute, "yes") && File.Exists(RFileName + ".txt"))
+            if (false)
             {
-                string s3 = GetTextFromFileWithWait(RFileName + ".txt");
-                List<string> ss = G.ExtractLinesFromText(s3);
-                bool skip = true;  //avoid the method and the R header in input
-                G.Writeln();
-                foreach (string s2 in ss)
+
+                r.WaitForExit();
+
+                if (!G.Equal(o.opt_mute, "yes") && File.Exists(RFileName + ".txt"))
                 {
-                    if (!skip) G.Writeln(s2);
-                    if (s2.Contains(def2)) skip = false;
+                    string s3 = GetTextFromFileWithWait(RFileName + ".txt");
+                    List<string> ss = G.ExtractLinesFromText(s3);
+                    bool skip = true;  //avoid the method and the R header in input
+                    G.Writeln();
+                    foreach (string s2 in ss)
+                    {
+                        if (!skip) G.Writeln(s2);
+                        if (s2.Contains(def2)) skip = false;
+                    }
+                    G.Writeln();
                 }
-                G.Writeln();
             }
 
             string s = Program.GetTextFromFileWithWait(RExportFileName);
