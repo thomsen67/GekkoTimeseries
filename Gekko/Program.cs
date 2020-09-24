@@ -10705,6 +10705,12 @@ namespace Gekko
             lines2.Add(def2);
             string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
 
+            if (Globals.r_fileContent == null)
+            {
+                G.Writeln2("*** ERROR: No R file defined in R_FILE");
+                throw new GekkoException();
+            }
+
             using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -10728,6 +10734,8 @@ namespace Gekko
                 sw.Close();
             }
 
+            string exe = "rscript.exe";
+
             string RPathUsedHere = null;
             if (Program.options.r_exe_folder.Trim() == "")
             {
@@ -10737,7 +10745,7 @@ namespace Gekko
                     //do not do this every time R is called!
                     string RPath = GetRhomeWin32NT(null);
                     if (RPath == null || RPath.Trim() == "") Globals.detectedRPath = "[[RDetectFailed]]";
-                    else Globals.detectedRPath = RPath + "\\bin\\R.exe";
+                    else Globals.detectedRPath = RPath + "\\bin\\" + exe;
                 }
                 else
                 {
@@ -10748,19 +10756,19 @@ namespace Gekko
             else
             {
                 //overrides
-                if (Program.options.r_exe_folder.ToLower().EndsWith("\\r.exe"))
+                if (Program.options.r_exe_folder.ToLower().EndsWith("\\" + exe))
                 {
                     RPathUsedHere = Program.options.r_exe_folder;
                 }
                 else
                 {
-                    if (Program.options.r_exe_folder.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_folder + "R.exe";
-                    else RPathUsedHere = Program.options.r_exe_folder + "\\R.exe";
+                    if (Program.options.r_exe_folder.EndsWith("\\")) RPathUsedHere = Program.options.r_exe_folder + exe;
+                    else RPathUsedHere = Program.options.r_exe_folder + "\\" + exe;
                 }
             }
 
             //Now RPathUsedHere should be either
-            // - A file path ending with "\R.exe"
+            // - A file path ending with "\rscript.exe"
             // - "[[RDetectFailed]]"
 
             if (RPathUsedHere == "[[RDetectFailed]]")
@@ -10775,9 +10783,15 @@ namespace Gekko
             Process r = new Process();
 
             //It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
-            r.StartInfo.FileName = RPathUsedHere;
-            r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
-            r.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            //r.StartInfo.FileName = RPathUsedHere;
+            string ss7 = "\"\"" + RPathUsedHere + "\" --no-save \"" + RFileName + "\"\"";
+            Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"));
+
+
+            //r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
+            //r.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            //sys'c:\Progra~1\R\R-3.6.2\bin\i386\rscript.exe --no-save test.r';
 
             try
             {
@@ -10900,8 +10914,8 @@ namespace Gekko
 
         public static void RunPython(Gekko.O.Python_run o)
         {
-            string RFileName = Globals.localTempFilesLocation + "\\tempPyFile.py";
-            string RExportFileName = Globals.localTempFilesLocation + "\\tempPy2Gekko.txt";
+            string pythonFileName = Globals.localTempFilesLocation + "\\tempPyFile.py";
+            string pythonExportFileName = Globals.localTempFilesLocation + "\\tempPy2Gekko.txt";
             List<string> lines2 = new List<string>();
 
             string def1 = "#gekkoexport function def start";
@@ -10910,9 +10924,9 @@ namespace Gekko
             lines2.Add(def1);
             lines2.Add("import numpy as np");
             lines2.Add("def gekkoexport(input, name)");            
-            lines2.Add("  filename = '" + RExportFileName.Replace("\\", "\\\\") + "'");
+            lines2.Add("  filename = '" + pythonExportFileName.Replace("\\", "\\\\") + "'");
             lines2.Add("  rows, cols = a.shape");            
-            lines2.Add("  f = open('" + RFileName + "')");
+            lines2.Add("  f = open('" + pythonFileName + "')");
             lines2.Add("  f.write('name = ' + name + '\\n', 'a')");
             lines2.Add("  f.write('rows = ' + rows + '\\n', 'a')");
             lines2.Add("  f.write('cols = ' + cols + '\\n', 'a')");
@@ -10924,11 +10938,17 @@ namespace Gekko
             lines2.Add(def2);
             string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
 
-            using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))
+            if (Globals.python_fileContent == null)
+            {
+                G.Writeln2("*** ERROR: No Python file defined in PYTHON_FILE");
+                throw new GekkoException();
+            }
+
+            using (FileStream fs = WaitForFileStream(pythonFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.Write(f);
-                foreach (string s2 in Globals.r_fileContent)
+                foreach (string s2 in Globals.python_fileContent)
                 {
                     if (s2.TrimStart().ToLower().StartsWith("gekkoimport ")) continue;
                     sw.WriteLine(s2);
@@ -10938,7 +10958,7 @@ namespace Gekko
             }
 
             //Make python2gekko.txt file that Python later on fills into
-            using (FileStream fs = WaitForFileStream(RExportFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pythonExportFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.WriteLine("Python2Gekko version 1.0");
@@ -11009,8 +11029,16 @@ namespace Gekko
 
             //It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
             process.StartInfo.FileName = pythonPathUsedHere;
-            process.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
+            //process.StartInfo.Arguments = " CMD BATCH " + Globals.QT + pythonFileName + Globals.QT + " > " + Globals.QT + pythonFileName + ".txt" + Globals.QT;
+            process.StartInfo.Arguments = "" + Globals.QT + pythonFileName + Globals.QT + " >> " + Globals.QT + pythonFileName + ".txt" + Globals.QT;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+
+            process.StartInfo.UseShellExecute = false; // Do not use OS shell
+            process.StartInfo.CreateNoWindow = true; // We don't need new window
+            process.StartInfo.RedirectStandardOutput = true;// Any output, generated by application will be redirected back
+            process.StartInfo.RedirectStandardError = true; // Any error in standard output will be redirected back (for example exceptions)
+            
 
             try
             {
@@ -11054,9 +11082,9 @@ namespace Gekko
 
             process.WaitForExit();
 
-            if (!G.Equal(o.opt_mute, "yes") && File.Exists(RFileName + ".txt"))
+            if (!G.Equal(o.opt_mute, "yes") && File.Exists(pythonFileName + ".txt"))
             {
-                string s3 = GetTextFromFileWithWait(RFileName + ".txt");
+                string s3 = GetTextFromFileWithWait(pythonFileName + ".txt");
                 List<string> ss = G.ExtractLinesFromText(s3);
                 bool skip = true;  //avoid the method and the R header in input
                 G.Writeln();
@@ -11068,7 +11096,7 @@ namespace Gekko
                 G.Writeln();
             }
 
-            string s = Program.GetTextFromFileWithWait(RExportFileName);
+            string s = Program.GetTextFromFileWithWait(pythonExportFileName);
             List<string> lines = G.ExtractLinesFromText(s);
             string data = null;
             string name = null;
@@ -11146,111 +11174,111 @@ namespace Gekko
             return null;
         }
 
-        public static string Python()
-        {            
-            string cmd = "p.py";
-            string args = "";
+        //public static string Python()
+        //{            
+        //    string cmd = "p.py";
+        //    string args = "";
 
-            string pythonPathUsedHere = null;
-            if (Program.options.python_exe_folder.Trim() == "")
-            {
-                //no path stated manually
-                if (Globals.detectedPythonPath == null || Globals.detectedPythonPath == "[[PythonDetectFailed]]")
-                {
-                    //do not do this every time Python is called!
-                    string pythonPath = GetPythonPath();
-                    if (pythonPath == null || pythonPath.Trim() == "") Globals.detectedPythonPath = "[[PythonDetectFailed]]";
-                    else Globals.detectedPythonPath = pythonPath;
-                }
-                else
-                {
-                    //either second etc. time, or previous detect fail                    
-                }
-                pythonPathUsedHere = Globals.detectedPythonPath;
-            }
-            else
-            {
-                //overrides
-                if (Program.options.python_exe_folder.ToLower().EndsWith("\\python.exe"))
-                {
-                    pythonPathUsedHere = Program.options.python_exe_folder;
-                }
-                else
-                {
-                    if (Program.options.python_exe_folder.EndsWith("\\")) pythonPathUsedHere = Program.options.python_exe_folder + "python.exe";
-                    else pythonPathUsedHere = Program.options.python_exe_folder + "\\python.exe";
-                }
-            }
+        //    string pythonPathUsedHere = null;
+        //    if (Program.options.python_exe_folder.Trim() == "")
+        //    {
+        //        //no path stated manually
+        //        if (Globals.detectedPythonPath == null || Globals.detectedPythonPath == "[[PythonDetectFailed]]")
+        //        {
+        //            //do not do this every time Python is called!
+        //            string pythonPath = GetPythonPath();
+        //            if (pythonPath == null || pythonPath.Trim() == "") Globals.detectedPythonPath = "[[PythonDetectFailed]]";
+        //            else Globals.detectedPythonPath = pythonPath;
+        //        }
+        //        else
+        //        {
+        //            //either second etc. time, or previous detect fail                    
+        //        }
+        //        pythonPathUsedHere = Globals.detectedPythonPath;
+        //    }
+        //    else
+        //    {
+        //        //overrides
+        //        if (Program.options.python_exe_folder.ToLower().EndsWith("\\python.exe"))
+        //        {
+        //            pythonPathUsedHere = Program.options.python_exe_folder;
+        //        }
+        //        else
+        //        {
+        //            if (Program.options.python_exe_folder.EndsWith("\\")) pythonPathUsedHere = Program.options.python_exe_folder + "python.exe";
+        //            else pythonPathUsedHere = Program.options.python_exe_folder + "\\python.exe";
+        //        }
+        //    }
 
-            //Now pythonPathUsedHere should be either
-            // - A file path ending with "\python.exe"
-            // - "[[PythonDetectFailed]]"
+        //    //Now pythonPathUsedHere should be either
+        //    // - A file path ending with "\python.exe"
+        //    // - "[[PythonDetectFailed]]"
 
-            if (pythonPathUsedHere == "[[PythonDetectFailed]]")
-            {
-                G.Writeln2("*** ERROR: python.exe path could not be auto-detected.");
-                G.Writeln("           Please state the python.exe path manually with OPTION python exe folder = ...");
-                throw new GekkoException();
-            }
+        //    if (pythonPathUsedHere == "[[PythonDetectFailed]]")
+        //    {
+        //        G.Writeln2("*** ERROR: python.exe path could not be auto-detected.");
+        //        G.Writeln("           Please state the python.exe path manually with OPTION python exe folder = ...");
+        //        throw new GekkoException();
+        //    }
 
-            ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = pythonPathUsedHere;
-            start.Arguments = string.Format("\"{0}\" \"{1}\"", cmd, args);
-            start.UseShellExecute = false;// Do not use OS shell
-            start.CreateNoWindow = true; // We don't need new window
-            start.RedirectStandardOutput = true;// Any output, generated by application will be redirected back
-            start.RedirectStandardError = true; // Any error in standard output will be redirected back (for example exceptions)
-            start.WindowStyle = ProcessWindowStyle.Hidden;  //???
+        //    ProcessStartInfo start = new ProcessStartInfo();
+        //    start.FileName = pythonPathUsedHere;
+        //    start.Arguments = string.Format("\"{0}\" \"{1}\"", cmd, args);
+        //    start.UseShellExecute = false;// Do not use OS shell
+        //    start.CreateNoWindow = true; // We don't need new window
+        //    start.RedirectStandardOutput = true;// Any output, generated by application will be redirected back
+        //    start.RedirectStandardError = true; // Any error in standard output will be redirected back (for example exceptions)
+        //    start.WindowStyle = ProcessWindowStyle.Hidden;  //???
             
-            try
-            {
-                using (Process process = Process.Start(start))
-                {
-                    using (StreamReader reader = process.StandardOutput)
-                    {
-                        string stderr = process.StandardError.ReadToEnd(); // Here are the exceptions from our Python script
-                        string result = reader.ReadToEnd(); // Here is the result of StdOut(for example: print "test")
-                        return result + G.NL + stderr; ;
-                    }
-                }
-            }
-            //Now PythonPathUsedHere is a file path ending with "\python.exe"            
-            catch (Exception e)
-            {
-                if (!File.Exists(start.FileName))
-                {
-                    if (Program.options.python_exe_folder.Trim() == "")
-                    {
-                        //auto-detect
-                        G.Writeln2("*** ERROR: Error message: " + e.Message);
-                        G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
-                        G.Writeln("           You may try to manually set \"OPTION python exe folder = ... , if you know the");
-                        G.Writeln("           python.exe location.");
-                        G.Writeln("           To locate your python.exe file location, you may try this:");
-                        G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
-                        G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
-                    }
-                    else
-                    {
-                        //stated manually
-                        G.Writeln2("*** ERROR: Error message: " + e.Message);
-                        G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
-                        G.Writeln("           You may try to set \"OPTION python exe path = '';\" (or remove the option),");
-                        G.Writeln("           which will make Gekko try to auto-detect the python.exe path.");
-                        G.Writeln("           To locate your python.exe file location, you may try this:");
-                        G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
-                        G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
-                    }
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Error message: " + e.Message);
-                    G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " exists, but Python fails");
-                }
-                throw new GekkoException();
-            }            
+        //    try
+        //    {
+        //        using (Process process = Process.Start(start))
+        //        {
+        //            using (StreamReader reader = process.StandardOutput)
+        //            {
+        //                string stderr = process.StandardError.ReadToEnd(); // Here are the exceptions from our Python script
+        //                string result = reader.ReadToEnd(); // Here is the result of StdOut(for example: print "test")
+        //                return result + G.NL + stderr; ;
+        //            }
+        //        }
+        //    }
+        //    //Now PythonPathUsedHere is a file path ending with "\python.exe"            
+        //    catch (Exception e)
+        //    {
+        //        if (!File.Exists(start.FileName))
+        //        {
+        //            if (Program.options.python_exe_folder.Trim() == "")
+        //            {
+        //                //auto-detect
+        //                G.Writeln2("*** ERROR: Error message: " + e.Message);
+        //                G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
+        //                G.Writeln("           You may try to manually set \"OPTION python exe folder = ... , if you know the");
+        //                G.Writeln("           python.exe location.");
+        //                G.Writeln("           To locate your python.exe file location, you may try this:");
+        //                G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
+        //                G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
+        //            }
+        //            else
+        //            {
+        //                //stated manually
+        //                G.Writeln2("*** ERROR: Error message: " + e.Message);
+        //                G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
+        //                G.Writeln("           You may try to set \"OPTION python exe path = '';\" (or remove the option),");
+        //                G.Writeln("           which will make Gekko try to auto-detect the python.exe path.");
+        //                G.Writeln("           To locate your python.exe file location, you may try this:");
+        //                G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
+        //                G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            G.Writeln2("*** ERROR: Error message: " + e.Message);
+        //            G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " exists, but Python fails");
+        //        }
+        //        throw new GekkoException();
+        //    }            
             
-        }
+        //}
 
         public static void AddToPrecedents(Databank db, string varnameWithFreq)
         {
@@ -18040,11 +18068,11 @@ namespace Gekko
         {            
             if (Globals.runningOnTTComputer)
             {
-                if (text == "python")
-                {
-                    string s = Python();
-                    G.Writeln2(s);
-                }                
+                //if (text == "python")
+                //{
+                //    string s = Python();
+                //    G.Writeln2(s);
+                //}                
             }
 
             if (nocr) G.Write(text);

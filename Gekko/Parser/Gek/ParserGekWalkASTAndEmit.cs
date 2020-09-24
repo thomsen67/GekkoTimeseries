@@ -5850,6 +5850,42 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".r_exportItems = new List<string>() {" + s2 + "};" + G.NL);
                         }
                         break;
+                    case "ASTPYTHON_FILE":
+                        {
+                            node.Code.A("O.Python_file o" + Num(node) + " = new O.Python_file();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0][0].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTPYTHON_EXPORT":
+                        {
+                            node.Code.A("O.Python_export o" + Num(node) + " = new O.Python_export();" + G.NL);
+                            GetCodeFromAllChildren(node, node[0]);
+                            node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTPYTHON_RUN":
+                        {
+                            node.Code.A("O.Python_run o" + Num(node) + " = new O.Python_run();" + G.NL);
+                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTPYTHON_EXPORTITEMS":
+                        {
+                            //G.Writeln2(node.Text);                            
+                            string s2 = "";
+                            bool first = true;
+                            foreach (ASTNode child in node.ChildrenIterator())
+                            {
+                                if (first) s2 += "`" + child.Text + "`";
+                                else s2 += ", `" + child.Text + "`";
+                                first = false;
+                            }
+                            node.Code.A("o" + Num(node) + ".python_exportItems = new List<string>() {" + s2 + "};" + G.NL);
+                        }
+                        break;
                     case "ASTTRANSLATE":
                         {
                             node.Code.A("O.Translate o" + Num(node) + " = new O.Translate();" + G.NL);

@@ -741,6 +741,10 @@ ASTOPT_STRING_Y2;
     ASTR_EXPORTITEMS ;
     ASTR_FILE;
     ASTR_RUN;
+	ASTPYTHON_EXPORT;
+    ASTPYTHON_EXPORTITEMS ;
+    ASTPYTHON_FILE;
+    ASTPYTHON_RUN;
     ASTRANGEWITHBANK;
     ASTREAD;
     ASTREAD;
@@ -1306,6 +1310,9 @@ Y2                    = 'Y2'                       ;
     R_EXPORT = 'R_EXPORT';
     R_FILE = 'R_FILE';
     R_RUN = 'R_RUN';
+	PYTHON_EXPORT = 'PYTHON_EXPORT';
+    PYTHON_FILE = 'PYTHON_FILE';
+    PYTHON_RUN = 'PYTHON_RUN';
     RD= 'RD'       ;
     RDP= 'RDP'       ;
     READ             = 'READ'            ;
@@ -1942,6 +1949,9 @@ d.Add("Y" ,Y);
                                         d.Add("R_EXPORT" , R_EXPORT);
                                         d.Add("R_FILE" ,R_FILE);
                                         d.Add("R_RUN" , R_RUN);
+										d.Add("PYTHON_EXPORT" , PYTHON_EXPORT);
+                                        d.Add("PYTHON_FILE" ,PYTHON_FILE);
+                                        d.Add("PYTHON_RUN" , PYTHON_RUN);
                                         d.Add("rd"               , RD );
                                         d.Add("rdp"               , RDP );
                                         d.Add("read"    , READ      );
@@ -2576,6 +2586,9 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | r_file               SEMICOLON!
 						  | r_export             SEMICOLON!
 						  | r_run                SEMICOLON!
+						  | python_file          SEMICOLON!
+						  | python_export        SEMICOLON!
+						  | python_run           SEMICOLON!
 						  | read                 SEMICOLON!
 						  | rebase               SEMICOLON!
 						  | rename               SEMICOLON!
@@ -3493,6 +3506,21 @@ r_run:  				    R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).L
 r_runOpt1:			        ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
 r_runOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// PYTHON_FILE, PYTHON_EXPORT, PYTHON_RUN
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+python_file:   				    PYTHON_FILE fileName -> ^({token("ASTPYTHON_FILE", ASTPYTHON_FILE, input.LT(1).Line)} ^(ASTPLACEHOLDER fileName?));
+
+python_export:  				PYTHON_EXPORT python_exportOpt1? seqOfBankvarnames -> ^({token("ASTPYTHON_EXPORT", ASTPYTHON_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER python_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
+python_exportOpt1:			    ISNOTQUAL | leftAngle python_exportOpt1h* RIGHTANGLE -> python_exportOpt1h*;
+python_exportOpt1h:             TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
+
+python_run:  				    PYTHON_RUN python_runOpt1? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)}  python_runOpt1? );
+python_runOpt1:			        ISNOTQUAL | leftAngle python_runOpt1h* RIGHTANGLE -> python_runOpt1h*;
+python_runOpt1h:                MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
+
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // REBASE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4341,6 +4369,9 @@ ident2: 					Ident |
   R_EXPORT|
   R_FILE|
   R_RUN|
+  PYTHON_EXPORT|
+  PYTHON_FILE|
+  PYTHON_RUN|
   READ|
   REBASE|
   RENAME|
