@@ -10599,19 +10599,31 @@ namespace Gekko
             return s;
         }
 
-        public static void ROrPythonExport(O.R_export o, O.Python_export o2, int type)
+        public static void ROrPythonExport(O.R_export o1, O.Python_export o2, int type)
         {
             //type 0 = R, type 1 = Python
-            List<string> fileContent = Globals.r_fileContent;
-            string programName = "R";
-            if (type == 1)
+
+            List<string> fileContent = null;
+            string programName = null;
+            List names = null;
+            string target = null;            
+            if (type == 0)
+            {
+                fileContent = Globals.r_fileContent;
+                programName = "R";
+                names = o1.names;
+                target = o1.opt_target;       
+            }
+            else 
             {
                 fileContent = Globals.python_fileContent;
-                programName = "Python";                
+                programName = "Python";
+                names = o2.names;
+                target = o2.opt_target;
             }
             string all = null;
-            List<string> r_exportItems = O.Restrict(o.names, true, true, false, false);  //only matrices, #x
-            foreach (string s in r_exportItems)
+            List<string> exportItems = O.Restrict(names, true, true, false, false);  //only matrices, #x
+            foreach (string s in exportItems)
             {
                 string rawS = G.Chop_RemoveBank(s).Replace(Globals.symbolCollection.ToString(), "");
                 IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true);
@@ -10627,24 +10639,24 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            if (o.opt_target == null)
+            if (target == null)
             {
                 //insert at top
                 List<string> l2 = new List<string>();
-                l2.Add(all);
-                if (Globals.r_fileContent != null) l2.AddRange(Globals.r_fileContent);
-                Globals.r_fileContent = l2;
+                l2.Add(all);                
+                if (fileContent != null) l2.AddRange(fileContent);
+                fileContent = l2;
             }
             else
             {
                 bool hit = false;
                 List<string> l2 = new List<string>();
-                if (Globals.r_fileContent == null)
+                if (fileContent == null)
                 {
                     G.Writeln2("*** ERROR: the " + programName.ToUpper() + "_FILE is empty");
                     throw new GekkoException();
                 }
-                foreach (string line in Globals.r_fileContent)
+                foreach (string line in fileContent)
                 {
                     l2.Add(line);
                     if (line.TrimStart().ToLower().StartsWith("gekkoimport "))
@@ -10655,7 +10667,7 @@ namespace Gekko
                             if (G.IsIdent(ss[1]))
                             {
                                 string foundBlock = ss[1];
-                                if (G.Equal(o.opt_target, foundBlock))
+                                if (G.Equal(target, foundBlock))
                                 {
                                     l2.Add(all);
                                     hit = true;
@@ -10666,10 +10678,12 @@ namespace Gekko
                 }
                 if (hit == false)
                 {
-                    G.Writeln2("*** ERROR: Could not find statement 'gekkoimport " + o.opt_target + "' in the " + programName + " file");
+                    G.Writeln2("*** ERROR: Could not find statement 'gekkoimport " + target + "' in the " + programName + " file");
                     throw new GekkoException();
                 }
-                Globals.r_fileContent = l2;
+
+                fileContent = l2;
+
             }
         }
 
@@ -10935,19 +10949,62 @@ namespace Gekko
             string def2 = "#gekkoexport function def end";
 
             lines2.Add(def1);
-            lines2.Add("import numpy as np");
-            lines2.Add("def gekkoexport(input, name)");            
-            lines2.Add("  filename = '" + pythonExportFileName.Replace("\\", "\\\\") + "'");
-            lines2.Add("  rows, cols = a.shape");            
-            lines2.Add("  f = open('" + pythonFileName + "')");
-            lines2.Add("  f.write('name = ' + name + '\\n', 'a')");
-            lines2.Add("  f.write('rows = ' + rows + '\\n', 'a')");
-            lines2.Add("  f.write('cols = ' + cols + '\\n', 'a')");
-            lines2.Add("  for i in range(0, rows):");
-            lines2.Add("    for j in range(0, cols):");
-            lines2.Add("      f.write(a[i, j] + '\\n', 'a')");            
-            lines2.Add("  f.close()");
-            lines2.Add("}");
+            //-------
+            lines2.Add(@"");
+            lines2.Add(@"import inspect");
+            lines2.Add(@"def gekkoexport(input, name2 = None):");
+            lines2.Add(@"  if name2 is None:  ");
+            lines2.Add(@"    frame = inspect.currentframe()");
+            lines2.Add(@"    frame = inspect.getouterframes(frame)[1]");
+            lines2.Add(@"    s = inspect.getframeinfo(frame[0]).code_context[0].strip()");
+            lines2.Add(@"    args = s[s.find('gekkoexport('):-1].split(')')");
+            lines2.Add(@"    name = args[0].replace('gekkoexport(', '') # only one gekkoexport() per line, and no expressions");
+            lines2.Add(@"  else:");
+            lines2.Add(@"    name = name2");
+
+            lines2.Add(@"  filename = r'" + pythonExportFileName + "'");
+            lines2.Add(@"  dim = -12345");
+            lines2.Add(@"  isList = False");
+            lines2.Add(@"  if isinstance(input, list):");
+            lines2.Add(@"    isList = True");
+            lines2.Add(@"    if (isinstance(input[0], list)):");
+            lines2.Add(@"      dim = 2 #could be higher...");
+            lines2.Add(@"      rows = len(input)");
+            lines2.Add(@"      cols = len(input[0])");
+            lines2.Add(@"    else:");
+            lines2.Add(@"      dim = 1");
+            lines2.Add(@"      rows = len(input)");
+            lines2.Add(@"      cols = 1");
+            lines2.Add(@"  elif isinstance(input, (int, float)):");
+            lines2.Add(@"    dim = 0");
+            lines2.Add(@"    rows = 1");
+            lines2.Add(@"    cols = 1");
+            lines2.Add(@"  else:");
+            lines2.Add(@"    if len(input.shape) == 1:");
+            lines2.Add(@"      dim = 1");
+            lines2.Add(@"      rows = input.shape[0]");
+            lines2.Add(@"      cols = 1");
+            lines2.Add(@"    else:");
+            lines2.Add(@"      dim = len(input.shape)");
+            lines2.Add(@"      rows, cols = input.shape");
+            lines2.Add(@"  f = open(filename, 'a')");
+            lines2.Add(@"  f.write('name = ' + name + '\n')");
+            lines2.Add(@"  f.write('rows = ' + str(rows) + '\n')");
+            lines2.Add(@"  f.write('cols = ' + str(cols) + '\n')");
+            lines2.Add(@"  if dim == 0:");
+            lines2.Add(@"    f.write(str(input) + '\n')");
+            lines2.Add(@"  elif dim == 1:");
+            lines2.Add(@"    for i in range(0, rows):");
+            lines2.Add(@"      f.write(str(input[i]) + '\n')");
+            lines2.Add(@"  elif dim == 2:");
+            lines2.Add(@"    for i in range(0, rows):");
+            lines2.Add(@"      for j in range(0, cols):");
+            lines2.Add(@"        if isList:");
+            lines2.Add(@"          f.write(str(input[i][j]) + '\n')");
+            lines2.Add(@"        else:");
+            lines2.Add(@"          f.write(str(input[i, j]) + '\n')");
+            lines2.Add(@"  f.close()");
+            //-------
             lines2.Add(def2);
             string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
 
@@ -10978,21 +11035,7 @@ namespace Gekko
                 sw.WriteLine("-------------------");
                 sw.Flush();
                 sw.Close();
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            }            
 
             string pythonPathUsedHere = null;
             if (Program.options.python_exe_folder.Trim() == "")
