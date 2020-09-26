@@ -10580,22 +10580,40 @@ namespace Gekko
             return r;
         }
 
-        public static string MatrixFromGekkoToR<T>(string Name, T[,] m)
+        public static string MatrixFromGekkoToROrPython<T>(string name, T[,] m, int type)
         {
-
             if (m == null || m.Length == 0) return null;
-
-            string s = Name + " = c(" + m[0, 0];
-
-            for (int i = 1; i < m.GetLength(0); i++)
-                s += "," + m[i, 0];
-
-            for (int j = 1; j < m.GetLength(1); j++)
+            string s = null;
+            if (type == 0)
+            {
+                //hmmm, why not just use the double loop, strange...
+                //maybe because of comma
+                s = name + " = c(" + m[0, 0];
+                for (int i = 1; i < m.GetLength(0); i++)
+                    s += "," + m[i, 0];
+                for (int j = 1; j < m.GetLength(1); j++)
+                    for (int i = 0; i < m.GetLength(0); i++)
+                        s += "," + m[i, j];
+                s += ")" + G.NL;
+                s += "dim(" + name + ") = c(" + m.GetLength(0) + ", " + m.GetLength(1) + ")";
+            }
+            else
+            {
+                s = name + " = ";
+                s += "numpy.array([";
                 for (int i = 0; i < m.GetLength(0); i++)
-                    s += "," + m[i, j];
-
-            s += ")" + G.NL;
-            s += "dim(" + Name + ") = c(" + m.GetLength(0) + ", " + m.GetLength(1) + ")";
+                {
+                    if (i > 0) s += ",";
+                    s += "[";
+                    for (int j = 0; j < m.GetLength(1); j++)
+                    {
+                        if (j > 0) s += ",";
+                        s += m[i, j];
+                    }
+                    s += "]";
+                }
+                s += "])";
+            }
             return s;
         }
 
@@ -10629,9 +10647,8 @@ namespace Gekko
                 IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true);
                 if (iv != null && iv.Type() == EVariableType.Matrix)
                 {
-                    Matrix m = (Matrix)iv;
-                    string xxx = Program.MatrixFromGekkoToR<double>(rawS, m.data);
-                    all += xxx + G.NL;
+                    Matrix m = (Matrix)iv;                    
+                    all += Program.MatrixFromGekkoToROrPython<double>(rawS, m.data, type) + G.NL;
                 }
                 else
                 {
@@ -10682,7 +10699,10 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                fileContent = l2;
+                fileContent.Clear();
+                foreach (string s in l2) fileContent.Add(s);
+                
+                //fileContent = l2;
 
             }
         }
@@ -10951,9 +10971,10 @@ namespace Gekko
             lines2.Add(def1);
             //-------
             lines2.Add(@"");
+            lines2.Add(@"import numpy");
             lines2.Add(@"import inspect");
             lines2.Add(@"def gekkoexport(input, name2 = None):");
-            lines2.Add(@"  if name2 is None:  ");
+            lines2.Add(@"  if name2 is None:");
             lines2.Add(@"    frame = inspect.currentframe()");
             lines2.Add(@"    frame = inspect.getouterframes(frame)[1]");
             lines2.Add(@"    s = inspect.getframeinfo(frame[0]).code_context[0].strip()");
@@ -10961,7 +10982,6 @@ namespace Gekko
             lines2.Add(@"    name = args[0].replace('gekkoexport(', '') # only one gekkoexport() per line, and no expressions");
             lines2.Add(@"  else:");
             lines2.Add(@"    name = name2");
-
             lines2.Add(@"  filename = r'" + pythonExportFileName + "'");
             lines2.Add(@"  dim = -12345");
             lines2.Add(@"  isList = False");
@@ -11079,12 +11099,13 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            G.Writeln2("----- R start -----");
+            G.Writeln2("----- Python start -----");
 
-            string ss7 = "\"\"" + pythonPathUsedHere + "\" \"" + pythonFileName + "\"\"";
+            //Python needs -u argument to show long-running processes output line by line
+            string ss7 = "\"\"" + pythonPathUsedHere + "\" -u \"" + pythonFileName + "\"\"";
             Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"));
 
-            G.Writeln("------ R end ------");
+            G.Writeln("------ Python end ------");
 
             //Now pythonPathUsedHere is a file path ending with "\R.exe"            
 
@@ -25641,7 +25662,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     Matrix m = (Matrix)iv;
-                    file.WriteLine(Program.MatrixFromGekkoToR<double>(s.Substring(1), m.data));
+                    file.WriteLine(Program.MatrixFromGekkoToROrPython<double>(s.Substring(1), m.data, 0));
                     file.WriteLine();
                 }
                 file.Flush();
