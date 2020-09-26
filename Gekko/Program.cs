@@ -10582,6 +10582,7 @@ namespace Gekko
 
         public static string MatrixFromGekkoToROrPython<T>(string name, T[,] m, int type)
         {
+            //See also MatrixFromROrPythonToGekko()
             if (m == null || m.Length == 0) return null;
             string s = null;
             if (type == 0)
@@ -10662,7 +10663,8 @@ namespace Gekko
                 List<string> l2 = new List<string>();
                 l2.Add(all);                
                 if (fileContent != null) l2.AddRange(fileContent);
-                fileContent = l2;
+                fileContent.Clear();
+                foreach (string s in l2) fileContent.Add(s);
             }
             else
             {
@@ -10745,8 +10747,8 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = new StreamWriter(fs))  //using GekkoStreamWriter() not good here, since it is best the file it UTF8
+            using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))            
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))  //using new StreamWriter() not good here, then problem with chars like (c) copyright in filename. See also #7284242898
             {
                 sw.Write(f);
                 foreach (string s2 in Globals.r_fileContent)
@@ -10826,7 +10828,6 @@ namespace Gekko
 
             G.Writeln("------ R end ------");
 
-
             //r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
             //r.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
@@ -10900,6 +10901,13 @@ namespace Gekko
 
             string s = Program.GetTextFromFileWithWait(RExportFileName);
             List<string> lines = G.ExtractLinesFromText(s);
+            MatrixFromROrPythonToGekko(lines, 0);
+            //WaitForFileDelete(
+        }
+
+        private static void MatrixFromROrPythonToGekko(List<string> lines, int type)
+        {
+            //See also MatrixFromGekkoToROrPython()
             string data = null;
             string name = null;
             int rows = -12345;
@@ -10907,7 +10915,8 @@ namespace Gekko
             bool first = true;
             foreach (string line in lines)
             {
-                if (line.StartsWith("R2Gekko")) continue;
+                if (type == 0 && line.StartsWith("R2Gekko")) continue;
+                if (type == 1 && line.StartsWith("Python2Gekko")) continue;
                 if (line.StartsWith("---"))
                 {
                     if (first)
@@ -10918,7 +10927,7 @@ namespace Gekko
                     else
                     {
                         string[] ss = data.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        
+
                         Matrix m = new Matrix(rows, cols);
 
                         int cnt = -1;
@@ -10956,7 +10965,6 @@ namespace Gekko
                 }
                 data += line + " ";
             }
-            //WaitForFileDelete(
         }
 
         public static void RunPython(Gekko.O.Python_run o)
@@ -11023,6 +11031,7 @@ namespace Gekko
             lines2.Add(@"          f.write(str(input[i][j]) + '\n')");
             lines2.Add(@"        else:");
             lines2.Add(@"          f.write(str(input[i, j]) + '\n')");
+            lines2.Add(@"  f.write('-------------------\n')");
             lines2.Add(@"  f.close()");
             //-------
             lines2.Add(def2);
@@ -11035,7 +11044,7 @@ namespace Gekko
             }
 
             using (FileStream fs = WaitForFileStream(pythonFileName, GekkoFileReadOrWrite.Write))
-            using (StreamWriter sw = new StreamWriter(fs))  //GekkoStreamWriter() not good here, since it is best the file it UTF8
+            using (StreamWriter sw = new StreamWriter(fs))    //using G.GekkoStreamWriter() not good here, then problem with chars like (c) copyright in filename. See also #7284242898
             {
                 sw.Write(f);
                 foreach (string s2 in Globals.python_fileContent)
@@ -11182,62 +11191,7 @@ namespace Gekko
 
             string s = Program.GetTextFromFileWithWait(pythonExportFileName);
             List<string> lines = G.ExtractLinesFromText(s);
-            string data = null;
-            string name = null;
-            int rows = -12345;
-            int cols = -12345;
-            bool first = true;
-            foreach (string line in lines)
-            {
-                if (line.StartsWith("Python2Gekko")) continue;
-                if (line.StartsWith("---"))
-                {
-                    if (first)
-                    {
-                        first = false;
-                        continue;
-                    }
-                    else
-                    {
-                        string[] ss = data.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                        Matrix m = new Matrix(rows, cols);
-
-                        int cnt = -1;
-                        foreach (string s2 in ss)
-                        {
-                            cnt++;
-                            double d = double.NaN;
-                            if (s2 != "NA") d = G.ParseIntoDouble(s2);
-                            m.data[cnt / cols, cnt % cols] = d;
-                        }
-
-                        Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name, m);
-
-                        data = null;
-                        name = null;
-                        rows = -12345;
-                        cols = -12345;
-                        continue;
-                    }
-                }
-                if (line.StartsWith("name ="))
-                {
-                    name = line.Split('=')[1].Trim();
-                    continue;
-                }
-                if (line.StartsWith("rows ="))
-                {
-                    rows = int.Parse(line.Split('=')[1].Trim());
-                    continue;
-                }
-                if (line.StartsWith("cols ="))
-                {
-                    cols = int.Parse(line.Split('=')[1].Trim());
-                    continue;
-                }
-                data += line + " ";
-            }            
+            MatrixFromROrPythonToGekko(lines, 1);                        
         }
 
         public static string GetPythonPath()
