@@ -3511,15 +3511,22 @@ r_runOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 // PYTHON_FILE, PYTHON_EXPORT, PYTHON_RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
+//deprecated
 python_file:   				    PYTHON_FILE fileName -> ^({token("ASTPYTHON_FILE", ASTPYTHON_FILE, input.LT(1).Line)} ^(ASTPLACEHOLDER fileName?));
 
+//deprecated
 python_export:  				PYTHON_EXPORT python_exportOpt1? seqOfBankvarnames -> ^({token("ASTPYTHON_EXPORT", ASTPYTHON_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER python_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
 python_exportOpt1:			    ISNOTQUAL | leftAngle python_exportOpt1h* RIGHTANGLE -> python_exportOpt1h*;
 python_exportOpt1h:             TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
 
-python_run:  				    PYTHON_RUN python_runOpt1? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)}  python_runOpt1? );
+python_run:  				    PYTHON_RUN python_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTPLACEHOLDER fileName?))
+                              | PYTHON_RUN python_runOpt1? fileName? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER fileName?))                              
+							    ;
+
 python_runOpt1:			        ISNOTQUAL | leftAngle python_runOpt1h* RIGHTANGLE -> python_runOpt1h*;
-python_runOpt1h:                MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
+python_runOpt1h:                MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)
+                              | TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression)
+								;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // REBASE

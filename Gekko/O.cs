@@ -10973,7 +10973,14 @@ namespace Gekko
             public string opt_mute = null;
             public void Exe()
             {
-                Program.RunR(this);
+                try
+                {
+                    Program.RunR(this);
+                }
+                finally
+                {
+                    Globals.r_fileContent = null;
+                }
             }
         }
 
@@ -11002,10 +11009,16 @@ namespace Gekko
             public string opt_mute = null;
             public void Exe()
             {
-                Program.RunPython(this);
+                try
+                {
+                    Program.RunPython(this);
+                }
+                finally
+                {
+                    Globals.python_fileContent = null;
+                }
             }
         }
-
 
         public class Sys
         {
