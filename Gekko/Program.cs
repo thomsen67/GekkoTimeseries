@@ -10814,95 +10814,18 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            //Now RPathUsedHere is a file path ending with "\R.exe"            
-
-            Process r = new Process();
-
-            //It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
-            //r.StartInfo.FileName = RPathUsedHere;
+            //Now RPathUsedHere is a file path ending with "\Rscript.exe"            
 
             G.Writeln2("----- R start -----");
-
             string ss7 = "\"\"" + RPathUsedHere + "\" --no-save \"" + RFileName + "\"\"";
             Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"));
-
             G.Writeln("------ R end ------");
 
-            //r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
-            //r.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-
-            //sys'c:\Progra~1\R\R-3.6.2\bin\i386\rscript.exe --no-save test.r';
-
-            if (false)
-            {
-
-                try
-                {
-                    r.Start();
-                }
-                catch (Exception e)
-                {
-                    if (!File.Exists(r.StartInfo.FileName))
-                    {
-                        if (Program.options.r_exe_folder.Trim() == "")
-                        {
-                            //auto-detect
-                            G.Writeln2("*** ERROR: Error message: " + e.Message);
-                            G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
-                            G.Writeln("           You may try to manually set \"OPTION r exe folder = ... , if you know the R.exe location.");
-                            G.Writeln("           R.exe file locations may be similar to these:");
-                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
-                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
-                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
-                            G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
-                        }
-                        else
-                        {
-                            //stated manually
-                            G.Writeln2("*** ERROR: Error message: " + e.Message);
-                            G.Writeln("*** ERROR: The file " + RPathUsedHere + " does not seem to exist.");
-                            G.Writeln("           You may try to set \"OPTION r exe path = '';\" (or remove the option),");
-                            G.Writeln("           which will make Gekko try to auto-detect the R.exe path.");
-                            G.Writeln("           R.exe file locations may be similar to these:");
-                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\R.exe");
-                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\i386\\R.exe");
-                            G.Writeln("             c:\\Program Files\\R\\R-3.0.0\\bin\\x64\\R.exe");
-                            G.Writeln("           The first one is generic, the second is 32-bit, and the last is 64-bit");
-                        }
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Error message: " + e.Message);
-                        G.Writeln("*** ERROR: The file " + RPathUsedHere + " exists, but R fails");
-                    }
-                    throw new GekkoException();
-                }
-            }
-
-            if (false)
-            {
-
-                r.WaitForExit();
-
-                if (!G.Equal(o.opt_mute, "yes") && File.Exists(RFileName + ".txt"))
-                {
-                    string s3 = GetTextFromFileWithWait(RFileName + ".txt");
-                    List<string> ss = G.ExtractLinesFromText(s3);
-                    bool skip = true;  //avoid the method and the R header in input
-                    G.Writeln();
-                    foreach (string s2 in ss)
-                    {
-                        if (!skip) G.Writeln(s2);
-                        if (s2.Contains(def2)) skip = false;
-                    }
-                    G.Writeln();
-                }
-            }
-
+            //Old way --> r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
+                        
             string s = Program.GetTextFromFileWithWait(RExportFileName);
             List<string> lines = G.ExtractLinesFromText(s);
-            MatrixFromROrPythonToGekko(lines, 0);
-            //WaitForFileDelete(
+            MatrixFromROrPythonToGekko(lines, 0);            
         }
 
         private static void MatrixFromROrPythonToGekko(List<string> lines, int type)
@@ -11109,86 +11032,11 @@ namespace Gekko
             }
 
             G.Writeln2("----- Python start -----");
-
             //Python needs -u argument to show long-running processes output line by line
             string ss7 = "\"\"" + pythonPathUsedHere + "\" -u \"" + pythonFileName + "\"\"";
             Program.ExecuteShellCommand(ss7, G.Equal(o.opt_mute, "yes"));
-
             G.Writeln("------ Python end ------");
-
-            //Now pythonPathUsedHere is a file path ending with "\R.exe"            
-
-            //Process process = new Process();
-
-            ////It seems that \bin\R.exe calls \i386\R.exe or \x64\R.exe depending on R settings on the user's computer.
-            //process.StartInfo.FileName = pythonPathUsedHere;
-            ////process.StartInfo.Arguments = " CMD BATCH " + Globals.QT + pythonFileName + Globals.QT + " > " + Globals.QT + pythonFileName + ".txt" + Globals.QT;
-            //process.StartInfo.Arguments = "" + Globals.QT + pythonFileName + Globals.QT + " >> " + Globals.QT + pythonFileName + ".txt" + Globals.QT;
-            //process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-
-
-            //process.StartInfo.UseShellExecute = false; // Do not use OS shell
-            //process.StartInfo.CreateNoWindow = true; // We don't need new window
-            //process.StartInfo.RedirectStandardOutput = true;// Any output, generated by application will be redirected back
-            //process.StartInfo.RedirectStandardError = true; // Any error in standard output will be redirected back (for example exceptions)
-
-
-            //try
-            //{
-            //    process.Start();
-            //}
-            //catch (Exception e)
-            //{
-            //    if (!File.Exists(process.StartInfo.FileName))
-            //    {
-
-            //        if (Program.options.python_exe_folder.Trim() == "")
-            //        {
-            //            //auto-detect
-            //            G.Writeln2("*** ERROR: Error message: " + e.Message);
-            //            G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
-            //            G.Writeln("           You may try to manually set \"OPTION python exe folder = ... , if you know the");
-            //            G.Writeln("           python.exe location.");
-            //            G.Writeln("           To locate your python.exe file location, you may try this:");
-            //            G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
-            //            G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
-            //        }
-            //        else
-            //        {
-            //            //stated manually
-            //            G.Writeln2("*** ERROR: Error message: " + e.Message);
-            //            G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
-            //            G.Writeln("           You may try to set \"OPTION python exe path = '';\" (or remove the option),");
-            //            G.Writeln("           which will make Gekko try to auto-detect the python.exe path.");
-            //            G.Writeln("           To locate your python.exe file location, you may try this:");
-            //            G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
-            //            G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
-            //        }                    
-            //    }
-            //    else
-            //    {
-            //        G.Writeln2("*** ERROR: Error message: " + e.Message);
-            //        G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " exists, but R fails");
-            //    }
-            //    throw new GekkoException();
-            //}
-
-            //process.WaitForExit();
-
-            //if (!G.Equal(o.opt_mute, "yes") && File.Exists(pythonFileName + ".txt"))
-            //{
-            //    string s3 = GetTextFromFileWithWait(pythonFileName + ".txt");
-            //    List<string> ss = G.ExtractLinesFromText(s3);
-            //    bool skip = true;  //avoid the method and the R header in input
-            //    G.Writeln();
-            //    foreach (string s2 in ss)
-            //    {
-            //        if (!skip) G.Writeln(s2);
-            //        if (s2.Contains(def2)) skip = false;
-            //    }
-            //    G.Writeln();
-            //}
-
+            
             string s = Program.GetTextFromFileWithWait(pythonExportFileName);
             List<string> lines = G.ExtractLinesFromText(s);
             MatrixFromROrPythonToGekko(lines, 1);                        
