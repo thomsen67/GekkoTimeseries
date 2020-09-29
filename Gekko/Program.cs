@@ -10618,50 +10618,48 @@ namespace Gekko
             return s;
         }
 
-        public static void ROrPythonExport(O.R_export o1, O.Python_export o2, int type)
+        public static void ROrPythonExport(List names, string target, int type)
         {
             //type 0 = R, type 1 = Python
 
             List<string> fileContent = null;
-            string programName = null;
-            List names = null;
-            string target = null;            
+            string programName = null;            
             if (type == 0)
             {
                 fileContent = Globals.r_fileContent;
-                programName = "R";
-                names = o1.names;
-                target = o1.opt_target;       
+                programName = "R";                
             }
             else 
             {
                 fileContent = Globals.python_fileContent;
-                programName = "Python";
-                names = o2.names;
-                target = o2.opt_target;
-            }
+                programName = "Python";                
+            }            
             string all = null;
             List<string> exportItems = O.Restrict(names, true, true, false, false);  //only matrices, #x
-            foreach (string s in exportItems)
+            if (exportItems != null)
             {
-                string rawS = G.Chop_RemoveBank(s).Replace(Globals.symbolCollection.ToString(), "");
-                IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true);
-                if (iv != null && iv.Type() == EVariableType.Matrix)
+                foreach (string s in exportItems)
                 {
-                    Matrix m = (Matrix)iv;                    
-                    all += Program.MatrixFromGekkoToROrPython<double>(rawS, m.data, type) + G.NL;
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Could not find matrix " + s);
-                    throw new GekkoException();
+                    string rawS = G.Chop_RemoveBank(s).Replace(Globals.symbolCollection.ToString(), "");
+                    IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true);
+                    if (iv != null && iv.Type() == EVariableType.Matrix)
+                    {
+                        Matrix m = (Matrix)iv;
+                        all += Program.MatrixFromGekkoToROrPython<double>(rawS, m.data, type) + G.NL;
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Could not find matrix " + s);
+                        throw new GekkoException();
+                    }
                 }
             }
+
             if (target == null)
             {
                 //insert at top
                 List<string> l2 = new List<string>();
-                l2.Add(all);                
+                if (all != null) l2.Add(all);
                 if (fileContent != null) l2.AddRange(fileContent);
                 fileContent.Clear();
                 foreach (string s in l2) fileContent.Add(s);
@@ -10962,8 +10960,17 @@ namespace Gekko
 
             if (Globals.python_fileContent == null)
             {
-                G.Writeln2("*** ERROR: No Python file defined in PYTHON_FILE");
-                throw new GekkoException();
+
+                if (o.fileName != null)
+                {
+                    Globals.python_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
+                    Program.ROrPythonExport(o.names, o.opt_target, 1);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: No Python file defined in PYTHON_FILE");
+                    throw new GekkoException();
+                }
             }
 
             using (FileStream fs = WaitForFileStream(pythonFileName, GekkoFileReadOrWrite.Write))

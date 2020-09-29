@@ -12169,6 +12169,59 @@ namespace UnitTests
             _AssertMatrix(First(), "#beta2", 3, 1, 0.613875, 0.000001d);
             _AssertMatrix(First(), "#beta2", 4, 1, 0.186740, 0.000001d);
             _AssertMatrix(First(), "#beta2", 5, 1, -0.350908, 0.000001d);
+
+            // ---------------------------------------------
+            // Then new simpler syntax
+            // ---------------------------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+            //Same data as for Test__Ols()
+            I("CREATE lna1, pcp, bul1;");
+            I("SERIES <1998 2010> lna1 = data(' 166.223000  173.221000  179.571000  187.343000  194.888000  202.959000  209.426000  215.134000  222.716000  230.520000  238.518000  246.654000  254.991000') ;");
+            I("SERIES <1998 2010> pcp  = data(' 0.9502030   0.9699920   1.0000000   1.0235000   1.0401100   1.0605400   1.0754700   1.0977800   1.1121200   1.1314800   1.1513000   1.1717600   1.1871600')  ;");
+            I("SERIES <1998 2010> bul1 = data(' 0.0684791   0.0591698   0.0560344   0.0535439   0.0535003   0.0631703   0.0649875   0.0578112   0.0473207   0.0404508   0.0467488   0.0472923   0.0475191')  ;");
+            I("time 2000 2010;");
+            I("create s0, s1, s2, s3, s4, s5;");
+            I("series s0 = dlog(lna1);");
+            I("series s1 = dlog(pcp);");
+            I("series s2 = dlog(pcp.1);");
+            I("series s3 = bul1;");
+            I("series s4 = bul1.1;");
+            //I("series s5 = 1;");
+            I("matrix #x = pack(2000, 2010, s1, s2, s3, s4);");
+            I("matrix #y = pack(2000, 2010, s0);");            
+            I("r_run <target = 'data1'>  #x, #y file = ols.r;");
+            I("PRT #beta;");
+            _AssertMatrix(First(), "#beta", "rows", 5);
+            _AssertMatrix(First(), "#beta", "cols", 1);
+            _AssertMatrix(First(), "#beta", 1, 1, 0.0298039, 0.000001d);
+            _AssertMatrix(First(), "#beta", 2, 1, 0.144517, 0.000001d);
+            _AssertMatrix(First(), "#beta", 3, 1, 0.613875, 0.000001d);
+            _AssertMatrix(First(), "#beta", 4, 1, 0.186740, 0.000001d);
+            _AssertMatrix(First(), "#beta", 5, 1, -0.350908, 0.000001d);
+            I("s0fit = #yfit[.., 1].unpack(2000, 2010);");
+            //TODO: check s0fit above
+
+            //testing without target            
+            I("r_run #x, #y file = ols2.r;");
+            I("PRT #beta2;");
+            _AssertMatrix(First(), "#beta2", "rows", 5);
+            _AssertMatrix(First(), "#beta2", "cols", 1);
+            _AssertMatrix(First(), "#beta2", 1, 1, 0.0298039, 0.000001d);
+            _AssertMatrix(First(), "#beta2", 2, 1, 0.144517, 0.000001d);
+            _AssertMatrix(First(), "#beta2", 3, 1, 0.613875, 0.000001d);
+            _AssertMatrix(First(), "#beta2", 4, 1, 0.186740, 0.000001d);
+            _AssertMatrix(First(), "#beta2", 5, 1, -0.350908, 0.000001d);
+
+            I("r_run ols3.r;"); //nothing exported, #beta3 returned
+            _AssertMatrix(First(), "#beta3", "rows", 3);
+            _AssertMatrix(First(), "#beta3", "cols", 1);
+            _AssertMatrix(First(), "#beta3", 1, 1, 1d, 0.000001d);
+            _AssertMatrix(First(), "#beta3", 2, 1, 2d, 0.000001d);
+            _AssertMatrix(First(), "#beta3", 3, 1, 3d, 0.000001d);
+
+            I("r_run ols4.r;"); //nothing exported, nothing returned
         }
 
         [TestMethod]

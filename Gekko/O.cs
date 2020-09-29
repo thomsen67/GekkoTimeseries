@@ -10964,13 +10964,16 @@ namespace Gekko
             public string opt_target = null;
             public void Exe()
             {
-                Program.ROrPythonExport(this, null, 0);
+                Program.ROrPythonExport(this.names, this.opt_target, 0);
             }            
         }
 
         public class R_run
         {
             public string opt_mute = null;
+            public string opt_target = null; //new in 3.1.8
+            public string fileName = null; //new in 3.1.8
+            public List names = null; //new in 3.1.8
             public void Exe()
             {
                 try
@@ -11000,13 +11003,16 @@ namespace Gekko
             public string opt_target = null;
             public void Exe()
             {
-                Program.ROrPythonExport(null, this, 1);
+                Program.ROrPythonExport(this.names, this.opt_target, 1);
             }
         }
 
         public class Python_run
         {
             public string opt_mute = null;
+            public string opt_target = null; //new in 3.1.8
+            public string fileName = null; //new in 3.1.8
+            public List names = null; //new in 3.1.8
             public void Exe()
             {
                 try
