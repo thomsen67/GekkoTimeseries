@@ -5830,9 +5830,11 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTR_RUN":
-                        {
+                        {                            
                             node.Code.A("O.R_run o" + Num(node) + " = new O.R_run();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node, node[0]);
+                            if (node[1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
+                            if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[2][0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -5867,8 +5869,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTPYTHON_RUN":
                         {
-                            node.Code.A("O.Python_run o" + Num(node) + " = new O.Python_run();" + G.NL);
-                            //GetCodeFromAllChildren(node);
+                            node.Code.A("O.Python_run o" + Num(node) + " = new O.Python_run();" + G.NL);                            
                             GetCodeFromAllChildren(node, node[0]);
                             if (node[1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                             if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[2][0].Code + ");" + G.NL);

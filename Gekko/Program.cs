@@ -558,7 +558,8 @@ namespace Gekko
         Csv,
         R,
         Gcm,
-        Tsp   
+        Tsp,
+        Python
     }
 
     public enum EPrtCollapseTypes
@@ -10609,7 +10610,19 @@ namespace Gekko
                     for (int j = 0; j < m.GetLength(1); j++)
                     {
                         if (j > 0) s += ",";
-                        s += m[i, j];
+                        if (typeof(T) == typeof(double))
+                        {
+                            double[,] xx = m as double[,];
+                            double d = xx[i, j];
+                            if (G.isNumericalError(d))
+                                s += "numpy.nan";
+                            else
+                                s += m[i, j];
+                        }
+                        else
+                        {
+                            s += m[i, j];
+                        }
                     }
                     s += "]";
                 }
@@ -10739,10 +10752,21 @@ namespace Gekko
             lines2.Add(def2);
             string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
 
-            if (Globals.r_fileContent == null)
+            if (o.fileName != null)
             {
-                G.Writeln2("*** ERROR: No R file defined in R_FILE");
-                throw new GekkoException();
+                //called in the new way
+                Globals.r_fileContent = null;
+                Globals.r_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
+                Program.ROrPythonExport(o.names, o.opt_target, 0);
+            }
+            else
+            {
+                //called in old way
+                if (Globals.r_fileContent == null)
+                {
+                    G.Writeln2("*** ERROR: No R file defined in R_FILE");
+                    throw new GekkoException();
+                }
             }
 
             using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))            
@@ -10957,20 +10981,12 @@ namespace Gekko
             //-------
             lines2.Add(def2);
             string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
-
-            if (Globals.python_fileContent == null)
+            
+            if (true)
             {
-
-                if (o.fileName != null)
-                {
-                    Globals.python_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
-                    Program.ROrPythonExport(o.names, o.opt_target, 1);
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: No Python file defined in PYTHON_FILE");
-                    throw new GekkoException();
-                }
+                Globals.python_fileContent = null;
+                Globals.python_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
+                Program.ROrPythonExport(o.names, o.opt_target, 1);
             }
 
             using (FileStream fs = WaitForFileStream(pythonFileName, GekkoFileReadOrWrite.Write))
@@ -24445,7 +24461,6 @@ namespace Gekko
                     {
                         // Timed out.
                     }
-
                 }
 
                 if (!Globals.threadIsInProcessOfAborting)
@@ -24453,8 +24468,8 @@ namespace Gekko
                     int exitCode = process.ExitCode;
                     if (exitCode != 0)
                     {
-                        G.Writeln2("+++ WARNING: SYS command exited with exit code: " + exitCode, Globals.warningColor);
-                        G.Writeln("             SYS command: " + _CommandLine, Globals.warningColor);
+                        G.Writeln2("+++ WARNING: System call exited with code: " + exitCode, Globals.warningColor);
+                        G.Writeln("             System command: " + _CommandLine, Globals.warningColor);
                         //fail = true;
                     }
                 }
@@ -24466,14 +24481,14 @@ namespace Gekko
                         //G.Writeln2(output.ToString());
                         if (error.Length > 0)
                         {
-                            G.Writeln2("=================== SYS error message ===================", Globals.warningColor);
+                            G.Writeln2("=================== System error message ===================", Globals.warningColor);
                             G.Writeln2(error.ToString(), Globals.warningColor);
                             //fail = true;
                         }
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("+++ WARNING: Could not write output from SYS command", Globals.warningColor);
+                        G.Writeln2("+++ WARNING: Could not write output from system command", Globals.warningColor);
                         //fail = true;
                     }
                 }
@@ -25225,6 +25240,12 @@ namespace Gekko
                     ExportR(o);
                     return o.list1.Count();
                 }
+                else if (writeType == EWriteType.Python)
+                {
+                    //special treatment for the time being
+                    ExportPython(o);
+                    return o.list1.Count();
+                }
                 else if (writeAllVariables)  //writing the whole first databank
                 {                    
                     list = new List<ToFrom>();
@@ -25432,6 +25453,7 @@ namespace Gekko
             else if (G.Equal(o.opt_xls, "yes")) writeType = EWriteType.Xls;
             else if (G.Equal(o.opt_xlsx, "yes")) writeType = EWriteType.Xlsx;
             else if (G.Equal(o.opt_flat, "yes")) writeType = EWriteType.Flat;
+            else if (G.Equal(o.opt_python, "yes")) writeType = EWriteType.Python;
             return writeType;
         }
 
@@ -25450,8 +25472,7 @@ namespace Gekko
             using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
-                foreach(IVariable iv2 in o.list1.list)
-                //foreach (string s in o.listItems)
+                foreach(IVariable iv2 in o.list1.list)                
                 {
                     string s = iv2.ConvertToString();
                     if (!s.StartsWith(Globals.symbolCollection.ToString()))
@@ -25479,16 +25500,48 @@ namespace Gekko
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
-        //private static List<BankNameVersion> GetInfoFromListOfWildcards(List<string> list)
-        //{
-        //    if (list == null) return null;
-        //    List<BankNameVersion> list2 = new List<BankNameVersion>();
-        //    foreach (string s in list)
-        //    {
-        //        list2.AddRange(Program.GetInfoFromStringWildcard(s, null)); //could use .from or .bank here!!!!
-        //    }
-        //    return list2;
-        //}
+        private static void ExportPython(O.Write o)
+        {
+            //Special treatment, for the time being
+
+            if (o.fileName == null)
+            {
+                G.Writeln2("*** ERROR: You must state a filename with FILE = ...");
+                throw new GekkoException();
+            }
+
+            string fullFileName = CreateFullPathAndFileName(o.fileName);
+
+            using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
+            using (StreamWriter file = G.GekkoStreamWriter(fs))
+            {
+                foreach (IVariable iv2 in o.list1.list)                
+                {
+                    string s = iv2.ConvertToString();
+                    if (!s.StartsWith(Globals.symbolCollection.ToString()))
+                    {
+                        G.Writeln2("*** ERROR: EXPORT<python>: expected all list items to start with '#'");
+                        throw new GekkoException();
+                    }
+                    IVariable iv = null; iv = Program.databanks.GetFirst().GetIVariable(s);
+                    if (iv == null)
+                    {
+                        G.Writeln2("*** ERROR: " + s + " does not exist");
+                        throw new GekkoException();
+                    }
+                    if (iv.Type() != EVariableType.Matrix)
+                    {
+                        G.Writeln2("*** ERROR: " + s + " is not a matrix");
+                        throw new GekkoException();
+                    }
+                    Matrix m = (Matrix)iv;
+                    file.WriteLine(Program.MatrixFromGekkoToROrPython<double>(s.Substring(1), m.data, 1));
+                    file.WriteLine();
+                }
+                file.Flush();
+            }
+            G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
+        }
 
         private static void CheckSomethingToWrite(List<ToFrom> listFilteredForCurrentFreq)
         {

@@ -10982,30 +10982,10 @@ namespace Gekko
                 }
                 finally
                 {
-                    Globals.r_fileContent = null;
+                    //Globals.r_fileContent = null;
                 }
             }
-        }
-
-
-        public class Python_file
-        {
-            public string fileName = null;
-            public void Exe()
-            {
-                Globals.python_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName));
-            }
-        }
-
-        public class Python_export
-        {
-            public List names = null;
-            public string opt_target = null;
-            public void Exe()
-            {
-                Program.ROrPythonExport(this.names, this.opt_target, 1);
-            }
-        }
+        }        
 
         public class Python_run
         {
@@ -11021,7 +11001,7 @@ namespace Gekko
                 }
                 finally
                 {
-                    Globals.python_fileContent = null;
+                    //Globals.python_fileContent = null;
                 }
             }
         }
@@ -11084,6 +11064,7 @@ namespace Gekko
             public string opt_caps = null;
             public string opt_gcm = null;
             public string opt_flat = null;
+            public string opt_python = null;
             public string opt_cols = null;
             public string opt_respect = null;
             public string opt_op = null;

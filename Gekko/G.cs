@@ -2483,6 +2483,7 @@ namespace Gekko
 
         private static string CheckFor45PlusVersion(int releaseKey)
         {
+            //see https://github.com/dotnet/docs/blob/master/docs/framework/migration-guide/how-to-determine-which-versions-are-installed.md
             if (releaseKey >= 528040)
                 return "4.8 or later";
             if (releaseKey >= 461808)

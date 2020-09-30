@@ -680,6 +680,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_XLS;
     ASTOPT_STRING_XLSX;
 	ASTOPT_STRING_FLAT;
+	ASTOPT_STRING_PYTHON;
 	ASTOPT_STRING_AREMOS;
 	ASTOPT_VAL_WIDTH;
 	ASTOPT_VAL_DEC;
@@ -2585,9 +2586,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | procedureDef         SEMICOLON!
 						  | r_file               SEMICOLON!
 						  | r_export             SEMICOLON!
-						  | r_run                SEMICOLON!
-						  | python_file          SEMICOLON!
-						  | python_export        SEMICOLON!
+						  | r_run                SEMICOLON!						  
 						  | python_run           SEMICOLON!
 						  | read                 SEMICOLON!
 						  | rebase               SEMICOLON!
@@ -3496,28 +3495,26 @@ v:    					    V ('=' yesNo -> ^(ASTV yesNo) | -> ^(ASTV ASTYES))
 // R_FILE, R_EXPORT, R_RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-r_file:   				    R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, input.LT(1).Line)} ^(ASTPLACEHOLDER fileName?));
+//deprecated
+r_file:   				        R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, input.LT(1).Line)} ^(ASTPLACEHOLDER fileName?));
 
-r_export:  				    R_EXPORT r_exportOpt1? seqOfBankvarnames -> ^({token("ASTR_EXPORT", ASTR_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER r_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
-r_exportOpt1:			    ISNOTQUAL | leftAngle r_exportOpt1h* RIGHTANGLE -> r_exportOpt1h*;
-r_exportOpt1h:              TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
+//deprecated
+r_export:  				        R_EXPORT r_exportOpt1? seqOfBankvarnames -> ^({token("ASTR_EXPORT", ASTR_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER r_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
+r_exportOpt1:			        ISNOTQUAL | leftAngle r_exportOpt1h* RIGHTANGLE -> r_exportOpt1h*;
+r_exportOpt1h:                  TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
 
-r_run:  				    R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)}  r_runOpt1? );
-r_runOpt1:			        ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
-r_runOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
+r_run:  				        R_RUN r_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTPLACEHOLDER fileName?))
+                              | R_RUN r_runOpt1? fileName? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER r_runOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER fileName?))                              
+							    ;
 
-
+r_runOpt1:			            ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
+r_runOpt1h:                     MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)
+                              | TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression)
+								;
+															   
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PYTHON_FILE, PYTHON_EXPORT, PYTHON_RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
-
-//deprecated
-python_file:   				    PYTHON_FILE fileName -> ^({token("ASTPYTHON_FILE", ASTPYTHON_FILE, input.LT(1).Line)} ^(ASTPLACEHOLDER fileName?));
-
-//deprecated
-python_export:  				PYTHON_EXPORT python_exportOpt1? seqOfBankvarnames -> ^({token("ASTPYTHON_EXPORT", ASTPYTHON_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER python_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
-python_exportOpt1:			    ISNOTQUAL | leftAngle python_exportOpt1h* RIGHTANGLE -> python_exportOpt1h*;
-python_exportOpt1h:             TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
 
 python_run:  				    PYTHON_RUN python_runOpt1? seqOfBankvarnames (FILE EQUAL fileName)? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTPLACEHOLDER fileName?))
                               | PYTHON_RUN python_runOpt1? fileName? -> ^({token("ASTPYTHON_RUN", ASTPYTHON_RUN, input.LT(1).Line)} ^(ASTPLACEHOLDER python_runOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER fileName?))                              
@@ -3830,6 +3827,7 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | GCM (EQUAL yesNo)? -> ^(ASTOPT_STRING_GCM yesNo?)
 						  | OP EQUAL exportType -> ^(ASTOPT_STRING_OP exportType)							  				
 						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
+						  | PYTHON (EQUAL yesNo)? -> ^(ASTOPT_STRING_PYTHON yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)	
 						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)	
 						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
