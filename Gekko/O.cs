@@ -5698,9 +5698,52 @@ namespace Gekko
                     // kind of like the <dyn> fix, make sure the warning is shown.
                     // kind of like special warning.
                     // provide a function that provides old behavior.
+                    //
+                    // Python:
+                    // import math
+                    // m = math.nan
+                    //
+                    // In both Python and C#, if one or 
+                    // both of x and y are NaN, the following is the case:                    
+                    // x == y --> false
+                    // x != y --> true
+                    // x <op> x --> false, for op = <, <=, >=, >                  
+                    // So only != is true if any operand is NaN (Python: math.nan)                                                         
+                    //
+                    // Gekko has same behavior regarding op = <, <=, >=, > 
+                    // But in Gekko we have:
+                    //
+                    // m() == m() --> 1
+                    // m() == 2 --> 0
+                    // 2 == m() --> 0
+                    // m() <> m() --> 0
+                    // m() <> 2 --> 1
+                    // 2 <> m() --> 1
+                    //
+                    // So in Gekko, if there are missings, op = <, <=, >=, > are just kind of broke
+                    // but with missings, == and <> can be used.
+
+
+
                     // ---------------------------------------------
-                    if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
-                    else rv_series.SetData(t, 0d);  //else it would be missing
+                    if (true)
+                    {
+                        if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
+                        else rv_series.SetData(t, 0d);  //else it would be missing
+                    }
+                    else
+                    {
+                        double vx = x.GetVal(t);
+                        double vy = y.GetVal(t);
+                        if (G.IsBothNumericalError(vx, vy))  // see also #87342543534
+                        {
+                            rv = Globals.scalarVal1;
+                        }
+                        else
+                        {
+                            if (vx == vy) rv = Globals.scalarVal1; ;
+                        }
+                    }
                 }
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)

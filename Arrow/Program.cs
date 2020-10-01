@@ -41,6 +41,22 @@ namespace Arrow
 
             //dataframes in R vs Python: https://towardsdatascience.com/python-and-r-for-data-wrangling-examples-for-both-including-speed-up-considerations-f2ec2bb53a86
 
+            //older commentaries:        
+            //Feather kan læse / skrive hurtigt med lille ram-forbrug hvis, især hvis brug af pandas.Categorial(slags enums)
+            //Men parquet er mere stabilt, tæt knyttet til Hadoop. Feather er nyere        
+            //Parquet understøttes også af tensorflow.Sammenligning: se https://towardsdatascience.com/the-best-format-to-save-pandas-data-414dca023e0d
+            //Konklusion: feather er godt mht. næsten alle benchmarks        
+            //https://github.com/elastacloud/parquet-dotnet  finde til .NET Core
+            //https://github.com/kevin-montrose/FeatherDotNet  finde til .NET Core
+            //Hadoop og Spark er de store inden for big data. Spark er nyere og kører in-memory og integrer Arrow.      
+            //Fremtiden er Spark, meget bedre gearet mod Tensorflow, Python, etc.Efter Spark kommer Flink, og de overvejer        
+            //Arrow som internt format. Flink er bedre til streaming, f.eks.aktiekurser, hvor < millisekunder er vigtigt.        
+            //Men Spark prøver vist også at blive bedre til dette.Spark bedre integreret med Python / R.
+            //Snowflake kunne være god.
+            //Use using PLINQ to do pivoting. That should be future - safe.
+            //Parquet.NET 3.3.9 har brug for flg.fra nuget netstandard.library, system.buffers, system.memory, system.reflection.emit.lightweight
+            //De sidste 3 kommer vist med automatisk, mens den første skulle installeres manuelt. Men så kørte det.
+
             string s = null, s0 = null, s1 = null, s2 = null, s3 = null;
 
             // --------> example
@@ -133,8 +149,6 @@ namespace Arrow
                 //df777 = df;
                 s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
                 //df777.Columns["AAA"][3] = 777d;
-
-
             }
 
             if (false)

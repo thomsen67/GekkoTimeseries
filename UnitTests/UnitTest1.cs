@@ -16895,6 +16895,54 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_If_Missings()
+        {
+            double TRUE = 1d;
+            double FALSE = -1d;
+            
+            I("IF(m() == m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", TRUE);            
+            I("IF(m() <> m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() < m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() <= m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() >= m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() > m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+
+            I("IF(m() == 2) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() <> 2) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", TRUE);
+            I("IF(m() < 2) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() <= 2) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() >= 2) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(m() > 2) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+
+            I("IF(2 == m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(2 <> m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", TRUE);
+            I("IF(2 < m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(2 <= m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(2 >= m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("IF(2 > m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+
+
+        }
+
+        [TestMethod]
         public void _Test_If_Series()
         {
             // Testing IF and logical operators etc.
@@ -16902,6 +16950,8 @@ namespace UnitTests
             I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 2, 3, 3;");
             I("if (x1 == x2); %x = 100; else; %x = 50; end;");
             _AssertScalarVal(First(), "%x", 50d, sharedDelta);
+            I("if (x1 <> x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 50d, sharedDelta); //some are equal
             I("if (x1 < x2); %x = 100; else; %x = 50; end;");
             _AssertScalarVal(First(), "%x", 50d, sharedDelta);
             I("if (x1 <= x2); %x = 100; else; %x = 50; end;");
@@ -16914,6 +16964,8 @@ namespace UnitTests
             I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 1, 2, 3;");
             I("if (x1 == x2); %x = 100; else; %x = 50; end;");
             _AssertScalarVal(First(), "%x", 100d, sharedDelta);
+            I("if (x1 <> x2); %x = 100; else; %x = 50; end;");
+            _AssertScalarVal(First(), "%x", 50d, sharedDelta);  //none are equal
 
             I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 2, 3, 4;");
             I("if (x1 < x2); %x = 100; else; %x = 50; end;");
@@ -16971,226 +17023,161 @@ namespace UnitTests
 
             //basic
             I("IF(%s1 == 'abc') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
-            _AssertScalarVal(First(), "%xx", 1d);
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);            
 
-            I("IF(%s1 == 'abc ') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc ') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc0') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc0') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
 
             //parentheses + not
-            I("IF((%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF((%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(not %s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(not %s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(not(%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(not(%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
 
             //or table
-            I("IF(%s1 == 'abc' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc7' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc7' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc7' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc7' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
 
             //and table
-            I("IF(%s1 == 'abc' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc7' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc7' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
 
             //precedence and over or
-            I("IF(%s1 == 'abc' or %s2 == 'abcd7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc' or %s2 == 'abcd7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 == 'abc' or (%s2 == 'abcd7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc' or (%s2 == 'abcd7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF((%s1 == 'abc' or %s2 == 'abcd7') and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF((%s1 == 'abc' or %s2 == 'abcd7') and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
 
             //precedence not
-            I("IF(not %s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(not %s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(not( %s1 == 'abc7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(not( %s1 == 'abc7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
             //expressions
-            I("IF(%s1 == 'abc' and %s1+%s2 == 'abcabcd' and %s1+%s2+%s1 == 'abcabcd'+%s1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc' and %s1+%s2 == 'abcabcd' and %s1+%s2+%s1 == 'abcabcd'+%s1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
             //decorated with a lot of parentheses
-            I("IF(((%s1 == 'abc')) and (((%s1)+%s2) == ('abcabcd')) and (%s1+(%s2+(%s1))) == ('abcabcd'+%s1)) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(((%s1 == 'abc')) and (((%s1)+%s2) == ('abcabcd')) and (%s1+(%s2+(%s1))) == ('abcabcd'+%s1)) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
             // == and <> operators
-            I("IF(%s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%s1 <> 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 <> 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 == 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%s1 <> 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 <> 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%v3 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v3 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v3 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v3 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v2 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v2 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
             //values, relations
 
-            I("IF(%v0+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v0+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v0+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v0+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v0+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v0+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v0+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v0+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v0+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v0+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v0+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v0+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%v1+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v1+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v1+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v1+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v1+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v1+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v1+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v1+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v1+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v1+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v1+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v1+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
 
-            I("IF(%v2+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v2+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v2+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v2+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%v2+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v2+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v2+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v2+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%v2+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v2+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
             //dates, relations
 
-            I("IF(%d0-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d0-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
             I("IF(%d0-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d0-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d0-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d0-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d0-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d0-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d0-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d0-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d0-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%d1-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d1-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d1-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d1-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d1-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d1-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d1-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d1-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d1-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d1-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d1-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d1-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
 
-            I("IF(%d2-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d2-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d2-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d2-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d2-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d2-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 0d);
-            I("IF(%d2-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d2-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d2-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d2-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(%d2-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d2-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
             // FIXME FIXME FIXME
@@ -17207,11 +17194,9 @@ namespace UnitTests
             I("VAL %v = 2000;");  //must be integer, else fail
             I("TIME 2000 2001;");
             I("SERIES y = 123;");
-            I("IF(y[%d+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(y[%d+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
-            I("IF(y[%v+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
-            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(y[%v+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");            
             _AssertScalarVal(First(), "%xx", 1d);
 
             //casting
