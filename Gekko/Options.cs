@@ -27,19 +27,14 @@ namespace Gekko
     public class Options
     {
 
-        //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR        
-
-        
-            
-            
-        
-            
+        //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR            
             
         //NOTE: THESE LINES CORRESPOND TO LINES IN Cmd3.g, line for line    
             
         //these are not mentioned in help
         public bool bugfix_import_export = false;             
         public bool bugfix_gbk = false;  //set true to activate old 7zip writer
+        public bool bugfix_missing = true;  //if option true, m()==m() will be true, and m()<>m() false for series comparison
 
         //question
         //public double databank_compare_tabs = 1.0d;

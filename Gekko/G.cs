@@ -1853,10 +1853,40 @@ namespace Gekko
             else return false;
         }
 
-        public static bool Compare(double d1, double d2)  
+        public static bool Equals(double d1, double d2)  
         {
+            // ---------------------------------------------
+            // #890345340857                        
+            //
+            // In both Python and C#, if one or 
+            // both of x and y are NaN, the following is the case:                    
+            // x == y --> false
+            // x != y --> true
+            // x <op> x --> false, for op = <, <=, >=, >                  
+            // So only != is true if any operand is NaN (Python: math.nan)                                                         
+            //
+            // Gekko has same behavior regarding op = <, <=, >=, > 
+            // But in Gekko we have:
+            //
+            // m() == m() --> 1
+            // m() == 2 --> 0
+            // 2 == m() --> 0
+            // m() <> m() --> 0
+            // m() <> 2 --> 1
+            // 2 <> m() --> 1
+            //
+            // So in Gekko, if there are missings, op = <, <=, >=, > are just kind of broke
+            // but with missings, == and <> can be used.
+            //
+            //                              d2
+            //               |   NaN    normal
+            //-------------------------------------
+            //   d1  NaN     |   true   false
+            //      normal   |   false    ?
+            //-------------------------------------
+            //
             if (G.IsBothNumericalError(d1, d2)) return true;  //see also #87342543534
-            if (d1 == d2) return true;
+            if (d1 == d2) return true;  //can only be true if neither is NaN
             return false;
         }
 

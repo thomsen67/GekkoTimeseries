@@ -3894,6 +3894,7 @@ optionType:
 			 
 			 | BUGFIX IMPORT EXPORT '='? yesNoSimple -> BUGFIX IMPORT EXPORT ^(ASTBOOL yesNoSimple)	//not mentioned in help		 			 	
 			 | BUGFIX GBK '='? yesNoSimple -> BUGFIX GBK ^(ASTBOOL yesNoSimple)                     //not mentioned in help
+			 | BUGFIX MISSING '='? yesNoSimple -> BUGFIX MISSING ^(ASTBOOL yesNoSimple)             //not mentioned in help
 			
 			 | DATABANK question -> DATABANK question
              | DATABANK COMPARE TABS '='? numberIntegerOrDouble -> DATABANK COMPARE TABS numberIntegerOrDouble

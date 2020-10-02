@@ -5671,14 +5671,8 @@ namespace Gekko
             {
                 //must return a VAL, not a SERIES                
                 double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
-                if (G.IsBothNumericalError(d1, d2))  // see also #87342543534
-                {
-                    rv = Globals.scalarVal1;
-                }
-                else
-                {
-                    if (d1 == d2) rv = Globals.scalarVal1; ;
-                }
+                bool b = G.Equals(d1, d2);
+                if(b) rv = Globals.scalarVal1;
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
@@ -5687,62 +5681,21 @@ namespace Gekko
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    //if x or y does not have frequency corresponding to t, we will get an error here
-                    // ---------------------------------------------
-                    // #890345340857
-                    // HMMMMMMMMMMMMMMMMMMM
-                    // HMMMMMMMMMMMMMMMMMMM
-                    // HMMMMMMMMMMMMMMMMMMM
-                    // shouldn't we check G.IsBothNumericalError(d1, d2)) like above??
-                    // fix this, and if IsBoth is hit, issue a warning that this has changed 
-                    // kind of like the <dyn> fix, make sure the warning is shown.
-                    // kind of like special warning.
-                    // provide a function that provides old behavior.
-                    //
-                    // Python:
-                    // import math
-                    // m = math.nan
-                    //
-                    // In both Python and C#, if one or 
-                    // both of x and y are NaN, the following is the case:                    
-                    // x == y --> false
-                    // x != y --> true
-                    // x <op> x --> false, for op = <, <=, >=, >                  
-                    // So only != is true if any operand is NaN (Python: math.nan)                                                         
-                    //
-                    // Gekko has same behavior regarding op = <, <=, >=, > 
-                    // But in Gekko we have:
-                    //
-                    // m() == m() --> 1
-                    // m() == 2 --> 0
-                    // 2 == m() --> 0
-                    // m() <> m() --> 0
-                    // m() <> 2 --> 1
-                    // 2 <> m() --> 1
-                    //
-                    // So in Gekko, if there are missings, op = <, <=, >=, > are just kind of broke
-                    // but with missings, == and <> can be used.
-
-
 
                     // ---------------------------------------------
-                    if (true)
+                    if (Program.options.bugfix_missing)
                     {
-                        if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
-                        else rv_series.SetData(t, 0d);  //else it would be missing
+                        if (G.Equals(x.GetVal(t), y.GetVal(t)) != (x.GetVal(t) == y.GetVal(t)))
+                        {
+                            MissingProblem();
+                        }
+                        if (G.Equals(x.GetVal(t), y.GetVal(t))) rv_series.SetData(t, 1d);
+                        else rv_series.SetData(t, 0d);
                     }
                     else
                     {
-                        double vx = x.GetVal(t);
-                        double vy = y.GetVal(t);
-                        if (G.IsBothNumericalError(vx, vy))  // see also #87342543534
-                        {
-                            rv = Globals.scalarVal1;
-                        }
-                        else
-                        {
-                            if (vx == vy) rv = Globals.scalarVal1; ;
-                        }
+                        if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
+                        else rv_series.SetData(t, 0d);  //else it would be missing                        
                     }
                 }
             }
@@ -5763,7 +5716,10 @@ namespace Gekko
             return rv;
         }
 
-        
+        private static void MissingProblem()
+        {
+            G.Writeln2("+++ WARNING: missing problem");
+        }
 
         public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
@@ -5773,14 +5729,8 @@ namespace Gekko
             {
                 //must return a VAL, not a SERIES                
                 double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
-                if (G.isNumericalError(d1) && G.isNumericalError(d2))
-                {
-                    rv = Globals.scalarVal0;
-                }
-                else
-                {
-                    if (d1 != d2) rv = Globals.scalarVal1; ;
-                }
+                bool b = G.Equals(d1, d2);
+                if (!b) rv = Globals.scalarVal1;
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
@@ -5791,7 +5741,22 @@ namespace Gekko
                 {
                     //if x or y does not have frequency corresponding to t, we will get an error here
                     if (x.GetVal(t) != y.GetVal(t)) rv_series.SetData(t, 1d);
-                    else rv_series.SetData(t, 0d);  //else it would be missing
+                    else rv_series.SetData(t, 0d);  //else it would be missing                                                         
+                    // ---------------------------------------------
+                    if (Program.options.bugfix_missing)
+                    {
+                        if (!G.Equals(x.GetVal(t), y.GetVal(t)) != (x.GetVal(t) != y.GetVal(t)))
+                        {
+                            MissingProblem();
+                        }
+                        if (!G.Equals(x.GetVal(t), y.GetVal(t))) rv_series.SetData(t, 1d);
+                        else rv_series.SetData(t, 0d);
+                    }
+                    else
+                    {
+                        if (x.GetVal(t) != y.GetVal(t)) rv_series.SetData(t, 1d);
+                        else rv_series.SetData(t, 0d);  //else it would be missing                        
+                    }
                 }
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)

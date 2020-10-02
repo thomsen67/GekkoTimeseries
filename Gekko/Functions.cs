@@ -2291,7 +2291,7 @@ namespace Gekko
 
                 if (x == "==")
                 {
-                    if (G.Compare(di1.GetData(smpl, gt), di2.GetData(smpl, gt)))
+                    if (G.Equals(di1.GetData(smpl, gt), di2.GetData(smpl, gt)))
                     {                        
                         result.SetData(gt, do1.GetData(smpl, gt));
                     }
@@ -2302,7 +2302,7 @@ namespace Gekko
                 }
                 else if (x == "<>")
                 {
-                    if (!G.Compare(di1.GetData(smpl, gt), di2.GetData(smpl, gt)))
+                    if (!G.Equals(di1.GetData(smpl, gt), di2.GetData(smpl, gt)))
                     {                        
                         result.SetData(gt, do1.GetData(smpl, gt));
                     }

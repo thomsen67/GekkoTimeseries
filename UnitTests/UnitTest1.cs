@@ -262,7 +262,7 @@ namespace UnitTests
                 {
                     double d1 = (item as ScalarVal).val;
                     double d2 = ss[i];
-                    if (!G.Compare(d1, d2)) Assert.IsFalse(true);
+                    if (!G.Equals(d1, d2)) Assert.IsFalse(true);
                 }
                 else
                 {
@@ -16896,10 +16896,64 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_If_Missings()
-        {
+        {            
             double TRUE = 1d;
             double FALSE = -1d;
-            
+
+            // ------------------------------------------
+            // ------------------------------------------
+            // Testing logic for help system
+            // ------------------------------------------
+            // ------------------------------------------
+
+            I("RESET;");
+            I("TELL <nocr> 'm() == m()'; IF(m() == m()) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", TRUE);
+            I("TELL <nocr> 'm() <> m()'; IF(m() <> m()) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("TELL <nocr> 'not m() == m()'; IF(not m() == m()) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("TELL <nocr> 'not m() <> m()'; IF(not m() <> m()) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", TRUE);
+
+            I("RESET; TIME 2001 2003; x1 = 1, m(), 3; x2 = 1, m(), 3;");
+            I("TELL 'x1 = 1, m(), 3; x2 = 1, m(), 3;';");
+            I("TELL <nocr> 'x1 == x2'; IF(x1 == x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", TRUE);            
+            I("TELL <nocr> 'x1 <> x2'; IF(x1 <> x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("TELL <nocr> 'not x1 == x2'; IF(not x1 == x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE); //same as x1 <> x2
+            I("TELL <nocr> 'not x1 <> x2'; IF(not x1 <> x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", TRUE); //same as x1 == x2
+
+            I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 1, m(), 3;");
+            I("TELL 'x1 = 1, 2, 3; x2 = 1, m(), 3;';");
+            I("TELL <nocr> 'x1 == x2'; IF(x1 == x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE);
+            I("TELL <nocr> 'x1 <> x2'; IF(x1 <> x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE); // --> false, true, false --> false. It is only <> if all elements are <>.
+            I("TELL <nocr> 'not x1 == x2'; IF(not x1 == x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE); //true, false, true --not--> false, true, false --> false. Same as x1 <> x2.
+            I("TELL <nocr> 'not x1 <> x2'; IF(not x1 <> x2) TELL ' --> true'; %xx = 1; ELSE TELL ' --> false'; %xx = -1; END;");
+            _AssertScalarVal(First(), "%xx", FALSE); //false, true, false --not--> true, false, true --> false. Same as x1 == x2.
+            //
+            // NB: To test if any obs is different, use IF(x1 == x2); ELSE ...do something...; END;");
+            // NB: To test if any obs is same, use IF(x1 <> x2); ELSE ...do something...; END;");
+            // NB: Mention issues regarding precision here
+            // NB: Finding out if series contains missing not possible this way.
+            // NB: Maybe a countmiss(x) and countmiss(x, 'all'), and also implement ismiss(x, 'all').
+            // NB: Mention that for IF(x) to be true, all obs in x must be 1.
+            //
+
+
+            //try else in not x1 == x2
+            //test 1, 2, 3 vs. 2, m(), 4
+
+
+
+
+
             I("IF(m() == m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
             _AssertScalarVal(First(), "%xx", TRUE);            
             I("IF(m() <> m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
@@ -16939,6 +16993,95 @@ namespace UnitTests
             I("IF(2 > m()) VAL %xx = 1; ELSE VAL %xx = -1; END;");
             _AssertScalarVal(First(), "%xx", FALSE);
 
+            // --------------------------------------------
+            // series
+            // series
+            // series
+            // --------------------------------------------
+            
+            I("OPTION bugfix missing = no;");
+
+            //type1 -------------------
+
+            I("RESET; TIME 2001 2003; x1 = 1, m(), 3; x2 = 1, m(), 3;");            
+            I("if (x1 == x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", TRUE, sharedDelta);
+            I("if (x1 <> x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            if (true)
+            {
+                I("OPTION bugfix missing = no;");
+                I("if (x1 == x2); %x = 1; else; %x = -1; end;");
+                _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+                I("if (x1 <> x2); %x = 1; else; %x = -1; end;");
+                _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+                I("OPTION bugfix missing = yes;");
+            }
+            I("if (x1 < x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 <= x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 >= x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 > x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+
+            //type2 -------------------
+
+            I("RESET; TIME 2001 2003; x1 = 1, 2, 3; x2 = 1, m(), 3;");
+            I("if (x1 == x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 <> x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);  //they are not all different, even though 2 and m() are
+
+            //what about if (not x1 == x2) or  if (not x1 <> x2) ??
+
+            if (true)
+            {
+                I("OPTION bugfix missing = no;");
+                I("if (x1 == x2); %x = 1; else; %x = -1; end;");
+                _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+                I("if (x1 <> x2); %x = 1; else; %x = -1; end;");
+                _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+                I("OPTION bugfix missing = yes;");
+            }
+
+            I("if (x1 < x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 <= x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 >= x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 > x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+
+            //type3 -------------------
+
+            I("RESET; TIME 2001 2003; x1 = 1, m(), 3; x2 = 1, 2, 3;");
+            I("if (x1 == x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 <> x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+
+            if (true)
+            {
+                I("OPTION bugfix missing = no;");
+                I("if (x1 == x2); %x = 1; else; %x = -1; end;");
+                _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+                I("if (x1 <> x2); %x = 1; else; %x = -1; end;");
+                _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+                I("OPTION bugfix missing = yes;");
+            }
+
+            I("if (x1 < x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 <= x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 >= x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);
+            I("if (x1 > x2); %x = 1; else; %x = -1; end;");
+            _AssertScalarVal(First(), "%x", FALSE, sharedDelta);          
+         
 
         }
 
