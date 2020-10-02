@@ -2058,10 +2058,9 @@ namespace Gekko.Parser.Gek
                     //    break;
 
                     case "ASTRETURN":
-                        {
-                            //node.functionDef[]
+                        {                                                                
+                            LinesForSpecialCommands(node);
 
-                            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
                             string type = SearchUpwardsInTree8(node);
 
                             if (type == null)
@@ -2110,7 +2109,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTGOTO":
                         {
-                            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
+                            LinesForSpecialCommands(node);
+
                             node.Code.A("goto " + GetStringFromIdent(node[0]).ToLower().Trim() + ";" + G.NL);  //calls a C# label
                             w.wh.isGotoOrTarget = true;
                             //node.Code.A(Globals.splitSTART);
@@ -2118,7 +2118,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTTARGET":  //AREMOS: target
                         {
-                            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
+                            LinesForSpecialCommands(node);
+
                             node.Code.A(GetStringFromIdent(node[0]).ToLower().Trim() + ":;" + G.NL);  //a C# label
                             w.wh.isGotoOrTarget = true;
                             //node.Code.A(Globals.splitSTART);
@@ -2127,7 +2128,7 @@ namespace Gekko.Parser.Gek
 
                     case "ASTFOR":
                         {
-                            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
+                            LinesForSpecialCommands(node);
 
                             GetCodeFromAllChildren(node[1]);
 
@@ -2273,7 +2274,8 @@ namespace Gekko.Parser.Gek
 
                     case "ASTIF":
                         {
-                            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
+                            LinesForSpecialCommands(node);
+
                             node.Code.A("if(O.IsTrue(" + Globals.smpl + ", " + node[0].Code + ")) {");
                             //node.Code.A(Globals.splitSTART);
                             GetCodeFromAllChildren(node, node[1][0]);                            
@@ -6397,39 +6399,7 @@ namespace Gekko.Parser.Gek
                 }
             }  //end of switch on node.Text AFTER sub-nodes are done
 
-
-            ////if (relativeDepth == 1)
-            //{
-            //    //#982375: if it is 0, walk the sub-tree to see...                  
-            //    bool gotoTarget = false;
-            //    if (w.wh != null && w.wh.isGotoOrTarget) gotoTarget = true;
-
-            //    if (!gotoTarget)
-            //    {
-            //        //HACK #438543
-            //        string putInBefore = null;
-
-            //        if (relativeDepth == 1)
-            //        {
-            //            if (Globals.special.ContainsKey(node.Text))
-            //            {
-            //                //do nothing                        
-            //            }
-            //            else
-            //            {
-            //                //#2384328423                        
-            //                putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL;
-            //            }
-            //        }
-            //        string addText = null;
-            //        if (w.wh != null && w.wh?.localInsideLoopVariables != null || w.wh?.localFuncs != null)
-            //        {
-            //            addText = w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
-            //        }
-            //        node.Code.Prepend(putInBefore + addText);
-            //    }                
-            //}         
-
+            
             bool isGoto = false;
             if (w.wh != null && w.wh.isGotoOrTarget) isGoto = true;
             
@@ -6478,7 +6448,11 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        
+        private static void LinesForSpecialCommands(ASTNode node)
+        {              
+            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
+            //node.Code.A(G.NL + "p.SetText(@`¤" + node.Line + "`); " + G.NL);  //before anything else happens, like looping etc.
+        }
 
         private static string MaybeControlledSet(ASTNode node)
         {

@@ -5687,7 +5687,7 @@ namespace Gekko
                     {
                         if (G.Equals(x.GetVal(t), y.GetVal(t)) != (x.GetVal(t) == y.GetVal(t)))
                         {
-                            MissingProblem();
+                            MissingProblem(smpl.p);
                         }
                         if (G.Equals(x.GetVal(t), y.GetVal(t))) rv_series.SetData(t, 1d);
                         else rv_series.SetData(t, 0d);
@@ -5716,9 +5716,15 @@ namespace Gekko
             return rv;
         }
 
-        private static void MissingProblem()
+        private static void MissingProblem(P p)
         {
-            G.Writeln2("+++ WARNING: missing problem");
+            if (false)
+            {
+                G.Writeln2("+++ WARNING: missing problem " + p.lastFileSentToANTLR + " ");
+                int lineNumber; string originalFileName; List<string> commandLines;
+                Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
+                throw new GekkoException();
+            }
         }
 
         public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)
@@ -5747,7 +5753,7 @@ namespace Gekko
                     {
                         if (!G.Equals(x.GetVal(t), y.GetVal(t)) != (x.GetVal(t) != y.GetVal(t)))
                         {
-                            MissingProblem();
+                            MissingProblem(smpl.p);
                         }
                         if (!G.Equals(x.GetVal(t), y.GetVal(t))) rv_series.SetData(t, 1d);
                         else rv_series.SetData(t, 0d);
