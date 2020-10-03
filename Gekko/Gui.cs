@@ -1963,10 +1963,20 @@ namespace Gekko
             if (Globals.bugfixMissing.Count > 0)
             {
                 G.Writeln2("+++ Missing WARNING: The following statements compare timeseries and ", Globals.warningColor);
-                G.Writeln2("    may be problematic:", Globals.warningColor);
-                foreach (string s in Globals.bugfixMissing.Keys)
+                G.Writeln("    may be problematic:", Globals.warningColor);
+                                               
+                int widthRemember = Program.options.print_width;                
+                Program.options.print_width = int.MaxValue;
+                try
                 {
-                    G.Writeln(s);
+                    foreach (string s in Globals.bugfixMissing.Keys)
+                    {
+                        G.Writeln(s, Color.DarkBlue);
+                    }
+                }
+                finally
+                {
+                    Program.options.print_width = widthRemember;
                 }
             }
 

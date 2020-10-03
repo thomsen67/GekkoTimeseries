@@ -5729,7 +5729,7 @@ namespace Gekko
                 ss = commandLines[lineNumber - 1];
             }
             catch { }
-            string s = G.ReplaceGlueNew(ss) + "   (" + originalFileName + " line " + lineNumber + ")";
+            string s = G.ReplaceGlueNew(ss) + "  --->   " + originalFileName + " line " + lineNumber + ")";
             if (!Globals.bugfixMissing.ContainsKey(s)) Globals.bugfixMissing.Add(s, null);            
             //throw new GekkoException();
         }
