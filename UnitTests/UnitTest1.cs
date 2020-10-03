@@ -12899,47 +12899,48 @@ namespace UnitTests
 
 
 
+            if (true)
+            {
 
 
 
+                // -----------------------------------------------------
+                // ----- SOME EXTRA TESTS regarding IF etc.
+                // -----------------------------------------------------
 
-            // -----------------------------------------------------
-            // ----- SOME EXTRA TESTS regarding IF etc.
-            // -----------------------------------------------------
+                //Test of IF
+                I("RESET;");
+                Globals.unitTestScreenOutput = new StringBuilder();
+                Globals.errorHelper = "extra2";
+                FAIL("RUN extra2;");
+                s = Globals.unitTestScreenOutput.ToString();
+                ss = G.NL +
+                    @"*** ERROR: ErrorHelper #extra2" + G.NL
+                  + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\extra2.gcm', line 11" + G.NL
+                  + @"    [  11]:   for(val %i = 1 to HELPER_error('extra2'));" + G.NL
+                  + @"" + G.NL
+                  + @"    Call stack: Command line calling -->" + G.NL
+                  + @"    c:\Thomas\Gekko\regres\StackTrace\extra2.gcm (run-time error in line 11)" + G.NL + G.NL;
+                Assert.IsTrue(s == ss);
 
-            ////Test of IF
-            //I("RESET;");
-            //Globals.unitTestScreenOutput = new StringBuilder();
-            //Globals.errorHelper = "1a";
-            //FAIL("RUN extra2;");
-            //s = Globals.unitTestScreenOutput.ToString();
-            //ss = G.NL +
-            //    @"*** ERROR: ErrorHelper #1a" + G.NL
-            //  + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\extra1.gcm', line 11" + G.NL
-            //  + @"    [  11]:   for(val %i = 1 to %xxx);" + G.NL
-            //  + @"" + G.NL
-            //  + @"    Call stack: Command line calling -->" + G.NL
-            //  + @"    c:\Thomas\Gekko\regres\StackTrace\extra1.gcm (run-time error in line 11)" + G.NL + G.NL;
-            //Assert.IsTrue(s == ss);
-
-            //Test of FUNCTION
-            I("RESET;");
-            Globals.unitTestScreenOutput = new StringBuilder();
-            Globals.errorHelper = "extra1";
-            FAIL("RUN extra1;");
-            s = Globals.unitTestScreenOutput.ToString();
-            ss = G.NL +
-                @"*** ERROR: ErrorHelper #extra1" + G.NL
-              + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\extra1.gcm', line 11" + G.NL
-              + @"    [  11]:   if(HELPER_error('extra1') == 2);" + G.NL
-              + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL
-              + @"    c:\Thomas\Gekko\regres\StackTrace\extra1.gcm (run-time error in line 11)" + G.NL + G.NL;
-            Assert.IsTrue(s == ss);
-
+                //Test of FUNCTION
+                I("RESET;");
+                Globals.unitTestScreenOutput = new StringBuilder();
+                Globals.errorHelper = "extra1";
+                FAIL("RUN extra1;");
+                s = Globals.unitTestScreenOutput.ToString();
+                ss = G.NL +
+                    @"*** ERROR: ErrorHelper #extra1" + G.NL
+                  + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\extra1.gcm', line 11" + G.NL
+                  + @"    [  11]:   if(HELPER_error('extra1') == 2);" + G.NL
+                  + @"" + G.NL
+                  + @"    Call stack: Command line calling -->" + G.NL
+                  + @"    c:\Thomas\Gekko\regres\StackTrace\extra1.gcm (run-time error in line 11)" + G.NL + G.NL;
+                Assert.IsTrue(s == ss);
 
 
 
+            }
 
 
 

@@ -6427,21 +6427,20 @@ namespace Gekko.Parser.Gek
                 {
                     //#982375: if it is 0, walk the sub-tree to see...                  
 
+                    int line = node.Line;                    
+
+                    if (node.Text == "ASTIF")
+                    {
+                        line = GetLineRecursive(node[0]);
+                    }
+                    else if (node.Text == "ASTFOR")
+                    {
+                        line = GetLineRecursive(node[0]);
+                    }
+
                     //HACK #438543
                     if (Globals.special.ContainsKey(node.Text))
-                    {
-                        int line = node.Line;
-                        if (line == 0)
-                        {
-                            if (node.Text == "ASTIF")
-                            {
-                                line = GetLineRecursive(node[0]);
-                            }
-                            else if (node.Text == "ASTFOR")
-                            {
-                                line = GetLineRecursive(node[0]);
-                            }
-                        }                        
+                    {                                           
                         //do nothing
                         string putInBefore = G.NL + "p.SetText(@`¤" + line + "`);" + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
@@ -6449,7 +6448,7 @@ namespace Gekko.Parser.Gek
                     else
                     {
                         //#2384328423                        
-                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }
                     
