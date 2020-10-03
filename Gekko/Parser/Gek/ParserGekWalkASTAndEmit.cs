@@ -514,7 +514,24 @@ namespace Gekko.Parser.Gek
                 }
             }
         }
-                
+
+        public static void WalkASTSimple(ASTNode node, int depth, ref int line)
+        {
+            if (line > 0) return;
+            if (node != null)
+            {
+                if (node.Line > 0)
+                {
+                    line = node.Line;
+                    return;
+                }
+                foreach (ASTNode child in node.ChildrenIterator())
+                {
+                    WalkASTSimple(child, depth + 1, ref line);
+                }
+            }
+        }
+
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {
@@ -6413,11 +6430,21 @@ namespace Gekko.Parser.Gek
                     //HACK #438543
                     if (Globals.special.ContainsKey(node.Text))
                     {
+                        int line = node.Line;
+                        if (line == 0)
+                        {
+                            if (node.Text == "ASTIF")
+                            {
+                                line = GetLineRecursive(node[0]);
+                            }
+                            else if (node.Text == "ASTFOR")
+                            {
+                                line = GetLineRecursive(node[0]);
+                            }
+                        }                        
                         //do nothing
-                        string putInBefore = w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        string putInBefore = G.NL + "p.SetText(@`¤" + line + "`);" + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
-
-
                     }
                     else
                     {
@@ -6425,6 +6452,7 @@ namespace Gekko.Parser.Gek
                         string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }
+                    
 
                     //HACK #438543: a hack on this hack...! To avoid it is getting printed > 1 time for the same statement
                     w.wh.localInsideLoopVariables = null;
@@ -6446,6 +6474,13 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
+        }
+
+        private static int GetLineRecursive(ASTNode node)
+        {
+            int line2 = 0;
+            WalkASTSimple(node, 0, ref line2);
+            return line2;
         }
 
         private static void LinesForSpecialCommands(ASTNode node)

@@ -137,31 +137,7 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Create AST end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
-            //Dictionary<string, int> functions = new Dictionary<string, int>();
-            //Gekko.Parser.Gek.ParserGekWalkASTAndEmit.FindFunctionsUsedInGekkoCode(root, functions);
-            //foreach (string function in functions.Keys)
-            //{
-            //    if (Globals.uFunctionStorageCs.ContainsKey(function))  //case-insensitive anyway
-            //    {
-            //        //ok
-            //    }
-            //    else if (Globals.gekkoInbuiltFunctions.ContainsKey(function))
-            //    {
-            //        //ok                    
-            //    }
-            //    else if (Globals.lagFunctions.Contains(function))
-            //    {
-            //        //some or most of these are contained in Globals.gekkoInbuiltFunctions
-            //    }
-            //    else
-            //    {
-            //        //Now it is not FUNCTION inside the same .gcm file, it is not n Gekko.Functions,
-            //        //and it is not a Gekko lag function. So we must look for it elsewhere, in 
-            //        //the file system.
-            //    }
-            //}
-
+            
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
             Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmitUnfold(root);
             Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
