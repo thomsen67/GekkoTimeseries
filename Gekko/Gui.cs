@@ -1699,6 +1699,7 @@ namespace Gekko
             toolStripStatusLabel3.Image = yellow;
             toolStripButton3.Enabled = true;
             Globals.dateStamp = Program.GetDateStamp();  //takes a small amount of time to generate, so we put it in globally for later use in SERIES statements etc. Around midnight, this may be 1 day off.....!
+            Globals.bugfixMissing = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             //System.Threading.Timer timer = new System.Threading.Timer(new TimerCallback(xx), null, 0, 1000);
 
@@ -1956,6 +1957,16 @@ namespace Gekko
                 {
                     if (Globals.numberOfSkippedLines == 1) G.Writeln("There was " + Globals.numberOfSkippedLines + " SKIPPED LINE while running the command");
                     else G.Writeln("There were " + Globals.numberOfSkippedLines + " SKIPPED LINES while running the command");
+                }
+            }
+
+            if (Globals.bugfixMissing.Count > 0)
+            {
+                G.Writeln2("+++ Missing WARNING: The following statements compare timeseries and ", Globals.warningColor);
+                G.Writeln2("    may be problematic:", Globals.warningColor);
+                foreach (string s in Globals.bugfixMissing.Keys)
+                {
+                    G.Writeln(s);
                 }
             }
 

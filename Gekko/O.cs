@@ -5718,13 +5718,20 @@ namespace Gekko
 
         private static void MissingProblem(P p)
         {
-            if (false)
+            //G.Writeln2("+++ WARNING: missing problem " + p.lastFileSentToANTLR + " ");
+            int lineNumber; string originalFileName; List<string> commandLines;
+
+            Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
+
+            string ss = null;
+            try
             {
-                G.Writeln2("+++ WARNING: missing problem " + p.lastFileSentToANTLR + " ");
-                int lineNumber; string originalFileName; List<string> commandLines;
-                Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
-                throw new GekkoException();
+                ss = commandLines[lineNumber - 1];
             }
+            catch { }
+            string s = G.ReplaceGlueNew(ss) + "   (" + originalFileName + " line " + lineNumber + ")";
+            if (!Globals.bugfixMissing.ContainsKey(s)) Globals.bugfixMissing.Add(s, null);            
+            //throw new GekkoException();
         }
 
         public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)

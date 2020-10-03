@@ -974,6 +974,8 @@ namespace Gekko
 
         public static CommandMemory commandMemory = new CommandMemory();
 
+        public static GekkoDictionary<string, string> bugfixMissing = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
     }
 
     public class CommandMemory
