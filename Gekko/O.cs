@@ -5720,17 +5720,20 @@ namespace Gekko
         {
             //G.Writeln2("+++ WARNING: missing problem " + p.lastFileSentToANTLR + " ");
             int lineNumber; string originalFileName; List<string> commandLines;
-
             Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
-
             string ss = null;
             try
             {
                 ss = commandLines[lineNumber - 1];
             }
             catch { }
-            string s = G.ReplaceGlueNew(ss) + "  --->   " + originalFileName + " line " + lineNumber + ")";
-            if (!Globals.bugfixMissing.ContainsKey(s)) Globals.bugfixMissing.Add(s, null);            
+            string s = G.ReplaceGlueNew(ss) + "  --->   " + originalFileName + ", line " + lineNumber;
+            if (!Globals.bugfixMissing2.ContainsKey(s))
+            {
+                Globals.bugfixMissing1.Add(s);
+                Globals.bugfixMissing2.Add(s, null);
+            }
+
             //throw new GekkoException();
         }
 

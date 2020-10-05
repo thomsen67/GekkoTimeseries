@@ -1699,7 +1699,9 @@ namespace Gekko
             toolStripStatusLabel3.Image = yellow;
             toolStripButton3.Enabled = true;
             Globals.dateStamp = Program.GetDateStamp();  //takes a small amount of time to generate, so we put it in globally for later use in SERIES statements etc. Around midnight, this may be 1 day off.....!
-            Globals.bugfixMissing = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            Globals.bugfixMissing1 = new List<string>();
+            Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             //System.Threading.Timer timer = new System.Threading.Timer(new TimerCallback(xx), null, 0, 1000);
 
@@ -1960,24 +1962,35 @@ namespace Gekko
                 }
             }
 
-            if (Globals.bugfixMissing.Count > 0)
+            if (Globals.bugfixMissing1.Count > 0)
             {
-                G.Writeln2("+++ Missing WARNING: The following statements compare timeseries and ", Globals.warningColor);
-                G.Writeln("    may be problematic:", Globals.warningColor);
-                                               
+                G.Writeln2("+++ WARNING (compatibility): The following statements compare whole timeseries that contain ", Globals.warningColor);
+                G.Writeln("    missing values. Gekko 3.1.8 implemented some changes regarding such comparisons,", Globals.warningColor);
+                G.Writeln("    and the comparisons may therefore differ compared to Gekko 3.1.8.", Globals.warningColor);
+
                 int widthRemember = Program.options.print_width;                
                 Program.options.print_width = int.MaxValue;
                 try
                 {
-                    foreach (string s in Globals.bugfixMissing.Keys)
+                    G.Writeln("", Globals.warningColor);
+                    foreach (string s in Globals.bugfixMissing1)
                     {
-                        G.Writeln(s, Color.DarkBlue);
+                        G.Writeln("    " + s, Globals.warningColor);
                     }
+                    G.Writeln("", Globals.warningColor);
                 }
                 finally
                 {
                     Program.options.print_width = widthRemember;
-                }
+                }                                
+                Action a = () =>
+                {
+                    Program.Help("i_dynamic_statements");
+                };
+                G.Writeln("    Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.8 to a", Globals.warningColor);
+                G.Writeln("    Gekko version >= 3.1.8, this error may come out of the blue. In that case, yout may set", Globals.warningColor);
+                G.Writeln("    'OPTION bugfix missing = no;' to emulate the behavior of Gekko < 3.1.8.", Globals.warningColor);
+                G.Writeln();
             }
 
             if (p.hasBeenCmdFile)
