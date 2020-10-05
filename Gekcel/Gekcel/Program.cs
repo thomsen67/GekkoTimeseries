@@ -6,6 +6,9 @@ using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
 using System.IO;
 using Gekko;
+using ExcelDna.IntelliSense;
+using ExcelDna.ComInterop;
+using Extensibility;
 
 namespace Gekcel
 {
@@ -88,6 +91,85 @@ namespace Gekcel
         }
     }
 
+
+    //https://github.com/Excel-DNA/Samples/tree/master/DnaComServer
+    //https://brooklynanalyticsinc.com/2019/04/09/excel-dna-or-why-are-you-still-using-vba/
+    //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
+    [ComVisible(true)]
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    public class COMLibrary
+    {
+        public DateTime ThirtyDaysAgo()
+        {
+            return DateTime.Today - TimeSpan.FromDays(30);
+        }
+
+        public double GetAbaseData(string startDate, string endDate, string frequency, string series)
+            // Jeg får en fejl i den her funktion, det virker til at den ikke kan loade Gekko ordentligt. GEKKO_-funktionerne virker heller
+            // ikke, så det kan være det er noget med min maskine.
+        {
+            string seriesWithFrequency = series + "!" + frequency;
+
+            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile("c:\\abase.gbk");
+            Gekko.Series ts = db.GetIVariable(seriesWithFrequency) as Gekko.Series;
+            GekkoTime gt = GekkoTime.FromStringToGekkoTime(startDate, true, true);
+            double d = ts.GetDataSimple(gt);
+            return d;
+
+        }
+    }
+
+
+    [ComVisible(true)]
+    [Guid("a407a925-2ebf-4452-9c42-e431a382276f")]
+    [ProgId("GekkoExcelComAddIn.ComAddIn")]
+    public class GekkoExcelComAddIn : ExcelComAddIn
+    {
+        public void OnConnection(object Application,
+                                 ext_ConnectMode ConnectMode,
+                                 object AddInInst,
+                                 ref Array custom)
+        {
+            try
+            {
+                dynamic addIn = AddInInst;
+                addIn.Object = new COMLibrary();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex);
+            }
+        }
+    }
+
+
+    [ComVisible(false)]
+    internal class ExcelAddin : IExcelAddIn
+    {
+        private GekkoExcelComAddIn com_addin;
+        public void AutoOpen()
+        {
+            try
+            {
+                com_addin = new GekkoExcelComAddIn();
+                ExcelComAddInHelper.LoadComAddIn(com_addin);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading COM AddIn: " + ex);
+            }
+
+            ComServer.DllRegisterServer();
+            IntelliSenseServer.Install();
+        }
+
+        public void AutoClose()
+        {
+            ComServer.DllUnregisterServer();
+            IntelliSenseServer.Uninstall();
+        }
+    }
+
     public static class ExcelFunctionCalls
     {
         [ExcelFunction(Description = "Reverse string example from Gekko")]
@@ -158,7 +240,9 @@ namespace Gekcel
         }
 
         [ExcelFunction(Name = "GEKKO_GetData", Description = "Gets a data value from a timeseries in a gbk databank file")]
-        public static double GEKKO_GetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
+        public static double GEKKO_GetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
+            [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
+            [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
         {
             Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
             Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);

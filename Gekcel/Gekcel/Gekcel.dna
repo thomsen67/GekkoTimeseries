@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<DnaLibrary Name="%ProjectName% Add-In" RuntimeVersion="v4.0" xmlns="http://schemas.excel-dna.net/addin/2018/05/dnalibrary">
-  <ExternalLibrary Path="Gekcel.exe" ExplicitExports="false" LoadFromBytes="true" Pack="true" IncludePdb="false" />
-
+<DnaLibrary Name="Gekcel Add-In" RuntimeVersion="v4.0" xmlns="http://schemas.excel-dna.net/addin/2018/05/dnalibrary">
+  <ExternalLibrary Path="Gekcel.dll" ExplicitExports="false" LoadFromBytes="true" Pack="true" IncludePdb="false" ComServer="true"/>
+	
   <!--
        The RuntimeVersion attribute above allows two settings:
        * RuntimeVersion="v4.0" - for .NET 4 and 4.5
