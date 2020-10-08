@@ -4149,7 +4149,7 @@ namespace Gekko
                 if (!lastElementStar)
                 {
                     G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
-                    throw new GekkoException();
+                    throw new GekkoException(); 
                 }
             }
             else if (rhs_list.list.Count > n)
