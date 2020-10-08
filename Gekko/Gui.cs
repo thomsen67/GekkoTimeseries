@@ -1991,7 +1991,7 @@ namespace Gekko
                 G.Writeln("    Gekko version >= 3.1.8, this warning may come out of the blue. In that case, as a work-around,", Globals.warningColor);
                 G.Writeln("    you may replace the problematic IF(...) with IF_OLD(...), to emulate the behavior of", Globals.warningColor);
                 G.Writeln("    Gekko < 3.1.8. If you are using the trick IF(x == x) to check if a series x contains missings, ", Globals.warningColor);
-                G.Writeln("    you may instead use IF(sumt(x.ismiss('all')) > 0) to check for missings.", Globals.warningColor);
+                G.Writeln("    you may instead use IF(x.ismiss('all').sumt() > 0) to check for missings.", Globals.warningColor);
                 G.Writeln("    If all this turns problematic or cumbersome, you may set OPTION bugfix missing = no, to", Globals.warningColor);
                 G.Writeln("    emulate Gekko < 3.1.8 completely regarding IF and missings. Using the option generally", Globals.warningColor);
                 G.Writeln("    is not recommended though.", Globals.warningColor);
