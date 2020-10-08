@@ -537,7 +537,7 @@ namespace Gekko.Parser.Gek
         {
 
             //if (node != null) G.Writeln(G.Blanks(absoluteDepth) + node.Text);
-
+            
             if (node.Parent != null)
             {
                 string s = null;
@@ -706,7 +706,14 @@ namespace Gekko.Parser.Gek
             }                           
             
             foreach (ASTNode child in node.ChildrenIterator())
-            {                   
+            {
+                if (true)
+                {
+                    if (Globals.bugStack && absoluteDepth >= 28)
+                    {
+                        System.Windows.Forms.MessageBox.Show("abs depth " + absoluteDepth + ", calling next");
+                    }
+                }
                 WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p);
                 //return; Globals.testing = true;
             }            
@@ -2290,20 +2297,18 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTIF":
+                    case "ASTIFOLD":
                         {
                             LinesForSpecialCommands(node);
+                            if (node.Text == "ASTIFOLD") node.Code.A("O.UseOldIf(true);" + G.NL);
+                            node.Code.A("if(O.IsTrue(" + Globals.smpl + ", " + node[0].Code + ")) {");                            
+                            GetCodeFromAllChildren(node, node[1][0]);                                                        
+                            node.Code.A("}");
+                            node.Code.A("else {");                            
+                            GetCodeFromAllChildren(node, node[2][0]);                            
+                            node.Code.A("}");
+                            if (node.Text == "ASTIFOLD") node.Code.A("O.UseOldIf(false);" + G.NL);
 
-                            node.Code.A("if(O.IsTrue(" + Globals.smpl + ", " + node[0].Code + ")) {");
-                            //node.Code.A(Globals.splitSTART);
-                            GetCodeFromAllChildren(node, node[1][0]);                            
-                            //node.Code.A(Globals.splitSTOP);
-                            node.Code.A("}");
-                            node.Code.A("else {");
-                            //node.Code.A(Globals.splitSTART);
-                            GetCodeFromAllChildren(node, node[2][0]);
-                            //node.Code.A(Globals.splitSTOP);
-                            node.Code.A("}");
-                            //node.Code.A(Globals.splitSTART);
                         }
                         break;
                     case "ASTFUNCTIONDEF2":
@@ -6429,7 +6434,7 @@ namespace Gekko.Parser.Gek
 
                     int line = node.Line;                    
 
-                    if (node.Text == "ASTIF")
+                    if (node.Text == "ASTIF" || node.Text == "ASTIFOLD")
                     {
                         line = GetLineRecursive(node[0]);
                     }
@@ -6484,8 +6489,7 @@ namespace Gekko.Parser.Gek
 
         private static void LinesForSpecialCommands(ASTNode node)
         {              
-            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
-            //node.Code.A(G.NL + "p.SetText(@`¤" + node.Line + "`); " + G.NL);  //before anything else happens, like looping etc.
+            node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);            
         }
 
         private static string MaybeControlledSet(ASTNode node)

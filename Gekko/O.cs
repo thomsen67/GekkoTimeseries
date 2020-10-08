@@ -5656,6 +5656,11 @@ namespace Gekko
         // =========================================================================
         // =========================================================================
 
+        public static void UseOldIf(bool b)
+        {
+            Globals.if_old_helper = b;
+        }
+
         public static bool IsTrue(double d)
         {
             if (d != 0d) return true;
@@ -5683,7 +5688,12 @@ namespace Gekko
                 {
 
                     // ---------------------------------------------
-                    if (Program.options.bugfix_missing)
+                    if (Program.options.bugfix_missing == false || Globals.if_old_helper)
+                    {
+                        if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
+                        else rv_series.SetData(t, 0d);  //else it would be missing                                                
+                    }
+                    else
                     {
                         if (G.Equals(x.GetVal(t), y.GetVal(t)) != (x.GetVal(t) == y.GetVal(t)))
                         {
@@ -5691,11 +5701,6 @@ namespace Gekko
                         }
                         if (G.Equals(x.GetVal(t), y.GetVal(t))) rv_series.SetData(t, 1d);
                         else rv_series.SetData(t, 0d);
-                    }
-                    else
-                    {
-                        if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
-                        else rv_series.SetData(t, 0d);  //else it would be missing                        
                     }
                 }
             }
@@ -5759,19 +5764,19 @@ namespace Gekko
                     if (x.GetVal(t) != y.GetVal(t)) rv_series.SetData(t, 1d);
                     else rv_series.SetData(t, 0d);  //else it would be missing                                                         
                     // ---------------------------------------------
-                    if (Program.options.bugfix_missing)
+                    if (Program.options.bugfix_missing == false || Globals.if_old_helper)
                     {
+                        if (x.GetVal(t) != y.GetVal(t)) rv_series.SetData(t, 1d);
+                        else rv_series.SetData(t, 0d);  //else it would be missing  
+                    }
+                    else
+                    {                        
                         if (!G.Equals(x.GetVal(t), y.GetVal(t)) != (x.GetVal(t) != y.GetVal(t)))
                         {
                             MissingProblem(smpl.p);
                         }
                         if (!G.Equals(x.GetVal(t), y.GetVal(t))) rv_series.SetData(t, 1d);
                         else rv_series.SetData(t, 0d);
-                    }
-                    else
-                    {
-                        if (x.GetVal(t) != y.GetVal(t)) rv_series.SetData(t, 1d);
-                        else rv_series.SetData(t, 0d);  //else it would be missing                        
                     }
                 }
             }

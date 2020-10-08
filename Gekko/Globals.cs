@@ -44,6 +44,10 @@ namespace Gekko
         
         public static string versionInternal = "";
 
+        public static bool bugStack = false;
+
+        public static bool if_old_helper = false;
+
         public static bool oldcontrol = true;
         public static bool oldcontrol2 = false;
 
@@ -123,7 +127,7 @@ namespace Gekko
         public static string blockHelper = "<[time]>";
 
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction        
-        public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" }};
+        public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTIF_OLD", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" }};
 
         public static string errorHelper = null;
 

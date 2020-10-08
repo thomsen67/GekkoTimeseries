@@ -1966,7 +1966,7 @@ namespace Gekko
             {
                 G.Writeln2("+++ WARNING (compatibility): The following statements compare whole timeseries that contain ", Globals.warningColor);
                 G.Writeln("    missing values. Gekko 3.1.8 implemented some changes regarding such comparisons,", Globals.warningColor);
-                G.Writeln("    and the comparisons may therefore differ compared to Gekko 3.1.8.", Globals.warningColor);
+                G.Writeln("    and the following concrete comparisons differ compared to Gekko 3.1.8.", Globals.warningColor);
 
                 int widthRemember = Program.options.print_width;                
                 Program.options.print_width = int.MaxValue;
@@ -1975,7 +1975,7 @@ namespace Gekko
                     G.Writeln("", Globals.warningColor);
                     foreach (string s in Globals.bugfixMissing1)
                     {
-                        G.Writeln("    " + s, Globals.warningColor);
+                        G.Writeln("      " + s, Globals.warningColor);
                     }
                     G.Writeln("", Globals.warningColor);
                 }
@@ -1985,11 +1985,18 @@ namespace Gekko
                 }                                
                 Action a = () =>
                 {
-                    Program.Help("i_dynamic_statements");
+                    Program.Help("i_missing_values");
                 };
-                G.Writeln("    Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.8 to a", Globals.warningColor);
-                G.Writeln("    Gekko version >= 3.1.8, this error may come out of the blue. In that case, yout may set", Globals.warningColor);
-                G.Writeln("    'OPTION bugfix missing = no;' to emulate the behavior of Gekko < 3.1.8.", Globals.warningColor);
+                G.Writeln("    Read more about missing values " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.8 to a", Globals.warningColor);
+                G.Writeln("    Gekko version >= 3.1.8, this warning may come out of the blue. In that case, as a work-around,", Globals.warningColor);
+                G.Writeln("    you may replace the problematic IF(...) with IF_OLD(...), to emulate the behavior of", Globals.warningColor);
+                G.Writeln("    Gekko < 3.1.8. If you are using the trick IF(x == x) to check if a series x contains missings, ", Globals.warningColor);
+                G.Writeln("    you may instead use IF(sumt(x.ismiss('all')) > 0) to check for missings.", Globals.warningColor);
+                G.Writeln("    If all this turns problematic or cumbersome, you may set OPTION bugfix missing = no, to", Globals.warningColor);
+                G.Writeln("    emulate Gekko < 3.1.8 completely regarding IF and missings. Using the option generally", Globals.warningColor);
+                G.Writeln("    is not recommended though.", Globals.warningColor);
+                
+
                 G.Writeln();
             }
 

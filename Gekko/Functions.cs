@@ -1463,11 +1463,34 @@ namespace Gekko
 
         public static IVariable ismiss(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
+            return ismiss(smpl, _t1, _t2, x, null);
+        }
+
+        public static IVariable ismiss(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable option)
+        {
             if (x.Type() == EVariableType.Series)
             {
                 Series x_series = x as Series;
-                GekkoTime t1 = x_series.GetRealDataPeriodFirst();
-                GekkoTime t2 = x_series.GetRealDataPeriodLast();
+
+                GekkoTime t1 = GekkoTime.tNull;
+                GekkoTime t2 = GekkoTime.tNull;
+
+                if (option == null)
+                {
+                    t1 = x_series.GetRealDataPeriodFirst();
+                    t2 = x_series.GetRealDataPeriodLast();
+                }
+                else
+                {
+                    string option_string = O.ConvertToString(option);
+                    if (!G.Equal(option_string, "all"))
+                    {
+                        G.Writeln2("*** ERROR: Expected 'all' option");
+                        throw new GekkoException();
+                    }
+                    Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+                }
+
                 Series rv = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                 {

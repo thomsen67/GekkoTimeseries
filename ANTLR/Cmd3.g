@@ -173,6 +173,7 @@ ASTOR;
 ASTAND;
 ASTNOT;
 ASTCOMPARE;
+ASTIFOLD;
 ASTIF;
 ASTIFOPERATOR;
 ASTIFOPERATOR1;
@@ -1176,6 +1177,7 @@ Y2                    = 'Y2'                       ;
     HPFILTER         = 'HPFILTER';
     HTML             = 'HTML';
     IF               = 'IF'              ;
+	IF_OLD               = 'IF_OLD'              ;
 	ASBANK = 'ASBANK';
 	TOBANK = 'TOBANK';
 	FROMBANK = 'FROMBANK';
@@ -1815,6 +1817,7 @@ d.Add("Y" ,Y);
                                         d.Add("hpfilter"    , HPFILTER      );
                                         d.Add("html"    , HTML      );
                                         d.Add("if"      , IF      );
+										d.Add("if_old"      , IF_OLD      );
 
 										d.Add("asbank"      , ASBANK      );
 										d.Add("tobank"      , TOBANK      );
@@ -3073,7 +3076,10 @@ help:					    HELP  name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} nam
 // IF
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?));
+//the latter, IF_OLD will soon be obsolete.
+if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?))
+						  | IF_OLD leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIFOLD", ASTIFOLD, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?))
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // BLOCK
@@ -4346,6 +4352,7 @@ ident2: 					Ident |
   HDG|
   HELP|
   IF|
+  IF_OLD|
   IMPORT|
   INDEX|
   INI|
