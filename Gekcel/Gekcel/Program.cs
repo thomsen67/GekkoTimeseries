@@ -99,13 +99,23 @@ namespace Gekcel
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class COMLibrary
     {
+        //TT: In order to be able to use this function on Excel cells, create this VBA code
+        //    in your sheet. The code must be put under "Modules", same place as macros.
+        //    Otherwise it does not show up when typing "=Ge..." in a cell.
+        //
+        //  Public Function Gekko_ThirtyDaysAgo() As Date
+        //    dim gekko as Object
+        //    set gekko = createobject("Gekcel.COMLibrary")
+        //    Gekko_ThirtyDaysAgo = gekko.thirtydaysago()
+        //  End Function        
+
         public DateTime ThirtyDaysAgo()
         {
             return DateTime.Today - TimeSpan.FromDays(30);
         }
 
         public double GetAbaseData(string startDate, string endDate, string frequency, string series)
-            // Jeg får en fejl i den her funktion, det virker til at den ikke kan loade Gekko ordentligt. GEKKO_-funktionerne virker heller
+            // DFG: Jeg får en fejl i den her funktion, det virker til at den ikke kan loade Gekko ordentligt. Gekko_-funktionerne virker heller
             // ikke, så det kan være det er noget med min maskine.
         {
             string seriesWithFrequency = series + "!" + frequency;
@@ -173,7 +183,7 @@ namespace Gekcel
     public static class ExcelFunctionCalls
     {
         [ExcelFunction(Description = "Reverse string example from Gekko")]
-        public static string GEKKO_ReverseString([ExcelArgument(Name = "input_string", Description = "String to reverse")] string input_string)
+        public static string Gekko_ReverseString([ExcelArgument(Name = "input_string", Description = "String to reverse")] string input_string)
         {
             string reversestring = "";
             int ilength = input_string.Length - 1;
@@ -185,8 +195,8 @@ namespace Gekcel
             return reversestring;            
         }
 
-        [ExcelFunction(Name = "GEKKO_Roundtrip", Description = "Roundtrip")]
-        public static double GEKKO_Roundtrip()
+        [ExcelFunction(Name = "Gekko_Roundtrip", Description = "Roundtrip")]
+        public static double Gekko_Roundtrip()
         {
             Globals.excelDna = true;  //so that it does not try to print on screen etc.
             Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
@@ -239,8 +249,8 @@ namespace Gekcel
             return d;
         }
 
-        [ExcelFunction(Name = "GEKKO_GetData", Description = "Gets a data value from a timeseries in a gbk databank file")]
-        public static double GEKKO_GetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
+        [ExcelFunction(Name = "Gekko_GetData", Description = "Gets a data value from a timeseries in a gbk databank file")]
+        public static double Gekko_GetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
             [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
         {
@@ -253,8 +263,8 @@ namespace Gekcel
             return d;
         }
 
-        [ExcelFunction(Name = "GEKKO_SetData", Description = "Sets a data value in a timeseries in a gbk databank file")]        
-        public static void GEKKO_SetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
+        [ExcelFunction(Name = "Gekko_SetData", Description = "Sets a data value in a timeseries in a gbk databank file")]        
+        public static void Gekko_SetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
         {
             Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
             Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
