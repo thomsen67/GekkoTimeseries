@@ -13808,7 +13808,7 @@ namespace UnitTests
             _AssertSeries(First(), "yy3!a", 2001, 1d, sharedDelta);
             _AssertSeries(First(), "yy3!a", 2002, 0d, sharedDelta);
             _AssertSeries(First(), "yy3!a", 2003, 1d, sharedDelta);
-            I("yy4 <99 2003> = ismiss <2000 2002> (xx2, 'all');");
+            I("yy4 <99 2003> = ismiss(<2000 2002>, xx2, 'all');");
             _AssertSeries(First(), "yy4!a", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy4!a", 2000, 0d, sharedDelta);
             _AssertSeries(First(), "yy4!a", 2001, 1d, sharedDelta);
