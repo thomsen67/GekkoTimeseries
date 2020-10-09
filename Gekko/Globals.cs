@@ -46,6 +46,8 @@ namespace Gekko
 
         public static bool bugStack = false;
 
+        public static bool fixPxProblem = true;
+
         public static bool if_old_helper = false;
 
         public static bool oldcontrol = true;

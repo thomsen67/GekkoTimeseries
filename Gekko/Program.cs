@@ -5112,22 +5112,42 @@ namespace Gekko
                     if (s.StartsWith(codeTimeString, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString.Length);
                     else if (s.StartsWith(codeTimeString2, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString2.Length);
 
-                    string[] ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] ss = null;
+                    if (Globals.fixPxProblem)
+                    {
+                        ss = G.SplitCsv(s).ToArray();
+                    }
+                    else
+                    {
+                        ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    }
+
                     foreach (string s2 in ss)
                     {
-                        if (s2.Substring(1, s2.Length - 2).IndexOf("m", StringComparison.OrdinalIgnoreCase) != -1)
+                        string s3 = s2;
+
+                        if (Globals.fixPxProblem)
+                        {
+                            s3 = s3.Trim();
+                        }
+                        else
+                        {
+                            s3 = s2.Substring(1, s2.Length - 2);
+                        }
+
+                        if (s3.IndexOf("m", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             freq = "m";
                         }
-                        if (s2.Substring(1, s2.Length - 2).IndexOf("k", StringComparison.OrdinalIgnoreCase) != -1)
+                        if (s3.IndexOf("k", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             freq = "q";
                         }
-                        if (s2.Substring(1, s2.Length - 2).IndexOf("q", StringComparison.OrdinalIgnoreCase) != -1)
+                        if (s3.IndexOf("q", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             freq = "q";
                         }
-                        dates.Add(s2.Substring(1, s2.Length - 2));
+                        dates.Add(s3);
                     }
                 }
                 else if (state == 3)
@@ -5151,11 +5171,32 @@ namespace Gekko
 
                     string s = line777.Substring(i + 1);
                     //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
-                    string[] ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    string[] ss = null;
+                    if (Globals.fixPxProblem)
+                    {
+                        ss = G.SplitCsv(s).ToArray();
+                    }
+                    else
+                    {
+                        ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    }
+
+
                     List<string> names2 = new List<string>();
                     foreach (string s2 in ss)
                     {
-                        names2.Add(s2.Substring(1, s2.Length - 2));
+                        string s4 = s2;
+                        if (Globals.fixPxProblem)
+                        {
+                            s4 = s4.Trim();
+                        }
+                        else
+                        {
+                            s4 = s2.Substring(1, s2.Length - 2);
+                        }
+
+                        names2.Add(s4);
                     }
                     if (names2.Count == 0)
                     {
@@ -5176,11 +5217,31 @@ namespace Gekko
                     }
                     string s = line5.Substring(i + 1);
                     //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
-                    string[] ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    string[] ss = null;
+                    if (Globals.fixPxProblem)
+                    {
+                        ss = G.SplitCsv(s).ToArray();
+                    }
+                    else
+                    {
+                        ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    }
+
                     List<string> values2 = new List<string>();
                     foreach (string s2 in ss)
                     {
-                        values2.Add(s2.Substring(1, s2.Length - 2));
+                        string s5 = s2;
+                        if (Globals.fixPxProblem)
+                        {
+                            s5 = s5.Trim();
+                        }
+                        else
+                        {
+                            s5 = s2.Substring(1, s2.Length - 2);
+                        }
+
+                        values2.Add(s5);
                     }
                     if (values2.Count == 0)
                     {
@@ -17981,7 +18042,7 @@ namespace Gekko
                 //{
                 //    string s = Python();
                 //    G.Writeln2(s);
-                //}                
+                //}            
             }
 
             if (nocr) G.Write(text);
