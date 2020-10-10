@@ -288,7 +288,15 @@ namespace Gekcel
             string tsdxFile = null;
             string tempTsdxPath = null;
             int NaNCounter = 0;
-            Databank db = Program.GetDatabankFromFile(null, oRead, info, gbkFile, gbkFile, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+            Databank db = null;
+            try
+            {
+                db = Program.GetDatabankFromFile(null, oRead, info, gbkFile, gbkFile, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+            }
+            catch (Exception e)
+            {
+
+            }
             return db;
         }
 
