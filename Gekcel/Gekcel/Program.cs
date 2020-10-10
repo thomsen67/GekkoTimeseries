@@ -99,33 +99,43 @@ namespace Gekcel
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class COMLibrary
     {
-        //TT: In order to be able to use this function on Excel cells, create this VBA code
+        //TT: In order to be able to use these functions on Excel cells, create this VBA code
         //    in your sheet. The code must be put under "Modules", same place as macros.
         //    Otherwise it does not show up when typing "=Ge..." in a cell.
         //
-        //  Public Function Gekko_ThirtyDaysAgo() As Date
-        //    dim gekko as Object
-        //    set gekko = createobject("Gekcel.COMLibrary")
-        //    Gekko_ThirtyDaysAgo = gekko.thirtydaysago()
-        //  End Function        
+        /*
+              Public Function Gekko_ThirtyDaysAgo() As Date
+                dim gekko as Object
+                set gekko = createobject("Gekcel.COMLibrary")
+                Gekko_ThirtyDaysAgo = gekko.ThirtyDaysAgo()
+              End Function                      
+            
+              Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
+                dim gekko as Object
+                set gekko = createobject("Gekcel.COMLibrary")
+                Gekko_GetData2 = gekko.GetData2(gbkFile, variableWithFreq, date2)
+              End Function       
+
+              The last one is called with = Gekko_GetData2("c:\Thomas\Desktop\gekko\testing\jul05.gbk"; "enl!a"; "2000")
+              
+
+        */
 
         public DateTime ThirtyDaysAgo()
         {
             return DateTime.Today - TimeSpan.FromDays(30);
         }
 
-        public double GetAbaseData(string startDate, string endDate, string frequency, string series)
-            // DFG: Jeg får en fejl i den her funktion, det virker til at den ikke kan loade Gekko ordentligt. Gekko_-funktionerne virker heller
-            // ikke, så det kan være det er noget med min maskine.
+        public double GetData2(string gbkFile, string variableWithFreq, string date)
         {
-            string seriesWithFrequency = series + "!" + frequency;
-
-            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile("c:\\abase.gbk");
-            Gekko.Series ts = db.GetIVariable(seriesWithFrequency) as Gekko.Series;
-            GekkoTime gt = GekkoTime.FromStringToGekkoTime(startDate, true, true);
+            //TT: Same as Gekko_GetData(...), just callable from VBA
+            Globals.excelDna = true;  //so that it does not try to print on screen etc.     
+            Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+            Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
+            GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
             double d = ts.GetDataSimple(gt);
             return d;
-
         }
     }
 
