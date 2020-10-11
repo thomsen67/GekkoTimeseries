@@ -91,7 +91,7 @@ namespace Gekcel
         }
     }
 
-
+    //DFG: links regarding COM interface
     //https://github.com/Excel-DNA/Samples/tree/master/DnaComServer
     //https://brooklynanalyticsinc.com/2019/04/09/excel-dna-or-why-are-you-still-using-vba/
     //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
@@ -225,8 +225,7 @@ namespace Gekcel
             string fileName2 = "test2.gbk";
             string name = "y";
             double v = 54321d;
-            int year = 2000;
-            Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+            int year = 2000;            
             string path = Path.Combine(Globals.excelDnaPath, fileName);
             string path2 = Path.Combine(Globals.excelDnaPath, fileName2);
             double d = double.NaN;
@@ -234,12 +233,10 @@ namespace Gekcel
             if (true)
             {
                 int i1 = Program.databanks.GetFirst().storage.Count;
-                int i2 = Program.databanks.GetRef().storage.Count;
-                MessageBox.Show("Before " + i1 + " " + i2);
+                int i2 = Program.databanks.GetRef().storage.Count;                
                 Program.obeyCommandCalledFromGUI(@"clone;", new P());
                 int i3 = Program.databanks.GetFirst().storage.Count;
-                int i4 = Program.databanks.GetRef().storage.Count;
-                MessageBox.Show("After " + i3 + " " + i4);
+                int i4 = Program.databanks.GetRef().storage.Count;                
             }
 
             if (true)
