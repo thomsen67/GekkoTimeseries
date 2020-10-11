@@ -4,6 +4,7 @@ using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
 using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
+using Microsoft.Vbe.Interop;
 using System.IO;
 using Gekko;
 using ExcelDna.IntelliSense;
@@ -12,6 +13,19 @@ using Extensibility;
 //Test DFG
 namespace Gekcel
 {
+    //TT: Basically, we want to be able to have Excel use Gekko, but without opening Gekko and running 
+    //    commands in Gekko. There are two ways of using Gekko methods from within Excel:
+    //
+    //      (1) Just typing "=" in a cell, and calling a Gekko method like "= Gekko_GetData(...)",
+    //          returning some value
+    //      (2) Calling the same Gekko_GetData(...) method from within a VB script inside Excel.
+    //      (3) Using buttons in the Ribbon interface in Excel (point and click)
+    //
+    //    Bullet (1) comes directly from ExcelDNA, but to do (2), we need to use a so-called COM server.
+    //
+    //
+    //
+
     [ComVisible(true)]
     public class RibbonController : ExcelRibbon
     {
@@ -68,37 +82,73 @@ namespace Gekcel
 
         public void OnButtonPressed3(IRibbonControl control)
         {
-            Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;
-            //Workbook wb = app.Workbooks[1];            
-            Worksheet ws = (Worksheet)app.ActiveSheet;
-            try
-            {
-                app.Run("h", "Gekko");
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("ERROR: " + e.Message);
-            }
+            //TT: Inserting and calling VB code via the Ribbon ("play" button)
+            //To do this, you must have this activated in Excel:
+            //-------------------------------------------------------------
+            //Go to Excel options
+            //Go to Trust Center
+            //Go to Trust Center Settings
+            //Goto Macro settings
+            //Check this: Trust access to the VBA object model
+            //-------------------------------------------------------------
 
-            //The sheet must contain this macro:
-            //----------------------------------
-            //Sub h(word)
-            //  d = Range("B2").Value
-            //  MsgBox "Hello from " & word & ", value of B2 is: " & d
-            //End Sub
-            //----------------------------------
+            Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;            
+            Worksheet ws = (Worksheet)app.ActiveSheet;
+            string excelFile = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\Gekcel.xlsm";
+            DirectoryInfo networkDir = new DirectoryInfo(ExcelDnaUtil.XllPath);
+            DirectoryInfo twoLevelsUp = networkDir.Parent.Parent.Parent;
+            string excelFile_orig = twoLevelsUp.FullName + "\\Diverse\\ExternalDllFiles\\Gekcel_orig.xlsm";
+            if (File.Exists(excelFile))
+            {
+                try
+                {
+                    File.Delete(excelFile);
+                }
+                catch
+                {
+                    MessageBox.Show("*** ERROR: Could not delete file: " + excelFile);
+                    throw new Exception();
+                }
+            }
+            File.Copy(excelFile_orig, excelFile);
+            Workbook targetExcelFile = app.Workbooks.Open(excelFile);            
+            VBComponent newStandardModule = targetExcelFile.VBProject.VBComponents.Add(vbext_ComponentType.vbext_ct_StdModule);
+            CodeModule codeModule = newStandardModule.CodeModule;
+
+            string codeText = null;
+            int lineNum = codeModule.CountOfLines + 1;
+            // ---
+            codeText += "Public Sub Button1_Click()" + "\r\n";
+            codeText += "  MsgBox \"Hi from Gekko\"" + "\r\n";
+            codeText += "End Sub" + "\r\n";
+            // ---            
+            codeText += "Public Sub h(word)" + "\r\n";            
+            codeText +=   "MsgBox \"Hello from \" & word " + "\r\n";
+            codeText += "End Sub" + "\r\n";
+            // ---
+            codeModule.InsertLines(lineNum, codeText);            
+
+            targetExcelFile.Save();  //saves file
+
+            // run the macros
+            string macro = string.Format("{0}!{1}.{2}", targetExcelFile.Name, newStandardModule.Name, "Button1_Click");
+            app.Run(macro);                        
+            app.Run("h", "Gekko");  //h("Gekko")
             
+            //app.Quit();
+
         }
     }
-
-    //DFG: links regarding COM interface
-    //https://github.com/Excel-DNA/Samples/tree/master/DnaComServer
-    //https://brooklynanalyticsinc.com/2019/04/09/excel-dna-or-why-are-you-still-using-vba/
-    //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
+    
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class COMLibrary
     {
+        //DFG: links regarding COM interface
+        //https://github.com/Excel-DNA/Samples/tree/master/DnaComServer
+        //https://brooklynanalyticsinc.com/2019/04/09/excel-dna-or-why-are-you-still-using-vba/
+        //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
+
         //TT: In order to be able to use these functions on Excel cells, create this VBA code
         //    in your sheet. The code must be put under "Modules", same place as macros.
         //    Otherwise it does not show up when typing "=Ge..." in a cell.
@@ -117,8 +167,6 @@ namespace Gekcel
               End Function       
 
               The last one is called with = Gekko_GetData2("c:\Thomas\Desktop\gekko\testing\jul05.gbk"; "enl!a"; "2000")
-              
-
         */
 
         public DateTime ThirtyDaysAgo()
@@ -139,16 +187,12 @@ namespace Gekcel
         }
     }
 
-
     [ComVisible(true)]
     [Guid("a407a925-2ebf-4452-9c42-e431a382276f")]
     [ProgId("GekkoExcelComAddIn.ComAddIn")]
     public class GekkoExcelComAddIn : ExcelComAddIn
     {
-        public void OnConnection(object Application,
-                                 ext_ConnectMode ConnectMode,
-                                 object AddInInst,
-                                 ref Array custom)
+        public void OnConnection(object Application, ext_ConnectMode ConnectMode, object AddInInst, ref Array custom)
         {
             try
             {
@@ -210,9 +254,7 @@ namespace Gekcel
         {
             Globals.excelDna = true;  //so that it does not try to print on screen etc.
             Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
-
-            //NOTE: See c:\Thomas\slet regarding files. 7z.dll needs to be in same folder.
-
+            
             //Data
             Program.databanks.storage.Add(new Databank("Work"));
             Program.databanks.storage.Add(new Databank("Ref"));
@@ -286,7 +328,6 @@ namespace Gekcel
     public static class InternalHelperMethods
     {
         //These helper methods are not shown in Excel
-
         public static Databank ReadGbkDatabankFromFile(string gbkFile)
         {
             //Read gbk file
