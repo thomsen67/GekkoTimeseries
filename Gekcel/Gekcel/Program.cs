@@ -118,14 +118,43 @@ namespace Gekcel
             string codeText = null;
             int lineNum = codeModule.CountOfLines + 1;
             // ---
-            codeText += "Public Sub Button1_Click()" + "\r\n";
-            codeText += "  MsgBox \"Hi from Gekko\"" + "\r\n";
-            codeText += "End Sub" + "\r\n";
-            // ---            
-            codeText += "Public Sub h(word)" + "\r\n";            
-            codeText +=   "MsgBox \"Hello from \" & word " + "\r\n";
-            codeText += "End Sub" + "\r\n";
-            // ---
+
+            //
+            // TT: In the following code, you can just format it normally. Only exception is that
+            //     double quotes like " must be doubled: "".
+            //     Aligning at the left-most margin is intentional.
+            //
+            // -----------------------------------------------------
+            codeText += 
+            @"
+Public Sub Button1_Click()
+  MsgBox ""Hi from Gekko""
+End Sub";
+            codeText += "\r\n";
+            // -----------------------------------------------------
+            codeText += @"
+Public Sub h(word)
+  MsgBox ""Hello from "" & word
+End Sub";
+            codeText += "\r\n";
+            // -----------------------------------------------------
+            codeText += @"
+Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
+  dim gekko as Object
+  set gekko = createobject(""Gekcel.COMLibrary"")
+  Gekko_GetData2 = gekko.GetData2(gbkFile, variableWithFreq, date2)
+End Function";
+            codeText += "\r\n";
+            // -----------------------------------------------------
+            codeText += @"
+Public Function Gekko_ThirtyDaysAgo() As Date
+  dim gekko as Object
+  set gekko = createobject(""Gekcel.COMLibrary"")
+  Gekko_ThirtyDaysAgo = gekko.ThirtyDaysAgo()
+End Function";
+            codeText += "\r\n";
+            // -----------------------------------------------------
+
             codeModule.InsertLines(lineNum, codeText);            
 
             targetExcelFile.Save();  //saves file
@@ -144,36 +173,20 @@ namespace Gekcel
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class COMLibrary
     {
+        //TT: These are 
+        
         //DFG: links regarding COM interface
         //https://github.com/Excel-DNA/Samples/tree/master/DnaComServer
         //https://brooklynanalyticsinc.com/2019/04/09/excel-dna-or-why-are-you-still-using-vba/
         //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
-
-        //TT: In order to be able to use these functions on Excel cells, create this VBA code
-        //    in your sheet. The code must be put under "Modules", same place as macros.
-        //    Otherwise it does not show up when typing "=Ge..." in a cell.
-        //
-        /*
-              Public Function Gekko_ThirtyDaysAgo() As Date
-                dim gekko as Object
-                set gekko = createobject("Gekcel.COMLibrary")
-                Gekko_ThirtyDaysAgo = gekko.ThirtyDaysAgo()
-              End Function                      
-            
-              Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
-                dim gekko as Object
-                set gekko = createobject("Gekcel.COMLibrary")
-                Gekko_GetData2 = gekko.GetData2(gbkFile, variableWithFreq, date2)
-              End Function       
-
-              The last one is called with = Gekko_GetData2("c:\Thomas\Desktop\gekko\testing\jul05.gbk"; "enl!a"; "2000")
-        */
-
+        
+        //TT: Callable by VBA version, type this in cell: =Gekko_ThirtyDaysAgo()
         public DateTime ThirtyDaysAgo()
         {
             return DateTime.Today - TimeSpan.FromDays(30);
         }
 
+        //TT: Callable by VBA version, type this in cell: =Gekko_GetData2("jul05.gbk"; "enl!a"; "2000")
         public double GetData2(string gbkFile, string variableWithFreq, string date)
         {
             //TT: Same as Gekko_GetData(...), just callable from VBA
@@ -184,53 +197,6 @@ namespace Gekcel
             GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
             double d = ts.GetDataSimple(gt);
             return d;
-        }
-    }
-
-    [ComVisible(true)]
-    [Guid("a407a925-2ebf-4452-9c42-e431a382276f")]
-    [ProgId("GekkoExcelComAddIn.ComAddIn")]
-    public class GekkoExcelComAddIn : ExcelComAddIn
-    {
-        public void OnConnection(object Application, ext_ConnectMode ConnectMode, object AddInInst, ref Array custom)
-        {
-            try
-            {
-                dynamic addIn = AddInInst;
-                addIn.Object = new COMLibrary();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex);
-            }
-        }
-    }
-
-
-    [ComVisible(false)]
-    internal class ExcelAddin : IExcelAddIn
-    {
-        private GekkoExcelComAddIn com_addin;
-        public void AutoOpen()
-        {
-            try
-            {
-                com_addin = new GekkoExcelComAddIn();
-                ExcelComAddInHelper.LoadComAddIn(com_addin);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading COM AddIn: " + ex);
-            }
-
-            ComServer.DllRegisterServer();
-            IntelliSenseServer.Install();
-        }
-
-        public void AutoClose()
-        {
-            ComServer.DllUnregisterServer();
-            IntelliSenseServer.Uninstall();
         }
     }
 
@@ -353,6 +319,54 @@ namespace Gekcel
             int i = Program.WriteGbk(db, GekkoTime.tNull, GekkoTime.tNull, gbkFile, false, null, null, true, false);
         }
 
+    }
+
+
+    [ComVisible(true)]
+    [Guid("a407a925-2ebf-4452-9c42-e431a382276f")]
+    [ProgId("GekkoExcelComAddIn.ComAddIn")]
+    public class GekkoExcelComAddIn : ExcelComAddIn
+    {
+        public void OnConnection(object Application, ext_ConnectMode ConnectMode, object AddInInst, ref Array custom)
+        {
+            try
+            {
+                dynamic addIn = AddInInst;
+                addIn.Object = new COMLibrary();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex);
+            }
+        }
+    }
+
+
+    [ComVisible(false)]
+    internal class ExcelAddin : IExcelAddIn
+    {
+        private GekkoExcelComAddIn com_addin;
+        public void AutoOpen()
+        {
+            try
+            {
+                com_addin = new GekkoExcelComAddIn();
+                ExcelComAddInHelper.LoadComAddIn(com_addin);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading COM AddIn: " + ex);
+            }
+
+            ComServer.DllRegisterServer();
+            IntelliSenseServer.Install();
+        }
+
+        public void AutoClose()
+        {
+            ComServer.DllUnregisterServer();
+            IntelliSenseServer.Uninstall();
+        }
     }
 
 
