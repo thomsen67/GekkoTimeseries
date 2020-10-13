@@ -40,7 +40,7 @@ namespace Gekcel
   <ribbon>
     <tabs>
       <tab id='tab1' label='Gekko'>        
-        <group id='group3' label='VBA calls'>   
+        <group id='group3' label='Setup'>   
           <button id='button3a' imageMso='MacroPlay' size='large' label='Setup' onAction='OnButtonPressed3' />  
         </group>            
 <!-- 
