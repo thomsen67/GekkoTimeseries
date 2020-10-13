@@ -36,23 +36,23 @@ namespace Gekcel
         {
             //This is the Ribbon interface (a 'Gekko' tab) that will show up in Excel
             return @"
-      <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui'>
-      <ribbon>
-        <tabs>
-          <tab id='tab1' label='Gekko'>
-            <group id='group1' label='Gekko reading'>              
-              <button id='button1a' imageMso='FileOpen' size='large' label='Read' onAction='OnButtonPressed1' />                   
-            </group>
-            <group id='group2' label='Gekko writing'>                            
-              <button id='button2a' imageMso='FileSave' size='large' label='Write' onAction='OnButtonPressed2' />
-            </group >
-            <group id='group3' label='VBA calls'>   
-              <button id='button3a' imageMso='MacroPlay' size='large' label='Run VBA' onAction='OnButtonPressed3' />  
-            </group >
-          </tab>
-        </tabs>
-      </ribbon>
-    </customUI>";
+<customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui'>
+  <ribbon>
+    <tabs>
+      <tab id='tab1' label='Gekko'>
+        <group id='group3' label='VBA calls'>   
+          <button id='button3a' imageMso='MacroPlay' size='large' label='Run VBA' onAction='OnButtonPressed3' />  
+        </group>            
+        <group id='group1' label='Gekko reading'>              
+          <button id='button1a' imageMso='FileOpen' size='large' label='Read' onAction='OnButtonPressed1' />                   
+        </group>
+        <group id='group2' label='Gekko writing'>                            
+          <button id='button2a' imageMso='FileSave' size='large' label='Write' onAction='OnButtonPressed2' />
+        </group>            
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>";
         }
 
         public void OnButtonPressed1(IRibbonControl control)
@@ -154,37 +154,38 @@ namespace Gekcel
             //     double quotes like " must be doubled: "".
             //     Aligning at the left-most margin is intentional.
             //
+            //     The functions starting with 'Gekko_' just mirror the methods in the class COMLibrary
+            //
             // -----------------------------------------------------
-            codeText += 
+            codeText +=
             @"
 Public Sub Button1_Click()
-  MsgBox ""Hi from Gekko""
+  MsgBox ""Hello1 from Gekko""
 End Sub
 
 Public Sub h(word)
-  MsgBox ""Hello from "" & word
+  MsgBox ""Hello2 from "" & word
 End Sub
 
 Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
   dim gekko as Object
   set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_GetData2 = gekko.GetData2(gbkFile, variableWithFreq, date2)
+  Gekko_GetData2 = gekko.Gekko_GetData2(gbkFile, variableWithFreq, date2)
 End Function
 
-Public Function Gekko_ThirtyDaysAgo() As Date
+Public Function Gekko_SetData2(gbkFile As String, variableWithFreq As String, date2 As String, d As Double) As Double
   dim gekko as Object
   set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_ThirtyDaysAgo = gekko.ThirtyDaysAgo()
+  Gekko_SetData2 = gekko.Gekko_SetData2(gbkFile, variableWithFreq, date2, d)  
 End Function";
 
             codeText += "\r\n";
             // -----------------------------------------------------
 
-            codeModule.InsertLines(lineNum, codeText);            
-
+            codeModule.InsertLines(lineNum, codeText);
             targetExcelFile.Save();  //saves file
 
-            // run the macros
+            //TT: Calling two of the VBA macros for testing            
             string macro = string.Format("{0}!{1}.{2}", targetExcelFile.Name, newStandardModule.Name, "Button1_Click");
             app.Run(macro);                        
             app.Run("h", "Gekko");  //h("Gekko")
@@ -198,101 +199,33 @@ End Function";
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class COMLibrary
     {
-        //TT: These are 
-        
         //DFG: links regarding COM interface
         //https://github.com/Excel-DNA/Samples/tree/master/DnaComServer
         //https://brooklynanalyticsinc.com/2019/04/09/excel-dna-or-why-are-you-still-using-vba/
         //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
-        
-        //TT: Callable by VBA version, type this in cell: =Gekko_ThirtyDaysAgo()
-        public DateTime ThirtyDaysAgo()
+
+        //TT: These methods just mirror the ones in the class ExcelFunctionCalls
+
+        //TT: Version that can be called by VBA
+        public double Gekko_GetData2(string gbkFile, string variableWithFreq, string date)
         {
-            return DateTime.Today - TimeSpan.FromDays(30);
+            return ExcelFunctionCalls.Gekko_GetData1(gbkFile, variableWithFreq, date);
         }
 
-        //TT: Callable by VBA version, type this in cell: =Gekko_GetData2("demo.gbk"; "x1!a"; "2000")
-        public double GetData2(string gbkFile, string variableWithFreq, string date)
+        //TT: Version that can be called by VBA
+        public double Gekko_SetData2(string gbkFile, string variableWithFreq, string date, double d)
         {
-            //TT: Same as Gekko_GetData(...), just callable from VBA
-            Globals.excelDna = true;  //so that it does not try to print on screen etc.     
-            Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
-            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-            Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
-            GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
-            double d = ts.GetDataSimple(gt);
-            return d;
+            return ExcelFunctionCalls.Gekko_SetData1(gbkFile, variableWithFreq, date, d);
         }
     }
 
     public static class ExcelFunctionCalls
     {
-        [ExcelFunction(Description = "Reverse string example from Gekko")]
-        public static string Gekko_ReverseString([ExcelArgument(Name = "input_string", Description = "String to reverse")] string input_string)
-        {
-            string reversestring = "";
-            int ilength = input_string.Length - 1;
-            while (ilength >= 0)
-            {
-                reversestring = reversestring + input_string[ilength];
-                ilength--;
-            }
-            return reversestring;            
-        }
-
-        [ExcelFunction(Name = "Gekko_Roundtrip", Description = "Roundtrip")]
-        public static double Gekko_Roundtrip()
-        {
-            Globals.excelDna = true;  //so that it does not try to print on screen etc.
-            Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
-            
-            //Data
-            Program.databanks.storage.Add(new Databank("Work"));
-            Program.databanks.storage.Add(new Databank("Ref"));
-
-            Gekko.Series ts2 = new Gekko.Series(EFreq.A, "testing1234" + "!a");
-            ts2.SetData(new GekkoTime(EFreq.A, 2020, 1), 1234d);
-            Program.databanks.GetFirst().AddIVariable("testing1234" + "!a", ts2);
-
-            string fileName = "test.gbk";
-            string fileName2 = "test2.gbk";
-            string name = "y";
-            double v = 54321d;
-            int year = 2000;            
-            string path = Path.Combine(Globals.excelDnaPath, fileName);
-            string path2 = Path.Combine(Globals.excelDnaPath, fileName2);
-            double d = double.NaN;
-
-            if (true)
-            {
-                int i1 = Program.databanks.GetFirst().storage.Count;
-                int i2 = Program.databanks.GetRef().storage.Count;                
-                Program.obeyCommandCalledFromGUI(@"clone;", new P());
-                int i3 = Program.databanks.GetFirst().storage.Count;
-                int i4 = Program.databanks.GetRef().storage.Count;                
-            }
-
-            if (true)
-            {
-                //Setup Work databanks with series inside (used for writing)            
-                Gekko.Series ts5 = new Gekko.Series(EFreq.A, name + "!a");
-                ts5.SetData(new GekkoTime(EFreq.A, year, 1), v);
-                Program.databanks.GetFirst().AddIVariable(name + "!a", ts5);
-                InternalHelperMethods.WriteGbkDatabankToFile(path, Program.databanks.GetFirst());
-                MessageBox.Show("Give Gekko a few seconds of pause to release the gbk file for writing");
-                Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(path);  
-                Gekko.Series ts = db.GetIVariable(name + "!a") as Gekko.Series;
-                GekkoTime gt = new GekkoTime(EFreq.A, 2000, 1);
-                d = ts.GetDataSimple(gt);
-                MessageBox.Show("value of name: " + d);
-            }
-            return d;
-        }
-
-        //TT: Callable by VBA version, type this in cell: =Gekko_GetData2("demo.gbk"; "x1!a"; "2000")
-        [ExcelFunction(Name = "Gekko_GetData", Description = "Gets a data value from a timeseries in a gbk databank file")]
-        public static double Gekko_GetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
-            [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
+        //TT: Type this in cell: =Gekko_GetData1("demo.gbk"; "x1!a"; "2020")
+        [ExcelFunction(Name = "Gekko_GetData1", Description = "Gets a data value from a timeseries in a gbk databank file")]
+        public static double Gekko_GetData1(
+            [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
+            [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq,
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
         {
             Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
@@ -304,17 +237,35 @@ End Function";
             return d;
         }
 
-        [ExcelFunction(Name = "Gekko_SetData", Description = "Sets a data value in a timeseries in a gbk databank file")]        
-        public static void Gekko_SetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
+        //TT: Type this in cell: =Gekko_SetData1("demo.gbk"; "x1!a"; "2020"; 777)
+        [ExcelFunction(Name = "Gekko_SetData1", Description = "Sets a data value in a timeseries in a gbk databank file")]
+        public static double Gekko_SetData1(
+            [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
+            [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
+            [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, 
+            [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
         {
             Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
             Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+            if (true)
+            {
+                //TT: hack because of path problem when writing
+                if(gbkFile.Contains(":")|| gbkFile.Contains("\\") || gbkFile.Contains("/"))
+                {
+                    //TT: has path
+                }
+                else
+                {
+                    gbkFile = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\" + gbkFile;
+                }
+            }
             Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
             Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
             GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
             ts.SetData(gt, value);
             InternalHelperMethods.WriteGbkDatabankToFile(gbkFile, db);
-        }        
+            return 1d; //1 for 'true'
+        }                
     }
 
     public static class InternalHelperMethods
@@ -342,6 +293,9 @@ End Function";
 
         public static void WriteGbkDatabankToFile(string gbkFile, Databank db)
         {
+            //TT: hmmm, the two following seem necessary...
+            Program.databanks.storage = new System.Collections.Generic.List<Databank>();            
+            Program.databanks.storage.Add(db);
             int i = Program.WriteGbk(db, GekkoTime.tNull, GekkoTime.tNull, gbkFile, false, null, null, true, false);
         }
 
