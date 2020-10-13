@@ -14,15 +14,14 @@ using Extensibility;
 namespace Gekcel
 {
     //TT: Basically, we want to be able to have Excel use Gekko, but without opening Gekko and running 
-    //    commands in Gekko. There are two ways of using Gekko methods from within Excel:
+    //    commands in Gekko. There are three ways of using Gekko methods from within Excel:
     //
-    //      (1) Just typing "=" in a cell, and calling a Gekko method like "= Gekko_GetData(...)",
+    //      (1) Just typing "=" in a cell, and calling a Gekko method like "=Gekko_GetData(...)",
     //          returning some value
     //      (2) Calling the same Gekko_GetData(...) method from within a VB script inside Excel.
     //      (3) Using buttons in the Ribbon interface in Excel (point and click)
     //
     //    Bullet (1) comes directly from ExcelDNA, but to do (2), we need to use a so-called COM server.
-    //
     //
     //
 
@@ -35,6 +34,7 @@ namespace Gekcel
 
         public override string GetCustomUI(string RibbonID)
         {
+            //This is the Ribbon interface (a 'Gekko' tab) that will show up in Excel
             return @"
       <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui'>
       <ribbon>
@@ -92,12 +92,41 @@ namespace Gekcel
             //Check this: Trust access to the VBA object model
             //-------------------------------------------------------------
 
+            //First, copy the demo.gbk file, so that it is easy to use
+            //To recreate or alter this databank, use the following .gcm code.
+            //
+            //    RESET;
+            //    TIME 2020 2043;
+            //    x1 = 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42;
+            //    x2 = 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82;
+            //    OPTION freq q; TIME 2020q1 2025q4;
+            //    x1 = 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142;
+            //    x2 = 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182;
+            //    OPTION freq m; TIME 2020m1 2021m12;
+            //    x1 = 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242;
+            //    x2 = 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282;
+            //    WRITE demo;
+            string demo = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\demo.gbk";
+            string demo_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
+            if (File.Exists(demo))
+            {
+                try
+                {
+                    File.Delete(demo);
+                }
+                catch
+                {
+                    MessageBox.Show("*** ERROR: Could not delete file: " + demo);
+                    throw new Exception();
+                }
+            }
+            File.Copy(demo_orig, demo);
+
+            //Next, handle the Gekcel.xlsm file, and inject VBA code into it.
             Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;            
             Worksheet ws = (Worksheet)app.ActiveSheet;
-            string excelFile = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\Gekcel.xlsm";
-            DirectoryInfo networkDir = new DirectoryInfo(ExcelDnaUtil.XllPath);
-            DirectoryInfo twoLevelsUp = networkDir.Parent.Parent.Parent;
-            string excelFile_orig = twoLevelsUp.FullName + "\\Diverse\\ExternalDllFiles\\Gekcel_orig.xlsm";
+            string excelFile = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\Gekcel.xlsm";                     
+            string excelFile_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\Gekcel_orig.xlsm";
             if (File.Exists(excelFile))
             {
                 try
@@ -111,6 +140,7 @@ namespace Gekcel
                 }
             }
             File.Copy(excelFile_orig, excelFile);
+
             Workbook targetExcelFile = app.Workbooks.Open(excelFile);            
             VBComponent newStandardModule = targetExcelFile.VBProject.VBComponents.Add(vbext_ComponentType.vbext_ct_StdModule);
             CodeModule codeModule = newStandardModule.CodeModule;
@@ -120,7 +150,7 @@ namespace Gekcel
             // ---
 
             //
-            // TT: In the following code, you can just format it normally. Only exception is that
+            // TT: The following code will be injected into an Excel sheet. It can just be formatted normally. Only exception is that
             //     double quotes like " must be doubled: "".
             //     Aligning at the left-most margin is intentional.
             //
@@ -129,29 +159,24 @@ namespace Gekcel
             @"
 Public Sub Button1_Click()
   MsgBox ""Hi from Gekko""
-End Sub";
-            codeText += "\r\n";
-            // -----------------------------------------------------
-            codeText += @"
+End Sub
+
 Public Sub h(word)
   MsgBox ""Hello from "" & word
-End Sub";
-            codeText += "\r\n";
-            // -----------------------------------------------------
-            codeText += @"
+End Sub
+
 Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
   dim gekko as Object
   set gekko = createobject(""Gekcel.COMLibrary"")
   Gekko_GetData2 = gekko.GetData2(gbkFile, variableWithFreq, date2)
-End Function";
-            codeText += "\r\n";
-            // -----------------------------------------------------
-            codeText += @"
+End Function
+
 Public Function Gekko_ThirtyDaysAgo() As Date
   dim gekko as Object
   set gekko = createobject(""Gekcel.COMLibrary"")
   Gekko_ThirtyDaysAgo = gekko.ThirtyDaysAgo()
 End Function";
+
             codeText += "\r\n";
             // -----------------------------------------------------
 
@@ -186,7 +211,7 @@ End Function";
             return DateTime.Today - TimeSpan.FromDays(30);
         }
 
-        //TT: Callable by VBA version, type this in cell: =Gekko_GetData2("jul05.gbk"; "enl!a"; "2000")
+        //TT: Callable by VBA version, type this in cell: =Gekko_GetData2("demo.gbk"; "x1!a"; "2000")
         public double GetData2(string gbkFile, string variableWithFreq, string date)
         {
             //TT: Same as Gekko_GetData(...), just callable from VBA
@@ -264,6 +289,7 @@ End Function";
             return d;
         }
 
+        //TT: Callable by VBA version, type this in cell: =Gekko_GetData2("demo.gbk"; "x1!a"; "2000")
         [ExcelFunction(Name = "Gekko_GetData", Description = "Gets a data value from a timeseries in a gbk databank file")]
         public static double Gekko_GetData([ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
             [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
