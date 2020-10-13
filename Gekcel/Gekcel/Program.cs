@@ -39,16 +39,18 @@ namespace Gekcel
 <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui'>
   <ribbon>
     <tabs>
-      <tab id='tab1' label='Gekko'>
+      <tab id='tab1' label='Gekko'>        
         <group id='group3' label='VBA calls'>   
-          <button id='button3a' imageMso='MacroPlay' size='large' label='Run VBA' onAction='OnButtonPressed3' />  
+          <button id='button3a' imageMso='MacroPlay' size='large' label='Setup' onAction='OnButtonPressed3' />  
         </group>            
+<!-- 
         <group id='group1' label='Gekko reading'>              
           <button id='button1a' imageMso='FileOpen' size='large' label='Read' onAction='OnButtonPressed1' />                   
         </group>
         <group id='group2' label='Gekko writing'>                            
           <button id='button2a' imageMso='FileSave' size='large' label='Write' onAction='OnButtonPressed2' />
         </group>            
+-->
       </tab>
     </tabs>
   </ribbon>
