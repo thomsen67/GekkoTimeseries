@@ -2776,19 +2776,27 @@ namespace Gekko
             else if (x1_series.freq == EFreq.Q) i = Globals.freqQSubperiods;
             else if (x1_series.freq == EFreq.M) i = Globals.freqMSubperiods;
             return i;
-        }        
-        
-        //Used as function, but also for string interplation, like TELL 'Number is {%v}'.
-        //See also #83490837432, these should be merged/fusioned
+        }
+
         public static IVariable format(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
+            return format(smpl, _t1, _t2, x1, x2, null);
+        }
+
+        //Used as function, but also for string interplation, like TELL 'Number is {%v}'.
+        //See also #83490837432, these should be merged/fusioned
+        public static IVariable format(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
+        {
+            string culture = null;
+            if (x3 != null) culture = O.ConvertToString(x3);            
+
             string format2 = O.ConvertToString(x2);
             try
             {                
                 if (x1.Type() == EVariableType.Val)
                 {
                     double d = O.ConvertToVal(x1); //#875324397                
-                    string x = Program.NumberFormat(d, format2);
+                    string x = Program.NumberFormat(d, format2, culture);
                     return new ScalarString(x);
                 }
                 else if (x1.Type() == EVariableType.Date)
@@ -2814,7 +2822,6 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Format '" + format2 + "' failed");
                 throw new GekkoException();
             }
-
         }
 
         public static IVariable round(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable round)

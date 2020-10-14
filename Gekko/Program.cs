@@ -6750,6 +6750,11 @@ namespace Gekko
 
         public static string NumberFormat(double d, string format2)
         {
+            return NumberFormat(d, format2, null);
+        }
+
+        public static string NumberFormat(double d, string format2, string culture)
+        {
             string format = null;
             if (format2.Contains(":"))
             {
@@ -6762,7 +6767,12 @@ namespace Gekko
             string x = null;
             try
             {
-                x = String.Format(format, d);
+                if (culture == null) x = String.Format(format, d);
+                else
+                {
+                    CultureInfo ci = CultureInfo.CreateSpecificCulture(culture);  //for instance "da-DK", "en-US", "fr-FR", etc.
+                    x = String.Format(ci, format, d);
+                }
             }
             catch (Exception e)
             {

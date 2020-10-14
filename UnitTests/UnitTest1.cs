@@ -13808,7 +13808,7 @@ namespace UnitTests
             _AssertSeries(First(), "yy3!a", 2001, 1d, sharedDelta);
             _AssertSeries(First(), "yy3!a", 2002, 0d, sharedDelta);
             _AssertSeries(First(), "yy3!a", 2003, 1d, sharedDelta);
-            I("yy4 <99 2003> = ismiss <2000 2002> (xx2, 'all');");
+            I("yy4 <99 2003> = ismiss(<2000 2002>, xx2, 'all');");
             _AssertSeries(First(), "yy4!a", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy4!a", 2000, 0d, sharedDelta);
             _AssertSeries(First(), "yy4!a", 2001, 1d, sharedDelta);
@@ -13845,6 +13845,16 @@ namespace UnitTests
             I("#m = truncate(<2011 2015>, 2001, 2013);");
             Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[0] as ScalarDate).date.super, 2011);
             Assert.AreEqual((((List)Program.databanks.GetFirst().GetIVariable("#m")).list[1] as ScalarDate).date.super, 2013);
+
+            //format()
+            I("RESET;");
+            I("%s1 = format(1234567.8987, '0,0.00', 'da-DK');");
+            I("%s2 = format(1234567.8987, '0,0.00', 'en-US');");
+            I("%s3 = format(1234567.8987, '0,0.00');");
+            _AssertScalarString(First(), "%s1", "1.234.567,90");
+            _AssertScalarString(First(), "%s2", "1,234,567.90");
+            _AssertScalarString(First(), "%s3", "1,234,567.90");
+
         }
 
         [TestMethod]
