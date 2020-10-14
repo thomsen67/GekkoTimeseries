@@ -13848,12 +13848,26 @@ namespace UnitTests
 
             //format()
             I("RESET;");
-            I("%s1 = format(1234567.8987, '0,0.00', 'da-DK');");
-            I("%s2 = format(1234567.8987, '0,0.00', 'en-US');");
+            I("%s1 = format(1234567.8987, '0,0.00=da-DK');");
+            I("%s2 = format(1234567.8987, '0,0.00=en-US');");
             I("%s3 = format(1234567.8987, '0,0.00');");
             _AssertScalarString(First(), "%s1", "1.234.567,90");
             _AssertScalarString(First(), "%s2", "1,234,567.90");
             _AssertScalarString(First(), "%s3", "1,234,567.90");
+            I("RESET;");
+            I("%s1 = format(1234567.8987, '20:0,0.00=da-DK');");
+            I("%s2 = format(1234567.8987, '20:0,0.00=en-US');");
+            I("%s3 = format(1234567.8987, '20:0,0.00');");
+            _AssertScalarString(First(), "%s1", "        1.234.567,90");
+            _AssertScalarString(First(), "%s2", "        1,234,567.90");
+            _AssertScalarString(First(), "%s3", "        1,234,567.90");
+            I("RESET;");
+            I("%s1 = format(1234567.8987, '-20:0,0.00=da-DK');");
+            I("%s2 = format(1234567.8987, '-20:0,0.00=en-US');");
+            I("%s3 = format(1234567.8987, '-20:0,0.00');");
+            _AssertScalarString(First(), "%s1", "1.234.567,90        ");
+            _AssertScalarString(First(), "%s2", "1,234,567.90        ");
+            _AssertScalarString(First(), "%s3", "1,234,567.90        ");
 
         }
 

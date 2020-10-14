@@ -2777,20 +2777,17 @@ namespace Gekko
             else if (x1_series.freq == EFreq.M) i = Globals.freqMSubperiods;
             return i;
         }
-
-        public static IVariable format(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
-        {
-            return format(smpl, _t1, _t2, x1, x2, null);
-        }
-
+        
         //Used as function, but also for string interplation, like TELL 'Number is {%v}'.
         //See also #83490837432, these should be merged/fusioned
-        public static IVariable format(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
-        {
+        public static IVariable format(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {            
+            string format3 = O.ConvertToString(x2);
+            string[] two = format3.Split('=');
+            string format2 = two[0];
             string culture = null;
-            if (x3 != null) culture = O.ConvertToString(x3);            
+            if (two.Length > 1) culture = two[1];
 
-            string format2 = O.ConvertToString(x2);
             try
             {                
                 if (x1.Type() == EVariableType.Val)
