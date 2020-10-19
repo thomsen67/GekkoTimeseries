@@ -1607,7 +1607,7 @@ namespace Gekko
                         dr.Set(frame, col_valueLevelRef, new CellLight(dLevelRef));
                         dr.Set(frame, col_valueLevelRefLag, new CellLight(dLevelRefLag));
 
-                        frame.rows.Add(dr);
+                        frame.rows.Add(dr); 
                     }
                 }
             }
