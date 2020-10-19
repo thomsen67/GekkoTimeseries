@@ -29,7 +29,7 @@ namespace Deploy
         //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll";
         //For some reason, the full 7z files need to be present in the folder, whereas for the Gekko installation, this
         //is not necessary. A mystery ... so we had to install z-zip to make it work. Never mind.
-        public static string zip = @"c:\Program Files\7-Zip\7z.dll";
+        //public static string zip = @"c:\Program Files\7-Zip\7z.dll";
         public static string tools = @"c:\tools\tmp\Gekko_files";
 
         public MainWindow()
@@ -486,10 +486,10 @@ namespace Deploy
             list.Add("f145630ea51af460770a81351919032b3efc9219", path + @"GAMS.net4.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\GAMS.net4.dll");
 
             //same as 2.4.2
-            list.Add("45ca532a64d10c1f56635a11ec7973ee8bc7cf73", path + @"SevenZipSharp.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\SevenZipSharp.dll");
+            //list.Add("45ca532a64d10c1f56635a11ec7973ee8bc7cf73", path + @"SevenZipSharp.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\ExternalDllFiles\SevenZipSharp.dll");
 
             //seems ok, sha1 exists on net
-            list.Add("774584ff54b38da5d3b3ee02e30908dacab175c5", path + @"zip\7z.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll");
+            //list.Add("774584ff54b38da5d3b3ee02e30908dacab175c5", path + @"zip\7z.dll", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll");
 
             //ok, taken from this EViews link: http://www.eviews.com/download/older/censusx12.html
             list.Add("2fae4c913ff299e61bbbc0f1bfe9d34a52465b50", path + @"X12A.EXE", @"C:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\X12A.EXE");
