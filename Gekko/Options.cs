@@ -33,7 +33,7 @@ namespace Gekko
             
         //these are not mentioned in help
         public bool bugfix_import_export = false;             
-        public bool bugfix_gbk = false;  //set true to activate old 7zip writer
+        //public bool bugfix_gbk = false;  //set true to activate old 7zip writer
         public bool bugfix_missing = true;  //if option true, m()==m() will be true, and m()<>m() false for series comparison
 
         //question
