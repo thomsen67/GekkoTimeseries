@@ -18046,13 +18046,9 @@ namespace Gekko
 
         public static void Tell(string text, bool nocr)
         {            
-            if (Globals.runningOnTTComputer)
+            if (Globals.runningOnTTComputer && text == "arrow")
             {
-                //if (text == "python")
-                //{
-                //    string s = Python();
-                //    G.Writeln2(s);
-                //}            
+                Arrow.Run();     
             }
 
             if (nocr) G.Write(text);

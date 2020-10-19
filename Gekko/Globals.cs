@@ -64,7 +64,7 @@ namespace Gekko
         public static bool prompting = true;
         public static List<string> unitTestsPromtingHelper = null;
 
-        public static bool arrow = false;  //true for use with Arrow project
+        //public static bool arrow = false;  //true for use with Arrow project
 
         public static bool excelDna = false;  //true for use with ExcelDna solution
         public static string excelDnaPath = null;
