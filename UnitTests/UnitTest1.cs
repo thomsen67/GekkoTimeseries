@@ -18304,6 +18304,21 @@ namespace UnitTests
         [TestMethod]
         public void _Test__Rebase()
         {
+            //#dors, måske også frombank i stedet for bank...?
+
+            I("RESET;");
+            I("TIME 2010 2012;");
+            I("MODE data;");
+            I("SER y1 = -7, 3, 4;");
+            I("OPEN <edit> temp;");
+            I("SER y2 = 7, -3, -4;");
+            I("CLOSE temp; OPEN temp;");
+            I("OPEN <edit> temp2; CLEAR temp2;");
+            I("REBASE <tobank=temp2 index = 100> temp:y2 2011;");
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+
             I("RESET;");
             I("TIME 2010 2012;");
             I("MODE data;");
