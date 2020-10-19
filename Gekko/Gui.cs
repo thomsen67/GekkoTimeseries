@@ -32,7 +32,7 @@ using System.Globalization;
 using System.Collections;
 using System.Xml;
 using System.Runtime.InteropServices;
-using SevenZip;
+//using SevenZip;
 using System.Diagnostics;
 using System.Configuration;
 using System.Collections.ObjectModel;

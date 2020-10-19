@@ -46,7 +46,7 @@ using Office = Microsoft.Office.Core;
 //using VBIDE = Microsoft.Vbe.Interop;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
-using SevenZip;
+//using SevenZip;
 using System.Security.Permissions;
 using Microsoft.Win32;
 using System.Security.Cryptography;
