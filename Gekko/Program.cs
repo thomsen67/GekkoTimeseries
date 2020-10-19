@@ -26215,14 +26215,10 @@ namespace Gekko
                 File.Delete(zipFileName);
                 Thread.Sleep(sleepMs);  //give some time after file is deleted
                 ZipFile.CreateFromDirectory(folder, zipFileName);
-                //ZipFile.ExtractToDirectory(zipPath, extractPath);
-
             }
             catch (Exception e)
-            {
-                string msg = null;
-                if (e.InnerException != null) msg = e.InnerException.Message;
-                G.Writeln("*** ERROR: Writing " + zipFileName + " failed, error: " + e.InnerException + " " + e.Message);
+            {                
+                G.Writeln("*** ERROR: Zip write failed, error: " + e.InnerException + " " + e.Message);
                 throw new GekkoException();
             }
 
@@ -26242,6 +26238,7 @@ namespace Gekko
         //Only used for reading TSDX files, much more specific than WaitForZipRead()
         public static string WaitForZipRead_TSDX(string folder, string zipFileName, string inside, string originalFileName)
         {
+            //is not actually waiting...
             int gap = Globals.waitFileGap;  //1 second
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
             int repeats = totalTime / gap;
@@ -26250,157 +26247,102 @@ namespace Gekko
             string ext = Path.GetExtension(zipFileName);
             if (G.Equal(ext, "." + Globals.extensionDatabank)) isProtobuf = true; //with .gbk files, the inside is always protobuf-files.
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
-            for (int j = 0; j < repeats; j++)
+            if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
+            //try-catch is not used here: normally a zip-file can be read even if blocked by others (not so for writing)                                
+
+            try
             {
-                if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
-                //try-catch is not used here: normally a zip-file can be read even if blocked by others (not so for writing)
+                ZipFile.ExtractToDirectory(zipFileName, folder);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: Zip extraction failed: " + e.InnerException + " " + e.Message);
+            }
+            
+            string xmlFile = "";
+            int tsdfilecounter = 0;
+            foreach (FileInfo fi in (new DirectoryInfo(folder)).GetFiles())
+            {
+                string fileName2 = fi.Name;
+
+                if (G.Equal(fileName2, Globals.protobufFileName) || G.Equal(fileName2, Globals.protobufFileName2) || G.Equal(fileName2, Program.options.databank_file_gbk_internal))
                 {
-                    string sevenzPath = null;
-                    if (G.IsUnitTesting())
-                    {                        
-                        if (Globals.excelDna)
-                        {
-                            sevenzPath = Path.Combine(Globals.excelDnaPath, "7z.dll");
-                        }
-                        else
-                        {
-                            sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
-                        }
-                    }
-                    else
-                    {
-                        sevenzPath = Application.StartupPath + "\\zip\\7z.dll";
-                    }
-
-                    SevenZipExtractor.SetLibraryPath(sevenzPath);
-                    SevenZipExtractor tmp2 = null;
-                    try
-                    {
-                        tmp2 = new SevenZipExtractor(zipFileName);
-                    }
-                    catch (Exception e)
-                    {
-                        //It seems this happens if the file is not a 'real' zip file
-                        G.Writeln2("*** ERROR: It seems the databank file is not in the right format (unzipping failed)");
-                        throw new GekkoException();
-                    }
-                    
-                    using (tmp2)
-                    {
-                        string xmlFile = "";
-                        int tsdfilecounter = 0;
-                        for (int i = 0; i < tmp2.ArchiveFileData.Count; i++)
-                        {
-                            string fileName2 = tmp2.ArchiveFileNames[i];
-
-                            if (G.Equal(fileName2, Globals.protobufFileName) || G.Equal(fileName2, Globals.protobufFileName2) || G.Equal(fileName2, Program.options.databank_file_gbk_internal))
-                            {
-                                //this is only relevant for the older .tsdx files, .gbk files always has isProtobuf = true.
-                                isProtobuf = true;
-                            }
-
-                            //Console.WriteLine(fileName2);
-                            if (string.Compare(inside, fileName2, true) == 0)
-                            {
-                                //This is only for legacy reasons: all new tsdx files have databank.tsd as internal file.
-                                //Remove this option a some point.
-                                tsdFile = fileName2;
-                                tsdfilecounter++;
-                            }
-                            if (string.Compare("databank.tsd", fileName2, true) == 0)
-                            {
-                                tsdFile = fileName2;
-                                tsdfilecounter++;
-                            }
-                            if (string.Compare("DatabankInfo.xml", fileName2, true) == 0)
-                            {
-                                xmlFile = fileName2;
-                            }
-                        }
-
-                        if (xmlFile == "")
-                        {
-                            G.Writeln2("*** ERROR: Cannot find xml-file inside zip-file. Expected to find '" + "DatabankInfo.xml" + "' inside '" + originalFileName + "'");
-                            throw new GekkoException();
-                        }
-
-                        if (isProtobuf)
-                        {
-                            for (int i = 0; i < tmp2.ArchiveFileData.Count; i++)
-                            {
-                                tmp2.ExtractFiles(folder, tmp2.ArchiveFileData[i].Index);
-                            }
-                            tsdFile = Globals.isAProto;  //okay, this is a hacky way to signal back, I admit it...
-                        }
-                        else
-                        {
-                            if (tsdfilecounter == 2 && G.Equal(inside, "databank.tsd"))
-                            {
-                                //the rare case where the databank file name is "databank"
-                                tsdfilecounter = 1;
-                            }
-
-                            if (tsdfilecounter > 1)
-                            {
-                                G.Writeln2("*** ERROR: Found several tsd-files inside zip-file. Cannot decide which one to use");
-                                throw new GekkoException();
-                            }
-
-                            if (tsdFile == "")
-                            {
-                                G.Writeln2("*** ERROR: Cannot find tsd-file inside zip-file. Expected to find '" + inside + "' inside '" + originalFileName + "'");
-                                throw new GekkoException();
-                            }
-
-                            for (int i = 0; i < tmp2.ArchiveFileData.Count; i++)
-                            {
-                                tmp2.ExtractFiles(folder, tmp2.ArchiveFileData[i].Index);
-                            }
-                        }
-                    }
-                    break;
+                    //this is only relevant for the older .tsdx files, .gbk files always has isProtobuf = true.
+                    isProtobuf = true;
+                }
+                
+                if (string.Compare(inside, fileName2, true) == 0)
+                {
+                    //This is only for legacy reasons: all new tsdx files have databank.tsd as internal file.
+                    //Remove this option a some point.
+                    tsdFile = fileName2;
+                    tsdfilecounter++;
+                }
+                if (string.Compare("databank.tsd", fileName2, true) == 0)
+                {
+                    tsdFile = fileName2;
+                    tsdfilecounter++;
+                }
+                if (string.Compare("DatabankInfo.xml", fileName2, true) == 0)
+                {
+                    xmlFile = fileName2;
                 }
             }
+
+            if (xmlFile == "")
+            {
+                G.Writeln2("*** ERROR: Cannot find xml-file inside zip-file. Expected to find '" + "DatabankInfo.xml" + "' inside '" + originalFileName + "'");
+                throw new GekkoException();
+            }
+            
+            if (isProtobuf)
+            {                
+                tsdFile = Globals.isAProto;  //okay, this is a hacky way to signal back...
+            }
+            else
+            {
+                if (tsdfilecounter == 2 && G.Equal(inside, "databank.tsd"))
+                {
+                    //the rare case where the databank file name is "databank"
+                    tsdfilecounter = 1;
+                }
+
+                if (tsdfilecounter > 1)
+                {
+                    G.Writeln2("*** ERROR: Found several tsd-files inside zip-file. Cannot decide which one to use");
+                    throw new GekkoException();
+                }
+
+                if (tsdFile == "")
+                {
+                    G.Writeln2("*** ERROR: Cannot find tsd-file inside zip-file. Expected to find '" + inside + "' inside '" + originalFileName + "'");
+                    throw new GekkoException();
+                }                             
+            }
+
             return tsdFile;
         }
 
-
         public static void WaitForZipRead(string folderToUseForOutput, string zipFileNameAndPath)
         {
+            //is not actually waiting...
             int gap = Globals.waitFileGap;  //1 second
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
             int repeats = totalTime / gap;
             string tsdFile = "";
-
             DirectoryInfo folderInfo = new DirectoryInfo(folderToUseForOutput);
+            if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
+            //try-catch is not used here: normally a zip-file can be read even if blocked by others (not so for writing)            
 
-            for (int j = 0; j < repeats; j++)
+            try
             {
-                if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
-                //try-catch is not used here: normally a zip-file can be read even if blocked by others (not so for writing)
-                {
-                    string sevenzPath = null;
-                    if (G.IsUnitTesting())
-                    {
-                        sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
-                    }
-                    else
-                    {
-                        sevenzPath = Application.StartupPath + "\\zip\\7z.dll";
-                    }
-
-                    SevenZipExtractor.SetLibraryPath(sevenzPath);
-
-                    using (SevenZipExtractor tmp2 = new SevenZipExtractor(zipFileNameAndPath))
-                    {
-                        for (int i = 0; i < tmp2.ArchiveFileData.Count; i++)
-                        {
-                            tmp2.ExtractFiles(folderToUseForOutput, tmp2.ArchiveFileData[i].Index);
-                        }
-                    }
-                    break;
-                }
+                ZipFile.ExtractToDirectory(zipFileNameAndPath, folderToUseForOutput);
             }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: Zip extraction failed: " + e.InnerException + " " + e.Message);
+            }
+
             return;
         }
 
