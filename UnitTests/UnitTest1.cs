@@ -68,15 +68,15 @@ Integration_OEM2012()
 using System;
 using System.Text;
 using System.Collections.Generic;
-//using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Gekko;
-using Antlr.Runtime;
-using Antlr.Runtime.Tree;
-using Antlr.Runtime.Debug;
 using System.Threading;
 using System.Windows.Forms;
 using System.IO;
+using Apache.Arrow;
+using Apache.Arrow.Ipc;
+using Apache.Arrow.Memory;
+using Microsoft.Data.Analysis;
 
 namespace UnitTests
 {
@@ -1643,7 +1643,7 @@ namespace UnitTests
             //Testing OPTION series array print missing = ..., and 
             //also p <missing = ...> and also OPTION series data missing = ...
 
-            Table table = null;
+            Gekko.Table table = null;
 
 
             // =============== missing in First
@@ -2143,7 +2143,7 @@ namespace UnitTests
             I("%acd = 3;");
             I("option freq a;");
             I("PRT <n> {'*'};");
-            Table table = Globals.lastPrtOrMulprtTable;
+            Gekko.Table table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.GetColMaxNumber(), 2 + 1);
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "abc");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "acd");
@@ -2775,7 +2775,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_PrintSumMultiplier()
         {
-            Table table = null;
+            Gekko.Table table = null;
 
             I("reset;");
             I("time 2001 2003;");
@@ -2857,7 +2857,7 @@ namespace UnitTests
 
             I("CLONE;");
 
-            Table table = null;
+            Gekko.Table table = null;
             I("p <n> sum(#m1, xx[#m1, x]);");
             table = Globals.lastPrtOrMulprtTable;
 
@@ -2875,7 +2875,7 @@ namespace UnitTests
         public void _Test_SumUnfoldDollarPrint()
         {
 
-            Table table = null;
+            Gekko.Table table = null;
 
             // setting up the tests
             // setting up the tests ----------------------------------------------
@@ -3984,7 +3984,7 @@ namespace UnitTests
             I("x = 200, 205;");
             I("ref:x = 100, 102;");
             I("prt <m> x;");
-            Table table = Globals.lastPrtOrMulprtTable;
+            Gekko.Table table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).number, 100d, sharedDelta);
             I("prt <bank=b1 ref=b2 m> x;");
             table = Globals.lastPrtOrMulprtTable;
@@ -4032,7 +4032,7 @@ namespace UnitTests
             I("option freq a;");
             //Globals.lastPrtOrMulprtTable = null;
             I("p xx1, xx2, {#m};");
-            Table table = Globals.lastPrtOrMulprtTable;
+            Gekko.Table table = Globals.lastPrtOrMulprtTable;
             double deltaHere = 0.0001d;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx1");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "%");
@@ -6188,8 +6188,8 @@ namespace UnitTests
         public void _Test_Freq()
         {
             //In principle, Gekko should be able to run regardless of freq settings
-                        
-            Table tab = null; int counter = -12345;
+
+            Gekko.Table tab = null; int counter = -12345;
             
             //value on rhs -----------------------                 
 
@@ -9621,7 +9621,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Decomp()
         {
-            Table table = null;
+            Gekko.Table table = null;
 
             //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
 
@@ -9998,7 +9998,7 @@ namespace UnitTests
 
         }
 
-        private static int Helper_residual2(Table table, int j, int i, double reduce)
+        private static int Helper_residual2(Gekko.Table table, int j, int i, double reduce)
         {
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompResidualName + " | null | [0]");
@@ -10016,7 +10016,7 @@ namespace UnitTests
             return i;
         }
 
-        private static int Helper_residual1(Table table, int j, int i, double ydif2011b, double ydif2012b, double reduce)
+        private static int Helper_residual1(Gekko.Table table, int j, int i, double ydif2011b, double ydif2012b, double reduce)
         {
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompResidualName + "_link1 | null | [0]");
@@ -10078,7 +10078,7 @@ namespace UnitTests
             //                                           qCxRef[#a18t100] in E_mUC <lead>,
             //                                           muc[#a18t100] in e_qCr <lead>,
             //                                           emuc[#a18t99] in E_EmUC <lead>;
-            Table table = Globals.lastDecompTable;
+            Gekko.Table table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2015");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2016");
             //TODO: a_residual row 2 (residual)              
@@ -10151,8 +10151,8 @@ namespace UnitTests
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             I("decomp3 <d> y from e1, e2, e3 endo y, c, g;");
-            
-            Table table = Globals.lastDecompTable;
+
+            Gekko.Table table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
             //TODO: a_residual row 2 (residual)              
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
@@ -10415,7 +10415,7 @@ namespace UnitTests
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            Table table = null;
+            Gekko.Table table = null;
 
             for (int i = 0; i < 2; i++)
             {
@@ -10687,7 +10687,7 @@ namespace UnitTests
                 // <n>
                 // -----------------------------------------------------------------------
                 I("decomp2 <n> ctot in e_c rows vars, #a cols time;");
-                Table table = Globals.lastDecompTable;
+                Gekko.Table table = Globals.lastDecompTable;
                 int i = 1;
                 Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2020");
                 Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2021");
@@ -13286,7 +13286,7 @@ namespace UnitTests
             I("setdomains(x, ('#i',));");
             I("setdomains(p, ('#i',));");
             I("p<n> x;");
-            Table table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);
+            Gekko.Table table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);
             I("p<n> p*x;");
             table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);
             I("#default = map();");
@@ -13509,66 +13509,77 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Arrow()
-        {
-            ////Globals.unitTestScreenOutput.Clear();
-            ////I(@"sys'c:\Progra~1\R\R-3.6.2\bin\Rscript -e ""Sys.info()""';");
-            ////Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("build 18363"));
+        {            
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("READ " + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM\take2\jul05;");
+            
+            Databank db1 = Gekko.Program.databanks.GetFirst();            
 
-            //DateTime dt1 = DateTime.Now;
-            //Globals.unitTestScreenOutput.Clear();
-            //Gekko.Globals.arrow = true;  //so that messages are not shown
-            //Gekko.Program.databanks.storage.Add(new Databank("Work"));
-            //O.Read o0 = new O.Read();
-            //o0.type = @"read";
-            //o0.fileName = @"c:\Thomas\Desktop\gekko\testing\jul05";
-            //o0.opt_first = "yes";
-            //o0.Exe();
-            //Databank db = Gekko.Program.databanks.GetFirst();
-            //s = Globals.unitTestScreenOutput.ToString();
-            //s0 = "Read gbk took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
+            int t1 = 1998;
+            int t2 = 2079;
+            int n = t2 - t1 + 1;
+            int k = db1.storage.Count + 1;
 
-            //dt1 = DateTime.Now;
-            //int t1 = 1998;
-            //int t2 = 2079;
-            //int n = t2 - t1 + 1;
-            //int k = db.storage.Count + 1;
+            RecordBatch.Builder recordBatchBuilder = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64));
+            List<double> data = new List<double>();
+            for (int i = 0; i < n; i++)
+            {
+                data.Add(double.NaN);
+            }
 
-            //RecordBatch.Builder recordBatchBuilder = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64));
-            //List<double> data = new List<double>();
-            //for (int i = 0; i < n; i++)
-            //{
-            //    data.Add(double.NaN);
-            //}
+            List<string> dates = new List<string>();
+            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
+            {
+                dates.Add(t.super.ToString());
+            }
 
-            //List<string> dates = new List<string>();
-            //foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
-            //{
-            //    dates.Add(t.super.ToString());
-            //}
+            recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));
+            
+            int counter = 0;
+            foreach (KeyValuePair<string, IVariable> kvp in db1.storage)
+            {
+                counter++;
+                PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(G.Chop_RemoveFreq(kvp.Key), n);
+                int i = -1;
+                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
+                {
+                    i++;
+                    Series ts = kvp.Value as Series;
+                    data[i] = ts.GetDataSimple(t);
+                }
+                recordBatchBuilder.Append(G.Chop_RemoveFreq(kvp.Key), false, col => col.Double(array => array.AppendRange(data)));
+            }
+            RecordBatch recordBatch1 = recordBatchBuilder.Build();
+            DataFrame df1 = DataFrame.FromArrowRecordBatch(recordBatch1);
 
-            //recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));
+            if (false)
+            {
+                //hmmm...?
+                df1.Columns["AAA"][3] = 777d;  //--> not fed back to recordBatch1 it seems
+            }
+
+            Arrow.WriteArrow(recordBatch1, Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
+                        
+            RecordBatch recordBatch2 = Arrow.ReadArrow(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
+            DataFrame df2 = DataFrame.FromArrowRecordBatch(recordBatch2);
+
+            Databank db2 = new Databank(null);
+
+            long rows = df2.Rows.Count;
+            long cols = df2.Columns.Count;
+
+            for (int j = 1; j < cols; j++)
+            {
+                DataFrameColumn column = df2.Columns[j];
+                string name = column.Name;
+
+            }
+
+            Assert.AreEqual((double)df1.Columns["AAA"][3], 0.169202d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["AAA"][3], 0.169202d, sharedDelta);
 
 
-            //int counter = 0;
-            //foreach (KeyValuePair<string, IVariable> kvp in db.storage)
-            //{
-            //    counter++;
-            //    PrimitiveDataFrameColumn<double> column = new PrimitiveDataFrameColumn<double>(G.Chop_RemoveFreq(kvp.Key), n);
-            //    int i = -1;
-            //    foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
-            //    {
-            //        i++;
-            //        Series ts = kvp.Value as Series;
-            //        data[i] = ts.GetDataSimple(t);
-            //    }
-            //    recordBatchBuilder.Append(G.Chop_RemoveFreq(kvp.Key), false, col => col.Double(array => array.AppendRange(data)));
-            //}
-            //RecordBatch recordBatch = recordBatchBuilder.Build();
-            //DataFrame df777 = DataFrame.FromArrowRecordBatch(recordBatch);
-            //WriteArrow(recordBatch);
-            ////df777 = df;
-            //s1 = "Construct arrow took: " + (DateTime.Now - dt1).TotalMilliseconds / 1000d;
-            ////df777.Columns["AAA"][3] = 777d;
         }
 
 
@@ -15252,7 +15263,7 @@ namespace UnitTests
                     Assert.AreEqual(Program.databanks.storage[3].name, "Work"); //bank1
                     Globals.lastPrtOrMulprtTable = null;
                     I("PRT<2010 2010> a;");
-                    Table table = Globals.lastPrtOrMulprtTable;
+                    Gekko.Table table = Globals.lastPrtOrMulprtTable;
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010"); //why is it not a date?
                     _AssertHelperTwoDoubles(table.Get(2, 2).number, 20d, sharedDelta);
                     table = null;
@@ -18748,7 +18759,7 @@ namespace UnitTests
             I("SERIES<2000 2004> xx %= 10;");
             I("TIMEFILTER 2000,2004;");
             I("PRT xx;");
-            Table tab = Globals.lastPrtOrMulprtTable;
+            Gekko.Table tab = Globals.lastPrtOrMulprtTable;
             int counter = 0;
             TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
             TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
@@ -18804,7 +18815,7 @@ namespace UnitTests
             }
         }
 
-        private static void TestCell(ref int counter, Table tab, int row, int col, CellType type, string s)
+        private static void TestCell(ref int counter, Gekko.Table tab, int row, int col, CellType type, string s)
         {
             Cell c = tab.Get(row, col);
             Assert.AreEqual(c.cellType, type);
@@ -18813,7 +18824,7 @@ namespace UnitTests
             counter++;
         }
 
-        private static void TestCell(ref int counter, Table tab, int row, int col, CellType type, double d, double crit)
+        private static void TestCell(ref int counter, Gekko.Table tab, int row, int col, CellType type, double d, double crit)
         {
             Cell c = tab.Get(row, col);
             Assert.AreEqual(c.cellType, type);

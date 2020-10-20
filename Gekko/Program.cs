@@ -40831,7 +40831,7 @@ namespace Gekko
                             if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
                             {
                                 //ws.Cells[d1 + i, d2 + j].Value = na;
-                                ws.Cells[d1 + i, d2 + j].Formula = "=" + na;
+                                ws.Cells[d1 + i, d2 + j].Formula = "=" + na;                                
                             }
                         }
                     }
@@ -40937,8 +40937,6 @@ namespace Gekko
                                 datesData = ToJaggedArray(data3);
                             }
 
-
-
                             if (isTranspose)
                             {
                                 ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].LoadFromArrays(datesData);
@@ -40946,7 +40944,6 @@ namespace Gekko
                             else
                             {
                                 ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].LoadFromArrays(datesData);
-
                             }
                         }
 
