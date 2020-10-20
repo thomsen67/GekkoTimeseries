@@ -9725,7 +9725,9 @@ namespace Gekko
             public GekkoTime t1 = GekkoTime.tNull;
             public GekkoTime t2 = GekkoTime.tNull;
             public string opt_prefix = null;
-            public string opt_bank = null;
+            public string opt_bank = null;  //obsolete
+            public string opt_frombank = null;
+            public string opt_tobank = null;
             public double opt_index = 100d;
             public void Exe()
             {
@@ -9754,14 +9756,21 @@ namespace Gekko
 
                 int counter = 0;
                 int count = 0;
-                
+
+                Databank optionToBank_databank = null;
+                if (opt_tobank != null) optionToBank_databank = Program.databanks.GetDatabank(opt_tobank, true);                
+
                 for (int i = 0; i < listItems.Count; i++)
                 {
                     //#098098q3453
                     //maybe this.opt_bank should be <frombank=...> not <bank=...>
                     //and we could have a <tobank=...>
 
-                    string varnameWithBank = G.Chop_AddBank(listItems[i], this.opt_bank); //this.opt_bank can be null, no problem                 
+                    string frombank = null;
+                    if (this.opt_bank != null) frombank = this.opt_bank;
+                    if (this.opt_frombank != null) frombank = this.opt_frombank;
+
+                    string varnameWithBank = G.Chop_AddBank(listItems[i], frombank); //this.opt_bank can be null, no problem                 
 
                     IVariable iv = O.GetIVariableFromString(varnameWithBank, ECreatePossibilities.NoneReportError);
 
@@ -9771,12 +9780,7 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR: Expected series type");
                         throw new GekkoException();
-                    }
-
-                    //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(listItems[i], opt_bank);
-                    //foreach (Series ts in tss)
-
-                    if (!ts.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank.name + ")");
+                    }                    
 
                     GekkoTime ddate1 = t1;
                     GekkoTime ddate2 = t2;
@@ -9828,15 +9832,16 @@ namespace Gekko
                     }
 
                     Series tsNew = null;
-                    if (opt_prefix != null)  ////#098098q3453 or a tobank is set
+                    if (opt_prefix != null || opt_tobank != null)  ////#098098q3453 or a tobank is set
                     {
-                        tsNew = ts.DeepClone(null) as Series;
+                        Databank tobank = ts.meta.parentDatabank;
+                        if (optionToBank_databank != null) tobank = optionToBank_databank;  //overriding if designated tobank is there
+                                                                        
+                        tsNew = ts.DeepClone(null) as Series; //parentDatabank for tsNew will be null here 
                         tsNew.name = opt_prefix + ts.name;
 
-                        Databank tobank = ts.meta.parentDatabank;
-
-                        ///#098098q3453 use another...
-
+                        //Necessary, otherwise it only fails when trying to write the databank to file (better to catch the problem here)
+                        if (!tobank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tobank.name + "), see OPEN<edit> or UNLOCK");
                         if (tobank.ContainsIVariable(tsNew.name))
                         {
                             tobank.RemoveIVariable(tsNew.name);
@@ -9844,7 +9849,12 @@ namespace Gekko
                         }
                         tobank.AddIVariable(tsNew.name, tsNew);
                     }
-                    else tsNew = ts;
+                    else
+                    {
+                        //Necessary, otherwise it only fails when trying to write the databank to file (better to catch the problem here)
+                        tsNew = ts;
+                        if (!tsNew.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tsNew.meta.parentDatabank.name + "), see OPEN<edit> or UNLOCK");                        
+                    }                    
 
                     double[] data = tsNew.GetDataSequenceUnsafePointerAlterBEWARE();  //do not optionally change NaN to 0
                     for (int ii = 0; ii < data.Length; ii++)

@@ -3539,7 +3539,9 @@ rebase:                     REBASE rebaseOpt1? seqOfBankvarnames rebaseDate1? re
 rebaseDate1:                expression;
 rebaseDate2:                expression;
 rebaseOpt1:                 ISNOTQUAL | leftAngle rebaseOpt1h* RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h*);							
-rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
+rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //obsolete: name can be without quotes
+						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)  //name can be without quotes
+						  | TOBANK EQUAL name -> ^(ASTOPT_STRING_TOBANK name)  //name can be without quotes
 						  | PREFIX EQUAL name -> ^(ASTOPT_STRING_PREFIX name) //name can be without quotes
 						  | INDEX EQUAL expression -> ^(ASTOPT_VAL_INDEX expression)
 						    ;

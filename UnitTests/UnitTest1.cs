@@ -18326,9 +18326,9 @@ namespace UnitTests
             I("CLOSE temp; OPEN temp;");
             I("OPEN <edit> temp2; CLEAR temp2;");
             I("REBASE <tobank=temp2 index = 100> temp:y2 2011;");
-            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
-            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
-            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2012, -4d / (-3d) * 100d, sharedDelta);
 
             I("RESET;");
             I("TIME 2010 2012;");
