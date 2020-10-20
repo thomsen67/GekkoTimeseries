@@ -78,6 +78,13 @@ namespace Gekko
     //    }
     //}
 
+    public enum EAppend
+    {
+        Yes,
+        No,
+        Ifexist
+    }
+
     public enum EVariablesForWrite
     {
         Normal,  //series
@@ -26029,6 +26036,13 @@ namespace Gekko
             }
         }
 
+        public static bool ExistFile(string s)
+        {
+            string filename = Program.CreateFullPathAndFileName(s);
+            bool exist = File.Exists(filename);
+            return exist;
+        }
+
         public static void WriteFile(IVariable file2, IVariable x1)
         {
             string file = O.ConvertToString(file2);
@@ -40616,8 +40630,38 @@ namespace Gekko
                     fileNameWithPath = AddExtension(CreateFullPathAndFileName(fileNameWithPath), ".xlsx");
                 }
                 fileNameWithPathOriginal = fileNameWithPath;
+                
+                EAppend append = EAppend.No;
+                if (oPrt.opt_append != null)
+                {
+                    if (G.Equal(oPrt.opt_append, "yes"))
+                    {
+                        append = EAppend.Yes;
+                    }
+                    else if (G.Equal(oPrt.opt_append, "no"))
+                    {
+                        //already set
+                    }
+                    else if (G.Equal(oPrt.opt_append, "ifexist"))
+                    {
+                        append = EAppend.Ifexist;
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Append option must be either yes, no or ifexist");
+                        throw new GekkoException();
+                    }
+                }
 
-                bool isAppend = false; if (oPrt != null && G.Equal(oPrt.opt_append, "yes")) isAppend = true;
+                bool isAppend = false;
+                if (append == EAppend.Yes) isAppend = true;
+                if (append == EAppend.Ifexist)
+                {
+                    //only activate append if the file is already there
+                    if (File.Exists(fileNameWithPathOriginal)) isAppend = true;
+                }
+
+                //bool isAppend = false; if (oPrt != null && G.Equal(oPrt.opt_append, "yes")) isAppend = true;
 
                 //Deal with non-existing files
                 if (isAppend)

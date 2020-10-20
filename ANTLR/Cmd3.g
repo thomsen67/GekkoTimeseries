@@ -4230,9 +4230,10 @@ nameOrStar:                 name -> name
 
 dates: expression expression;
 
-yesNo:					    yes
-						  | no
-						  | expression
+yesNo:					    yes                   //xxx=yes
+						  | no                    //xxx=no
+						  | name                  //xxx=other
+						  | expression            //xxx='other'
 						    ;
 yesNoSimple:			    yes
 						  | no
