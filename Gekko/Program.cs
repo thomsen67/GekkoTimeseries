@@ -40756,8 +40756,9 @@ namespace Gekko
 
                         if (!eo.isClip)
                         {
-                            ws.Cells[rowcounter, colcounter].Value = clipData.stamp;
-                            //ws.Cells[rowcounter, colcounter].Value = cplotData.heading;                            
+                            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                            ws.Cells[rowcounter, colcounter].Formula = null;
+                            ws.Cells[rowcounter, colcounter].Value = clipData.stamp;                            
                             ExcelRange range = ws.Cells[rowcounter, colcounter, rowcounter, colcounter];
                             range.Style.Font.Color.SetColor(System.Drawing.Color.Gray);
                             rowcounter++;
@@ -40771,6 +40772,8 @@ namespace Gekko
 
                         if (!eo.isClip)
                         {
+                            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                            ws.Cells[rowcounter, colcounter].Formula = null;
                             ws.Cells[rowcounter, colcounter].Value = clipData.heading;
                             ExcelRange range = ws.Cells[rowcounter, colcounter, rowcounter, colcounter];
                             range.Style.Font.Bold = true;
@@ -40809,8 +40812,11 @@ namespace Gekko
                     }
 
                     if (!eo.isClip)
-                    {
+                    {   
+                        //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                        ws.Cells[d1, d2, d1 + data.GetLength(0) - 1, d2 + data.GetLength(1) - 1].Formula = null;
                         ws.Cells[d1, d2, d1 + data.GetLength(0) - 1, d2 + data.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(data));
+                        
                         if (isColors)
                         {
                             int minus = 0;
@@ -40829,8 +40835,7 @@ namespace Gekko
                         for (int j = 0; j < data.GetLength(1); j++)
                         {
                             if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
-                            {
-                                //ws.Cells[d1 + i, d2 + j].Value = na;
+                            {                                
                                 ws.Cells[d1 + i, d2 + j].Formula = "=" + na;                                
                             }
                         }
@@ -40851,25 +40856,15 @@ namespace Gekko
                             //cf. DateTime.FromOADate(excelvalue);
 
                             if (isTranspose)
-                            {
-
-                                //for (int i = d2; i <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; i++)
-                                //{
-                                //    for (int j = d1 - 1; j <= d1 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
-                                //    {
-                                //        GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d1 - 1), i - d2];
-                                //        DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
-                                //        ws.SetValue(i, j, dt);
-                                //        ws.Cells[i, j].Style.Numberformat.Format = f;
-                                //    }
-                                //}
-
+                            {                                
                                 for (int i = d1; i <= d1 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; i++)
                                 {
                                     for (int j = d2 - 1; j <= d2 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
                                     {
                                         GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d2 - 1), i - d1];
                                         DateTime dt; string f; string discard; GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(gt, isFirst, format, out dt, out f, out discard);
+                                        //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                                        ws.Cells[i, j].Formula = null;
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
                                     }
@@ -40883,6 +40878,8 @@ namespace Gekko
                                     {
                                         GekkoTime gt = eo.excelColumnLabelsGekkoTime[i - (d1 - 1), j - d2];
                                         DateTime dt; string f; string discard; GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(gt, isFirst, format, out dt, out f, out discard);
+                                        //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                                        ws.Cells[i, j].Formula = null;
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
                                     }
@@ -40939,10 +40936,14 @@ namespace Gekko
 
                             if (isTranspose)
                             {
-                                ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].LoadFromArrays(datesData);
+                                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                                ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].Formula = null;
+                                ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].LoadFromArrays(datesData);                                
                             }
                             else
                             {
+                                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                                ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].Formula = null;
                                 ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].LoadFromArrays(datesData);
                             }
                         }
@@ -40968,6 +40969,8 @@ namespace Gekko
                         if (isTranspose)
                         {
                             labels = Transpose(eo.excelRowLabels);
+                            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                            ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].Formula = null;
                             ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(labels));
 
                             if (isColors)
@@ -40983,6 +40986,8 @@ namespace Gekko
                         else
                         {
                             labels = eo.excelRowLabels;
+                            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                            ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].Formula = null;
                             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(ToJaggedArray(labels));
                         }
                         clipData.varnames = labels;
@@ -40990,7 +40995,6 @@ namespace Gekko
 
                     clipData.transpose = isTranspose;
                     if (eo.isClip) return clipData;
-
 
                     //Save the new workbook. We haven't specified the filename so use the Save as method.
                     excel.SaveAs(new FileInfo(fileNameWithPath));
