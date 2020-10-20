@@ -18314,8 +18314,22 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test__Rebase()
-        {
-            //#dors, måske også frombank i stedet for bank...?
+        {            
+            I("RESET;");
+            I("TIME 2010 2012;");
+            I("MODE data;");
+            I("SER y1 = -7, 3, 4;");
+            I("OPEN <edit> temp;");
+            I("SER y2 = 7, -3, -4;");
+            I("CLOSE temp; OPEN temp;");
+            I("OPEN <edit> temp2; CLEAR temp2;");
+            I("REBASE <tobank=temp2 index = 100> work:y1, temp:y2 2011;");
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", 2010, -7d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", 2011, 3d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", 2012, 4d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2012, -4d / (-3d) * 100d, sharedDelta);
 
             I("RESET;");
             I("TIME 2010 2012;");
@@ -18325,10 +18339,30 @@ namespace UnitTests
             I("SER y2 = 7, -3, -4;");
             I("CLOSE temp; OPEN temp;");
             I("OPEN <edit> temp2; CLEAR temp2;");
-            I("REBASE <tobank=temp2 index = 100> temp:y2 2011;");
-            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2010, 7d / (-3d) * 100d, sharedDelta);
-            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2011, -3d / (-3d) * 100d, sharedDelta);
-            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2012, -4d / (-3d) * 100d, sharedDelta);
+            I("REBASE <tobank=temp2 prefix=re index = 100> work:y1, temp:y2 2011;");
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey1", 2010, -7d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey1", 2011, 3d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey1", 2012, 4d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+
+            I("RESET;");
+            I("TIME 2010 2012;");
+            I("MODE data;");
+            I("SER y1 = -7, 3, 4;");
+            I("OPEN <edit> temp;");
+            I("SER y2 = 7, -3, -4;");
+            I("CLOSE temp; OPEN temp;");
+            I("OPEN <edit> temp2; CLEAR temp2;");
+            I("REBASE <frombank=temp tobank=temp2 prefix=re index = 100> work:y1, y2 2011;");
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey1", 2010, -7d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey1", 2011, 3d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey1", 2012, 4d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+
 
             I("RESET;");
             I("TIME 2010 2012;");
@@ -18337,30 +18371,30 @@ namespace UnitTests
             I("OPEN<edit>temp;");
             I("SER y2 = (7, -3, -4);");
             I("CLOSE temp; OPEN temp;");
-            FAIL("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
+            FAIL("REBASE <frombank=work prefix=re index = 100> y1, temp:y2 2011;");
             I("UNLOCK temp;");
-            I("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
+            I("REBASE <frombank=work prefix=re index = 100> y1, temp:y2 2011;");
             _AssertSeries(First(), "rey1", 2010, -7d / 3d * 100d, sharedDelta);
             _AssertSeries(First(), "rey1", 2011, 3d / 3d * 100d, sharedDelta);
             _AssertSeries(First(), "rey1", 2012, 4d / 3d * 100d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
-            I("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011 2012;");
+            I("REBASE <frombank=work prefix=re index = 100> y1, temp:y2 2011 2012;");
             _AssertSeries(First(), "rey1", 2010, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
             _AssertSeries(First(), "rey1", 2011, 3d / ((3d + 4d) / 2d) * 100d, sharedDelta);
             _AssertSeries(First(), "rey1", 2012, 4d / ((3d + 4d) / 2d) * 100d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
-            FAIL("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011 2013;");
-            FAIL("REBASE <bank=work prefix=re index = 100> y1 2010 2012;");
-            FAIL("REBASE <bank=work prefix=re index = 100> temp:y2 2010 2012;");
+            FAIL("REBASE <frombank=work prefix=re index = 100> y1, temp:y2 2011 2013;");
+            FAIL("REBASE <frombank=work prefix=re index = 100> y1 2010 2012;");
+            FAIL("REBASE <frombank=work prefix=re index = 100> temp:y2 2010 2012;");
             FAIL("REBASE y1 2012 2011;");
             FAIL("REBASE y1 2010q1 2012;");
             FAIL("REBASE y1 2010m1 2012q4;");
             I("LIST #m = work:y1, y2;");
-            I("REBASE <bank=temp index = 1> {#m} 2010;");
+            I("REBASE <frombank=temp index = 1> {#m} 2010;");
             _AssertSeries(First(), "y1", 2010, -7d / (-7d) * 1d, sharedDelta);
             _AssertSeries(First(), "y1", 2011, 3d / (-7d) * 1d, sharedDelta);
             _AssertSeries(First(), "y1", 2012, 4d / (-7d) * 1d, sharedDelta);
