@@ -3017,6 +3017,25 @@ namespace Gekko
             return new ScalarVal(i);
         }
 
+        public static IVariable yesno(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            double d = O.ConvertToVal(x1);
+            ScalarString rv = null;
+            if (d == 0d)
+            {
+                rv = new ScalarString("no");
+            }
+            else if (d == 1d)
+            {
+                rv = new ScalarString("yes");
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: yesno(): expected input 0 or 1, got " + d);
+            }
+            return rv;
+        }
+
         public static IVariable readfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(x1);
