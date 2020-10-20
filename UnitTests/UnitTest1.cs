@@ -11927,7 +11927,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _Test__Ols()
+        public void _Test_Ols()
         {
             Databank work = First();
 
@@ -13504,38 +13504,64 @@ namespace UnitTests
             _AssertScalarString(First(), "%y4", "abc");
             _AssertScalarString(First(), "%y5", "abo");
             _AssertScalarString(First(), "%y6", "aop");
-
         }
 
         [TestMethod]
-        public void _Test_Arrow()
+        public void _Test_Arrow2()
+        {
+            string fileName = Globals.ttPath2 + @"\regres\Databanks\test.arrow";
+            List<int> xxA = new List<int>() { 1, 2, 3, 4, 5 };
+            List<double> xxB = new List<double>() { 1.1d, 2.1d, 3.1d, 4.1d, 5.1d };
+            List<string> xxC = new List<string>() { "a", "b", "c", "d", "e" };
+            RecordBatch rb1 = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64))
+                        .Append("Column A", false, col => col.Int32(array => array.AppendRange(xxA)))
+                        .Append("Column B", false, col => col.Double(array => array.AppendRange(xxB)))
+                        .Append("Column C", false, col => col.String(array => array.AppendRange(xxC)))
+                        .Build();
+            if (File.Exists(fileName)) File.Delete(fileName); //just for extra safety that it is gone
+            Arrow.WriteArrow(rb1, fileName);
+            RecordBatch rb2 = Arrow.ReadArrow(fileName);
+            DataFrame df2 = DataFrame.FromArrowRecordBatch(rb2);
+            Assert.AreEqual((int)df2.Columns["Column A"][0], 1);
+            Assert.AreEqual((int)df2.Columns["Column A"][1], 2);
+            Assert.AreEqual((int)df2.Columns["Column A"][2], 3);
+            Assert.AreEqual((int)df2.Columns["Column A"][3], 4);
+            Assert.AreEqual((int)df2.Columns["Column A"][4], 5);
+            Assert.AreEqual((double)df2.Columns["Column B"][0], 1.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][1], 2.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][2], 3.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][3], 4.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][4], 5.1d, sharedDelta);
+            Assert.AreEqual((string)df2.Columns["Column C"][0], "a");
+            Assert.AreEqual((string)df2.Columns["Column C"][1], "b");
+            Assert.AreEqual((string)df2.Columns["Column C"][2], "c");
+            Assert.AreEqual((string)df2.Columns["Column C"][3], "d");
+            Assert.AreEqual((string)df2.Columns["Column C"][4], "e");
+        }
+
+        [TestMethod]
+        public void _Test_Arrow1()
         {            
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
-            I("READ " + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM\take2\jul05;");
-            
+            I("READ " + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM\take2\jul05;");            
             Databank db1 = Gekko.Program.databanks.GetFirst();            
-
             int t1 = 1998;
             int t2 = 2079;
             int n = t2 - t1 + 1;
             int k = db1.storage.Count + 1;
-
             RecordBatch.Builder recordBatchBuilder = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64));
             List<double> data = new List<double>();
             for (int i = 0; i < n; i++)
             {
                 data.Add(double.NaN);
             }
-
             List<string> dates = new List<string>();
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, t1, 1), new GekkoTime(EFreq.A, t2, 1)))
             {
                 dates.Add(t.super.ToString());
             }
-
-            recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));
-            
+            recordBatchBuilder.Append("time", false, col => col.String(array => array.AppendRange(dates)));            
             int counter = 0;
             foreach (KeyValuePair<string, IVariable> kvp in db1.storage)
             {
@@ -13552,34 +13578,24 @@ namespace UnitTests
             }
             RecordBatch recordBatch1 = recordBatchBuilder.Build();
             DataFrame df1 = DataFrame.FromArrowRecordBatch(recordBatch1);
-
             if (false)
             {
                 //hmmm...?
                 df1.Columns["AAA"][3] = 777d;  //--> not fed back to recordBatch1 it seems
             }
-
-            Arrow.WriteArrow(recordBatch1, Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
-                        
+            Arrow.WriteArrow(recordBatch1, Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");                        
             RecordBatch recordBatch2 = Arrow.ReadArrow(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
             DataFrame df2 = DataFrame.FromArrowRecordBatch(recordBatch2);
-
             Databank db2 = new Databank(null);
-
             long rows = df2.Rows.Count;
             long cols = df2.Columns.Count;
-
-            for (int j = 1; j < cols; j++)
-            {
-                DataFrameColumn column = df2.Columns[j];
-                string name = column.Name;
-
-            }
-
+            //for (int j = 1; j < cols; j++)
+            //{
+            //    DataFrameColumn column = df2.Columns[j];
+            //    string name = column.Name;
+            //}
             Assert.AreEqual((double)df1.Columns["AAA"][3], 0.169202d, sharedDelta);
             Assert.AreEqual((double)df2.Columns["AAA"][3], 0.169202d, sharedDelta);
-
-
         }
 
 
@@ -18313,7 +18329,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _Test__Rebase()
+        public void _Test_Rebase()
         {            
             I("RESET;");
             I("TIME 2010 2012;");
@@ -18730,7 +18746,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void _Test__Timefilter()
+        public void _Test_Timefilter()
         {
             //
             // Testing TIMEFILTER, implicit a little bit of PRT testing too
@@ -22300,7 +22316,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Meta()
+        public void _Test_Meta()
         {
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
