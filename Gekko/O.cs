@@ -9756,7 +9756,11 @@ namespace Gekko
                 int count = 0;
                 
                 for (int i = 0; i < listItems.Count; i++)
-                {                           
+                {
+                    //#098098q3453
+                    //maybe this.opt_bank should be <frombank=...> not <bank=...>
+                    //and we could have a <tobank=...>
+
                     string varnameWithBank = G.Chop_AddBank(listItems[i], this.opt_bank); //this.opt_bank can be null, no problem                 
 
                     IVariable iv = O.GetIVariableFromString(varnameWithBank, ECreatePossibilities.NoneReportError);
@@ -9824,23 +9828,21 @@ namespace Gekko
                     }
 
                     Series tsNew = null;
-                    if (opt_prefix != null)
+                    if (opt_prefix != null)  ////#098098q3453 or a tobank is set
                     {
                         tsNew = ts.DeepClone(null) as Series;
                         tsNew.name = opt_prefix + ts.name;
-                        if (ts.meta.parentDatabank == null)
-                        {
-                            G.Writeln2("*** ERROR: Internal error #8796357826435");
-                            throw new GekkoException();
-                        }
 
+                        Databank tobank = ts.meta.parentDatabank;
 
-                        if (ts.meta.parentDatabank.ContainsIVariable(tsNew.name))
+                        ///#098098q3453 use another...
+
+                        if (tobank.ContainsIVariable(tsNew.name))
                         {
-                            ts.meta.parentDatabank.RemoveIVariable(tsNew.name);
+                            tobank.RemoveIVariable(tsNew.name);
                             counter++;
                         }
-                        ts.meta.parentDatabank.AddIVariable(tsNew.name, tsNew);
+                        tobank.AddIVariable(tsNew.name, tsNew);
                     }
                     else tsNew = ts;
 

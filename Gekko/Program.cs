@@ -40632,7 +40632,7 @@ namespace Gekko
                 fileNameWithPathOriginal = fileNameWithPath;
                 
                 EAppend append = EAppend.No;
-                if (oPrt.opt_append != null)
+                if (oPrt != null && oPrt.opt_append != null)
                 {
                     if (G.Equal(oPrt.opt_append, "yes"))
                     {
