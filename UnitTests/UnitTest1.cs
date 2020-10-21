@@ -13513,10 +13513,12 @@ namespace UnitTests
             List<int> xxA = new List<int>() { 1, 2, 3, 4, 5 };
             List<double> xxB = new List<double>() { 1.1d, 2.1d, 3.1d, 4.1d, 5.1d };
             List<string> xxC = new List<string>() { "a", "b", "c", "d", "e" };
+            List<DateTime> xxD = new List<DateTime>() { new DateTime(2020, 10, 21), new DateTime(2020, 10, 22), new DateTime(2020, 10, 23), new DateTime(2020, 10, 24), new DateTime(2020, 10, 25) };
             RecordBatch rb1 = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64))
                         .Append("Column A", false, col => col.Int32(array => array.AppendRange(xxA)))
                         .Append("Column B", false, col => col.Double(array => array.AppendRange(xxB)))
                         .Append("Column C", false, col => col.String(array => array.AppendRange(xxC)))
+                       // .Append("Column D", false, col => col.Date64(array => array.AppendRange(xxD)))
                         .Build();
             if (File.Exists(fileName)) File.Delete(fileName); //just for extra safety that it is gone
             Arrow.WriteArrow(rb1, fileName);
@@ -13537,6 +13539,8 @@ namespace UnitTests
             Assert.AreEqual((string)df2.Columns["Column C"][2], "c");
             Assert.AreEqual((string)df2.Columns["Column C"][3], "d");
             Assert.AreEqual((string)df2.Columns["Column C"][4], "e");
+         //   Assert.AreEqual(((DateTime)df2.Columns["Column D"][0]).Year, 2020);
+            
         }
 
         [TestMethod]
