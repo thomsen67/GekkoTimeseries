@@ -13509,6 +13509,11 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Arrow2()
         {
+            //Note that date formats are not yes supported when a .NET dataframe wraps around an arrow.
+            //therefore we postpone the use of dates.
+            //We can use null for string and NaN for double, and they return with same values, nice!
+            //cf. https://github.com/dotnet/corefxlab/blob/master/src/Microsoft.Data.Analysis/DataFrame.Arrow.cs
+
             string fileName = Globals.ttPath2 + @"\regres\Databanks\test.arrow";
             List<int> xxA = new List<int>() { 1, 2, 3, 4, 5 };
             List<double> xxB = new List<double>() { 1.1d, 2.1d, 3.1d, 4.1d, 5.1d };
@@ -13518,12 +13523,47 @@ namespace UnitTests
                         .Append("Column A", false, col => col.Int32(array => array.AppendRange(xxA)))
                         .Append("Column B", false, col => col.Double(array => array.AppendRange(xxB)))
                         .Append("Column C", false, col => col.String(array => array.AppendRange(xxC)))
-                       // .Append("Column D", false, col => col.Date64(array => array.AppendRange(xxD)))
+                        //.Append("Column D", false, col => col.Date32(array => array.AppendRange(xxD)))
                         .Build();
-            if (File.Exists(fileName)) File.Delete(fileName); //just for extra safety that it is gone
+
+            DataFrame df1 = DataFrame.FromArrowRecordBatch(rb1);
+            Assert.AreEqual((int)df1.Columns["Column A"][0], 1);
+            Assert.AreEqual((int)df1.Columns["Column A"][1], 2);
+            Assert.AreEqual((int)df1.Columns["Column A"][2], 3);
+            Assert.AreEqual((int)df1.Columns["Column A"][3], 4);
+            Assert.AreEqual((int)df1.Columns["Column A"][4], 5);
+            Assert.AreEqual((double)df1.Columns["Column B"][0], 1.1d, sharedDelta);
+            Assert.AreEqual((double)df1.Columns["Column B"][1], 2.1d, sharedDelta);
+            Assert.AreEqual((double)df1.Columns["Column B"][2], 3.1d, sharedDelta);
+            Assert.AreEqual((double)df1.Columns["Column B"][3], 4.1d, sharedDelta);
+            //Assert.AreEqual((double)df1.Columns["Column B"][4], 5.1d, sharedDelta);
+            Assert.AreEqual((string)df1.Columns["Column C"][0], "a");
+            Assert.AreEqual((string)df1.Columns["Column C"][1], "b");
+            Assert.AreEqual((string)df1.Columns["Column C"][2], "c");
+            Assert.AreEqual((string)df1.Columns["Column C"][3], "d");
+            Assert.AreEqual((string)df1.Columns["Column C"][4], "e");
+
+            if (false)
+            {
+                foreach (DataFrameColumn dfc in df1.Columns)
+                {
+                    for (int i = 0; i < dfc.Length; i++)
+                    {
+                        G.Write(dfc[i].ToString() + " ");
+                    }
+                    G.Writeln();
+                }
+            }
+            
             Arrow.WriteArrow(rb1, fileName);
-            RecordBatch rb2 = Arrow.ReadArrow(fileName);
+            
+            //Arrow.WriteArrow(df1.ToArrowRecordBatches(), fileName);  //does not work properly when file is read again
+                        
+            RecordBatch rb2 = Arrow.ReadArrow(fileName);            
             DataFrame df2 = DataFrame.FromArrowRecordBatch(rb2);
+
+            var xx = (double)df2.Columns["Column B"][4];
+
             Assert.AreEqual((int)df2.Columns["Column A"][0], 1);
             Assert.AreEqual((int)df2.Columns["Column A"][1], 2);
             Assert.AreEqual((int)df2.Columns["Column A"][2], 3);
@@ -13539,8 +13579,13 @@ namespace UnitTests
             Assert.AreEqual((string)df2.Columns["Column C"][2], "c");
             Assert.AreEqual((string)df2.Columns["Column C"][3], "d");
             Assert.AreEqual((string)df2.Columns["Column C"][4], "e");
-         //   Assert.AreEqual(((DateTime)df2.Columns["Column D"][0]).Year, 2020);
-            
+            //   Assert.AreEqual(((DateTime)df2.Columns["Column D"][0]).Year, 2020);
+
+            //var xx = df2.Columns["Column D"][0];
+
+            //IArrowArray col = rb2.Column("Column D");
+
+
         }
 
         [TestMethod]

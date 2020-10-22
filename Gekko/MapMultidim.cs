@@ -75,8 +75,7 @@ namespace Gekko
         {
             string first = null;
             foreach (string s in this.storage)
-            {
-                //first += "'" + s + "'" + ", ";
+            {                
                 first += s + ", ";
             }
             first = first.Substring(0, first.Length - ", ".Length);
@@ -102,7 +101,7 @@ namespace Gekko
         {
             //This will run fastest if the strings are interned (cf. string.Intern). But it seems they are so when getting deflated
             //from protobuf file anyway.
-            //Hmmm maybe not se important, since the strings will have mixed cases. Maybe in principle we should store all of them as
+            //Hmmm maybe not so important, since the strings will have mixed cases. Maybe in principle we should store all of them as
             //lower-case..... ??
 
             if (obj == null || obj.GetType() != typeof(MapMultidimItem)) return false;

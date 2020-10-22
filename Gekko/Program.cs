@@ -6057,7 +6057,7 @@ namespace Gekko
         //    gdx.gdxDataWriteStr(Indx, Values);
         //}
 
-        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -6408,7 +6408,7 @@ namespace Gekko
             }
         }
 
-        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
         {
             //TODO: try-catch if writing fails    
 
@@ -25460,11 +25460,11 @@ namespace Gekko
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     if (Program.options.gams_fast)
                     {
-                        WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list, writeOption, false);
+                        WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);
                     }
                     else
                     {
-                        WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list, writeOption, false);
+                        WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);
                     }
                     return 0;
                 }
