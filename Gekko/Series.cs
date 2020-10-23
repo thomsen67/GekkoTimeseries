@@ -357,29 +357,12 @@ namespace Gekko
             //========================================================================================================
 
             //Also see #345632473
-            if (dates == null) return;
-            if (this.freq == EFreq.A)
-            {
-                this.Truncate(dates.t1Annual, dates.t2Annual);
-            }
-            else if (this.freq == EFreq.Q)
-            {
-                this.Truncate(dates.t1Quarterly, dates.t2Quarterly);
-            }
-            else if (this.freq == EFreq.M)
-            {
-                this.Truncate(dates.t1Monthly, dates.t2Monthly);
-            }
-            else if (this.freq == EFreq.D)
-            {
-                this.Truncate(dates.t1Daily, dates.t2Daily);
-            }
-            else
-            {
-                G.Writeln2("***: Freq error");
-                throw new GekkoException();
-            }
-        }
+            if (dates == null) return;            
+            GekkoTime gt1 = GekkoTime.tNull;
+            GekkoTime gt2 = GekkoTime.tNull;
+            G.PickFromAllFreqs(dates, this.freq, out gt1, out gt2);
+            this.Truncate(gt1, gt2);
+        }        
 
         /// <summary>
         /// Truncates the Series object, so that the starting period

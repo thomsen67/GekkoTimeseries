@@ -25308,7 +25308,7 @@ namespace Gekko
             try
             {
                 
-                if (writeAllVariables) Program.options.interface_alias = false;
+                if (writeAllVariables) Program.options.interface_alias = false;  //is remembered above and reverted
 
                 if (writeType == EWriteType.R)
                 {
@@ -25389,14 +25389,13 @@ namespace Gekko
 
                 if (tStart.IsNull() && tEnd.IsNull())
                 {
-                    if (isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes"))
+                    if (isRecordsFormat)
                     {
                         //Do nothing, skip this, we do not need to know the timespan of the bank
-                        //Not done for GBK or TSD, would just waste time. For these formats, a null period
-                        //is handled ok    
                     }
                     else
                     {
+                        //will find that largest timespan of the databank series
                         GetDatabankPeriodFilteredForFreq(listFilteredForCurrentFreq, ref tStart, ref tEnd);
                     }
                 }
@@ -25481,8 +25480,23 @@ namespace Gekko
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     string file = AddExtension(fileName, "." + "arrow");
-                    string pathAndFilename = CreateFullPathAndFileName(file);                    
-                    Arrow.WriteArrowDatabank(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);                    
+                    string pathAndFilename = CreateFullPathAndFileName(file);
+                    try
+                    {
+                        Arrow.WriteArrowDatabank(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);
+                    }
+                    catch (Exception e)
+                    {
+                        if (e.Message.Contains("System.OutOfMemoryException"))
+                        {
+                            G.Writeln2("Arrow writing ran out of memory. At the moment, the Arrow implementation", Color.Red);
+                            G.Writeln("in Gekko is not very fast or memory-efficient, but more of a proof of concept.", Color.Red);
+                            G.Writeln("In the longer run, we expect the Arrow interface to run very fast and efficiently", Color.Red);
+                            G.Writeln("in Gekko, since speed and efficiency are fundamental to the Arrow project.", Color.Red);
+                            G.Writeln();
+                            throw;
+                        }
+                    }
                     return 0;
                 }
                 else if (isRecordsFormat)

@@ -349,6 +349,40 @@ namespace Gekko
             return allFreqsHelper;
         }
 
+        public static void PickFromAllFreqs(AllFreqsHelper dates, EFreq freqHere, out GekkoTime gt1, out GekkoTime gt2)
+        {
+            if (freqHere == EFreq.A)
+            {
+                gt1 = dates.t1Annual;
+                gt2 = dates.t2Annual;
+            }
+            else if (freqHere == EFreq.Q)
+            {
+                gt1 = dates.t1Quarterly;
+                gt2 = dates.t2Quarterly;
+            }
+            else if (freqHere == EFreq.M)
+            {
+                gt1 = dates.t1Monthly;
+                gt2 = dates.t2Monthly;
+            }
+            else if (freqHere == EFreq.D)
+            {
+                gt1 = dates.t1Daily;
+                gt2 = dates.t2Daily;
+            }
+            else if (freqHere == EFreq.U)
+            {
+                gt1 = dates.t1Undated;
+                gt2 = dates.t2Undated;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Freq error");
+                throw new GekkoException();
+            }
+        }
+
         public static string AddFreq(string varname, string freq, EVariableType type, O.ELookupType isLeftSideVariable)
         {
             //freq is added for all no-sigil rhs
