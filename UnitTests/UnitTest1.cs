@@ -13646,8 +13646,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Arrow3()
-        {
-            Globals.unitTestScreenOutput.Clear();
+        {            
             I("reset; time 2021 2023;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
             I("xa = 1, 2, 3;");
@@ -13655,6 +13654,10 @@ namespace UnitTests
             I("x1a[i] = 2, 3, 4;");
             I("x1a[j] = 4, 5, 6;");
             I("write <arrow> test1.arrow;");
+
+            //====== trying out R ===============================
+
+            Globals.unitTestScreenOutput.Clear();
             //will need install.packages("arrow")
             string s = @"
 library(arrow)
@@ -13677,6 +13680,33 @@ print(df)
             Assert.IsTrue(output.Contains("8   xa    a    0 <NA> 2022     2"));
             Assert.IsTrue(output.Contains("9   xa    a    0 <NA> 2023     3"));
 
+            //====== trying out Python ===============================
+
+            Globals.unitTestScreenOutput.Clear();
+
+            //will need pip install pyarrow
+
+            s = @"
+import pandas as pd
+df = pd.read_feather(('" + Globals.ttPath2.Replace("\\", "\\\\") + @"\\regres\\Databanks\\test1.arrow'))
+print(df)
+";
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.py", s);
+            I("python_run test1.py;");
+            output = Globals.unitTestScreenOutput.ToString();
+            //could be a more precise test regarding R, but never mind
+
+            Assert.IsTrue(output.Contains("  name freq  dims  dim1  per1  value"));
+            Assert.IsTrue(output.Contains("0  x1a    a     1     i  2021    2.0"));
+            Assert.IsTrue(output.Contains("1  x1a    a     1     i  2022    3.0"));
+            Assert.IsTrue(output.Contains("2  x1a    a     1     i  2023    4.0"));
+            Assert.IsTrue(output.Contains("3  x1a    a     1     j  2021    4.0"));
+            Assert.IsTrue(output.Contains("4  x1a    a     1     j  2022    5.0"));
+            Assert.IsTrue(output.Contains("5  x1a    a     1     j  2023    6.0"));
+            Assert.IsTrue(output.Contains("6   xa    a     0  None  2021    1.0"));
+            Assert.IsTrue(output.Contains("7   xa    a     0  None  2022    2.0"));
+            Assert.IsTrue(output.Contains("8   xa    a     0  None  2023    3.0"));
+            
         }
 
         [TestMethod]
