@@ -567,7 +567,8 @@ namespace Gekko
         R,
         Gcm,
         Tsp,
-        Python
+        Python,
+        Arrow
     }
 
     public enum EPrtCollapseTypes
@@ -25334,7 +25335,8 @@ namespace Gekko
                     }                    
                 }
 
-                bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes");
+                //??? why is EWriteType not used in line below and elsewhere???
+                bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes") || G.Equal(o.opt_arrow, "yes");
 
                 //TODO TODO TODO
                 //TODO TODO TODO
@@ -25468,6 +25470,21 @@ namespace Gekko
                     }
                     return 0;
                 }
+                else if (o.opt_arrow != null)
+                {
+                    //RECORDS
+                    ErrorIfMatrix(variablesType);
+                    if (fileName == null || fileName.Trim() == "")
+                    {
+                        G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<arrow>");
+                        throw new GekkoException();
+                    }
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    string file = AddExtension(fileName, "." + "arrow");
+                    string pathAndFilename = CreateFullPathAndFileName(file);                    
+                    Arrow.WriteArrowDatabank(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list);                    
+                    return 0;
+                }
                 else if (isRecordsFormat)
                 {
                     //RECORDS
@@ -25529,6 +25546,7 @@ namespace Gekko
             else if (G.Equal(o.opt_xlsx, "yes")) writeType = EWriteType.Xlsx;
             else if (G.Equal(o.opt_flat, "yes")) writeType = EWriteType.Flat;
             else if (G.Equal(o.opt_python, "yes")) writeType = EWriteType.Python;
+            else if (G.Equal(o.opt_arrow, "yes")) writeType = EWriteType.Arrow;
             return writeType;
         }
 

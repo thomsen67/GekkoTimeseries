@@ -487,7 +487,17 @@ namespace Gekko
         }
 
 
-
+        public static int FreqType(Series ts)
+        {
+            if (ts.freq == EFreq.A || ts.freq == EFreq.U) return 1;
+            else if (ts.freq == EFreq.M || ts.freq == EFreq.Q) return 2;
+            else if (ts.freq == EFreq.D) return 3;
+            else
+            {
+                G.Writeln2("*** ERROR: Internal error #726326283");
+                throw new GekkoException();
+            }
+        }
 
 
         // ===========================================================================================================================

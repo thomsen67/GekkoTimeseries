@@ -13505,88 +13505,7 @@ namespace UnitTests
             _AssertScalarString(First(), "%y5", "abo");
             _AssertScalarString(First(), "%y6", "aop");
         }
-
-        [TestMethod]
-        public void _Test_Arrow2()
-        {
-            //Note that date formats are not yes supported when a .NET dataframe wraps around an arrow.
-            //therefore we postpone the use of dates.
-            //We can use null for string and NaN for double, and they return with same values, nice!
-            //cf. https://github.com/dotnet/corefxlab/blob/master/src/Microsoft.Data.Analysis/DataFrame.Arrow.cs
-
-            string fileName = Globals.ttPath2 + @"\regres\Databanks\test.arrow";
-            List<int> xxA = new List<int>() { 1, 2, 3, 4, 5 };
-            List<double> xxB = new List<double>() { 1.1d, 2.1d, 3.1d, 4.1d, 5.1d };
-            List<string> xxC = new List<string>() { "a", "b", "c", "d", "e" };
-            List<DateTime> xxD = new List<DateTime>() { new DateTime(2020, 10, 21), new DateTime(2020, 10, 22), new DateTime(2020, 10, 23), new DateTime(2020, 10, 24), new DateTime(2020, 10, 25) };
-            RecordBatch rb1 = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64))
-                        .Append("Column A", false, col => col.Int32(array => array.AppendRange(xxA)))
-                        .Append("Column B", false, col => col.Double(array => array.AppendRange(xxB)))
-                        .Append("Column C", false, col => col.String(array => array.AppendRange(xxC)))
-                        //.Append("Column D", false, col => col.Date32(array => array.AppendRange(xxD)))
-                        .Build();
-
-            DataFrame df1 = DataFrame.FromArrowRecordBatch(rb1);
-            Assert.AreEqual((int)df1.Columns["Column A"][0], 1);
-            Assert.AreEqual((int)df1.Columns["Column A"][1], 2);
-            Assert.AreEqual((int)df1.Columns["Column A"][2], 3);
-            Assert.AreEqual((int)df1.Columns["Column A"][3], 4);
-            Assert.AreEqual((int)df1.Columns["Column A"][4], 5);
-            Assert.AreEqual((double)df1.Columns["Column B"][0], 1.1d, sharedDelta);
-            Assert.AreEqual((double)df1.Columns["Column B"][1], 2.1d, sharedDelta);
-            Assert.AreEqual((double)df1.Columns["Column B"][2], 3.1d, sharedDelta);
-            Assert.AreEqual((double)df1.Columns["Column B"][3], 4.1d, sharedDelta);
-            //Assert.AreEqual((double)df1.Columns["Column B"][4], 5.1d, sharedDelta);
-            Assert.AreEqual((string)df1.Columns["Column C"][0], "a");
-            Assert.AreEqual((string)df1.Columns["Column C"][1], "b");
-            Assert.AreEqual((string)df1.Columns["Column C"][2], "c");
-            Assert.AreEqual((string)df1.Columns["Column C"][3], "d");
-            Assert.AreEqual((string)df1.Columns["Column C"][4], "e");
-
-            if (false)
-            {
-                foreach (DataFrameColumn dfc in df1.Columns)
-                {
-                    for (int i = 0; i < dfc.Length; i++)
-                    {
-                        G.Write(dfc[i].ToString() + " ");
-                    }
-                    G.Writeln();
-                }
-            }
-            
-            Arrow.WriteArrow(rb1, fileName);
-            
-            //Arrow.WriteArrow(df1.ToArrowRecordBatches(), fileName);  //does not work properly when file is read again
-                        
-            RecordBatch rb2 = Arrow.ReadArrow(fileName);            
-            DataFrame df2 = DataFrame.FromArrowRecordBatch(rb2);
-
-            var xx = (double)df2.Columns["Column B"][4];
-
-            Assert.AreEqual((int)df2.Columns["Column A"][0], 1);
-            Assert.AreEqual((int)df2.Columns["Column A"][1], 2);
-            Assert.AreEqual((int)df2.Columns["Column A"][2], 3);
-            Assert.AreEqual((int)df2.Columns["Column A"][3], 4);
-            Assert.AreEqual((int)df2.Columns["Column A"][4], 5);
-            Assert.AreEqual((double)df2.Columns["Column B"][0], 1.1d, sharedDelta);
-            Assert.AreEqual((double)df2.Columns["Column B"][1], 2.1d, sharedDelta);
-            Assert.AreEqual((double)df2.Columns["Column B"][2], 3.1d, sharedDelta);
-            Assert.AreEqual((double)df2.Columns["Column B"][3], 4.1d, sharedDelta);
-            Assert.AreEqual((double)df2.Columns["Column B"][4], 5.1d, sharedDelta);
-            Assert.AreEqual((string)df2.Columns["Column C"][0], "a");
-            Assert.AreEqual((string)df2.Columns["Column C"][1], "b");
-            Assert.AreEqual((string)df2.Columns["Column C"][2], "c");
-            Assert.AreEqual((string)df2.Columns["Column C"][3], "d");
-            Assert.AreEqual((string)df2.Columns["Column C"][4], "e");
-            //   Assert.AreEqual(((DateTime)df2.Columns["Column D"][0]).Year, 2020);
-
-            //var xx = df2.Columns["Column D"][0];
-
-            //IArrowArray col = rb2.Column("Column D");
-
-
-        }
+        
 
         [TestMethod]
         public void _Test_Arrow1()
@@ -13647,6 +13566,118 @@ namespace UnitTests
             Assert.AreEqual((double)df2.Columns["AAA"][3], 0.169202d, sharedDelta);
         }
 
+        [TestMethod]
+        public void _Test_Arrow2()
+        {
+
+            string fileName = Globals.ttPath2 + @"\regres\Databanks\test.arrow";
+            List<int> xxA = new List<int>() { 1, 2, 3, 4, 5 };
+            List<double> xxB = new List<double>() { 1.1d, 2.1d, 3.1d, 4.1d, 5.1d };
+            List<string> xxC = new List<string>() { "a", "b", "c", "d", "e" };
+            List<DateTime> xxD = new List<DateTime>() { new DateTime(2020, 10, 21), new DateTime(2020, 10, 22), new DateTime(2020, 10, 23), new DateTime(2020, 10, 24), new DateTime(2020, 10, 25) };
+            RecordBatch rb1 = new RecordBatch.Builder(new NativeMemoryAllocator(alignment: 64))
+                        .Append("Column A", false, col => col.Int32(array => array.AppendRange(xxA)))
+                        .Append("Column B", false, col => col.Double(array => array.AppendRange(xxB)))
+                        .Append("Column C", false, col => col.String(array => array.AppendRange(xxC)))
+                        //.Append("Column D", false, col => col.Date32(array => array.AppendRange(xxD)))
+                        .Build();
+
+            DataFrame df1 = DataFrame.FromArrowRecordBatch(rb1);
+            Assert.AreEqual((int)df1.Columns["Column A"][0], 1);
+            Assert.AreEqual((int)df1.Columns["Column A"][1], 2);
+            Assert.AreEqual((int)df1.Columns["Column A"][2], 3);
+            Assert.AreEqual((int)df1.Columns["Column A"][3], 4);
+            Assert.AreEqual((int)df1.Columns["Column A"][4], 5);
+            Assert.AreEqual((double)df1.Columns["Column B"][0], 1.1d, sharedDelta);
+            Assert.AreEqual((double)df1.Columns["Column B"][1], 2.1d, sharedDelta);
+            Assert.AreEqual((double)df1.Columns["Column B"][2], 3.1d, sharedDelta);
+            Assert.AreEqual((double)df1.Columns["Column B"][3], 4.1d, sharedDelta);
+            //Assert.AreEqual((double)df1.Columns["Column B"][4], 5.1d, sharedDelta);
+            Assert.AreEqual((string)df1.Columns["Column C"][0], "a");
+            Assert.AreEqual((string)df1.Columns["Column C"][1], "b");
+            Assert.AreEqual((string)df1.Columns["Column C"][2], "c");
+            Assert.AreEqual((string)df1.Columns["Column C"][3], "d");
+            Assert.AreEqual((string)df1.Columns["Column C"][4], "e");
+
+            if (false)
+            {
+                foreach (DataFrameColumn dfc in df1.Columns)
+                {
+                    for (int i = 0; i < dfc.Length; i++)
+                    {
+                        G.Write(dfc[i].ToString() + " ");
+                    }
+                    G.Writeln();
+                }
+            }
+
+            Arrow.WriteArrow(rb1, fileName);
+
+            //Arrow.WriteArrow(df1.ToArrowRecordBatches(), fileName);  //does not work properly when file is read again
+
+            RecordBatch rb2 = Arrow.ReadArrow(fileName);
+            DataFrame df2 = DataFrame.FromArrowRecordBatch(rb2);
+
+            var xx = (double)df2.Columns["Column B"][4];
+
+            Assert.AreEqual((int)df2.Columns["Column A"][0], 1);
+            Assert.AreEqual((int)df2.Columns["Column A"][1], 2);
+            Assert.AreEqual((int)df2.Columns["Column A"][2], 3);
+            Assert.AreEqual((int)df2.Columns["Column A"][3], 4);
+            Assert.AreEqual((int)df2.Columns["Column A"][4], 5);
+            Assert.AreEqual((double)df2.Columns["Column B"][0], 1.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][1], 2.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][2], 3.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][3], 4.1d, sharedDelta);
+            Assert.AreEqual((double)df2.Columns["Column B"][4], 5.1d, sharedDelta);
+            Assert.AreEqual((string)df2.Columns["Column C"][0], "a");
+            Assert.AreEqual((string)df2.Columns["Column C"][1], "b");
+            Assert.AreEqual((string)df2.Columns["Column C"][2], "c");
+            Assert.AreEqual((string)df2.Columns["Column C"][3], "d");
+            Assert.AreEqual((string)df2.Columns["Column C"][4], "e");
+            //   Assert.AreEqual(((DateTime)df2.Columns["Column D"][0]).Year, 2020);
+
+            //var xx = df2.Columns["Column D"][0];
+
+            //IArrowArray col = rb2.Column("Column D");
+
+
+        }
+
+        [TestMethod]
+        public void _Test_Arrow3()
+        {
+            Globals.unitTestScreenOutput.Clear();
+            I("reset; time 2021 2023;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\databanks';");
+            I("xa = 1, 2, 3;");
+            I("series x1a = series(1);");
+            I("x1a[i] = 2, 3, 4;");
+            I("x1a[j] = 4, 5, 6;");
+            I("write <arrow> test1.arrow;");
+            //will need install.packages("arrow")
+            string s = @"
+library(arrow)
+df <- read_feather("""+ Globals.ttPath2.Replace("\\", "\\\\") + @"\\regres\\Databanks\\test1.arrow"")
+print(df)
+";
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.r", s);            
+            I("r_run test1.r;");
+            string output = Globals.unitTestScreenOutput.ToString();
+            //could be a more precise test regarding R, but never mind
+
+            Assert.IsTrue(output.Contains("  name freq dims dim1 per1 value"));
+            Assert.IsTrue(output.Contains("1  x1a    a    1    i 2021     2"));
+            Assert.IsTrue(output.Contains("2  x1a    a    1    i 2022     3"));
+            Assert.IsTrue(output.Contains("3  x1a    a    1    i 2023     4"));
+            Assert.IsTrue(output.Contains("4  x1a    a    1    j 2021     4"));
+            Assert.IsTrue(output.Contains("5  x1a    a    1    j 2022     5"));
+            Assert.IsTrue(output.Contains("6  x1a    a    1    j 2023     6"));
+            Assert.IsTrue(output.Contains("7   xa    a    0 <NA> 2021     1"));
+            Assert.IsTrue(output.Contains("8   xa    a    0 <NA> 2022     2"));
+            Assert.IsTrue(output.Contains("9   xa    a    0 <NA> 2023     3"));
+
+        }
 
         [TestMethod]
         public void _Test_FunctionsInBuilt()
