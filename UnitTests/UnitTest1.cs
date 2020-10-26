@@ -13680,11 +13680,17 @@ namespace UnitTests
             //====== trying out R ===============================
 
             Globals.unitTestScreenOutput.Clear();
-            //will need install.packages("arrow")
+            //will need install.packages("arrow"), you can use View() to view dataframes
             string s = @"
 library(arrow)
-df <- read_feather("""+ Globals.ttPath2.Replace("\\", "\\\\") + @"\\regres\\Databanks\\test1.arrow"")
-print(df)
+library(dplyr)
+df1 <- read_feather(""" + Globals.ttPath2.Replace("\\", "\\\\") + @"\\regres\\Databanks\\test1.arrow"")
+print(df1)
+df2 <- select(filter(df1, name == ""x"", freq == ""a""), c(name, freq, per1, value))
+print(df2)
+df3 <- select(filter(df, dims == 0), c(name, freq, per1, per2, per3, value))
+print(df3)
+
 ";
             File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.r", s);            
             I("r_run test1.r;");
@@ -13747,8 +13753,10 @@ print(df)
 
             s = @"
 import pandas as pd
-df = pd.read_feather(('" + Globals.ttPath2.Replace("\\", "\\\\") + @"\\regres\\Databanks\\test1.arrow'))
-print(df)
+df1 = pd.read_feather('" + Globals.ttPath2.Replace("\\", "\\\\") + @"\\regres\\Databanks\\test1.arrow')
+print(df1)
+df2 = df1.loc[df1['dims'] == 0][['name', 'freq', 'per1', 'value']]
+print(df2)
 ";
             File.WriteAllText(@"c:\Thomas\Gekko\regres\Databanks\test1.py", s);
             I("python_run test1.py;");
