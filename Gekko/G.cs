@@ -3296,6 +3296,7 @@ namespace Gekko
             {
                 color = Color.Red;
                 Globals.numberOfErrors++;
+                if (Globals.excelDna && Globals.excelDnaStorage == null) Globals.excelDnaStorage = new StringBuilder();  //loaded, records everything from now on
             }
             else if (s.Trim().StartsWith("+++ WARNING"))
             {
@@ -3353,8 +3354,7 @@ namespace Gekko
 
         public static bool IsUnitTesting()  
         {
-            if (Globals.excelDna) return true;
-            //if (Globals.arrow) return true;
+            if (Globals.excelDna) return true;            
             if ((Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32_40.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe"))) return true;
             else return false;
         }
@@ -3522,14 +3522,28 @@ namespace Gekko
                 if (G.IsUnitTesting())
                 {
                     if (newline)
-                    {                        
-                        Globals.unitTestScreenOutput.AppendLine(s);
-                        System.Diagnostics.Debug.WriteLine(s);                        
+                    {
+                        if (Globals.excelDna)
+                        {
+                            if (Globals.excelDnaStorage != null) MessageBox.Show(s);
+                        }
+                        else
+                        {
+                            Globals.unitTestScreenOutput.AppendLine(s);
+                            System.Diagnostics.Debug.WriteLine(s);
+                        }
                     }
                     else
                     {
-                        Globals.unitTestScreenOutput.Append(s);                        
-                        System.Diagnostics.Debug.Write(s);
+                        if (Globals.excelDna)
+                        {
+                            if (Globals.excelDnaStorage != null) MessageBox.Show(s);
+                        }
+                        else
+                        {
+                            Globals.unitTestScreenOutput.Append(s);
+                            System.Diagnostics.Debug.Write(s);
+                        }
                     }
                 }
                 else

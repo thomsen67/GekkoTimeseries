@@ -1260,6 +1260,14 @@ namespace Gekko
                 Globals.linkContainer.Add(lc.counter, lc);
                 G.Write(" ("); G.WriteLink("more", "stacktrace:" + lc.counter); G.Write(")"); G.Writeln();
 
+                //if (Globals.excelDna)
+                //{
+                //    if (Globals.excelDnaStorage != null)
+                //    {
+                //        MessageBox.Show("Gekko failed with the following error: " + Globals.excelDnaStorage.ToString());
+                //    }
+                //}
+
             }
             Gui.gui.ThreadFinished();  //removes the job from the stack of jobs, otherwise we will wait for this halted job forever. Could use thread stop instead??
         }
@@ -1380,6 +1388,13 @@ namespace Gekko
         {
             SetGlobalTimePeriodAbstractNew(false, t1, t2);
         }
+
+        public static void PrepareExcelDna(string s)
+        {
+            Globals.excelDna = true;
+            //Globals.excelDnaStorage = null;
+            Globals.excelDnaPath = s;
+    }
 
         /// <summary>
         /// Creates a double[,] array to contain periodic (i.e. yearly/monthly) data.
@@ -3382,13 +3397,13 @@ namespace Gekko
                     try
                     {
                         DateTime dt3 = DateTime.Now;
-                        
-                        RuntimeTypeModel serializer = TypeModel.Create();                        
-                        
-                        deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;                        
-                        
+
+                        RuntimeTypeModel serializer = TypeModel.Create();
+
+                        deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
+
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
-                        {                            
+                        {
                             iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
                         }
                         readInfo.variables = deserializedDatabank.storage.Count;
@@ -3396,16 +3411,10 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        if (Globals.excelDna)
-                        {
-                            MessageBox.Show(e.Message);
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers)");
-                            G.Writeln("           Message: " + e.Message, Color.Red);
-                            G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
-                        }
+                        G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers)");
+                        G.Writeln("           Message: " + e.Message, Color.Red);
+                        G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
+
                         throw;
                     }
 
@@ -25898,7 +25907,7 @@ namespace Gekko
 
                 using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
                 {
-                    
+
                     try
                     {
                         RuntimeTypeModel serializer = TypeModel.Create();
@@ -25908,15 +25917,8 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        if (Globals.excelDna)
-                        {
-                            MessageBox.Show(e.Message);
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
-                            G.Writeln("           Message: " + e.Message, Color.Red);
-                        }
+                        G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                        G.Writeln("           Message: " + e.Message, Color.Red);
                         throw;
                     }
 
@@ -44116,11 +44118,9 @@ namespace Gekko
                 Program.options.print_filewidth = int.MaxValue;
                 try
                 {
-                    if (!Globals.excelDna)
-                    {
-                        List<string> ss = tab.Print();
-                        foreach (string s in ss) G.Writeln(s);
-                    }
+
+                    List<string> ss = tab.Print();
+                    foreach (string s in ss) G.Writeln(s);
 
                     if (this.modelName != null)
                     {

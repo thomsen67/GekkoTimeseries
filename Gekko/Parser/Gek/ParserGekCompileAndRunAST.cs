@@ -62,126 +62,10 @@ namespace Gekko.Parser.Gek
                 //code = code;  //just so it is easy to see here                                                
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
 
-                if (false)
-                {
+                Assembly assembly = compilerResults.CompiledAssembly;
+                Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
+                tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method                     
 
-                    //
-                    // ROSLYN
-                    //
-                    //using (var ms = new MemoryStream())
-                    //{
-                    //    string assemblyFileName = "gen" + Guid.NewGuid().ToString().Replace("-", "") + ".dll";
-
-                    //    CSharpCompilation compilation = CSharpCompilation.Create(assemblyFileName,
-                    //        new[] { CSharpSyntaxTree.ParseText(fooSource) },
-                    //        new[]
-                    //        {
-                    //    new MetadataFileReference(typeof (object).Assembly.Location)
-                    //        },
-                    //        new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    //        );
-
-                    //    compilation.Emit(ms);
-                    //    Assembly assembly = Assembly.Load(ms.GetBuffer());
-                    //    return assembly;
-                    //}
-
-                }
-                
-                //qwerty
-                if (false && Globals.excelDna)
-                {
-                    //Roslyn is basically better than Mono (who now uses Roslyn)
-                    //hint here??: https://www.codeproject.com/Questions/1030521/How-Can-I-Display-Range-In-Excel-Dna
-                    //here: https://gist.github.com/govert/1378887/834b2db68ad95107c2e665487b1bdacd5c6edac2
-                    //https://benohead.com/blog/2014/08/13/three-options-to-dynamically-execute-csharp-code/
-                    //https://gist.github.com/RickStrahl/f65727881668488b0a562df4c21ab560
-
-                    if (false)  //this works!
-                    {
-                        var provider = CodeDomProvider.CreateProvider("CSharp");
-                        var parms = new CompilerParameters();
-                        parms.ReferencedAssemblies.Add("System.dll");
-                        parms.ReferencedAssemblies.Add("System.Core.dll");
-                        parms.ReferencedAssemblies.Add("Microsoft.CSharp.dll");
-                        parms.GenerateInMemory = true;
-                        var classCode = @"
-                    using System;
-                    namespace MyApp
-                    {    
-                        public class Test1
-                        {                    
-                            public string HelloWorld(string name) 
-                            {
-                                 return @""Hello Thomas from Roslyn with CodeDomProvider."";
-                            }
-                        }
-                    }
-                    ";
-                        CompilerResults result = provider.CompileAssemblyFromSource(parms, classCode);
-                        if (result.Errors.Count > 0)
-                        {
-                            Console.WriteLine("*** Compilation Errors");
-                            foreach (var error in result.Errors)
-                            {
-                                Console.WriteLine("- " + error);
-                                return;
-                            }
-                        }
-                        var ass = result.CompiledAssembly;
-                        dynamic inst = ass.CreateInstance("MyApp.Test1");
-                        string methResult = inst.HelloWorld("Rick") as string;
-                        G.Writeln(methResult);
-                    }
-
-                    if (true)  //almost works
-                    {
-                        var provider = CodeDomProvider.CreateProvider("CSharp");
-                        var parms = new CompilerParameters();
-                        parms.ReferencedAssemblies.Add("System.dll");
-                        parms.ReferencedAssemblies.Add("System.Core.dll");
-                        parms.ReferencedAssemblies.Add("Microsoft.CSharp.dll");
-                        parms.ReferencedAssemblies.Add("system.windows.forms.dll");                        
-                        parms.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
-                        parms.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "gekko.exe"));                        
-                        parms.GenerateInMemory = true;
-                        var classCode = ch.code;
-                        classCode = classCode.Replace("public static void CodeLines(P p)", "public void CodeLines()");
-                        classCode = classCode.Replace("GekkoSmpl smpl = new GekkoSmpl();", "P p = new P(); GekkoSmpl smpl = new GekkoSmpl();");                        
-
-                        CompilerResults result = provider.CompileAssemblyFromSource(parms, classCode);
-                        if (result.Errors.Count > 0)
-                        {
-                            Console.WriteLine("*** Compilation Errors");
-                            foreach (var error in result.Errors)
-                            {
-                                Console.WriteLine("- " + error);
-                                return;
-                            }
-                        }
-                        var ass = result.CompiledAssembly;
-                        dynamic inst = ass.CreateInstance("Gekko.TranslatedCode");
-                        //string methResult = inst.HelloWorld("CodeLines") as string;                        
-                        inst.CodeLines();
-                        //Databank db = Program.databanks.GetFirst();
-                        //Series ts = db.GetIVariable("enl!a") as Series;
-                        //double d = ts.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1));
-                    }
-
-                    if (false)  //hmmm same error
-                    {
-                        Assembly assembly = compilerResults.CompiledAssembly;
-                        Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
-                        tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method    
-                    }
-
-                }
-                else
-                {
-                    Assembly assembly = compilerResults.CompiledAssembly;
-                    Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
-                    tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method                     
-                }
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN END");
             }
             catch (Exception e)
@@ -217,9 +101,7 @@ namespace Gekko.Parser.Gek
 
             if (Globals.excelDna)
             {
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
-                //compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "gekko.exe"));
-                //compilerParams.ReferencedAssemblies.Add(Path.Combine(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug", "gekko.exe"));
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));                
                 compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
             }
             else if (G.IsUnitTesting())

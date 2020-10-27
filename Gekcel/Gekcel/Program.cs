@@ -228,19 +228,13 @@ End Function";
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
         {
             double d = double.NaN;
-            try
-            {
-                Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
-                Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
-                Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-                Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
-                GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
-                d = ts.GetDataSimple(gt);                
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("*** Gekko error: " + e.Message + " " + e.InnerException);
-            }
+
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run                
+            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+            Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
+            GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
+            d = ts.GetDataSimple(gt);
+
             return d;
         }
 
@@ -252,8 +246,8 @@ End Function";
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, 
             [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
         {
-            Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
-            Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+            Program.PrepareExcelDna(Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run
+            
             if (true)
             {
                 //TT: hack because of path problem when writing
@@ -287,14 +281,7 @@ End Function";
             string tempTsdxPath = null;
             int NaNCounter = 0;
             Databank db = null;
-            try
-            {
-                db = Program.GetDatabankFromFile(null, oRead, info, gbkFile, gbkFile, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-            }
-            catch (Exception e)
-            {
-
-            }
+            db = Program.GetDatabankFromFile(null, oRead, info, gbkFile, gbkFile, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
             return db;
         }
 
