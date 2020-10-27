@@ -13697,53 +13697,11 @@ print(df3)
             string output = Globals.unitTestScreenOutput.ToString();
             //could be a more precise test regarding R, but never mind
 
-            Assert.IsTrue(output.Contains("   name freq dims dim1 dim2 per1 per2 per3 value"));
-            Assert.IsTrue(output.Contains("1     x    a    0 <NA> <NA> 2021    0    0     1"));
-            Assert.IsTrue(output.Contains("2     x    a    0 <NA> <NA> 2022    0    0     2"));
-            Assert.IsTrue(output.Contains("3     x    a    0 <NA> <NA> 2023    0    0     3"));
-            Assert.IsTrue(output.Contains("4     x    d    0 <NA> <NA> 2021    1    1     1"));
-            Assert.IsTrue(output.Contains("5     x    d    0 <NA> <NA> 2021    1    2     2"));
-            Assert.IsTrue(output.Contains("6     x    d    0 <NA> <NA> 2021    1    3     3"));
-            Assert.IsTrue(output.Contains("7     x    q    0 <NA> <NA> 2021    1    0     1"));
-            Assert.IsTrue(output.Contains("8     x    q    0 <NA> <NA> 2021    2    0     2"));
-            Assert.IsTrue(output.Contains("9     x    q    0 <NA> <NA> 2021    3    0     3"));
-            Assert.IsTrue(output.Contains("10   x1    a    1    i <NA> 2021    0    0     2"));
-            Assert.IsTrue(output.Contains("11   x1    a    1    i <NA> 2022    0    0     3"));
-            Assert.IsTrue(output.Contains("12   x1    a    1    i <NA> 2023    0    0     4"));
-            Assert.IsTrue(output.Contains("13   x1    a    1    j <NA> 2021    0    0     3"));
-            Assert.IsTrue(output.Contains("14   x1    a    1    j <NA> 2022    0    0     4"));
-            Assert.IsTrue(output.Contains("15   x1    a    1    j <NA> 2023    0    0     5"));
-            Assert.IsTrue(output.Contains("16   x1    d    1    i <NA> 2021    1    1     2"));
-            Assert.IsTrue(output.Contains("17   x1    d    1    i <NA> 2021    1    2     3"));
-            Assert.IsTrue(output.Contains("18   x1    d    1    i <NA> 2021    1    3     4"));
-            Assert.IsTrue(output.Contains("19   x1    d    1    j <NA> 2021    1    1     3"));
-            Assert.IsTrue(output.Contains("20   x1    d    1    j <NA> 2021    1    2     4"));
-            Assert.IsTrue(output.Contains("21   x1    d    1    j <NA> 2021    1    3     5"));
-            Assert.IsTrue(output.Contains("22   x1    q    1    i <NA> 2021    1    0     2"));
-            Assert.IsTrue(output.Contains("23   x1    q    1    i <NA> 2021    2    0     3"));
-            Assert.IsTrue(output.Contains("24   x1    q    1    i <NA> 2021    3    0     4"));
-            Assert.IsTrue(output.Contains("25   x1    q    1    j <NA> 2021    1    0     3"));
-            Assert.IsTrue(output.Contains("26   x1    q    1    j <NA> 2021    2    0     4"));
-            Assert.IsTrue(output.Contains("27   x1    q    1    j <NA> 2021    3    0     5"));
-            Assert.IsTrue(output.Contains("28   x2    a    2    x    y 2021    0    0     4"));
-            Assert.IsTrue(output.Contains("29   x2    a    2    x    y 2022    0    0     5"));
-            Assert.IsTrue(output.Contains("30   x2    a    2    x    y 2023    0    0     6"));
-            Assert.IsTrue(output.Contains("31   x2    a    2    x    z 2021    0    0     5"));
-            Assert.IsTrue(output.Contains("32   x2    a    2    x    z 2022    0    0     6"));
-            Assert.IsTrue(output.Contains("33   x2    a    2    x    z 2023    0    0     7"));
-            Assert.IsTrue(output.Contains("34   x2    d    2    x    y 2021    1    1     4"));
-            Assert.IsTrue(output.Contains("35   x2    d    2    x    y 2021    1    2     5"));
-            Assert.IsTrue(output.Contains("36   x2    d    2    x    y 2021    1    3     6"));
-            Assert.IsTrue(output.Contains("37   x2    d    2    x    z 2021    1    1     5"));
-            Assert.IsTrue(output.Contains("38   x2    d    2    x    z 2021    1    2     6"));
-            Assert.IsTrue(output.Contains("39   x2    d    2    x    z 2021    1    3     7"));
-            Assert.IsTrue(output.Contains("40   x2    q    2    x    y 2021    1    0     4"));
-            Assert.IsTrue(output.Contains("41   x2    q    2    x    y 2021    2    0     5"));
-            Assert.IsTrue(output.Contains("42   x2    q    2    x    y 2021    3    0     6"));
-            Assert.IsTrue(output.Contains("43   x2    q    2    x    z 2021    1    0     5"));
-            Assert.IsTrue(output.Contains("44   x2    q    2    x    z 2021    2    0     6"));
-            Assert.IsTrue(output.Contains("45   x2    q    2    x    z 2021    3    0     7"));
-
+            Assert.IsTrue(output.Contains("# A tibble: 45 x 9"));
+            Assert.IsTrue(output.Contains("   name  freq   dims dim1  dim2   per1  per2  per3 value"));
+            Assert.IsTrue(output.Contains("   <chr> <chr> <int> <chr> <chr> <int> <int> <int> <dbl>"));
+            Assert.IsTrue(output.Contains(" 1 x     a         0 <NA>  <NA>   2021     0     0     1"));
+            Assert.IsTrue(output.Contains(" 2 x     a         0 <NA>  <NA>   2022     0     0     2"));            
 
             //====== trying out Python ===============================
 
