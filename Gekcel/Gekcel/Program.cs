@@ -161,12 +161,8 @@ namespace Gekcel
             // -----------------------------------------------------
             codeText +=
             @"
-Public Sub Button1_Click()
-  MsgBox ""Hello1 from Gekko""
-End Sub
-
 Public Sub h(word)
-  MsgBox ""Hello2 from "" & word
+  MsgBox word
 End Sub
 
 Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
@@ -187,10 +183,11 @@ End Function";
             codeModule.InsertLines(lineNum, codeText);
             targetExcelFile.Save();  //saves file
 
-            //TT: Calling two of the VBA macros for testing            
-            string macro = string.Format("{0}!{1}.{2}", targetExcelFile.Name, newStandardModule.Name, "Button1_Click");
-            app.Run(macro);                        
-            app.Run("h", "Gekko");  //h("Gekko")
+            if (true)
+            {
+                //TT: Calling two of the VBA macros for testing                            
+                app.Run("h", "Gekko environment is set up and ready"); 
+            }
             
             //app.Quit();
 
@@ -230,12 +227,20 @@ End Function";
             [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq,
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
         {
-            Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
-            Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
-            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-            Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
-            GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
-            double d = ts.GetDataSimple(gt);
+            double d = double.NaN;
+            try
+            {
+                Globals.excelDna = true;  //so that it does not try to print on screen etc.                        
+                Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+                Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+                Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
+                GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
+                d = ts.GetDataSimple(gt);                
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("*** Gekko error: " + e.Message + " " + e.InnerException);
+            }
             return d;
         }
 
