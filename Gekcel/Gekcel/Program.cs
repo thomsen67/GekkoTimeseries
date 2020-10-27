@@ -66,7 +66,7 @@ namespace Gekcel
             {
                 Microsoft.Office.Interop.Excel.Range cells = (Microsoft.Office.Interop.Excel.Range)ws.Cells[2, 2];
                 cells.Value2 = 12345d;
-            }
+            }            
         }
 
         public void OnButtonPressed2(IRibbonControl control)
