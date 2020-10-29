@@ -228,13 +228,11 @@ End Function";
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
         {
             double d = double.NaN;
-
-            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run                
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run             
             Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
             Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
             GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
             d = ts.GetDataSimple(gt);
-
             return d;
         }
 

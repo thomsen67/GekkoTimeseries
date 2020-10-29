@@ -1393,8 +1393,8 @@ namespace Gekko
         {
             Globals.excelDna = true;
             //Globals.excelDnaStorage = null;
-            Globals.excelDnaPath = s;
-    }
+            Globals.excelDnaPath = s;            
+        }
 
         /// <summary>
         /// Creates a double[,] array to contain periodic (i.e. yearly/monthly) data.
