@@ -10595,6 +10595,54 @@ namespace Gekko
             }
         }
 
+        public static void MemTest()
+        {
+
+            if (true)
+            {
+                //with 32 bit around:                2.81 mio m chunks = 100 --> 281 mio 32 bits (4 bytes) --> 1.12 GB. 
+                //with 32 bit large-ram-aware about: 6.21 RamLargeAware                                    --> 2.48 GB
+                //with 64 bit it probably uses pagefile, got all the way up to around 40 mio chunks        --> 16 GB...
+                //     However, 64-bit got SLOW fast, so probably needs tuning regarding page file. 
+
+                int ii = 0;
+                //memory test to test 64-bit versions
+
+                int chunk = 100;
+
+                int i_report = 100000000 / 4 / chunk;  //100 MB
+
+                DateTime t = DateTime.Now;
+                LinkedList<List<int>> list = new LinkedList<List<int>>();
+                try
+                {
+                    for (int i = 0; i < int.MaxValue; i++)
+                    {
+
+                        List<int> temp = new List<int>(chunk);
+                        for (int i2 = i; i2 < chunk + i; i2++)
+                        {
+                            temp.Add(i);
+                        }
+
+                        list.AddLast(temp);
+                        if (i % i_report == 0)
+                        {
+                            G.Writeln("ii = " + i + ", GB = " + ((double)(chunk * 4) * (double)i / 1e9d) + " ----> sec = " + (DateTime.Now - t).TotalMilliseconds / 1000d);
+                            t = DateTime.Now;
+                        }
+                        ii = i;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    MessageBox.Show("ii = " + ii + ", chunk = " + chunk + ", " + Ex.Message + " " + Ex.InnerException);
+                    //Microsoft.VisualBasic.Devices.ComputerInfo CI = new ComputerInfo();
+                    //Console.WriteLine(CI.AvailablePhysicalMemory);
+                }
+            }
+        }
+
         private static string GetRCurrentVersionStringFromRegistry(RegistryKey rCoreKey)
         {
             return rCoreKey.GetValue("Current Version") as string;
@@ -15049,6 +15097,16 @@ namespace Gekko
                         //not intended for "normal" Gekko users.
                         Globals.printAST = true;
                         G.Writeln("AST tree will be printed...");
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == "testmem".Length)
+                {
+                    string sub = s2;
+                    if (G.Equal(sub, "testmem"))
+                    {
+                        Program.MemTest();
                         return "";  //no need for the parser to chew on this afterwards!
                     }
                 }
