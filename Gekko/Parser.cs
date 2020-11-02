@@ -1436,7 +1436,7 @@ namespace Gekko
                     codeGauss.AppendLine(@"" + "}}");  //namespace and class
 
                     CompilerParameters compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Globals.compilerOptions;
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
                     compilerParams.GenerateInMemory = true;
                     compilerParams.IncludeDebugInformation = false;
                     compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -1555,7 +1555,7 @@ namespace Gekko
 
                     CompilerParameters compilerParams = new CompilerParameters();
                     compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Globals.compilerOptions;
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
                     compilerParams.GenerateInMemory = true;
                     compilerParams.IncludeDebugInformation = false;
                     compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -1604,7 +1604,7 @@ namespace Gekko
 
                     CompilerParameters compilerParams = new CompilerParameters();
                     compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Globals.compilerOptions;
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
                     compilerParams.GenerateInMemory = true;
                     compilerParams.IncludeDebugInformation = false;
                     compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -1658,7 +1658,7 @@ namespace Gekko
 
                     CompilerParameters compilerParams = new CompilerParameters();
                     compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Globals.compilerOptions;
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
                     compilerParams.GenerateInMemory = true;
                     compilerParams.IncludeDebugInformation = false;
                     compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -1711,7 +1711,7 @@ namespace Gekko
 
                     CompilerParameters compilerParams = new CompilerParameters();
                     compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Globals.compilerOptions;
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
                     compilerParams.GenerateInMemory = true;
                     compilerParams.IncludeDebugInformation = false;
                     compilerParams.ReferencedAssemblies.Add("system.dll");

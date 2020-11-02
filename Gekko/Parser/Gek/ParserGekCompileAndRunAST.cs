@@ -90,7 +90,7 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RunCmd start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
             CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;  //has no effect it seems
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();  //has no effect it seems
             compilerParams.GenerateInMemory = false;  //cannot be set true, since the .gcm dll needs to refer to the user defined functions dll. But this should not be a problem.
             compilerParams.IncludeDebugInformation = false; //CHanged, maybe change back
             compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -101,14 +101,14 @@ namespace Gekko.Parser.Gek
 
             if (Globals.excelDna)
             {
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));                
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
             }
             else if (G.IsUnitTesting())
             {
                 //if running test cases, use this absolute path, this will never be run by users                
                 compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");                
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
             }
             else
             {
@@ -126,7 +126,7 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE START");
 
             cr = provider.CompileAssemblyFromSource(compilerParams, code);
-            
+
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE END");
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
@@ -136,8 +136,6 @@ namespace Gekko.Parser.Gek
             }
             return cr;
         }
-
-        
 
         private static void HandleRunErrors(P p, Exception e)
         {

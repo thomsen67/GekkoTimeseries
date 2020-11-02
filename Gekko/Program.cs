@@ -7990,6 +7990,13 @@ namespace Gekko
             }
         }
 
+        public static string GetCompilerOptions()
+        {
+            if (Globals.bitness == 32) return Globals.compilerOptions32;
+            else if (Globals.bitness == 64) return Globals.compilerOptions64;
+            else throw new GekkoException();
+        }
+
         private static void FindDiagonal(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> fb)
         {
             for (int i = 0; i < rowsIndexes.Count; i++)
@@ -14157,7 +14164,7 @@ namespace Gekko
             s2.Replace("`", Globals.QT);
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
             compilerParams.GenerateInMemory = true;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -14189,7 +14196,7 @@ namespace Gekko
             s2.Replace("`", Globals.QT);
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
             compilerParams.GenerateInMemory = true;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -14228,7 +14235,7 @@ namespace Gekko
             s2.Replace("`", Globals.QT);
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
             compilerParams.GenerateInMemory = false;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -14316,7 +14323,7 @@ namespace Gekko
             s2.Replace("`", Globals.QT);
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
             compilerParams.GenerateInMemory = false;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");

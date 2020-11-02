@@ -346,6 +346,45 @@ namespace Gekko
             Gui.gui.gekkoToolStripMenuItem.Checked = true;
 
             Program.StartPulse();  //regarding remote.gcm
+
+            if (false)
+            {
+                //with 32 bit around:                2.81 mio m chunks = 100 --> 281 mio 32 bits (4 bytes) --> 1.12 GB. 
+                //with 32 bit large-ram-aware about: 6.21 RamLargeAware                                    --> 2.48 GB
+                //with 64 bit it probably uses pagefile, got all the way up to around 40 mio chunks        --> 16 GB...
+                //     However, 64-bit got SLOW fast, so probably needs tuning regarding page file. 
+
+                int ii = 0;
+                //memory test to test 64-bit versions
+
+                int chunk = 100;
+
+                int i_with_32_bit_no_ram_aware = 2810000;
+
+                List<List<int>> list = new List<List<int>>();
+                try
+                {
+                    for (int i = 0; i < int.MaxValue; i++)
+                    {
+
+                        List<int> temp = new List<int>();
+                        for (int i2 = i; i2 < chunk + i; i2++)
+                        {
+                            temp.Add(i);
+                        }
+
+                        list.Add(temp);
+                        if (i % i_with_32_bit_no_ram_aware == 0) MessageBox.Show("ii = " + i);
+                        ii = i;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    MessageBox.Show("ii = " + ii + ", chunk = " + chunk + ", " + Ex.Message + " " + Ex.InnerException);
+                    //Microsoft.VisualBasic.Devices.ComputerInfo CI = new ComputerInfo();
+                    //Console.WriteLine(CI.AvailablePhysicalMemory);
+                }
+            }
         }
 
         private void StartupExeAndIniStuff()

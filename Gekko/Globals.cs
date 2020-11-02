@@ -698,8 +698,10 @@ namespace Gekko
         public static string ols1 = "OLS estimation";
         public static string ols2 = "Dep. variable = ";
 
+        public static int bitness = 64;  //32 or 64
         public static CompilerOptions co = new CompilerOptions();
-        public static string compilerOptions = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
+        public static string compilerOptions32 = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
+        public static string compilerOptions64 = "/optimize /platform:x64";  
 
         public static ArrayList alFunctions;
         public static CaseInsensitiveHashtable userFunctions;
