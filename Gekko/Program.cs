@@ -7992,9 +7992,8 @@ namespace Gekko
 
         public static string GetCompilerOptions()
         {
-            if (Globals.bitness == 32) return Globals.compilerOptions32;
-            else if (Globals.bitness == 64) return Globals.compilerOptions64;
-            else throw new GekkoException();
+            if (Environment.Is64BitProcess) return Globals.compilerOptions64;
+            else return Globals.compilerOptions32;
         }
 
         private static void FindDiagonal(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> fb)
@@ -10595,7 +10594,7 @@ namespace Gekko
             }
         }
 
-        public static void MemTest()
+        public static void TestMem()
         {
 
             if (true)
@@ -10604,6 +10603,8 @@ namespace Gekko
                 //with 32 bit large-ram-aware about: 6.21 RamLargeAware                                    --> 2.48 GB
                 //with 64 bit it probably uses pagefile, got all the way up to around 40 mio chunks        --> 16 GB...
                 //     However, 64-bit got SLOW fast, so probably needs tuning regarding page file. 
+
+                G.Writeln(Get64Bitness());
 
                 int ii = 0;
                 //memory test to test 64-bit versions
@@ -10628,19 +10629,37 @@ namespace Gekko
                         list.AddLast(temp);
                         if (i % i_report == 0)
                         {
-                            G.Writeln("ii = " + i + ", GB = " + ((double)(chunk * 4) * (double)i / 1e9d) + " ----> sec = " + (DateTime.Now - t).TotalMilliseconds / 1000d);
+                            G.Writeln("GB = " + (((double)(chunk * 4) * (double)i / 1e9d) + " ----> " + G.Seconds(t)));
                             t = DateTime.Now;
                         }
                         ii = i;
                     }
                 }
-                catch (Exception Ex)
+                catch (Exception e)
                 {
-                    MessageBox.Show("ii = " + ii + ", chunk = " + chunk + ", " + Ex.Message + " " + Ex.InnerException);
+                    if (Globals.threadIsInProcessOfAborting || Globals.applicationIsInProcessOfAborting)
+                    {
+                        G.Writeln2("+++ NOTE: Hard abort of memory test");
+                    }
+                    else
+                    {
+                        G.Writeln2("+++ NOTE: Memory test ran out of memory (not unexpected)");
+                    }
+                    //MessageBox.Show("ii = " + ii + ", chunk = " + chunk + ", " + Ex.Message + " " + Ex.InnerException);
                     //Microsoft.VisualBasic.Devices.ComputerInfo CI = new ComputerInfo();
                     //Console.WriteLine(CI.AvailablePhysicalMemory);
                 }
             }
+        }
+
+        public static string Get64Bitness()
+        {
+            string s = null;
+            if (Environment.Is64BitProcess) s = "64-bit process on ";
+            else s = "32-bit process on ";
+            if (Environment.Is64BitOperatingSystem) s += "64-bit operating system";
+            else s += "32-bit operating system";
+            return s;
         }
 
         private static string GetRCurrentVersionStringFromRegistry(RegistryKey rCoreKey)
@@ -15106,7 +15125,7 @@ namespace Gekko
                     string sub = s2;
                     if (G.Equal(sub, "testmem"))
                     {
-                        Program.MemTest();
+                        Program.TestMem();
                         return "";  //no need for the parser to chew on this afterwards!
                     }
                 }

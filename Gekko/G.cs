@@ -2506,7 +2506,7 @@ namespace Gekko
                 sb.AppendLine(" Excel version installed: Excel " + Program.GetExcelVersion(Program.eOfficeApp.eOfficeApp_Excel));                
 
                 try
-                {
+                {                    
                     if (false)
                     {
                         RegistryKey installed_versions = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP");
@@ -2525,10 +2525,12 @@ namespace Gekko
                         foreach (string ss in ss1) sb.AppendLine("   " + ss.Trim());
                         foreach (string ss in ss2) sb.AppendLine("   " + ss.Trim());
                     }
-                    
+
+                    sb.AppendLine(" Bitness: " + Program.Get64Bitness());
+
                     foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_ComputerSystem").Get())
                     {
-                        sb.AppendLine("Number of physical processors: " + item["NumberOfProcessors"]);
+                        sb.AppendLine(" Number of physical processors: " + item["NumberOfProcessors"]);
                     }
 
                     int coreCount = 0;
@@ -2536,7 +2538,7 @@ namespace Gekko
                     {
                         coreCount += int.Parse(item["NumberOfCores"].ToString());
                     }
-                    sb.AppendLine("Number of cores: " + coreCount);
+                    sb.AppendLine(" Number of cores: " + coreCount);
 
                 }
                 catch { };  //fail silently               
