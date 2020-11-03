@@ -10594,7 +10594,7 @@ namespace Gekko
             }
         }
 
-        public static void TestMem()
+        public static void TestRam(bool read)
         {
 
             if (true)
@@ -10610,8 +10610,10 @@ namespace Gekko
                 //memory test to test 64-bit versions
 
                 int chunk = 100;
-
                 int i_report = 100000000 / 4 / chunk;  //100 MB
+
+                //chunk = 3;
+                //i_report = 4;
 
                 DateTime t = DateTime.Now;
                 LinkedList<List<int>> list = new LinkedList<List<int>>();
@@ -10621,16 +10623,41 @@ namespace Gekko
                     {
 
                         List<int> temp = new List<int>(chunk);
-                        for (int i2 = i; i2 < chunk + i; i2++)
+                        for (int i2 = 0; i2 < chunk; i2++)
                         {
-                            temp.Add(i);
+                            temp.Add(i2);  //from 0...99
                         }
 
                         list.AddLast(temp);
                         if (i % i_report == 0)
                         {
-                            G.Writeln("GB = " + (((double)(chunk * 4) * (double)i / 1e9d) + " ----> " + G.Seconds(t)));
+                            double gb = (double)(chunk * 4) * (double)i / 1e9d;
+                            G.Writeln("GB = " + gb + " ----> write ram = " + G.Seconds(t));
                             t = DateTime.Now;
+
+                            if (read)
+                            {
+                                double d = 0d;
+                                //double d2 = 0d;
+
+                                foreach (List<int> temp2 in list)
+                                {
+                                    foreach (int temp3 in temp2)
+                                    {
+                                        d += (double)temp3;
+                                        //d2 += 1d;
+                                    }
+                                }
+                                //if 1 chunk runs from i1-i2 (inclusive), we get sum = (i2-i1+1)*(i1+i2)/2
+                                double check = (double)(i + 1) * (double)chunk * ((double)chunk - 1) / 2;
+
+                                G.Writeln("     Reading test: " + (d - check) + " == 0 ----> read ram = " + G.Seconds(t) + " ... per GB = " + Math.Round((DateTime.Now - t).TotalMilliseconds / 1000d / gb, 2));
+                                //G.Writeln("     Test   " + d2 + "   " + d2 * 4d / 1e9d);  //just a test that the GB are correctly calculated
+
+                                t = DateTime.Now;
+                            }
+
+
                         }
                         ii = i;
                     }
@@ -10639,11 +10666,11 @@ namespace Gekko
                 {
                     if (Globals.threadIsInProcessOfAborting || Globals.applicationIsInProcessOfAborting)
                     {
-                        G.Writeln2("+++ NOTE: Hard abort of memory test");
+                        MessageBox.Show("+++ NOTE: Hard abort of memory test");
                     }
                     else
                     {
-                        G.Writeln2("+++ NOTE: Memory test ran out of memory (not unexpected)");
+                        MessageBox.Show("+++ NOTE: Memory test ran out of memory (not unexpected)");
                     }
                     //MessageBox.Show("ii = " + ii + ", chunk = " + chunk + ", " + Ex.Message + " " + Ex.InnerException);
                     //Microsoft.VisualBasic.Devices.ComputerInfo CI = new ComputerInfo();
@@ -15120,12 +15147,22 @@ namespace Gekko
                     }
                 }
 
-                if (s2.Length == "testmem".Length)
+                if (s2.Length == "testram".Length)
                 {
                     string sub = s2;
-                    if (G.Equal(sub, "testmem"))
+                    if (G.Equal(sub, "testram"))
                     {
-                        Program.TestMem();
+                        Program.TestRam(false);
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
+                if (s2.Length == "testram2".Length)
+                {
+                    string sub = s2;
+                    if (G.Equal(sub, "testram2"))
+                    {
+                        Program.TestRam(true);
                         return "";  //no need for the parser to chew on this afterwards!
                     }
                 }
