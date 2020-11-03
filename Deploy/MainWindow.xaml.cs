@@ -14,9 +14,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.IO.Compression;
-//using System.IO.Compression.FileSystem;
 using System.Net;
-//using SevenZip;
+using System.Reflection;
+using System.Diagnostics;
+
 
 namespace Deploy
 {
@@ -75,34 +76,56 @@ namespace Deploy
             catch
             {
                 MessageBox.Show("*** ERROR: Copying 2 files failed");
-            }
+            }           
             
-            //string version = null;
-            //string[] ss = textBox2.Text.Split('.');
-            //int x1, x2, x3 = 0;
-            //if (ss.Length == 3 && int.TryParse(ss[0], out x1) && int.TryParse(ss[1], out x2) && int.TryParse(ss[2], out x3))
-            //{
-            //    version = x1 + "_" + x2 + "_" + x3;
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Version number illegal");
-            //    return;
-            //}
+        }
 
-            //WebRequest request = WebRequest.Create(@"http://www.t-t.dk/gekko/downloads/" + version);
-            //request.Method = WebRequestMethods.Ftp.MakeDirectory;
-            //request.Credentials = new NetworkCredential(user, pwd);
-            //using (var resp = (FtpWebResponse)request.GetResponse())
-            //{
-            //    //Console.WriteLine(resp.StatusCode);
-            //}
+        public void IsJit()
+        {
+            var HasDebuggableAttribute = false;
+            var IsJITOptimized = false;
+            var IsJITTrackingEnabled = false;
+            var BuildType = "";
+            var DebugOutput = "";
+            var ReflectedAssembly = Assembly.LoadFile(@"c:\Program Files (x86)\Gekko\Gekko.exe");
 
-            //using (WebClient client = new WebClient())
-            //{
-            //    client.Credentials = new NetworkCredential(user, pwd);
-            //    client.UploadFile(@"http://www.t-t.dk/gekko/downloads/" + version + "/InstallerForGekko.msi", "STOR", @"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi");
-            //}
+            //	var ReflectedAssembly = Assembly.LoadFile(@"path to the dll you are testing");
+            object[] attribs = ReflectedAssembly.GetCustomAttributes(typeof(DebuggableAttribute), false);
+
+            // If the 'DebuggableAttribute' is not found then it is definitely an OPTIMIZED build
+            if (attribs.Length > 0)
+            {
+                // Just because the 'DebuggableAttribute' is found doesn't necessarily mean
+                // it's a DEBUG build; we have to check the JIT Optimization flag
+                // i.e. it could have the "generate PDB" checked but have JIT Optimization enabled
+                DebuggableAttribute debuggableAttribute = attribs[0] as DebuggableAttribute;
+                if (debuggableAttribute != null)
+                {
+                    HasDebuggableAttribute = true;
+                    IsJITOptimized = !debuggableAttribute.IsJITOptimizerDisabled;
+
+                    // IsJITTrackingEnabled - Gets a value that indicates whether the runtime will track information during code generation for the debugger.
+                    IsJITTrackingEnabled = debuggableAttribute.IsJITTrackingEnabled;
+                    BuildType = debuggableAttribute.IsJITOptimizerDisabled ? "Debug" : "Release";
+
+                    // check for Debug Output "full" or "pdb-only"
+                    DebugOutput = (debuggableAttribute.DebuggingFlags &
+                                    DebuggableAttribute.DebuggingModes.Default) !=
+                                    DebuggableAttribute.DebuggingModes.None
+                                    ? "Full" : "pdb-only";
+                }
+            }
+            else
+            {
+                IsJITOptimized = true;
+                BuildType = "Release";
+            }
+
+            Console.WriteLine($"{nameof(HasDebuggableAttribute)}: {HasDebuggableAttribute}");
+            Console.WriteLine($"{nameof(IsJITOptimized)}: {IsJITOptimized}");
+            Console.WriteLine($"{nameof(IsJITTrackingEnabled)}: {IsJITTrackingEnabled}");
+            Console.WriteLine($"{nameof(BuildType)}: {BuildType}");
+            Console.WriteLine($"{nameof(DebugOutput)}: {DebugOutput}");
         }
 
         private string GetVersion()
