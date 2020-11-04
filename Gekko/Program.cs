@@ -10593,6 +10593,88 @@ namespace Gekko
                 return null;
             }
         }
+        
+        public static void GetVersionAndGekkoExeLocationFromAssembly()
+        {
+            try
+            {
+                string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                if (version.EndsWith(".0"))
+                {
+                    version = version.Substring(0, version.Length - 2);
+                }
+                Globals.gekkoVersion = version;
+                string path = Assembly.GetExecutingAssembly().Location; 
+                Globals.gekkoExePath = path;
+            }
+            catch (Exception e) { };
+        }
+
+
+        public static string IsJit()
+        {
+            var HasDebuggableAttribute = false;
+            var IsJITOptimized = false;
+            var IsJITTrackingEnabled = false;
+            var BuildType = "";
+            var DebugOutput = "";
+
+            Assembly ReflectedAssembly = null;
+
+            try
+            {
+                ReflectedAssembly = Assembly.LoadFile(Globals.gekkoExePath);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            //	var ReflectedAssembly = Assembly.LoadFile(@"path to the dll you are testing");
+            object[] attribs = ReflectedAssembly.GetCustomAttributes(typeof(DebuggableAttribute), false);
+
+            // If the 'DebuggableAttribute' is not found then it is definitely an OPTIMIZED build
+            if (attribs.Length > 0)
+            {
+                // Just because the 'DebuggableAttribute' is found doesn't necessarily mean
+                // it's a DEBUG build; we have to check the JIT Optimization flag
+                // i.e. it could have the "generate PDB" checked but have JIT Optimization enabled
+                DebuggableAttribute debuggableAttribute = attribs[0] as DebuggableAttribute;
+                if (debuggableAttribute != null)
+                {
+                    HasDebuggableAttribute = true;
+                    IsJITOptimized = !debuggableAttribute.IsJITOptimizerDisabled;
+
+                    // IsJITTrackingEnabled - Gets a value that indicates whether the runtime will track information during code generation for the debugger.
+                    IsJITTrackingEnabled = debuggableAttribute.IsJITTrackingEnabled;
+                    BuildType = debuggableAttribute.IsJITOptimizerDisabled ? "Debug" : "Release";
+
+                    // check for Debug Output "full" or "pdb-only"
+                    DebugOutput = (debuggableAttribute.DebuggingFlags &
+                                    DebuggableAttribute.DebuggingModes.Default) !=
+                                    DebuggableAttribute.DebuggingModes.None
+                                    ? "Full" : "pdb-only";
+                }
+            }
+            else
+            {
+                IsJITOptimized = true;
+                BuildType = "Release";
+            }
+
+            string s = null;
+
+            s += G.NL;
+            s += "----- ONLY ON TT COMPUTER -----------------" + G.NL;
+            s += $"{nameof(HasDebuggableAttribute)}: {HasDebuggableAttribute}" + " (TT: should be false)" + G.NL;
+            s += $"{nameof(IsJITOptimized)}: {IsJITOptimized}" + " (TT: should be true)" + G.NL;
+            s += $"{nameof(IsJITTrackingEnabled)}: {IsJITTrackingEnabled}" + " (TT: should be false)" + G.NL;
+            s += $"{nameof(BuildType)}: {BuildType}" + " (TT: should be release)" + G.NL;
+            s += $"{nameof(DebugOutput)}: {DebugOutput}" + G.NL;
+            s += "-------------------------------------------" + G.NL;            
+
+            return s;
+        }
 
         public static void TestRam(bool read)
         {

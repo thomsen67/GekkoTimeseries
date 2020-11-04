@@ -557,6 +557,7 @@ namespace Gekko
         public static int solveNewtonSimpleBacktrack = 1;
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
 
+        public static string gekkoExePath = "";  //probably strange when unit testing or calling Gekcel
         public static string gekkoVersion = "";        
 
         public static bool useDfsane = false;        

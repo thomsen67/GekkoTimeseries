@@ -80,54 +80,6 @@ namespace Deploy
             
         }
 
-        public void IsJit()
-        {
-            var HasDebuggableAttribute = false;
-            var IsJITOptimized = false;
-            var IsJITTrackingEnabled = false;
-            var BuildType = "";
-            var DebugOutput = "";
-            var ReflectedAssembly = Assembly.LoadFile(@"c:\Program Files (x86)\Gekko\Gekko.exe");
-
-            //	var ReflectedAssembly = Assembly.LoadFile(@"path to the dll you are testing");
-            object[] attribs = ReflectedAssembly.GetCustomAttributes(typeof(DebuggableAttribute), false);
-
-            // If the 'DebuggableAttribute' is not found then it is definitely an OPTIMIZED build
-            if (attribs.Length > 0)
-            {
-                // Just because the 'DebuggableAttribute' is found doesn't necessarily mean
-                // it's a DEBUG build; we have to check the JIT Optimization flag
-                // i.e. it could have the "generate PDB" checked but have JIT Optimization enabled
-                DebuggableAttribute debuggableAttribute = attribs[0] as DebuggableAttribute;
-                if (debuggableAttribute != null)
-                {
-                    HasDebuggableAttribute = true;
-                    IsJITOptimized = !debuggableAttribute.IsJITOptimizerDisabled;
-
-                    // IsJITTrackingEnabled - Gets a value that indicates whether the runtime will track information during code generation for the debugger.
-                    IsJITTrackingEnabled = debuggableAttribute.IsJITTrackingEnabled;
-                    BuildType = debuggableAttribute.IsJITOptimizerDisabled ? "Debug" : "Release";
-
-                    // check for Debug Output "full" or "pdb-only"
-                    DebugOutput = (debuggableAttribute.DebuggingFlags &
-                                    DebuggableAttribute.DebuggingModes.Default) !=
-                                    DebuggableAttribute.DebuggingModes.None
-                                    ? "Full" : "pdb-only";
-                }
-            }
-            else
-            {
-                IsJITOptimized = true;
-                BuildType = "Release";
-            }
-
-            Console.WriteLine($"{nameof(HasDebuggableAttribute)}: {HasDebuggableAttribute}");
-            Console.WriteLine($"{nameof(IsJITOptimized)}: {IsJITOptimized}");
-            Console.WriteLine($"{nameof(IsJITTrackingEnabled)}: {IsJITTrackingEnabled}");
-            Console.WriteLine($"{nameof(BuildType)}: {BuildType}");
-            Console.WriteLine($"{nameof(DebugOutput)}: {DebugOutput}");
-        }
-
         private string GetVersion()
         {
             string version = null;

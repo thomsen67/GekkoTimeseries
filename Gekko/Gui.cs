@@ -437,7 +437,7 @@ namespace Gekko
             if (track) MessageBox.Show("5");
             Program.CreateTempFilesFolder();
             if (track) MessageBox.Show("6");
-            GetVersionFromAssembly();  //goes into Globals.gekkoVersion
+            Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
             if (track) MessageBox.Show("7");
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             if (track) MessageBox.Show("8");
@@ -706,21 +706,6 @@ namespace Gekko
                 GC.WaitForPendingFinalizers();
             }
         }        
-
-        private static void GetVersionFromAssembly()
-        {
-            try
-            {
-                string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                if (version.EndsWith(".0"))
-                {
-                    version = version.Substring(0, version.Length - 2);
-                }
-                Globals.gekkoVersion = version;
-            }
-            catch (Exception e) { };
-        }
-
 
         /// <summary>
         /// Files of type temp*.emf/dat/gp in \gnuplot\tempfiles are deleted

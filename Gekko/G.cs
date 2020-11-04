@@ -2528,6 +2528,11 @@ namespace Gekko
 
                     sb.AppendLine(" Bitness: " + Program.Get64Bitness());
 
+                    if(Globals.runningOnTTComputer)
+                    {
+                        sb.AppendLine(Program.IsJit());
+                    }
+
                     foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_ComputerSystem").Get())
                     {
                         sb.AppendLine(" Number of physical processors: " + item["NumberOfProcessors"]);
