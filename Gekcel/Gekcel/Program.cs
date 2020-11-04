@@ -73,117 +73,8 @@ namespace Gekcel
 
         public void OnButtonPressed3(IRibbonControl control)
         {
-            //TT: Inserting and calling VB code via the Ribbon ("play" button)
-            //To do this, you must have this activated in Excel:
-            //-------------------------------------------------------------
-            //Go to Excel options
-            //Go to Trust Center
-            //Go to Trust Center Settings
-            //Goto Macro settings
-            //Check this: Trust access to the VBA object model
-            //-------------------------------------------------------------
-
-            //To recreate or alter demo.gbk, use the following .gcm code.
-            //
-            //    RESET;
-            //    TIME 2020 2043;
-            //    x1 = 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42;
-            //    x2 = 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82;
-            //    OPTION freq q; TIME 2020q1 2025q4;
-            //    x1 = 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142;
-            //    x2 = 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182;
-            //    OPTION freq m; TIME 2020m1 2021m12;
-            //    x1 = 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242;
-            //    x2 = 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282;
-            //    WRITE demo;
-                        
-            string demo = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\demo.gbk";
-            string demo_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
-
-            Program.options.folder_working = Path.GetDirectoryName(ExcelDnaUtil.XllPath); //so that Gekko will read/write to that location
-            //MessageBox.Show("demo: " + demo + "     demo_orig: " + demo_orig);
-
-            if (File.Exists(demo))
-            {
-                try
-                {
-                    File.Delete(demo);
-                }
-                catch
-                {
-                    MessageBox.Show("*** ERROR: Could not delete file: " + demo);
-                    throw new Exception();
-                }
-            }
-            File.Copy(demo_orig, demo);
-
-            //Next, handle the Gekcel.xlsm file, and inject VBA code into it.
-            Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;            
-            Worksheet ws = (Worksheet)app.ActiveSheet;
-            string excelFile = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\Gekcel.xlsm";                     
-            string excelFile_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\Gekcel_orig.xlsm";
-            if (File.Exists(excelFile))
-            {
-                try
-                {
-                    File.Delete(excelFile);
-                }
-                catch
-                {
-                    MessageBox.Show("*** ERROR: Could not delete file: " + excelFile);
-                    throw new Exception();
-                }
-            }
-            File.Copy(excelFile_orig, excelFile);
-
-            Workbook targetExcelFile = app.Workbooks.Open(excelFile);            
-            VBComponent newStandardModule = targetExcelFile.VBProject.VBComponents.Add(vbext_ComponentType.vbext_ct_StdModule);
-            CodeModule codeModule = newStandardModule.CodeModule;
-
-            string codeText = null;
-            int lineNum = codeModule.CountOfLines + 1;
-            // ---
-
-            //
-            // TT: The following code will be injected into an Excel sheet. It can just be formatted normally. Only exception is that
-            //     double quotes like " must be doubled: "".
-            //     Aligning at the left-most margin is intentional.
-            //
-            //     The functions starting with 'Gekko_' just mirror the methods in the class COMLibrary
-            //
-            // -----------------------------------------------------
-            codeText +=
-            @"
-Public Sub h(word)
-  MsgBox word
-End Sub
-
-Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
-  dim gekko as Object
-  set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_GetData2 = gekko.Gekko_GetData2(gbkFile, variableWithFreq, date2)
-End Function
-
-Public Function Gekko_SetData2(gbkFile As String, variableWithFreq As String, date2 As String, d As Double) As Double
-  dim gekko as Object
-  set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_SetData2 = gekko.Gekko_SetData2(gbkFile, variableWithFreq, date2, d)  
-End Function";
-
-            codeText += "\r\n";
-            // -----------------------------------------------------
-
-            codeModule.InsertLines(lineNum, codeText);
-            targetExcelFile.Save();  //saves file
-
-            if (true)
-            {                               
-                app.Run("h", "Gekko environment is set up and ready"); 
-            }
-            
-            //app.Quit();
-
-        }
+            InternalHelperMethods.Setup();
+        }        
     }
     
     [ComVisible(true)]
@@ -212,6 +103,14 @@ End Function";
 
     public static class ExcelFunctionCalls
     {
+        //TT: Type this in cell: =Gekko_Setup()
+        [ExcelFunction(Name = "Gekko_Setup", Description = "Sets up Gekko environment")]
+        public static double Gekko_Setup()
+        {
+            InternalHelperMethods.Setup();
+            return 1d;
+        }
+
         //TT: Type this in cell: =Gekko_GetData1("demo.gbk"; "x1!a"; "2020")
         [ExcelFunction(Name = "Gekko_GetData1", Description = "Gets a data value from a timeseries in a gbk databank file")]
         public static double Gekko_GetData1(
@@ -262,6 +161,120 @@ End Function";
 
     public static class InternalHelperMethods
     {
+        public static void Setup()
+        {
+            //TT: Inserting and calling VB code via the Ribbon ("play" button)
+            //To do this, you must have this activated in Excel:
+            //-------------------------------------------------------------
+            //Go to Excel options
+            //Go to Trust Center
+            //Go to Trust Center Settings
+            //Goto Macro settings
+            //Check this: Trust access to the VBA object model
+            //-------------------------------------------------------------
+
+            //To recreate or alter demo.gbk, use the following .gcm code.
+            //
+            //    RESET;
+            //    TIME 2020 2043;
+            //    x1 = 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42;
+            //    x2 = 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82;
+            //    OPTION freq q; TIME 2020q1 2025q4;
+            //    x1 = 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142;
+            //    x2 = 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182;
+            //    OPTION freq m; TIME 2020m1 2021m12;
+            //    x1 = 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242;
+            //    x2 = 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282;
+            //    WRITE demo;
+
+            MessageBox.Show("Hello");
+            string demo = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\demo.gbk";
+            string demo_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
+
+            Program.options.folder_working = Path.GetDirectoryName(ExcelDnaUtil.XllPath); //so that Gekko will read/write to that location
+            //MessageBox.Show("demo: " + demo + "     demo_orig: " + demo_orig);
+
+            if (File.Exists(demo))
+            {
+                try
+                {
+                    File.Delete(demo);
+                }
+                catch
+                {
+                    MessageBox.Show("*** ERROR: Could not delete file: " + demo);
+                    throw new Exception();
+                }
+            }
+            File.Copy(demo_orig, demo);
+
+            //Next, handle the Gekcel.xlsm file, and inject VBA code into it.
+            Microsoft.Office.Interop.Excel.Application app = (Microsoft.Office.Interop.Excel.Application)ExcelDnaUtil.Application;
+            Worksheet ws = (Worksheet)app.ActiveSheet;
+            string excelFile = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\Gekcel.xlsm";
+            string excelFile_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\Gekcel_orig.xlsm";
+            if (File.Exists(excelFile))
+            {
+                try
+                {
+                    File.Delete(excelFile);
+                }
+                catch
+                {
+                    MessageBox.Show("*** ERROR: Could not delete file: " + excelFile);
+                    throw new Exception();
+                }
+            }
+            File.Copy(excelFile_orig, excelFile);
+
+            Workbook targetExcelFile = app.Workbooks.Open(excelFile);
+            VBComponent newStandardModule = targetExcelFile.VBProject.VBComponents.Add(vbext_ComponentType.vbext_ct_StdModule);
+            CodeModule codeModule = newStandardModule.CodeModule;
+
+            string codeText = null;
+            int lineNum = codeModule.CountOfLines + 1;
+            // ---
+
+            //
+            // TT: The following code will be injected into an Excel sheet. It can just be formatted normally. Only exception is that
+            //     double quotes like " must be doubled: "".
+            //     Aligning at the left-most margin is intentional.
+            //
+            //     The functions starting with 'Gekko_' just mirror the methods in the class COMLibrary
+            //
+            // -----------------------------------------------------
+            codeText +=
+            @"
+Public Sub h(word)
+  MsgBox word
+End Sub
+
+Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
+  dim gekko as Object
+  set gekko = createobject(""Gekcel.COMLibrary"")
+  Gekko_GetData2 = gekko.Gekko_GetData2(gbkFile, variableWithFreq, date2)
+End Function
+
+Public Function Gekko_SetData2(gbkFile As String, variableWithFreq As String, date2 As String, d As Double) As Double
+  dim gekko as Object
+  set gekko = createobject(""Gekcel.COMLibrary"")
+  Gekko_SetData2 = gekko.Gekko_SetData2(gbkFile, variableWithFreq, date2, d)  
+End Function";
+
+            codeText += "\r\n";
+            // -----------------------------------------------------
+
+            codeModule.InsertLines(lineNum, codeText);
+            targetExcelFile.Save();  //saves file
+
+            if (true)
+            {
+                app.Run("h", "Gekko environment is set up and ready");
+            }
+
+            //app.Quit();
+        }
+
         //These helper methods are not shown in Excel
         public static Databank ReadGbkDatabankFromFile(string gbkFile)
         {
@@ -272,7 +285,7 @@ End Function";
             string tempTsdxPath = null;
             int NaNCounter = 0;
             Databank db = null;
-            MessageBox.Show("gbk: " + gbkFile);
+            //MessageBox.Show("gbk: " + gbkFile);
             db = Program.GetDatabankFromFile(null, oRead, info, gbkFile, gbkFile, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
             return db;
         }
