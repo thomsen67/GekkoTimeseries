@@ -1391,8 +1391,7 @@ namespace Gekko
 
         public static void PrepareExcelDna(string s)
         {
-            Globals.excelDna = true;
-            //Globals.excelDnaStorage = null;
+            Globals.excelDna = true;            
             Globals.excelDnaPath = s;            
         }
 
@@ -17117,7 +17116,7 @@ namespace Gekko
         public static string CreateFullPathAndFileName(string s)
         {
             return CreateFullPathAndFileNameFromFolder(s, null);
-        }
+        }        
 
         public static string CreateFullPathAndFileNameFromFolder(string file, string path)
         {

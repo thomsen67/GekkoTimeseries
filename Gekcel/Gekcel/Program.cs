@@ -13,18 +13,7 @@ using Extensibility;
 //Test DFG
 namespace Gekcel
 {
-    //TT: Basically, we want to be able to have Excel use Gekko, but without opening Gekko and running 
-    //    commands in Gekko. There are three ways of using Gekko methods from within Excel:
-    //
-    //      (1) Just typing "=" in a cell, and calling a Gekko method like "=Gekko_GetData(...)",
-    //          returning some value
-    //      (2) Calling the same Gekko_GetData(...) method from within a VB script inside Excel.
-    //      (3) Using buttons in the Ribbon interface in Excel (point and click)
-    //
-    //    Bullet (1) comes directly from ExcelDNA, but to do (2), we need to use a so-called COM server.
-    //
-    //
-
+    
     [ComVisible(true)]
     public class RibbonController : ExcelRibbon
     {
@@ -94,8 +83,7 @@ namespace Gekcel
             //Check this: Trust access to the VBA object model
             //-------------------------------------------------------------
 
-            //First, copy the demo.gbk file, so that it is easy to use
-            //To recreate or alter this databank, use the following .gcm code.
+            //To recreate or alter demo.gbk, use the following .gcm code.
             //
             //    RESET;
             //    TIME 2020 2043;
@@ -108,8 +96,13 @@ namespace Gekcel
             //    x1 = 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242;
             //    x2 = 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282;
             //    WRITE demo;
+                        
             string demo = Path.GetDirectoryName(ExcelDnaUtil.XllPath) + "\\demo.gbk";
             string demo_orig = (new DirectoryInfo(ExcelDnaUtil.XllPath)).Parent.Parent.Parent.FullName + "\\Diverse\\ExternalDllFiles\\demo.gbk";
+
+            Program.options.folder_working = Path.GetDirectoryName(ExcelDnaUtil.XllPath); //so that Gekko will read/write to that location
+            //MessageBox.Show("demo: " + demo + "     demo_orig: " + demo_orig);
+
             if (File.Exists(demo))
             {
                 try
@@ -184,8 +177,7 @@ End Function";
             targetExcelFile.Save();  //saves file
 
             if (true)
-            {
-                //TT: Calling two of the VBA macros for testing                            
+            {                               
                 app.Run("h", "Gekko environment is set up and ready"); 
             }
             
@@ -227,8 +219,9 @@ End Function";
             [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq,
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
         {
+            MessageBox.Show("Working folder: " + Program.options.folder_working + "   " + gbkFile);
             double d = double.NaN;
-            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run             
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
             Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
             Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
             GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
@@ -244,9 +237,9 @@ End Function";
             [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, 
             [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
         {
-            Program.PrepareExcelDna(Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run
+            Program.PrepareExcelDna(Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.
             
-            if (true)
+            if (false)
             {
                 //TT: hack because of path problem when writing
                 if(gbkFile.Contains(":")|| gbkFile.Contains("\\") || gbkFile.Contains("/"))
@@ -279,6 +272,7 @@ End Function";
             string tempTsdxPath = null;
             int NaNCounter = 0;
             Databank db = null;
+            MessageBox.Show("gbk: " + gbkFile);
             db = Program.GetDatabankFromFile(null, oRead, info, gbkFile, gbkFile, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
             return db;
         }
