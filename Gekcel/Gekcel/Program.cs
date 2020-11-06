@@ -248,14 +248,14 @@ SetSeries(db, names, freq, per1, per2, array)
             GekkoTime gt2 = new GekkoTime(EFreq.A, int.Parse(t2), 1);
             int n = GekkoTime.Observations(gt1, gt2);
 
-            object[,] o = new object[m, n];
-
+            object[,] o = new object[m + 1, n + 1];
+                        
             int i = -1;            
             foreach (string s in ss)
             {
-                i++;
+                i++;                
                 string varnameWithFreq = G.Chop_AddFreq(s.Trim(), freq);
-                //o[j, i + 1] = d;
+                o[i + 1, 0] = varnameWithFreq;
                 Gekko.Series ts = db.GetIVariable(varnameWithFreq) as Gekko.Series;
                 if (ts == null)
                 {
@@ -265,8 +265,10 @@ SetSeries(db, names, freq, per1, per2, array)
                 foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
                 {
                     j++;
+                    string date = gt.super.ToString();  //TODO!!
+                    if (i == 0) o[0, j + 1] = date;
                     double d = ts.GetDataSimple(gt);
-                    o[i, j] = d;
+                    o[i + 1, j + 1] = d;
                 }
             }
             return o;             
