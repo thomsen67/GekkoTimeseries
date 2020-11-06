@@ -151,14 +151,13 @@ SetSeries(db, names, freq, per1, per2, array)
         //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
 
         //TT: These methods just mirror the ones in the class ExcelFunctionCalls
+        //TT: They are version that can be called from inside of VBA
 
-        //TT: Version that can be called by VBA
         public double Gekko_GetData2(string gbkFile, string variableWithFreq, string date)
         {
             return ExcelFunctionCalls.Gekko_GetData1(gbkFile, variableWithFreq, date);
         }
-
-        //TT: Version that can be called by VBA
+                
         public double Gekko_SetData2(string gbkFile, string variableWithFreq, string date, double d)
         {
             return ExcelFunctionCalls.Gekko_SetData1(gbkFile, variableWithFreq, date, d);
@@ -240,12 +239,40 @@ SetSeries(db, names, freq, per1, per2, array)
             [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
             [ExcelArgument(Name = "t1", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2)
         {
-            //Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-            //Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-            Object[,] o = new object[2, 2];
-            o[0, 0] = 2d;
-            o[0, 1] = "hej";
-            o[1, 0] = null;
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+                        
+            string[] ss = names.Split(',');
+            int m = ss.Length;
+            GekkoTime gt1 = new GekkoTime(EFreq.A, int.Parse(t1), 1);
+            GekkoTime gt2 = new GekkoTime(EFreq.A, int.Parse(t2), 1);
+            int n = GekkoTime.Observations(gt1, gt2);
+
+            object[,] o = new object[n, m];
+
+            int i = -1;            
+            foreach (string s in ss)
+            {
+                i++;
+                string varnameWithFreq = G.Chop_AddFreq(s.Trim(), freq);
+                Gekko.Series ts = db.GetIVariable(varnameWithFreq) as Gekko.Series;
+                if (ts == null)
+                {
+                    MessageBox.Show("*** ERROR: Series '" + varnameWithFreq + "' was not found in databank '" + gbkFile + "'");
+                }
+                int j = -1;
+                foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+                {
+                    j++;
+                    double d = ts.GetDataSimple(gt);
+                    o[j, i] = d;
+                }
+            }
+
+            //Object[,] o = new object[2, 2];
+            //o[0, 0] = 2d;
+            //o[0, 1] = "hej";
+            //o[1, 0] = null;
             return o;             
         }
     }
@@ -346,7 +373,10 @@ End Function
 
 Sub Gekko_Populate()
   o = Gekko_GetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"")
-  Set rValues = Application.Range(""B2: X50"")   'TODO
+  nrows = UBound(o, 1) - LBound(o, 1) + 1
+  ncols = UBound(o, 2) - LBound(o, 2) + 1
+  MsgBox nrows & "" --- "" & ncols
+  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
   rValues.ClearContents
   rValues.Value = o  
 End Sub
