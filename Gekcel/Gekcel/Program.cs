@@ -248,13 +248,14 @@ SetSeries(db, names, freq, per1, per2, array)
             GekkoTime gt2 = new GekkoTime(EFreq.A, int.Parse(t2), 1);
             int n = GekkoTime.Observations(gt1, gt2);
 
-            object[,] o = new object[n, m];
+            object[,] o = new object[m, n];
 
             int i = -1;            
             foreach (string s in ss)
             {
                 i++;
                 string varnameWithFreq = G.Chop_AddFreq(s.Trim(), freq);
+                //o[j, i + 1] = d;
                 Gekko.Series ts = db.GetIVariable(varnameWithFreq) as Gekko.Series;
                 if (ts == null)
                 {
@@ -265,14 +266,9 @@ SetSeries(db, names, freq, per1, per2, array)
                 {
                     j++;
                     double d = ts.GetDataSimple(gt);
-                    o[j, i] = d;
+                    o[i, j] = d;
                 }
             }
-
-            //Object[,] o = new object[2, 2];
-            //o[0, 0] = 2d;
-            //o[0, 1] = "hej";
-            //o[1, 0] = null;
             return o;             
         }
     }
@@ -374,8 +370,7 @@ End Function
 Sub Gekko_Populate()
   o = Gekko_GetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"")
   nrows = UBound(o, 1) - LBound(o, 1) + 1
-  ncols = UBound(o, 2) - LBound(o, 2) + 1
-  MsgBox nrows & "" --- "" & ncols
+  ncols = UBound(o, 2) - LBound(o, 2) + 1  
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
   rValues.ClearContents
   rValues.Value = o  
