@@ -17120,6 +17120,11 @@ namespace Gekko
 
         public static string CreateFullPathAndFileNameFromFolder(string file, string path)
         {
+            if (Globals.excelDna && false)
+            {
+                MessageBox.Show("file: " + file + " path: " + path + "   working: " + Program.options.folder_working);
+            }
+            
             //This method can be called with path = null or path = "", in that case it reduces to
             //only adding the working folder is file is without colon.
             //Path is given from options: "option folder bank = ..." for instance
@@ -21682,7 +21687,11 @@ namespace Gekko
             }
             else
             {
-                //fileName = SubstituteAssignVarsInExpression(fileName);
+                if (Globals.excelDna && false)
+                {
+                    MessageBox.Show(" bank: " + Program.options.folder_bank + " working: " + Program.options.folder_working);
+                }
+
                 fileName = AddExtension(fileName, "." + extension);
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_bank);
@@ -26488,6 +26497,12 @@ namespace Gekko
         //Only used for reading TSDX files, much more specific than WaitForZipRead()
         public static string WaitForZipRead_TSDX(string folder, string zipFileName, string inside, string originalFileName)
         {
+
+            if (Globals.excelDna && false)
+            {
+                MessageBox.Show("folder: " + folder + " zipffname: " + zipFileName + " originFilename: " + originalFileName);
+            }
+            
             //is not actually waiting...
             int gap = Globals.waitFileGap;  //1 second
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
