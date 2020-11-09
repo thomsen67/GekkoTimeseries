@@ -140,7 +140,7 @@ SetSeries(db, names, freq, per1, per2, array)
             InternalHelperMethods.Setup();
         }        
     }
-    
+
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class COMLibrary
@@ -157,7 +157,7 @@ SetSeries(db, names, freq, per1, per2, array)
         {
             return ExcelFunctionCalls.Gekko_GetData1(gbkFile, variableWithFreq, date);
         }
-                
+
         public double Gekko_SetData2(string gbkFile, string variableWithFreq, string date, double d)
         {
             return ExcelFunctionCalls.Gekko_SetData1(gbkFile, variableWithFreq, date, d);
@@ -173,9 +173,14 @@ SetSeries(db, names, freq, per1, per2, array)
             return ExcelFunctionCalls.Gekko_SetGroup1(gbkFile, names, freq, t1, t2, cells);
         }
 
-        public double Gekko_Test2(string s)
+        public double Gekko_Test2(object[,] cells)
         {
-            return ExcelFunctionCalls.Gekko_Test1(s);
+            return ExcelFunctionCalls.Gekko_Test1(cells);
+        }
+
+        public static double Gekko_TestRange2(object valueRange)
+        {
+            return ExcelFunctionCalls.Gekko_TestRange1(valueRange);
         }
 
     }
@@ -302,11 +307,33 @@ SetSeries(db, names, freq, per1, per2, array)
 
         [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]
         //public static string Gekko_Test(object[,] cells)
-        public static double Gekko_Test1(string s)
+        public static double Gekko_Test1([ExcelArgument(AllowReference = false)] object[,] cells)
         {
-            MessageBox.Show("hejsa1 " + s);
+            MessageBox.Show("hejsa1 " + cells[1, 1]);
             return 12345d;
         }
+
+        [ExcelFunction(Name = "Gekko_TestRange1", Description = "")]
+        public static double Gekko_TestRange1([ExcelArgument(AllowReference = false)] object valueRange)
+        {
+            ExcelReference valueRangeRef = (ExcelReference)valueRange;
+            int rowFirst = valueRangeRef.RowFirst;
+            int rowLast = valueRangeRef.RowLast;
+            int colFirst = valueRangeRef.ColumnFirst;
+            int colLast = valueRangeRef.ColumnLast;
+
+            for (int i = colFirst; i < colLast; i++)
+            {
+                for (int j = rowFirst; j < rowFirst; j++)
+                {
+                    //var value = ??
+                }
+            }
+
+            return 12321d;
+        }
+
+        
     }
 
     public static class InternalHelperMethods
@@ -425,12 +452,42 @@ Sub Gekko_SetGroup2()
   s = Gekko_SetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"", xx)
 End Sub
 
-Public Function Gekko_Test2(s As String) As Double
-  MsgBox ""lkadsfj "" & s  
+Public Function Gekko_Test2(cells As Variant) As Double
+  MsgBox ""lkadsfj "" & "" "" & cells(1, 1) & "" "" & TypeName(cells)
   Dim gekko As Object
-  Set gekko = CreateObject(""Gekcel.COMLibrary"")  
-  Gekko_Test2 = gekko.Gekko_Test2(s)
+  Set gekko = CreateObject(""Gekcel.COMLibrary"")
+  Gekko_Test2 = gekko.Gekko_Test2(cells)
 End Function
+
+Sub Xxx()
+  
+  Dim x1() as Variant  
+  Set x = Range(""A1:B2"")
+  x1 = x.Value
+  MsgBox Gekko_Test2(x1)
+
+  'Dim x(5, 4) As Variant
+  'x(1, 1) = 12345
+  'MsgBox Gekko_Test2(x)
+End Sub
+
+Public Function Gekko_TestRange2(cells As Variant) As Double
+  MsgBox TypeName(cells)
+  Dim gekko As Object
+  Set gekko = CreateObject(""Gekcel.COMLibrary"")
+  Gekko_TestRange2 = gekko.Gekko_TestRange2(cells)
+End Function
+
+Sub Xxxx()
+  'Dim arr as Variant
+  'arr = Range(""A1:B2"").Value
+  'MsgBox Gekko_TestRange2(x)
+
+  Dim x As Excel.Range
+  Set rng = Range(""A1:B2"")
+  MsgBox Gekko_TestRange2(x)
+
+End Sub
 
 
 ";
