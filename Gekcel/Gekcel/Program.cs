@@ -163,11 +163,21 @@ SetSeries(db, names, freq, per1, per2, array)
             return ExcelFunctionCalls.Gekko_SetData1(gbkFile, variableWithFreq, date, d);
         }
 
-        public object[,] Gekko_GetSeries2(string gbkFile, string names, string freq, string t1, string t2)
+        public object[,] Gekko_GetGroup2(string gbkFile, string names, string freq, string t1, string t2)
         {
-            return ExcelFunctionCalls.Gekko_GetSeries1(gbkFile, names, freq, t1, t2);
+            return ExcelFunctionCalls.Gekko_GetGroup1(gbkFile, names, freq, t1, t2);
         }
-        
+
+        public string Gekko_SetGroup2(string gbkFile, string names, string freq, string t1, string t2, object[,] cells)
+        {
+            return ExcelFunctionCalls.Gekko_SetGroup1(gbkFile, names, freq, t1, t2, cells);
+        }
+
+        public double Gekko_Test2(string s)
+        {
+            return ExcelFunctionCalls.Gekko_Test1(s);
+        }
+
     }
 
     public static class ExcelFunctionCalls
@@ -231,13 +241,13 @@ SetSeries(db, names, freq, per1, per2, array)
             return rv; //1 for good, 0 for problem
         }
                 
-        [ExcelFunction(Name = "Gekko_GetSeries1", Description = "Gets a 2d array with rows of names and colums of periods")]
-        public static object[,] Gekko_GetSeries1(
+        [ExcelFunction(Name = "Gekko_GetGroup1", Description = "Gets a 2d array with rows of names and colums of periods")]
+        public static object[,] Gekko_GetGroup1(
             [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
             [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
             [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
             [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
-            [ExcelArgument(Name = "t1", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2)
+            [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2)
         {
             Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
             Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
@@ -272,6 +282,30 @@ SetSeries(db, names, freq, per1, per2, array)
                 }
             }
             return o;             
+        }
+
+        [ExcelFunction(Name = "Gekko_SetGroup1", Description = "Sets a 2d array with rows of names and colums of periods")]
+        public static string Gekko_SetGroup1(
+            [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
+            [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
+            [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
+            [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
+            [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2,
+            [ExcelArgument(Name = "cells", Description = "Excel cells as Variant array")] object[,] o)
+        {
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+
+            MessageBox.Show("hejsa");
+            return "hejsa2";
+        }
+
+        [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]
+        //public static string Gekko_Test(object[,] cells)
+        public static double Gekko_Test1(string s)
+        {
+            MessageBox.Show("hejsa1 " + s);
+            return 12345d;
         }
     }
 
@@ -369,14 +403,35 @@ Public Function Gekko_GetSeries2(gbkFile As String, names As String, freq As Str
   Gekko_GetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2)
 End Function
 
-Sub Gekko_Populate()
-  o = Gekko_GetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"")
-  nrows = UBound(o, 1) - LBound(o, 1) + 1
-  ncols = UBound(o, 2) - LBound(o, 2) + 1  
+Public Function Gekko_SetSeries2(gbkFile As String, names As String, freq As String, t1 as String, t2 as String, cells as Variant)
+  dim gekko as Object
+  set gekko = createobject(""Gekcel.COMLibrary"")
+  Gekko_SetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2, cells)
+End Function
+
+Sub Gekko_GetGroup2()
+  cells = Gekko_GetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"")
+  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
+  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
   rValues.ClearContents
-  rValues.Value = o  
+  rValues.Value = cells
 End Sub
+
+Sub Gekko_SetGroup2()
+  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
+  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
+  xx = Application.Range(""A1:x100"").Value
+  s = Gekko_SetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"", xx)
+End Sub
+
+Public Function Gekko_Test2(s As String) As Double
+  MsgBox ""lkadsfj "" & s  
+  Dim gekko As Object
+  Set gekko = CreateObject(""Gekcel.COMLibrary"")  
+  Gekko_Test2 = gekko.Gekko_Test2(s)
+End Function
+
 
 ";
 
