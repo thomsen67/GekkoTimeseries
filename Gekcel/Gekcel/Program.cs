@@ -306,6 +306,9 @@ SetSeries(db, names, freq, per1, per2, array)
         {
             //double sum = 0d;
             //The object starts with index 1 for both dimensions
+
+            TableLight matrix = new TableLight();
+
             for (int i = 1; i < cells.GetLength(0) + 1; i++)
             {                
                 for (int j = 1; j < cells.GetLength(1) + 1; j++)
@@ -322,8 +325,9 @@ SetSeries(db, names, freq, per1, per2, array)
                         //dates                        
                         if (cell.GetType() == typeof(string))
                         {
-                            string date = (string)cell;
-                            MessageBox.Show("date " + date);
+                            string date = (string)cell;                            
+                            CellLight cellLight = new CellLight(date); //as string
+                            matrix.Add(i - 1, j - 1, cellLight);
                         }
                         else
                         {
@@ -337,7 +341,8 @@ SetSeries(db, names, freq, per1, per2, array)
                         if (cell.GetType() == typeof(string))
                         {
                             string name = (string)cell;
-                            MessageBox.Show("name " + name);
+                            CellLight cellLight = new CellLight(name); //as string
+                            matrix.Add(i - 1, j - 1, cellLight);
                         }
                         else
                         {
@@ -354,7 +359,8 @@ SetSeries(db, names, freq, per1, per2, array)
                             //MessageBox.Show("Added " + i + " " + j + "   " + (double)cell);
                             //sum += (double)cell;
                             double d = (double)cell;
-                            MessageBox.Show("value " + d);
+                            CellLight cellLight = new CellLight(d); //as double
+                            matrix.Add(i - 1, j - 1, cellLight);
                         }
                         else
                         {
@@ -364,6 +370,8 @@ SetSeries(db, names, freq, per1, per2, array)
                     }
                 }
             }
+
+            TableLight xx = matrix;
             
             return 12345d;
 
