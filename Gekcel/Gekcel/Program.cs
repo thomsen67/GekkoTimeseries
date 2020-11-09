@@ -309,8 +309,24 @@ SetSeries(db, names, freq, per1, per2, array)
         //public static string Gekko_Test(object[,] cells)
         public static double Gekko_Test1([ExcelArgument(AllowReference = false)] object[,] cells)
         {
-            MessageBox.Show("hejsa1 " + cells[1, 1]);
+            double sum = 0d;
+            for (int i = 1; i < cells.GetLength(0) + 1; i++)
+            {
+                for (int j = 1; j < cells.GetLength(1) + 1; j++)
+                {
+                    object cell = cells[i, j];
+                    if (cell == null) continue;
+                    if (cell.GetType() == typeof(double))
+                    {
+                        MessageBox.Show("Added " + i + " " + j + "   " + (double)cell);
+                        sum += (double)cell;
+                    }
+                }
+            }
+
+            MessageBox.Show("sum " + sum);
             return 12345d;
+
         }
 
         [ExcelFunction(Name = "Gekko_TestRange1", Description = "")]
@@ -461,8 +477,11 @@ End Function
 
 Sub Xxx()
   
+  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
+  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
   Dim x1() as Variant  
-  Set x = Range(""A1:B2"")
+  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
+  'Set x = Range(""A1:B2"").Resize(nrows, ncols)
   x1 = x.Value
   MsgBox Gekko_Test2(x1)
 
