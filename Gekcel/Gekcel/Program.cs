@@ -305,11 +305,11 @@ SetSeries(db, names, freq, per1, per2, array)
             return "hejsa2";
         }
 
-        [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]
-        //public static string Gekko_Test(object[,] cells)
-        public static double Gekko_Test1([ExcelArgument(AllowReference = false)] object[,] cells)
+        [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]        
+        public static double Gekko_Test1(object[,] cells)
         {
             double sum = 0d;
+            //The object starts with index 1 for both dimensions
             for (int i = 1; i < cells.GetLength(0) + 1; i++)
             {
                 for (int j = 1; j < cells.GetLength(1) + 1; j++)
@@ -475,8 +475,7 @@ Public Function Gekko_Test2(cells As Variant) As Double
   Gekko_Test2 = gekko.Gekko_Test2(cells)
 End Function
 
-Sub Xxx()
-  
+Sub Xxx()  
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
   Dim x1() as Variant  
@@ -484,10 +483,6 @@ Sub Xxx()
   'Set x = Range(""A1:B2"").Resize(nrows, ncols)
   x1 = x.Value
   MsgBox Gekko_Test2(x1)
-
-  'Dim x(5, 4) As Variant
-  'x(1, 1) = 12345
-  'MsgBox Gekko_Test2(x)
 End Sub
 
 Public Function Gekko_TestRange2(cells As Variant) As Double
