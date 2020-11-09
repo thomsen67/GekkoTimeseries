@@ -177,11 +177,7 @@ SetSeries(db, names, freq, per1, per2, array)
         {
             return ExcelFunctionCalls.Gekko_Test1(cells);
         }
-
-        public static double Gekko_TestRange2(object valueRange)
-        {
-            return ExcelFunctionCalls.Gekko_TestRange1(valueRange);
-        }
+        
 
     }
 
@@ -308,48 +304,70 @@ SetSeries(db, names, freq, per1, per2, array)
         [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]        
         public static double Gekko_Test1(object[,] cells)
         {
-            double sum = 0d;
+            //double sum = 0d;
             //The object starts with index 1 for both dimensions
             for (int i = 1; i < cells.GetLength(0) + 1; i++)
-            {
+            {                
                 for (int j = 1; j < cells.GetLength(1) + 1; j++)
-                {
+                {                    
+
                     object cell = cells[i, j];
-                    if (cell == null) continue;
-                    if (cell.GetType() == typeof(double))
+
+                    if(i==1 && j == 1)
                     {
-                        MessageBox.Show("Added " + i + " " + j + "   " + (double)cell);
-                        sum += (double)cell;
+
+                    }
+                    else if (i == 1)
+                    {
+                        //dates                        
+                        if (cell.GetType() == typeof(string))
+                        {
+                            string date = (string)cell;
+                            MessageBox.Show("date " + date);
+                        }
+                        else
+                        {
+                            MessageBox.Show("*** ERROR: expected date");
+                            return 0;
+                        }
+                    }
+                    else if (j == 1)
+                    {
+                        //names
+                        if (cell.GetType() == typeof(string))
+                        {
+                            string name = (string)cell;
+                            MessageBox.Show("name " + name);
+                        }
+                        else
+                        {
+                            MessageBox.Show("*** ERROR: expected variable name");
+                            return 0;
+                        }
+                    }
+                    else
+                    {
+
+                        if (cell == null) continue;
+                        if (cell.GetType() == typeof(double))
+                        {
+                            //MessageBox.Show("Added " + i + " " + j + "   " + (double)cell);
+                            //sum += (double)cell;
+                            double d = (double)cell;
+                            MessageBox.Show("value " + d);
+                        }
+                        else
+                        {
+                            MessageBox.Show("*** ERROR: expected variable name");
+                            return 0;
+                        }
                     }
                 }
             }
-
-            MessageBox.Show("sum " + sum);
+            
             return 12345d;
 
         }
-
-        [ExcelFunction(Name = "Gekko_TestRange1", Description = "")]
-        public static double Gekko_TestRange1([ExcelArgument(AllowReference = false)] object valueRange)
-        {
-            ExcelReference valueRangeRef = (ExcelReference)valueRange;
-            int rowFirst = valueRangeRef.RowFirst;
-            int rowLast = valueRangeRef.RowLast;
-            int colFirst = valueRangeRef.ColumnFirst;
-            int colLast = valueRangeRef.ColumnLast;
-
-            for (int i = colFirst; i < colLast; i++)
-            {
-                for (int j = rowFirst; j < rowFirst; j++)
-                {
-                    //var value = ??
-                }
-            }
-
-            return 12321d;
-        }
-
-        
     }
 
     public static class InternalHelperMethods
@@ -464,20 +482,6 @@ End Sub
 Sub Gekko_SetGroup2()
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
-  xx = Application.Range(""A1:x100"").Value
-  s = Gekko_SetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"", xx)
-End Sub
-
-Public Function Gekko_Test2(cells As Variant) As Double
-  MsgBox ""lkadsfj "" & "" "" & cells(1, 1) & "" "" & TypeName(cells)
-  Dim gekko As Object
-  Set gekko = CreateObject(""Gekcel.COMLibrary"")
-  Gekko_Test2 = gekko.Gekko_Test2(cells)
-End Function
-
-Sub Xxx()  
-  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
-  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
   Dim x1() as Variant  
   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
   'Set x = Range(""A1:B2"").Resize(nrows, ncols)
@@ -485,23 +489,11 @@ Sub Xxx()
   MsgBox Gekko_Test2(x1)
 End Sub
 
-Public Function Gekko_TestRange2(cells As Variant) As Double
-  MsgBox TypeName(cells)
+Public Function Gekko_Test2(cells As Variant) As Double  
   Dim gekko As Object
   Set gekko = CreateObject(""Gekcel.COMLibrary"")
-  Gekko_TestRange2 = gekko.Gekko_TestRange2(cells)
+  Gekko_Test2 = gekko.Gekko_Test2(cells)
 End Function
-
-Sub Xxxx()
-  'Dim arr as Variant
-  'arr = Range(""A1:B2"").Value
-  'MsgBox Gekko_TestRange2(x)
-
-  Dim x As Excel.Range
-  Set rng = Range(""A1:B2"")
-  MsgBox Gekko_TestRange2(x)
-
-End Sub
 
 
 ";
