@@ -18,7 +18,9 @@ namespace Gekcel
 {
     // Running Gekcel:
     //
-    // Note when compiling a new gekko.exe that this must be 32-bit. This and ANTLR.dll etc. should be put in the \Diverse\ExternalDllFiles folder.
+    // Note when compiling a new gekko.exe that this SEEMS to have to be 
+    // Debug|x86 (that is, debug 32-bit). Then gekko.exe, gekko.pdb and ANTLR.dll should be put in 
+    // the \Diverse\ExternalDllFiles folder.
     //
     // In this setup, we inject some VBA code into Excel, creating a Gekxel.xlsm file with this VBA code.
     // All this is done automatically, but you need to setup Excel to allow this kind of injection. This
@@ -201,9 +203,7 @@ SetSeries(db, names, freq, per1, per2, array)
         [ExcelFunction(Name = "Gekko_Run1", Description = "Run Gekko command(s)")]
         public static string Gekko_Run1(string commands)
         {            
-            InternalHelperMethods.Run(commands);
-            Databank db = Program.databanks.GetFirst();
-            return "Output from Gekko...";
+            return InternalHelperMethods.Run(commands);
         }        
 
         //TT: Type this in cell: =Gekko_GetData1("demo.gbk"; "x1!a"; "2020")
@@ -423,7 +423,7 @@ SetSeries(db, names, freq, per1, per2, array)
             Run("restart;");            
         }
 
-        public static void Run(string commands)
+        public static string Run(string commands)
         {
             if (counter == 0)
             {
@@ -439,6 +439,12 @@ SetSeries(db, names, freq, per1, per2, array)
             counter++;
             Globals.lastPrtOrMulprtTable = null;
             Program.obeyCommandCalledFromGUI(commands, new P());
+            string rv = null;
+            if (Globals.excelDnaStorage != null)
+            {
+                rv = Globals.excelDnaStorage.ToString();
+            }
+            return rv;
         }
 
         public static void Setup()
@@ -567,13 +573,14 @@ Public Function Gekko_Run2(commands As String) As String
   Dim gekko As Object
   Set gekko = CreateObject(""Gekcel.COMLibrary"")  
   Gekko_Run2 = gekko.Gekko_Run2(commands)
+  Debug.Print Gekko_Run2
 End Function
 
 Public Sub Gekko_Demo()
-  x1 = Gekko_Run2(""tell 'hej1';"")
-  Debug.Print x1
-  x2 = Gekko_Run2(""tell 'hej2';"")
-Debug.Print x2
+  Gekko_Run2(""tell 'Hello from Gekko';"")
+  Gekko_Run2(""time 2015 2020;"")
+  Gekko_Run2(""x = 100;"")
+  Gekko_Run2(""prt x;"")  
 End Sub
 
 ";

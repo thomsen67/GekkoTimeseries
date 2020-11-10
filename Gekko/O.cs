@@ -7558,10 +7558,10 @@ namespace Gekko
 
                     List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
 
-                    if (Globals.excelDna)
-                    {
-                        MessageBox.Show("fname: " + hlp.FileName);
-                    }
+                    //if (Globals.excelDna)
+                    //{
+                    //    MessageBox.Show("fname: " + hlp.FileName);
+                    //}
 
                     bool open = false;
                     if (isTo)

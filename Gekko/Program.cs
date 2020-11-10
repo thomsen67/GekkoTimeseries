@@ -29070,10 +29070,12 @@ namespace Gekko
         // --------------------------------------------------------------------------------------
 
         public static void obeyCommandCalledFromGUI(string s, P p)
-        {            
-            //Globals.prtCsSnippets.Clear();  //to save RAM for long sessions, should be ok to delete it here (otherwise we will just get an exception)
-            Program.EmitCodeFromANTLR(s, "", false, 0, p);
-            //if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
+        {
+            if (Globals.excelDna)
+            {
+                Globals.excelDnaStorage = new StringBuilder();  //clears, and records everything from now on for use in Excel window
+            }
+            Program.EmitCodeFromANTLR(s, "", false, 0, p);            
         }
 
         public static void Create(List varsInput, bool questionMark, O.Create o)

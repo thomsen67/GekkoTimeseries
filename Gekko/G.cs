@@ -3303,7 +3303,7 @@ namespace Gekko
             {
                 color = Color.Red;
                 Globals.numberOfErrors++;
-                if (Globals.excelDna && Globals.excelDnaStorage == null) Globals.excelDnaStorage = new StringBuilder();  //loaded, records everything from now on
+                //if (Globals.excelDna && Globals.excelDnaStorage == null) Globals.excelDnaStorage = new StringBuilder();  //loaded, records everything from now on
             }
             else if (s.Trim().StartsWith("+++ WARNING"))
             {
@@ -3532,7 +3532,7 @@ namespace Gekko
                     {
                         if (Globals.excelDna)
                         {
-                            if (Globals.excelDnaStorage != null) MessageBox.Show(s);
+                            if (Globals.excelDnaStorage != null) Globals.excelDnaStorage.AppendLine(s);
                         }
                         else
                         {
@@ -3544,7 +3544,7 @@ namespace Gekko
                     {
                         if (Globals.excelDna)
                         {
-                            if (Globals.excelDnaStorage != null) MessageBox.Show(s);
+                            if (Globals.excelDnaStorage != null) Globals.excelDnaStorage.Append(s);
                         }
                         else
                         {
