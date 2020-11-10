@@ -432,13 +432,32 @@ SetSeries(db, names, freq, per1, per2, array)
                 Program.databanks.storage.Clear();
                 Program.databanks.storage.Add(new Databank("Work"));
                 Program.databanks.storage.Add(new Databank("Base"));
-                //Program.Re(null, "reset;", new P());
-                
-                //Restart();
+
+                Program.databanks.local.Clear();
+                Program.databanks.global.Clear();
+                Program.databanks.localGlobal = new LocalGlobal();
+                Globals.commandMemory = new CommandMemory();
+                Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
+                Program.InitUfunctionsAndArithmeticsAndMore();
+                Program.model = new Gekko.Model();
+
+                Program.GetStartingPeriod();
+                Globals.lastPrtOrMulprtTable = null;
+
+
             }
             counter++;
             Globals.lastPrtOrMulprtTable = null;
-            Program.obeyCommandCalledFromGUI(commands, new P());
+            try
+            {
+                Program.obeyCommandCalledFromGUI(commands, new P());
+            }
+            catch (Exception e)
+            {
+                //We have to catch this exception here, otherwise it ripples through to
+                //Excel itself with a strange error message there.
+            }
+
             string rv = null;
             if (Globals.excelDnaStorage != null)
             {
