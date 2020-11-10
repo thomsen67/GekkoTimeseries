@@ -65,6 +65,8 @@ GetSeries(db, names, freq, per1, per2)     db, freq can be null. Names comma-sep
 SetSeries(db, names, freq, per1, per2, array)
 
 
+        CLS: See https://stackoverflow.com/questions/10203349/use-vba-to-clear-immediate-window
+
 
      * 
      * */
@@ -177,7 +179,12 @@ SetSeries(db, names, freq, per1, per2, array)
         {
             return ExcelFunctionCalls.Gekko_Test1(cells);
         }
-        
+
+        public string Gekko_Run2(string commands)
+        {
+            return ExcelFunctionCalls.Gekko_Run1(commands);
+        }
+
 
     }
 
@@ -190,6 +197,14 @@ SetSeries(db, names, freq, per1, per2, array)
             InternalHelperMethods.Setup();
             return 1d;
         }
+                
+        [ExcelFunction(Name = "Gekko_Run1", Description = "Run Gekko command(s)")]
+        public static string Gekko_Run1(string commands)
+        {            
+            InternalHelperMethods.Run(commands);
+            Databank db = Program.databanks.GetFirst();
+            return "Output from Gekko...";
+        }        
 
         //TT: Type this in cell: =Gekko_GetData1("demo.gbk"; "x1!a"; "2020")
         [ExcelFunction(Name = "Gekko_GetData1", Description = "Gets a data value from a timeseries in a gbk databank file")]
@@ -307,6 +322,8 @@ SetSeries(db, names, freq, per1, per2, array)
             //double sum = 0d;
             //The object starts with index 1 for both dimensions
 
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+
             TableLight matrix = new TableLight();
 
             for (int i = 1; i < cells.GetLength(0) + 1; i++)
@@ -327,7 +344,7 @@ SetSeries(db, names, freq, per1, per2, array)
                         {
                             string date = (string)cell;                            
                             CellLight cellLight = new CellLight(date); //as string
-                            matrix.Add(i - 1, j - 1, cellLight);
+                            matrix.Add(i, j, cellLight);
                         }
                         else
                         {
@@ -342,7 +359,7 @@ SetSeries(db, names, freq, per1, per2, array)
                         {
                             string name = (string)cell;
                             CellLight cellLight = new CellLight(name); //as string
-                            matrix.Add(i - 1, j - 1, cellLight);
+                            matrix.Add(i, j, cellLight);
                         }
                         else
                         {
@@ -360,7 +377,7 @@ SetSeries(db, names, freq, per1, per2, array)
                             //sum += (double)cell;
                             double d = (double)cell;
                             CellLight cellLight = new CellLight(d); //as double
-                            matrix.Add(i - 1, j - 1, cellLight);
+                            matrix.Add(i, j, cellLight);
                         }
                         else
                         {
@@ -370,9 +387,27 @@ SetSeries(db, names, freq, per1, per2, array)
                     }
                 }
             }
-
-            TableLight xx = matrix;
             
+            TableLight xx = matrix;
+            string dateformat = null;
+            string datetype = null;
+            Program.ReadInfo readInfo = new Program.ReadInfo();
+            Databank databank = new Databank("temp");
+            ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
+            oRead.Type = EDataFormat.Xlsx;            
+            CellOffset cellOffset = new CellOffset();
+            Program.options.freq = EFreq.Q;  //TODO TODO TODO
+            //oRead.t1 = new GekkoTime(EFreq.Q, 2000, 1);
+            //oRead.t2 = new GekkoTime(EFreq.Q, 2000, 1);
+            try
+            {
+                Program.GetTimeseriesFromWorkbookMatrix(cellOffset, oRead, databank, matrix, readInfo, dateformat, datetype);
+            }
+            catch (Exception e)
+            {
+
+            }
+
             return 12345d;
 
         }
@@ -380,6 +415,32 @@ SetSeries(db, names, freq, per1, per2, array)
 
     public static class InternalHelperMethods
     {
+        public static int counter = 0;
+
+        public static void Restart()
+        {
+            counter++;
+            Run("restart;");            
+        }
+
+        public static void Run(string commands)
+        {
+            if (counter == 0)
+            {
+                Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+                SetWorkingFolderIfNullOrEmpty();
+                Program.databanks.storage.Clear();
+                Program.databanks.storage.Add(new Databank("Work"));
+                Program.databanks.storage.Add(new Databank("Base"));
+                //Program.Re(null, "reset;", new P());
+                
+                //Restart();
+            }
+            counter++;
+            Globals.lastPrtOrMulprtTable = null;
+            Program.obeyCommandCalledFromGUI(commands, new P());
+        }
+
         public static void Setup()
         {
             //To recreate or alter demo.gbk, use the following .gcm code.
@@ -491,10 +552,9 @@ Sub Gekko_SetGroup2()
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
   Dim x1() as Variant  
-  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
-  'Set x = Range(""A1:B2"").Resize(nrows, ncols)
+  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)  
   x1 = x.Value
-  MsgBox Gekko_Test2(x1)
+  temp = Gekko_Test2(x1)
 End Sub
 
 Public Function Gekko_Test2(cells As Variant) As Double  
@@ -503,6 +563,18 @@ Public Function Gekko_Test2(cells As Variant) As Double
   Gekko_Test2 = gekko.Gekko_Test2(cells)
 End Function
 
+Public Function Gekko_Run2(commands As String) As String  
+  Dim gekko As Object
+  Set gekko = CreateObject(""Gekcel.COMLibrary"")  
+  Gekko_Run2 = gekko.Gekko_Run2(commands)
+End Function
+
+Public Sub Gekko_Demo()
+  x1 = Gekko_Run2(""tell 'hej1';"")
+  Debug.Print x1
+  x2 = Gekko_Run2(""tell 'hej2';"")
+Debug.Print x2
+End Sub
 
 ";
 
@@ -514,7 +586,7 @@ End Function
 
             if (true)
             {
-                app.Run("h", "Gekko environment is set up and ready");
+                app.Run("h", @"Gekko environment is set up and ready. You may try these:\n=Gekko_Run(""prt <2020 2020> x1!a;"")\n=Gekko_Run(""x1!a[2020] = 888;"")");
             }
 
             //app.Quit();

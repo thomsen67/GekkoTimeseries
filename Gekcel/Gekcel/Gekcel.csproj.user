@@ -5,4 +5,9 @@
     <StartProgram>c:\Program Files\WindowsApps\Microsoft.Office.Desktop.Excel_16051.13328.20292.0_x86__8wekyb3d8bbwe\Office16\EXCEL.EXE</StartProgram>
     <StartArguments>"Gekcel.xll"</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <StartProgram>c:\Program Files\WindowsApps\Microsoft.Office.Desktop.Excel_16051.13328.20292.0_x86__8wekyb3d8bbwe\Office16\EXCEL.EXE</StartProgram>
+    <StartArguments>"Gekcel.xll"</StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
 </Project>

@@ -63,6 +63,16 @@ namespace Gekko.Parser.Gek
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
 
                 Assembly assembly = compilerResults.CompiledAssembly;
+
+                //if (Globals.runningOnTTComputer)
+                //{
+                //    List<Type> myTypes = assembly.GetTypes().ToList();
+                //    foreach (Type tt in myTypes)
+                //    {
+                //        MessageBox.Show(tt.FullName + "  " + tt.Name);
+                //    }
+                //}
+
                 Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
                 tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method                     
 

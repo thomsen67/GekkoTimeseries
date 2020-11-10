@@ -1675,7 +1675,7 @@ namespace Gekko
             return matrix;
         }
 
-        private static void GetTimeseriesFromWorkbookMatrix(CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo, string dateformat, string datetype)
+        public static void GetTimeseriesFromWorkbookMatrix(CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo, string dateformat, string datetype)
         {
 
             //We could 'taste' the file, but how to distinguish A and U for instance?
