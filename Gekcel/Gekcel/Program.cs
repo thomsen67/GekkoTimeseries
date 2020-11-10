@@ -416,6 +416,8 @@ SetSeries(db, names, freq, per1, per2, array)
     public static class InternalHelperMethods
     {
         public static int counter = 0;
+        public static string gekcelError1 = "Gekcel terminated because of Gekko error(s)";
+        public static string gekcelError2 = "Gekko error. See the error message in the 'Immediate' window in VBA. First open VBA (Alt+F11), then open 'Immediate' (Ctrl+G). You may move the 'Immediate' window to the top of the VBA window, or even make it free-floating.";
 
         public static void Restart()
         {
@@ -448,6 +450,9 @@ SetSeries(db, names, freq, per1, per2, array)
             }
             counter++;
             Globals.lastPrtOrMulprtTable = null;
+
+            string rv = null;
+
             try
             {
                 Program.obeyCommandCalledFromGUI(commands, new P());
@@ -456,13 +461,20 @@ SetSeries(db, names, freq, per1, per2, array)
             {
                 //We have to catch this exception here, otherwise it ripples through to
                 //Excel itself with a strange error message there.
+                if (Globals.excelDnaStorage != null)
+                {
+                    Globals.excelDnaStorage.AppendLine();
+                    Globals.excelDnaStorage.AppendLine(gekcelError1);
+                }
             }
-
-            string rv = null;
-            if (Globals.excelDnaStorage != null)
+            finally
             {
-                rv = Globals.excelDnaStorage.ToString();
-            }
+                if (Globals.excelDnaStorage != null)
+                {
+                    rv = Globals.excelDnaStorage.ToString();
+                }
+            }            
+            
             return rv;
         }
 
@@ -593,12 +605,15 @@ Public Function Gekko_Run2(commands As String) As String
   Set gekko = CreateObject(""Gekcel.COMLibrary"")  
   Gekko_Run2 = gekko.Gekko_Run2(commands)
   Debug.Print Gekko_Run2
+  If InStr(1, Gekko_Run2, """ + InternalHelperMethods.gekcelError1 + @""") <> 0 Then
+    Err.Raise Number:=vbObjectError + 513, Description:=""" + gekcelError2 + @"""    '513 to not collide with Excel's own error numbers
+  End If
 End Function
 
 Public Sub Gekko_Demo()
   Gekko_Run2(""tell 'Hello from Gekko';"")
   Gekko_Run2(""time 2015 2020;"")
-  Gekko_Run2(""x = 100;"")
+  Gekko_Run2(""x = 1, 2, 3, 4, 5, 6;"")
   Gekko_Run2(""prt x;"")  
 End Sub
 
