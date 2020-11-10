@@ -611,10 +611,10 @@ Public Function Gekko_Run2(commands As String) As String
 End Function
 
 Public Sub Gekko_Demo()
-  Gekko_Run2(""tell 'Hello from Gekko';"")
-  Gekko_Run2(""time 2015 2020;"")
-  Gekko_Run2(""x = 1, 2, 3, 4, 5, 6;"")
-  Gekko_Run2(""prt x;"")  
+  Gekko_Run2 ""tell 'Hello from Gekko';""
+  Gekko_Run2 ""time 2015 2020;""
+  Gekko_Run2 ""x = 1, 2, 3, 4, 5, 6;""
+  Gekko_Run2 ""prt x;""
 End Sub
 
 ";
