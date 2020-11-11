@@ -324,13 +324,14 @@ SetSeries(db, names, freq, per1, per2, array)
         [ExcelFunction(Name = "Gekko_Fetch1", Description = "Fetch")]
         public static object[,] Gekko_Fetch1()
         {
-            var xxx = Globals.excelDnaData.clipData.data;
-            object[,] xx = new object[2, 2];
-            xx[0, 0] = 1d;
-            xx[0, 1] = 2d;
-            xx[1, 0] = 3d;
-            xx[1, 1] = 4d;
-            return xx;
+            return Globals.excelDnaData.cells;
+
+            //object[,] xx = new object[2, 2];
+            //xx[0, 0] = 1d;
+            //xx[0, 1] = 2d;
+            //xx[1, 0] = 3d;
+            //xx[1, 1] = 4d;
+            //return xx;
             
         }
 

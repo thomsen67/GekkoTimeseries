@@ -129,9 +129,7 @@ namespace Gekko
 
     public class ExcelDnaData
     {
-        public object[,] cells = null;
-        //public TableLight tableLight = null;
-        public ExcelDataForClip clipData = null;
+        public object[,] cells = null;        
     }
 
     public class WalkTokensHelper
@@ -31915,6 +31913,8 @@ namespace Gekko
             }
             else if (type == EPrintTypes.Sheet)
             {
+                bool isStamp = false; if (o != null && G.Equal(o.opt_stamp, "yes")) isStamp = true;
+                string title = o.opt_title;
 
                 if (sameFreq == EFreq.None)
                 {
@@ -31934,53 +31934,63 @@ namespace Gekko
                 //labels.. what if they break -- should be infinitely long
 
                 Table tab2 = table.Transpose();
-                int startRows = 1;
-                int startCols = 1;
-                ExcelOptions eo = new ExcelOptions();
-                eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
-                eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
-                eo.excelColumnLabelsGekkoTime = new GekkoTime[1, tab2.GetColMaxNumber() - startCols];
-                eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
 
-                for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
+                if (Globals.excelDna)
                 {
-                    for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
+                    Program.PrtToExcelDna(tab2, IsMulprt(o), isStamp, title);
+                }
+                else
+                {
+
+                    int startRows = 1;
+                    int startCols = 1;
+                    ExcelOptions eo = new ExcelOptions();
+                    eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
+                    eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
+                    eo.excelColumnLabelsGekkoTime = new GekkoTime[1, tab2.GetColMaxNumber() - startCols];
+                    eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
+
+                    for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
                     {
-                        Cell cell2 = tab2.Get(i, j);
-                        string s2 = "";
-                        if (cell2 == null)
+                        for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
                         {
-                        }
-                        else
-                        {
-                            if (i == 1 && j == 1)
+                            Cell cell2 = tab2.Get(i, j);
+                            string s2 = "";
+                            if (cell2 == null)
                             {
-                                //do nothing
-                            }
-                            else if (j == 1)
-                            {
-                                //first row
-                                string s = cell2.CellText.TextData[0];
-                                if (s == null) s = "";
-                                eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
-                            }
-                            else if (i == 1)
-                            {
-                                string s = cell2.CellText.TextData[0];
-                                if (s == null) s = "";
-                                eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
-                                eo.excelColumnLabelsGekkoTime[i - 1, j - 1 - startCols] = cell2.date_hack; //a hack, the cell ought to be date format
                             }
                             else
                             {
-                                eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
-                                s2 = cell2.date;
+                                if (i == 1 && j == 1)
+                                {
+                                    //do nothing
+                                }
+                                else if (j == 1)
+                                {
+                                    //first row
+                                    string s = cell2.CellText.TextData[0];
+                                    if (s == null) s = "";
+                                    eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
+                                }
+                                else if (i == 1)
+                                {
+                                    string s = cell2.CellText.TextData[0];
+                                    if (s == null) s = "";
+                                    eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
+                                    eo.excelColumnLabelsGekkoTime[i - 1, j - 1 - startCols] = cell2.date_hack; //a hack, the cell ought to be date format
+                                }
+                                else
+                                {
+                                    eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
+                                    s2 = cell2.date;
+                                }
                             }
                         }
                     }
-                }
 
-                CreateExcelWorkbook2(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
+                    CreateExcelWorkbook2(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
+
+                }
                 return;
             }
             else if (type == EPrintTypes.Clip)
@@ -31993,21 +32003,29 @@ namespace Gekko
             {
                 if (rows) table = table.Transpose();
 
-                int widthRemember = Program.options.print_width;
-                int fileWidthRemember = Program.options.print_filewidth;
-                Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
-                try
-                {
-                    G.Writeln("");
-                    List<string> ss = table.Print();
-                    foreach (string s in ss) G.Writeln(s);
+                if (Globals.excelDna)
+                {                    
+                    Program.PrtToExcelDna(table, IsMulprt(o), false, null);
                 }
-                finally
+                else
                 {
-                    //resetting, also if there is an error
-                    Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
+
+                    int widthRemember = Program.options.print_width;
+                    int fileWidthRemember = Program.options.print_filewidth;
+                    Program.options.print_width = int.MaxValue;
+                    Program.options.print_filewidth = int.MaxValue;
+                    try
+                    {
+                        G.Writeln("");
+                        List<string> ss = table.Print();
+                        foreach (string s in ss) G.Writeln(s);
+                    }
+                    finally
+                    {
+                        //resetting, also if there is an error
+                        Program.options.print_width = widthRemember;
+                        Program.options.print_filewidth = fileWidthRemember;
+                    }                    
                 }
 
                 Globals.lastPrtOrMulprtTable = table;  //if CLIP x, y, z, this Globals.lastPrtOrMulprtTable is used later on
@@ -34905,6 +34923,70 @@ namespace Gekko
                     G.Writeln("These are the cells from your last PRT/MULPRT/SHOW or table.");
                 }
             }
+        }
+
+        public static void PrtToExcelDna(Table table, bool isMulprt, bool isStamp, string title)
+        {
+            //TODO TODO
+            //TODO TODO
+            //TODO TODO title and stamp??
+            //TODO TODO
+            //TODO TODO
+
+            int extraRows = 0;
+            if (isStamp) extraRows++;
+            if (title != null) extraRows++;
+
+            int rowsOffset = 0; //not used yet
+            int colOffset = 0; //not used yet
+
+            //ttqwerty
+
+            object[,] cells = new object[table.GetRowMaxNumber() + rowsOffset + extraRows, table.GetColMaxNumber() + colOffset];
+
+            int extra = 0;
+            if (isStamp)
+            {
+                cells[extra, 0] = GetStamp(isMulprt);
+                extra++;
+            }
+            if (title != null)
+            {
+                cells[extra, 0] = title;
+            }
+
+            for (int i = 0; i < table.GetRowMaxNumber(); i++)
+            {                
+                for (int j = 0; j < table.GetColMaxNumber(); j++)
+                {
+                    Cell cell2 = table.Get(i + 1, j + 1);
+                    string s2 = "";
+                    if (cell2 == null)
+                    {
+                        //skip
+                    }
+                    else
+                    {
+                        int ii = i + rowsOffset + extraRows;
+                        int jj = j + colOffset;
+                        if (cell2.cellType == CellType.Number)
+                        {
+                            cells[ii, jj] = cell2.number;
+                        }
+                        else if (cell2.cellType == CellType.Date)
+                        {
+                            cells[ii, jj] = cell2.date;
+                        }
+                        else if (cell2.cellType == CellType.Text)
+                        {
+                            cells[ii, jj] =  cell2.CellText.TextData[0];
+                        }
+                    }                    
+                }
+            }
+
+            Globals.excelDnaData = new ExcelDnaData();
+            Globals.excelDnaData.cells = cells;
         }
 
         public static string PrepareDataForClipboard(double d2)
@@ -40996,6 +41078,11 @@ namespace Gekko
         private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
         {
 
+            //
+            // NOTE: IsClipOrDna() is always false, these are not done here
+            //       clip stuff and dna could be removed here
+            //
+
             //1. append-     filename-     sheet-            show fakefilename sheet='Data'
             //2. append-     filename-     sheet+            show fakefilename sheet=sheetname
             //3. append-     filename+     sheet-            store filename sheet='Data'                        ...as above just silent
@@ -41186,18 +41273,8 @@ namespace Gekko
                     }
 
                     if (isStamp)
-                    {
-                        StampTypes type = StampTypes.Normal;
-                        if (isMulprt) type = StampTypes.Multiplier; //we drop .Base for now...
-
-                        List<string> lines = GetDatabankInfo(type);
-                        string ss = GetDateTimeStamp() + ". ";
-                        foreach (string s in lines)
-                        {
-                            ss = ss + s + ". ";
-                        }
-                        if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
-                        clipData.stamp = ss;
+                    {                        
+                        clipData.stamp = GetStamp(isMulprt);
 
                         if (!IsClipOrDna(eo))
                         {
@@ -41417,13 +41494,7 @@ namespace Gekko
                         clipData.varnames = labels;
                     }
 
-                    clipData.transpose = isTranspose;
-
-                    if (Globals.excelDna)
-                    {
-                        Globals.excelDnaData = new ExcelDnaData();
-                        Globals.excelDnaData.clipData = clipData;
-                    }
+                    clipData.transpose = isTranspose;                    
                         
                     if (IsClipOrDna(eo)) return clipData;
 
@@ -41479,6 +41550,21 @@ namespace Gekko
             }
 
             return null;
+        }
+
+        private static string GetStamp(bool isMulprt)
+        {
+            StampTypes type = StampTypes.Normal;
+            if (isMulprt) type = StampTypes.Multiplier; //we drop .Base for now...
+
+            List<string> lines = GetDatabankInfo(type);
+            string ss = GetDateTimeStamp() + ". ";
+            foreach (string s in lines)
+            {
+                ss = ss + s + ". ";
+            }
+            if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
+            return ss;
         }
 
         private static bool IsClipOrDna(ExcelOptions eo)
