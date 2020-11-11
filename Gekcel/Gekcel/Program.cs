@@ -182,6 +182,11 @@ SetSeries(db, names, freq, per1, per2, array)
             return ExcelFunctionCalls.Gekko_Test1(cells);
         }
 
+        public object[,] Gekko_Fetch2()
+        {
+            return ExcelFunctionCalls.Gekko_Fetch1();
+        }
+
         public string Gekko_Run2(string commands)
         {
             return ExcelFunctionCalls.Gekko_Run1(commands);
@@ -316,6 +321,18 @@ SetSeries(db, names, freq, per1, per2, array)
             return "hejsa2";
         }
 
+        [ExcelFunction(Name = "Gekko_Fetch1", Description = "Fetch")]
+        public static object[,] Gekko_Fetch1()
+        {
+            object[,] xx = new object[2, 2];
+            xx[0, 0] = 1d;
+            xx[0, 1] = 2d;
+            xx[1, 0] = 3d;
+            xx[1, 1] = 4d;
+            return xx;
+            //return Globals.excelDnaData.cells;
+        }
+
         [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]        
         public static double Gekko_Test1(object[,] cells)
         {
@@ -445,11 +462,12 @@ SetSeries(db, names, freq, per1, per2, array)
 
                 Program.GetStartingPeriod();
                 Globals.lastPrtOrMulprtTable = null;
-
-
             }
             counter++;
             Globals.lastPrtOrMulprtTable = null;
+
+            //TODO: To make lastPrtOrMulprtTable show up in cells, we need to make sure that 
+            //      there is only one command issued. Or else it will be the last "table".
 
             string rv = null;
 
@@ -564,57 +582,79 @@ Public Function Gekko_SetData2(gbkFile As String, variableWithFreq As String, da
   Gekko_SetData2 = gekko.Gekko_SetData2(gbkFile, variableWithFreq, date2, d)  
 End Function
 
-Public Function Gekko_GetSeries2(gbkFile As String, names As String, freq As String, t1 as String, t2 as String) As Variant()
-  dim gekko as Object
-  set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_GetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2)
-End Function
+'Public Function Gekko_GetSeries2(gbkFile As String, names As String, freq As String, t1 as String, t2 as String) As Variant()
+'  dim gekko as Object
+'  set gekko = createobject(""Gekcel.COMLibrary"")
+'  Gekko_GetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2)
+'End Function
 
-Public Function Gekko_SetSeries2(gbkFile As String, names As String, freq As String, t1 as String, t2 as String, cells as Variant)
-  dim gekko as Object
-  set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_SetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2, cells)
-End Function
+'Public Function Gekko_SetSeries2(gbkFile As String, names As String, freq As String, t1 as String, t2 as String, cells as Variant()) As Variant()
+'  dim gekko as Object
+'  set gekko = createobject(""Gekcel.COMLibrary"")
+'  Gekko_SetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2, cells)
+'End Function
 
-Sub Gekko_GetGroup2()
-  cells = Gekko_GetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"")
-  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
-  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
-  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
-  rValues.ClearContents
-  rValues.Value = cells
-End Sub
+'Sub Gekko_GetGroup2()
+'  cells = Gekko_GetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"")
+'  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
+'  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
+'  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
+'  rValues.ClearContents
+'  rValues.Value = cells
+'End Sub
 
-Sub Gekko_SetGroup2()
-  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
-  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
-  Dim x1() as Variant  
-  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)  
-  x1 = x.Value
-  temp = Gekko_Test2(x1)
-End Sub
+'Sub Gekko_SetGroup2()
+'  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
+'  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
+'  Dim x1() as Variant  
+'  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)  
+'  x1 = x.Value
+'  temp = Gekko_Test2(x1)
+'End Sub
 
-Public Function Gekko_Test2(cells As Variant) As Double  
-  Dim gekko As Object
-  Set gekko = CreateObject(""Gekcel.COMLibrary"")
-  Gekko_Test2 = gekko.Gekko_Test2(cells)
-End Function
+'Public Function Gekko_Test2(cells As Variant) As Double  
+'  Dim gekko As Object
+'  Set gekko = CreateObject(""Gekcel.COMLibrary"")
+'  Gekko_Test2 = gekko.Gekko_Test2(cells)
+'End Function
 
 Public Function Gekko_Run2(commands As String) As String  
   Dim gekko As Object
   Set gekko = CreateObject(""Gekcel.COMLibrary"")  
   Gekko_Run2 = gekko.Gekko_Run2(commands)
-  Debug.Print Gekko_Run2
+  Debug.Print Gekko_Run2;
   If InStr(1, Gekko_Run2, """ + InternalHelperMethods.gekcelError1 + @""") <> 0 Then
     Err.Raise Number:=vbObjectError + 513, Description:=""" + gekcelError2 + @"""    '513 to not collide with Excel's own error numbers
   End If
 End Function
+
+Public Function Gekko_Fetch2() As Variant()
+  dim gekko as Object
+  set gekko = createobject(""Gekcel.COMLibrary"")
+  Gekko_Fetch2 = gekko.Gekko_Fetch2()
+End Function
+
+'Sub Gekko_Insert2()
+'  cells = Gekko_Fetch2()
+'  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
+'  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
+'  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
+'  rValues.ClearContents
+'  rValues.Value = cells
+'End Sub
 
 Public Sub Gekko_Demo()
   Gekko_Run2 ""tell 'Hello from Gekko';""
   Gekko_Run2 ""time 2015 2020;""
   Gekko_Run2 ""x = 1, 2, 3, 4, 5, 6;""
   Gekko_Run2 ""prt x;""
+  Dim cells As Variant
+  cells = Gekko_Fetch2()
+  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
+  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
+  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
+  rValues.ClearContents
+  rValues.Value = cells
 End Sub
 
 ";
