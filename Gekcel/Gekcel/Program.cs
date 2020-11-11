@@ -324,13 +324,14 @@ SetSeries(db, names, freq, per1, per2, array)
         [ExcelFunction(Name = "Gekko_Fetch1", Description = "Fetch")]
         public static object[,] Gekko_Fetch1()
         {
-            //object[,] xx = new object[2, 2];
-            //xx[0, 0] = 1d;
-            //xx[0, 1] = 2d;
-            //xx[1, 0] = 3d;
-            //xx[1, 1] = 4d;
-            //return xx;
-            return Globals.excelDnaData.cells;
+            var xxx = Globals.excelDnaData.clipData.data;
+            object[,] xx = new object[2, 2];
+            xx[0, 0] = 1d;
+            xx[0, 1] = 2d;
+            xx[1, 0] = 3d;
+            xx[1, 1] = 4d;
+            return xx;
+            
         }
 
         [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]        
@@ -647,7 +648,7 @@ Public Sub Gekko_Demo()
   Gekko_Run2 ""tell 'Hello from Gekko';""
   Gekko_Run2 ""time 2015 2020;""
   Gekko_Run2 ""x = 1, 2, 3, 4, 5, 6;""
-  Gekko_Run2 ""prt x;""
+  Gekko_Run2 ""sheet x;""
   Dim cells As Variant
   cells = Gekko_Fetch2()
   nrows = UBound(cells, 1) - LBound(cells, 1) + 1

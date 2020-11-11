@@ -130,6 +130,8 @@ namespace Gekko
     public class ExcelDnaData
     {
         public object[,] cells = null;
+        //public TableLight tableLight = null;
+        public ExcelDataForClip clipData = null;
     }
 
     public class WalkTokensHelper
@@ -500,18 +502,30 @@ namespace Gekko
 
     public class WorkBookHelper
     {
-        public static void WorkBookSetData_1(ExcelDataForClip clipData, ExcelWorksheet ws, int rowcounter, int colcounter)
+        public static void WorkBookSetData_1(string stamp, ExcelWorksheet ws, int rowcounter, int colcounter)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[rowcounter, colcounter].Formula = null;
-            ws.Cells[rowcounter, colcounter].Value = clipData.stamp;
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {
+                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[rowcounter, colcounter].Formula = null;
+                ws.Cells[rowcounter, colcounter].Value = stamp;
+            }
         }
 
         public static void WorkBookSetData_2(ExcelDataForClip clipData, ExcelWorksheet ws, int rowcounter, int colcounter)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[rowcounter, colcounter].Formula = null;
-            ws.Cells[rowcounter, colcounter].Value = clipData.heading;
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {
+                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[rowcounter, colcounter].Formula = null;
+                ws.Cells[rowcounter, colcounter].Value = clipData.heading;
+            }
         }
 
         //This is the data matrix
@@ -519,10 +533,10 @@ namespace Gekko
         {
             if (Globals.excelDna)
             {
-                Globals.excelDnaData = new ExcelDnaData();
-                object[,] temp = new object[data.GetLength(0), data.GetLength(1)];
-                Array.Copy(data, temp, data.Length);
-                Globals.excelDnaData.cells = temp;
+                //Globals.excelDnaData = new ExcelDnaData();
+                //object[,] temp = new object[data.GetLength(0), data.GetLength(1)];
+                //Array.Copy(data, temp, data.Length);
+                //Globals.excelDnaData.cells = temp;
             }
             else
             {
@@ -534,46 +548,81 @@ namespace Gekko
         
         public static void WorkBookSetData_4(ExcelWorksheet ws, int i, int j, DateTime dt, string f)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[i, j].Formula = null;
-            ws.SetValue(i, j, dt);
-            ws.Cells[i, j].Style.Numberformat.Format = f;
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {//See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[i, j].Formula = null;
+                ws.SetValue(i, j, dt);
+                ws.Cells[i, j].Style.Numberformat.Format = f;
+            }
         }
 
         public static void WorkBookSetData_5(ExcelWorksheet ws, int i, int j, DateTime dt, string f)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[i, j].Formula = null;
-            ws.SetValue(i, j, dt);
-            ws.Cells[i, j].Style.Numberformat.Format = f;
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {
+                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[i, j].Formula = null;
+                ws.SetValue(i, j, dt);
+                ws.Cells[i, j].Style.Numberformat.Format = f;
+            }
         }
 
         public static void WorkBookSetData_6(ExcelWorksheet ws, int d1, int d2, object[][] datesData)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].Formula = null;
-            ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].LoadFromArrays(datesData);
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {
+                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].Formula = null;
+                ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].LoadFromArrays(datesData);
+            }
         }
 
         public static void WorkBookSetData_7(ExcelWorksheet ws, int d1, int d2, object[][] datesData)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].Formula = null;
-            ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].LoadFromArrays(datesData);
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {
+                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].Formula = null;
+                ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].LoadFromArrays(datesData);
+            }
         }   
 
         public static void WorkBookSetData_8(ExcelWorksheet ws, int d1, int d2, string[,] labels)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].Formula = null;
-            ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {
+                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].Formula = null;
+                ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
+            }
         }
 
         public static void WorkBookSetData_9(ExcelWorksheet ws, int d1, int d2, string[,] labels)
         {
-            //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
-            ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].Formula = null;
-            ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
+            if (Globals.excelDna)
+            {
+            }
+            else
+            {
+                //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
+                ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].Formula = null;
+                ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
+            }
         }
 
     }
@@ -40591,6 +40640,7 @@ namespace Gekko
                 matrix.Add(1, 2, new CellLight(2020));
                 matrix.Add(2, 1, new CellLight("x1"));
                 matrix.Add(2, 2, new CellLight(23456d));
+                //Globals.excelDnaData.tableLight = matrix;
                 return matrix;
             }
 
@@ -41057,7 +41107,7 @@ namespace Gekko
                         isNames = false;
                         isDates = false;
                         if (eo.excelRowLabels != null)
-                        {                            
+                        {
                             isNames = true;
                         }
                         if (eo.excelColumnLabels != null)
@@ -41120,7 +41170,7 @@ namespace Gekko
                     int rowcounter = 1;  //1-based
                     int colcounter = 1;  //1-based
 
-                    if (!eo.isClip)
+                    if (!IsClipOrDna(eo))
                     {
                         //See identical #98oiwu543w
                         string s2 = "a1";
@@ -41149,21 +41199,20 @@ namespace Gekko
                         if (ss.EndsWith(". ")) ss = ss.Substring(0, ss.Length - 2);
                         clipData.stamp = ss;
 
-                        if (!eo.isClip)
+                        if (!IsClipOrDna(eo))
                         {
-                            WorkBookHelper.WorkBookSetData_1(clipData, ws, rowcounter, colcounter);
+                            WorkBookHelper.WorkBookSetData_1(clipData.stamp, ws, rowcounter, colcounter);
                             ExcelRange range = ws.Cells[rowcounter, colcounter, rowcounter, colcounter];
                             range.Style.Font.Color.SetColor(System.Drawing.Color.Gray);
                             rowcounter++;
                         }
-
                     }
 
                     if (oPrt != null && oPrt.opt_title != null)
                     {
                         clipData.heading = oPrt.opt_title;
 
-                        if (!eo.isClip)
+                        if (!IsClipOrDna(eo))
                         {
                             WorkBookHelper.WorkBookSetData_2(clipData, ws, rowcounter, colcounter);
                             ExcelRange range = ws.Cells[rowcounter, colcounter, rowcounter, colcounter];
@@ -41202,7 +41251,7 @@ namespace Gekko
                         data = Transpose(eo.excelData);
                     }
 
-                    if (!eo.isClip)
+                    if (!IsClipOrDna(eo))
                     {
                         WorkBookHelper.WorkBookSetData_3(ws, data, d1, d2);
 
@@ -41224,8 +41273,8 @@ namespace Gekko
                         for (int j = 0; j < data.GetLength(1); j++)
                         {
                             if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
-                            {                                
-                                ws.Cells[d1 + i, d2 + j].Formula = "=" + na;                                
+                            {
+                                ws.Cells[d1 + i, d2 + j].Formula = "=" + na;
                             }
                         }
                     }
@@ -41245,7 +41294,7 @@ namespace Gekko
                             //cf. DateTime.FromOADate(excelvalue);
 
                             if (isTranspose)
-                            {                                
+                            {
                                 for (int i = d1; i <= d1 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; i++)
                                 {
                                     for (int j = d2 - 1; j <= d2 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
@@ -41308,7 +41357,7 @@ namespace Gekko
                                     {
                                         DateTime dt; string f; string date_as_string;
                                         GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(eo.excelColumnLabelsGekkoTime[i, j], isFirst, format, out dt, out f, out date_as_string);
-                                        tmp[i, j] = date_as_string;                                        
+                                        tmp[i, j] = date_as_string;
                                     }
                                 }
                                 object[,] data3 = null;
@@ -41362,14 +41411,21 @@ namespace Gekko
                         }
                         else
                         {
-                            labels = eo.excelRowLabels;                            
+                            labels = eo.excelRowLabels;
                             WorkBookHelper.WorkBookSetData_9(ws, d1, d2, labels);
                         }
                         clipData.varnames = labels;
                     }
 
                     clipData.transpose = isTranspose;
-                    if (eo.isClip) return clipData;
+
+                    if (Globals.excelDna)
+                    {
+                        Globals.excelDnaData = new ExcelDnaData();
+                        Globals.excelDnaData.clipData = clipData;
+                    }
+                        
+                    if (IsClipOrDna(eo)) return clipData;
 
                     //Save the new workbook. We haven't specified the filename so use the Save as method.
                     excel.SaveAs(new FileInfo(fileNameWithPath));
@@ -41424,7 +41480,12 @@ namespace Gekko
 
             return null;
         }
-        
+
+        private static bool IsClipOrDna(ExcelOptions eo)
+        {
+            return eo.isClip || Globals.excelDna;
+        }
+
         private static string SplitDateFormatInTwo(string dateformat, ref bool isFirst)
         {
             string format = null;
