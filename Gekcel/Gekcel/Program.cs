@@ -616,12 +616,16 @@ End Function
 'End Sub
 
 Public Sub Unpopulate()
-nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
-   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
-   Dim x1() As Variant
-   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
-   x1 = x.Value
-   temp = Gekko_Test2(x1)
+  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
+  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
+  Dim x1() As Variant
+  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
+  x1 = x.Value
+  'temp = Gekko_Test2(x1)
+  Dim gekko As Object
+  Set gekko = CreateObject(""Gekcel.COMLibrary"")
+  Dim temp As Variant
+  temp = gekko.Gekko_Test2(x1)
 End Sub
 
 Public Sub Populate()
@@ -658,7 +662,7 @@ End Sub
 
             if (true)
             {
-                app.Run("h", @"Gekko environment is set up and ready. You may try these:\n=Gekko_Run(""prt <2020 2020> x1!a;"")\n=Gekko_Run(""x1!a[2020] = 888;"")");
+                app.Run("h", @"Gekko environment is set up and ready.");
             }
 
             //app.Quit();
