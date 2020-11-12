@@ -10,9 +10,6 @@ using Gekko;
 using ExcelDna.IntelliSense;
 using ExcelDna.ComInterop;
 using Extensibility;
-//Test DFG
-
-
 
 namespace Gekcel
 {
@@ -38,48 +35,20 @@ namespace Gekcel
     // 2. If there is a security warning, click "activate"
     // 3. Now there should be a "Gekko" tab on the ribbon. Click this tab and click the "Setup" button
     //    You should get a message that the Gekko environment is set up.
-    // 4. In a cell, type this: =Gekko_GetData1("demo"; "x1"; 2020)
-    //    This should show the value 11
-    //
+    // 4. Run the macro "Demo"   
     //
     // Else when deployed:
     //
     // 1. Open up Gekcel.xlsm (activate content)
     // 2. Drag Gekcel.xll on it
     // 3. If there is a security warning, click "activate"
-    // 4. In a cell, type this: =Gekko_GetData1("demo"; "x1"; 2020)
-    //    This should show the value 11. This requires that demo.gbk is in the same folder as the Gekcel.xlsm file.
-
-    //
+    // 4. Run the macro "Demo"       //
     //
     // https://stackoverflow.com/questions/14896215/how-do-you-set-the-value-of-a-cell-using-excel-dna
-
-    /*
-     http://www.eviews.com/download/whitepapers/EViews_COM_Automation.pdf
-
-Run("%x = 100;")
-Index("x*!*", "series", returnType), returnType = strings, array (1-dim). You cannot index across banks here.
-ListToArray(nameString). Convert a comma-separated string into an array
-ArrayToList(nameArray). Reverse
-GetSeries(db, names, freq, per1, per2)     db, freq can be null. Names comma-separated. If freq!=null, a "!f" is added to names if no "!" in search. You cannot index across banks here.
-  it returns a 2d area with names as rows and dates as cols and names.
-  Operator!
-SetSeries(db, names, freq, per1, per2, array)
-
-
-        CLS: See https://stackoverflow.com/questions/10203349/use-vba-to-clear-immediate-window
-
-
-     * 
-     * */
-
-    //
-    //
-
-    //TT: Inserting and calling VB code via the Ribbon ("play" button)
-    //To do this, you must have this activated in Excel:
+    // http://www.eviews.com/download/whitepapers/EViews_COM_Automation.pdf   
+    // CLS: See https://stackoverflow.com/questions/10203349/use-vba-to-clear-immediate-window
+    
     //-------------------------------------------------------------
-
     //-------------------------------------------------------------
 
     [ComVisible(true)]
@@ -155,41 +124,21 @@ SetSeries(db, names, freq, per1, per2, array)
         //http://mikejuniperhill.blogspot.com/2014/03/interfacing-c-and-vba-with-exceldna_16.html
 
         //TT: These methods just mirror the ones in the class ExcelFunctionCalls
-        //TT: They are version that can be called from inside of VBA
-
-        //public double Gekko_GetData2(string gbkFile, string variableWithFreq, string date)
-        //{
-        //    return ExcelFunctionCalls.Gekko_GetData1(gbkFile, variableWithFreq, date);
-        //}
-
-        //public double Gekko_SetData2(string gbkFile, string variableWithFreq, string date, double d)
-        //{
-        //    return ExcelFunctionCalls.Gekko_SetData1(gbkFile, variableWithFreq, date, d);
-        //}
-
-        //public object[,] Gekko_GetGroup2(string gbkFile, string names, string freq, string t1, string t2)
-        //{
-        //    return ExcelFunctionCalls.Gekko_GetGroup1(gbkFile, names, freq, t1, t2);
-        //}
-
-        //public string Gekko_SetGroup2(string gbkFile, string names, string freq, string t1, string t2, object[,] cells)
-        //{
-        //    return ExcelFunctionCalls.Gekko_SetGroup1(gbkFile, names, freq, t1, t2, cells);
-        //}
-
-        public double Gekko_Put(object[,] cells)
-        {
-            return ExcelFunctionCalls.Gekko_Put(cells);
-        }
+        //TT: They are version that can be called from inside of VBA        
 
         public object[,] Gekko_Get()
         {
             return ExcelFunctionCalls.Gekko_Get();
         }
 
-        public string Gekko_Run(string commands)
+        public double Gekko_Put(object[,] cells)
         {
-            return ExcelFunctionCalls.Gekko_Run(commands);
+            return ExcelFunctionCalls.Gekko_Put(cells);
+        }
+
+        public string Gekko(string commands)
+        {
+            return ExcelFunctionCalls.Gekko(commands);
         }
     }
 
@@ -203,142 +152,15 @@ SetSeries(db, names, freq, per1, per2, array)
             return 1d;
         }
 
-        [ExcelFunction(Name = "Gekko_Run1", Description = "Run Gekko command(s)")]
-        public static string Gekko_Run(string commands)
-        {
-            return InternalHelperMethods.Run(commands);
-        }
-
-        ////TT: Type this in cell: =Gekko_GetData1("demo.gbk"; "x1!a"; "2020")
-        //[ExcelFunction(Name = "Gekko_GetData1", Description = "Gets a data value from a timeseries in a gbk databank file")]
-        //public static double Gekko_GetData1(
-        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
-        //    [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq,
-        //    [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
-        //{            
-        //    double d = double.NaN;            
-        //    Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-        //    variableWithFreq = G.Chop_AddFreq(variableWithFreq, "a");
-        //    Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
-        //    if (ts == null)
-        //    {
-        //        MessageBox.Show("*** ERROR: Could not find timeseries '" + variableWithFreq + "' in '" + gbkFile + "' databank");
-        //    }
-        //    else
-        //    {
-        //        GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
-        //        d = ts.GetDataSimple(gt);
-        //    }
-        //    return d;
-        //}
-
-        ////TT: Type this in cell: =Gekko_SetData1("demo.gbk"; "x1!a"; "2020"; 777)
-        //[ExcelFunction(Name = "Gekko_SetData1", Description = "Sets a data value in a timeseries in a gbk databank file")]
-        //public static double Gekko_SetData1(
-        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
-        //    [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
-        //    [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, 
-        //    [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
-        //{            
-        //    Program.PrepareExcelDna(Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.            
-        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);            
-        //    variableWithFreq = G.Chop_AddFreq(variableWithFreq, "a");
-        //    double rv = 0;
-        //    Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;            
-        //    if (ts == null)
-        //    {
-        //        MessageBox.Show("*** ERROR: Could not find timeseries '" + variableWithFreq + "' in '" + gbkFile + "' databank");
-        //    }
-        //    else
-        //    {
-        //        GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
-        //        ts.SetData(gt, value);
-        //        InternalHelperMethods.WriteGbkDatabankToFile(gbkFile, db);
-        //        rv = 1d;
-        //    }
-        //    return rv; //1 for good, 0 for problem
-        //}
-
-        //[ExcelFunction(Name = "Gekko_GetGroup1", Description = "Gets a 2d array with rows of names and colums of periods")]
-        //public static object[,] Gekko_GetGroup1(
-        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
-        //    [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
-        //    [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
-        //    [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
-        //    [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2)
-        //{
-        //    Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-
-        //    string[] ss = names.Split(',');
-        //    int m = ss.Length;
-        //    GekkoTime gt1 = new GekkoTime(EFreq.A, int.Parse(t1), 1);
-        //    GekkoTime gt2 = new GekkoTime(EFreq.A, int.Parse(t2), 1);
-        //    int n = GekkoTime.Observations(gt1, gt2);
-
-        //    object[,] o = new object[m + 1, n + 1];
-
-        //    int i = -1;            
-        //    foreach (string s in ss)
-        //    {
-        //        i++;                
-        //        string varnameWithFreq = G.Chop_AddFreq(s.Trim(), freq);
-        //        o[i + 1, 0] = varnameWithFreq;
-        //        Gekko.Series ts = db.GetIVariable(varnameWithFreq) as Gekko.Series;
-        //        if (ts == null)
-        //        {
-        //            MessageBox.Show("*** ERROR: Series '" + varnameWithFreq + "' was not found in databank '" + gbkFile + "'");
-        //        }
-        //        int j = -1;
-        //        foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
-        //        {
-        //            j++;
-        //            string date = gt.super.ToString();  //TODO!!
-        //            if (i == 0) o[0, j + 1] = date;
-        //            double d = ts.GetDataSimple(gt);
-        //            o[i + 1, j + 1] = d;
-        //        }
-        //    }
-        //    return o;             
-        //}
-
-        //[ExcelFunction(Name = "Gekko_SetGroup1", Description = "Sets a 2d array with rows of names and colums of periods")]
-        //public static string Gekko_SetGroup1(
-        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
-        //    [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
-        //    [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
-        //    [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
-        //    [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2,
-        //    [ExcelArgument(Name = "cells", Description = "Excel cells as Variant array")] object[,] o)
-        //{
-        //    Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-
-        //    MessageBox.Show("hejsa");
-        //    return "hejsa2";
-        //}
-
-        [ExcelFunction(Name = "Gekko_Fetch1", Description = "Fetch")]
+        [ExcelFunction(Name = "Gekko_Get", Description = "Transfers data from a Gekko databank to sheet cells")]
         public static object[,] Gekko_Get()
         {
             return Globals.excelDnaData.cells;
-
-            //object[,] xx = new object[2, 2];
-            //xx[0, 0] = 1d;
-            //xx[0, 1] = 2d;
-            //xx[1, 0] = 3d;
-            //xx[1, 1] = 4d;
-            //return xx;
-
         }
 
-        [ExcelFunction(Name = "Gekko_Put", Description = "Sets a 2d array with rows of names and colums of periods")]
+        [ExcelFunction(Name = "Gekko_Put", Description = "Transfers data from sheet cells to a Gekko databank to ")]
         public static double Gekko_Put(object[,] cells)
         {
-            //double sum = 0d;
-            //The object starts with index 1 for both dimensions
-
             Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
 
             TableLight matrix = new TableLight();
@@ -347,7 +169,6 @@ SetSeries(db, names, freq, per1, per2, array)
             {
                 for (int j = 1; j < cells.GetLength(1) + 1; j++)
                 {
-
                     object cell = cells[i, j];
 
                     if (cell == null) continue;
@@ -374,29 +195,14 @@ SetSeries(db, names, freq, per1, per2, array)
 
             Globals.excelDnaData = new ExcelDnaData();
             Globals.excelDnaData.tableLight = matrix;
-
-            //TableLight xx = matrix;
-            //string dateformat = null;
-            //string datetype = null;
-            //Program.ReadInfo readInfo = new Program.ReadInfo();
-            //Databank databank = new Databank("temp");
-            //ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
-            //oRead.Type = EDataFormat.Xlsx;            
-            //CellOffset cellOffset = new CellOffset();
-            //Program.options.freq = EFreq.Q;  //TODO TODO TODO
-            ////oRead.t1 = new GekkoTime(EFreq.Q, 2000, 1);
-            ////oRead.t2 = new GekkoTime(EFreq.Q, 2000, 1);
-            //try
-            //{
-            //    Program.GetTimeseriesFromWorkbookMatrix(cellOffset, oRead, databank, matrix, readInfo, dateformat, datetype);
-            //}
-            //catch (Exception e)
-            //{
-
-            //}
-
+            
             return 12345d;
+        }
 
+        [ExcelFunction(Name = "Gekko", Description = "Run Gekko command(s)")]
+        public static string Gekko(string commands)
+        {
+            return InternalHelperMethods.Run(commands);
         }
     }
 
@@ -405,67 +211,7 @@ SetSeries(db, names, freq, per1, per2, array)
         public static int counter = 0;
         public static string gekcelError1 = "Gekcel terminated because of Gekko error(s)";
         public static string gekcelError2 = "Gekko error. See the error message in the 'Immediate' window in VBA. First open VBA (Alt+F11), then open 'Immediate' (Ctrl+G). You may move the 'Immediate' window to the top of the VBA window, or even make it free-floating.";
-
-        public static void Restart()
-        {
-            counter++;
-            Run("restart;");            
-        }
-
-        public static string Run(string commands)
-        {
-            if (counter == 0)
-            {
-                Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-                SetWorkingFolderIfNullOrEmpty();
-                Program.databanks.storage.Clear();
-                Program.databanks.storage.Add(new Databank("Work"));
-                Program.databanks.storage.Add(new Databank("Base"));
-
-                Program.databanks.local.Clear();
-                Program.databanks.global.Clear();
-                Program.databanks.localGlobal = new LocalGlobal();
-                Globals.commandMemory = new CommandMemory();
-                Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
-                Program.InitUfunctionsAndArithmeticsAndMore();
-                Program.model = new Gekko.Model();
-
-                Program.GetStartingPeriod();
-                Globals.lastPrtOrMulprtTable = null;
-            }
-            counter++;
-            Globals.lastPrtOrMulprtTable = null;
-
-            //TODO: To make lastPrtOrMulprtTable show up in cells, we need to make sure that 
-            //      there is only one command issued. Or else it will be the last "table".
-
-            string rv = null;
-
-            try
-            {
-                Program.obeyCommandCalledFromGUI(commands, new P());
-            }
-            catch (Exception e)
-            {
-                //We have to catch this exception here, otherwise it ripples through to
-                //Excel itself with a strange error message there.
-                if (Globals.excelDnaStorage != null)
-                {
-                    Globals.excelDnaStorage.AppendLine();
-                    Globals.excelDnaStorage.AppendLine(gekcelError1);
-                }
-            }
-            finally
-            {
-                if (Globals.excelDnaStorage != null)
-                {
-                    rv = Globals.excelDnaStorage.ToString();
-                }
-            }            
-            
-            return rv;
-        }
-
+                
         public static void Setup()
         {
             //To recreate or alter demo.gbk, use the following .gcm code.
@@ -543,22 +289,12 @@ End Sub
 Public Function Gekko(commands As String) As String  
   Dim gekcel As Object
   Set gekcel = CreateObject(""Gekcel.COMLibrary"")  
-  Gekko = gekcel.Gekko_Run(commands)
+  Gekko = gekcel.Gekko(commands)
   Debug.Print Gekko;
   If InStr(1, Gekko, """ + InternalHelperMethods.gekcelError1 + @""") <> 0 Then
     Err.Raise Number:=vbObjectError + 513, Description:=""" + gekcelError2 + @"""    '513 to not collide with Excel's own error numbers
   End If
 End Function
-
-Public Sub Gekko_Put()
-  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
-  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column  
-  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
-  Dim x1() As Variant
-  x1 = x.Value  
-  Dim temp As Variant  
-  temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Put(x1)
-End Sub
 
 Public Sub Gekko_Get()
   Dim cells As Variant  
@@ -568,6 +304,17 @@ Public Sub Gekko_Get()
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
   rValues.ClearContents
   rValues.Value = cells
+End Sub
+
+
+Public Sub Gekko_Put()
+  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
+  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column  
+  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
+  Dim x1() As Variant
+  x1 = x.Value  
+  Dim temp As Variant  
+  temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Put(x1)
 End Sub
 
 Public Sub Gekko_Demo()
@@ -598,50 +345,69 @@ End Sub
             }
 
             //app.Quit();
-        }
-
-        //These helper methods are not shown in Excel
-        public static Databank ReadGbkDatabankFromFile(string gbkFile)
-        {
-            //Read gbk file
-            SetWorkingFolderIfNullOrEmpty();
-            gbkFile = GetFullPathNameWithExtension(gbkFile, ".gbk");
-            ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
-            Program.ReadInfo info = new Program.ReadInfo();
-            string tsdxFile = null;
-            string tempTsdxPath = null;
-            int NaNCounter = 0;
-            Databank db = null;            
-            db = Program.GetDatabankFromFile(null, oRead, info, gbkFile, gbkFile, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-            return db;
-        }
-
-        public static void WriteGbkDatabankToFile(string gbkFile, Databank db)
-        {
-            SetWorkingFolderIfNullOrEmpty();
-            gbkFile = GetFullPathNameWithExtension(gbkFile, ".gbk");
-            //TT: hmmm, the two following seem necessary...
-            Program.databanks.storage = new System.Collections.Generic.List<Databank>();
-            Program.databanks.storage.Add(db);
-            int i = Program.WriteGbk(db, GekkoTime.tNull, GekkoTime.tNull, gbkFile, false, null, null, true, false);
-        }
-
-        private static string GetFullPathNameWithExtension(string gbkFile, string extension)
-        {            
-            gbkFile = Gekko.Program.AddExtension(gbkFile, extension);
-            gbkFile = Gekko.Program.CreateFullPathAndFileName(gbkFile);
-            return gbkFile;
-        }
-
+        }                
 
         private static void SetWorkingFolderIfNullOrEmpty()
         {
             if (string.IsNullOrEmpty(Program.options.folder_working)) Program.options.folder_working = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
         }
 
+        public static string Run(string commands)
+        {
+            if (counter == 0)
+            {
+                //TODO: set this up in a better way, using Program.Re() or RESTART
 
+                Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+                SetWorkingFolderIfNullOrEmpty();
+                Program.databanks.storage.Clear();
+                Program.databanks.storage.Add(new Databank("Work"));
+                Program.databanks.storage.Add(new Databank("Base"));
+
+                Program.databanks.local.Clear();
+                Program.databanks.global.Clear();
+                Program.databanks.localGlobal = new LocalGlobal();
+                Globals.commandMemory = new CommandMemory();
+                Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
+                Program.InitUfunctionsAndArithmeticsAndMore();
+                Program.model = new Gekko.Model();
+
+                Program.GetStartingPeriod();
+                Globals.lastPrtOrMulprtTable = null;
+            }
+            counter++;
+            Globals.lastPrtOrMulprtTable = null;
+
+            //TODO: To make lastPrtOrMulprtTable show up in cells, we need to make sure that 
+            //      there is only one command issued. Or else it will be the last "table".
+
+            string rv = null;
+
+            try
+            {
+                Program.obeyCommandCalledFromGUI(commands, new P());
+            }
+            catch (Exception e)
+            {
+                //We have to catch this exception here, otherwise it ripples through to
+                //Excel itself with a strange error message there.
+                if (Globals.excelDnaStorage != null)
+                {
+                    Globals.excelDnaStorage.AppendLine();
+                    Globals.excelDnaStorage.AppendLine(gekcelError1);
+                }
+            }
+            finally
+            {
+                if (Globals.excelDnaStorage != null)
+                {
+                    rv = Globals.excelDnaStorage.ToString();
+                }
+            }
+
+            return rv;
+        }
     }
-
 
     [ComVisible(true)]
     [Guid("a407a925-2ebf-4452-9c42-e431a382276f")]
@@ -657,7 +423,7 @@ End Sub
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex);
+                MessageBox.Show("*** ERROR: " + ex);
             }
         }
     }
@@ -675,7 +441,7 @@ End Sub
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading COM AddIn: " + ex);
+                MessageBox.Show("*** ERROR: loading COM AddIn: " + ex);
             }
 
             ComServer.DllRegisterServer();
@@ -688,6 +454,4 @@ End Sub
             IntelliSenseServer.Uninstall();
         }
     }
-
-
 }
