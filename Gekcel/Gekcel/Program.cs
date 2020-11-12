@@ -542,12 +542,6 @@ Public Sub h(word)
   MsgBox word
 End Sub
 
-Public Function Gekko_Test2(cells As Variant) As Double  
-  Dim gekcel As Object
-  Set gekcel = CreateObject(""Gekcel.COMLibrary"")
-  Gekko_Test2 = gekcel.Gekko_Test2(cells)
-End Function
-
 Public Function Gekko(commands As String) As String  
   Dim gekcel As Object
   Set gekcel = CreateObject(""Gekcel.COMLibrary"")  
@@ -558,27 +552,23 @@ Public Function Gekko(commands As String) As String
   End If
 End Function
 
-Public Function Gekko_Fetch2() As Variant()
-  dim gekko as Object
-  set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_Fetch2 = gekko.Gekko_Fetch2()
-End Function
-
-Public Sub Unpopulate()
+Public Sub Gekko_Put()
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
   Dim x1() As Variant
   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
   x1 = x.Value  
-  Dim gekko As Object
-  Set gekko = CreateObject(""Gekcel.COMLibrary"")
-  Dim temp As Variant
-  temp = gekko.Gekko_Test2(x1)
+  Dim temp As Variant  
+  Dim gekcel As Object  
+  Set gekcel = CreateObject(""Gekcel.COMLibrary"")  
+  temp = gekcel.Gekko_Test2(x1)
 End Sub
 
-Public Sub Populate()
+Public Sub Gekko_Get()
   Dim cells As Variant
-  cells = Gekko_Fetch2()
+  dim gekcel as Object
+  set gekcel = createobject(""Gekcel.COMLibrary"")
+  cells = gekcel.Gekko_Fetch2()
   nrows = UBound(cells, 1) - LBound(cells, 1) + 1
   ncols = UBound(cells, 2) - LBound(cells, 2) + 1
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
@@ -591,10 +581,10 @@ Public Sub Gekko_Demo()
   Gekko ""time 2015 2020;""
   Gekko ""x = 1, 2, 3, 4, 5, 6;""
   Gekko ""sheet x;""
-  Populate
+  Gekko_Get
   Range(""C2"").Value = 1000   '2016
   Range(""D2"").Value = 2000   '2017
-  Unpopulate
+  Gekko_Put
   Gekko ""import <2017 2019 xlsx> gekcel;""
   'Gekko-compare? showing file with EDIT.
   Gekko ""prt x[2015], x[2016], x[2017], x[2018];""
