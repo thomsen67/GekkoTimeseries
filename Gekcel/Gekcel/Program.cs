@@ -157,34 +157,34 @@ SetSeries(db, names, freq, per1, per2, array)
         //TT: These methods just mirror the ones in the class ExcelFunctionCalls
         //TT: They are version that can be called from inside of VBA
 
-        public double Gekko_GetData2(string gbkFile, string variableWithFreq, string date)
+        //public double Gekko_GetData2(string gbkFile, string variableWithFreq, string date)
+        //{
+        //    return ExcelFunctionCalls.Gekko_GetData1(gbkFile, variableWithFreq, date);
+        //}
+
+        //public double Gekko_SetData2(string gbkFile, string variableWithFreq, string date, double d)
+        //{
+        //    return ExcelFunctionCalls.Gekko_SetData1(gbkFile, variableWithFreq, date, d);
+        //}
+
+        //public object[,] Gekko_GetGroup2(string gbkFile, string names, string freq, string t1, string t2)
+        //{
+        //    return ExcelFunctionCalls.Gekko_GetGroup1(gbkFile, names, freq, t1, t2);
+        //}
+
+        //public string Gekko_SetGroup2(string gbkFile, string names, string freq, string t1, string t2, object[,] cells)
+        //{
+        //    return ExcelFunctionCalls.Gekko_SetGroup1(gbkFile, names, freq, t1, t2, cells);
+        //}
+
+        public double Gekko_Put(object[,] cells)
         {
-            return ExcelFunctionCalls.Gekko_GetData1(gbkFile, variableWithFreq, date);
+            return ExcelFunctionCalls.Gekko_Put(cells);
         }
 
-        public double Gekko_SetData2(string gbkFile, string variableWithFreq, string date, double d)
+        public object[,] Gekko_Get()
         {
-            return ExcelFunctionCalls.Gekko_SetData1(gbkFile, variableWithFreq, date, d);
-        }
-
-        public object[,] Gekko_GetGroup2(string gbkFile, string names, string freq, string t1, string t2)
-        {
-            return ExcelFunctionCalls.Gekko_GetGroup1(gbkFile, names, freq, t1, t2);
-        }
-
-        public string Gekko_SetGroup2(string gbkFile, string names, string freq, string t1, string t2, object[,] cells)
-        {
-            return ExcelFunctionCalls.Gekko_SetGroup1(gbkFile, names, freq, t1, t2, cells);
-        }
-
-        public double Gekko_Test2(object[,] cells)
-        {
-            return ExcelFunctionCalls.Gekko_Test1(cells);
-        }
-
-        public object[,] Gekko_Fetch2()
-        {
-            return ExcelFunctionCalls.Gekko_Fetch1();
+            return ExcelFunctionCalls.Gekko_Get();
         }
 
         public string Gekko_Run2(string commands)
@@ -204,125 +204,125 @@ SetSeries(db, names, freq, per1, per2, array)
             InternalHelperMethods.Setup();
             return 1d;
         }
-                
+
         [ExcelFunction(Name = "Gekko_Run1", Description = "Run Gekko command(s)")]
         public static string Gekko_Run1(string commands)
-        {            
+        {
             return InternalHelperMethods.Run(commands);
-        }        
-
-        //TT: Type this in cell: =Gekko_GetData1("demo.gbk"; "x1!a"; "2020")
-        [ExcelFunction(Name = "Gekko_GetData1", Description = "Gets a data value from a timeseries in a gbk databank file")]
-        public static double Gekko_GetData1(
-            [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
-            [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq,
-            [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
-        {            
-            double d = double.NaN;            
-            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-            variableWithFreq = G.Chop_AddFreq(variableWithFreq, "a");
-            Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
-            if (ts == null)
-            {
-                MessageBox.Show("*** ERROR: Could not find timeseries '" + variableWithFreq + "' in '" + gbkFile + "' databank");
-            }
-            else
-            {
-                GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
-                d = ts.GetDataSimple(gt);
-            }
-            return d;
         }
 
-        //TT: Type this in cell: =Gekko_SetData1("demo.gbk"; "x1!a"; "2020"; 777)
-        [ExcelFunction(Name = "Gekko_SetData1", Description = "Sets a data value in a timeseries in a gbk databank file")]
-        public static double Gekko_SetData1(
-            [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
-            [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
-            [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, 
-            [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
-        {            
-            Program.PrepareExcelDna(Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.            
-            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);            
-            variableWithFreq = G.Chop_AddFreq(variableWithFreq, "a");
-            double rv = 0;
-            Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;            
-            if (ts == null)
-            {
-                MessageBox.Show("*** ERROR: Could not find timeseries '" + variableWithFreq + "' in '" + gbkFile + "' databank");
-            }
-            else
-            {
-                GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
-                ts.SetData(gt, value);
-                InternalHelperMethods.WriteGbkDatabankToFile(gbkFile, db);
-                rv = 1d;
-            }
-            return rv; //1 for good, 0 for problem
-        }
-                
-        [ExcelFunction(Name = "Gekko_GetGroup1", Description = "Gets a 2d array with rows of names and colums of periods")]
-        public static object[,] Gekko_GetGroup1(
-            [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
-            [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
-            [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
-            [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
-            [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2)
-        {
-            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
-                        
-            string[] ss = names.Split(',');
-            int m = ss.Length;
-            GekkoTime gt1 = new GekkoTime(EFreq.A, int.Parse(t1), 1);
-            GekkoTime gt2 = new GekkoTime(EFreq.A, int.Parse(t2), 1);
-            int n = GekkoTime.Observations(gt1, gt2);
+        ////TT: Type this in cell: =Gekko_GetData1("demo.gbk"; "x1!a"; "2020")
+        //[ExcelFunction(Name = "Gekko_GetData1", Description = "Gets a data value from a timeseries in a gbk databank file")]
+        //public static double Gekko_GetData1(
+        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
+        //    [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq,
+        //    [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date)
+        //{            
+        //    double d = double.NaN;            
+        //    Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+        //    variableWithFreq = G.Chop_AddFreq(variableWithFreq, "a");
+        //    Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;
+        //    if (ts == null)
+        //    {
+        //        MessageBox.Show("*** ERROR: Could not find timeseries '" + variableWithFreq + "' in '" + gbkFile + "' databank");
+        //    }
+        //    else
+        //    {
+        //        GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
+        //        d = ts.GetDataSimple(gt);
+        //    }
+        //    return d;
+        //}
 
-            object[,] o = new object[m + 1, n + 1];
-                        
-            int i = -1;            
-            foreach (string s in ss)
-            {
-                i++;                
-                string varnameWithFreq = G.Chop_AddFreq(s.Trim(), freq);
-                o[i + 1, 0] = varnameWithFreq;
-                Gekko.Series ts = db.GetIVariable(varnameWithFreq) as Gekko.Series;
-                if (ts == null)
-                {
-                    MessageBox.Show("*** ERROR: Series '" + varnameWithFreq + "' was not found in databank '" + gbkFile + "'");
-                }
-                int j = -1;
-                foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
-                {
-                    j++;
-                    string date = gt.super.ToString();  //TODO!!
-                    if (i == 0) o[0, j + 1] = date;
-                    double d = ts.GetDataSimple(gt);
-                    o[i + 1, j + 1] = d;
-                }
-            }
-            return o;             
-        }
+        ////TT: Type this in cell: =Gekko_SetData1("demo.gbk"; "x1!a"; "2020"; 777)
+        //[ExcelFunction(Name = "Gekko_SetData1", Description = "Sets a data value in a timeseries in a gbk databank file")]
+        //public static double Gekko_SetData1(
+        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile, 
+        //    [ExcelArgument(Name = "variableWithFreq", Description = "Name of timeseries including frequency, for instance x!a or y!q")] string variableWithFreq, 
+        //    [ExcelArgument(Name = "date", Description = "Date, for instance 2020, 2020q2 or 2020m7")] string date, 
+        //    [ExcelArgument(Name = "value", Description = "Value of observation")] double value)
+        //{            
+        //    Program.PrepareExcelDna(Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.            
+        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);            
+        //    variableWithFreq = G.Chop_AddFreq(variableWithFreq, "a");
+        //    double rv = 0;
+        //    Gekko.Series ts = db.GetIVariable(variableWithFreq) as Gekko.Series;            
+        //    if (ts == null)
+        //    {
+        //        MessageBox.Show("*** ERROR: Could not find timeseries '" + variableWithFreq + "' in '" + gbkFile + "' databank");
+        //    }
+        //    else
+        //    {
+        //        GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true, true);
+        //        ts.SetData(gt, value);
+        //        InternalHelperMethods.WriteGbkDatabankToFile(gbkFile, db);
+        //        rv = 1d;
+        //    }
+        //    return rv; //1 for good, 0 for problem
+        //}
 
-        [ExcelFunction(Name = "Gekko_SetGroup1", Description = "Sets a 2d array with rows of names and colums of periods")]
-        public static string Gekko_SetGroup1(
-            [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
-            [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
-            [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
-            [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
-            [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2,
-            [ExcelArgument(Name = "cells", Description = "Excel cells as Variant array")] object[,] o)
-        {
-            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-            Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+        //[ExcelFunction(Name = "Gekko_GetGroup1", Description = "Gets a 2d array with rows of names and colums of periods")]
+        //public static object[,] Gekko_GetGroup1(
+        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
+        //    [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
+        //    [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
+        //    [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
+        //    [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2)
+        //{
+        //    Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
 
-            MessageBox.Show("hejsa");
-            return "hejsa2";
-        }
+        //    string[] ss = names.Split(',');
+        //    int m = ss.Length;
+        //    GekkoTime gt1 = new GekkoTime(EFreq.A, int.Parse(t1), 1);
+        //    GekkoTime gt2 = new GekkoTime(EFreq.A, int.Parse(t2), 1);
+        //    int n = GekkoTime.Observations(gt1, gt2);
+
+        //    object[,] o = new object[m + 1, n + 1];
+
+        //    int i = -1;            
+        //    foreach (string s in ss)
+        //    {
+        //        i++;                
+        //        string varnameWithFreq = G.Chop_AddFreq(s.Trim(), freq);
+        //        o[i + 1, 0] = varnameWithFreq;
+        //        Gekko.Series ts = db.GetIVariable(varnameWithFreq) as Gekko.Series;
+        //        if (ts == null)
+        //        {
+        //            MessageBox.Show("*** ERROR: Series '" + varnameWithFreq + "' was not found in databank '" + gbkFile + "'");
+        //        }
+        //        int j = -1;
+        //        foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+        //        {
+        //            j++;
+        //            string date = gt.super.ToString();  //TODO!!
+        //            if (i == 0) o[0, j + 1] = date;
+        //            double d = ts.GetDataSimple(gt);
+        //            o[i + 1, j + 1] = d;
+        //        }
+        //    }
+        //    return o;             
+        //}
+
+        //[ExcelFunction(Name = "Gekko_SetGroup1", Description = "Sets a 2d array with rows of names and colums of periods")]
+        //public static string Gekko_SetGroup1(
+        //    [ExcelArgument(Name = "gbkFile", Description = "Absolute path and filename for gbk file")] string gbkFile,
+        //    [ExcelArgument(Name = "names", Description = "Name of timeseries, can include wildcards and frequency, for instance 'x*!q' or 'x, y, z'")] string names,
+        //    [ExcelArgument(Name = "freq", Description = "Frequency (optional), for instance 'a' or 'q'")] string freq,
+        //    [ExcelArgument(Name = "t1", Description = "Starting date, for instance 2020, 2020q2 or 2020m7")] string t1,
+        //    [ExcelArgument(Name = "t2", Description = "Ending date, for instance 2020, 2020q2 or 2020m7")] string t2,
+        //    [ExcelArgument(Name = "cells", Description = "Excel cells as Variant array")] object[,] o)
+        //{
+        //    Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+        //    Databank db = InternalHelperMethods.ReadGbkDatabankFromFile(gbkFile);
+
+        //    MessageBox.Show("hejsa");
+        //    return "hejsa2";
+        //}
 
         [ExcelFunction(Name = "Gekko_Fetch1", Description = "Fetch")]
-        public static object[,] Gekko_Fetch1()
+        public static object[,] Gekko_Get()
         {
             return Globals.excelDnaData.cells;
 
@@ -332,11 +332,11 @@ SetSeries(db, names, freq, per1, per2, array)
             //xx[1, 0] = 3d;
             //xx[1, 1] = 4d;
             //return xx;
-            
+
         }
 
-        [ExcelFunction(Name = "Gekko_Test1", Description = "Sets a 2d array with rows of names and colums of periods")]        
-        public static double Gekko_Test1(object[,] cells)
+        [ExcelFunction(Name = "Gekko_Put", Description = "Sets a 2d array with rows of names and colums of periods")]
+        public static double Gekko_Put(object[,] cells)
         {
             //double sum = 0d;
             //The object starts with index 1 for both dimensions
@@ -559,12 +559,12 @@ Public Sub Gekko_Put()
   Dim x1() As Variant
   x1 = x.Value  
   Dim temp As Variant  
-  temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Test2(x1)
+  temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Put(x1)
 End Sub
 
 Public Sub Gekko_Get()
   Dim cells As Variant  
-  cells = CreateObject(""Gekcel.COMLibrary"").Gekko_Fetch2()
+  cells = CreateObject(""Gekcel.COMLibrary"").Gekko_Get()
   nrows = UBound(cells, 1) - LBound(cells, 1) + 1
   ncols = UBound(cells, 2) - LBound(cells, 2) + 1
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
@@ -578,8 +578,8 @@ Public Sub Gekko_Demo()
   Gekko ""x = 1, 2, 3, 4, 5, 6;""
   Gekko ""sheet x;""
   Gekko_Get
-  Range(""C2"").Value = 1000   '2016
-  Range(""D2"").Value = 2000   '2017
+  Range(""C2"").Value = 777   '2016
+  Range(""D2"").Value = 888   '2017
   Gekko_Put
   Gekko ""import <2017 2019 xlsx> gekcel;""
   'Gekko-compare? showing file with EDIT.
