@@ -542,60 +542,18 @@ Public Sub h(word)
   MsgBox word
 End Sub
 
-Public Function Gekko_GetData2(gbkFile As String, variableWithFreq As String, date2 As String) As Double
-  dim gekko as Object
-  set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_GetData2 = gekko.Gekko_GetData2(gbkFile, variableWithFreq, date2)
-End Function
-
-Public Function Gekko_SetData2(gbkFile As String, variableWithFreq As String, date2 As String, d As Double) As Double
-  dim gekko as Object
-  set gekko = createobject(""Gekcel.COMLibrary"")
-  Gekko_SetData2 = gekko.Gekko_SetData2(gbkFile, variableWithFreq, date2, d)  
-End Function
-
-'Public Function Gekko_GetSeries2(gbkFile As String, names As String, freq As String, t1 as String, t2 as String) As Variant()
-'  dim gekko as Object
-'  set gekko = createobject(""Gekcel.COMLibrary"")
-'  Gekko_GetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2)
-'End Function
-
-'Public Function Gekko_SetSeries2(gbkFile As String, names As String, freq As String, t1 as String, t2 as String, cells as Variant()) As Variant()
-'  dim gekko as Object
-'  set gekko = createobject(""Gekcel.COMLibrary"")
-'  Gekko_SetSeries2 = gekko.Gekko_GetSeries2(gbkFile, names, freq, t1, t2, cells)
-'End Function
-
-'Sub Gekko_GetGroup2()
-'  cells = Gekko_GetSeries2(""demo"", ""x1"", ""a"", ""2020"", ""2021"")
-'  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
-'  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
-'  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
-'  rValues.ClearContents
-'  rValues.Value = cells
-'End Sub
-
-'Sub Gekko_SetGroup2()
-'  nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
-'  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
-'  Dim x1() as Variant  
-'  Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)  
-'  x1 = x.Value
-'  temp = Gekko_Test2(x1)
-'End Sub
-
 Public Function Gekko_Test2(cells As Variant) As Double  
-  Dim gekko As Object
-  Set gekko = CreateObject(""Gekcel.COMLibrary"")
-  Gekko_Test2 = gekko.Gekko_Test2(cells)
+  Dim gekcel As Object
+  Set gekcel = CreateObject(""Gekcel.COMLibrary"")
+  Gekko_Test2 = gekcel.Gekko_Test2(cells)
 End Function
 
-Public Function Gekko_Run2(commands As String) As String  
-  Dim gekko As Object
-  Set gekko = CreateObject(""Gekcel.COMLibrary"")  
-  Gekko_Run2 = gekko.Gekko_Run2(commands)
-  Debug.Print Gekko_Run2;
-  If InStr(1, Gekko_Run2, """ + InternalHelperMethods.gekcelError1 + @""") <> 0 Then
+Public Function Gekko(commands As String) As String  
+  Dim gekcel As Object
+  Set gekcel = CreateObject(""Gekcel.COMLibrary"")  
+  Gekko = gekcel.Gekko_Run2(commands)
+  Debug.Print Gekko;
+  If InStr(1, Gekko, """ + InternalHelperMethods.gekcelError1 + @""") <> 0 Then
     Err.Raise Number:=vbObjectError + 513, Description:=""" + gekcelError2 + @"""    '513 to not collide with Excel's own error numbers
   End If
 End Function
@@ -606,22 +564,12 @@ Public Function Gekko_Fetch2() As Variant()
   Gekko_Fetch2 = gekko.Gekko_Fetch2()
 End Function
 
-'Sub Gekko_Insert2()
-'  cells = Gekko_Fetch2()
-'  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
-'  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
-'  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
-'  rValues.ClearContents
-'  rValues.Value = cells
-'End Sub
-
 Public Sub Unpopulate()
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
   Dim x1() As Variant
   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
-  x1 = x.Value
-  'temp = Gekko_Test2(x1)
+  x1 = x.Value  
   Dim gekko As Object
   Set gekko = CreateObject(""Gekcel.COMLibrary"")
   Dim temp As Variant
@@ -639,17 +587,17 @@ Public Sub Populate()
 End Sub
 
 Public Sub Gekko_Demo()
-  Gekko_Run2 ""tell 'Hello from Gekko';""
-  Gekko_Run2 ""time 2015 2020;""
-  Gekko_Run2 ""x = 1, 2, 3, 4, 5, 6;""
-  Gekko_Run2 ""sheet x;""
+  Gekko ""tell 'Hello from Gekko';""
+  Gekko ""time 2015 2020;""
+  Gekko ""x = 1, 2, 3, 4, 5, 6;""
+  Gekko ""sheet x;""
   Populate
   Range(""C2"").Value = 1000   '2016
   Range(""D2"").Value = 2000   '2017
   Unpopulate
-  Gekko_Run2 ""import <2017 2019 xlsx> gekcel;""
+  Gekko ""import <2017 2019 xlsx> gekcel;""
   'Gekko-compare? showing file with EDIT.
-  Gekko_Run2 ""prt x[2015], x[2016], x[2017], x[2018];""
+  Gekko ""prt x[2015], x[2016], x[2017], x[2018];""
 End Sub
 
 ";
