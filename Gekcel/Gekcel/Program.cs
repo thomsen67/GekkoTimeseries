@@ -615,28 +615,37 @@ End Function
 '  rValues.Value = cells
 'End Sub
 
+Public Sub Unpopulate()
+nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
+   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
+   Dim x1() As Variant
+   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
+   x1 = x.Value
+   temp = Gekko_Test2(x1)
+End Sub
+
+Public Sub Populate()
+  Dim cells As Variant
+  cells = Gekko_Fetch2()
+  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
+  ncols = UBound(cells, 2) - LBound(cells, 2) + 1
+  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
+  rValues.ClearContents
+  rValues.Value = cells
+End Sub
+
 Public Sub Gekko_Demo()
   Gekko_Run2 ""tell 'Hello from Gekko';""
   Gekko_Run2 ""time 2015 2020;""
   Gekko_Run2 ""x = 1, 2, 3, 4, 5, 6;""
   Gekko_Run2 ""sheet x;""
-
-  Dim cells As Variant
-  cells = Gekko_Fetch2()
-  nrows = UBound(cells, 1) - LBound(cells, 1) + 1
-  ncols = UBound(cells, 2) - LBound(cells, 2) + 1  
-  Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
-  rValues.ClearContents
-  rValues.Value = cells
-
-   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
-   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
-   Dim x1() as Variant  
-   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)  
-   x1 = x.Value
-   temp = Gekko_Test2(x1)
-
-   Gekko_Run2 ""import <2017 2019 xlsx> gekcel ;""
+  Populate
+  Range(""C2"").Value = 1000   '2016
+  Range(""D2"").Value = 2000   '2017
+  Unpopulate
+  Gekko_Run2 ""import <2017 2019 xlsx> gekcel;""
+  'Gekko-compare? showing file with EDIT.
+  Gekko_Run2 ""prt x[2015], x[2016], x[2017], x[2018];""
 End Sub
 
 ";
