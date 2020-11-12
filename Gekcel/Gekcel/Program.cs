@@ -554,21 +554,17 @@ End Function
 
 Public Sub Gekko_Put()
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
-  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
-  Dim x1() As Variant
+  ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column  
   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)
+  Dim x1() As Variant
   x1 = x.Value  
   Dim temp As Variant  
-  Dim gekcel As Object  
-  Set gekcel = CreateObject(""Gekcel.COMLibrary"")  
-  temp = gekcel.Gekko_Test2(x1)
+  temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Test2(x1)
 End Sub
 
 Public Sub Gekko_Get()
-  Dim cells As Variant
-  dim gekcel as Object
-  set gekcel = createobject(""Gekcel.COMLibrary"")
-  cells = gekcel.Gekko_Fetch2()
+  Dim cells As Variant  
+  cells = CreateObject(""Gekcel.COMLibrary"").Gekko_Fetch2()
   nrows = UBound(cells, 1) - LBound(cells, 1) + 1
   ncols = UBound(cells, 2) - LBound(cells, 2) + 1
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
