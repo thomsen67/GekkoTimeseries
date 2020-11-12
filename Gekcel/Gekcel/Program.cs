@@ -187,12 +187,10 @@ SetSeries(db, names, freq, per1, per2, array)
             return ExcelFunctionCalls.Gekko_Get();
         }
 
-        public string Gekko_Run2(string commands)
+        public string Gekko_Run(string commands)
         {
-            return ExcelFunctionCalls.Gekko_Run1(commands);
+            return ExcelFunctionCalls.Gekko_Run(commands);
         }
-
-
     }
 
     public static class ExcelFunctionCalls
@@ -206,7 +204,7 @@ SetSeries(db, names, freq, per1, per2, array)
         }
 
         [ExcelFunction(Name = "Gekko_Run1", Description = "Run Gekko command(s)")]
-        public static string Gekko_Run1(string commands)
+        public static string Gekko_Run(string commands)
         {
             return InternalHelperMethods.Run(commands);
         }
@@ -545,7 +543,7 @@ End Sub
 Public Function Gekko(commands As String) As String  
   Dim gekcel As Object
   Set gekcel = CreateObject(""Gekcel.COMLibrary"")  
-  Gekko = gekcel.Gekko_Run2(commands)
+  Gekko = gekcel.Gekko_Run(commands)
   Debug.Print Gekko;
   If InStr(1, Gekko, """ + InternalHelperMethods.gekcelError1 + @""") <> 0 Then
     Err.Raise Number:=vbObjectError + 513, Description:=""" + gekcelError2 + @"""    '513 to not collide with Excel's own error numbers
