@@ -129,7 +129,8 @@ namespace Gekko
 
     public class ExcelDnaData
     {
-        public object[,] cells = null;        
+        public object[,] cells = null; //when transferring from Gekko databank to current sheet
+        public TableLight tableLight = null; //when transferring from current sheet to Gekko databank
     }
 
     public class WalkTokensHelper
@@ -2526,16 +2527,22 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                }                
+                }
 
                 // ---------------------------------------------------------------------------------
                 //                  End of categories
                 // ---------------------------------------------------------------------------------
-
-                if (!open && file == null)
+                
+                if (file == null)
                 {
-                    G.Writeln2("*** ERROR: OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
-                    throw new GekkoException();
+                    if (!Globals.excelDna)
+                    {
+                        if (!open)
+                        {
+                            G.Writeln2("*** ERROR: OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
+                            throw new GekkoException();
+                        }
+                    }
                 }
                 
                 if (as2 != null && as2 == "*") as2 = readInfo.dbName;    //With READ * TO *, as2 will be '*'. In that case, we use the filename. This will only happen regarding READ, we do not have an OPEN * AS * (would not be useful, OPEN * would do exactly the same)
@@ -2572,14 +2579,18 @@ namespace Gekko
 
                 if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
-                    if (copyLocal)
+                    if (!Globals.excelDna)
                     {
-                        DateTime t0 = DateTime.Now;
-                        localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
-                        WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
-                        G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
-                        file = localFileThatShouldBeDeletedPathAndFilename;
+                        if (copyLocal)
+                        {
+                            DateTime t0 = DateTime.Now;
+                            localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
+                            WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
+                            G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
+                            file = localFileThatShouldBeDeletedPathAndFilename;
+                        }
                     }
+
                     databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
                     {
@@ -2831,7 +2842,7 @@ namespace Gekko
                 //Cleanup of local files
                 if (copyLocal)
                 {
-                    if (true)
+                    if (!Globals.excelDna)
                     {
                         try
                         {
@@ -3074,7 +3085,19 @@ namespace Gekko
             }
             else
             {
-                matrix = ReadExcelWorkbook(file, oRead.sheet);
+                if (Globals.excelDna)
+                {
+                    //if (!G.Equal(file, "gekcel.xlsx"))
+                    //{
+                    //    G.Writeln2("*** ERROR: Please use 'gekcel' as filename when reading/importing xlsx via Gekcel");
+                    //    throw new GekkoException();
+                    //}
+                    matrix = Globals.excelDnaData.tableLight;
+                }
+                else
+                {
+                    matrix = ReadExcelWorkbook(file, oRead.sheet);
+                }
             }
             GetTimeseriesFromWorkbookMatrix(offset, oRead, databank, matrix, readInfo, dateformat, datetype);
         }

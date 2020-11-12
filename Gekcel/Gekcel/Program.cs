@@ -346,86 +346,56 @@ SetSeries(db, names, freq, per1, per2, array)
             TableLight matrix = new TableLight();
 
             for (int i = 1; i < cells.GetLength(0) + 1; i++)
-            {                
+            {
                 for (int j = 1; j < cells.GetLength(1) + 1; j++)
-                {                    
+                {
 
                     object cell = cells[i, j];
 
-                    if(i==1 && j == 1)
-                    {
+                    if (cell == null) continue;
 
-                    }
-                    else if (i == 1)
+                    if (cell.GetType() == typeof(double))
                     {
-                        //dates                        
-                        if (cell.GetType() == typeof(string))
-                        {
-                            string date = (string)cell;                            
-                            CellLight cellLight = new CellLight(date); //as string
-                            matrix.Add(i, j, cellLight);
-                        }
-                        else
-                        {
-                            MessageBox.Show("*** ERROR: expected date");
-                            return 0;
-                        }
+                        matrix.Add(i, j, new CellLight((double)cell)); //as double
                     }
-                    else if (j == 1)
+                    else if (cell.GetType() == typeof(int))
                     {
-                        //names
-                        if (cell.GetType() == typeof(string))
-                        {
-                            string name = (string)cell;
-                            CellLight cellLight = new CellLight(name); //as string
-                            matrix.Add(i, j, cellLight);
-                        }
-                        else
-                        {
-                            MessageBox.Show("*** ERROR: expected variable name");
-                            return 0;
-                        }
+                        matrix.Add(i, j, new CellLight((double)((int)cell))); //as double
                     }
-                    else
+                    else if (cell.GetType() == typeof(string))
                     {
-
-                        if (cell == null) continue;
-                        if (cell.GetType() == typeof(double))
-                        {
-                            //MessageBox.Show("Added " + i + " " + j + "   " + (double)cell);
-                            //sum += (double)cell;
-                            double d = (double)cell;
-                            CellLight cellLight = new CellLight(d); //as double
-                            matrix.Add(i, j, cellLight);
-                        }
-                        else
-                        {
-                            MessageBox.Show("*** ERROR: expected variable name");
-                            return 0;
-                        }
+                        matrix.Add(i, j, new CellLight((string)cell)); //as string
+                    }
+                    else if (cell.GetType() == typeof(DateTime))
+                    {
+                        MessageBox.Show("*** ERROR: Date cells are not supported (yet)");
+                        throw new Exception();
                     }
                 }
             }
-            
-            TableLight xx = matrix;
-            string dateformat = null;
-            string datetype = null;
-            Program.ReadInfo readInfo = new Program.ReadInfo();
-            Databank databank = new Databank("temp");
-            ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
-            oRead.Type = EDataFormat.Xlsx;            
-            CellOffset cellOffset = new CellOffset();
-            Program.options.freq = EFreq.Q;  //TODO TODO TODO
-            //oRead.t1 = new GekkoTime(EFreq.Q, 2000, 1);
-            //oRead.t2 = new GekkoTime(EFreq.Q, 2000, 1);
-            try
-            {
-                Program.GetTimeseriesFromWorkbookMatrix(cellOffset, oRead, databank, matrix, readInfo, dateformat, datetype);
-            }
-            catch (Exception e)
-            {
 
-            }
+            Globals.excelDnaData = new ExcelDnaData();
+            Globals.excelDnaData.tableLight = matrix;
+
+            //TableLight xx = matrix;
+            //string dateformat = null;
+            //string datetype = null;
+            //Program.ReadInfo readInfo = new Program.ReadInfo();
+            //Databank databank = new Databank("temp");
+            //ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
+            //oRead.Type = EDataFormat.Xlsx;            
+            //CellOffset cellOffset = new CellOffset();
+            //Program.options.freq = EFreq.Q;  //TODO TODO TODO
+            ////oRead.t1 = new GekkoTime(EFreq.Q, 2000, 1);
+            ////oRead.t2 = new GekkoTime(EFreq.Q, 2000, 1);
+            //try
+            //{
+            //    Program.GetTimeseriesFromWorkbookMatrix(cellOffset, oRead, databank, matrix, readInfo, dateformat, datetype);
+            //}
+            //catch (Exception e)
+            //{
+
+            //}
 
             return 12345d;
 
@@ -614,11 +584,11 @@ End Function
 '  temp = Gekko_Test2(x1)
 'End Sub
 
-'Public Function Gekko_Test2(cells As Variant) As Double  
-'  Dim gekko As Object
-'  Set gekko = CreateObject(""Gekcel.COMLibrary"")
-'  Gekko_Test2 = gekko.Gekko_Test2(cells)
-'End Function
+Public Function Gekko_Test2(cells As Variant) As Double  
+  Dim gekko As Object
+  Set gekko = CreateObject(""Gekcel.COMLibrary"")
+  Gekko_Test2 = gekko.Gekko_Test2(cells)
+End Function
 
 Public Function Gekko_Run2(commands As String) As String  
   Dim gekko As Object
@@ -650,6 +620,7 @@ Public Sub Gekko_Demo()
   Gekko_Run2 ""time 2015 2020;""
   Gekko_Run2 ""x = 1, 2, 3, 4, 5, 6;""
   Gekko_Run2 ""sheet x;""
+
   Dim cells As Variant
   cells = Gekko_Fetch2()
   nrows = UBound(cells, 1) - LBound(cells, 1) + 1
@@ -657,6 +628,15 @@ Public Sub Gekko_Demo()
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
   rValues.ClearContents
   rValues.Value = cells
+
+   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
+   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column
+   Dim x1() as Variant  
+   Set x = Application.Range(""A1:A1"").Resize(nrows, ncols)  
+   x1 = x.Value
+   temp = Gekko_Test2(x1)
+
+   Gekko_Run2 ""import <2017 2019 xlsx> gekcel ;""
 End Sub
 
 ";

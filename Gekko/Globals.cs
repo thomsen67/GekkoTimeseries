@@ -70,6 +70,7 @@ namespace Gekko
         public static StringBuilder excelDnaStorage = null;
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
         public static ExcelDnaData excelDnaData = null;
+        public static string excelDnaName = "Gekcel";
 
         public static bool decompUnitCsvPivot = false;  //can activate xlsx pivot writing   
 
