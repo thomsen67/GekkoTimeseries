@@ -410,17 +410,17 @@ End Sub
             {
                 //We have to catch this exception here, otherwise it ripples through to
                 //Excel itself with a strange error message there.
-                if (Globals.excelDnaStorage != null)
+                if (Globals.excelDnaOutput != null)
                 {
-                    Globals.excelDnaStorage.AppendLine();
-                    Globals.excelDnaStorage.AppendLine(gekcelError1);
+                    Globals.excelDnaOutput.AppendLine();
+                    Globals.excelDnaOutput.AppendLine(gekcelError1);
                 }
             }
             finally
             {
-                if (Globals.excelDnaStorage != null)
+                if (Globals.excelDnaOutput != null)
                 {
-                    rv = Globals.excelDnaStorage.ToString();
+                    rv = Globals.excelDnaOutput.ToString();
                 }
             }
 
