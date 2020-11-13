@@ -12,6 +12,7 @@ using ExcelDna.ComInterop;
 using Extensibility;
 
 //TODO: prt should work. Maybe wipe cells before sheet/prt? Optional. Starting cell?
+//      sheet does not work with <cols>, transposed, fix
 //      cls should wipe, and be careful
 //      special gekcel commands?? SHEET without filename, filename is stupid.
 //      Other commands like TELL to decorate cells?

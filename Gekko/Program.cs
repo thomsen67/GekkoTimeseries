@@ -27571,6 +27571,16 @@ namespace Gekko
 
         public static void MaybeWriteOpenDatabank(Databank removed)
         {
+            if (Globals.runningOnTTComputer)
+            {
+                // #matisk
+                if (removed.storage.ContainsKey("kcf!q"))
+                {
+                    Series xx = removed.storage["kcf!q"] as Series;
+                    MessageBox.Show("WRITING databank dirty " + Program.IsDatabankDirty(removed) + " --> " + removed.name + " --- " + xx.meta.label + " --- " + xx.meta.source);
+                }
+            }
+
             if (Program.IsDatabankDirty(removed))
             {
                 if (removed.save == false)
