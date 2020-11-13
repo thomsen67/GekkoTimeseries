@@ -67,7 +67,7 @@ namespace Gekko
         //public static bool arrow = false;  //true for use with Arrow project
 
         public static bool excelDna = false;  //true for use with ExcelDna solution
-        public static StringBuilder excelDnaStorage = null;
+        public static StringBuilder excelDnaOutput = null;
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
         public static ExcelDnaData excelDnaData = null;
         public static string excelDnaName = "Gekcel";

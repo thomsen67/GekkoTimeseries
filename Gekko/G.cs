@@ -3532,7 +3532,7 @@ namespace Gekko
                     {
                         if (Globals.excelDna)
                         {
-                            if (Globals.excelDnaStorage != null) Globals.excelDnaStorage.AppendLine(s);
+                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);
                         }
                         else
                         {
@@ -3544,7 +3544,7 @@ namespace Gekko
                     {
                         if (Globals.excelDna)
                         {
-                            if (Globals.excelDnaStorage != null) Globals.excelDnaStorage.Append(s);
+                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
                         }
                         else
                         {

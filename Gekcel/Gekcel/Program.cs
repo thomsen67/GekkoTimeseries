@@ -11,6 +11,22 @@ using ExcelDna.IntelliSense;
 using ExcelDna.ComInterop;
 using Extensibility;
 
+//TODO: prt should work. Maybe wipe cells before sheet/prt? Optional. Starting cell?
+//      cls should wipe, and be careful
+//      special gekcel commands?? SHEET without filename, filename is stupid.
+//      Other commands like TELL to decorate cells?
+//      Option to aviod overwrites.
+//      Buttons and clicks etc.
+//      Guided tour of this.
+//      Setting up immediate window, activate if not activated, focus, perhaps clear. Putting it on top??
+//      How to issue commands one by one?
+//      Do plots work??
+//      Clean up file mess, possible to put all in xll file?? 
+//      Decorate Excel with Gekko version number.
+//      Fix the Re() or RESET issue.
+//      Fix syntax regarding PUT/GET.
+//      See what EViews does.
+
 namespace Gekcel
 {
     // Running Gekcel:
@@ -320,15 +336,18 @@ End Sub
 Public Sub Gekko_Demo()
   Gekko ""tell 'Hello from Gekko';""
   Gekko ""time 2015 2020;""
-  Gekko ""x = 1, 2, 3, 4, 5, 6;""
-  Gekko ""sheet x;""
+  Gekko ""x1 = 1, 2, 3, 4, 5, 6;""
+  Gekko ""x2 = 2, 3, 4, 5, 6, 7;""
+  Gekko ""sheet x1, x2;""
   Gekko_Get
+  Gekko ""clone;""
   Range(""C2"").Value = 777   '2016
   Range(""D2"").Value = 888   '2017
   Gekko_Put
   Gekko ""import <2017 2019 xlsx> gekcel;""
-  'Gekko-compare? showing file with EDIT.
-  Gekko ""prt x[2015], x[2016], x[2017], x[2018];""
+  Gekko ""compare <2010 2020> file=knr_compare.txt;""
+  Gekko ""edit knr_compare.txt;""
+  Gekko ""prt x1[2015], x1[2016], x1[2017], x1[2018];""
 End Sub
 
 ";
