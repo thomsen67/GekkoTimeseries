@@ -44417,6 +44417,28 @@ namespace Gekko
 
             public void Print()
             {
+                string fileNameWithPath = null;
+                string fileNameWithoutPath = null;
+                string fileNameName = null;
+                string fileNameExtension = null;
+                if (this.fileName != null)
+                {
+                    fileNameWithPath = this.fileName;
+                    fileNameWithoutPath = Path.GetFileNameWithoutExtension(this.fileName);
+                    fileNameName = Path.GetFileName(this.fileName);
+                    fileNameExtension = Path.GetExtension(this.fileName);                    
+                }
+                else
+                {
+                    if (Globals.excelDna)
+                    {
+                        fileNameWithPath = "[Gekcel]";
+                        fileNameWithoutPath = "[Gekcel]";
+                        fileNameName = "[Gekcel]";
+                        fileNameExtension = "[xlsx]";
+                    }
+                }
+
                 if (this.databank == null || this.databank.storage.Count == 0) return;  //no printing of these
                 Table tab = new Table();
                 tab.CurRow.SetTopBorder(1, 1);
@@ -44427,9 +44449,8 @@ namespace Gekko
                 string date = this.date;
                 if (date == null || date == "" || date == strange) date = "[empty]";
                 string ext = "";
-                if (Path.GetExtension(this.fileName).ToLower() == "bnk") ext = ".bnk";
-                tab.CurRow.SetText(1, "DATABANK " + Path.GetFileNameWithoutExtension(this.fileName));
-                //tab.CurRow.SetText(1, "DATABANK " + Path.GetFileNameWithoutExtension(this.dbName));
+                if (fileNameExtension.ToLower() == "bnk") ext = ".bnk";
+                tab.CurRow.SetText(1, "DATABANK " + fileNameWithoutPath);                
                 tab.CurRow.SetBottomBorder(1, 1);
                 tab.CurRow.Next();
                 tab.CurRow.SetText(1, "Info     : " + info);
@@ -44438,10 +44459,10 @@ namespace Gekko
                 tab.CurRow.Next();
                 if (open)
                 {
-                    tab.CurRow.SetText(1, "Open     : Opened " + Path.GetFileName(this.fileName) + " as '" + this.dbName + "'");
+                    tab.CurRow.SetText(1, "Open     : Opened " + fileNameName + " as '" + this.dbName + "'");
                     tab.CurRow.Next();
                 }
-                tab.CurRow.SetText(1, "File     : " + this.fileName + " " + this.databankVersion);
+                tab.CurRow.SetText(1, "File     : " + fileNameWithPath + " " + this.databankVersion);
                 tab.CurRow.Next();
 
                 string i1, i2; GetYearPeriod(this.startPerInFile, this.endPerInFile, out i1, out i2);
