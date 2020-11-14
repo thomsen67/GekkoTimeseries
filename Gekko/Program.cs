@@ -1942,11 +1942,10 @@ namespace Gekko
 
                         if (error)
                         {
-                            G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not find frequency data in this date: '" + date + "'");
+                            G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + date + "'");
                             G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
                             throw new GekkoException();
                         }
-
                     }
                     else
                     {
@@ -27571,15 +27570,15 @@ namespace Gekko
 
         public static void MaybeWriteOpenDatabank(Databank removed)
         {
-            if (Globals.runningOnTTComputer)
-            {
-                // #matisk
-                if (removed.storage.ContainsKey("kcf!q"))
-                {
-                    Series xx = removed.storage["kcf!q"] as Series;
-                    MessageBox.Show("WRITING databank dirty " + Program.IsDatabankDirty(removed) + " --> " + removed.name + " --- " + xx.meta.label + " --- " + xx.meta.source);
-                }
-            }
+            //if (Globals.runningOnTTComputer)
+            //{
+            //    // #matisk
+            //    if (removed.storage.ContainsKey("kcf!q"))
+            //    {
+            //        Series xx = removed.storage["kcf!q"] as Series;
+            //        MessageBox.Show("WRITING databank dirty " + Program.IsDatabankDirty(removed) + " --> " + removed.name + " --- " + xx.meta.label + " --- " + xx.meta.source);
+            //    }
+            //}
 
             if (Program.IsDatabankDirty(removed))
             {
@@ -31870,25 +31869,8 @@ namespace Gekko
             else if (type == EPrintTypes.Sheet)
             {
                 bool isStamp = false; if (o != null && G.Equal(o.opt_stamp, "yes")) isStamp = true;
-                string title = o.opt_title;
-
-                if (sameFreq == EFreq.None)
-                {
-                    G.Writeln2("*** ERROR: SHEET is only for same frequency series, else use CLIP");
-                    throw new GekkoException();
-                }
-
-                //tab2 = tab.Transpose();
-                //TODO: we need a counter regarding the first rows/cols of the table, how many??
-
-                //TODO: fill with NaN!!!
-                //TODO: fill with NaN!!!
-                //TODO: fill with NaN!!!
-
-                //remember append
-                //always start in A1, no blank line
-                //labels.. what if they break -- should be infinitely long
-
+                string title = o.opt_title;                
+                
                 Table tab2 = table.Transpose();
 
                 if (Globals.excelDna)
@@ -31897,55 +31879,8 @@ namespace Gekko
                 }
                 else
                 {
-
-                    int startRows = 1;
-                    int startCols = 1;
-                    ExcelOptions eo = new ExcelOptions();
-                    eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
-                    eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
-                    eo.excelColumnLabelsGekkoTime = new GekkoTime[1, tab2.GetColMaxNumber() - startCols];
-                    eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
-
-                    for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
-                    {
-                        for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
-                        {
-                            Cell cell2 = tab2.Get(i, j);
-                            string s2 = "";
-                            if (cell2 == null)
-                            {
-                            }
-                            else
-                            {
-                                if (i == 1 && j == 1)
-                                {
-                                    //do nothing
-                                }
-                                else if (j == 1)
-                                {
-                                    //first row
-                                    string s = cell2.CellText.TextData[0];
-                                    if (s == null) s = "";
-                                    eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
-                                }
-                                else if (i == 1)
-                                {
-                                    string s = cell2.CellText.TextData[0];
-                                    if (s == null) s = "";
-                                    eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
-                                    eo.excelColumnLabelsGekkoTime[i - 1, j - 1 - startCols] = cell2.date_hack; //a hack, the cell ought to be date format
-                                }
-                                else
-                                {
-                                    eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
-                                    s2 = cell2.date;
-                                }
-                            }
-                        }
-                    }
-
+                    ExcelOptions eo = PrepareDataForExcel(tab2);
                     CreateExcelWorkbook2(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
-
                 }
                 return;
             }
@@ -31961,7 +31896,7 @@ namespace Gekko
 
                 if (Globals.excelDna)
                 {                    
-                    Program.PrtToExcelDna(table, IsMulprt(o), false, null);
+                    Program.PrtToExcelDna(table, false, false, null); //isMulprt only relevant if there is a stamp, just set false here
                 }
                 else
                 {
@@ -31986,6 +31921,57 @@ namespace Gekko
                     CrossThreadStuff.CopyButtonEnabled(true);
                 }
             }
+        }
+
+        private static ExcelOptions PrepareDataForExcel(Table tab2)
+        {
+            int startRows = 1;
+            int startCols = 1;
+            ExcelOptions eo = new ExcelOptions();
+            eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
+            eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
+            eo.excelColumnLabelsGekkoTime = new GekkoTime[1, tab2.GetColMaxNumber() - startCols];
+            eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
+
+            for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
+            {
+                for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
+                {
+                    Cell cell2 = tab2.Get(i, j);
+                    string s2 = "";
+                    if (cell2 == null)
+                    {
+                    }
+                    else
+                    {
+                        if (i == 1 && j == 1)
+                        {
+                            //do nothing
+                        }
+                        else if (j == 1)
+                        {
+                            //first row
+                            string s = cell2.CellText.TextData[0];
+                            if (s == null) s = "";
+                            eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
+                        }
+                        else if (i == 1)
+                        {
+                            string s = cell2.CellText.TextData[0];
+                            if (s == null) s = "";
+                            eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
+                            eo.excelColumnLabelsGekkoTime[i - 1, j - 1 - startCols] = cell2.date_hack; //a hack, the cell ought to be date format
+                        }
+                        else
+                        {
+                            eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
+                            s2 = cell2.date;
+                        }
+                    }
+                }
+            }
+
+            return eo;
         }
 
         private static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
@@ -34880,22 +34866,14 @@ namespace Gekko
         }
 
         public static void PrtToExcelDna(Table table, bool isMulprt, bool isStamp, string title)
-        {
-            //TODO TODO
-            //TODO TODO
-            //TODO TODO title and stamp??
-            //TODO TODO
-            //TODO TODO
-
+        {            
             int extraRows = 0;
             if (isStamp) extraRows++;
             if (title != null) extraRows++;
 
             int rowsOffset = 0; //not used yet
             int colOffset = 0; //not used yet
-
-            //ttqwerty
-
+            
             object[,] cells = new object[table.GetRowMaxNumber() + rowsOffset + extraRows, table.GetColMaxNumber() + colOffset];
 
             int extra = 0;
@@ -34939,8 +34917,7 @@ namespace Gekko
                 }
             }
 
-            Globals.excelDnaData = new ExcelDnaData();
-            Globals.excelDnaData.cells = cells;
+            Globals.excelDnaData = new ExcelDnaData { cells = cells };
         }
 
         public static string PrepareDataForClipboard(double d2)
@@ -40827,11 +40804,11 @@ namespace Gekko
             Object[,] input = null;
 
             try
-            {
-                //Seems this startup always takes 1 second. Maybe put it in Global and reuse from there.
-                if (Globals.excelFix)
+            {                
+                if (true)
                 {
                     //THIS SEEMS TO WORK, cf also #5298375235                    
+                    //Starts up faster this way
                     if (Globals.objApp == null)
                     {
                         Globals.objApp = new Excel.Application();
@@ -40853,11 +40830,7 @@ namespace Gekko
                         Globals.objApp = new Excel.Application();
                     }
                     excel = Globals.objApp;
-                }
-                else
-                {
-                    excel = new Excel.Application();
-                }
+                }                
 
                 workbooks = excel.Workbooks;
 
@@ -40896,7 +40869,7 @@ namespace Gekko
                     //G.Writeln("interop " + G.Seconds(t2));
 
                     //This is faster regarding the data, but problem is we will not get an error
-                    //that points to the problematic cell. Could be implemented at a later point, if
+                    //that points to the problematic cell. Could be implemented at a later point,
                     //if Excel reading becomes a bottleneck.
                     //  double[,] dst = new double[input.GetLength(0), input.GetLength(1)];
                     //  Array.Copy(input, dst, input.Length);
