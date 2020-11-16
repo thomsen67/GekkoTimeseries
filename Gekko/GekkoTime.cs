@@ -76,7 +76,8 @@ namespace Gekko
         public readonly EFreq freq;
 
         public static GekkoTime tNull = new GekkoTime(EFreq.A, -12345, 1);  //think of it as a 'null' object (but it is a struct)
-                
+        public static DateTime unixTimeOrigin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);        
+
         //Note: using "new GekkoTime()" without arguments is not intended to be used, even
         //      though it is valid to do. Such a struct cannot have its fields changed anyway, so
         //      it will be unusable.
@@ -171,6 +172,13 @@ namespace Gekko
         {
             if (this.super == -12345) return true;
             return false;
+        }
+
+        public static int FromDateTimeToUnixDays(DateTime t)
+        {            
+            //note this possibility for seconds: long unixSeconds = DateTimeOffset.Now.ToUnixTimeSeconds();
+            int days = (t - GekkoTime.unixTimeOrigin).Days;
+            return days;
         }
 
         public static GekkoTime FromDateTimeToGekkoTime(EFreq freq, DateTime dt)
@@ -607,6 +615,7 @@ namespace Gekko
             }
             else if (gt.freq == EFreq.D)
             {
+                //for daily, firstLast has no effect
                 return new DateTime(gt.super, gt.sub, gt.subsub);
             }
             else

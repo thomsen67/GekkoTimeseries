@@ -64,8 +64,8 @@ namespace Gekko
         public static bool prompting = true;
         public static List<string> unitTestsPromtingHelper = null;
 
-        //public static bool arrow = false;  //true for use with Arrow project
-
+        //public static EArrowType arrowType = EArrowType.Ver1_0__with_time_int_and_underscore_name;
+        
         public static bool excelDna = false;  //true for use with ExcelDna solution
         public static StringBuilder excelDnaOutput = null;
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR

@@ -78,6 +78,12 @@ namespace Gekko
     //    }
     //}
 
+    public enum EArrowType
+    {
+        Ver1_0,
+        Ver1_0__with_time_int_and_underscore_name
+    }
+
     public enum EAppend
     {
         Yes,
