@@ -3377,11 +3377,25 @@ namespace Gekko
             }
         }
 
-        public static IVariable sort(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        public static IVariable sort(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2 = null)
         {
             List<IVariable> tmp = O.ConvertToList(x1);
             List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables(tmp.ToArray()));
-            xx.Sort(StringComparer.OrdinalIgnoreCase);
+
+            string sort = null;
+            if (x2 != null)
+            {
+                sort = O.ConvertToString(x2);
+                if (!G.Equal(sort, "natural"))
+                {
+                    G.Writeln2("*** ERROR: Expected 'natural' argument");
+                    throw new GekkoException();
+                }
+            }            
+
+            if (G.Equal(sort, "natural")) xx.Sort(G.CompareNaturalIgnoreCase);
+            else xx.Sort(StringComparer.OrdinalIgnoreCase);
+
             List m = new List();
             foreach (string s in xx)
             {
