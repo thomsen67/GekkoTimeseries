@@ -152,11 +152,11 @@ namespace Gekko
     {
         public Action action = null;
         public EGekkoActionTypes type = EGekkoActionTypes.Unknown;
-        public string name = null;  //for instance the OLS name given, so that for type == ols, we can expire links with a certain name
+        public string name = null;  //for instance the OLS name given, so that for type == ols, we can expire links with a certain name. If name = null, the link will always expire.
         public GekkoAction(EGekkoActionTypes type, string name, Action action)
         {
-            this.type = type;
-            this.name = name;
+            this.type = type;  //can be .Unknown
+            this.name = name;  //can be null
             this.action = action;
         }
     }

@@ -7090,9 +7090,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be SERIES type");
-                    else if (position == 0) G.Writeln("*** ERROR: The return type should be SERIES");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be SERIES type");
+                    G.Writeln(TypeErrorString(position, "SERIES"));
                     throw;
                 }
             }
@@ -7114,9 +7112,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be VAL type");
-                    else if (position == 0) G.Writeln("*** ERROR: The return type should be VAL");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be VAL type");
+                    G.Writeln(TypeErrorString(position, "VAL"));
                     throw;
                 }
             }
@@ -7133,9 +7129,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be STRING type");
-                    else if (position == 0) G.Writeln("*** ERROR: The return type should be STRING");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be STRING type");
+                    G.Writeln(TypeErrorString(position, "STRING"));
                     throw;
                 }
             }
@@ -7146,7 +7140,8 @@ namespace Gekko
         {
             if (x == null)
             {
-                G.Writeln("*** ERROR: Argument #" + position + " should be a name");
+                //hmmm, x == null??
+                G.Writeln(TypeErrorString(position, "NAME"));
                 throw new GekkoException();
             }
             if (x.Type() != EVariableType.String)
@@ -7157,8 +7152,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position <= 0) G.Writeln("*** ERROR: Name error, argument #" + position);
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be a name");
+                    G.Writeln(TypeErrorString(position, "NAME"));
                     throw new GekkoException();
                 }
             }
@@ -7201,9 +7195,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be DATE type");
-                    else if (position == 0) G.Writeln("*** ERROR: The return type should be DATE");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be DATE type");
+                    G.Writeln(TypeErrorString(position, "DATE"));
                     throw;
                 }
             }
@@ -7220,9 +7212,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be LIST type");
-                    else if (position == 0) G.Writeln("*** ERROR: The return type should be LIST");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be LIST type");
+                    G.Writeln(TypeErrorString(position, "LIST"));
                     throw;
                 }
             }
@@ -7243,9 +7233,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be MATRIX type");
-                    else if (position == 0) G.Writeln("*** ERROR: The return type should be MATRIX");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be MATRIX type");
+                    G.Writeln(TypeErrorString(position, "MATRIX"));
                     throw;
                 }
             }
@@ -7254,6 +7242,40 @@ namespace Gekko
                 if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
             }
             return x;
+        }
+
+        private static string TypeErrorString(int position, string type)
+        {
+            string rv = null;
+            if (position == -1)
+            {
+                rv = "***ERROR: The right-hand side should be " + type + " type";
+            }
+            else if (position == 0)
+            {
+                rv = "*** ERROR: The return type should be " + type + " type";
+            }
+            else if (position == 1)
+            {
+                rv = "*** ERROR: The start date %t1 in a f(<%t1 %t2>, ...) call should be " + type + " type";
+            }
+            else if (position == 2)
+            {
+                rv = "*** ERROR: The end date %t2 in a f(<%t1 %t2>, ...) call should be " + type + " type";
+            }
+            else  //3 or larger, corresponding to argument 1 and so on. However, using UFCS, position = 3 is the variable before dot, and position = 4, 5, 6... are the first, second etc. arguments inside the parenthesis.
+            {
+                Action a = () =>
+                {
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                    Program.Cls("output");
+                    string txt = "When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.";
+                    G.Writeln(txt, ETabs.Output);
+                };
+                string s = G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a));
+                rv = "*** ERROR: Argument #" + (position - 2) + " should be " + type + " type (see more on argument number counting " + s + ")";
+            }
+            return rv;
         }
 
         public static IVariable TypeCheck_map(IVariable x, int position)
@@ -7266,9 +7288,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    if (position == -1) G.Writeln("*** ERROR: The right-hand side should be MAP type");
-                    else if (position == 0) G.Writeln("*** ERROR: The return type should be MAP");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be MAP type");
+                    G.Writeln(TypeErrorString(position, "MAP"));
                     throw;
                 }
             }
