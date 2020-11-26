@@ -1289,6 +1289,38 @@ namespace Gekko
         public GekkoTime t2Daily;
         public GekkoTime t1Undated;
         public GekkoTime t2Undated;
+
+        public GekkoSmplSimple GetPeriods(EFreq desiredFreq)
+        {
+            GekkoTime t1 = GekkoTime.tNull;
+            GekkoTime t2 = GekkoTime.tNull;
+            if (desiredFreq == EFreq.U)
+            {
+                t1 = this.t1Undated;
+                t2 = this.t2Undated;
+            }
+            else if (desiredFreq == EFreq.A)
+            {
+                t1 = this.t1Annual;
+                t2 = this.t2Annual;
+            }
+            if (desiredFreq == EFreq.Q)
+            {
+                t1 = this.t1Quarterly;
+                t2 = this.t2Quarterly;
+            }
+            if (desiredFreq == EFreq.M)
+            {
+                t1 = this.t1Monthly;
+                t2 = this.t2Monthly;
+            }
+            if (desiredFreq == EFreq.D)
+            {
+                t1 = this.t1Daily;
+                t2 = this.t2Daily;
+            }
+            return new GekkoSmplSimple(t1, t2);
+        }
     }
 
     public class GekkoTimeIteratorBackwards : IEnumerable<GekkoTime>

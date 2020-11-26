@@ -1006,7 +1006,7 @@ namespace Gekko
         [ProtoMember(28)]
         public int largestLag = 0; //always 0 or positive        
         [ProtoMember(29)]
-        public int largestLead = 0; //always 0 or positive        
+        public int largestLead = 0; //always 0 or positive         
 
         public List<Func<GekkoSmpl, IVariable>> expressions = null; //do not protobuf this
         public Action<string, GekkoTime> predictAction = null; //do not protobuf this
@@ -32214,6 +32214,7 @@ namespace Gekko
             Table table = new Table();
             table.writeOnce = true;
 
+            AllFreqsHelper allFreqsDates = G.ConvertDateFreqsToAllFreqs(smpl.t1, smpl.t2);
 
             for (int j = 1; j < n + 2; j++)
             {
@@ -32258,7 +32259,6 @@ namespace Gekko
                 //remember there is a label column which gets number 1
                 for (int year = y1; year <= y2; year++)
                 {
-
                     string uglyYear = null; if (!pretty) uglyYear = year.ToString();
 
                     if (type != EPrintTypes.Plot) // ------------------------------------------------------------- (1)
@@ -32310,15 +32310,18 @@ namespace Gekko
                             int subHere = 1;
                             i++;
                             int sumOver = 1;
-                            // --------------------------
-                            if (j == 1)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "m1"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                // --------------------------
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m1"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32331,15 +32334,18 @@ namespace Gekko
                             int subHere = 2;
                             i++;
                             int sumOver = 1;
-                            // --------------------------
-                            if (j == 1)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "m2"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                // --------------------------
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m2"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32353,15 +32359,18 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "m3"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m3"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32376,28 +32385,31 @@ namespace Gekko
                             i++;
                             int sumOver = 3;
                             // --------------------------
-
-                            bool skip = false;
-                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                {
-                                    skip = true;
-                                    break;
-                                }
-                            }
 
-                            if (!skip)
-                            {
-                                if (j == 1)
+                                bool skip = false;
+                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                                foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
-                                    //no date hack
+                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    {
+                                        skip = true;
+                                        break;
+                                    }
                                 }
-                                else
+
+                                if (!skip)
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    if (j == 1)
+                                    {
+                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        //no date hack
+                                    }
+                                    else
+                                    {
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    }
                                 }
                             }
                         }
@@ -32412,14 +32424,18 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "q1"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "q1"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32442,14 +32458,17 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "m4"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m4"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32463,15 +32482,19 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
-                            {
-                                table.Set(i, j, uglyYear + "m5"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m5"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32485,15 +32508,19 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
-                            {
-                                table.Set(i, j, uglyYear + "m6"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m6"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32508,28 +32535,31 @@ namespace Gekko
                             i++;
                             int sumOver = 3;
                             // --------------------------
-
-                            bool skip = false;
-                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                {
-                                    skip = true;
-                                    break;
-                                }
-                            }
 
-                            if (!skip)
-                            {
-                                if (j == 1)
+                                bool skip = false;
+                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                                foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
-                                    //no date hack
+                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    {
+                                        skip = true;
+                                        break;
+                                    }
                                 }
-                                else
+
+                                if (!skip)
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    if (j == 1)
+                                    {
+                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        //no date hack
+                                    }
+                                    else
+                                    {
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    }
                                 }
                             }
                         }
@@ -32544,14 +32574,18 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "q2"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "q2"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32588,15 +32622,19 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
-                            {
-                                table.Set(i, j, uglyYear + "m7"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m7"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32610,15 +32648,19 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
-                            {
-                                table.Set(i, j, uglyYear + "m8"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m8"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32632,15 +32674,19 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
-                            {
-                                table.Set(i, j, uglyYear + "m9"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m9"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32655,28 +32701,31 @@ namespace Gekko
                             i++;
                             int sumOver = 3;
                             // --------------------------
-
-                            bool skip = false;
-                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                {
-                                    skip = true;
-                                    break;
-                                }
-                            }
 
-                            if (!skip)
-                            {
-                                if (j == 1)
+                                bool skip = false;
+                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                                foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
-                                    //no date hack
+                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    {
+                                        skip = true;
+                                        break;
+                                    }
                                 }
-                                else
+
+                                if (!skip)
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    if (j == 1)
+                                    {
+                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        //no date hack
+                                    }
+                                    else
+                                    {
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    }
                                 }
                             }
                         }
@@ -32692,14 +32741,18 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "q3"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "q3"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32725,15 +32778,19 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
-                            {
-                                table.Set(i, j, uglyYear + "m10"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m10"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32747,15 +32804,18 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "m11"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m11"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32769,15 +32829,19 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
-                            {
-                                table.Set(i, j, uglyYear + "m12"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
 
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
+                            {
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "m12"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32793,27 +32857,30 @@ namespace Gekko
                             int sumOver = 3;
                             // --------------------------
 
-                            bool skip = false;
-                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                bool skip = false;
+                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                                foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    skip = true;
-                                    break;
+                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    {
+                                        skip = true;
+                                        break;
+                                    }
                                 }
-                            }
 
-                            if (!skip)
-                            {
-                                if (j == 1)
+                                if (!skip)
                                 {
-                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
-                                    //no date hack
-                                }
-                                else
-                                {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    if (j == 1)
+                                    {
+                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        //no date hack
+                                    }
+                                    else
+                                    {
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    }
                                 }
                             }
                         }
@@ -32830,28 +32897,30 @@ namespace Gekko
                             i++;
                             int sumOver = 12;
                             // --------------------------
-
-                            bool skip = false;
-                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                bool skip = false;
+                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                                foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    skip = true;
-                                    break;
+                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    {
+                                        skip = true;
+                                        break;
+                                    }
                                 }
-                            }
 
-                            if (!skip)
-                            {
-                                if (j == 1)
+                                if (!skip)
                                 {
-                                    table.Set(i, j, uglyYear + "mSUM12"); if (rows) table.SetAlign(i, j, Align.Right);
-                                    //no date hack
-                                }
-                                else
-                                {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    if (j == 1)
+                                    {
+                                        table.Set(i, j, uglyYear + "mSUM12"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        //no date hack
+                                    }
+                                    else
+                                    {
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    }
                                 }
                             }
                         }
@@ -32865,14 +32934,18 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                table.Set(i, j, uglyYear + "q4"); if (rows) table.SetAlign(i, j, Align.Right);
-                                DateHack(table, i, j, freqHere, year, subHere);
-                            }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, uglyYear + "q4"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
+                                }
+                                else
+                                {
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                }
                             }
                         }
                     }
@@ -32888,28 +32961,31 @@ namespace Gekko
                             i++;
                             int sumOver = 4;
                             // --------------------------
-
-                            bool skip = false;
-                            GekkoTime t = new GekkoTime(freqHere, year, subHere);
-                            foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                if (t.freq == tFilter.freq && t.Equals(tFilter))
-                                {
-                                    skip = true;
-                                    break;
-                                }
-                            }
 
-                            if (!skip)
-                            {
-                                if (j == 1)
+                                bool skip = false;
+                                GekkoTime t = new GekkoTime(freqHere, year, subHere);
+                                foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    table.Set(i, j, uglyYear + "qSUM"); if (rows) table.SetAlign(i, j, Align.Right);
-                                    //no date hack
+                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    {
+                                        skip = true;
+                                        break;
+                                    }
                                 }
-                                else
+
+                                if (!skip)
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    if (j == 1)
+                                    {
+                                        table.Set(i, j, uglyYear + "qSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        //no date hack
+                                    }
+                                    else
+                                    {
+                                        PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    }
                                 }
                             }
                         }
@@ -32941,30 +33017,43 @@ namespace Gekko
                             i++;
                             int sumOver = 1;
                             // --------------------------
-                            if (j == 1)
+
+                            if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-                                if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A))
+
+                                if (j == 1)
                                 {
-                                    // #98075235874325
+                                    if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A))
+                                    {
+                                        // #98075235874325
+                                    }
+                                    else
+                                    {
+                                        table.Set(i, j, uglyYear + "a");
+                                        if (rows) table.SetAlign(i, j, Align.Right);
+                                        DateHack(table, i, j, freqHere, year, subHere);
+                                    }
                                 }
                                 else
                                 {
-                                    table.Set(i, j, uglyYear + "a");
-                                    if (rows) table.SetAlign(i, j, Align.Right);
-                                    DateHack(table, i, j, freqHere, year, subHere);
+                                    PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
+                                if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A)) i = i - 1; // #98075235874325
                             }
-                            else
-                            {
-                                PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
-                            }
-                            if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A)) i = i - 1; // #98075235874325
                         }
                     }
                 }  //end of years                   
             }
             return table;
         }
+
+        private static bool PrintShouldKeep(AllFreqsHelper allFreqs, EFreq freqHere, int year, int subHere)
+        {
+            GekkoTime tHere = new GekkoTime(freqHere, year, subHere);            
+            GekkoSmplSimple smplSimple = allFreqs.GetPeriods(freqHere);
+            if (tHere.LargerThanOrEqual(smplSimple.t1) && tHere.SmallerThanOrEqual(smplSimple.t2)) return true;
+            return false;
+        }        
 
         private static void PrintPrepareColumn(EPrintTypes type, List<O.Prt.Element> containerExplode, int j, out O.Prt.Element cc, out string operator2, out List<string> label, out string format, out EFreq freqColumn, out double scalarValueWork, out Series tsWork, out double scalarValueRef, out Series tsRef)
         {

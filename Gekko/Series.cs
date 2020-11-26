@@ -2134,6 +2134,17 @@ namespace Gekko
                 {
                     rv = this.FindArraySeries(smpl, indexes, false, false, null);  //last arg. not used
                 }
+                else if (indexerType == O.EIndexerType.Dot)
+                {
+                    //why not allow this, really? Would work for 1-dimensional array-series, x['a'] = x[a] = x.a
+                    //or maybe just keep disallowing it, because it would be hard to add a new dimension with a lot of x.a without []-parentheses.
+                    //also a bit hard to spot that it is an array-series.
+                    G.Writeln2("*** ERROR: Use of dot syntax not possible regarding array-series indexing.");
+                    G.Writeln("           Using x.a instead of x['a'] or x[a] would make it harder to spot x as an array-series,", Color.Red);
+                    G.Writeln("           adding a dimension would be cumbersome, and the confusion would probably not merit the", Color.Red);
+                    G.Writeln("           advantages (that are only present regarding 1-dimensional array-series anyway)", Color.Red);
+                    throw new GekkoException();
+                }
                 else
                 {
                     G.Writeln2("*** ERROR: Direct lagging/leading of an arrayseries not yet possible");
