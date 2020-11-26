@@ -32307,11 +32307,11 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 1;
-                            i++;
+                            int subHere = 1;                            
                             int sumOver = 1;
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 // --------------------------
                                 if (j == 1)
                                 {
@@ -32331,12 +32331,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 2;
-                            i++;
+                            int subHere = 2;                            
                             int sumOver = 1;
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
                                 // --------------------------
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m2"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32355,12 +32355,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 3;
-                            i++;
+                            int subHere = 3;                            
                             int sumOver = 1;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m3"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32381,13 +32381,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 3;
-                            i++;
+                            int subHere = 3;                            
                             int sumOver = 3;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-
+                                i++;
                                 bool skip = false;
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
@@ -32420,13 +32419,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
-                            int subHere = 1;
-                            i++;
+                            int subHere = 1;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "q1"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32454,12 +32453,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 4;
-                            i++;
+                            int subHere = 4;                            
                             int sumOver = 1;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m4"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32478,13 +32477,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 5;
-                            i++;
+                            int subHere = 5;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m5"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32504,13 +32503,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 6;
-                            i++;
+                            int subHere = 6;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m6"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32531,13 +32530,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 6;
-                            i++;
+                            int subHere = 6;                            
                             int sumOver = 3;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-
+                                i++;
                                 bool skip = false;
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
@@ -32570,13 +32568,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
-                            int subHere = 2;
-                            i++;
+                            int subHere = 2;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "q2"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32618,13 +32616,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 7;
-                            i++;
+                            int subHere = 7;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m7"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32644,13 +32642,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 8;
-                            i++;
+                            int subHere = 8;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m8"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32670,13 +32668,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 9;
-                            i++;
+                            int subHere = 9;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m9"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32697,13 +32695,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 9;
-                            i++;
+                            int subHere = 9;                            
                             int sumOver = 3;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-
+                                i++;
                                 bool skip = false;
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
@@ -32737,13 +32734,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
-                            int subHere = 3;
-                            i++;
+                            int subHere = 3;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "q3"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32774,13 +32771,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 10;
-                            i++;
+                            int subHere = 10;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m10"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32800,12 +32797,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 11;
-                            i++;
+                            int subHere = 11;                            
                             int sumOver = 1;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m11"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32825,13 +32822,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 12;
-                            i++;
+                            int subHere = 12;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "m12"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32852,13 +32849,13 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 12;
-                            i++;
+                            int subHere = 12;                            
                             int sumOver = 3;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 bool skip = false;
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
@@ -32893,12 +32890,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
-                            int subHere = 12;
-                            i++;
+                            int subHere = 12;                            
                             int sumOver = 12;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 bool skip = false;
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
@@ -32930,13 +32927,13 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {// --------------------------
                             EFreq freqHere = EFreq.Q;
-                            int subHere = 4;
-                            i++;
+                            int subHere = 4;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
+                                i++;
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "q4"); if (rows) table.SetAlign(i, j, Align.Right);
@@ -32957,13 +32954,12 @@ namespace Gekko
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
-                            int subHere = 4;
-                            i++;
+                            int subHere = 4;                            
                             int sumOver = 4;
                             // --------------------------
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-
+                                i++;
                                 bool skip = false;
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
@@ -33013,14 +33009,13 @@ namespace Gekko
                             if (isUndatedOrAnnual == 1) freqHere = EFreq.A;
 
                             //EFreq freqHere = EFreq.A;  //will also become "annual" if it is undated
-                            int subHere = 1;
-                            i++;
+                            int subHere = 1;                            
                             int sumOver = 1;
                             // --------------------------
 
                             if (PrintShouldKeep(allFreqsDates, freqHere, year, subHere))
                             {
-
+                                i++;
                                 if (j == 1)
                                 {
                                     if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A))
