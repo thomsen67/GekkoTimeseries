@@ -3,8 +3,10 @@ using System.Windows.Forms;
 using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
 using System.Runtime.InteropServices;
+using System.Globalization;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Vbe.Interop;
+using System.Threading;
 using System.IO;
 using Gekko;
 using ExcelDna.IntelliSense;
@@ -146,11 +148,11 @@ namespace Gekcel
         public object[,] Gekko_Get()
         {
             return ExcelFunctionCalls.Gekko_Get();
-        }
+        }        
 
-        public double Gekko_Put(object[,] cells)
+        public double Gekko_Put(object[,] cells, int baseOfArrayZeroOrOne)
         {
-            return ExcelFunctionCalls.Gekko_Put(cells);
+            return ExcelFunctionCalls.Gekko_Put(cells, baseOfArrayZeroOrOne);
         }
 
         public string Gekko(string commands)
@@ -173,34 +175,39 @@ namespace Gekcel
         public static object[,] Gekko_Get()
         {
             return Globals.excelDnaData.cells;
-        }
+        }        
 
-        [ExcelFunction(Name = "Gekko_Put", Description = "Transfers data from sheet cells to a Gekko databank to ")]
-        public static double Gekko_Put(object[,] cells)
+        [ExcelFunction(Name = "Gekko_Put", Description = "Transfers data from sheet cells to a Gekko databank (baseOfArray can be index = 0 or 1)")]
+        public static double Gekko_Put(object[,] cells, int baseOfArrayZeroOrOne)
         {
-            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+            Program.PrepareExcelDnaOld(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
 
-            TableLight matrix = new TableLight();
+            TableLight matrix = new TableLight();  //1-based
 
-            for (int i = 1; i < cells.GetLength(0) + 1; i++)
+            int offset = 1 - baseOfArrayZeroOrOne;
+
+            for (int i = baseOfArrayZeroOrOne; i < cells.GetLength(0) + baseOfArrayZeroOrOne; i++)
             {
-                for (int j = 1; j < cells.GetLength(1) + 1; j++)
+                for (int j = baseOfArrayZeroOrOne; j < cells.GetLength(1) + baseOfArrayZeroOrOne; j++)
                 {
                     object cell = cells[i, j];
 
                     if (cell == null) continue;
 
+                    int ii = i + offset;
+                    int jj = j + offset;
+
                     if (cell.GetType() == typeof(double))
                     {
-                        matrix.Add(i, j, new CellLight((double)cell)); //as double
+                        matrix.Add(ii, jj, new CellLight((double)cell)); //as double
                     }
                     else if (cell.GetType() == typeof(int))
                     {
-                        matrix.Add(i, j, new CellLight((double)((int)cell))); //as double
+                        matrix.Add(ii, jj, new CellLight((double)((int)cell))); //as double
                     }
                     else if (cell.GetType() == typeof(string))
                     {
-                        matrix.Add(i, j, new CellLight((string)cell)); //as string
+                        matrix.Add(ii, jj, new CellLight((string)cell)); //as string
                     }
                     else if (cell.GetType() == typeof(DateTime))
                     {
@@ -323,7 +330,6 @@ Public Sub Gekko_Get()
   rValues.Value = cells
 End Sub
 
-
 Public Sub Gekko_Put()
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
   ncols = Range(""A1"").SpecialCells(xlCellTypeLastCell).Column  
@@ -331,7 +337,7 @@ Public Sub Gekko_Put()
   Dim x1() As Variant
   x1 = x.Value  
   Dim temp As Variant  
-  temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Put(x1)
+  temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Put(x1, 1)
 End Sub
 
 Public Sub Gekko_Demo()
@@ -378,11 +384,17 @@ End Sub
             {
                 //TODO: set this up in a better way, using Program.Re() or RESTART
 
-                Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+                //#7980345743573
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
+                Program.InitUfunctionsAndArithmeticsAndMore();
+
+                Program.PrepareExcelDnaOld(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
                 SetWorkingFolderIfNullOrEmpty();
                 Program.databanks.storage.Clear();
                 Program.databanks.storage.Add(new Databank("Work"));
-                Program.databanks.storage.Add(new Databank("Base"));
+                Program.databanks.storage.Add(new Databank("Ref"));
 
                 Program.databanks.local.Clear();
                 Program.databanks.global.Clear();

@@ -1470,10 +1470,18 @@ namespace Gekko
             SetGlobalTimePeriodAbstractNew(false, t1, t2);
         }
 
+        public static void PrepareExcelDnaOld(string s)
+        {
+            Globals.excelDna = true;
+            Globals.excelDna2 = true;
+            Globals.excelDnaPath = s;            
+        }
+
         public static void PrepareExcelDna(string s)
         {
-            Globals.excelDna = true;            
-            Globals.excelDnaPath = s;            
+            Globals.excelDna = true;
+            Globals.excelDna2 = false;
+            Globals.excelDnaPath = s;
         }
 
         /// <summary>
@@ -2482,7 +2490,7 @@ namespace Gekko
                 
                 if (file == null)
                 {
-                    if (!Globals.excelDna)
+                    if (!Globals.excelDna)  //because we Gekcel-cheat with IMPORT<xlsx>, so file == null, but should not report an error here
                     {
                         if (!open)
                         {
@@ -2526,16 +2534,13 @@ namespace Gekko
 
                 if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
-                    if (!Globals.excelDna)
+                    if (copyLocal && !Globals.excelDna2)
                     {
-                        if (copyLocal)
-                        {
-                            DateTime t0 = DateTime.Now;
-                            localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
-                            WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
-                            G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
-                            file = localFileThatShouldBeDeletedPathAndFilename;
-                        }
+                        DateTime t0 = DateTime.Now;
+                        localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
+                        WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
+                        G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
+                        file = localFileThatShouldBeDeletedPathAndFilename;
                     }
 
                     databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
@@ -2787,9 +2792,9 @@ namespace Gekko
                 }
 
                 //Cleanup of local files
-                if (copyLocal)
+                if (copyLocal && !Globals.excelDna2)
                 {
-                    if (!Globals.excelDna)
+                    if (true)
                     {
                         try
                         {
@@ -2804,6 +2809,7 @@ namespace Gekko
 
                     if (isGbk)
                     {
+                    
                         try
                         {
                             File.SetAttributes(tsdxFile, FileAttributes.Normal);  //it may be read-only if original file is so

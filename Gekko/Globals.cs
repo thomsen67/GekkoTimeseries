@@ -67,6 +67,7 @@ namespace Gekko
         //public static EArrowType arrowType = EArrowType.Ver1_0__with_time_int_and_underscore_name;
         
         public static bool excelDna = false;  //true for use with ExcelDna solution
+        public static bool excelDna2 = false;  
         public static StringBuilder excelDnaOutput = null;
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
         public static ExcelDnaData excelDnaData = null;

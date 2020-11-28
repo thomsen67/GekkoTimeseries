@@ -2,7 +2,7 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
-    <StartProgram>c:\Program Files\WindowsApps\Microsoft.Office.Desktop.Excel_16051.13328.20292.0_x86__8wekyb3d8bbwe\Office16\EXCEL.EXE</StartProgram>
+    <StartProgram>c:\Program Files\WindowsApps\Microsoft.Office.Desktop.Excel_16051.13328.20356.0_x86__8wekyb3d8bbwe\Office16\EXCEL.EXE</StartProgram>
     <StartArguments>"Gekcel.xll"</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
