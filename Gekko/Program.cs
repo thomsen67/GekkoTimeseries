@@ -10768,10 +10768,10 @@ namespace Gekko
 
             s += G.NL;
             s += "----- ONLY ON TT COMPUTER -----------------" + G.NL;
-            s += $"{nameof(HasDebuggableAttribute)}: {HasDebuggableAttribute}" + " (TT: should be false)" + G.NL;
-            s += $"{nameof(IsJITOptimized)}: {IsJITOptimized}" + " (TT: should be true)" + G.NL;
-            s += $"{nameof(IsJITTrackingEnabled)}: {IsJITTrackingEnabled}" + " (TT: should be false)" + G.NL;
-            s += $"{nameof(BuildType)}: {BuildType}" + " (TT: should be release)" + G.NL;
+            s += $"{nameof(HasDebuggableAttribute)}: {HasDebuggableAttribute}" + " (not grave if True)" + G.NL;
+            s += $"{nameof(IsJITOptimized)}: {IsJITOptimized}" + " (TT: should be True)" + G.NL;
+            s += $"{nameof(IsJITTrackingEnabled)}: {IsJITTrackingEnabled}" + " (TT: should be False)" + G.NL;
+            s += $"{nameof(BuildType)}: {BuildType}" + " (TT: should be Release)" + G.NL;
             s += $"{nameof(DebugOutput)}: {DebugOutput}" + G.NL;
             s += "--> See also the DumpBin() method (unused) that can check files" + G.NL;
 
