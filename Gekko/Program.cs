@@ -88,7 +88,7 @@ namespace Gekko
             Indx[0] = s;
             Values[gamsglobals.val_level] = V;
             gdx.gdxDataWriteStr(Indx, Values);
-        }        
+        }
     }
 
     public class TokenHelper
@@ -126,11 +126,11 @@ namespace Gekko
             this.container.AddRange(x.container);
         }
 
-        public GekkoList(List<T>x)
+        public GekkoList(List<T> x)
         {
             this.container.AddRange(x);
         }
-                
+
         public GekkoList<T> AddRange(GekkoList<T> x)
         {
             this.container.AddRange(x.container);
@@ -1471,7 +1471,7 @@ namespace Gekko
                                         {
                                             G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
                                             G.Writeln("+++ NOTE:  You may change separator: OPTION interface csv decimalseparator");
-                                            if(s3.Trim() == ".")
+                                            if (s3.Trim() == ".")
                                             {
                                                 G.Writeln("+++ NOTE:  You cannot use dot ('.') to indicate missing value, use M or NA instead");
                                             }
@@ -2393,7 +2393,7 @@ namespace Gekko
             if (removed.isDirty) isDirty = true;
             else
             {
-                foreach (TimeSeries ts in removed.storage.Values)  
+                foreach (TimeSeries ts in removed.storage.Values)
                 {
                     if (ts.IsDirty())
                     {
@@ -2408,10 +2408,10 @@ namespace Gekko
         public static void HandleCleanAndParentForTimeseries(Databank db, bool merge)
         {
             db.isDirty = false;
-            foreach (TimeSeries ts in db.storage.Values) 
+            foreach (TimeSeries ts in db.storage.Values)
             {
                 if (!merge) ts.SetDirty(false);  //if we are not merging, the bank is comletely new, and the timeseries are all considered clean. When merging, dirt is all over.
-                ts.parentDatabank = db;                
+                ts.parentDatabank = db;
             }
         }
 
@@ -2581,7 +2581,7 @@ namespace Gekko
         public static void FromXls(string s, out int rowOffset, out int colOffset, bool transpose)
         {
             //0-based
-            int i_data, j_data; Program.FromXls1Based(s, out i_data, out j_data, transpose);            
+            int i_data, j_data; Program.FromXls1Based(s, out i_data, out j_data, transpose);
             rowOffset = i_data - 1;
             colOffset = j_data - 1;
         }
@@ -2628,7 +2628,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             return v;
-        }        
+        }
 
         private static void ReadTsdOrTsdx(ReadDatesHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, bool isTsdx, ref bool isProtobuf, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
@@ -2821,7 +2821,7 @@ write datatest;
                     try
                     {
                         DateTime dt3 = DateTime.Now;
-                        databank2 = Serializer.Deserialize<Databank_1_2>(fs);                        
+                        databank2 = Serializer.Deserialize<Databank_1_2>(fs);
                         //readInfo.variables = databank2.storage.Count;
                         G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
                     }
@@ -2853,9 +2853,9 @@ write datatest;
                     {
                         if (kvp.Value is Series_1_2)
                         {
-                                                                                    
+
                             Series_1_2 xGekko3 = kvp.Value as Series_1_2;
-                            
+
                             EFreq freq2 = EFreq.Annual;
                             if (xGekko3.freq == EFreq_1_2.Q) freq2 = EFreq.Quarterly;
                             else if (xGekko3.freq == EFreq_1_2.M) freq2 = EFreq.Monthly;
@@ -2883,7 +2883,7 @@ write datatest;
                                 nArrayseries++;
 
                                 //make ghost
-                                                                                                
+
                                 xGekko2.SetGhost(true);  //only a placeholder, should not be counted etc.                                                                
 
                                 foreach (KeyValuePair<MapMultidimItem, IVariable_1_2> kvpSub in xGekko3.dimensionsStorage.storage)
@@ -2930,7 +2930,7 @@ write datatest;
                                         minYearInProtobufFile = Math.Min(minYearInProtobufFile, gt1.super);
                                         maxYearInProtobufFile = Math.Max(maxYearInProtobufFile, gt2.super);
                                     }
-                                    
+
                                     subGekko2.stamp = subGekko3.meta.stamp;
                                     subGekko2.source = subGekko3.meta.source;
                                     subGekko2.label = subGekko3.meta.label;
@@ -2979,7 +2979,7 @@ write datatest;
                         else if (kvp.Value is Matrix_1_2) nMatrix++;
 
                     }
-                    
+
                     if (nVal > 0) lines.Add(nVal + " VALs were skipped");
                     if (nDate > 0) lines.Add(nDate + " DATEs were skipped");
                     if (nString > 0) lines.Add(nString + " STRINGs were skipped");
@@ -2999,7 +2999,7 @@ write datatest;
                     if (nArrayseries > 0) lines.Add(nArrayseries + " array-SERIES were read");
                     if (nTimelessseries > 0) lines.Add(nTimelessseries + " timeless SERIES were read (dates set to 1950-2100)");
 
-                    readInfo.variables = nSeries;                                       
+                    readInfo.variables = nSeries;
 
                     if (mergeOrTimeLimit)
                     {
@@ -3216,7 +3216,7 @@ write datatest;
             else if (first.freq == EFreq.Quarterly)
             {
                 if (first.SmallerThanOrEqual(dates.t1Quarterly))
-                {                    
+                {
                     offset = GekkoTime.Observations(first, dates.t1Quarterly) - 1;
                     first = dates.t1Quarterly;
                 }
@@ -3230,7 +3230,7 @@ write datatest;
                 if (first.SmallerThanOrEqual(dates.t1Monthly))
                 {
                     offset = GekkoTime.Observations(first, dates.t1Monthly) - 1;
-                    first = dates.t1Monthly;                    
+                    first = dates.t1Monthly;
                 }
                 if (last.LargerThanOrEqual(dates.t2Monthly))
                 {
@@ -3514,7 +3514,7 @@ write datatest;
         }
 
         public static void ReadPxHelper(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
-        {           
+        {
 
             DateTime dt1 = DateTime.Now;
 
@@ -3531,7 +3531,7 @@ write datatest;
             ReadPx(oRead.array, false, dates, null, null, null, pxLinesText, out vars, out startYear, out endYear);
 
             readInfo.startPerInFile = startYear.super;
-            readInfo.endPerInFile = endYear.super;        
+            readInfo.endPerInFile = endYear.super;
             readInfo.variables = vars;
             readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
 
@@ -3549,7 +3549,7 @@ write datatest;
             Databank currentBank = Program.databanks.GetDatabank(databank.aliasName);
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
-            
+
             readInfo.databank.info1 = readInfo.info1;
             readInfo.databank.date = readInfo.date;
             readInfo.databank.FileNameWithPath = readInfo.fileName;
@@ -3894,8 +3894,8 @@ write datatest;
                     ts.SetDataSequence(gt1, gt2, tempArray);
                     ts.Trim();  //to save RAM
 
-                    
-                }                
+
+                }
             }
 
             readInfo.startPerInFile = year1;
@@ -3926,13 +3926,13 @@ write datatest;
             readInfo.databank.info1 = readInfo.info1;
             readInfo.databank.date = readInfo.date;
             readInfo.databank.FileNameWithPath = readInfo.fileName;
-                        
+
         }
 
 
         public static void ReadPx(string array, bool isDownload, ReadDatesHelper datesRestrict, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
-         
+
             bool isArray = false; if (G.equal(array, "yes")) isArray = true;
 
             bool hyphenFound = false;
@@ -4256,7 +4256,7 @@ write datatest;
                     ts.source = source;
                     ts.stamp = Globals.dateStamp;
                     ts.SetDirtyGhost(true, false);
-                }                
+                }
 
                 if (Program.options.bugfix_px)  //can be switched off
                 {
@@ -4433,7 +4433,7 @@ write datatest;
                     name2 = name2.Replace("=", "");
                     name2 = name2.Replace(".", "");
                     name2 = name2.Replace(",", "");
-                    name2 = name2.Replace(":", "");                    
+                    name2 = name2.Replace(":", "");
                 }
                 codesCombi.Add(name2);
                 valuesCombi.Add(sValues);
@@ -4447,10 +4447,10 @@ write datatest;
 
                 Walk(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound);
             }
-        }        
+        }
 
         public static void ReadGdx(Databank databank, ReadDatesHelper dates, ReadOpenMulbkHelper oRead, string file2, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
-        {            
+        {
             string prefix = Program.options.gams_time_prefix.Trim().ToLower();
             bool hasPrefix = prefix.Length > 0;
             string file = AddExtension(file2, "." + "gdx");
@@ -4459,7 +4459,7 @@ write datatest;
             int skippedSets = 0;
             int importedSets = 0;
             int counterVariables = 0;
-            int counterParameters = 0;            
+            int counterParameters = 0;
             int yearMax = int.MinValue;
             int yearMin = int.MaxValue;
             string gamsDir = Program.options.gams_exe_folder.Trim();
@@ -4470,7 +4470,7 @@ write datatest;
             {
                 //do nothing
             }
-            else 
+            else
             {
                 try
                 {
@@ -4500,7 +4500,7 @@ write datatest;
                 }
                 try
                 {
-                    string msg = string.Empty;                
+                    string msg = string.Empty;
                     string producer = string.Empty;
                     int errNr = 0;
                     int rc;
@@ -4515,7 +4515,7 @@ write datatest;
                     int dimensions = 0;
                     string varName = string.Empty;
                     int varType = 0;
-                    int d;                    
+                    int d;
                     if (gamsDir == null) gamsDir = "";
                     gdxcs gdx = new gdxcs(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
                     if (msg != string.Empty)
@@ -4524,7 +4524,7 @@ write datatest;
                         G.Writeln("*** ERROR: " + msg);
                         GameErrorMessage();
                         throw new GekkoException();
-                    }                    
+                    }
                     if (true)
                     {
                         rc = gdx.gdxOpenRead(file, ref errNr);
@@ -4537,7 +4537,7 @@ write datatest;
                             G.Writeln2("*** ERROR: Internal UEL problem (GDX)");
                             throw new GekkoException();
                         }
-                        string[] uel = new string[uelCount + 1];                        
+                        string[] uel = new string[uelCount + 1];
                         for (int u = 1; u <= uelCount; u++)
                         {
                             string s = null;
@@ -4579,13 +4579,13 @@ write datatest;
                                 {
                                     skippedSets++;
                                     continue;
-                                }                                
+                                }
                                 List<string> setData = new List<string>();  //contains names of sets (entryNr --> symbolName)
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) xp_example1.ReportGDXError();
                                 while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                                 {
-                                    string s = null;                                    
-                                    s = uel[index[0]];                                    
+                                    string s = null;
+                                    s = uel[index[0]];
                                     setData.Add(s);
                                 }
                                 gdx.gdxDataReadDone();
@@ -4606,7 +4606,7 @@ write datatest;
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0) xp_example1.ReportGDXError();
                                 //int[] indexOld = new int[dimensions];
                                 string oldHash = "    ";  //will not match anything
-                                TimeSeries ts2 = null;                                
+                                TimeSeries ts2 = null;
                                 while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
                                 {
                                     int tt = -12345;
@@ -4741,10 +4741,10 @@ write datatest;
                             {
                                 //do nothing, skip this symbol
                             }
-                        }                        
+                        }
                     }
                     errNr = gdx.gdxClose();
-                    if (errNr != 0) xp_example1.ReportIOError(errNr);                    
+                    if (errNr != 0) xp_example1.ReportIOError(errNr);
                 }
                 catch (Exception e)
                 {
@@ -4753,7 +4753,7 @@ write datatest;
                     throw;
                 }
                 G.Writeln2("Fast GDX read seemed to succeed, but please note that the fast GDX reader is still experimental.");
-                G.Writeln("You may use 'OPTION gams fast = no;' to revert to the normal GDX reader");                
+                G.Writeln("You may use 'OPTION gams fast = no;' to revert to the normal GDX reader");
             }
             else
             {
@@ -5092,12 +5092,12 @@ write datatest;
             G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder',");
             G.Writeln("           for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. Note that you must");
             G.Writeln("           use a 32-bit version of GAMS with Gekko (which is 32-bit).");
-        }        
+        }
 
-        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2  ,  string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string file2, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
         {
             //TODO: try-catch if writing fails            
-                        
+
             bool usePrefix = false;
             if (Program.options.gams_time_prefix.Length > 0) usePrefix = true;
             int offset = (int)Program.options.gams_time_offset;
@@ -5129,7 +5129,7 @@ write datatest;
                 G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
                 throw;
             }
-            
+
             GAMSDatabase db = ws.AddDatabase();
 
             foreach (BankNameVersion bnv in list)
@@ -5191,9 +5191,9 @@ write datatest;
             //i2.AddRecord("b");                        
 
             db.Export(pathAndFilename);
-                              
+
             G.Writeln2("Exported " + counterVariables + " variables to " + pathAndFilename + " (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
-            if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");            
+            if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");
         }
 
         private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int offset, int counterVariables, Databank gdb, List<string> names, GAMSVariable gvar)
@@ -6732,7 +6732,7 @@ write datatest;
                     if (libcode != null) input = libcode + G.NL + G.NL + Globals.libHelper + Program.options.library_file + G.NL + G.NL + input;
 
                     commandLinesFlat = HandleObeyFiles2(input);
-                    
+
                     ph.isOneLinerFromGui = false;
                 }
                 else if (text != "")
@@ -6762,7 +6762,7 @@ write datatest;
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                     p.lastFileSentToANTLR = fileName;
                     p.SetLastFileSentToANTLR(fileName);
-                    
+
                     ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, p);
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                 }
@@ -6913,12 +6913,12 @@ write datatest;
                 }
                 TimeSeries ts = db.GetVariable(bnv.name);
                 if (ts == null && !ignoreNonExistingSeries)
-                {                    
+                {
                     G.Writeln2("*** ERROR: Could not find timeseries '" + bnv.name + "' in databank '" + bnv.bank + "'");
                     throw new GekkoException();
                 }
                 listTs.Add(ts);
-            }            
+            }
             return listTs;
         }
 
@@ -6939,7 +6939,7 @@ write datatest;
             bank = PerhapsOverrideWithDefaultBankName(defaultBank, h.hasColon, bank);
 
             List<BankNameVersion> list = new List<Gekko.BankNameVersion>();
-                        
+
             if (varName.Contains("*") || varName.Contains("?"))
             {
                 Databank db = Program.databanks.GetDatabank(bank);
@@ -7060,7 +7060,7 @@ write datatest;
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Timeseries '" + variable + "' could not be auto-created in '" + bank + "' databank");                        
+                        G.Writeln2("*** ERROR: Timeseries '" + variable + "' could not be auto-created in '" + bank + "' databank");
                         G.Writeln("           You should use CREATE to create the timeseries first, or alternatively use");
                         G.Writeln("           'MODE data', or set 'OPTION databank create auto = yes'");
                         throw new GekkoException();
@@ -7140,7 +7140,7 @@ write datatest;
         private static void ReportTimeseriesNotFound(string variable, string bank)
         {
             string b = "any open";
-            if (bank != null) b = "'" + bank + "'";                        
+            if (bank != null) b = "'" + bank + "'";
 
             G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + G.PrettifyTimeseriesHash(variable, true, false) + "' could not be found in " + b + " databank");
 
@@ -7148,7 +7148,7 @@ write datatest;
 
             foreach (EFreq freq in Enum.GetValues(typeof(EFreq)))
             {
-                List<string> found = new List<string>();                
+                List<string> found = new List<string>();
                 foreach (Databank db in Program.databanks.storage)
                 {
                     TimeSeries ts = db.GetVariable(freq, variable);
@@ -7214,7 +7214,7 @@ write datatest;
         public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
         {
             List<string> input = new List<string>();
-            
+
             //input.AddRange(db.storage.Keys);
             foreach (KeyValuePair<string, TimeSeries> kvp in db.storage)
             {
@@ -7274,8 +7274,8 @@ write datatest;
             string banks = "";
             if (s1.Equals(""))
             {
-                int wCount = Program.databanks.GetFirst().storage.Count;  
-                int rCount = Program.databanks.GetRef().storage.Count;  
+                int wCount = Program.databanks.GetFirst().storage.Count;
+                int rCount = Program.databanks.GetRef().storage.Count;
                 string originalDataFileWork = "[empty]";
                 string originalDataFileBaseline = "[empty]";
                 string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst().aliasName);
@@ -7710,7 +7710,7 @@ write datatest;
             {
                 return item[0].GetHashCode();
             }
-        }        
+        }
 
         private static void GetGamsVariable(string gvar, GAMSDatabase db, string filterScn)
         {
@@ -7803,6 +7803,181 @@ write datatest;
             double time = (DateTime.Now - t0).TotalMilliseconds;
             G.Writeln2("TIME: " + time / 1000d);
         }
+
+        public static void TestRam(bool read)
+        {
+
+            if (true)
+            {
+                //with 32 bit around:                2.81 mio m chunks = 100 --> 281 mio 32 bits (4 bytes) --> 1.12 GB. 
+                //with 32 bit large-ram-aware about: 6.21 RamLargeAware                                    --> 2.48 GB
+                //with 64 bit it probably uses pagefile, got all the way up to around 40 mio chunks        --> 16 GB...
+                //     However, 64-bit got SLOW fast, so probably needs tuning regarding page file. 
+
+                G.Writeln(Get64Bitness());
+
+                int ii = 0;
+                //memory test to test 64-bit versions
+
+                int chunk = 100;
+                int i_report = 100000000 / 4 / chunk;  //100 MB
+
+                //chunk = 3;
+                //i_report = 4;
+
+                DateTime t = DateTime.Now;
+                LinkedList<List<int>> list = new LinkedList<List<int>>();
+                try
+                {
+                    for (int i = 0; i < int.MaxValue; i++)
+                    {
+
+                        List<int> temp = new List<int>(chunk);
+                        for (int i2 = 0; i2 < chunk; i2++)
+                        {
+                            temp.Add(i2);  //from 0...99
+                        }
+
+                        list.AddLast(temp);
+                        if (i % i_report == 0)
+                        {
+                            double gb = (double)(chunk * 4) * (double)i / 1e9d;
+                            G.Writeln("GB = " + gb + " ----> write ram = " + G.Seconds(t));
+                            t = DateTime.Now;
+
+                            if (read)
+                            {
+                                double d = 0d;
+                                //double d2 = 0d;
+
+                                foreach (List<int> temp2 in list)
+                                {
+                                    foreach (int temp3 in temp2)
+                                    {
+                                        d += (double)temp3;
+                                        //d2 += 1d;
+                                    }
+                                }
+                                //if 1 chunk runs from i1-i2 (inclusive), we get sum = (i2-i1+1)*(i1+i2)/2
+                                double check = (double)(i + 1) * (double)chunk * ((double)chunk - 1) / 2;
+
+                                G.Writeln("     Reading test: " + (d - check) + " == 0 ----> read ram = " + G.Seconds(t) + " ... per GB = " + Math.Round((DateTime.Now - t).TotalMilliseconds / 1000d / gb, 2));
+                                //G.Writeln("     Test   " + d2 + "   " + d2 * 4d / 1e9d);  //just a test that the GB are correctly calculated
+
+                                t = DateTime.Now;
+                            }
+
+
+                        }
+                        ii = i;
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (Globals.threadIsInProcessOfAborting || Globals.applicationIsInProcessOfAborting)
+                    {
+                        MessageBox.Show("+++ NOTE: Hard abort of memory test");
+                    }
+                    else
+                    {
+                        MessageBox.Show("+++ NOTE: Memory test ran out of memory (not unexpected)");
+                    }
+                    //MessageBox.Show("ii = " + ii + ", chunk = " + chunk + ", " + Ex.Message + " " + Ex.InnerException);
+                    //Microsoft.VisualBasic.Devices.ComputerInfo CI = new ComputerInfo();
+                    //Console.WriteLine(CI.AvailablePhysicalMemory);
+                }
+            }
+        }
+
+
+        public static string IsJit()
+        {
+            var HasDebuggableAttribute = false;
+            var IsJITOptimized = false;
+            var IsJITTrackingEnabled = false;
+            var BuildType = "";
+            var DebugOutput = "";
+
+            Assembly ReflectedAssembly = null;
+
+            try
+            {
+                ReflectedAssembly = Assembly.LoadFile(Globals.gekkoExePath);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            //	var ReflectedAssembly = Assembly.LoadFile(@"path to the dll you are testing");
+            object[] attribs = ReflectedAssembly.GetCustomAttributes(typeof(DebuggableAttribute), false);
+
+            // If the 'DebuggableAttribute' is not found then it is definitely an OPTIMIZED build
+            if (attribs.Length > 0)
+            {
+                // Just because the 'DebuggableAttribute' is found doesn't necessarily mean
+                // it's a DEBUG build; we have to check the JIT Optimization flag
+                // i.e. it could have the "generate PDB" checked but have JIT Optimization enabled
+                DebuggableAttribute debuggableAttribute = attribs[0] as DebuggableAttribute;
+                if (debuggableAttribute != null)
+                {
+                    HasDebuggableAttribute = true;
+                    IsJITOptimized = !debuggableAttribute.IsJITOptimizerDisabled;
+
+                    // IsJITTrackingEnabled - Gets a value that indicates whether the runtime will track information during code generation for the debugger.
+                    IsJITTrackingEnabled = debuggableAttribute.IsJITTrackingEnabled;
+                    BuildType = debuggableAttribute.IsJITOptimizerDisabled ? "Debug" : "Release";
+
+                    // check for Debug Output "full" or "pdb-only"
+                    DebugOutput = (debuggableAttribute.DebuggingFlags &
+                                    DebuggableAttribute.DebuggingModes.Default) !=
+                                    DebuggableAttribute.DebuggingModes.None
+                                    ? "Full" : "pdb-only";
+                }
+            }
+            else
+            {
+                IsJITOptimized = true;
+                BuildType = "Release";
+            }
+
+            string s = null;
+
+            s += G.NL;
+            s += "----- ONLY ON TT COMPUTER -----------------" + G.NL;
+            s += $"{nameof(HasDebuggableAttribute)}: {HasDebuggableAttribute}" + " (TT: should be false)" + G.NL;
+            s += $"{nameof(IsJITOptimized)}: {IsJITOptimized}" + " (TT: should be true)" + G.NL;
+            s += $"{nameof(IsJITTrackingEnabled)}: {IsJITTrackingEnabled}" + " (TT: should be false)" + G.NL;
+            s += $"{nameof(BuildType)}: {BuildType}" + " (TT: should be release)" + G.NL;
+            s += $"{nameof(DebugOutput)}: {DebugOutput}" + G.NL;
+            s += "-------------------------------------------" + G.NL;
+
+            return s;
+        }
+
+
+        public static string GetCompilerOptions()
+        {
+            if (Environment.Is64BitProcess) return Globals.compilerOptions64;
+            else return Globals.compilerOptions32;
+        }
+
+        public static void GetVersionAndGekkoExeLocationFromAssembly()
+        {
+            try
+            {
+                string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                if (version.EndsWith(".0"))
+                {
+                    version = version.Substring(0, version.Length - 2);
+                }
+                Globals.gekkoVersion = version;
+                string path = Assembly.GetExecutingAssembly().Location;
+                Globals.gekkoExePath = path;
+            }
+            catch (Exception e) { };
+        }
+
 
         public static Table Dream(string options)
         {
@@ -12703,7 +12878,7 @@ write datatest;
             s2.Replace("`", Globals.QT);
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
             compilerParams.GenerateInMemory = true;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -12738,7 +12913,7 @@ write datatest;
             s2.Replace("`", Globals.QT);
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
             compilerParams.GenerateInMemory = false;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -12826,7 +13001,7 @@ write datatest;
             s2.Replace("`", Globals.QT);
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
             compilerParams.GenerateInMemory = false;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
@@ -13272,6 +13447,17 @@ write datatest;
                 {
                     text = s2.Substring(3, s2.Length - 5);
                 }
+
+                if (s2.Length == "testram".Length)
+                {
+                    string sub = s2;
+                    if (G.equal(sub, "testram"))
+                    {
+                        Program.TestRam(false);
+                        return "";  //no need for the parser to chew on this afterwards!
+                    }
+                }
+
 
                 if (s2.StartsWith("bvar"))
                 {
@@ -13841,6 +14027,106 @@ write datatest;
                 G.Writeln2("*** ERROR: please choose a folder");
             }
         }
+
+        public static List<string> Get45PlusFromRegistry()
+        {
+            List<string> ss = new List<string>();
+
+            const string subkey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
+
+            using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey))
+            {
+                if (ndpKey != null && ndpKey.GetValue("Release") != null)
+                {
+                    ss.Add($"{G.CheckFor45PlusVersion((int)ndpKey.GetValue("Release"))}");
+                }
+                else
+                {
+                    ss.Add("4.5 or later is not detected.");
+                }
+            }
+            return ss;
+        }
+
+        public static string Get64Bitness()
+        {
+            string s = null;
+            if (Environment.Is64BitProcess) s = "64-bit process on ";
+            else s = "32-bit process on ";
+            if (Environment.Is64BitOperatingSystem) s += "64-bit operating system";
+            else s += "32-bit operating system";
+            return s;
+        }
+
+
+        public static List<string> GetVersionFromRegistry()
+        {
+            List<string> ss = new List<string>();
+            // Opens the registry key for the .NET Framework entry.
+            using (RegistryKey ndpKey =
+                    RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).
+                    OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\"))
+            {
+                foreach (var versionKeyName in ndpKey.GetSubKeyNames())
+                {
+                    // Skip .NET Framework 4.5 version information.
+                    if (versionKeyName == "v4")
+                    {
+                        continue;
+                    }
+
+                    if (versionKeyName.StartsWith("v"))
+                    {
+
+                        RegistryKey versionKey = ndpKey.OpenSubKey(versionKeyName);
+                        // Get the .NET Framework version value.
+                        var name = (string)versionKey.GetValue("Version", "");
+                        // Get the service pack (SP) number.
+                        var sp = versionKey.GetValue("SP", "").ToString();
+
+                        // Get the installation flag, or an empty string if there is none.
+                        var install = versionKey.GetValue("Install", "").ToString();
+                        if (string.IsNullOrEmpty(install)) // No install info; it must be in a child subkey.
+                            ss.Add($"{versionKeyName}  {name}");
+                        else
+                        {
+                            if (!(string.IsNullOrEmpty(sp)) && install == "1")
+                            {
+                                ss.Add($"{versionKeyName}  {name}  SP{sp}");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            continue;
+                        }
+                        foreach (var subKeyName in versionKey.GetSubKeyNames())
+                        {
+                            RegistryKey subKey = versionKey.OpenSubKey(subKeyName);
+                            name = (string)subKey.GetValue("Version", "");
+                            if (!string.IsNullOrEmpty(name))
+                                sp = subKey.GetValue("SP", "").ToString();
+
+                            install = subKey.GetValue("Install", "").ToString();
+                            if (string.IsNullOrEmpty(install)) //No install info; it must be later.
+                                ss.Add($"{versionKeyName}  {name}");
+                            else
+                            {
+                                if (!(string.IsNullOrEmpty(sp)) && install == "1")
+                                {
+                                    ss.Add($"{subKeyName}  {name}  SP{sp}");
+                                }
+                                else if (install == "1")
+                                {
+                                    ss.Add($"  {subKeyName}  {name}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return ss;
+        }
+
 
         public static void ConvertMenu(int depth, string start, string folder, string outputPath)
         {

@@ -110,7 +110,7 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RunCmd start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
             CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;  //has no effect it seems
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();  //has no effect it seems
             compilerParams.GenerateInMemory = false;  //cannot be set true, since the .gcm dll needs to refer to the user defined functions dll. But this should not be a problem.
             compilerParams.IncludeDebugInformation = false; //CHanged, maybe change back
             compilerParams.ReferencedAssemblies.Add("system.dll");

@@ -472,8 +472,9 @@ namespace Gekko
             // Determine whether the directory exists, else create it (used for temporary files)
             if (track) MessageBox.Show("5");
             Program.CreateTempFilesFolder();
-            if (track) MessageBox.Show("6");
+            if (track) MessageBox.Show("6");            
             GetVersionFromAssembly();  //goes into Globals.gekkoVersion
+            Program.GetVersionAndGekkoExeLocationFromAssembly();  //probably overrides above
             if (track) MessageBox.Show("7");
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             if (track) MessageBox.Show("8");

@@ -432,8 +432,12 @@ namespace Gekko
         public static bool setPrintMute = false;
         public static bool doNotSaveUserSettings = false;
 
+        public static string gekkoExePath = "";  //probably strange when unit testing or calling Gekcel
+
+        //public static int bitness = 64;  //32 or 64
         public static CompilerOptions co = new CompilerOptions();
-        public static string compilerOptions = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
+        public static string compilerOptions32 = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
+        public static string compilerOptions64 = "/optimize /platform:x64";        
 
         public static ArrayList alFunctions;
         public static CaseInsensitiveHashtable userFunctions;

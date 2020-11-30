@@ -1255,7 +1255,22 @@ namespace Gekko
                         sb.AppendLine(" Build time of gekko.exe: " + buildTime);
                     }
                 }
-                
+
+                List<string> ss1 = Program.GetVersionFromRegistry();
+                List<string> ss2 = Program.Get45PlusFromRegistry();
+                sb.AppendLine(" Microsoft .NET framework versions installed:");
+                foreach (string ss in ss1) sb.AppendLine("   " + ss.Trim());
+                foreach (string ss in ss2) sb.AppendLine("   " + ss.Trim());
+
+                sb.AppendLine(" Bitness: " + Program.Get64Bitness());
+
+                if (Globals.runningOnTTComputer)
+                {
+                    sb.AppendLine(Program.IsJit());
+                }
+
+
+
 
             }
             sb.AppendLine("==========================================================================");
@@ -1296,6 +1311,34 @@ namespace Gekko
         public static bool IsSamePath(string path1, string path2)
         {
             return string.Compare(Path.GetFullPath(path1).TrimEnd('\\'), Path.GetFullPath(path2).TrimEnd('\\'), StringComparison.InvariantCultureIgnoreCase) == 0;
+        }
+
+        public static string CheckFor45PlusVersion(int releaseKey)
+        {
+            //see https://github.com/dotnet/docs/blob/master/docs/framework/migration-guide/how-to-determine-which-versions-are-installed.md
+            if (releaseKey >= 528040)
+                return "4.8 or later";
+            if (releaseKey >= 461808)
+                return "4.7.2";
+            if (releaseKey >= 461308)
+                return "4.7.1";
+            if (releaseKey >= 460798)
+                return "4.7";
+            if (releaseKey >= 394802)
+                return "4.6.2";
+            if (releaseKey >= 394254)
+                return "4.6.1";
+            if (releaseKey >= 393295)
+                return "4.6";
+            if (releaseKey >= 379893)
+                return "4.5.2";
+            if (releaseKey >= 378675)
+                return "4.5.1";
+            if (releaseKey >= 378389)
+                return "4.5";
+            // This code should never execute. A non-null release key should mean
+            // that 4.5 or later is installed.
+            return "No 4.5 or later version detected";
         }
 
         public static bool IsMissingVariableArtificialNumber(double val)
