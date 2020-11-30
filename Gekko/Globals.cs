@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "";  // "v14";
 
+        public static string isAProto = "Is_a_protobuffer_file";
+
         public static bool JOrderFix = true;
 
         public static bool overloadFix = true;
