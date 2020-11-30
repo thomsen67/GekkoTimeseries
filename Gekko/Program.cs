@@ -10773,6 +10773,8 @@ namespace Gekko
             s += $"{nameof(IsJITTrackingEnabled)}: {IsJITTrackingEnabled}" + " (TT: should be false)" + G.NL;
             s += $"{nameof(BuildType)}: {BuildType}" + " (TT: should be release)" + G.NL;
             s += $"{nameof(DebugOutput)}: {DebugOutput}" + G.NL;
+            s += "--> See also the DumpBin() method (unused) that can check files" + G.NL;
+
             s += "-------------------------------------------" + G.NL;            
 
             return s;
@@ -10861,6 +10863,13 @@ namespace Gekko
                     //Console.WriteLine(CI.AvailablePhysicalMemory);
                 }
             }
+        }
+
+        public static List<string> DumpBin()
+        {
+            List<string> rv = new List<string>();
+            string s = @"call ""c:\Program Files(x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\dumpbin"" /headers *.exe | findstr ""machine Dump"" > dumpbin.txt";  //fethces lines with either "machine" or "Dump"
+            return rv;
         }
 
         public static string Get64Bitness()

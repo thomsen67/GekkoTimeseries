@@ -2466,11 +2466,11 @@ namespace Gekko
                         foreach (string ss in ss2) sb.AppendLine("   " + ss.Trim());
                     }
 
-                    sb.AppendLine(" Bitness: " + Program.Get64Bitness());
+                    sb.AppendLine(" Bitness: " + Program.Get64Bitness());                    
 
                     if(Globals.runningOnTTComputer)
                     {
-                        sb.AppendLine(Program.IsJit());
+                        sb.AppendLine(Program.IsJit());                        
                     }
 
                     foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_ComputerSystem").Get())
