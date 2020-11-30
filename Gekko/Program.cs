@@ -2294,9 +2294,9 @@ namespace Gekko
                         if (createNewOpenFile) databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
                         else
                         {
-                            if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
+                            if (!databank.FileNameWithPath.Contains(Globals.isAProto))  //probably does not happen anymore
                             {                                
-                                //TT: It SEEMS this IF above is right to put here (after removing 7z and using internal zipper), but not 100.00 % sure
+                                //TT 30-11-2020: It SEEMS this IF above is right to put here, testing the there is not this phony stuff in path, which would make it fail anyway
                                 databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
                             }                            
                         }
@@ -2663,7 +2663,7 @@ namespace Gekko
                 string foundTsdFile = WaitForZipRead_TSDX(tempTsdxPath, file, unzippedFile, originalFilePath);
                 G.WritelnGray("Unzipping took: " + G.Seconds(dt2));
 
-                if (foundTsdFile == "Is_a_protobuffer_file") isProtobuf = true;
+                if (foundTsdFile == Globals.isAProto) isProtobuf = true;
 
                 //both protobuffers and tsd files
 
