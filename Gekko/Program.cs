@@ -7804,7 +7804,7 @@ write datatest;
             G.Writeln2("TIME: " + time / 1000d);
         }
 
-        public static void TestRam(bool read)
+        public static void TestMem(bool read)
         {
 
             if (true)
@@ -13448,12 +13448,12 @@ write datatest;
                     text = s2.Substring(3, s2.Length - 5);
                 }
 
-                if (s2.Length == "testram".Length)
+                if (s2.Length == "testmem".Length)
                 {
                     string sub = s2;
-                    if (G.equal(sub, "testram"))
+                    if (G.equal(sub, "testmem"))
                     {
-                        Program.TestRam(false);
+                        Program.TestMem(false);
                         return "";  //no need for the parser to chew on this afterwards!
                     }
                 }
