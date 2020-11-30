@@ -59,6 +59,7 @@ using System.Collections.ObjectModel;
 using GAMS;
 using System.Linq;
 using OfficeOpenXml;
+using System.IO.Compression;
 
 namespace Gekko
 {
@@ -21722,7 +21723,7 @@ write datatest;
             return now;
         }
 
-       
+
 
         //This is a general method for zipping the contents of a folder
         public static void WaitForZipWrite(string folder, string zipFileName)
@@ -21734,66 +21735,55 @@ write datatest;
                 throw new GekkoException();
             }
 
-            int gap = Globals.waitFileGap;  //2 seconds
-            int totalTime = Globals.waitFileTotalTime;  //600 seconds
-            int repeats = totalTime / gap;
-
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
 
-            for (int i = 0; i < repeats; i++)
+            if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
+            try
             {
-                if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
-                try
+                if (zipFileName.ToLower().EndsWith("." + Globals.extensionDatabank + "") && Program.options.databank_file_gbk_compress == false)
                 {
-                    string sevenzPath = null;
-                    if (G.IsUnitTesting())
-                    {
-                        sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
-                    }
-                    else
-                    {
-                        sevenzPath = Application.StartupPath + "\\zip\\7z.dll";
-                    }
-                    SevenZipExtractor.SetLibraryPath(sevenzPath);
-                    SevenZipCompressor tmp = new SevenZipCompressor();
-                    tmp.ArchiveFormat = OutArchiveFormat.Zip;
-                    //tmp.CompressionLevel = CompressionLevel.Low;  //could be better than .Fast??
-                    tmp.CompressionLevel = SevenZip.CompressionLevel.Fast;
-                    if (zipFileName.ToLower().EndsWith("." + Globals.extensionDatabank + "") && Program.options.databank_file_gbk_compress == false)
-                    {
-                        tmp.CompressionLevel = SevenZip.CompressionLevel.None;
-                    }
-                    if (!System.IO.Directory.Exists(folderInfo.FullName))
-                    {
-                        G.Writeln("+++ WARNING: zip file could not be created");  //should not be possible
-                        break;
-                    }
-                    tmp.CompressDirectory(folderInfo.FullName, zipFileName);
+                    G.Writeln2("+++ WARNING: 'OPTION databank file gbk compress = yes' is deprecated");
+                    G.Writeln("             in Gekko 3.1.9 and onwards.", Globals.warningColor);
+                    throw new GekkoException();
                 }
-                catch (Exception e)
+                if (!System.IO.Directory.Exists(folderInfo.FullName))
                 {
-                    //G.Writeln("+++ WARNING: Problem trying to zip folder '" + folder + "' into zip-file '" + zipFileName + "'. Retrying... (" + (i * gap) + " seconds)");
-                    G.Writeln("+++ WARNING: Zip-file '" + zipFileName + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
-                    System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
-                    continue;
+                    G.Writeln("+++ WARNING: zip file could not be created");  //should not be possible                        
                 }
 
-                //This folder name is in a user specific temp folder (typically on user's hard disk). The folder only lives for a very short time.
-                //So it would be very unlikely that any file inside should be blocked.
-                try
+                int sleepMs = 10;
+
+                using (FileStream fs = Program.WaitForFileStream(zipFileName, Program.GekkoFileReadOrWrite.Write))
                 {
-                    if (System.IO.Directory.Exists(folderInfo.FullName))
-                    {
-                        System.IO.Directory.Delete(folderInfo.FullName, true);
-                    }
+                    //fs is not actually used, but this way we wait for blocked files
+                    Thread.Sleep(sleepMs);  //to make sure the file is released
                 }
-                catch (Exception e)
-                {
-                    //do nothing
-                }
-                break;
+
+                File.Delete(zipFileName);
+                Thread.Sleep(sleepMs);  //give some time after file is deleted
+                ZipFile.CreateFromDirectory(folder, zipFileName);
+                //ZipFile.ExtractToDirectory(zipPath, extractPath);
+
             }
-            //return zipFileName;
+            catch (Exception e)
+            {
+                string msg = null;
+                if (e.InnerException != null) msg = e.InnerException.Message;
+                G.Writeln("*** ERROR: Writing " + zipFileName + " failed, error: " + e.InnerException + " " + e.Message);
+                throw new GekkoException();
+            }
+
+            try
+            {
+                if (System.IO.Directory.Exists(folderInfo.FullName))
+                {
+                    System.IO.Directory.Delete(folderInfo.FullName, true);
+                }
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
         }
 
         //Only used for reading TSDX files, much more specific than WaitForZipRead()
