@@ -33,7 +33,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
 using System.Collections;
-using SevenZip;
+//using SevenZip;
 using System.Security.Cryptography;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;

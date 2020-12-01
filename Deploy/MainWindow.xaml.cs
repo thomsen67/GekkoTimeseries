@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Net;
-using SevenZip;
+//using SevenZip;
 
 namespace Deploy
 {
@@ -161,13 +161,14 @@ namespace Deploy
         {
             try
             {
-                string sevenzPath = startupPath + "\\zip\\7z.dll";
-                SevenZipExtractor.SetLibraryPath(sevenzPath);
-                SevenZipCompressor tmp = new SevenZipCompressor();
-                tmp.ArchiveFormat = OutArchiveFormat.Zip;
-                tmp.CompressionLevel = CompressionLevel.Normal;                
-                tmp.CompressDirectory(@"c:\Program Files (x86)\Gekko\", @"c:\tmp\Gekko_files\Gekko.zip", true);
-                MessageBox.Show("Zipping of Gekko program dir ok");
+                MessageBox.Show("!Migrate to non-7z!");
+                //string sevenzPath = startupPath + "\\zip\\7z.dll";
+                //SevenZipExtractor.SetLibraryPath(sevenzPath);
+                //SevenZipCompressor tmp = new SevenZipCompressor();
+                //tmp.ArchiveFormat = OutArchiveFormat.Zip;
+                //tmp.CompressionLevel = CompressionLevel.Normal;                
+                //tmp.CompressDirectory(@"c:\Program Files (x86)\Gekko\", @"c:\tmp\Gekko_files\Gekko.zip", true);
+                //MessageBox.Show("Zipping of Gekko program dir ok");
             }
             catch
             {
@@ -205,13 +206,15 @@ namespace Deploy
         {
             try
             {
-                string sevenzPath = startupPath + "\\zip\\7z.dll";
-                SevenZipExtractor.SetLibraryPath(sevenzPath);
-                SevenZipCompressor tmp = new SevenZipCompressor();
-                tmp.ArchiveFormat = OutArchiveFormat.Zip;
-                tmp.CompressionLevel = CompressionLevel.Normal;
-                tmp.CompressDirectory(@"c:\Thomas\Gekko\GekkoCS\", @"c:\Thomas\Gekko\" + GetVersion() + ".zip", true);
-                MessageBox.Show("Zipping of Gekko " + GetVersion() + ".zip" + "  ok -- REMOVE .git and TestResults folders!");
+                MessageBox.Show("!Migrate to non-7z!");
+                //MessageBox.Show("")
+                //string sevenzPath = startupPath + "\\zip\\7z.dll";
+                //SevenZipExtractor.SetLibraryPath(sevenzPath);
+                //SevenZipCompressor tmp = new SevenZipCompressor();
+                //tmp.ArchiveFormat = OutArchiveFormat.Zip;
+                //tmp.CompressionLevel = CompressionLevel.Normal;
+                //tmp.CompressDirectory(@"c:\Thomas\Gekko\GekkoCS\", @"c:\Thomas\Gekko\" + GetVersion() + ".zip", true);
+                //MessageBox.Show("Zipping of Gekko " + GetVersion() + ".zip" + "  ok -- REMOVE .git and TestResults folders!");
             }
             catch
             {
