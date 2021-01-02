@@ -309,11 +309,11 @@
     <Compile Include="AutoComplete.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CompareUtility3Way.cs">
+    <Compile Include="GuiCompareUtility3Way.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CompareUtility3Way.designer.cs">
-      <DependentUpon>CompareUtility3Way.cs</DependentUpon>
+    <Compile Include="GuiCompareUtility3Way.designer.cs">
+      <DependentUpon>GuiCompareUtility3Way.cs</DependentUpon>
     </Compile>
     <Compile Include="CompareUtilityDatabanks.cs">
       <SubType>Form</SubType>
@@ -581,8 +581,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CompareUtility3Way.resx">
-      <DependentUpon>CompareUtility3Way.cs</DependentUpon>
+    <EmbeddedResource Include="GuiCompareUtility3Way.resx">
+      <DependentUpon>GuiCompareUtility3Way.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="CompareUtilityDatabanks.resx">

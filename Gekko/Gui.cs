@@ -1663,7 +1663,7 @@ namespace Gekko
         {
             try
             {
-                CompareUtility3Way gui = new CompareUtility3Way();
+                GuiCompareUtility3Way gui = new GuiCompareUtility3Way();
                 gui.ShowDialog();
                 gui.Close();
                 if (G.HasModelGekko()) G.Writeln("Output is in file 'compare.txt'");
