@@ -27,9 +27,9 @@ using System.Windows.Forms;
 
 namespace Gekko
 {
-    public partial class CompareUtilityDatabanks : Form
+    public partial class GuiCompareUtilityDatabanks : Form
     {
-        public CompareUtilityDatabanks()
+        public GuiCompareUtilityDatabanks()
         {
             InitializeComponent();
             this.ActiveControl = button1;

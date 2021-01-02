@@ -1632,7 +1632,7 @@ namespace Gekko
         {
             try
             {
-                CompareUtilityDatabanks gui = new CompareUtilityDatabanks();
+                GuiCompareUtilityDatabanks gui = new GuiCompareUtilityDatabanks();
                 gui.ShowDialog();
                 gui.Close();
             }
