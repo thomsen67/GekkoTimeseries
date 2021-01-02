@@ -27,9 +27,9 @@ using System.Windows.Forms;
 
 namespace Gekko
 {
-    public partial class CompareUtilityEquations : Form
+    public partial class GuiCompareUtilityEquations : Form
     {
-        public CompareUtilityEquations()
+        public GuiCompareUtilityEquations()
         {
             InitializeComponent();
             this.ActiveControl = button1;

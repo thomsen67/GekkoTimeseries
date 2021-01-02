@@ -1648,7 +1648,7 @@ namespace Gekko
         {
             try
             {
-                CompareUtilityEquations gui = new CompareUtilityEquations();
+                GuiCompareUtilityEquations gui = new GuiCompareUtilityEquations();
                 gui.ShowDialog();
                 gui.Close();
             }
