@@ -29,16 +29,16 @@ namespace Gekko
 
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR            
             
-        //NOTE: THESE LINES CORRESPOND TO LINES IN Cmd3.g, line for line    
+        //!!!! NOTE: THESE LINE NUMBERSS CORRESPOND TO LINES IN Cmd3.g, line for line    
             
         //these are not mentioned in help
         public bool bugfix_import_export = false;             
-        //public bool bugfix_gbk = false;  //set true to activate old 7zip writer
+        
         public bool bugfix_missing = true;  //if option true, m()==m() will be true, and m()<>m() false for series comparison
 
         //question
-        //public double databank_compare_tabs = 1.0d;
-        //public double databank_compare_trel = 0.0001d;
+        
+        
         public bool databank_create_auto = true;             
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
@@ -149,8 +149,8 @@ namespace Gekko
         public string r_exe_folder = "";  //there will probably be more R options later on
         public string r_exe_path = "";  //old name, delete at some point in 3.3.x series       
 
-        //array ignoremissing is obsolete
-        //data ignoremissing is obsolete
+        
+        
 
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;

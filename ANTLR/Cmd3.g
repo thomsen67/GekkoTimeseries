@@ -3898,7 +3898,7 @@ x12aOpt1h:                  PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expr
 //-----------------------------------------------------------------------------------------------------------
 						
 //!! do not use '_' as a char in a an option name. 'failsafe' is fine, but fail_safe is not.
-optionType:			   
+optionType:			    
 			   question -> question
              
 			 //NOTE: THESE LINES CORRESPOND TO LINES IN Options.cs, line for line
