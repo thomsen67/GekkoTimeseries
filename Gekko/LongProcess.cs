@@ -58,7 +58,7 @@ namespace Gekko
 		// Function runs in worker thread and emulates long process.
         public void Run(P p)
         {           
-            Program.obeyCommandCalledFromGUI(gekkoGui.threadInput, p);
+            Program.RunCommandCalledFromGUI(gekkoGui.threadInput, p);
 
             // check if thread is cancelled (do this inside loops in e.g. "sim" etc.)
             if (eventStop2.WaitOne(0, true))

@@ -24569,7 +24569,7 @@ print(df2)
         private static void I(string s)
         {
             Globals.lastPrtOrMulprtTable = null;
-            Program.obeyCommandCalledFromGUI(s, new P());
+            Program.RunCommandCalledFromGUI(s, new P());
         }
 
         private static void CheckFullDatabank(double deltaAbs, double deltaRel, int t1, int t2)

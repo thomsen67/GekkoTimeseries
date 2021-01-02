@@ -309,8 +309,6 @@
     <Compile Include="AutoComplete.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CGE1.cs" />
-    <Compile Include="CGE2.cs" />
     <Compile Include="CompareUtility3Way.cs">
       <SubType>Form</SubType>
     </Compile>

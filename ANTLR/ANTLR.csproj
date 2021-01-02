@@ -130,8 +130,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cmd2Lexer.cs" />
-    <Compile Include="Cmd2Parser.cs" />
     <Compile Include="Cmd3Lexer.cs" />
     <Compile Include="Cmd3Parser.cs" />
     <Compile Include="ModelLexer.cs" />
@@ -144,7 +142,6 @@
     <Compile Include="T2Parser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cmd2.g" />
     <None Include="Cmd3.g" />
     <None Include="Model.g" />
     <None Include="T1.g" />

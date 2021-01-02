@@ -235,17 +235,18 @@ namespace Gekko
                     ANTLRStringStream input = new ANTLRStringStream(input7);  //a newline for ease of use of ANTLR
                     List<string> errors = null;
                     CommonTree t = null;
-                    Cmd2Lexer lexer = new Cmd2Lexer(input);
+                    Cmd3Lexer lexer = new Cmd3Lexer(input);
                     CommonTokenStream tokens = new CommonTokenStream(lexer);
 
                     CommonToken ct;
 
-                    Cmd2Parser parser = new Cmd2Parser(tokens);
-                    Cmd2Parser.expr_return r = null;
+                    Cmd3Parser parser = new Cmd3Parser(tokens);
+                    Cmd3Parser.start_return r = null;                                       
+                    
                     bool ok = true;
                     try
                     {
-                        r = parser.expr();
+                        r = parser.start();
                     }
                     catch (Exception e)
                     {

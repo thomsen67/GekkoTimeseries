@@ -2522,7 +2522,7 @@ namespace Gekko
                 }
 
                 Globals.expressions = null;  //maybe not necessary
-                //Program.obeyCommandCalledFromGUI("EVAL " + tmp, new P());  //produces Func<> Globals.expression with the expression
+                
                 Program.CallEval(null, tmp);
 
                 found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here

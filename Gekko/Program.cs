@@ -8699,7 +8699,7 @@ namespace Gekko
                 File.Copy(fileNameIndex, fileNameIndex2, true);
             }
 
-            Program.obeyCommandCalledFromGUI(settings_commands, new P());
+            Program.RunCommandCalledFromGUI(settings_commands, new P());
 
             int gap = 20;
 
@@ -9168,13 +9168,13 @@ namespace Gekko
                 if (ts2 == null)
                 {
                     //only plot the series from Work
-                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
-                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
+                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
                 }
                 else
                 {
-                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
-                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
+                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
                 }
                 
                 sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
@@ -13681,9 +13681,8 @@ namespace Gekko
                     G.Writeln2("-------------- EVAL ---------------");
                     G.Writeln2("EVAL " + G.ReplaceGlueNew(rhs));
                     G.Writeln2("-----------------------------------");
-                }               
+                }                               
                 
-                //Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
                 CallEval(null, rhs);
             }
             catch (Exception e)
@@ -15358,17 +15357,7 @@ namespace Gekko
                         Program.TestRam(true);
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == 3)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "cge"))
-                    {
-                        CGE2.Run();
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
+                }                
 
                 if (s2.Length == 7)
                 {
@@ -15400,55 +15389,7 @@ namespace Gekko
                     }
 
                 }
-
-                if (s2.Length == 6)
-                {
-                    //string sub = s2;
-                    //if (G.Equal(sub, "speed1"))
-                    //{
-                    //    double n = 10000000d;
-                    //    string s = "val k   = 0; val m   = 0; val k1  = 1; val k2  = " + n + "; for val k=%k1 to %k2; val m=%m+%k; end;";
-                    //    DateTime t0 = DateTime.Now;
-                    //    obeyCommandCalledFromGUI(s, new P());
-                    //    DateTime t1 = DateTime.Now;
-                    //    double ms = (t1 - t0).TotalMilliseconds;
-                    //    G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                    //    double x = Program.scalars["m"].GetValOLD(null);
-                    //    G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
-                    //    return "";  //no need for the parser to chew on this afterwards!
-                    //}
-                    //else if (G.Equal(sub, "speed2"))
-                    //{
-                    //    DateTime t0 = DateTime.Now;
-
-                    //    //runs 2-3 x faster as integer loop, but never mind
-                    //    double n = 100000000d;
-                    //    double sum = 0;
-                    //    for (double i = 1; i <= n; i++)
-                    //    {
-                    //        sum += i;
-                    //    }
-
-                    //    DateTime t1 = DateTime.Now;
-                    //    double ms = (t1 - t0).TotalMilliseconds;
-                    //    G.Writeln2("C# Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                    //    double x = sum;
-                    //    G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
-                    //    return "";  //no need for the parser to chew on this afterwards!
-                    //}
-                    //else if (G.Equal(sub, "speed3"))
-                    //{
-                    //    double n = 100000d;
-                    //    string s = "time 95 2020; create y1, y2, y3, x1; upd <95 2020> y1 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y2 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y3 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> x1 = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26; val k = 0; val x  = 1; val k1 = 0; val k2 = " + n + "; for val k = %k1 to %k2; GENR <2000 2020> x1 = y1 + y1[-1] + y2 + y2[-1] + y3[2000] + %x + 1 + 2; end;";
-                    //    DateTime t0 = DateTime.Now;
-                    //    obeyCommandCalledFromGUI(s, new P());
-                    //    DateTime t1 = DateTime.Now;
-                    //    double ms = (t1 - t0).TotalMilliseconds;
-                    //    G.Writeln2("Speed3 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                    //    return "";  //no need for the parser to chew on this afterwards!
-                    //}
-                }
-
+                
                 if (s2.Length == 5)
                 {
                     string sub = s2;
@@ -20821,7 +20762,7 @@ namespace Gekko
         {
             if (!Globals.newEval)
             {
-                Program.obeyCommandCalledFromGUI("EVAL " + statement, new P()); //produces Func<> Globals.expression with the expression 
+                Program.RunCommandCalledFromGUI("EVAL " + statement, new P()); //produces Func<> Globals.expression with the expression 
             }
             else
             {
@@ -20831,7 +20772,7 @@ namespace Gekko
                     c = "$ (" + conditionals + ")";
                 }
                 string s = c + " = " + statement;
-                Program.obeyCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
+                Program.RunCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
 
                 if (Globals.expressions == null)
                 {
@@ -22277,7 +22218,7 @@ namespace Gekko
                 ScalarDate t2 = new ScalarDate(o.t2);
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt1", new ScalarDate(o.t1));
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt2", new ScalarDate(o.t2));
-                Program.obeyCommandCalledFromGUI(before, o.p);
+                Program.RunCommandCalledFromGUI(before, o.p);
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt1");
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }
@@ -22290,7 +22231,7 @@ namespace Gekko
             {                
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt1", new ScalarDate(o.t1));
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt2", new ScalarDate(o.t2));
-                Program.obeyCommandCalledFromGUI(after, o.p);
+                Program.RunCommandCalledFromGUI(after, o.p);
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt1");
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }
@@ -29177,7 +29118,7 @@ namespace Gekko
         // ----------------- used for tables end ------------------------------------------------
         // --------------------------------------------------------------------------------------
 
-        public static void obeyCommandCalledFromGUI(string s, P p)
+        public static void RunCommandCalledFromGUI(string s, P p)
         {
             if (Globals.excelDna)
             {
@@ -30214,7 +30155,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 6, G.GetLinkAction("Left", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -30227,7 +30168,7 @@ namespace Gekko
 
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 7, G.GetLinkAction("Slide", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -30239,7 +30180,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 8, G.GetLinkAction("Right", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -30259,7 +30200,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
+                    Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
                 };
                 line += "  " + G.GetLinkAction("Fit", new GekkoAction(EGekkoActionTypes.Ols, name, a));
 
@@ -30279,7 +30220,7 @@ namespace Gekko
                             string label = o.expressionsText[i + 1];
                             s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
                         }
-                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
+                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
                     }
                     else
                     {
@@ -30290,7 +30231,7 @@ namespace Gekko
                             s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
                         }
                         s += ", " + name + "_dec_trend 'trend'";
-                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
+                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
                     }
                 };
                 line += "  " + G.GetLinkAction("Dec", new GekkoAction(EGekkoActionTypes.Ols, name, a));
@@ -30304,7 +30245,7 @@ namespace Gekko
                 // ---------                
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_left 'Chow-test (left)' <type=boxes>;", new P());
+                    Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_left 'Chow-test (left)' <type=boxes>;", new P());
                 };
                 tab.Set(m + 2, 6, G.GetLinkAction("Chow", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                 // ---------
@@ -30314,7 +30255,7 @@ namespace Gekko
                 // ---------                
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_right 'Chow-test (right)' <type=boxes>;", new P());
+                    Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_right 'Chow-test (right)' <type=boxes>;", new P());
                 };
                 tab.Set(m + 2, 8, G.GetLinkAction("Chow", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                 // ---------
@@ -44465,6 +44406,82 @@ namespace Gekko
             xx.Close();
         }
 
+        // ================================================
+        // CES stuff, perhaps make available in Function.cs
+        // ================================================
+        
+        // with theta
+
+        static double CES_XL(double yrel, double p1rel, double p2rel, double theta, double sigma)
+        {
+            double uc = CES_UC(p1rel, p2rel, theta, sigma);
+            return yrel * Math.Pow(uc / p1rel, sigma);
+        }
+
+        static double CES_XR(double yrel, double p1rel, double p2rel, double theta, double sigma)
+        {
+            double uc = CES_UC(p1rel, p2rel, theta, sigma);
+            return yrel * Math.Pow(uc / p2rel, sigma);
+        }
+
+        static double C(double ca, double p1, double p2, double p1a, double p2a, double theta, double sigma)
+        {
+            double c = ca * CES_UC(p1 / p1a, p2 / p2a, theta, sigma);
+            return c;
+        }
+
+        static double CES_UC(double p1rel, double p2rel, double theta, double sigma)
+        {
+            double c = Math.Pow(theta * Math.Pow(p1rel, 1 - sigma) + (1 - theta) * Math.Pow(p2rel, 1 - sigma), 1 / (1 - sigma));
+            return c;
+        }
+
+        static double Y(double x1, double x2, double ya, double x1a, double x2a, double theta, double sigma)
+        {
+            double rho = (sigma - 1) / sigma;
+            double y_cal = ya * Math.Pow((theta * Math.Pow(x1 / x1a, rho) + (1 - theta) * Math.Pow(x2 / x2a, rho)), 1 / rho);
+            return y_cal;
+        }
+        
+        // -------
+
+        // with delta
+
+        static double Y_orig(double x1, double x2, double kappa, double delta, double sigma)
+        {
+            double rho = (sigma - 1) / sigma;
+            double y = kappa * Math.Pow(delta * Math.Pow(x1, rho) + (1 - delta) * Math.Pow(x2, rho), 1 / rho);
+            return y;
+        }
+
+        static double X1_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double x1 = y / kappa * Math.Pow((delta * kappa * AC_orig(p1, p2, kappa, delta, sigma)) / p1, sigma);
+            return x1;
+        }
+
+        static double X2_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double x2 = y / kappa * Math.Pow(((1 - delta) * kappa * AC_orig(p1, p2, kappa, delta, sigma)) / p2, sigma);
+            return x2;
+        }
+
+        static double C_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double c = y * AC_orig(p1, p2, kappa, delta, sigma);
+            return c;
+        }
+
+        static double AC_orig(double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double ac = 1 / kappa * Math.Pow(Math.Pow(delta, sigma) * Math.Pow(p1, 1 - sigma) + Math.Pow(1 - delta, sigma) * Math.Pow(p2, 1 - sigma), 1 / (1 - sigma));
+            return ac;
+        }
+
+        // ================================================
+        // CES stuff end
+        // ================================================
+                          
         [ProtoContract]
         public class ReadInfo
         {
