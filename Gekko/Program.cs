@@ -27621,7 +27621,7 @@ namespace Gekko
             GuiSetModelName();
             
             string workingFolder = Program.options.folder_working;
-            Program.options = new Options();  //resetting these, but letting working folder live on.
+            Program.options = new Options();  //resetting these, but letting working folder live on.            
 
             CrossThreadStuff.Mode();  //to show default color
 

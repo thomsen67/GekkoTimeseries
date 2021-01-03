@@ -5188,6 +5188,21 @@ namespace Gekko
         //    //if (a != null) a = null;
         //}
 
+        public static void SetOption(params IVariable[] input)
+        {
+            string s = null;
+            bool first = true;
+            for (int i = 0; i < input.Length - 1; i++)
+            {
+                if (!first) s += ".";
+                s += O.ConvertToString(input[i]);
+                first = false;
+            }
+            Program.options[s] = input[input.Length - 1];
+            //IVariable iv = Program.options[s];
+            return;
+        }
+
         public static List GetList(IVariable a)
         {
             if (a == null)

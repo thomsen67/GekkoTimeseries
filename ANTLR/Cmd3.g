@@ -32,6 +32,7 @@ options {
 
 tokens {
 	ASTDOLLAR;
+	ASTOPTIONSEQ;
 	ASTFORTYPE1;
 	ASTNUMBERMINUS;
 	ASTDECOMPITEMOPTION;
@@ -3897,6 +3898,8 @@ x12aOpt1h:                  PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expr
 //-----------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 						
+optionType2: name+ '='? expression -> name+ expression;
+
 //!! do not use '_' as a char in a an option name. 'failsafe' is fine, but fail_safe is not.
 optionType:			    
 			   question -> question

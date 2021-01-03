@@ -428,6 +428,8 @@ namespace Gekko
         public static UndoSim undoSim = null;
         public static PackSim packSim = null;
 
+        public static bool newOption = false;
+
         public static bool patch_zvar = true;
 
         //public const string symbolTurtle = "¤";

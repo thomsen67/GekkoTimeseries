@@ -2221,30 +2221,74 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTBLOCK":
-                        {                           
-
-                            string record = null;
-                            string alter = null;
-                            string play = null;                                                        
-
-                            foreach(ASTNode child in node[0].ChildrenIterator())
+                        {
+                            if (Globals.newOption)
                             {
-                                if (child.Text == "ASTDATES_BLOCK")
+
+                            }
+                            else
+                            {
+
+                                string record = null;
+                                string alter = null;
+                                string play = null;
+
+                                foreach (ASTNode child in node[0].ChildrenIterator())
                                 {
-                                    //handle BLOCK time ...
-                                    
-                                    string ss = child.Code.ToString();
-                                    if (ss != null)
+                                    if (child.Text == "ASTDATES_BLOCK")
                                     {
-                                        string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
-                                        int n = ++Globals.counter;
-                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
-                                        alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
-                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
-                                        n = ++Globals.counter;
-                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                        alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
-                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                        //handle BLOCK time ...
+
+                                        string ss = child.Code.ToString();
+                                        if (ss != null)
+                                        {
+                                            string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
+                                            int n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
+                                            alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
+                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
+                                            n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                            alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
+                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                        }
+                                        else
+                                        {
+                                            G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                            throw new GekkoException();
+                                        }
+                                    }
+                                    else if (child.Text == "ASTBLOCKOPTION")
+                                    {
+                                        StringBuilder s = new StringBuilder();
+                                        string o = "";
+
+                                        CreateOptionVariableOldDelete(child, true, s, ref o);
+
+                                        if (o == "Program.options.freq")
+                                        {
+                                            //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
+                                            int n = ++Globals.counter;
+                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
+                                            alter += s.ToString();                                //Program.options.freq = EFreq.Q;
+                                            alter += "Program.AdjustFreq();" + G.NL;              //Program.AdjustFreq();
+                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                                                                                  // global perStart
+                                            n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
+                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
+                                            // global perEnd
+                                            n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                        }
+                                        else
+                                        {
+                                            int n = ++Globals.counter;
+                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options....;
+                                            alter += s.ToString();                                //Program.options.... = ...;
+                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                                        }
                                     }
                                     else
                                     {
@@ -2252,47 +2296,11 @@ namespace Gekko.Parser.Gek
                                         throw new GekkoException();
                                     }
                                 }
-                                else if (child.Text == "ASTBLOCKOPTION")
-                                {
-                                    StringBuilder s = new StringBuilder();
-                                    string o = "";
-                                    CreateOptionVariable(child, true, s, ref o);
-
-                                    if (o == "Program.options.freq")
-                                    {
-                                        //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
-                                        int n = ++Globals.counter;
-                                        record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
-                                        alter += s.ToString();                                //Program.options.freq = EFreq.Q;
-                                        alter += "Program.AdjustFreq();" + G.NL;              //Program.AdjustFreq();
-                                        play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
-                                                                                              // global perStart
-                                        n = ++Globals.counter;
-                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
-                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
-                                        // global perEnd
-                                        n = ++Globals.counter;
-                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                    }
-                                    else
-                                    {
-                                        int n = ++Globals.counter;
-                                        record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options....;
-                                        alter += s.ToString();                                //Program.options.... = ...;
-                                        play += o + " = record" + n + ";" + G.NL;             //Program.options.... = record117
-                                    }
-                                }
-                                else
-                                {
-                                    G.Writeln2("*** ERROR: Internal error related to BLOCK");
-                                    throw new GekkoException();
-                                }                                
+                                node.Code.A(record);
+                                node.Code.A(alter);
+                                GetCodeFromAllChildren(node, node[1][0]);
+                                node.Code.A(play);
                             }
-                            node.Code.A(record);
-                            node.Code.A(alter);
-                            GetCodeFromAllChildren(node, node[1][0]);                            
-                            node.Code.A(play);
                         }
                         break;
 
@@ -4853,93 +4861,111 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTOPTION":
                         {
-                            if (node.GetChild(0).Text == "?")
+                            if (Globals.newOption)
                             {
-                                node.Code.A("Program.PrintOptions(`Program.options`);");
+                                string ss7 = null;
+                                bool first = true;
+                                for (int i = 0; i < node.ChildrenCount(); i++)
+                                {
+                                    if (!first) ss7 += ", ";
+                                    ss7 += node[i].Code;
+                                    first = false;
+                                }
+                                node.Code.A("O.SetOption(" + ss7 + ");");
                             }
                             else
                             {
-                                string o = "";
-                                //Use GekkoStringBuilder??
-                                StringBuilder s = new StringBuilder();
-                                CreateOptionVariable(node, false, s, ref o);
-                                node.Code.A(s.ToString());
-                                if (G.Equal(o, "freq"))
-                                {
-                                    //see also #89073589324
-                                    node.Code.A("Program.AdjustFreq();");
-                                }
-                                else if (G.Equal(o, "interface_sound_type"))
-                                {
-                                    if (!p.hasBeenCmdFile)
-                                    {
-                                        node.Code.A("Program.PlaySound();");
-                                    }
-                                }
-                                else if (G.Equal(o, "interface_edit_style"))
-                                {
-                                    node.Code.A("CrossThreadStuff.SetChecked();");
-                                }
-                                else if (G.Equal(o, "folder_menu") || G.Equal(o, "menu_startfile"))
-                                {
-                                    node.Code.A("CrossThreadStuff.RestartMenuBrowser();");
-                                }
-                                else if (G.Equal(o, "interface_zoom"))
-                                {
-                                    node.Code.A("CrossThreadStuff.Zoom();");
-                                }
-                                else if (G.Equal(o, "folder_working"))
-                                {
-                                    node.Code.A("CrossThreadStuff.WorkingFolder(``);");
-                                }
-                                else if (G.Equal(o, "interface_remote"))
-                                {
-                                    node.Code.A("Program.RemoteInit();");
-                                }
-                                else if (G.Equal(o, "solve_gauss_reorder"))
-                                {
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.`);");
-                                    node.Code.A("G.Writeln(`+++       (In command files, place this option before any MODEL statements).`);");
 
-                                }
-                                else if (G.Equal(o, "series_dyn"))
+                                if (node.GetChild(0).Text == "?")
                                 {
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`*** ERROR: Deprecated option`);");
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`+++ NOTE: The 'dyn' option has been deprecated. Instead, you may use <dyn> on individual series`);");
-                                    node.Code.A("G.Writeln(`+++       statements, or use 'BLOCK series dyn = yes; ... ; END;' to set the option for several`);");
-                                    node.Code.A("G.Writeln(`+++       series statemens. See more in the help, under the BLOCK command.`);");
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("throw new GekkoException();");
+                                    node.Code.A("Program.PrintOptions(`Program.options`);");
                                 }
-                                else if (G.Equal(o, "timefilter_type"))  //TODO: only issue if really avg
+                                else
                                 {
-                                    node.Code.A("G.Writeln2(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
-                                }
-                                else if (G.Equal(o, "solve_forward_nfair_damp") || G.Equal(o, "solve_forward_fair_damp") || G.Equal(o, "solve_gauss_damp"))
-                                {
-                                    node.Code.A("G.Writeln2(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
-                                }
-                                else if (G.Equal(o, "r_exe_path"))
-                                {
-                                    node.Code.A("G.Writeln2(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
-                                }
-                                else if (G.Equal(o, "series_array_ignoremissing"))
-                                {
-                                    node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series array print missing = skip;' and 'OPTION series array calc missing = zero;' instead`);");
-                                    node.Code.A("throw new GekkoException();");
-                                }
-                                else if (G.Equal(o, "table_ignoremissingvars"))
-                                {
-                                    node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series normal table missing = m;' instead`);");
-                                    node.Code.A("throw new GekkoException();");
-                                }
-                                else if (G.Equal(o, "series_data_ignoremissing"))
-                                {
-                                    node.Code.A("G.Writeln2(`*** ERROR: This option can no longer be used.`);");
-                                    node.Code.A("throw new GekkoException();");
+                                    string o = "";
+                                    //Use GekkoStringBuilder??
+                                    StringBuilder s = new StringBuilder();
+
+                                    CreateOptionVariableOldDelete(node, false, s, ref o);
+
+                                    node.Code.A(s.ToString());
+                                    if (G.Equal(o, "freq"))
+                                    {
+                                        //see also #89073589324
+                                        node.Code.A("Program.AdjustFreq();");
+                                    }
+                                    else if (G.Equal(o, "interface_sound_type"))
+                                    {
+                                        if (!p.hasBeenCmdFile)
+                                        {
+                                            node.Code.A("Program.PlaySound();");
+                                        }
+                                    }
+                                    else if (G.Equal(o, "interface_edit_style"))
+                                    {
+                                        node.Code.A("CrossThreadStuff.SetChecked();");
+                                    }
+                                    else if (G.Equal(o, "folder_menu") || G.Equal(o, "menu_startfile"))
+                                    {
+                                        node.Code.A("CrossThreadStuff.RestartMenuBrowser();");
+                                    }
+                                    else if (G.Equal(o, "interface_zoom"))
+                                    {
+                                        node.Code.A("CrossThreadStuff.Zoom();");
+                                    }
+                                    else if (G.Equal(o, "folder_working"))
+                                    {
+                                        node.Code.A("CrossThreadStuff.WorkingFolder(``);");
+                                    }
+                                    else if (G.Equal(o, "interface_remote"))
+                                    {
+                                        node.Code.A("Program.RemoteInit();");
+                                    }
+                                    else if (G.Equal(o, "solve_gauss_reorder"))
+                                    {
+                                        node.Code.A("G.Writeln();");
+                                        node.Code.A("G.Writeln(`+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.`);");
+                                        node.Code.A("G.Writeln(`+++       (In command files, place this option before any MODEL statements).`);");
+
+                                    }
+                                    else if (G.Equal(o, "series_dyn"))
+                                    {
+                                        node.Code.A("G.Writeln();");
+                                        node.Code.A("G.Writeln(`*** ERROR: Deprecated option`);");
+                                        node.Code.A("G.Writeln();");
+                                        node.Code.A("G.Writeln(`+++ NOTE: The 'dyn' option has been deprecated. Instead, you may use <dyn> on individual series`);");
+                                        node.Code.A("G.Writeln(`+++       statements, or use 'BLOCK series dyn = yes; ... ; END;' to set the option for several`);");
+                                        node.Code.A("G.Writeln(`+++       series statemens. See more in the help, under the BLOCK command.`);");
+                                        node.Code.A("G.Writeln();");
+                                        node.Code.A("throw new GekkoException();");
+                                    }
+                                    else if (G.Equal(o, "timefilter_type"))  //TODO: only issue if really avg
+                                    {
+                                        node.Code.A("G.Writeln2(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
+                                    }
+                                    else if (G.Equal(o, "solve_forward_nfair_damp") || G.Equal(o, "solve_forward_fair_damp") || G.Equal(o, "solve_gauss_damp"))
+                                    {
+                                        node.Code.A("G.Writeln2(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
+                                    }
+                                    else if (G.Equal(o, "r_exe_path"))
+                                    {
+                                        node.Code.A("G.Writeln2(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
+                                    }
+                                    else if (G.Equal(o, "series_array_ignoremissing"))
+                                    {
+                                        node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series array print missing = skip;' and 'OPTION series array calc missing = zero;' instead`);");
+                                        node.Code.A("throw new GekkoException();");
+                                    }
+                                    else if (G.Equal(o, "table_ignoremissingvars"))
+                                    {
+                                        node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series normal table missing = m;' instead`);");
+                                        node.Code.A("throw new GekkoException();");
+                                    }
+                                    else if (G.Equal(o, "series_data_ignoremissing"))
+                                    {
+                                        node.Code.A("G.Writeln2(`*** ERROR: This option can no longer be used.`);");
+                                        node.Code.A("throw new GekkoException();");
+                                    }
                                 }
                             }
                         }
@@ -8058,7 +8084,8 @@ namespace Gekko.Parser.Gek
             }
         }        
 
-        private static void CreateOptionVariable(ASTNode node, bool block, StringBuilder s, ref string o)
+        
+        private static void CreateOptionVariableOldDelete(ASTNode node, bool block, StringBuilder s, ref string o)
         {
             StringBuilder s1 = new StringBuilder();
             StringBuilder s1a = new StringBuilder();
@@ -8189,14 +8216,14 @@ namespace Gekko.Parser.Gek
                 }
                 else throw new GekkoException();
             }
-            
+
             s.Append(s2);
             s.Append(s1);
             if (!block) o = s1.ToString();
             else o = s2.ToString() + s1.ToString();
             s.Append(" = ");
             s.Append(s1a);
-            s.AppendLine(";");                      
+            s.AppendLine(";");
 
             StringBuilder s3 = new StringBuilder();
             s3.Append("option_");
@@ -8223,9 +8250,9 @@ namespace Gekko.Parser.Gek
             sss = sss.Replace("true", "`yes`");
             sss = sss.Replace("false", "`no`");
             sss = "(" + sss + ").ToString().ToLower()";  //may be an enum
-            
-            if(!block) s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
-            
+
+            if (!block) s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
+
         }
 
         private static void CreateOptionVariableOLD(ASTNode node, StringBuilder s, ref string o)

@@ -26,6 +26,13 @@ namespace Gekko
 {
     public class Options
     {
+        public GekkoDictionary<string, IVariable> storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+
+        public IVariable this[string s]
+        {
+            get => this.storage[s];
+            set => this.storage[s] = value;
+        }
 
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR            
             
