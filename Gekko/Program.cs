@@ -29241,7 +29241,8 @@ namespace Gekko
         //    }
 
         //    return counter;
-        //}
+        //}       
+        
 
         public static void Collapse(List lhs, List rhs, string method, P p)
         {

@@ -26,18 +26,96 @@ namespace Gekko
 {
     public class Options
     {
-        public GekkoDictionary<string, IVariable> storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+        //public GekkoDictionary<string, IVariable> storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
 
-        public IVariable this[string s]
-        {
-            get => this.storage[s];
-            set => this.storage[s] = value;
-        }
+        ////public IVariable this[string s]
+        ////{
+        ////    get => this.storage[s];
+        ////    set => this.storage[s] = value;
+        ////}
+        
+        //public string GetString(string key)
+        //{
+        //    return O.ConvertToString(this.storage[key]);
+        //}
+
+        //public void SetString(string key, string s)
+        //{
+        //    this.storage[key] = new ScalarString(s);
+        //}
+
+        //public double GetVal(string key)
+        //{
+        //    return O.ConvertToVal(this.storage[key]);
+        //}
+
+        //public void SetVal(string key, double v)
+        //{
+        //    this.storage[key] = new ScalarVal(v);
+        //}
+
+        //public int GetInt(string key)
+        //{
+        //    return O.ConvertToInt(this.storage[key]);
+        //}
+
+        //public void SetInt(string key, int i)
+        //{
+        //    this.storage[key] = new ScalarVal(i);
+        //}
+
+        //public bool GetBool(string key)
+        //{
+        //    IVariable iv = this.storage[key];
+        //    if (Object.ReferenceEquals(iv, Globals.scalarStringYes)) return true;
+        //    else if (Object.ReferenceEquals(iv, Globals.scalarStringNo)) return false;
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
+        //        throw new GekkoException();
+        //    }
+        //}
+
+        //public void SetBool(string key, string s)
+        //{
+        //    if (G.Equal(s, "yes")) this.storage[key] = Globals.scalarStringYes;
+        //    else if (G.Equal(s, "no")) this.storage[key] = Globals.scalarStringNo;
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
+        //        throw new GekkoException();
+        //    }
+        //}
+
+        //public bool? GetBoolQ(string key)
+        //{
+        //    IVariable iv = this.storage[key];
+        //    if (iv == null) return null;
+        //    else if (Object.ReferenceEquals(iv, Globals.scalarStringYes)) return true;
+        //    else if (Object.ReferenceEquals(iv, Globals.scalarStringNo)) return false;
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
+        //        throw new GekkoException();
+        //    }
+        //}
+
+        //public void SetBoolQ(string key, string s)
+        //{
+        //    if (s == null) this.storage[key] = null;
+        //    else if (G.Equal(s, "yes")) this.storage[key] = Globals.scalarStringYes;
+        //    else if (G.Equal(s, "no")) this.storage[key] = Globals.scalarStringNo;
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
+        //        throw new GekkoException();
+        //    }
+        //}
 
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR            
-            
+
         //!!!! NOTE: THESE LINE NUMBERSS CORRESPOND TO LINES IN Cmd3.g, line for line    
-            
+
         //these are not mentioned in help
         public bool bugfix_import_export = false;             
         
@@ -263,6 +341,305 @@ namespace Gekko
         //question
         public bool timefilter = false;
         public string timefilter_type = "hide";  //"hide" or "avg"
+
+        public static List<List<string>> Syntax()
+        {
+            List<List<string>> rv = new List<List<string>>();
+
+            List<string> types = new List<string>();
+            types.Add("bool");
+            types.Add("string");
+            types.Add("numberIntegerOrDouble");
+            types.Add("numberIntegerOrDouble2String");
+            types.Add("nameOrString");
+            types.Add("nameOrStringOrFilename");
+            types.Add("int");
+            types.Add("name2Freq");
+            types.Add("optionSeriesMissing");
+            types.Add("plusminusint");
+
+            void Add(params string[] ss)
+            {
+                //input array elements will be trimmed (and first element is set lowercase)
+                if (!types.Contains(ss[1]))
+                {
+                    G.Writeln("*** ERROR: Option type error");
+                    throw new GekkoException();
+                }
+                List<string> ss5 = new List<string>();
+                string w = ss[0].Trim().ToLower();
+                if (w.Contains("  "))
+                {
+                    G.Writeln("*** ERROR: Option type error, too many blanks");
+                    throw new GekkoException();
+                }
+                ss5.Add(w); //also set lowercase
+                for (int i = 1; i < ss.Length; i++) ss5.Add(ss[i].Trim());
+                rv.Add(ss5);
+            }
+
+            //NOTE: the first string is written like this:
+            // + capitals (only so it is easier to see visually)
+            // + 1 blank to separate idents
+            // + (..|..) for synonym, first one is used
+            // + type can be: "", "", "", "", "", ""
+            // 
+
+            Add("BUGFIX IMPORT EXPORT", "bool");
+            Add("BUGFIX GBK", "bool");
+            Add("BUGFIX MISSING", "bool");
+            Add("DATABANK COMPARE TABS", "numberIntegerOrDouble");
+            Add("DATABANK COMPARE TREL", "numberIntegerOrDouble");
+            Add("DATABANK CREATE AUTO", "bool");
+            Add("DATABANK FILE COPYLOCAL", "bool");
+            Add("DATABANK FILE GBK COMPRESS", "bool");            
+            Add("DATABANK FILE GBK VERSION", "numberIntegerOrDouble2String");
+            Add("DATABANK FILE GBK INTERNAL", "nameOrString");
+            Add("DATABANK SEARCH", "bool");
+            Add("DECOMP MAXLAG", "numberIntegerOrDouble");
+            Add("DECOMP MAXLEAD", "numberIntegerOrDouble");
+            Add("FIT OLS REKUR DFMIN", "numberIntegerOrDouble");
+            Add("FOLDER", "bool");
+            Add("FOLDER BANK", "nameOrStringOrFilename");
+            Add("FOLDER BANK1", "nameOrStringOrFilename");
+            Add("FOLDER BANK2", "nameOrStringOrFilename");
+            Add("FOLDER COMMAND", "nameOrStringOrFilename");
+            Add("FOLDER COMMAND1", "nameOrStringOrFilename");
+            Add("FOLDER COMMAND2", "nameOrStringOrFilename");
+            Add("FOLDER HELP", "nameOrStringOrFilename");
+            Add("FOLDER MENU", "nameOrStringOrFilename");
+            Add("FOLDER MODEL", "nameOrStringOrFilename");
+            Add("FOLDER PIPE", "nameOrStringOrFilename");
+            Add("FOLDER TABLE", "nameOrStringOrFilename");
+            Add("FOLDER TABLE1", "nameOrStringOrFilename");
+            Add("FOLDER TABLE2", "nameOrStringOrFilename");
+            Add("FOLDER WORKING", "nameOrStringOrFilename");
+            Add("FREQ", "name2Freq", "a", "q", "m", "d", "u");
+            Add("GAMS EXE FOLDER", "nameOrStringOrFilename");
+            Add("GAMS FAST", "bool");
+            Add("GAMS TIME DETECT AUTO", "bool");
+            Add("GAMS TIME FREQ", "nameOrString");
+            Add("GAMS TIME OFFSET", "int");
+            Add("GAMS TIME PREFIX", "nameOrString");
+            Add("GAMS TIME SET", "nameOrString");
+            Add("INTERFACE ALIAS", "bool");
+            Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", "nameOrString", "period", "comma");    //#kljsdfasfdlkj
+            Add("INTERFACE CSV DECIMALSEPARATOR", "nameOrString", "period", "comma");          //#kljsdfasfdlkj
+            Add("INTERFACE CSV DELIMITER", "nameOrString", "semicolon", "comma");
+            Add("INTERFACE CSV NDEC", "int");
+            Add("INTERFACE CSV PDEC", "int");
+            Add("INTERFACE DEBUG", "nameOrString", "none", "dialog");
+            Add("INTERFACE EDIT STYLE", "nameOrString", "gekko", "gekko2", "rstudio", "rstudio2");
+            Add("INTERFACE EXCEL LANGUAGE", "nameOrString", "danish", "english");
+            Add("INTERFACE EXCEL MODERNLOOK", "bool");
+            Add("INTERFACE HELP COPYLOCAL", "bool");
+            Add("INTERFACE MODE", "nameOrString", "mixed", "sim", "data");
+            Add("INTERFACE MUTE", "nameOrString", "bool");
+            Add("INTERFACE REMOTE", "bool");
+            Add("INTERFACE REMOTE FILE", "nameOrStringOrFilename");
+            Add("INTERFACE SOUND", "bool");
+            Add("INTERFACE SOUND TYPE", "nameOrString", "bowl", "ding", "notify", "ring");
+            Add("INTERFACE SOUND WAIT", "int");
+            Add("INTERFACE SUGGESTIONS", "nameOrString", "none", "option");
+            Add("INTERFACE TABLE OPERATORS", "bool");
+            Add("INTERFACE ZOOM", "int");
+            Add("MENU STARTFILE", "nameOrStringOrFilename");
+            Add("MODEL CACHE MAX", "int");
+            Add("MODEL CACHE", "bool");
+            Add("MODEL GAMS DEP CURRENT", "bool");
+            Add("MODEL GAMS DEP METHOD", "nameOrString", "lhs", "eqname");
+            Add("MODEL INFOFILE", "nameOrString", "yes", "no", "temp");
+            Add("MODEL TYPE", "nameOrString", "default", "gams");
+            Add("PLOT ELEMENTS MAX", "int");
+            Add("PLOT LINES POINTS", "bool");
+            Add("PLOT XLABELS ANNUAL", "nameOrString", "at", "between");  //#hsfsksgsdfg
+            Add("PLOT XLABELS DIGITS", "int");
+            Add("PLOT XLABELS NONANNUAL", "nameOrString", "at", "between");    //#hsfsksgsdfg
+            Add("PLOT DECIMALSEPARATOR", "nameOrString", "period", "comma");                   //#kljsdfasfdlkj
+            Add("PLOT USING", "nameOrStringOrFilename");
+            Add("PRINT COLLAPSE", "nameOrString", "avg", "total", "none");                      //#kllæksdfgsdg
+            Add("PRINT ELEMENTS MAX", "int");
+            Add("PRINT FREQ", "nameOrString", "simple", "pretty");
+            Add("PRINT DISP MAXLINES", "plusminusint");
+            Add("PRINT FIELDS NDEC", "int");
+            Add("PRINT FIELDS NWIDTH", "int");
+            Add("PRINT FIELDS PDEC", "int");
+            Add("PRINT FIELDS PWIDTH", "int");
+            Add("PRINT FILEWIDTH", "int");
+            Add("PRINT MULPRT (GDIF|GDIFF)", "bool");
+            Add("PRINT MULPRT ABS", "bool");
+            Add("PRINT MULPRT LEV", "bool");
+            Add("PRINT MULPRT PCH", "bool");
+            Add("PRINT MULPRT V", "bool");
+            Add("PRINT PRT (DIF|DIFF)", "bool");
+            Add("PRINT PRT (GDIF|GDIFF)", "bool");
+            Add("PRINT PRT ABS", "bool");
+            Add("PRINT PRT PCH", "bool");
+            Add("PRINT WIDTH", "int");
+            Add("PRINT SPLIT", "bool");
+            Add("PYTHON EXE FOLDER", "nameOrStringOrFilename");
+            Add("R EXE FOLDER", "nameOrStringOrFilename");
+            Add("R EXE PATH", "nameOrStringOrFilename");              //obsolete!
+            Add("SERIES ARRAY IGNOREMISSING", "bool");
+            Add("SERIES DATA IGNOREMISSING", "bool");
+            Add("SERIES DYN", "bool");
+            Add("SERIES DYN CHECK", "bool");
+            Add("SERIES FAILSAFE", "bool");
+            Add("SERIES NORMAL PRINT MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
+            Add("SERIES NORMAL CALC MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES NORMAL TABLE MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
+            Add("SERIES ARRAY PRINT MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES ARRAY CALC MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");      //#ljfdssdfgsh
+            Add("SERIES ARRAY TABLE MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES DATA MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");            //#ljfdssdfgsh
+            Add("SHEET COLLAPSE", "nameOrString", "avg", "total", "none");         //#kllæksdfgsdg
+            Add("SHEET ENGINE", "nameOrString", "excel", "internal");
+            Add("SHEET FREQ", "nameOrString", "simple", "pretty");
+            Add("SHEET MULPRT (GDIF|GDIFF)", "bool");
+            Add("SHEET MULPRT ABS", "bool");
+            Add("SHEET MULPRT LEV", "bool");
+            Add("SHEET MULPRT PCH", "bool");
+            Add("SHEET MULPRT V", "bool");
+            Add("SHEET PRT (DIF|DIFF)", "bool");
+            Add("SHEET PRT (GDIF|GDIFF)", "bool");
+            Add("SHEET PRT ABS", "bool");
+            Add("SHEET PRT PCH", "bool");
+            Add("SHEET ROWS", "bool");
+            Add("SHEET COLS", "bool");
+            Add("SOLVE DATA CREATE AUTO", "bool");
+            Add("SOLVE DATA IGNOREMISSING", "bool");
+            Add("SOLVE DATA INIT", "bool");
+            Add("SOLVE DATA INIT GROWTH", "bool");
+            Add("SOLVE DATA INIT GROWTH MAX", "numberIntegerOrDouble");
+            Add("SOLVE DATA INIT GROWTH MIN", "numberIntegerOrDouble");
+            Add("SOLVE FAILSAFE", "bool");
+            Add("SOLVE FORWARD DUMP", "bool");
+            Add("SOLVE FORWARD FAIR CONV", "nameOrString", "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE FORWARD FAIR CONV1 ABS", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD FAIR CONV1 REL", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD FAIR CONV2 TABS", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD FAIR CONV2 TREL", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD FAIR DAMP", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD FAIR ITERMAX", "int");
+            Add("SOLVE FORWARD FAIR ITERMIN", "int");
+            Add("SOLVE FORWARD NFAIR CONV", "nameOrString", "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE FORWARD NFAIR CONV1 ABS", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD NFAIR CONV1 REL", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD NFAIR CONV2 TABS", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD NFAIR CONV2 TREL", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD NFAIR DAMP", "numberIntegerOrDouble");
+            Add("SOLVE FORWARD NFAIR ITERMAX", "int");
+            Add("SOLVE FORWARD NFAIR ITERMIN", "int");
+            Add("SOLVE FORWARD NFAIR UPDATEFREQ", "int");
+            Add("SOLVE FORWARD STACKED HORIZON", "int");
+            Add("SOLVE FORWARD METHOD", "nameOrString", "stacked", "fair", "nfair", "none");
+            Add("SOLVE FORWARD TERMINAL", "nameOrString", "exo", "const", "growth");
+            Add("SOLVE FORWARD TERMINAL FEED", "nameOrString", "internal", "external");
+            Add("SOLVE GAUSS CONV", "nameOrString", "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE GAUSS CONV IGNOREVARS", "bool");
+            Add("SOLVE GAUSS CONV1 ABS", "numberIntegerOrDouble");
+            Add("SOLVE GAUSS CONV1 REL", "numberIntegerOrDouble");
+            Add("SOLVE GAUSS CONV2 TABS", "numberIntegerOrDouble");
+            Add("SOLVE GAUSS CONV2 TREL", "numberIntegerOrDouble");
+            Add("SOLVE GAUSS DAMP", "numberIntegerOrDouble");
+            Add("SOLVE GAUSS DUMP", "bool");
+            Add("SOLVE GAUSS ITERMAX", "int");
+            Add("SOLVE GAUSS ITERMIN", "int");
+            Add("SOLVE GAUSS REORDER", "bool");
+            Add("SOLVE METHOD", "nameOrString", "newton", "gauss");
+            Add("SOLVE NEWTON BACKTRACK", "bool");
+            Add("SOLVE NEWTON CONV ABS", "numberIntegerOrDouble");
+            Add("SOLVE NEWTON INVERT", "nameOrString", "lu", "iter");
+            Add("SOLVE NEWTON ROBUST", "bool");
+            Add("SOLVE NEWTON ITERMAX", "int");
+            Add("SOLVE NEWTON UPDATEFREQ", "int");
+            Add("SOLVE PRINT DETAILS", "bool");
+            Add("SOLVE PRINT ITER", "bool");
+            Add("SOLVE STATIC", "bool");
+            Add("STRING INTERPOLATE FORMAT VAL", "string");
+            Add("SYSTEM CODE SPLIT", "int");
+            Add("SYSTEM CLONE", "bool");
+            Add("TABLE DECIMALSEPARATOR", "nameOrString", "period", "comma");                  //#kljsdfasfdlkj
+            Add("TABLE HTML DATAWIDTH", "numberIntegerOrDouble");
+            Add("TABLE HTML FIRSTCOLWIDTH", "numberIntegerOrDouble");
+            Add("TABLE HTML FONT", "nameOrString");
+            Add("TABLE HTML FONTSIZE", "numberIntegerOrDouble");
+            Add("TABLE HTML SECONDCOLWIDTH", "numberIntegerOrDouble");
+            Add("TABLE HTML SPECIALMINUS", "bool");
+            Add("TABLE IGNOREMISSINGVARS", "bool");
+            Add("TABLE MDATEFORMAT", "string");
+            Add("TABLE STAMP", "bool");
+            Add("TABLE THOUSANDSSEPARATOR", "bool");
+            Add("TABLE TYPE", "nameOrString", "txt", "html");
+            Add("TIMEFILTER", "bool");
+            Add("TIMEFILTER TYPE", "nameOrString", "hide", "avg");
+
+            return rv;
+
+        }
+
+        public List<string> Intellisense(string s)
+        {
+            List<string> rv = new List<string>();
+            s = s.ToLower().Substring("option ".Length).Trim(); //must start with "option "
+            
+            string[] words1 = new string[0];
+            if (!string.IsNullOrEmpty(s))
+            {
+                words1 = s.Split(' ');
+            }
+
+            foreach (List<string> ss in Globals.listSyntax)
+            {
+                string[] words2 = ss[0].Split(' ');
+
+                //if we are typing "OPTION folder ", just after this blank, we have that 
+                //words1 = ["folder"]
+                //words2 = ["folder", "working"] for instance
+                //if words1.Length < words2.Length, we add "working" to output
+                //if same length, we add the type to output
+                //if words1.Length > words2.Length, we don't add anything (not matching)
+
+                if (words1.Length > words2.Length)
+                {
+                    continue;
+                }
+
+                //words1 has <= number of elements compared to words2
+
+                for (int i = 0; i < words1.Length; i++)
+                {
+                    if (words1[i] != words2[i]) goto Lbl1;  //all elements must match
+                }
+
+                if (words1.Length < words2.Length)
+                {
+                    string w = words2[words1.Length]; //.Length - 1 would take the corresponding (last) element, but we take the next
+                    if (!rv.Contains(w)) rv.Add(w); //this .Contains() is a little slow, but should be unnoticeable in the GUI
+                }
+                else if (words1.Length == words2.Length)
+                {
+                    if (ss.Count <= 2)
+                    {
+                        string w = ss[1];  //the type                    
+                        if (!rv.Contains(w)) rv.Add(w);
+                    }
+                    else
+                    {
+                        for (int i = 2; i < ss.Count; i++)
+                        {
+                            string w = ss[i];
+                            if (!rv.Contains(w)) rv.Add(w);
+                        }
+                    }
+                }
+            
+            Lbl1:
+                int ii = 0;  //useless statement, just used for the label
+
+            }
+            return rv;
+        }
 
         public void Write()
         {

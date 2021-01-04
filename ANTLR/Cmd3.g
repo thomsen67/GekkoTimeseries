@@ -3898,10 +3898,13 @@ x12aOpt1h:                  PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expr
 //-----------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 						
-optionType2: name+ '='? expression -> name+ expression;
+optionType:                 ident+ '='? fileName -> ident+ fileName
+                          | ident+ '='? name -> ident+ name
+                          | ident+ '='? expression -> ident+ expression						  
+						    ;
 
 //!! do not use '_' as a char in a an option name. 'failsafe' is fine, but fail_safe is not.
-optionType:			    
+optionType2:			    
 			   question -> question
              
 			 //NOTE: THESE LINES CORRESPOND TO LINES IN Options.cs, line for line

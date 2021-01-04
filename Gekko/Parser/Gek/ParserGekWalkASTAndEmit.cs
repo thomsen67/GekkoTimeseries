@@ -4865,13 +4865,40 @@ namespace Gekko.Parser.Gek
                             {
                                 string ss7 = null;
                                 bool first = true;
-                                for (int i = 0; i < node.ChildrenCount(); i++)
+                                for (int i = 0; i < node.ChildrenCount() - 1; i++)
                                 {
-                                    if (!first) ss7 += ", ";
-                                    ss7 += node[i].Code;
+                                    if (!first) ss7 += " ";
+                                    ss7 += node[i][0].Text.ToLower();
                                     first = false;
                                 }
-                                node.Code.A("O.SetOption(" + ss7 + ");");
+                                                                
+                                List<string> rv = null;
+                                foreach (List<string> ss in Globals.listSyntax)
+                                {
+                                    if (G.Equal(ss[0], ss7))
+                                    {
+                                        rv = ss;
+                                        break;
+                                    }
+                                }
+
+                                //option? check question at all places, implement
+                                //for int, check that -1 is ok, for instance PRINT DISP MAXLINES = -1
+                                //SOLVE DATA INIT GROWTH MIN = -0.02 
+                                //PRINT MULPRT (GDIF|GDIFF)
+                                //int
+                                //double
+                                //bool
+                                //string
+
+                                string f = "(";
+                                if (ss7 == "folder_working") f = "O.ConvertToString(";
+
+                                node.Code.A("Program.options." + ss7 + " = " + f + node[node.ChildrenCount() - 1].Code + ")" + ";" + G.NL);
+                                node.Code.A("G.Writeln2(`" + ss7 + "`);");
+
+                                
+
                             }
                             else
                             {

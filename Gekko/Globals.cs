@@ -428,7 +428,8 @@ namespace Gekko
         public static UndoSim undoSim = null;
         public static PackSim packSim = null;
 
-        public static bool newOption = false;
+        public static bool newOption = true;
+        public static List<List<string>> listSyntax = Options.Syntax();  //this is created once and for all and is used for the entire Gekko session (not redone in RESET/RESTART)
 
         public static bool patch_zvar = true;
 
@@ -458,6 +459,8 @@ namespace Gekko
         public static readonly ScalarVal scalarVal1 = new ScalarVal(1d);
         public static readonly ScalarVal scalarValMissing = new ScalarVal(double.NaN);
         public static readonly ScalarString scalarStringStar = new ScalarString("*");
+        public static readonly ScalarString scalarStringYes = new ScalarString("yes");
+        public static readonly ScalarString scalarStringNo = new ScalarString("no");
 
         public static bool poolGenrLines = false;
 

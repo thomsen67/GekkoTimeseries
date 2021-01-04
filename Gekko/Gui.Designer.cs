@@ -1711,8 +1711,7 @@ namespace Gekko
                 //do nothing
             }
 
-
-            List<string> suggestions = ParserOLD.IntelliParserNew(s2);
+            List<string> suggestions = Program.options.Intellisense(s2);
 
             if (suggestions.Count > 0)
             {
