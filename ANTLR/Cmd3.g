@@ -3086,24 +3086,14 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 // BLOCK
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({token("ASTBLOCK", ASTBLOCK, input.LT(1).Line)} ^(ASTPLACEHOLDER blockOpt1?) ^(ASTPLACEHOLDER functionStatements));
-
-//blockOpt1:                  (TIME dates COMMA2) (blockOpt1h (COMMA2 blockOpt1h)*)? -> ^(ASTDATES_BLOCK dates) blockOpt1h*
-//						  | (TIME dates) -> ^(ASTDATES_BLOCK dates?)
-//						  | (blockOpt1h (COMMA2 blockOpt1h)*)? -> ^(ASTDATES_BLOCK) blockOpt1h*
-//						    ;
-
-//blockOpt1h:                 SERIES DYN '='? yesNoSimple -> ^(ASTBLOCKOPTION SERIES DYN ^(ASTBOOL yesNoSimple))
-//						  | optionType -> ^(ASTBLOCKOPTION optionType)														
-//							;
-
 block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({token("ASTBLOCK", ASTBLOCK, input.LT(1).Line)} ^(ASTPLACEHOLDER blockOpt1?) ^(ASTPLACEHOLDER functionStatements));
 
 blockOpt1:                  blockOpt1h (COMMA2 blockOpt1h)* -> blockOpt1h+;
 
 blockOpt1h:                 SERIES DYN '='? yesNoSimple -> ^(ASTBLOCKOPTION SERIES DYN ^(ASTBOOL yesNoSimple))
 						  | TIME dates -> ^(ASTDATES_BLOCK dates?)
-						  | optionType -> ^(ASTBLOCKOPTION optionType)								  
+						  | optionType1 -> ^(ASTBLOCKOPTION optionType1)
+						  | optionType2 -> ^(ASTBLOCKOPTION optionType2)
 							;
 
 
@@ -3244,7 +3234,9 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 // OPTION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType);
+option:                     OPTION optionType1 -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType1)
+                          | OPTION optionType2 -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType2)
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PAUSE
@@ -3897,266 +3889,54 @@ x12aOpt1h:                  PARAM EQUAL expression -> ^(ASTOPT_STRING_PARAM expr
 //-----------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
-						
-optionType:                 ident+ '='? fileName -> ident+ fileName
+
+/*						
+optionType:              
+
+                 
+             //| TABLE HTML FONT '='? fileName ->  TABLE HTML FONT ^(ASTSTRINGSIMPLE fileName)
+
+                          | ident+ '='  fileName -> ident+ fileName
                           | ident+ '='? name -> ident+ name
                           | ident+ '='? expression -> ident+ expression						  
-						    ;
+						    ; 
+*/
 
-//!! do not use '_' as a char in a an option name. 'failsafe' is fine, but fail_safe is not.
-optionType2:			    
-			   question -> question
-             
-			 //NOTE: THESE LINES CORRESPOND TO LINES IN Options.cs, line for line
-			 
-			 | BUGFIX IMPORT EXPORT '='? yesNoSimple -> BUGFIX IMPORT EXPORT ^(ASTBOOL yesNoSimple)	//not mentioned in help		 			 	
-			 | BUGFIX GBK '='? yesNoSimple -> BUGFIX GBK ^(ASTBOOL yesNoSimple)                     //not mentioned in help
-			 | BUGFIX MISSING '='? yesNoSimple -> BUGFIX MISSING ^(ASTBOOL yesNoSimple)             //not mentioned in help
-			
-			 | DATABANK question -> DATABANK question
-             | DATABANK COMPARE TABS '='? numberIntegerOrDouble -> DATABANK COMPARE TABS numberIntegerOrDouble
-             | DATABANK COMPARE TREL '='? numberIntegerOrDouble  -> DATABANK COMPARE TREL numberIntegerOrDouble
-             | DATABANK CREATE AUTO '='? yesNoSimple -> DATABANK CREATE AUTO ^(ASTBOOL yesNoSimple )			 
-			 | DATABANK FILE COPYLOCAL '='? yesNoSimple -> DATABANK FILE COPYLOCAL ^(ASTBOOL yesNoSimple )             
-             | DATABANK FILE GBK COMPRESS '='? yesNoSimple -> DATABANK FILE GBK COMPRESS ^(ASTBOOL yesNoSimple)
-             | DATABANK FILE GBK VERSION '='? numberIntegerOrDouble ->  DATABANK FILE GBK VERSION ^(ASTSTRINGSIMPLE numberIntegerOrDouble)  //NOTE: number converted to string
-			 | DATABANK FILE GBK INTERNAL '='? expression ->  DATABANK FILE GBK INTERNAL ^(ASTSTRINGSIMPLE expression)			 
-			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )	
-			 
-			 | DECOMP MAXLAG '='? numberIntegerOrDouble ->  DECOMP MAXLAG numberIntegerOrDouble
-             | DECOMP MAXLEAD '='? numberIntegerOrDouble  -> DECOMP MAXLEAD numberIntegerOrDouble
 
-			 | FIT OLS REKUR DFMIN '='? numberIntegerOrDouble  -> FIT OLS REKUR DFMIN numberIntegerOrDouble
+optionType1:   //These catch unquoted filenames. Because of parser problems, this is necessary, unfortunately.
+               //If it is forgotten to put a new option with fileName here, the option will still work, but
+			   //will require the filename to be quoted.
+			   //If instead of exact tokens we just used ident+ here, it would also catch names as other things that 
+			   //would look like filenames.
+			   //In the long term (Gekko 4.0, it is perhaps best to make EQUAL ('=') mandatory).
+               //See also #jsadklgasj4j
+			   DATABANK FILE GBK INTERNAL EQUAL? fileName ->  DATABANK FILE GBK INTERNAL fileName
+             | FOLDER BANK           EQUAL? fileName ->  FOLDER BANK fileName
+             | FOLDER BANK1          EQUAL? fileName ->  FOLDER BANK1 fileName
+             | FOLDER BANK2          EQUAL? fileName ->  FOLDER BANK2 fileName
+             | FOLDER COMMAND        EQUAL? fileName ->  FOLDER COMMAND fileName
+             | FOLDER COMMAND1       EQUAL? fileName ->  FOLDER COMMAND1 fileName
+             | FOLDER COMMAND2       EQUAL? fileName ->  FOLDER COMMAND2 fileName
+             | FOLDER HELP           EQUAL? fileName ->  FOLDER HELP fileName
+             | FOLDER MENU           EQUAL? fileName ->  FOLDER MENU fileName
+             | FOLDER MODEL          EQUAL? fileName ->  FOLDER MODEL fileName
+             | FOLDER PIPE           EQUAL? fileName ->  FOLDER PIPE fileName
+             | FOLDER TABLE          EQUAL? fileName ->  FOLDER TABLE fileName
+             | FOLDER TABLE1         EQUAL? fileName ->  FOLDER TABLE1 fileName
+             | FOLDER TABLE2         EQUAL? fileName ->  FOLDER TABLE2 fileName
+             | FOLDER WORKING        EQUAL? fileName ->  FOLDER WORKING fileName
+             | GAMS EXE FOLDER       EQUAL? fileName ->  GAMS EXE FOLDER fileName
+             | INTERFACE REMOTE FILE EQUAL? fileName ->  INTERFACE REMOTE FILE fileName
+             | MENU STARTFILE        EQUAL? fileName ->  MENU STARTFILE fileName
+             | PLOT USING            EQUAL? fileName ->  PLOT USING fileName
+             | PYTHON EXE FOLDER     EQUAL? fileName ->  PYTHON EXE FOLDER fileName
+             | R EXE FOLDER          EQUAL? fileName ->  R EXE FOLDER fileName			 
+			   ;
 
-			 | FOLDER question -> FOLDER question
-             | FOLDER '='? yesNoSimple -> FOLDER ^(ASTBOOL yesNoSimple)
-             | FOLDER BANK    '='? fileName ->  FOLDER BANK ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER BANK1    '='? fileName ->  FOLDER BANK1 ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER BANK2    '='? fileName ->  FOLDER BANK2 ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER COMMAND    '='? fileName ->  FOLDER COMMAND ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER COMMAND1    '='? fileName ->  FOLDER COMMAND1 ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER COMMAND2    '='? fileName ->  FOLDER COMMAND2 ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER HELP   '='? fileName ->  FOLDER HELP ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER MENU     '='? fileName ->  FOLDER MENU ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER MODEL   '='? fileName ->  FOLDER MODEL ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER PIPE '='? fileName ->  FOLDER PIPE ^(ASTSTRINGSIMPLE fileName)			
-             | FOLDER TABLE    '='? fileName ->  FOLDER TABLE ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER TABLE1   '='? fileName ->  FOLDER TABLE1 ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER TABLE2   '='? fileName ->  FOLDER TABLE2 ^(ASTSTRINGSIMPLE fileName)
-             | FOLDER WORKING '='? fileName ->  FOLDER WORKING ^(ASTSTRINGSIMPLE fileName)
-
-			 | FREQ question -> FREQ question
-             | FREQ '='? name -> FREQ ^(ASTSTRINGSIMPLE name)
-			 
-			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
-			 | GAMS FAST '='? yesNoSimple -> GAMS FAST ^(ASTBOOL yesNoSimple)
-			 | GAMS TIME DETECT AUTO '='? yesNoSimple -> GAMS TIME DETECT AUTO ^(ASTBOOL yesNoSimple)
-			 | GAMS TIME FREQ '='? expression -> GAMS TIME FREQ ^(ASTSTRINGSIMPLE expression)
-			 | GAMS TIME OFFSET '='? Integer -> GAMS TIME OFFSET ^(ASTINTEGER Integer)
-			 | GAMS TIME PREFIX '='? expression -> GAMS TIME PREFIX ^(ASTSTRINGSIMPLE expression)
-			 | GAMS TIME SET '='? expression -> GAMS TIME SET ^(ASTSTRINGSIMPLE expression)			 
-
-			 | INTERFACE question -> INTERFACE question
-			 | INTERFACE ALIAS '='? yesNoSimple -> INTERFACE ALIAS ^(ASTBOOL yesNoSimple)			 
-             | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
-			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
-			 | INTERFACE CSV DELIMITER '='? name -> INTERFACE CSV DELIMITER ^(ASTSTRINGSIMPLE name)
-			 | INTERFACE CSV NDEC '='? Integer -> INTERFACE CSV NDEC ^(ASTINTEGER Integer)
-			 | INTERFACE CSV PDEC '='? Integer -> INTERFACE CSV PDEC ^(ASTINTEGER Integer)			 
-			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)
-			 | INTERFACE EDIT STYLE '='? name -> INTERFACE EDIT STYLE ^(ASTSTRINGSIMPLE name)
-			 | INTERFACE EXCEL LANGUAGE '='? optionInterfaceExcelLanguage -> INTERFACE EXCEL LANGUAGE ^(ASTSTRINGSIMPLE optionInterfaceExcelLanguage)
-             | INTERFACE EXCEL MODERNLOOK '='? yesNoSimple -> INTERFACE EXCEL MODERNLOOK ^(ASTBOOL yesNoSimple)             		 
-             | INTERFACE HELP COPYLOCAL '='? yesNoSimple -> INTERFACE HELP COPYLOCAL ^(ASTBOOL yesNoSimple)			 
-			 | INTERFACE MODE '='? mode2 -> INTERFACE MODE ^(ASTSTRINGSIMPLE mode2)
-			 | INTERFACE MUTE '='? name -> INTERFACE MUTE ^(ASTSTRINGSIMPLE name)	
-			 | INTERFACE REMOTE '='? yesNoSimple -> INTERFACE REMOTE ^(ASTBOOL yesNoSimple)
-			 | INTERFACE REMOTE FILE '='? fileName -> INTERFACE REMOTE FILE ^(ASTSTRINGSIMPLE fileName)
-             | INTERFACE SOUND '='? yesNoSimple -> INTERFACE SOUND ^(ASTBOOL yesNoSimple)
-             | INTERFACE SOUND TYPE '='? optionInterfaceSound -> INTERFACE SOUND TYPE ^(ASTSTRINGSIMPLE optionInterfaceSound)
-             | INTERFACE SOUND WAIT '='? Integer -> INTERFACE SOUND WAIT ^(ASTINTEGER Integer)
-             | INTERFACE SUGGESTIONS '='? optionInterfaceSuggestions -> INTERFACE SUGGESTIONS ^(ASTSTRINGSIMPLE optionInterfaceSuggestions)             | MODEL question -> MODEL question
-			 | INTERFACE TABLE OPERATORS '='? yesNoSimple ->  INTERFACE TABLE OPERATORS  ^(ASTBOOL yesNoSimple)
-			 | INTERFACE ZOOM '='? Integer -> INTERFACE ZOOM ^(ASTINTEGER Integer)
-
-			 | MENU question -> MENU question
-			 | MENU STARTFILE '='? fileName ->  MENU STARTFILE ^(ASTSTRINGSIMPLE fileName)
-
-			 | MODEL question -> MODEL question
-             | MODEL CACHE MAX '='? Integer -> MODEL CACHE MAX  ^(ASTINTEGER Integer)
-             | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
-			 | MODEL GAMS DEP CURRENT '='? yesNoSimple -> MODEL GAMS DEP CURRENT ^(ASTBOOL yesNoSimple)
-			 | MODEL GAMS DEP METHOD '='? name -> MODEL GAMS DEP METHOD ^(ASTSTRINGSIMPLE name)
-			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
-			 | MODEL TYPE '='? name -> MODEL TYPE ^(ASTSTRINGSIMPLE name)			 
-
-			 | PLOT question -> PLOT question	
-			 | PLOT ELEMENTS MAX '='? Integer -> PLOT ELEMENTS MAX ^(ASTINTEGER Integer)		 
-			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )	
-			 | PLOT XLABELS ANNUAL '='? optionPlotXlabels ->  PLOT XLABELS ANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
-			 | PLOT XLABELS DIGITS '='? Integer ->  PLOT XLABELS DIGITS  ^(ASTINTEGER Integer)
-			 | PLOT XLABELS NONANNUAL '='? optionPlotXlabels ->  PLOT XLABELS NONANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
-			 | PLOT DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  PLOT DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
-			 | PLOT USING '='? fileName -> PLOT USING ^(ASTSTRINGSIMPLE fileName)			 
-			
-			 | PRINT question -> PRINT question
-			 | PRINT COLLAPSE '='? optionPrintCollapse ->  PRINT COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)
-			 | PRINT ELEMENTS MAX '='? Integer -> PRINT ELEMENTS MAX ^(ASTINTEGER Integer)		 
-			 | PRINT FREQ '='? optionPrintFreq ->  PRINT FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)
-             | PRINT DISP MAXLINES '='? '-'? Integer -> PRINT DISP MAXLINES ^(ASTINTEGER '-'? Integer)  //can be set to -1
-             | PRINT FIELDS NDEC '='? Integer -> PRINT FIELDS NDEC ^(ASTINTEGER Integer)
-             | PRINT FIELDS NWIDTH '='? Integer -> PRINT FIELDS NWIDTH ^(ASTINTEGER Integer)
-             | PRINT FIELDS PDEC '='? Integer -> PRINT FIELDS PDEC ^(ASTINTEGER Integer)
-             | PRINT FIELDS PWIDTH '='? Integer -> PRINT FIELDS PWIDTH ^(ASTINTEGER Integer)
-             | PRINT FILEWIDTH '='? Integer -> PRINT FILEWIDTH ^(ASTINTEGER Integer)
-			 | PRINT MULPRT (GDIF|GDIFF) '='? yesNoSimple -> PRINT MULPRT GDIF ^(ASTBOOL yesNoSimple)
-             | PRINT MULPRT ABS '='? yesNoSimple -> PRINT MULPRT ABS ^(ASTBOOL yesNoSimple)
-             | PRINT MULPRT LEV '='? yesNoSimple -> PRINT MULPRT LEV ^(ASTBOOL yesNoSimple)
-             | PRINT MULPRT PCH '='? yesNoSimple -> PRINT MULPRT PCH ^(ASTBOOL yesNoSimple)
-             | PRINT MULPRT V '='? yesNoSimple -> PRINT MULPRT V ^(ASTBOOL yesNoSimple)
-             | PRINT PRT (DIF|DIFF) '='? yesNoSimple -> PRINT PRT DIF ^(ASTBOOL yesNoSimple)
-             | PRINT PRT (GDIF|GDIFF) '='? yesNoSimple -> PRINT PRT GDIF ^(ASTBOOL yesNoSimple)
-             | PRINT PRT ABS '='? yesNoSimple -> PRINT PRT ABS ^(ASTBOOL yesNoSimple)
-             | PRINT PRT PCH '='? yesNoSimple -> PRINT PRT PCH ^(ASTBOOL yesNoSimple)
-			 | PRINT WIDTH '='? Integer -> PRINT WIDTH ^(ASTINTEGER Integer)
-			 | PRINT SPLIT '='? yesNoSimple -> PRINT SPLIT ^(ASTBOOL yesNoSimple)
-
-			 | PYTHON EXE FOLDER '='? fileName -> PYTHON EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
-
-			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
-			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
-
-             | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	//obsolete, delete in 3.3.x versions
-			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	//obsolete, delete in 3.3.x versions
-
-			 | SERIES DYN '='? yesNoSimple -> SERIES DYN ^(ASTBOOL yesNoSimple)
-			 | SERIES DYN CHECK '='? yesNoSimple -> SERIES DYN  CHECK ^(ASTBOOL yesNoSimple)
-			 | SERIES FAILSAFE '='? yesNoSimple -> SERIES FAILSAFE ^(ASTBOOL yesNoSimple)			 			 
-			 | SERIES NORMAL PRINT MISSING '=' optionSeriesMissing -> SERIES NORMAL PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)			 
-             | SERIES NORMAL CALC MISSING '=' optionSeriesMissing -> SERIES NORMAL CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
-			 | SERIES NORMAL TABLE MISSING '=' optionSeriesMissing -> SERIES NORMAL TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
-             | SERIES ARRAY PRINT MISSING '=' optionSeriesMissing -> SERIES ARRAY PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
-             | SERIES ARRAY CALC MISSING '=' optionSeriesMissing -> SERIES ARRAY CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
-			 | SERIES ARRAY TABLE MISSING '=' optionSeriesMissing -> SERIES ARRAY TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
-			 | SERIES DATA MISSING '=' optionSeriesMissing -> SERIES DATA MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)			 
-			 
-			 | SHEET question -> SHEET question
-			 | SHEET COLLAPSE '='? optionPrintCollapse ->  SHEET COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)			 
-			 | SHEET ENGINE '='? optionSheetEngine -> SHEET ENGINE ^(ASTSTRINGSIMPLE optionSheetEngine)
-			 | SHEET FREQ '='? optionPrintFreq ->  SHEET FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)       			 
-			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
-             | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
-             | SHEET MULPRT LEV '='? yesNoSimple -> SHEET MULPRT LEV ^(ASTBOOL yesNoSimple)
-             | SHEET MULPRT PCH '='? yesNoSimple -> SHEET MULPRT PCH ^(ASTBOOL yesNoSimple)
-             | SHEET MULPRT V '='? yesNoSimple -> SHEET MULPRT V ^(ASTBOOL yesNoSimple)
-             | SHEET PRT (DIF|DIFF) '='? yesNoSimple -> SHEET PRT DIF ^(ASTBOOL yesNoSimple)
-             | SHEET PRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET PRT GDIF ^(ASTBOOL yesNoSimple)
-             | SHEET PRT ABS '='? yesNoSimple -> SHEET PRT ABS ^(ASTBOOL yesNoSimple)
-             | SHEET PRT PCH '='? yesNoSimple -> SHEET PRT PCH ^(ASTBOOL yesNoSimple)			 
-			 | SHEET ROWS  '='? yesNoSimple -> SHEET ROWS ^(ASTBOOL yesNoSimple)
-			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)		
-			 			 
-             | SOLVE question -> SOLVE question
-             | SOLVE DATA CREATE AUTO '='? yesNoSimple -> SOLVE DATA CREATE AUTO ^(ASTBOOL yesNoSimple)
-             | SOLVE DATA IGNOREMISSING '='? yesNoSimple -> SOLVE DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)
-             | SOLVE DATA INIT '='? yesNoSimple -> SOLVE DATA INIT ^(ASTBOOL yesNoSimple)
-             | SOLVE DATA INIT GROWTH '='? yesNoSimple -> SOLVE DATA INIT GROWTH ^(ASTBOOL yesNoSimple)						 
-			 | SOLVE DATA INIT GROWTH MAX '='? numberIntegerOrDouble -> SOLVE DATA INIT GROWTH MAX numberIntegerOrDouble
-             | SOLVE DATA INIT GROWTH MIN '='? numberIntegerOrDouble -> SOLVE DATA INIT GROWTH MIN numberIntegerOrDouble
-			 | SOLVE FAILSAFE '='? yesNoSimple -> SOLVE FAILSAFE ^(ASTBOOL yesNoSimple)
-			 | SOLVE FORWARD question -> SOLVE FORWARD question
-			 | SOLVE FORWARD DUMP '='? yesNoSimple -> SOLVE FORWARD DUMP ^(ASTBOOL yesNoSimple)  //common for fair and nfair
-             | SOLVE FORWARD FAIR CONV '='? optionSolveGaussConv -> SOLVE FORWARD FAIR CONV ^(ASTSTRINGSIMPLE optionSolveGaussConv )
-             | SOLVE FORWARD FAIR CONV1 ABS '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV1 ABS numberIntegerOrDouble
-             | SOLVE FORWARD FAIR CONV1 REL '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV1 REL numberIntegerOrDouble
-             | SOLVE FORWARD FAIR CONV2 TABS '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV2 TABS numberIntegerOrDouble
-             | SOLVE FORWARD FAIR CONV2 TREL '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV2 TREL numberIntegerOrDouble
-             | SOLVE FORWARD FAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD FAIR DAMP numberIntegerOrDouble			
-             | SOLVE FORWARD FAIR ITERMAX '='? Integer -> SOLVE FORWARD FAIR ITERMAX ^(ASTINTEGER Integer)
-             | SOLVE FORWARD FAIR ITERMIN '='? Integer -> SOLVE FORWARD FAIR ITERMIN ^(ASTINTEGER Integer)			
-			 | SOLVE FORWARD NFAIR CONV '='? optionSolveGaussConv -> SOLVE FORWARD NFAIR CONV ^(ASTSTRINGSIMPLE optionSolveGaussConv )
-             | SOLVE FORWARD NFAIR CONV1 ABS '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV1 ABS numberIntegerOrDouble
-             | SOLVE FORWARD NFAIR CONV1 REL '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV1 REL numberIntegerOrDouble
-             | SOLVE FORWARD NFAIR CONV2 TABS '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV2 TABS numberIntegerOrDouble
-             | SOLVE FORWARD NFAIR CONV2 TREL '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV2 TREL numberIntegerOrDouble
-             | SOLVE FORWARD NFAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD NFAIR DAMP numberIntegerOrDouble						
-             | SOLVE FORWARD NFAIR ITERMAX '='? Integer -> SOLVE FORWARD NFAIR ITERMAX ^(ASTINTEGER Integer)
-             | SOLVE FORWARD NFAIR ITERMIN '='? Integer -> SOLVE FORWARD NFAIR ITERMIN ^(ASTINTEGER Integer)			
-			 | SOLVE FORWARD NFAIR UPDATEFREQ '='? Integer -> SOLVE FORWARD NFAIR UPDATEFREQ ^(ASTINTEGER Integer)						
-			 | SOLVE FORWARD STACKED HORIZON '='? Integer -> SOLVE FORWARD STACKED HORIZON ^(ASTINTEGER Integer)
-             | SOLVE FORWARD METHOD '='? optionSolveForwardMethodOptions -> SOLVE FORWARD METHOD ^(ASTSTRINGSIMPLE optionSolveForwardMethodOptions)
-             | SOLVE FORWARD TERMINAL '='? optionSolveForwardTerminalOptions -> SOLVE FORWARD TERMINAL ^(ASTSTRINGSIMPLE optionSolveForwardTerminalOptions)
-			 | SOLVE FORWARD TERMINAL FEED '='? optionSolveForwardTerminalfeedOptions -> SOLVE FORWARD TERMINAL FEED ^(ASTSTRINGSIMPLE optionSolveForwardTerminalfeedOptions)
-			 | SOLVE GAUSS question -> SOLVE GAUSS question
-			 | SOLVE GAUSS CONV '='? optionSolveGaussConv -> SOLVE GAUSS CONV ^(ASTSTRINGSIMPLE optionSolveGaussConv )
-             | SOLVE GAUSS CONV IGNOREVARS '='? yesNoSimple -> SOLVE GAUSS CONV IGNOREVARS ^(ASTBOOL yesNoSimple)
-             | SOLVE GAUSS CONV1 ABS '='? numberIntegerOrDouble -> SOLVE GAUSS CONV1 ABS numberIntegerOrDouble
-             | SOLVE GAUSS CONV1 REL '='? numberIntegerOrDouble -> SOLVE GAUSS CONV1 REL numberIntegerOrDouble
-             | SOLVE GAUSS CONV2 TABS '='? numberIntegerOrDouble -> SOLVE GAUSS CONV2 TABS numberIntegerOrDouble
-             | SOLVE GAUSS CONV2 TREL '='? numberIntegerOrDouble -> SOLVE GAUSS CONV2 TREL numberIntegerOrDouble			
-			 | SOLVE GAUSS DAMP '='? numberIntegerOrDouble  -> SOLVE GAUSS DAMP numberIntegerOrDouble
-			 | SOLVE GAUSS DUMP '='? yesNoSimple -> SOLVE GAUSS DUMP ^(ASTBOOL yesNoSimple)
-             | SOLVE GAUSS ITERMAX '='? Integer -> SOLVE GAUSS ITERMAX ^(ASTINTEGER Integer)
-             | SOLVE GAUSS ITERMIN '='? Integer -> SOLVE GAUSS ITERMIN ^(ASTINTEGER Integer)
-             | SOLVE GAUSS REORDER '='? yesNoSimple -> SOLVE GAUSS REORDER ^(ASTBOOL yesNoSimple)
-             | SOLVE METHOD '='? optionSolveMethodOptions -> SOLVE METHOD ^(ASTSTRINGSIMPLE optionSolveMethodOptions)
-             | SOLVE NEWTON question -> SOLVE NEWTON question
-			 | SOLVE NEWTON BACKTRACK '='? yesNoSimple -> SOLVE NEWTON BACKTRACK ^(ASTBOOL yesNoSimple)
-			 | SOLVE NEWTON CONV ABS '='? numberIntegerOrDouble -> SOLVE NEWTON CONV ABS numberIntegerOrDouble
-             | SOLVE NEWTON INVERT '='? optionSolveNewtonInvert -> SOLVE NEWTON INVERT ^(ASTSTRINGSIMPLE optionSolveNewtonInvert)
-			 | SOLVE NEWTON ROBUST '='? yesNoSimple -> SOLVE NEWTON ROBUST ^(ASTBOOL yesNoSimple)	
-             | SOLVE NEWTON ITERMAX '='? Integer -> SOLVE NEWTON ITERMAX ^(ASTINTEGER Integer)
-             | SOLVE NEWTON UPDATEFREQ '='? Integer -> SOLVE NEWTON UPDATEFREQ ^(ASTINTEGER Integer)             
-             | SOLVE PRINT DETAILS '='? yesNoSimple -> SOLVE PRINT DETAILS ^(ASTBOOL yesNoSimple)
-             | SOLVE PRINT ITER '='? yesNoSimple -> SOLVE PRINT ITER ^(ASTBOOL yesNoSimple)
-             | SOLVE STATIC '='? yesNoSimple -> SOLVE STATIC ^(ASTBOOL yesNoSimple)             
-
-			 | STRING2 INTERPOLATE FORMAT VAL '='? expression -> STRING2 INTERPOLATE FORMAT VAL ^(ASTSTRINGSIMPLE expression)
-			
-			 | SYSTEM CODE SPLIT '='? Integer -> SYSTEM CODE SPLIT ^(ASTINTEGER Integer)
-			 | SYSTEM CLONE '='? yesNoSimple -> SYSTEM CLONE ^(ASTBOOL yesNoSimple)
-			
-			 | TABLE question -> TABLE question
-			 | TABLE DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  TABLE DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
-             | TABLE HTML DATAWIDTH '='? numberIntegerOrDouble ->  TABLE HTML DATAWIDTH numberIntegerOrDouble
-			 | TABLE HTML FIRSTCOLWIDTH '='? numberIntegerOrDouble ->  TABLE HTML FIRSTCOLWIDTH numberIntegerOrDouble
-             | TABLE HTML FONT '='? fileName ->  TABLE HTML FONT ^(ASTSTRINGSIMPLE fileName)
-             | TABLE HTML FONTSIZE '='? numberIntegerOrDouble ->  TABLE HTML FONTSIZE numberIntegerOrDouble		
-			 | TABLE HTML SECONDCOLWIDTH '='? numberIntegerOrDouble ->  TABLE HTML SECONDCOLWIDTH numberIntegerOrDouble
-			 | TABLE HTML SPECIALMINUS '='? yesNoSimple ->  TABLE HTML SPECIALMINUS ^(ASTBOOL yesNoSimple)
-             | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple) //obsolete, delete in 3.3.x versions			
-			 | TABLE MDATEFORMAT '='? expression ->  TABLE MDATEFORMAT ^(ASTSTRINGSIMPLE expression)			 
-             | TABLE STAMP '='? yesNoSimple ->  TABLE STAMP ^(ASTBOOL yesNoSimple)
-			 | TABLE THOUSANDSSEPARATOR '='? yesNoSimple ->  TABLE THOUSANDSSEPARATOR ^(ASTBOOL yesNoSimple)
-			 | TABLE TYPE '='? tableType ->  TABLE TYPE ^(ASTSTRINGSIMPLE tableType)			
-			
-			 | TIMEFILTER question -> TIMEFILTER question
-             | TIMEFILTER '='? yesNoSimple -> TIMEFILTER ^(ASTBOOL yesNoSimple)
-             | TIMEFILTER TYPE '='? timefilterType -> TIMEFILTER TYPE ^(ASTSTRINGSIMPLE timefilterType)
-            ;
-
-optionModelInfoFile: YES | NO | TEMP;
-timefilterType: HIDE | AVG;
-tableType: TXT | HTML;
-optionPlotXlabels: AT2 | BETWEEN ;
-optionPrintCollapse: AVG | TOTAL | NONE;
-optionPrintFreq: SIMPLE | PRETTY;
-optionSolveMethodOptions : NEWTON | GAUSS ;
-optionSolveGaussConv : CONV1 | CONV2;
-optionDatabankFileFormatOptions : TSD | TSDX | GBK;
-optionDatabankLogic : DEFAULT | AREMOS;
-optionInterfaceDebug: NONE | DIALOG;
-optionInterfaceSound: BOWL | DING | NOTIFY  | RING;
-optionInterfaceSuggestions: NONE | OPTION; // | SOME | ALL;
-optionInterfaceExcelLanguage: DANISH | ENGLISH;
-optionInterfaceExcelDecimalseparator: PERIOD | COMMA;
-optionSolveNewtonInvert: LU | ITER;
-optionSolveForwardMethodOptions : STACKED | FAIR | NFAIR | NONE ;
-optionSolveForwardTerminalOptions : EXO | CONST | GROWTH ;
-optionSolveForwardTerminalfeedOptions : INTERNAL | EXTERNAL;
-optionSeriesMissing : ERROR | M | ZERO | SKIP;
-optionSheetEngine: EXCEL | INTERNAL;
-
+optionType2:                
+                            ident+ EQUAL? name -> ident+ name
+                          | ident+ EQUAL? expression -> ident+ expression						  
+						    ; 
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------

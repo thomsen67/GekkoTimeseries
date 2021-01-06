@@ -17,6 +17,262 @@
     Else, see <http://www.gnu.org/licenses/>.
 */
 
+
+////!! do not use '_' as a char in a an option name. 'failsafe' is fine, but fail_safe is not.
+//optionType2:			    
+//			   question -> question
+             
+//			 //NOTE: THESE LINES CORRESPOND TO LINES IN Options.cs, line for line
+			 
+//			 | BUGFIX IMPORT EXPORT '='? yesNoSimple -> BUGFIX IMPORT EXPORT ^(ASTBOOL yesNoSimple)	//not mentioned in help		 			 	
+//			 | BUGFIX GBK '='? yesNoSimple -> BUGFIX GBK ^(ASTBOOL yesNoSimple)                     //not mentioned in help
+//			 | BUGFIX MISSING '='? yesNoSimple -> BUGFIX MISSING ^(ASTBOOL yesNoSimple)             //not mentioned in help
+			
+//			 | DATABANK question -> DATABANK question
+//             | DATABANK COMPARE TABS '='? numberIntegerOrDouble -> DATABANK COMPARE TABS numberIntegerOrDouble
+//             | DATABANK COMPARE TREL '='? numberIntegerOrDouble  -> DATABANK COMPARE TREL numberIntegerOrDouble
+//             | DATABANK CREATE AUTO '='? yesNoSimple -> DATABANK CREATE AUTO ^(ASTBOOL yesNoSimple )			 
+//			 | DATABANK FILE COPYLOCAL '='? yesNoSimple -> DATABANK FILE COPYLOCAL ^(ASTBOOL yesNoSimple )             
+//             | DATABANK FILE GBK COMPRESS '='? yesNoSimple -> DATABANK FILE GBK COMPRESS ^(ASTBOOL yesNoSimple)
+//             | DATABANK FILE GBK VERSION '='? numberIntegerOrDouble ->  DATABANK FILE GBK VERSION ^(ASTSTRINGSIMPLE numberIntegerOrDouble)  //NOTE: number converted to string
+//			 | DATABANK FILE GBK INTERNAL '='? expression ->  DATABANK FILE GBK INTERNAL ^(ASTSTRINGSIMPLE expression)			 
+//			 | DATABANK SEARCH '='? yesNoSimple -> DATABANK SEARCH ^(ASTBOOL yesNoSimple )	
+			 
+//			 | DECOMP MAXLAG '='? numberIntegerOrDouble ->  DECOMP MAXLAG numberIntegerOrDouble
+//             | DECOMP MAXLEAD '='? numberIntegerOrDouble  -> DECOMP MAXLEAD numberIntegerOrDouble
+
+//			 | FIT OLS REKUR DFMIN '='? numberIntegerOrDouble  -> FIT OLS REKUR DFMIN numberIntegerOrDouble
+
+//			 | FOLDER question -> FOLDER question
+//             | FOLDER '='? yesNoSimple -> FOLDER ^(ASTBOOL yesNoSimple)
+//             | FOLDER BANK    '='? fileName ->  FOLDER BANK ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER BANK1    '='? fileName ->  FOLDER BANK1 ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER BANK2    '='? fileName ->  FOLDER BANK2 ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER COMMAND    '='? fileName ->  FOLDER COMMAND ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER COMMAND1    '='? fileName ->  FOLDER COMMAND1 ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER COMMAND2    '='? fileName ->  FOLDER COMMAND2 ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER HELP   '='? fileName ->  FOLDER HELP ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER MENU     '='? fileName ->  FOLDER MENU ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER MODEL   '='? fileName ->  FOLDER MODEL ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER PIPE '='? fileName ->  FOLDER PIPE ^(ASTSTRINGSIMPLE fileName)			
+//             | FOLDER TABLE    '='? fileName ->  FOLDER TABLE ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER TABLE1   '='? fileName ->  FOLDER TABLE1 ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER TABLE2   '='? fileName ->  FOLDER TABLE2 ^(ASTSTRINGSIMPLE fileName)
+//             | FOLDER WORKING '='? fileName ->  FOLDER WORKING ^(ASTSTRINGSIMPLE fileName)
+
+//			 | FREQ question -> FREQ question
+//             | FREQ '='? name -> FREQ ^(ASTSTRINGSIMPLE name)
+			 
+//			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+//			 | GAMS FAST '='? yesNoSimple -> GAMS FAST ^(ASTBOOL yesNoSimple)
+//			 | GAMS TIME DETECT AUTO '='? yesNoSimple -> GAMS TIME DETECT AUTO ^(ASTBOOL yesNoSimple)
+//			 | GAMS TIME FREQ '='? expression -> GAMS TIME FREQ ^(ASTSTRINGSIMPLE expression)
+//			 | GAMS TIME OFFSET '='? Integer -> GAMS TIME OFFSET ^(ASTINTEGER Integer)
+//			 | GAMS TIME PREFIX '='? expression -> GAMS TIME PREFIX ^(ASTSTRINGSIMPLE expression)
+//			 | GAMS TIME SET '='? expression -> GAMS TIME SET ^(ASTSTRINGSIMPLE expression)			 
+
+//			 | INTERFACE question -> INTERFACE question
+//			 | INTERFACE ALIAS '='? yesNoSimple -> INTERFACE ALIAS ^(ASTBOOL yesNoSimple)			 
+//             | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+//			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+//			 | INTERFACE CSV DELIMITER '='? name -> INTERFACE CSV DELIMITER ^(ASTSTRINGSIMPLE name)
+//			 | INTERFACE CSV NDEC '='? Integer -> INTERFACE CSV NDEC ^(ASTINTEGER Integer)
+//			 | INTERFACE CSV PDEC '='? Integer -> INTERFACE CSV PDEC ^(ASTINTEGER Integer)			 
+//			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)
+//			 | INTERFACE EDIT STYLE '='? name -> INTERFACE EDIT STYLE ^(ASTSTRINGSIMPLE name)
+//			 | INTERFACE EXCEL LANGUAGE '='? optionInterfaceExcelLanguage -> INTERFACE EXCEL LANGUAGE ^(ASTSTRINGSIMPLE optionInterfaceExcelLanguage)
+//             | INTERFACE EXCEL MODERNLOOK '='? yesNoSimple -> INTERFACE EXCEL MODERNLOOK ^(ASTBOOL yesNoSimple)             		 
+//             | INTERFACE HELP COPYLOCAL '='? yesNoSimple -> INTERFACE HELP COPYLOCAL ^(ASTBOOL yesNoSimple)			 
+//			 | INTERFACE MODE '='? mode2 -> INTERFACE MODE ^(ASTSTRINGSIMPLE mode2)
+//			 | INTERFACE MUTE '='? name -> INTERFACE MUTE ^(ASTSTRINGSIMPLE name)	
+//			 | INTERFACE REMOTE '='? yesNoSimple -> INTERFACE REMOTE ^(ASTBOOL yesNoSimple)
+//			 | INTERFACE REMOTE FILE '='? fileName -> INTERFACE REMOTE FILE ^(ASTSTRINGSIMPLE fileName)
+//             | INTERFACE SOUND '='? yesNoSimple -> INTERFACE SOUND ^(ASTBOOL yesNoSimple)
+//             | INTERFACE SOUND TYPE '='? optionInterfaceSound -> INTERFACE SOUND TYPE ^(ASTSTRINGSIMPLE optionInterfaceSound)
+//             | INTERFACE SOUND WAIT '='? Integer -> INTERFACE SOUND WAIT ^(ASTINTEGER Integer)
+//             | INTERFACE SUGGESTIONS '='? optionInterfaceSuggestions -> INTERFACE SUGGESTIONS ^(ASTSTRINGSIMPLE optionInterfaceSuggestions)             | MODEL question -> MODEL question
+//			 | INTERFACE TABLE OPERATORS '='? yesNoSimple ->  INTERFACE TABLE OPERATORS  ^(ASTBOOL yesNoSimple)
+//			 | INTERFACE ZOOM '='? Integer -> INTERFACE ZOOM ^(ASTINTEGER Integer)
+
+//			 | MENU question -> MENU question
+//			 | MENU STARTFILE '='? fileName ->  MENU STARTFILE ^(ASTSTRINGSIMPLE fileName)
+
+//			 | MODEL question -> MODEL question
+//             | MODEL CACHE MAX '='? Integer -> MODEL CACHE MAX  ^(ASTINTEGER Integer)
+//             | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
+//			 | MODEL GAMS DEP CURRENT '='? yesNoSimple -> MODEL GAMS DEP CURRENT ^(ASTBOOL yesNoSimple)
+//			 | MODEL GAMS DEP METHOD '='? name -> MODEL GAMS DEP METHOD ^(ASTSTRINGSIMPLE name)
+//			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
+//			 | MODEL TYPE '='? name -> MODEL TYPE ^(ASTSTRINGSIMPLE name)			 
+
+//			 | PLOT question -> PLOT question
+//			 | PLOT ELEMENTS MAX '='? Integer -> PLOT ELEMENTS MAX ^(ASTINTEGER Integer)		 
+//			 | PLOT LINES POINTS '='? yesNoSimple -> PLOT LINES POINTS ^(ASTBOOL yesNoSimple )	
+//			 | PLOT XLABELS ANNUAL '='? optionPlotXlabels ->  PLOT XLABELS ANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
+//			 | PLOT XLABELS DIGITS '='? Integer ->  PLOT XLABELS DIGITS  ^(ASTINTEGER Integer)
+//			 | PLOT XLABELS NONANNUAL '='? optionPlotXlabels ->  PLOT XLABELS NONANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
+//			 | PLOT DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  PLOT DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+//			 | PLOT USING '='? fileName -> PLOT USING ^(ASTSTRINGSIMPLE fileName)			 
+			
+//			 | PRINT question -> PRINT question
+//			 | PRINT COLLAPSE '='? optionPrintCollapse ->  PRINT COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)
+//			 | PRINT ELEMENTS MAX '='? Integer -> PRINT ELEMENTS MAX ^(ASTINTEGER Integer)		 
+//			 | PRINT FREQ '='? optionPrintFreq ->  PRINT FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)
+//             | PRINT DISP MAXLINES '='? '-'? Integer -> PRINT DISP MAXLINES ^(ASTINTEGER '-'? Integer)  //can be set to -1
+//             | PRINT FIELDS NDEC '='? Integer -> PRINT FIELDS NDEC ^(ASTINTEGER Integer)
+//             | PRINT FIELDS NWIDTH '='? Integer -> PRINT FIELDS NWIDTH ^(ASTINTEGER Integer)
+//             | PRINT FIELDS PDEC '='? Integer -> PRINT FIELDS PDEC ^(ASTINTEGER Integer)
+//             | PRINT FIELDS PWIDTH '='? Integer -> PRINT FIELDS PWIDTH ^(ASTINTEGER Integer)
+//             | PRINT FILEWIDTH '='? Integer -> PRINT FILEWIDTH ^(ASTINTEGER Integer)
+//			 | PRINT MULPRT(GDIF|GDIFF) '='? yesNoSimple -> PRINT MULPRT GDIF ^(ASTBOOL yesNoSimple)
+//             | PRINT MULPRT ABS '='? yesNoSimple -> PRINT MULPRT ABS ^(ASTBOOL yesNoSimple)
+//             | PRINT MULPRT LEV '='? yesNoSimple -> PRINT MULPRT LEV ^(ASTBOOL yesNoSimple)
+//             | PRINT MULPRT PCH '='? yesNoSimple -> PRINT MULPRT PCH ^(ASTBOOL yesNoSimple)
+//             | PRINT MULPRT V '='? yesNoSimple -> PRINT MULPRT V ^(ASTBOOL yesNoSimple)
+//             | PRINT PRT(DIF|DIFF) '='? yesNoSimple -> PRINT PRT DIF ^(ASTBOOL yesNoSimple)
+//             | PRINT PRT(GDIF|GDIFF) '='? yesNoSimple -> PRINT PRT GDIF ^(ASTBOOL yesNoSimple)
+//             | PRINT PRT ABS '='? yesNoSimple -> PRINT PRT ABS ^(ASTBOOL yesNoSimple)
+//             | PRINT PRT PCH '='? yesNoSimple -> PRINT PRT PCH ^(ASTBOOL yesNoSimple)
+//			 | PRINT WIDTH '='? Integer -> PRINT WIDTH ^(ASTINTEGER Integer)
+//			 | PRINT SPLIT '='? yesNoSimple -> PRINT SPLIT ^(ASTBOOL yesNoSimple)
+
+//			 | PYTHON EXE FOLDER '='? fileName -> PYTHON EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+
+//			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+//			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
+
+//             | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	//obsolete, delete in 3.3.x versions
+//			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	//obsolete, delete in 3.3.x versions
+
+//			 | SERIES DYN '='? yesNoSimple -> SERIES DYN ^(ASTBOOL yesNoSimple)
+//			 | SERIES DYN CHECK '='? yesNoSimple -> SERIES DYN  CHECK ^(ASTBOOL yesNoSimple)
+//			 | SERIES FAILSAFE '='? yesNoSimple -> SERIES FAILSAFE ^(ASTBOOL yesNoSimple)			 			 
+//			 | SERIES NORMAL PRINT MISSING '=' optionSeriesMissing -> SERIES NORMAL PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)			 
+//             | SERIES NORMAL CALC MISSING '=' optionSeriesMissing -> SERIES NORMAL CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+//			 | SERIES NORMAL TABLE MISSING '=' optionSeriesMissing -> SERIES NORMAL TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+//             | SERIES ARRAY PRINT MISSING '=' optionSeriesMissing -> SERIES ARRAY PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+//             | SERIES ARRAY CALC MISSING '=' optionSeriesMissing -> SERIES ARRAY CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+//			 | SERIES ARRAY TABLE MISSING '=' optionSeriesMissing -> SERIES ARRAY TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+//			 | SERIES DATA MISSING '=' optionSeriesMissing -> SERIES DATA MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)			 
+			 
+//			 | SHEET question -> SHEET question
+//			 | SHEET COLLAPSE '='? optionPrintCollapse ->  SHEET COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)			 
+//			 | SHEET ENGINE '='? optionSheetEngine -> SHEET ENGINE ^(ASTSTRINGSIMPLE optionSheetEngine)
+//			 | SHEET FREQ '='? optionPrintFreq ->  SHEET FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)       			 
+//			 | SHEET MULPRT(GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
+//             | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
+//             | SHEET MULPRT LEV '='? yesNoSimple -> SHEET MULPRT LEV ^(ASTBOOL yesNoSimple)
+//             | SHEET MULPRT PCH '='? yesNoSimple -> SHEET MULPRT PCH ^(ASTBOOL yesNoSimple)
+//             | SHEET MULPRT V '='? yesNoSimple -> SHEET MULPRT V ^(ASTBOOL yesNoSimple)
+//             | SHEET PRT(DIF|DIFF) '='? yesNoSimple -> SHEET PRT DIF ^(ASTBOOL yesNoSimple)
+//             | SHEET PRT(GDIF|GDIFF) '='? yesNoSimple -> SHEET PRT GDIF ^(ASTBOOL yesNoSimple)
+//             | SHEET PRT ABS '='? yesNoSimple -> SHEET PRT ABS ^(ASTBOOL yesNoSimple)
+//             | SHEET PRT PCH '='? yesNoSimple -> SHEET PRT PCH ^(ASTBOOL yesNoSimple)			 
+//			 | SHEET ROWS  '='? yesNoSimple -> SHEET ROWS ^(ASTBOOL yesNoSimple)
+//			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)		
+			 			 
+//             | SOLVE question -> SOLVE question
+//             | SOLVE DATA CREATE AUTO '='? yesNoSimple -> SOLVE DATA CREATE AUTO ^(ASTBOOL yesNoSimple)
+//             | SOLVE DATA IGNOREMISSING '='? yesNoSimple -> SOLVE DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)
+//             | SOLVE DATA INIT '='? yesNoSimple -> SOLVE DATA INIT ^(ASTBOOL yesNoSimple)
+//             | SOLVE DATA INIT GROWTH '='? yesNoSimple -> SOLVE DATA INIT GROWTH ^(ASTBOOL yesNoSimple)						 
+//			 | SOLVE DATA INIT GROWTH MAX '='? numberIntegerOrDouble -> SOLVE DATA INIT GROWTH MAX numberIntegerOrDouble
+//             | SOLVE DATA INIT GROWTH MIN '='? numberIntegerOrDouble -> SOLVE DATA INIT GROWTH MIN numberIntegerOrDouble
+//			 | SOLVE FAILSAFE '='? yesNoSimple -> SOLVE FAILSAFE ^(ASTBOOL yesNoSimple)
+//			 | SOLVE FORWARD question -> SOLVE FORWARD question
+//			 | SOLVE FORWARD DUMP '='? yesNoSimple -> SOLVE FORWARD DUMP ^(ASTBOOL yesNoSimple)  //common for fair and nfair
+//             | SOLVE FORWARD FAIR CONV '='? optionSolveGaussConv -> SOLVE FORWARD FAIR CONV ^(ASTSTRINGSIMPLE optionSolveGaussConv )
+//             | SOLVE FORWARD FAIR CONV1 ABS '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV1 ABS numberIntegerOrDouble
+//             | SOLVE FORWARD FAIR CONV1 REL '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV1 REL numberIntegerOrDouble
+//             | SOLVE FORWARD FAIR CONV2 TABS '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV2 TABS numberIntegerOrDouble
+//             | SOLVE FORWARD FAIR CONV2 TREL '='? numberIntegerOrDouble -> SOLVE FORWARD FAIR CONV2 TREL numberIntegerOrDouble
+//             | SOLVE FORWARD FAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD FAIR DAMP numberIntegerOrDouble			
+//             | SOLVE FORWARD FAIR ITERMAX '='? Integer -> SOLVE FORWARD FAIR ITERMAX ^(ASTINTEGER Integer)
+//             | SOLVE FORWARD FAIR ITERMIN '='? Integer -> SOLVE FORWARD FAIR ITERMIN ^(ASTINTEGER Integer)			
+//			 | SOLVE FORWARD NFAIR CONV '='? optionSolveGaussConv -> SOLVE FORWARD NFAIR CONV ^(ASTSTRINGSIMPLE optionSolveGaussConv )
+//             | SOLVE FORWARD NFAIR CONV1 ABS '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV1 ABS numberIntegerOrDouble
+//             | SOLVE FORWARD NFAIR CONV1 REL '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV1 REL numberIntegerOrDouble
+//             | SOLVE FORWARD NFAIR CONV2 TABS '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV2 TABS numberIntegerOrDouble
+//             | SOLVE FORWARD NFAIR CONV2 TREL '='? numberIntegerOrDouble -> SOLVE FORWARD NFAIR CONV2 TREL numberIntegerOrDouble
+//             | SOLVE FORWARD NFAIR DAMP '='? numberIntegerOrDouble  -> SOLVE FORWARD NFAIR DAMP numberIntegerOrDouble						
+//             | SOLVE FORWARD NFAIR ITERMAX '='? Integer -> SOLVE FORWARD NFAIR ITERMAX ^(ASTINTEGER Integer)
+//             | SOLVE FORWARD NFAIR ITERMIN '='? Integer -> SOLVE FORWARD NFAIR ITERMIN ^(ASTINTEGER Integer)			
+//			 | SOLVE FORWARD NFAIR UPDATEFREQ '='? Integer -> SOLVE FORWARD NFAIR UPDATEFREQ ^(ASTINTEGER Integer)						
+//			 | SOLVE FORWARD STACKED HORIZON '='? Integer -> SOLVE FORWARD STACKED HORIZON ^(ASTINTEGER Integer)
+//             | SOLVE FORWARD METHOD '='? optionSolveForwardMethodOptions -> SOLVE FORWARD METHOD ^(ASTSTRINGSIMPLE optionSolveForwardMethodOptions)
+//             | SOLVE FORWARD TERMINAL '='? optionSolveForwardTerminalOptions -> SOLVE FORWARD TERMINAL ^(ASTSTRINGSIMPLE optionSolveForwardTerminalOptions)
+//			 | SOLVE FORWARD TERMINAL FEED '='? optionSolveForwardTerminalfeedOptions -> SOLVE FORWARD TERMINAL FEED ^(ASTSTRINGSIMPLE optionSolveForwardTerminalfeedOptions)
+//			 | SOLVE GAUSS question -> SOLVE GAUSS question
+//			 | SOLVE GAUSS CONV '='? optionSolveGaussConv -> SOLVE GAUSS CONV ^(ASTSTRINGSIMPLE optionSolveGaussConv )
+//             | SOLVE GAUSS CONV IGNOREVARS '='? yesNoSimple -> SOLVE GAUSS CONV IGNOREVARS ^(ASTBOOL yesNoSimple)
+//             | SOLVE GAUSS CONV1 ABS '='? numberIntegerOrDouble -> SOLVE GAUSS CONV1 ABS numberIntegerOrDouble
+//             | SOLVE GAUSS CONV1 REL '='? numberIntegerOrDouble -> SOLVE GAUSS CONV1 REL numberIntegerOrDouble
+//             | SOLVE GAUSS CONV2 TABS '='? numberIntegerOrDouble -> SOLVE GAUSS CONV2 TABS numberIntegerOrDouble
+//             | SOLVE GAUSS CONV2 TREL '='? numberIntegerOrDouble -> SOLVE GAUSS CONV2 TREL numberIntegerOrDouble			
+//			 | SOLVE GAUSS DAMP '='? numberIntegerOrDouble  -> SOLVE GAUSS DAMP numberIntegerOrDouble
+//			 | SOLVE GAUSS DUMP '='? yesNoSimple -> SOLVE GAUSS DUMP ^(ASTBOOL yesNoSimple)
+//             | SOLVE GAUSS ITERMAX '='? Integer -> SOLVE GAUSS ITERMAX ^(ASTINTEGER Integer)
+//             | SOLVE GAUSS ITERMIN '='? Integer -> SOLVE GAUSS ITERMIN ^(ASTINTEGER Integer)
+//             | SOLVE GAUSS REORDER '='? yesNoSimple -> SOLVE GAUSS REORDER ^(ASTBOOL yesNoSimple)
+//             | SOLVE METHOD '='? optionSolveMethodOptions -> SOLVE METHOD ^(ASTSTRINGSIMPLE optionSolveMethodOptions)
+//             | SOLVE NEWTON question -> SOLVE NEWTON question
+//			 | SOLVE NEWTON BACKTRACK '='? yesNoSimple -> SOLVE NEWTON BACKTRACK ^(ASTBOOL yesNoSimple)
+//			 | SOLVE NEWTON CONV ABS '='? numberIntegerOrDouble -> SOLVE NEWTON CONV ABS numberIntegerOrDouble
+//             | SOLVE NEWTON INVERT '='? optionSolveNewtonInvert -> SOLVE NEWTON INVERT ^(ASTSTRINGSIMPLE optionSolveNewtonInvert)
+//			 | SOLVE NEWTON ROBUST '='? yesNoSimple -> SOLVE NEWTON ROBUST ^(ASTBOOL yesNoSimple)	
+//             | SOLVE NEWTON ITERMAX '='? Integer -> SOLVE NEWTON ITERMAX ^(ASTINTEGER Integer)
+//             | SOLVE NEWTON UPDATEFREQ '='? Integer -> SOLVE NEWTON UPDATEFREQ ^(ASTINTEGER Integer)             
+//             | SOLVE PRINT DETAILS '='? yesNoSimple -> SOLVE PRINT DETAILS ^(ASTBOOL yesNoSimple)
+//             | SOLVE PRINT ITER '='? yesNoSimple -> SOLVE PRINT ITER ^(ASTBOOL yesNoSimple)
+//             | SOLVE STATIC '='? yesNoSimple -> SOLVE STATIC ^(ASTBOOL yesNoSimple)             
+
+//			 | STRING2 INTERPOLATE FORMAT VAL '='? expression -> STRING2 INTERPOLATE FORMAT VAL ^(ASTSTRINGSIMPLE expression)
+			
+//			 | SYSTEM CODE SPLIT '='? Integer -> SYSTEM CODE SPLIT ^(ASTINTEGER Integer)
+//			 | SYSTEM CLONE '='? yesNoSimple -> SYSTEM CLONE ^(ASTBOOL yesNoSimple)
+			
+//			 | TABLE question -> TABLE question
+//			 | TABLE DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  TABLE DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+//             | TABLE HTML DATAWIDTH '='? numberIntegerOrDouble ->  TABLE HTML DATAWIDTH numberIntegerOrDouble
+//			 | TABLE HTML FIRSTCOLWIDTH '='? numberIntegerOrDouble ->  TABLE HTML FIRSTCOLWIDTH numberIntegerOrDouble
+//             | TABLE HTML FONT '='? fileName ->  TABLE HTML FONT ^(ASTSTRINGSIMPLE fileName)
+//             | TABLE HTML FONTSIZE '='? numberIntegerOrDouble ->  TABLE HTML FONTSIZE numberIntegerOrDouble
+//			 | TABLE HTML SECONDCOLWIDTH '='? numberIntegerOrDouble ->  TABLE HTML SECONDCOLWIDTH numberIntegerOrDouble
+//			 | TABLE HTML SPECIALMINUS '='? yesNoSimple ->  TABLE HTML SPECIALMINUS ^(ASTBOOL yesNoSimple)
+//             | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple) //obsolete, delete in 3.3.x versions			
+//			 | TABLE MDATEFORMAT '='? expression ->  TABLE MDATEFORMAT ^(ASTSTRINGSIMPLE expression)			 
+//             | TABLE STAMP '='? yesNoSimple ->  TABLE STAMP ^(ASTBOOL yesNoSimple)
+//			 | TABLE THOUSANDSSEPARATOR '='? yesNoSimple ->  TABLE THOUSANDSSEPARATOR ^(ASTBOOL yesNoSimple)
+//			 | TABLE TYPE '='? tableType ->  TABLE TYPE ^(ASTSTRINGSIMPLE tableType)			
+			
+//			 | TIMEFILTER question -> TIMEFILTER question
+//             | TIMEFILTER '='? yesNoSimple -> TIMEFILTER ^(ASTBOOL yesNoSimple)
+//             | TIMEFILTER TYPE '='? timefilterType -> TIMEFILTER TYPE ^(ASTSTRINGSIMPLE timefilterType)
+//            ;
+
+//optionModelInfoFile: YES | NO | TEMP;
+//timefilterType: HIDE | AVG;
+//tableType: TXT | HTML;
+//optionPlotXlabels: AT2 | BETWEEN ;
+//optionPrintCollapse: AVG | TOTAL | NONE;
+//optionPrintFreq: SIMPLE | PRETTY;
+//optionSolveMethodOptions : NEWTON | GAUSS ;
+//optionSolveGaussConv : CONV1 | CONV2;
+//optionDatabankFileFormatOptions : TSD | TSDX | GBK;
+//optionDatabankLogic : DEFAULT | AREMOS;
+//optionInterfaceDebug: NONE | DIALOG;
+//optionInterfaceSound: BOWL | DING | NOTIFY  | RING;
+//optionInterfaceSuggestions: NONE | OPTION; // | SOME | ALL;
+//optionInterfaceExcelLanguage: DANISH | ENGLISH;
+//optionInterfaceExcelDecimalseparator: PERIOD | COMMA;
+//optionSolveNewtonInvert: LU | ITER;
+//optionSolveForwardMethodOptions : STACKED | FAIR | NFAIR | NONE ;
+//optionSolveForwardTerminalOptions : EXO | CONST | GROWTH ;
+//optionSolveForwardTerminalfeedOptions : INTERNAL | EXTERNAL;
+//optionSeriesMissing : ERROR | M | ZERO | SKIP;
+//optionSheetEngine: EXCEL | INTERNAL;
+
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,117 +282,26 @@ namespace Gekko
 {
     public class Options
     {
-        //public GekkoDictionary<string, IVariable> storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
+        //These options need to be callable in a fast way, so it would be very inefficient let them all be
+        //IVariables. In that case, for a simple boolean yes/no, we could not just check true/false, but would
+        //have to unbox the IVariable, and see if it is "yes" or "no". Inside a tight loop, this would be 
+        //hopeless. Therefore, all these option variables are C# primitives.
 
-        ////public IVariable this[string s]
-        ////{
-        ////    get => this.storage[s];
-        ////    set => this.storage[s] = value;
-        ////}
-        
-        //public string GetString(string key)
-        //{
-        //    return O.ConvertToString(this.storage[key]);
-        //}
-
-        //public void SetString(string key, string s)
-        //{
-        //    this.storage[key] = new ScalarString(s);
-        //}
-
-        //public double GetVal(string key)
-        //{
-        //    return O.ConvertToVal(this.storage[key]);
-        //}
-
-        //public void SetVal(string key, double v)
-        //{
-        //    this.storage[key] = new ScalarVal(v);
-        //}
-
-        //public int GetInt(string key)
-        //{
-        //    return O.ConvertToInt(this.storage[key]);
-        //}
-
-        //public void SetInt(string key, int i)
-        //{
-        //    this.storage[key] = new ScalarVal(i);
-        //}
-
-        //public bool GetBool(string key)
-        //{
-        //    IVariable iv = this.storage[key];
-        //    if (Object.ReferenceEquals(iv, Globals.scalarStringYes)) return true;
-        //    else if (Object.ReferenceEquals(iv, Globals.scalarStringNo)) return false;
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
-        //        throw new GekkoException();
-        //    }
-        //}
-
-        //public void SetBool(string key, string s)
-        //{
-        //    if (G.Equal(s, "yes")) this.storage[key] = Globals.scalarStringYes;
-        //    else if (G.Equal(s, "no")) this.storage[key] = Globals.scalarStringNo;
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
-        //        throw new GekkoException();
-        //    }
-        //}
-
-        //public bool? GetBoolQ(string key)
-        //{
-        //    IVariable iv = this.storage[key];
-        //    if (iv == null) return null;
-        //    else if (Object.ReferenceEquals(iv, Globals.scalarStringYes)) return true;
-        //    else if (Object.ReferenceEquals(iv, Globals.scalarStringNo)) return false;
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
-        //        throw new GekkoException();
-        //    }
-        //}
-
-        //public void SetBoolQ(string key, string s)
-        //{
-        //    if (s == null) this.storage[key] = null;
-        //    else if (G.Equal(s, "yes")) this.storage[key] = Globals.scalarStringYes;
-        //    else if (G.Equal(s, "no")) this.storage[key] = Globals.scalarStringNo;
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Option is not of yes/no type");
-        //        throw new GekkoException();
-        //    }
-        //}
-
-        //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR            
-
-        //!!!! NOTE: THESE LINE NUMBERSS CORRESPOND TO LINES IN Cmd3.g, line for line    
-
-        //these are not mentioned in help
-        public bool bugfix_import_export = false;             
-        
-        public bool bugfix_missing = true;  //if option true, m()==m() will be true, and m()<>m() false for series comparison
-
-        //question
-        
-        
+        public bool bugfix_import_export = false;  //not mentioned in help                     
+        public bool bugfix_missing = true;  //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
+        // ---
         public bool databank_create_auto = true;             
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
         public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2        
         public bool databank_search = true;
-                
+        // ---
         public int decomp_maxlag = 10;
         public int decomp_maxlead = 10;
-
+        // ---
         public int fit_ols_rekur_dfmin = 10;
-
-        //question
+        // ---
         public bool folder = true;
         public string folder_bank = "";
         public string folder_bank1 = "";
@@ -152,10 +317,9 @@ namespace Gekko
         public string folder_table1 = "";
         public string folder_table2 = "";
         public string folder_working = "";
-
-        //question
+        // ---
         public EFreq freq = EFreq.A;
-
+        // ---
         public string gams_exe_folder = "";
         public bool gams_fast = true; //use low-level api        
         public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
@@ -163,8 +327,7 @@ namespace Gekko
         public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
         public string gams_time_set = "t";  //name of the time set in GAMS                
-        
-        //question -- logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
+        // --- interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).        
         public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
@@ -186,19 +349,16 @@ namespace Gekko
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
         public bool interface_table_operators = true;
         public int interface_zoom = 100;
-
-        //question
+        // ---
         public string menu_startfile = "menu.html";
-
-        //question
+        // ---
         public bool model_cache = true;  //if using cache on file or not        
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM    
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "lhs";  //lhs|eqname
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //normal | gams
-
-        //question
+        // ---
         public string plot_decimalseparator = "period";  //comma|period
         public int plot_elements_max = 200;
         public bool plot_lines_points = true;
@@ -206,8 +366,7 @@ namespace Gekko
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
-
-        //question
+        // ---
         public string print_collapse = "none";  //avg or total or none
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public int print_elements_max = 400;
@@ -228,15 +387,12 @@ namespace Gekko
         public bool print_prt_gdif = false;  //dp        
         public int print_width = 100;  //so that eqs look ok in DISP
         public bool print_split = false;  //splits PRT x, y; into PRT x; PRT y;
-
+        // ---
         public string python_exe_folder = "";  //there will probably be more Python options later on
-
+        // ---
         public string r_exe_folder = "";  //there will probably be more R options later on
         public string r_exe_path = "";  //old name, delete at some point in 3.3.x series       
-
-        
-        
-
+        // ---
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
@@ -247,8 +403,7 @@ namespace Gekko
         public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip                
         public ESeriesMissing series_array_table_missing = ESeriesMissing.Error;          //not used at the moment
         public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero, last one only when accessing a series from an open databank, not in other cases. Not implemented for SIM (has its own solve option for that)
-
-        //question
+        // ---
         public string sheet_collapse = "none";  //avg or total or none
         public string sheet_engine = "internal";        
         public string sheet_freq = "simple";  //pretty or simple
@@ -263,16 +418,14 @@ namespace Gekko
         public bool sheet_prt_gdif = false;  //dp
         public bool sheet_cols = false;
         public bool sheet_rows = true;
-
-        //question
+        // ---
         public bool solve_data_create_auto = false;
         public bool solve_data_ignoremissing = false;  //for now, keep it here
         public bool solve_data_init = true;
         public bool solve_data_init_growth = true; //only has effect if solve_fast = true
         public double solve_data_init_growth_min = -0.02; //only has effect if solve_fast = true. Limit: -0.01 hurts.
         public double solve_data_init_growth_max = 0.06; //only has effect if solve_fast = true. Limit: it could be 0.05 without problems. But 0.04 hurts.
-        public bool solve_failsafe = false;
-        //question
+        public bool solve_failsafe = false;        
         public bool solve_forward_dump = false;
         public string solve_forward_fair_conv = "conv1";
         public double solve_forward_fair_conv1_abs = 0.001d; //it checks abs OR rel, so abs is set really low (for instance, interest rates have low abs value)
@@ -294,8 +447,7 @@ namespace Gekko
         public int solve_forward_nfair_updatefreq = 100; //Or 1        
         public int solve_forward_stacked_horizon = 5;
         public string solve_forward_terminal = "const";  //or exo or growth (growth does not work at the moment)
-        public string solve_forward_terminal_feed = "internal";  //or external
-        //question
+        public string solve_forward_terminal_feed = "internal";  //or external        
         public string solve_gauss_conv = "conv1";
         public double solve_gauss_conv1_abs = 0.0001d; //perhaps decrease, what about an interest rate...? It checks abs OR rel, so abs is set really low (for instance, interest rates have low abs value)
         public double solve_gauss_conv1_rel = 0.0001d;
@@ -307,8 +459,7 @@ namespace Gekko
         public int solve_gauss_itermax = 200;
         public int solve_gauss_itermin = 10;
         public bool solve_gauss_reorder = false;  //false since Gekko 1.5.11. Setting true should theoretically give fewer iterations, but may also provoke some starting value problems not seen with 'false'. On the other hand, on some problems, reorder=true seems to yield convergence, so we keep it as default.
-        public string solve_method = "gauss";  //gauss, newton
-        //question
+        public string solve_method = "gauss";  //gauss, newton        
         public bool solve_newton_backtrack = true;
         public double solve_newton_conv_abs = 0.0001;  //this is for a sum (really RMSQ) over all equations, so it is really low for most purposes. 
         public string solve_newton_invert = "lu"; //lu or iter, lu is more precise -- only problem is that the matrix is not sparse. Should maybe find sparse LU module.
@@ -318,13 +469,12 @@ namespace Gekko
         public bool solve_print_details = false;
         public bool solve_print_iter = false;
         public bool solve_static = false;
-
+        // ---
         public string string_interpolate_format_val = ""; //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used. //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used.
-
+        // ---
         public int system_code_split = 20; //20 seems good
         public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
-
-        //question        
+        // ---
         public string table_decimalseparator = "period";  //comma|period        
         public double table_html_datawidth = 5.5;  //in 'em' units
         public double table_html_firstcolwidth = 5.5;  //in 'em' units
@@ -337,26 +487,41 @@ namespace Gekko
         public bool table_stamp = true;
         public bool table_thousandsseparator = false;
         public string table_type = "html";  //txt or html
-
-        //question
+        // ---
         public bool timefilter = false;
         public string timefilter_type = "hide";  //"hide" or "avg"
 
+
         public static List<List<string>> Syntax()
         {
+            //All these have corresponding methods like O.XBool(), O.XString(), ... , cf. #jkafjkaddasfas
+            //Also, these names are used in ParserGekWalkASTAndEmit, cf. #jkafjkaddasfas
+            //Change all 3 places if a name is changed, or a new type is introduced.
+
+            string xbool = "bool";
+            string xstring = "string";
+            string xint = "int"; // >= 0
+            string xval = "val";
+            string xval2String = "val2String";
+            string xnameOrString = "nameOrString";
+            string xnameOrString2Freq = "nameOrString2Freq";
+            string xnameOrStringOrFilename = "nameOrStringOrFilename";
+            string xoptionSeriesMissing = "optionSeriesMissing";
+            string xsint = "sint";  //signed int            
+
             List<List<string>> rv = new List<List<string>>();
 
             List<string> types = new List<string>();
-            types.Add("bool");
-            types.Add("string");
-            types.Add("numberIntegerOrDouble");
-            types.Add("numberIntegerOrDouble2String");
-            types.Add("nameOrString");
-            types.Add("nameOrStringOrFilename");
-            types.Add("int");
-            types.Add("name2Freq");
-            types.Add("optionSeriesMissing");
-            types.Add("plusminusint");
+            types.Add(xbool);
+            types.Add(xstring);
+            types.Add(xint); // >= 0
+            types.Add(xval);
+            types.Add(xval2String);
+            types.Add(xnameOrString);
+            types.Add(xnameOrStringOrFilename);            
+            types.Add(xnameOrString2Freq);
+            types.Add(xoptionSeriesMissing);
+            types.Add(xsint);  //signed int
 
             void Add(params string[] ss)
             {
@@ -373,9 +538,16 @@ namespace Gekko
                     G.Writeln("*** ERROR: Option type error, too many blanks");
                     throw new GekkoException();
                 }
-                ss5.Add(w); //also set lowercase
+                //if (w.Contains("("))
+                //{
+                //    string[] sss = w.Split(' ');
+                //    for(int i =0;i<sss.Length;i++)
+
+                //}
+                ss5.Add(w); //is also lowercase
                 for (int i = 1; i < ss.Length; i++) ss5.Add(ss[i].Trim());
-                rv.Add(ss5);
+                rv.Add(ss5);               
+
             }
 
             //NOTE: the first string is written like this:
@@ -383,196 +555,218 @@ namespace Gekko
             // + 1 blank to separate idents
             // + (..|..) for synonym, first one is used
             // + type can be: "", "", "", "", "", ""
+            // option folder <enter> suggests = , but after =, there is bool but also other options.
+            //option? check question at all places, implement
+            //for int, check that -1 is ok, for instance PRINT DISP MAXLINES = -1
+            //SOLVE DATA INIT GROWTH MIN = -0.02 
+            //PRINT MULPRT (GDIF|GDIFF)
             // 
 
-            Add("BUGFIX IMPORT EXPORT", "bool");
-            Add("BUGFIX GBK", "bool");
-            Add("BUGFIX MISSING", "bool");
-            Add("DATABANK COMPARE TABS", "numberIntegerOrDouble");
-            Add("DATABANK COMPARE TREL", "numberIntegerOrDouble");
-            Add("DATABANK CREATE AUTO", "bool");
-            Add("DATABANK FILE COPYLOCAL", "bool");
-            Add("DATABANK FILE GBK COMPRESS", "bool");            
-            Add("DATABANK FILE GBK VERSION", "numberIntegerOrDouble2String");
-            Add("DATABANK FILE GBK INTERNAL", "nameOrString");
-            Add("DATABANK SEARCH", "bool");
-            Add("DECOMP MAXLAG", "numberIntegerOrDouble");
-            Add("DECOMP MAXLEAD", "numberIntegerOrDouble");
-            Add("FIT OLS REKUR DFMIN", "numberIntegerOrDouble");
-            Add("FOLDER", "bool");
-            Add("FOLDER BANK", "nameOrStringOrFilename");
-            Add("FOLDER BANK1", "nameOrStringOrFilename");
-            Add("FOLDER BANK2", "nameOrStringOrFilename");
-            Add("FOLDER COMMAND", "nameOrStringOrFilename");
-            Add("FOLDER COMMAND1", "nameOrStringOrFilename");
-            Add("FOLDER COMMAND2", "nameOrStringOrFilename");
-            Add("FOLDER HELP", "nameOrStringOrFilename");
-            Add("FOLDER MENU", "nameOrStringOrFilename");
-            Add("FOLDER MODEL", "nameOrStringOrFilename");
-            Add("FOLDER PIPE", "nameOrStringOrFilename");
-            Add("FOLDER TABLE", "nameOrStringOrFilename");
-            Add("FOLDER TABLE1", "nameOrStringOrFilename");
-            Add("FOLDER TABLE2", "nameOrStringOrFilename");
-            Add("FOLDER WORKING", "nameOrStringOrFilename");
-            Add("FREQ", "name2Freq", "a", "q", "m", "d", "u");
-            Add("GAMS EXE FOLDER", "nameOrStringOrFilename");
-            Add("GAMS FAST", "bool");
-            Add("GAMS TIME DETECT AUTO", "bool");
-            Add("GAMS TIME FREQ", "nameOrString");
-            Add("GAMS TIME OFFSET", "int");
-            Add("GAMS TIME PREFIX", "nameOrString");
-            Add("GAMS TIME SET", "nameOrString");
-            Add("INTERFACE ALIAS", "bool");
-            Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", "nameOrString", "period", "comma");    //#kljsdfasfdlkj
-            Add("INTERFACE CSV DECIMALSEPARATOR", "nameOrString", "period", "comma");          //#kljsdfasfdlkj
-            Add("INTERFACE CSV DELIMITER", "nameOrString", "semicolon", "comma");
-            Add("INTERFACE CSV NDEC", "int");
-            Add("INTERFACE CSV PDEC", "int");
-            Add("INTERFACE DEBUG", "nameOrString", "none", "dialog");
-            Add("INTERFACE EDIT STYLE", "nameOrString", "gekko", "gekko2", "rstudio", "rstudio2");
-            Add("INTERFACE EXCEL LANGUAGE", "nameOrString", "danish", "english");
-            Add("INTERFACE EXCEL MODERNLOOK", "bool");
-            Add("INTERFACE HELP COPYLOCAL", "bool");
-            Add("INTERFACE MODE", "nameOrString", "mixed", "sim", "data");
-            Add("INTERFACE MUTE", "nameOrString", "bool");
-            Add("INTERFACE REMOTE", "bool");
-            Add("INTERFACE REMOTE FILE", "nameOrStringOrFilename");
-            Add("INTERFACE SOUND", "bool");
-            Add("INTERFACE SOUND TYPE", "nameOrString", "bowl", "ding", "notify", "ring");
-            Add("INTERFACE SOUND WAIT", "int");
-            Add("INTERFACE SUGGESTIONS", "nameOrString", "none", "option");
-            Add("INTERFACE TABLE OPERATORS", "bool");
-            Add("INTERFACE ZOOM", "int");
-            Add("MENU STARTFILE", "nameOrStringOrFilename");
-            Add("MODEL CACHE MAX", "int");
-            Add("MODEL CACHE", "bool");
-            Add("MODEL GAMS DEP CURRENT", "bool");
-            Add("MODEL GAMS DEP METHOD", "nameOrString", "lhs", "eqname");
-            Add("MODEL INFOFILE", "nameOrString", "yes", "no", "temp");
-            Add("MODEL TYPE", "nameOrString", "default", "gams");
-            Add("PLOT ELEMENTS MAX", "int");
-            Add("PLOT LINES POINTS", "bool");
-            Add("PLOT XLABELS ANNUAL", "nameOrString", "at", "between");  //#hsfsksgsdfg
-            Add("PLOT XLABELS DIGITS", "int");
-            Add("PLOT XLABELS NONANNUAL", "nameOrString", "at", "between");    //#hsfsksgsdfg
-            Add("PLOT DECIMALSEPARATOR", "nameOrString", "period", "comma");                   //#kljsdfasfdlkj
-            Add("PLOT USING", "nameOrStringOrFilename");
-            Add("PRINT COLLAPSE", "nameOrString", "avg", "total", "none");                      //#kllæksdfgsdg
-            Add("PRINT ELEMENTS MAX", "int");
-            Add("PRINT FREQ", "nameOrString", "simple", "pretty");
-            Add("PRINT DISP MAXLINES", "plusminusint");
-            Add("PRINT FIELDS NDEC", "int");
-            Add("PRINT FIELDS NWIDTH", "int");
-            Add("PRINT FIELDS PDEC", "int");
-            Add("PRINT FIELDS PWIDTH", "int");
-            Add("PRINT FILEWIDTH", "int");
-            Add("PRINT MULPRT (GDIF|GDIFF)", "bool");
-            Add("PRINT MULPRT ABS", "bool");
-            Add("PRINT MULPRT LEV", "bool");
-            Add("PRINT MULPRT PCH", "bool");
-            Add("PRINT MULPRT V", "bool");
-            Add("PRINT PRT (DIF|DIFF)", "bool");
-            Add("PRINT PRT (GDIF|GDIFF)", "bool");
-            Add("PRINT PRT ABS", "bool");
-            Add("PRINT PRT PCH", "bool");
-            Add("PRINT WIDTH", "int");
-            Add("PRINT SPLIT", "bool");
-            Add("PYTHON EXE FOLDER", "nameOrStringOrFilename");
-            Add("R EXE FOLDER", "nameOrStringOrFilename");
-            Add("R EXE PATH", "nameOrStringOrFilename");              //obsolete!
-            Add("SERIES ARRAY IGNOREMISSING", "bool");
-            Add("SERIES DATA IGNOREMISSING", "bool");
-            Add("SERIES DYN", "bool");
-            Add("SERIES DYN CHECK", "bool");
-            Add("SERIES FAILSAFE", "bool");
-            Add("SERIES NORMAL PRINT MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
-            Add("SERIES NORMAL CALC MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
-            Add("SERIES NORMAL TABLE MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
-            Add("SERIES ARRAY PRINT MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
-            Add("SERIES ARRAY CALC MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");      //#ljfdssdfgsh
-            Add("SERIES ARRAY TABLE MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
-            Add("SERIES DATA MISSING", "optionSeriesMissing", "ERROR", "M", "ZERO", "SKIP");            //#ljfdssdfgsh
-            Add("SHEET COLLAPSE", "nameOrString", "avg", "total", "none");         //#kllæksdfgsdg
-            Add("SHEET ENGINE", "nameOrString", "excel", "internal");
-            Add("SHEET FREQ", "nameOrString", "simple", "pretty");
-            Add("SHEET MULPRT (GDIF|GDIFF)", "bool");
-            Add("SHEET MULPRT ABS", "bool");
-            Add("SHEET MULPRT LEV", "bool");
-            Add("SHEET MULPRT PCH", "bool");
-            Add("SHEET MULPRT V", "bool");
-            Add("SHEET PRT (DIF|DIFF)", "bool");
-            Add("SHEET PRT (GDIF|GDIFF)", "bool");
-            Add("SHEET PRT ABS", "bool");
-            Add("SHEET PRT PCH", "bool");
-            Add("SHEET ROWS", "bool");
-            Add("SHEET COLS", "bool");
-            Add("SOLVE DATA CREATE AUTO", "bool");
-            Add("SOLVE DATA IGNOREMISSING", "bool");
-            Add("SOLVE DATA INIT", "bool");
-            Add("SOLVE DATA INIT GROWTH", "bool");
-            Add("SOLVE DATA INIT GROWTH MAX", "numberIntegerOrDouble");
-            Add("SOLVE DATA INIT GROWTH MIN", "numberIntegerOrDouble");
-            Add("SOLVE FAILSAFE", "bool");
-            Add("SOLVE FORWARD DUMP", "bool");
-            Add("SOLVE FORWARD FAIR CONV", "nameOrString", "conv1", "conv2");   //#fxlsjffhsdks
-            Add("SOLVE FORWARD FAIR CONV1 ABS", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD FAIR CONV1 REL", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD FAIR CONV2 TABS", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD FAIR CONV2 TREL", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD FAIR DAMP", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD FAIR ITERMAX", "int");
-            Add("SOLVE FORWARD FAIR ITERMIN", "int");
-            Add("SOLVE FORWARD NFAIR CONV", "nameOrString", "conv1", "conv2");   //#fxlsjffhsdks
-            Add("SOLVE FORWARD NFAIR CONV1 ABS", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD NFAIR CONV1 REL", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD NFAIR CONV2 TABS", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD NFAIR CONV2 TREL", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD NFAIR DAMP", "numberIntegerOrDouble");
-            Add("SOLVE FORWARD NFAIR ITERMAX", "int");
-            Add("SOLVE FORWARD NFAIR ITERMIN", "int");
-            Add("SOLVE FORWARD NFAIR UPDATEFREQ", "int");
-            Add("SOLVE FORWARD STACKED HORIZON", "int");
-            Add("SOLVE FORWARD METHOD", "nameOrString", "stacked", "fair", "nfair", "none");
-            Add("SOLVE FORWARD TERMINAL", "nameOrString", "exo", "const", "growth");
-            Add("SOLVE FORWARD TERMINAL FEED", "nameOrString", "internal", "external");
-            Add("SOLVE GAUSS CONV", "nameOrString", "conv1", "conv2");   //#fxlsjffhsdks
-            Add("SOLVE GAUSS CONV IGNOREVARS", "bool");
-            Add("SOLVE GAUSS CONV1 ABS", "numberIntegerOrDouble");
-            Add("SOLVE GAUSS CONV1 REL", "numberIntegerOrDouble");
-            Add("SOLVE GAUSS CONV2 TABS", "numberIntegerOrDouble");
-            Add("SOLVE GAUSS CONV2 TREL", "numberIntegerOrDouble");
-            Add("SOLVE GAUSS DAMP", "numberIntegerOrDouble");
-            Add("SOLVE GAUSS DUMP", "bool");
-            Add("SOLVE GAUSS ITERMAX", "int");
-            Add("SOLVE GAUSS ITERMIN", "int");
-            Add("SOLVE GAUSS REORDER", "bool");
-            Add("SOLVE METHOD", "nameOrString", "newton", "gauss");
-            Add("SOLVE NEWTON BACKTRACK", "bool");
-            Add("SOLVE NEWTON CONV ABS", "numberIntegerOrDouble");
-            Add("SOLVE NEWTON INVERT", "nameOrString", "lu", "iter");
-            Add("SOLVE NEWTON ROBUST", "bool");
-            Add("SOLVE NEWTON ITERMAX", "int");
-            Add("SOLVE NEWTON UPDATEFREQ", "int");
-            Add("SOLVE PRINT DETAILS", "bool");
-            Add("SOLVE PRINT ITER", "bool");
-            Add("SOLVE STATIC", "bool");
-            Add("STRING INTERPOLATE FORMAT VAL", "string");
-            Add("SYSTEM CODE SPLIT", "int");
-            Add("SYSTEM CLONE", "bool");
-            Add("TABLE DECIMALSEPARATOR", "nameOrString", "period", "comma");                  //#kljsdfasfdlkj
-            Add("TABLE HTML DATAWIDTH", "numberIntegerOrDouble");
-            Add("TABLE HTML FIRSTCOLWIDTH", "numberIntegerOrDouble");
-            Add("TABLE HTML FONT", "nameOrString");
-            Add("TABLE HTML FONTSIZE", "numberIntegerOrDouble");
-            Add("TABLE HTML SECONDCOLWIDTH", "numberIntegerOrDouble");
-            Add("TABLE HTML SPECIALMINUS", "bool");
-            Add("TABLE IGNOREMISSINGVARS", "bool");
-            Add("TABLE MDATEFORMAT", "string");
-            Add("TABLE STAMP", "bool");
-            Add("TABLE THOUSANDSSEPARATOR", "bool");
-            Add("TABLE TYPE", "nameOrString", "txt", "html");
-            Add("TIMEFILTER", "bool");
-            Add("TIMEFILTER TYPE", "nameOrString", "hide", "avg");
+            Add("BUGFIX IMPORT EXPORT", xbool);
+            Add("BUGFIX GBK", xbool);
+            Add("BUGFIX MISSING", xbool);
+            Add("DATABANK COMPARE TABS", xval);
+            Add("DATABANK COMPARE TREL", xval);
+            Add("DATABANK CREATE AUTO", xbool);
+            Add("DATABANK FILE COPYLOCAL", xbool);
+            Add("DATABANK FILE GBK COMPRESS", xbool);            
+            Add("DATABANK FILE GBK VERSION", xval2String);
+            Add("DATABANK FILE GBK INTERNAL", xnameOrStringOrFilename);
+            Add("DATABANK SEARCH", xbool);
+            Add("DECOMP MAXLAG", xint);
+            Add("DECOMP MAXLEAD", xint);
+            Add("FIT OLS REKUR DFMIN", xint);
+            Add("FOLDER", xbool);
+            Add("FOLDER BANK", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER BANK1", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER BANK2", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER COMMAND", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER COMMAND1", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER COMMAND2", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER HELP", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER MENU", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER MODEL", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER PIPE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER TABLE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER TABLE1", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER TABLE2", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER WORKING", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FREQ", xnameOrString2Freq, "a", "q", "m", "d", "u");
+            Add("GAMS EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("GAMS FAST", xbool);
+            Add("GAMS TIME DETECT AUTO", xbool);
+            Add("GAMS TIME FREQ", xnameOrString);
+            Add("GAMS TIME OFFSET", xint);
+            Add("GAMS TIME PREFIX", xnameOrString);
+            Add("GAMS TIME SET", xnameOrString);
+            Add("INTERFACE ALIAS", xbool);
+            Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", xnameOrString, "period", "comma");    //#kljsdfasfdlkj
+            Add("INTERFACE CSV DECIMALSEPARATOR", xnameOrString, "period", "comma");          //#kljsdfasfdlkj
+            Add("INTERFACE CSV DELIMITER", xnameOrString, "semicolon", "comma");
+            Add("INTERFACE CSV NDEC", xint);
+            Add("INTERFACE CSV PDEC", xint);
+            Add("INTERFACE DEBUG", xnameOrString, "none", "dialog");
+            Add("INTERFACE EDIT STYLE", xnameOrString, "gekko", "gekko2", "rstudio", "rstudio2");
+            Add("INTERFACE EXCEL LANGUAGE", xnameOrString, "danish", "english");
+            Add("INTERFACE EXCEL MODERNLOOK", xbool);
+            Add("INTERFACE HELP COPYLOCAL", xbool);
+            Add("INTERFACE MODE", xnameOrString, "mixed", "sim", "data");
+            Add("INTERFACE MUTE", xnameOrString, xbool);
+            Add("INTERFACE REMOTE", xbool);
+            Add("INTERFACE REMOTE FILE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("INTERFACE SOUND", xbool);
+            Add("INTERFACE SOUND TYPE", xnameOrString, "bowl", "ding", "notify", "ring");
+            Add("INTERFACE SOUND WAIT", xint);
+            Add("INTERFACE SUGGESTIONS", xnameOrString, "none", "option");
+            Add("INTERFACE TABLE OPERATORS", xbool);
+            Add("INTERFACE ZOOM", xint);
+            Add("MENU STARTFILE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("MODEL CACHE MAX", xint);
+            Add("MODEL CACHE", xbool);
+            Add("MODEL GAMS DEP CURRENT", xbool);
+            Add("MODEL GAMS DEP METHOD", xnameOrString, "lhs", "eqname");
+            Add("MODEL INFOFILE", xnameOrString, "yes", "no", "temp");
+            Add("MODEL TYPE", xnameOrString, "default", "gams");
+            Add("PLOT ELEMENTS MAX", xint);
+            Add("PLOT LINES POINTS", xbool);
+            Add("PLOT XLABELS ANNUAL", xnameOrString, "at", "between");  //#hsfsksgsdfg
+            Add("PLOT XLABELS DIGITS", xint);
+            Add("PLOT XLABELS NONANNUAL", xnameOrString, "at", "between");    //#hsfsksgsdfg
+            Add("PLOT DECIMALSEPARATOR", xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
+            Add("PLOT USING", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("PRINT COLLAPSE", xnameOrString, "avg", "total", "none");                      //#kllæksdfgsdg
+            Add("PRINT ELEMENTS MAX", xint);
+            Add("PRINT FREQ", xnameOrString, "simple", "pretty");
+            Add("PRINT DISP MAXLINES", xsint);
+            Add("PRINT FIELDS NDEC", xint);
+            Add("PRINT FIELDS NWIDTH", xint);
+            Add("PRINT FIELDS PDEC", xint);
+            Add("PRINT FIELDS PWIDTH", xint);
+            Add("PRINT FILEWIDTH", xint);
+            {
+                Add("PRINT MULPRT GDIF", xbool);
+                Add("PRINT MULPRT GDIFF", xbool);
+            }
+            Add("PRINT MULPRT ABS", xbool);
+            Add("PRINT MULPRT LEV", xbool);
+            Add("PRINT MULPRT PCH", xbool);
+            Add("PRINT MULPRT V", xbool);
+            {
+                Add("PRINT PRT DIF", xbool);
+                Add("PRINT PRT DIFF", xbool);
+            }
+            {
+                Add("PRINT PRT GDIF", xbool);
+                Add("PRINT PRT GDIFF", xbool);
+            }
+            Add("PRINT PRT ABS", xbool);
+            Add("PRINT PRT PCH", xbool);
+            Add("PRINT WIDTH", xint);
+            Add("PRINT SPLIT", xbool);
+            Add("PYTHON EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("R EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j            
+            Add("SERIES ARRAY IGNOREMISSING", xbool);
+            Add("SERIES DATA IGNOREMISSING", xbool);
+            Add("SERIES DYN", xbool);
+            Add("SERIES DYN CHECK", xbool);
+            Add("SERIES FAILSAFE", xbool);
+            Add("SERIES NORMAL PRINT MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
+            Add("SERIES NORMAL CALC MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES NORMAL TABLE MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
+            Add("SERIES ARRAY PRINT MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES ARRAY CALC MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");      //#ljfdssdfgsh
+            Add("SERIES ARRAY TABLE MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES DATA MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");            //#ljfdssdfgsh
+            Add("SHEET COLLAPSE", xnameOrString, "avg", "total", "none");         //#kllæksdfgsdg
+            Add("SHEET ENGINE", xnameOrString, "excel", "internal");
+            Add("SHEET FREQ", xnameOrString, "simple", "pretty");
+            {
+                Add("SHEET MULPRT GDIF", xbool);
+                Add("SHEET MULPRT GDIFF", xbool);
+            }
+            Add("SHEET MULPRT ABS", xbool);
+            Add("SHEET MULPRT LEV", xbool);
+            Add("SHEET MULPRT PCH", xbool);
+            Add("SHEET MULPRT V", xbool);            
+            {
+                Add("SHEET PRT DIF", xbool);
+                Add("SHEET PRT DIFF", xbool);
+            }            
+            {
+                Add("SHEET PRT GDIF", xbool);
+                Add("SHEET PRT GDIFF", xbool);
+            }
+            Add("SHEET PRT ABS", xbool);
+            Add("SHEET PRT PCH", xbool);
+            Add("SHEET ROWS", xbool);
+            Add("SHEET COLS", xbool);
+            Add("SOLVE DATA CREATE AUTO", xbool);
+            Add("SOLVE DATA IGNOREMISSING", xbool);
+            Add("SOLVE DATA INIT", xbool);
+            Add("SOLVE DATA INIT GROWTH", xbool);
+            Add("SOLVE DATA INIT GROWTH MAX", xval);
+            Add("SOLVE DATA INIT GROWTH MIN", xval);
+            Add("SOLVE FAILSAFE", xbool);
+            Add("SOLVE FORWARD DUMP", xbool);
+            Add("SOLVE FORWARD FAIR CONV", xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE FORWARD FAIR CONV1 ABS", xval);
+            Add("SOLVE FORWARD FAIR CONV1 REL", xval);
+            Add("SOLVE FORWARD FAIR CONV2 TABS", xval);
+            Add("SOLVE FORWARD FAIR CONV2 TREL", xval);
+            Add("SOLVE FORWARD FAIR DAMP", xval);
+            Add("SOLVE FORWARD FAIR ITERMAX", xint);
+            Add("SOLVE FORWARD FAIR ITERMIN", xint);
+            Add("SOLVE FORWARD NFAIR CONV", xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE FORWARD NFAIR CONV1 ABS", xval);
+            Add("SOLVE FORWARD NFAIR CONV1 REL", xval);
+            Add("SOLVE FORWARD NFAIR CONV2 TABS", xval);
+            Add("SOLVE FORWARD NFAIR CONV2 TREL", xval);
+            Add("SOLVE FORWARD NFAIR DAMP", xval);
+            Add("SOLVE FORWARD NFAIR ITERMAX", xint);
+            Add("SOLVE FORWARD NFAIR ITERMIN", xint);
+            Add("SOLVE FORWARD NFAIR UPDATEFREQ", xint);
+            Add("SOLVE FORWARD STACKED HORIZON", xint);
+            Add("SOLVE FORWARD METHOD", xnameOrString, "stacked", "fair", "nfair", "none");
+            Add("SOLVE FORWARD TERMINAL", xnameOrString, "exo", "const", "growth");
+            Add("SOLVE FORWARD TERMINAL FEED", xnameOrString, "internal", "external");
+            Add("SOLVE GAUSS CONV", xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE GAUSS CONV IGNOREVARS", xbool);
+            Add("SOLVE GAUSS CONV1 ABS", xval);
+            Add("SOLVE GAUSS CONV1 REL", xval);
+            Add("SOLVE GAUSS CONV2 TABS", xval);
+            Add("SOLVE GAUSS CONV2 TREL", xval);
+            Add("SOLVE GAUSS DAMP", xval);
+            Add("SOLVE GAUSS DUMP", xbool);
+            Add("SOLVE GAUSS ITERMAX", xint);
+            Add("SOLVE GAUSS ITERMIN", xint);
+            Add("SOLVE GAUSS REORDER", xbool);
+            Add("SOLVE METHOD", xnameOrString, "newton", "gauss");
+            Add("SOLVE NEWTON BACKTRACK", xbool);
+            Add("SOLVE NEWTON CONV ABS", xval);
+            Add("SOLVE NEWTON INVERT", xnameOrString, "lu", "iter");
+            Add("SOLVE NEWTON ROBUST", xbool);
+            Add("SOLVE NEWTON ITERMAX", xint);
+            Add("SOLVE NEWTON UPDATEFREQ", xint);
+            Add("SOLVE PRINT DETAILS", xbool);
+            Add("SOLVE PRINT ITER", xbool);
+            Add("SOLVE STATIC", xbool);
+            Add("STRING INTERPOLATE FORMAT VAL", xstring);
+            Add("SYSTEM CODE SPLIT", xint);
+            Add("SYSTEM CLONE", xbool);
+            Add("TABLE DECIMALSEPARATOR", xnameOrString, "period", "comma");                  //#kljsdfasfdlkj
+            Add("TABLE HTML DATAWIDTH", xval);
+            Add("TABLE HTML FIRSTCOLWIDTH", xval);
+            Add("TABLE HTML FONT", xnameOrString);
+            Add("TABLE HTML FONTSIZE", xval);
+            Add("TABLE HTML SECONDCOLWIDTH", xval);
+            Add("TABLE HTML SPECIALMINUS", xbool);
+            Add("TABLE IGNOREMISSINGVARS", xbool);
+            Add("TABLE MDATEFORMAT", xstring);
+            Add("TABLE STAMP", xbool);
+            Add("TABLE THOUSANDSSEPARATOR", xbool);
+            Add("TABLE TYPE", xnameOrString, "txt", "html");
+            Add("TIMEFILTER", xbool);
+            Add("TIMEFILTER TYPE", xnameOrString, "hide", "avg");
 
             return rv;
 
@@ -580,8 +774,14 @@ namespace Gekko
 
         public List<string> Intellisense(string s)
         {
+            bool hasSeenEqual = false;
             List<string> rv = new List<string>();
             s = s.ToLower().Substring("option ".Length).Trim(); //must start with "option "
+            if (s.EndsWith("="))
+            {
+                s = s.Substring(0, s.Length - 1).Trim();
+                hasSeenEqual = true;
+            }
             
             string[] words1 = new string[0];
             if (!string.IsNullOrEmpty(s))
@@ -619,6 +819,7 @@ namespace Gekko
                 }
                 else if (words1.Length == words2.Length)
                 {
+                    if (!hasSeenEqual && !rv.Contains("=")) rv.Add("=");
                     if (ss.Count <= 2)
                     {
                         string w = ss[1];  //the type                    

@@ -4863,15 +4863,20 @@ namespace Gekko.Parser.Gek
                         {
                             if (Globals.newOption)
                             {
+                                //See also #jkafjkaddasfas
+
                                 string ss7 = null;
                                 bool first = true;
                                 for (int i = 0; i < node.ChildrenCount() - 1; i++)
                                 {
                                     if (!first) ss7 += " ";
-                                    ss7 += node[i][0].Text.ToLower();
+                                    string s = null;
+                                    if (node[i].ChildrenCount() == 0) s = node[i].Text.ToLower();  //the specially treated tokens, cf. #jsadklgasj4j
+                                    else s = node[i][0].Text.ToLower();
+                                    ss7 += s;
                                     first = false;
                                 }
-                                                                
+
                                 List<string> rv = null;
                                 foreach (List<string> ss in Globals.listSyntax)
                                 {
@@ -4882,22 +4887,65 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
 
-                                //option? check question at all places, implement
-                                //for int, check that -1 is ok, for instance PRINT DISP MAXLINES = -1
-                                //SOLVE DATA INIT GROWTH MIN = -0.02 
-                                //PRINT MULPRT (GDIF|GDIFF)
-                                //int
-                                //double
-                                //bool
-                                //string
+                                if (rv == null || rv[1] == null)
+                                {
+                                    G.Writeln("*** ERROR: Option type problem");
+                                    throw new GekkoException();
+                                }
 
+                                string type = rv[1];
                                 string f = "(";
-                                if (ss7 == "folder_working") f = "O.ConvertToString(";
 
-                                node.Code.A("Program.options." + ss7 + " = " + f + node[node.ChildrenCount() - 1].Code + ")" + ";" + G.NL);
+                                if (type == "bool")
+                                {
+                                    f = "O.XBool(";
+                                }
+                                else if (type == "string")
+                                {
+                                    f = "O.XString(";
+                                }
+                                else if (type == "int")
+                                {
+                                    f = "O.XInt(";
+                                }
+                                else if (type == "val")
+                                {
+                                    f = "O.XVal(";
+                                }
+                                else if (type == "val2String")
+                                {
+                                    f = "O.XVal2String(";
+                                }
+                                else if (type == "nameOrString")
+                                {
+                                    f = "O.XNameOrString(";
+                                }
+                                else if (type == "nameOrString2Freq")
+                                {
+                                    f = "O.XNameOrString2Freq(";
+                                }
+                                else if (type == "nameOrStringOrFilename")
+                                {
+                                    f = "O.XNameOrStringOrFilename(";
+                                }
+                                else if (type == "optionSeriesMissing")
+                                {
+                                    f = "O.XOptionSeriesMissing(";
+                                }
+                                else if (type == "sint")
+                                {
+                                    f = "O.XSint(";
+                                }
+                                else
+                                {
+                                    G.Writeln("*** ERROR: Option type problem");
+                                    throw new GekkoException();
+                                }
+
+                                node.Code.A("Program.options." + ss7.Replace(" ", "_") + " = " + f + node[node.ChildrenCount() - 1].Code + ")" + ";" + G.NL);
                                 node.Code.A("G.Writeln2(`" + ss7 + "`);");
 
-                                
+
 
                             }
                             else

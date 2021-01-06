@@ -502,7 +502,83 @@ namespace Gekko
             {
                 return ReplaceSlashHelper(x);
             }
-        }        
+        }
+
+        // ============ helper methods for options, start
+        // See #jkafjkaddasfas                
+
+        public static bool XBool(IVariable x)
+        {
+            string x_string = O.ConvertToString(x);
+            if (G.Equal(x_string, "yes")) return true;
+            else if (G.Equal(x_string, "no")) return false;
+            else
+            {
+                G.Writeln2("*** ERROR: Value expected to be 'yes' or 'no', not '" + x_string + "'");
+                throw new GekkoException();
+            }
+        }
+
+        public static string XString(IVariable x)
+        {
+            string x_string = O.ConvertToString(x);
+            return x_string;
+        }
+
+        public static int XInt(IVariable x)
+        {
+            int x_int = O.ConvertToInt(x);
+            return x_int;
+        }
+
+        public static int XSint(IVariable x)
+        {
+            int x_int = XInt(x);
+            if (x_int < 0)
+            {
+                G.Writeln2("*** ERROR: Expected integer >= 0, not " + x_int);
+            }
+            return x_int;
+        }
+
+        public static double XVal(IVariable x)
+        {
+            double x_val = O.ConvertToVal(x);
+            return x_val;
+        }
+
+        public static string XVal2String(IVariable x)
+        {
+            double x_val = O.ConvertToVal(x);
+            return x_val.ToString();
+        }
+
+        public static string XNameOrString(IVariable x)
+        {
+            string x_string = O.ConvertToString(x);
+            return x_string;
+        }
+
+        public static string XNameOrStringOrFilename(IVariable x)
+        { 
+            return XNameOrString(x);
+        }
+
+        public static EFreq XNameOrString2Freq(IVariable x)
+        {
+            string x_string = O.ConvertToString(x);
+            EFreq freq = G.GetFreq(x_string);
+            return freq;
+        }
+
+        public static ESeriesMissing XOptionSeriesMissing(IVariable x)
+        {
+            string x_string = O.ConvertToString(x);
+            return G.GetMissing(x_string);
+        }
+
+
+        // ============ helper methods for options, end
 
         public static string ResolvePath(string fileName2)
         {
