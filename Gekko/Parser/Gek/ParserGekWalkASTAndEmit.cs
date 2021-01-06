@@ -2223,8 +2223,7 @@ namespace Gekko.Parser.Gek
                     case "ASTBLOCK":
                         {
                             if (Globals.newOption)
-                            {
-                                Tuple<string, string> tup = HandleOptionAndBlock(node, true);
+                            {                               
 
                                 string record = null;
                                 string alter = null;
@@ -2257,20 +2256,21 @@ namespace Gekko.Parser.Gek
                                     }
                                     else if (child.Text == "ASTBLOCKOPTION")
                                     {
-                                        StringBuilder s = new StringBuilder();
-                                        string o = "";
+                                        //StringBuilder s = new StringBuilder();
+                                        //string o = "";
+                                        //CreateOptionVariableOldDelete(child, true, s, ref o);
 
-                                        CreateOptionVariableOldDelete(child, true, s, ref o);
+                                        Tuple<string, string> tup = HandleOptionAndBlock(child, true);
 
-                                        if (o == "Program.options.freq")
+                                        if (tup.Item1 == "Program.options.freq")
                                         {
                                             //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
                                             int n = ++Globals.counter;
-                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
-                                            alter += s.ToString();                                //Program.options.freq = EFreq.Q;
-                                            alter += "Program.AdjustFreq();" + G.NL;              //Program.AdjustFreq();
-                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
-                                                                                                  // global perStart
+                                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
+                                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
+                                            alter += "Program.AdjustFreq();" + G.NL;                      //Program.AdjustFreq();
+                                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                                                                                          // global perStart
                                             n = ++Globals.counter;
                                             record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
                                             play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
@@ -2282,9 +2282,9 @@ namespace Gekko.Parser.Gek
                                         else
                                         {
                                             int n = ++Globals.counter;
-                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options....;
-                                            alter += s.ToString();                                //Program.options.... = ...;
-                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
+                                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
+                                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
                                         }
                                     }
                                     else
@@ -6578,6 +6578,8 @@ namespace Gekko.Parser.Gek
         private static Tuple<string, string> HandleOptionAndBlock(ASTNode node, bool isBlock)
         {
             //See also #jkafjkaddasfas
+            //Item1: the option variable, for instance Program.options.folder_working
+            //Item2: the value as C# code (IVariable code)
 
             string ss7 = null;
             bool first = true;
