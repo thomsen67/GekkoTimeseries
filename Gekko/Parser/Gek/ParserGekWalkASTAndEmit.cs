@@ -2224,6 +2224,79 @@ namespace Gekko.Parser.Gek
                         {
                             if (Globals.newOption)
                             {
+                                Tuple<string, string> tup = HandleOptionAndBlock(node, true);
+
+                                string record = null;
+                                string alter = null;
+                                string play = null;
+
+                                foreach (ASTNode child in node[0].ChildrenIterator())
+                                {
+                                    if (child.Text == "ASTDATES_BLOCK")
+                                    {
+                                        //handle BLOCK time ...
+
+                                        string ss = child.Code.ToString();
+                                        if (ss != null)
+                                        {
+                                            string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
+                                            int n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
+                                            alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
+                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
+                                            n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                            alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
+                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                        }
+                                        else
+                                        {
+                                            G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                            throw new GekkoException();
+                                        }
+                                    }
+                                    else if (child.Text == "ASTBLOCKOPTION")
+                                    {
+                                        StringBuilder s = new StringBuilder();
+                                        string o = "";
+
+                                        CreateOptionVariableOldDelete(child, true, s, ref o);
+
+                                        if (o == "Program.options.freq")
+                                        {
+                                            //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
+                                            int n = ++Globals.counter;
+                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
+                                            alter += s.ToString();                                //Program.options.freq = EFreq.Q;
+                                            alter += "Program.AdjustFreq();" + G.NL;              //Program.AdjustFreq();
+                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                                                                                  // global perStart
+                                            n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
+                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
+                                            // global perEnd
+                                            n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                        }
+                                        else
+                                        {
+                                            int n = ++Globals.counter;
+                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options....;
+                                            alter += s.ToString();                                //Program.options.... = ...;
+                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                                        }
+                                    }
+                                    else
+                                    {
+                                        G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                        throw new GekkoException();
+                                    }
+                                }
+                                node.Code.A(record);
+                                node.Code.A(alter);
+                                GetCodeFromAllChildren(node, node[1][0]);
+                                node.Code.A(play);
 
                             }
                             else
@@ -4863,90 +4936,11 @@ namespace Gekko.Parser.Gek
                         {
                             if (Globals.newOption)
                             {
-                                //See also #jkafjkaddasfas
+                                Tuple<string, string> tup = HandleOptionAndBlock(node, false);
 
-                                string ss7 = null;
-                                bool first = true;
-                                for (int i = 0; i < node.ChildrenCount() - 1; i++)
-                                {
-                                    if (!first) ss7 += " ";
-                                    string s = null;
-                                    if (node[i].ChildrenCount() == 0) s = node[i].Text.ToLower();  //the specially treated tokens, cf. #jsadklgasj4j
-                                    else s = node[i][0].Text.ToLower();
-                                    ss7 += s;
-                                    first = false;
-                                }
-
-                                List<string> rv = null;
-                                foreach (List<string> ss in Globals.listSyntax)
-                                {
-                                    if (G.Equal(ss[0], ss7))
-                                    {
-                                        rv = ss;
-                                        break;
-                                    }
-                                }
-
-                                if (rv == null || rv[1] == null)
-                                {
-                                    G.Writeln("*** ERROR: Option type problem");
-                                    throw new GekkoException();
-                                }
-
-                                string type = rv[1];
-                                string f = "(";
-
-                                if (type == "bool")
-                                {
-                                    f = "O.XBool(";
-                                }
-                                else if (type == "string")
-                                {
-                                    f = "O.XString(";
-                                }
-                                else if (type == "int")
-                                {
-                                    f = "O.XInt(";
-                                }
-                                else if (type == "val")
-                                {
-                                    f = "O.XVal(";
-                                }
-                                else if (type == "val2String")
-                                {
-                                    f = "O.XVal2String(";
-                                }
-                                else if (type == "nameOrString")
-                                {
-                                    f = "O.XNameOrString(";
-                                }
-                                else if (type == "nameOrString2Freq")
-                                {
-                                    f = "O.XNameOrString2Freq(";
-                                }
-                                else if (type == "nameOrStringOrFilename")
-                                {
-                                    f = "O.XNameOrStringOrFilename(";
-                                }
-                                else if (type == "optionSeriesMissing")
-                                {
-                                    f = "O.XOptionSeriesMissing(";
-                                }
-                                else if (type == "sint")
-                                {
-                                    f = "O.XSint(";
-                                }
-                                else
-                                {
-                                    G.Writeln("*** ERROR: Option type problem");
-                                    throw new GekkoException();
-                                }
-
-                                node.Code.A("Program.options." + ss7.Replace(" ", "_") + " = " + f + node[node.ChildrenCount() - 1].Code + ")" + ";" + G.NL);
-                                node.Code.A("G.Writeln2(`" + ss7 + "`);");
-
-
-
+                                node.Code.A(tup.Item1 + " = " + tup.Item2 + ";" + G.NL);
+                                //TODO: print out
+                                //node.Code.A("G.Writeln2(`" + ss7 + "`);");
                             }
                             else
                             {
@@ -6579,6 +6573,91 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
+        }
+
+        private static Tuple<string, string> HandleOptionAndBlock(ASTNode node, bool isBlock)
+        {
+            //See also #jkafjkaddasfas
+
+            string ss7 = null;
+            bool first = true;
+            for (int i = 0; i < node.ChildrenCount() - 1; i++)
+            {
+                if (!first) ss7 += " ";
+                string s = null;
+                if (node[i].ChildrenCount() == 0) s = node[i].Text.ToLower();  //the specially treated tokens, cf. #jsadklgasj4j
+                else s = node[i][0].Text.ToLower();
+                ss7 += s;
+                first = false;
+            }
+
+            List<string> rv = null;
+            foreach (List<string> ss in Globals.listSyntax)
+            {
+                if (G.Equal(ss[0], ss7))
+                {
+                    rv = ss;
+                    break;
+                }
+            }
+
+            if (rv == null || rv[1] == null)
+            {
+                G.Writeln("*** ERROR: Option type problem");
+                throw new GekkoException();
+            }
+
+            string type = rv[1];
+            string f = "(";
+
+            if (type == "bool")
+            {
+                f = "O.XBool(";
+            }
+            else if (type == "string")
+            {
+                f = "O.XString(";
+            }
+            else if (type == "int")
+            {
+                f = "O.XInt(";
+            }
+            else if (type == "val")
+            {
+                f = "O.XVal(";
+            }
+            else if (type == "val2String")
+            {
+                f = "O.XVal2String(";
+            }
+            else if (type == "nameOrString")
+            {
+                f = "O.XNameOrString(";
+            }
+            else if (type == "nameOrString2Freq")
+            {
+                f = "O.XNameOrString2Freq(";
+            }
+            else if (type == "nameOrStringOrFilename")
+            {
+                f = "O.XNameOrStringOrFilename(";
+            }
+            else if (type == "optionSeriesMissing")
+            {
+                f = "O.XOptionSeriesMissing(";
+            }
+            else if (type == "sint")
+            {
+                f = "O.XSint(";
+            }
+            else
+            {
+                G.Writeln("*** ERROR: Option type problem");
+                throw new GekkoException();
+            }
+
+            Tuple<string, string> tup = new Tuple<string, string>("Program.options." + ss7.Replace(" ", "_"), f + node[node.ChildrenCount() - 1].Code + ")");
+            return tup;
         }
 
         private static int GetLineRecursive(ASTNode node)
