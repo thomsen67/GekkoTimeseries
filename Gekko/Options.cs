@@ -288,6 +288,7 @@ namespace Gekko
         //have to unbox the IVariable, and see if it is "yes" or "no". Inside a tight loop, this would be 
         //hopeless. Therefore, all these option variables are C# primitives.
 
+        //bugfix options (options starting with "bugfix_" are not shown in user manual or in "option?"
         public bool bugfix_import_export = false;  //not mentioned in help                     
         public bool bugfix_missing = true;  //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
         // ---
@@ -497,31 +498,20 @@ namespace Gekko
             //All these have corresponding methods like O.XBool(), O.XString(), ... , cf. #jkafjkaddasfas
             //Also, these names are used in ParserGekWalkASTAndEmit, cf. #jkafjkaddasfas
             //Change all 3 places if a name is changed, or a new type is introduced.
-
-            string xbool = "bool";
-            string xstring = "string";
-            string xint = "int"; // >= 0
-            string xval = "val";
-            string xval2String = "val2String";
-            string xnameOrString = "nameOrString";
-            string xnameOrString2Freq = "nameOrString2Freq";
-            string xnameOrStringOrFilename = "nameOrStringOrFilename";
-            string xoptionSeriesMissing = "optionSeriesMissing";
-            string xsint = "sint";  //signed int            
-
+            
             List<List<string>> rv = new List<List<string>>();
 
             List<string> types = new List<string>();
-            types.Add(xbool);
-            types.Add(xstring);
-            types.Add(xint); // >= 0
-            types.Add(xval);
-            types.Add(xval2String);
-            types.Add(xnameOrString);
-            types.Add(xnameOrStringOrFilename);            
-            types.Add(xnameOrString2Freq);
-            types.Add(xoptionSeriesMissing);
-            types.Add(xsint);  //signed int
+            types.Add(Globals.xbool);
+            types.Add(Globals.xstring);
+            types.Add(Globals.xint); // >= 0
+            types.Add(Globals.xval);
+            types.Add(Globals.xval2String);
+            types.Add(Globals.xnameOrString);
+            types.Add(Globals.xnameOrStringOrFilename);            
+            types.Add(Globals.xnameOrString2Freq);
+            types.Add(Globals.xoptionSeriesMissing);
+            types.Add(Globals.xsint);  //signed int
 
             void Add(params string[] ss)
             {
@@ -565,207 +555,206 @@ namespace Gekko
             
             //GO THROUGH EACH OPTION ONE BY ONE!!                        
             
-            Add("BUGFIX IMPORT EXPORT", xbool);
-            Add("BUGFIX MISSING", xbool);
-
-            Add("DATABANK CREATE AUTO", xbool);
-            Add("DATABANK FILE COPYLOCAL", xbool);
-            Add("DATABANK FILE GBK COMPRESS", xbool);            
-            Add("DATABANK FILE GBK VERSION", xval2String);
-            Add("DATABANK FILE GBK INTERNAL", xnameOrStringOrFilename);
-            Add("DATABANK SEARCH", xbool);
-            Add("DECOMP MAXLAG", xint);
-            Add("DECOMP MAXLEAD", xint);
-            Add("FIT OLS REKUR DFMIN", xint);
-            Add("FOLDER", xbool);
-            Add("FOLDER BANK", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER BANK1", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER BANK2", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER COMMAND", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER COMMAND1", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER COMMAND2", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER HELP", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER MENU", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER MODEL", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER PIPE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER TABLE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER TABLE1", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER TABLE2", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FOLDER WORKING", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FREQ", xnameOrString2Freq, "a", "q", "m", "d", "u");
-            Add("GAMS EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("GAMS FAST", xbool);
-            Add("GAMS TIME DETECT AUTO", xbool);
-            Add("GAMS TIME FREQ", xnameOrString);
-            Add("GAMS TIME OFFSET", xint);
-            Add("GAMS TIME PREFIX", xnameOrString);
-            Add("GAMS TIME SET", xnameOrString);
-            Add("INTERFACE ALIAS", xbool);
-            Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", xnameOrString, "period", "comma");    //#kljsdfasfdlkj
-            Add("INTERFACE CSV DECIMALSEPARATOR", xnameOrString, "period", "comma");          //#kljsdfasfdlkj
-            Add("INTERFACE CSV DELIMITER", xnameOrString, "semicolon", "comma");
-            Add("INTERFACE CSV NDEC", xint);
-            Add("INTERFACE CSV PDEC", xint);
-            Add("INTERFACE DEBUG", xnameOrString, "none", "dialog");
-            Add("INTERFACE EDIT STYLE", xnameOrString, "gekko", "gekko2", "rstudio", "rstudio2");
-            Add("INTERFACE EXCEL LANGUAGE", xnameOrString, "danish", "english");
-            Add("INTERFACE EXCEL MODERNLOOK", xbool);
-            Add("INTERFACE HELP COPYLOCAL", xbool);
-            Add("INTERFACE MODE", xnameOrString, "mixed", "sim", "data");
-            Add("INTERFACE MUTE", xnameOrString, xbool);
-            Add("INTERFACE REMOTE", xbool);
-            Add("INTERFACE REMOTE FILE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("INTERFACE SOUND", xbool);
-            Add("INTERFACE SOUND TYPE", xnameOrString, "bowl", "ding", "notify", "ring");
-            Add("INTERFACE SOUND WAIT", xint);
-            Add("INTERFACE SUGGESTIONS", xnameOrString, "none", "option");
-            Add("INTERFACE TABLE OPERATORS", xbool);
-            Add("INTERFACE ZOOM", xint);
-            Add("MENU STARTFILE", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("MODEL CACHE MAX", xint);
-            Add("MODEL CACHE", xbool);
-            Add("MODEL GAMS DEP CURRENT", xbool);
-            Add("MODEL GAMS DEP METHOD", xnameOrString, "lhs", "eqname");
-            Add("MODEL INFOFILE", xnameOrString, "yes", "no", "temp");
-            Add("MODEL TYPE", xnameOrString, "default", "gams");
-            Add("PLOT ELEMENTS MAX", xint);
-            Add("PLOT LINES POINTS", xbool);
-            Add("PLOT XLABELS ANNUAL", xnameOrString, "at", "between");  //#hsfsksgsdfg
-            Add("PLOT XLABELS DIGITS", xint);
-            Add("PLOT XLABELS NONANNUAL", xnameOrString, "at", "between");    //#hsfsksgsdfg
-            Add("PLOT DECIMALSEPARATOR", xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
-            Add("PLOT USING", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("PRINT COLLAPSE", xnameOrString, "avg", "total", "none");                      //#kllæksdfgsdg
-            Add("PRINT ELEMENTS MAX", xint);
-            Add("PRINT FREQ", xnameOrString, "simple", "pretty");
-            Add("PRINT DISP MAXLINES", xsint);
-            Add("PRINT FIELDS NDEC", xint);
-            Add("PRINT FIELDS NWIDTH", xint);
-            Add("PRINT FIELDS PDEC", xint);
-            Add("PRINT FIELDS PWIDTH", xint);
-            Add("PRINT FILEWIDTH", xint);
+            Add("BUGFIX IMPORT EXPORT", Globals.xbool);
+            Add("BUGFIX MISSING", Globals.xbool);
+            Add("DATABANK CREATE AUTO", Globals.xbool);
+            Add("DATABANK FILE COPYLOCAL", Globals.xbool);
+            Add("DATABANK FILE GBK COMPRESS", Globals.xbool);            
+            Add("DATABANK FILE GBK VERSION", Globals.xval2String);
+            Add("DATABANK FILE GBK INTERNAL", Globals.xnameOrStringOrFilename);
+            Add("DATABANK SEARCH", Globals.xbool);
+            Add("DECOMP MAXLAG", Globals.xint);
+            Add("DECOMP MAXLEAD", Globals.xint);
+            Add("FIT OLS REKUR DFMIN", Globals.xint);
+            Add("FOLDER", Globals.xbool);
+            Add("FOLDER BANK", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER BANK1", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER BANK2", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER COMMAND", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER COMMAND1", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER COMMAND2", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER HELP", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER MENU", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER MODEL", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER PIPE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER TABLE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER TABLE1", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER TABLE2", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FOLDER WORKING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("FREQ", Globals.xnameOrString2Freq, "a", "q", "m", "d", "u");
+            Add("GAMS EXE FOLDER", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("GAMS FAST", Globals.xbool);
+            Add("GAMS TIME DETECT AUTO", Globals.xbool);
+            Add("GAMS TIME FREQ", Globals.xnameOrString);
+            Add("GAMS TIME OFFSET", Globals.xint);
+            Add("GAMS TIME PREFIX", Globals.xnameOrString);
+            Add("GAMS TIME SET", Globals.xnameOrString);
+            Add("INTERFACE ALIAS", Globals.xbool);
+            Add("INTERFACE CLIPBOARD DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");    //#kljsdfasfdlkj
+            Add("INTERFACE CSV DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");          //#kljsdfasfdlkj
+            Add("INTERFACE CSV DELIMITER", Globals.xnameOrString, "semicolon", "comma");
+            Add("INTERFACE CSV NDEC", Globals.xint);
+            Add("INTERFACE CSV PDEC", Globals.xint);
+            Add("INTERFACE DEBUG", Globals.xnameOrString, "none", "dialog");
+            Add("INTERFACE EDIT STYLE", Globals.xnameOrString, "gekko", "gekko2", "rstudio", "rstudio2");
+            Add("INTERFACE EXCEL LANGUAGE", Globals.xnameOrString, "danish", "english");
+            Add("INTERFACE EXCEL MODERNLOOK", Globals.xbool);
+            Add("INTERFACE HELP COPYLOCAL", Globals.xbool);
+            Add("INTERFACE MODE", Globals.xnameOrString, "mixed", "sim", "data");
+            Add("INTERFACE MUTE", Globals.xnameOrString, Globals.xbool);
+            Add("INTERFACE REMOTE", Globals.xbool);
+            Add("INTERFACE REMOTE FILE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("INTERFACE SOUND", Globals.xbool);
+            Add("INTERFACE SOUND TYPE", Globals.xnameOrString, "bowl", "ding", "notify", "ring");
+            Add("INTERFACE SOUND WAIT", Globals.xint);
+            Add("INTERFACE SUGGESTIONS", Globals.xnameOrString, "none", "option");
+            Add("INTERFACE TABLE OPERATORS", Globals.xbool);
+            Add("INTERFACE ZOOM", Globals.xint);
+            Add("MENU STARTFILE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("MODEL CACHE MAX", Globals.xint);
+            Add("MODEL CACHE", Globals.xbool);
+            Add("MODEL GAMS DEP CURRENT", Globals.xbool);
+            Add("MODEL GAMS DEP METHOD", Globals.xnameOrString, "lhs", "eqname");
+            Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");
+            Add("MODEL TYPE", Globals.xnameOrString, "default", "gams");
+            Add("PLOT ELEMENTS MAX", Globals.xint);
+            Add("PLOT LINES POINTS", Globals.xbool);
+            Add("PLOT XLABELS ANNUAL", Globals.xnameOrString, "at", "between");  //#hsfsksgsdfg
+            Add("PLOT XLABELS DIGITS", Globals.xint);
+            Add("PLOT XLABELS NONANNUAL", Globals.xnameOrString, "at", "between");    //#hsfsksgsdfg
+            Add("PLOT DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                   //#kljsdfasfdlkj
+            Add("PLOT USING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("PRINT COLLAPSE", Globals.xnameOrString, "avg", "total", "none");                      //#kllæksdfgsdg
+            Add("PRINT ELEMENTS MAX", Globals.xint);
+            Add("PRINT FREQ", Globals.xnameOrString, "simple", "pretty");
+            Add("PRINT DISP MAXLINES", Globals.xsint);
+            Add("PRINT FIELDS NDEC", Globals.xint);
+            Add("PRINT FIELDS NWIDTH", Globals.xint);
+            Add("PRINT FIELDS PDEC", Globals.xint);
+            Add("PRINT FIELDS PWIDTH", Globals.xint);
+            Add("PRINT FILEWIDTH", Globals.xint);
             {
-                Add("PRINT MULPRT GDIF", xbool);
+                Add("PRINT MULPRT GDIF", Globals.xbool);
                 Alias("PRINT MULPRT GDIFF", "PRINT MULPRT GDIF");
             }
-            Add("PRINT MULPRT ABS", xbool);
-            Add("PRINT MULPRT LEV", xbool);
-            Add("PRINT MULPRT PCH", xbool);
-            Add("PRINT MULPRT V", xbool);
+            Add("PRINT MULPRT ABS", Globals.xbool);
+            Add("PRINT MULPRT LEV", Globals.xbool);
+            Add("PRINT MULPRT PCH", Globals.xbool);
+            Add("PRINT MULPRT V", Globals.xbool);
             {
-                Add("PRINT PRT DIF", xbool);
+                Add("PRINT PRT DIF", Globals.xbool);
                 Alias("PRINT PRT DIFF", "PRINT PRT DIF");
             }
             {
-                Add("PRINT PRT GDIF", xbool);
+                Add("PRINT PRT GDIF", Globals.xbool);
                 Alias("PRINT PRT GDIFF", "PRINT PRT GDIF");
             }
-            Add("PRINT PRT ABS", xbool);
-            Add("PRINT PRT PCH", xbool);
-            Add("PRINT WIDTH", xint);
-            Add("PRINT SPLIT", xbool);
-            Add("PYTHON EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("R EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j                                    
-            Add("SERIES DYN", xbool);
-            Add("SERIES DYN CHECK", xbool);
-            Add("SERIES FAILSAFE", xbool);
-            Add("SERIES NORMAL PRINT MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
-            Add("SERIES NORMAL CALC MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
-            Add("SERIES NORMAL TABLE MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
-            Add("SERIES ARRAY PRINT MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
-            Add("SERIES ARRAY CALC MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");      //#ljfdssdfgsh
-            Add("SERIES ARRAY TABLE MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
-            Add("SERIES DATA MISSING", xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");            //#ljfdssdfgsh
-            Add("SHEET COLLAPSE", xnameOrString, "avg", "total", "none");         //#kllæksdfgsdg
-            Add("SHEET ENGINE", xnameOrString, "excel", "internal");
-            Add("SHEET FREQ", xnameOrString, "simple", "pretty");
+            Add("PRINT PRT ABS", Globals.xbool);
+            Add("PRINT PRT PCH", Globals.xbool);
+            Add("PRINT WIDTH", Globals.xint);
+            Add("PRINT SPLIT", Globals.xbool);
+            Add("PYTHON EXE FOLDER", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
+            Add("R EXE FOLDER", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j                                    
+            Add("SERIES DYN", Globals.xbool);
+            Add("SERIES DYN CHECK", Globals.xbool);
+            Add("SERIES FAILSAFE", Globals.xbool);
+            Add("SERIES NORMAL PRINT MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
+            Add("SERIES NORMAL CALC MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES NORMAL TABLE MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
+            Add("SERIES ARRAY PRINT MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES ARRAY CALC MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");      //#ljfdssdfgsh
+            Add("SERIES ARRAY TABLE MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
+            Add("SERIES DATA MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");            //#ljfdssdfgsh
+            Add("SHEET COLLAPSE", Globals.xnameOrString, "avg", "total", "none");         //#kllæksdfgsdg
+            Add("SHEET ENGINE", Globals.xnameOrString, "excel", "internal");
+            Add("SHEET FREQ", Globals.xnameOrString, "simple", "pretty");
             {
-                Add("SHEET MULPRT GDIF", xbool);
+                Add("SHEET MULPRT GDIF", Globals.xbool);
                 Alias("SHEET MULPRT GDIFF", "SHEET MULPRT GDIF");
             }
-            Add("SHEET MULPRT ABS", xbool);
-            Add("SHEET MULPRT LEV", xbool);
-            Add("SHEET MULPRT PCH", xbool);
-            Add("SHEET MULPRT V", xbool);            
+            Add("SHEET MULPRT ABS", Globals.xbool);
+            Add("SHEET MULPRT LEV", Globals.xbool);
+            Add("SHEET MULPRT PCH", Globals.xbool);
+            Add("SHEET MULPRT V", Globals.xbool);            
             {
-                Add("SHEET PRT DIF", xbool);
+                Add("SHEET PRT DIF", Globals.xbool);
                 Alias("SHEET PRT DIFF", "SHEET PRT DIF");
             }            
             {
-                Add("SHEET PRT GDIF", xbool);
+                Add("SHEET PRT GDIF", Globals.xbool);
                 Alias("SHEET PRT GDIFF", "SHEET PRT GDIF");
             }
-            Add("SHEET PRT ABS", xbool);
-            Add("SHEET PRT PCH", xbool);
-            Add("SHEET ROWS", xbool);
-            Add("SHEET COLS", xbool);
-            Add("SOLVE DATA CREATE AUTO", xbool);
-            Add("SOLVE DATA IGNOREMISSING", xbool);
-            Add("SOLVE DATA INIT", xbool);
-            Add("SOLVE DATA INIT GROWTH", xbool);
-            Add("SOLVE DATA INIT GROWTH MAX", xval);
-            Add("SOLVE DATA INIT GROWTH MIN", xval);
-            Add("SOLVE FAILSAFE", xbool);
-            Add("SOLVE FORWARD DUMP", xbool);
-            Add("SOLVE FORWARD FAIR CONV", xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
-            Add("SOLVE FORWARD FAIR CONV1 ABS", xval);
-            Add("SOLVE FORWARD FAIR CONV1 REL", xval);
-            Add("SOLVE FORWARD FAIR CONV2 TABS", xval);
-            Add("SOLVE FORWARD FAIR CONV2 TREL", xval);
-            Add("SOLVE FORWARD FAIR DAMP", xval);
-            Add("SOLVE FORWARD FAIR ITERMAX", xint);
-            Add("SOLVE FORWARD FAIR ITERMIN", xint);
-            Add("SOLVE FORWARD NFAIR CONV", xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
-            Add("SOLVE FORWARD NFAIR CONV1 ABS", xval);
-            Add("SOLVE FORWARD NFAIR CONV1 REL", xval);
-            Add("SOLVE FORWARD NFAIR CONV2 TABS", xval);
-            Add("SOLVE FORWARD NFAIR CONV2 TREL", xval);
-            Add("SOLVE FORWARD NFAIR DAMP", xval);
-            Add("SOLVE FORWARD NFAIR ITERMAX", xint);
-            Add("SOLVE FORWARD NFAIR ITERMIN", xint);
-            Add("SOLVE FORWARD NFAIR UPDATEFREQ", xint);
-            Add("SOLVE FORWARD STACKED HORIZON", xint);
-            Add("SOLVE FORWARD METHOD", xnameOrString, "stacked", "fair", "nfair", "none");
-            Add("SOLVE FORWARD TERMINAL", xnameOrString, "exo", "const", "growth");
-            Add("SOLVE FORWARD TERMINAL FEED", xnameOrString, "internal", "external");
-            Add("SOLVE GAUSS CONV", xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
-            Add("SOLVE GAUSS CONV IGNOREVARS", xbool);
-            Add("SOLVE GAUSS CONV1 ABS", xval);
-            Add("SOLVE GAUSS CONV1 REL", xval);
-            Add("SOLVE GAUSS CONV2 TABS", xval);
-            Add("SOLVE GAUSS CONV2 TREL", xval);
-            Add("SOLVE GAUSS DAMP", xval);
-            Add("SOLVE GAUSS DUMP", xbool);
-            Add("SOLVE GAUSS ITERMAX", xint);
-            Add("SOLVE GAUSS ITERMIN", xint);
-            Add("SOLVE GAUSS REORDER", xbool);
-            Add("SOLVE METHOD", xnameOrString, "newton", "gauss");
-            Add("SOLVE NEWTON BACKTRACK", xbool);
-            Add("SOLVE NEWTON CONV ABS", xval);
-            Add("SOLVE NEWTON INVERT", xnameOrString, "lu", "iter");
-            Add("SOLVE NEWTON ROBUST", xbool);
-            Add("SOLVE NEWTON ITERMAX", xint);
-            Add("SOLVE NEWTON UPDATEFREQ", xint);
-            Add("SOLVE PRINT DETAILS", xbool);
-            Add("SOLVE PRINT ITER", xbool);
-            Add("SOLVE STATIC", xbool);
-            Add("STRING INTERPOLATE FORMAT VAL", xstring);
-            Add("SYSTEM CODE SPLIT", xint);
-            Add("SYSTEM CLONE", xbool);
-            Add("TABLE DECIMALSEPARATOR", xnameOrString, "period", "comma");                  //#kljsdfasfdlkj
-            Add("TABLE HTML DATAWIDTH", xval);
-            Add("TABLE HTML FIRSTCOLWIDTH", xval);
-            Add("TABLE HTML FONT", xnameOrString);
-            Add("TABLE HTML FONTSIZE", xval);
-            Add("TABLE HTML SECONDCOLWIDTH", xval);
-            Add("TABLE HTML SPECIALMINUS", xbool);
-            Add("TABLE IGNOREMISSINGVARS", xbool);
-            Add("TABLE MDATEFORMAT", xstring);
-            Add("TABLE STAMP", xbool);
-            Add("TABLE THOUSANDSSEPARATOR", xbool);
-            Add("TABLE TYPE", xnameOrString, "txt", "html");
-            Add("TIMEFILTER", xbool);
-            Add("TIMEFILTER TYPE", xnameOrString, "hide", "avg");
+            Add("SHEET PRT ABS", Globals.xbool);
+            Add("SHEET PRT PCH", Globals.xbool);
+            Add("SHEET ROWS", Globals.xbool);
+            Add("SHEET COLS", Globals.xbool);
+            Add("SOLVE DATA CREATE AUTO", Globals.xbool);
+            Add("SOLVE DATA IGNOREMISSING", Globals.xbool);
+            Add("SOLVE DATA INIT", Globals.xbool);
+            Add("SOLVE DATA INIT GROWTH", Globals.xbool);
+            Add("SOLVE DATA INIT GROWTH MAX", Globals.xval);
+            Add("SOLVE DATA INIT GROWTH MIN", Globals.xval);
+            Add("SOLVE FAILSAFE", Globals.xbool);
+            Add("SOLVE FORWARD DUMP", Globals.xbool);
+            Add("SOLVE FORWARD FAIR CONV", Globals.xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE FORWARD FAIR CONV1 ABS", Globals.xval);
+            Add("SOLVE FORWARD FAIR CONV1 REL", Globals.xval);
+            Add("SOLVE FORWARD FAIR CONV2 TABS", Globals.xval);
+            Add("SOLVE FORWARD FAIR CONV2 TREL", Globals.xval);
+            Add("SOLVE FORWARD FAIR DAMP", Globals.xval);
+            Add("SOLVE FORWARD FAIR ITERMAX", Globals.xint);
+            Add("SOLVE FORWARD FAIR ITERMIN", Globals.xint);
+            Add("SOLVE FORWARD NFAIR CONV", Globals.xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE FORWARD NFAIR CONV1 ABS", Globals.xval);
+            Add("SOLVE FORWARD NFAIR CONV1 REL", Globals.xval);
+            Add("SOLVE FORWARD NFAIR CONV2 TABS", Globals.xval);
+            Add("SOLVE FORWARD NFAIR CONV2 TREL", Globals.xval);
+            Add("SOLVE FORWARD NFAIR DAMP", Globals.xval);
+            Add("SOLVE FORWARD NFAIR ITERMAX", Globals.xint);
+            Add("SOLVE FORWARD NFAIR ITERMIN", Globals.xint);
+            Add("SOLVE FORWARD NFAIR UPDATEFREQ", Globals.xint);
+            Add("SOLVE FORWARD STACKED HORIZON", Globals.xint);
+            Add("SOLVE FORWARD METHOD", Globals.xnameOrString, "stacked", "fair", "nfair", "none");
+            Add("SOLVE FORWARD TERMINAL", Globals.xnameOrString, "exo", "const", "growth");
+            Add("SOLVE FORWARD TERMINAL FEED", Globals.xnameOrString, "internal", "external");
+            Add("SOLVE GAUSS CONV", Globals.xnameOrString, "conv1", "conv2");   //#fxlsjffhsdks
+            Add("SOLVE GAUSS CONV IGNOREVARS", Globals.xbool);
+            Add("SOLVE GAUSS CONV1 ABS", Globals.xval);
+            Add("SOLVE GAUSS CONV1 REL", Globals.xval);
+            Add("SOLVE GAUSS CONV2 TABS", Globals.xval);
+            Add("SOLVE GAUSS CONV2 TREL", Globals.xval);
+            Add("SOLVE GAUSS DAMP", Globals.xval);
+            Add("SOLVE GAUSS DUMP", Globals.xbool);
+            Add("SOLVE GAUSS ITERMAX", Globals.xint);
+            Add("SOLVE GAUSS ITERMIN", Globals.xint);
+            Add("SOLVE GAUSS REORDER", Globals.xbool);
+            Add("SOLVE METHOD", Globals.xnameOrString, "newton", "gauss");
+            Add("SOLVE NEWTON BACKTRACK", Globals.xbool);
+            Add("SOLVE NEWTON CONV ABS", Globals.xval);
+            Add("SOLVE NEWTON INVERT", Globals.xnameOrString, "lu", "iter");
+            Add("SOLVE NEWTON ROBUST", Globals.xbool);
+            Add("SOLVE NEWTON ITERMAX", Globals.xint);
+            Add("SOLVE NEWTON UPDATEFREQ", Globals.xint);
+            Add("SOLVE PRINT DETAILS", Globals.xbool);
+            Add("SOLVE PRINT ITER", Globals.xbool);
+            Add("SOLVE STATIC", Globals.xbool);
+            Add("STRING INTERPOLATE FORMAT VAL", Globals.xstring);
+            Add("SYSTEM CODE SPLIT", Globals.xint);
+            Add("SYSTEM CLONE", Globals.xbool);
+            Add("TABLE DECIMALSEPARATOR", Globals.xnameOrString, "period", "comma");                  //#kljsdfasfdlkj
+            Add("TABLE HTML DATAWIDTH", Globals.xval);
+            Add("TABLE HTML FIRSTCOLWIDTH", Globals.xval);
+            Add("TABLE HTML FONT", Globals.xnameOrString);
+            Add("TABLE HTML FONTSIZE", Globals.xval);
+            Add("TABLE HTML SECONDCOLWIDTH", Globals.xval);
+            Add("TABLE HTML SPECIALMINUS", Globals.xbool);
+            Add("TABLE IGNOREMISSINGVARS", Globals.xbool);
+            Add("TABLE MDATEFORMAT", Globals.xstring);
+            Add("TABLE STAMP", Globals.xbool);
+            Add("TABLE THOUSANDSSEPARATOR", Globals.xbool);
+            Add("TABLE TYPE", Globals.xnameOrString, "txt", "html");
+            Add("TIMEFILTER", Globals.xbool);
+            Add("TIMEFILTER TYPE", Globals.xnameOrString, "hide", "avg");
 
             //sort by the first string
             rv.Sort((x, y) => String.Compare(x.FirstOrDefault(), y.FirstOrDefault()));
@@ -828,6 +817,8 @@ namespace Gekko
 
             foreach (List<string> ss in Globals.listSyntax)
             {
+                if (ss[0].StartsWith("bugfix ")) continue;  //do not intellisense "option bugfix ..." options.
+
                 string[] words2 = ss[0].Split(' ');
 
                 //if we are typing "OPTION folder ", just after this blank, we have that 
@@ -859,8 +850,51 @@ namespace Gekko
                     if (!hasSeenEqual && !rv.Contains("=")) rv.Add("=");
                     if (ss.Count <= 2)
                     {
-                        string w = ss[1];  //the type                    
-                        if (!rv.Contains(w)) rv.Add(w);
+                        string w = ss[1];  //the type           
+                        string desc = null;
+
+                        if (w == Globals.xbool)
+                        {
+                            desc = "[yes | no]";
+                        }
+                        else if (w == Globals.xstring)
+                        {
+                            desc = "[string]";
+                        }
+                        else if (w == Globals.xint)
+                        {
+                            desc = "[integer]";  //will fail if < 0
+                        }
+                        else if (w == Globals.xval)
+                        {
+                            desc = "[value]";
+                        }
+                        else if (w == Globals.xval2String)
+                        {
+                            desc = "[value]";
+                        }
+                        else if (w == Globals.xnameOrString)
+                        {
+                            desc = "[name | string]";
+                        }
+                        else if (w == Globals.xnameOrStringOrFilename)
+                        {
+                            desc = "[filename]";
+                        }
+                        else if (w == Globals.xnameOrString2Freq)
+                        {
+                            desc = "[frequency]";
+                        }
+                        else if (w == Globals.xoptionSeriesMissing)
+                        {
+                            desc = "[missing options]";
+                        }
+                        else if (w == Globals.xsint)
+                        {
+                            desc = "[integer]";
+                        }                       
+
+                        if (!rv.Contains(w)) rv.Add(desc);
                     }
                     else
                     {
@@ -886,7 +920,8 @@ namespace Gekko
 
         public void Write(string optionName5)
         {
-            string optionName = optionName5.Replace("Program.options.", "");
+            string optionName = null;
+            if (optionName5 != null) optionName = optionName5.Replace("Program.options.", "");
             //G.Writeln();
             //G.writeln("------------------------------------------------------");
             Type type = typeof(Options); // Get type pointer
@@ -911,6 +946,9 @@ namespace Gekko
                 }                
                 
                 if (optionName != null && name != optionName) continue;
+
+                if (optionName == null && name.StartsWith("bugfix_")) continue;  //do not show bugfix options in list
+
                 line += "option ";
                 name = name.Replace("_", " ");
                 object temp = field.GetValue(this); // Get value
@@ -1001,6 +1039,7 @@ namespace Gekko
                 }
                 Program.LinkContainer lc = new Program.LinkContainer(sb.ToString());
                 Globals.linkContainer.Add(lc.counter, lc);
+                G.Writeln();
                 G.Write("Advice on finding and setting options ");
                 G.WriteLink("here", "outputtab:" + lc.counter); G.Writeln(".");
             }

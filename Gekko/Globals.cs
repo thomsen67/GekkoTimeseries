@@ -429,11 +429,23 @@ namespace Gekko
         public static PackSim packSim = null;
 
         public static bool newOption = true;
+        // ----
+        public static string xbool = "bool";
+        public static string xstring = "string";
+        public static string xint = "int"; // >= 0
+        public static string xval = "val";
+        public static string xval2String = "val2String";
+        public static string xnameOrString = "nameOrString";
+        public static string xnameOrString2Freq = "nameOrString2Freq";
+        public static string xnameOrStringOrFilename = "nameOrStringOrFilename";
+        public static string xoptionSeriesMissing = "optionSeriesMissing";
+        public static string xsint = "sint";  //signed int            
+        // ----
         public static List<List<string>> listSyntaxAlias = new List<List<string>>();
         public static List<List<string>> listSyntax = Options.Syntax();  //this is created once and for all and is used for the entire Gekko session (not redone in RESET/RESTART)
         
         public static bool patch_zvar = true;
-
+        
         //public const string symbolTurtle = "¤";
         public const string symbolTurtle = "___";
 

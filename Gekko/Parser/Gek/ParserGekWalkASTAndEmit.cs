@@ -4938,7 +4938,7 @@ namespace Gekko.Parser.Gek
                             {
                                 if (node[0].Text == "?")
                                 {
-                                    node.Code.A("Program.PrintOptions(``);");
+                                    node.Code.A("Program.PrintOptions(null);");
                                 }
                                 else
                                 {
@@ -6621,56 +6621,56 @@ namespace Gekko.Parser.Gek
 
             if (rv == null || rv[1] == null)
             {
-                G.Writeln("*** ERROR: Option type problem");
+                G.Writeln2("*** ERROR: OPTION " + ss7 + " = ... does not exist");
                 throw new GekkoException();
             }
 
             if (!isBlock && rv[0] == "series dyn")
             {
-                G.Writeln("*** ERROR: You cannot use 'option series dyn ...', use 'block series dyn ...' instead.");
+                G.Writeln2("*** ERROR: You cannot use 'option series dyn ...', use 'block series dyn ...' instead.");
                 throw new GekkoException();
             }
 
             string type = rv[1];
             string f = "(";
 
-            if (type == "bool")
+            if (type == Globals.xbool)
             {
                 f = "O.XBool(";
             }
-            else if (type == "string")
+            else if (type == Globals.xstring)
             {
                 f = "O.XString(";
             }
-            else if (type == "int")
+            else if (type == Globals.xint)
             {
                 f = "O.XInt(";
             }
-            else if (type == "val")
+            else if (type == Globals.xval)
             {
                 f = "O.XVal(";
             }
-            else if (type == "val2String")
+            else if (type == Globals.xval2String)
             {
                 f = "O.XVal2String(";
             }
-            else if (type == "nameOrString")
+            else if (type == Globals.xnameOrString)
             {
                 f = "O.XNameOrString(";
             }
-            else if (type == "nameOrString2Freq")
+            else if (type == Globals.xnameOrString2Freq)
             {
                 f = "O.XNameOrString2Freq(";
             }
-            else if (type == "nameOrStringOrFilename")
+            else if (type == Globals.xnameOrStringOrFilename)
             {
                 f = "O.XNameOrStringOrFilename(";
             }
-            else if (type == "optionSeriesMissing")
+            else if (type == Globals.xoptionSeriesMissing)
             {
                 f = "O.XOptionSeriesMissing(";
             }
-            else if (type == "sint")
+            else if (type == Globals.xsint)
             {
                 f = "O.XSint(";
             }
