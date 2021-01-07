@@ -881,12 +881,13 @@ namespace Gekko
 
         public void Write()
         {
-            Write("Program.options");
+            Write(null);
         }
 
-        public void Write(string path)
+        public void Write(string optionName5)
         {
-            G.Writeln();
+            string optionName = optionName5.Replace("Program.options.", "");
+            //G.Writeln();
             //G.writeln("------------------------------------------------------");
             Type type = typeof(Options); // Get type pointer
             FieldInfo[] fields = type.GetFields(); // Obtain all fields
@@ -907,10 +908,9 @@ namespace Gekko
                 if (name == "series_dyn")
                 {
                     continue;  //do not show this as an option
-                }
-                string longName = "Program_options_" + name;
-                string path2 = path.Replace(".", "_");
-                if (!longName.Contains(path2)) continue;
+                }                
+                
+                if (optionName != null && name != optionName) continue;
                 line += "option ";
                 name = name.Replace("_", " ");
                 object temp = field.GetValue(this); // Get value
@@ -922,7 +922,7 @@ namespace Gekko
                 else if (temp is string) // See if it is a string.
                 {
                     string value = temp as string;
-                    if (value == "") value = "{''}";
+                    if (value == "") value = "''";
                     line += name + " = " + value + ";";
                 }
                 else if (temp is bool) // See if it is a string.
@@ -942,12 +942,8 @@ namespace Gekko
                 else if (temp is EFreq) // See if it is a freq.
                 {
                     EFreq value = (EFreq)temp;
-                    string s = "???";
-                    if (value == EFreq.A) s = "a";
-                    else if (value == EFreq.Q) s = "q";
-                    else if (value == EFreq.M) s = "m";
-                    else if (value == EFreq.U) s = "u";
-                    line += name + " = " + s + ";";
+                    string d = G.GetFreq(value);
+                    line += name + " = " + d + ";";
                 }
                 else if (temp is ESeriesMissing)
                 {
@@ -965,13 +961,14 @@ namespace Gekko
             }
 
             lines.Sort(StringComparer.InvariantCulture);
+
+            G.Writeln();
             foreach (string s in lines)
             {       
                 G.Writeln(s);
-            }
-            G.Writeln();            
+            }            
 
-            if (path == "")
+            if (optionName == null)
             {
                 StringBuilder sb = new StringBuilder();
                 if (true)
