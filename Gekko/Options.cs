@@ -277,6 +277,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Linq;
 
 namespace Gekko
 {
@@ -390,8 +391,7 @@ namespace Gekko
         // ---
         public string python_exe_folder = "";  //there will probably be more Python options later on
         // ---
-        public string r_exe_folder = "";  //there will probably be more R options later on
-        public string r_exe_path = "";  //old name, delete at some point in 3.3.x series       
+        public string r_exe_folder = "";  //there will probably be more R options later on        
         // ---
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
@@ -550,23 +550,24 @@ namespace Gekko
 
             }
 
+            void Alias(string s1, string s2)
+            {
+                Globals.listSyntaxAlias.Add(new List<string>() { s1.ToLower().Trim(), s2.ToLower().Trim() });
+            }
+
             //NOTE: the first string is written like this:
             // + capitals (only so it is easier to see visually)
-            // + 1 blank to separate idents
-            // + (..|..) for synonym, first one is used
+            // + 1 blank to separate idents            
             // + type can be: "", "", "", "", "", ""
             // option folder <enter> suggests = , but after =, there is bool but also other options.
             //option? check question at all places, implement
             //for int, check that -1 is ok, for instance PRINT DISP MAXLINES = -1
-            //SOLVE DATA INIT GROWTH MIN = -0.02 
-            //PRINT MULPRT (GDIF|GDIFF)
-            // 
-
+            
+            //GO THROUGH EACH OPTION ONE BY ONE!!                        
+            
             Add("BUGFIX IMPORT EXPORT", xbool);
-            Add("BUGFIX GBK", xbool);
             Add("BUGFIX MISSING", xbool);
-            Add("DATABANK COMPARE TABS", xval);
-            Add("DATABANK COMPARE TREL", xval);
+
             Add("DATABANK CREATE AUTO", xbool);
             Add("DATABANK FILE COPYLOCAL", xbool);
             Add("DATABANK FILE GBK COMPRESS", xbool);            
@@ -645,7 +646,7 @@ namespace Gekko
             Add("PRINT FILEWIDTH", xint);
             {
                 Add("PRINT MULPRT GDIF", xbool);
-                Add("PRINT MULPRT GDIFF", xbool);
+                Alias("PRINT MULPRT GDIFF", "PRINT MULPRT GDIF");
             }
             Add("PRINT MULPRT ABS", xbool);
             Add("PRINT MULPRT LEV", xbool);
@@ -653,20 +654,18 @@ namespace Gekko
             Add("PRINT MULPRT V", xbool);
             {
                 Add("PRINT PRT DIF", xbool);
-                Add("PRINT PRT DIFF", xbool);
+                Alias("PRINT PRT DIFF", "PRINT PRT DIF");
             }
             {
                 Add("PRINT PRT GDIF", xbool);
-                Add("PRINT PRT GDIFF", xbool);
+                Alias("PRINT PRT GDIFF", "PRINT PRT GDIF");
             }
             Add("PRINT PRT ABS", xbool);
             Add("PRINT PRT PCH", xbool);
             Add("PRINT WIDTH", xint);
             Add("PRINT SPLIT", xbool);
             Add("PYTHON EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("R EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j            
-            Add("SERIES ARRAY IGNOREMISSING", xbool);
-            Add("SERIES DATA IGNOREMISSING", xbool);
+            Add("R EXE FOLDER", xnameOrStringOrFilename); //cf. #jsadklgasj4j                                    
             Add("SERIES DYN", xbool);
             Add("SERIES DYN CHECK", xbool);
             Add("SERIES FAILSAFE", xbool);
@@ -682,7 +681,7 @@ namespace Gekko
             Add("SHEET FREQ", xnameOrString, "simple", "pretty");
             {
                 Add("SHEET MULPRT GDIF", xbool);
-                Add("SHEET MULPRT GDIFF", xbool);
+                Alias("SHEET MULPRT GDIFF", "SHEET MULPRT GDIF");
             }
             Add("SHEET MULPRT ABS", xbool);
             Add("SHEET MULPRT LEV", xbool);
@@ -690,11 +689,11 @@ namespace Gekko
             Add("SHEET MULPRT V", xbool);            
             {
                 Add("SHEET PRT DIF", xbool);
-                Add("SHEET PRT DIFF", xbool);
+                Alias("SHEET PRT DIFF", "SHEET PRT DIF");
             }            
             {
                 Add("SHEET PRT GDIF", xbool);
-                Add("SHEET PRT GDIFF", xbool);
+                Alias("SHEET PRT GDIFF", "SHEET PRT GDIF");
             }
             Add("SHEET PRT ABS", xbool);
             Add("SHEET PRT PCH", xbool);
@@ -767,6 +766,44 @@ namespace Gekko
             Add("TABLE TYPE", xnameOrString, "txt", "html");
             Add("TIMEFILTER", xbool);
             Add("TIMEFILTER TYPE", xnameOrString, "hide", "avg");
+
+            //sort by the first string
+            rv.Sort((x, y) => String.Compare(x.FirstOrDefault(), y.FirstOrDefault()));
+
+            Type type = typeof(Options); // Get type pointer
+            FieldInfo[] fields = type.GetFields(); // Obtain all fields
+            List<string> lines = new List<string>();
+            foreach (var field in fields) // Loop through fields
+            {
+                string name = field.Name; // Get string name
+                name = name.Replace("_", " ");
+                lines.Add(name);
+            }
+            lines.Sort();
+            
+            int i1 = 0;
+            int i2 = 0;
+            //This is just to check full correspondence between the lines returned and the fields in Options.cs.
+            //When adding or removing options, this is helpful, so that this is kept synchronized.
+            //Options in Options.cs that are undocumented ("hidden") can have the check skipped below.
+            while (true)
+            {
+                string s_handmadeList = rv[i1][0];  //the hand-made list
+                string s_listFromReflection = lines[i2];  //from C# object
+
+                ////These are so we can skip undocumented options (that are not mentioned in help or intellisense, but can still be used for instance to (try) to fix bugs
+                //if (s_listFromReflection == "bugfix import export") { i2++; continue; }                
+                //else if (s_listFromReflection == "bugfix missing") { i2++; continue; }                
+
+                if (s_handmadeList != s_listFromReflection)
+                {
+                    G.Writeln2("*** ERROR: Mismatch regarding options, cf. Options.Syntax()");
+                    throw new GekkoException();
+                }
+                i1++;
+                i2++;
+                if (i1 >= rv.Count && i2 >= lines.Count) break;  //else it will crash, and we will know that something is wrong
+            }
 
             return rv;
 
@@ -856,10 +893,21 @@ namespace Gekko
 
             List<string> lines = new List<string>();
 
+            //TOTO TODO TODO
+            //TOTO TODO TODO
+            //TOTO TODO TODO what about plings in string names? What if they contain blanks?
+            //TOTO TODO TODO
+            //TOTO TODO TODO
+
+            bool solveOptionSkipped = false;
             foreach (var field in fields) // Loop through fields
             {
                 string line = "";
                 string name = field.Name; // Get string name
+                if (name == "series_dyn")
+                {
+                    continue;  //do not show this as an option
+                }
                 string longName = "Program_options_" + name;
                 string path2 = path.Replace(".", "_");
                 if (!longName.Contains(path2)) continue;
@@ -874,7 +922,7 @@ namespace Gekko
                 else if (temp is string) // See if it is a string.
                 {
                     string value = temp as string;
-                    if (value == "") value = "[empty]";
+                    if (value == "") value = "{''}";
                     line += name + " = " + value + ";";
                 }
                 else if (temp is bool) // See if it is a string.
@@ -901,7 +949,7 @@ namespace Gekko
                     else if (value == EFreq.U) s = "u";
                     line += name + " = " + s + ";";
                 }
-                else if (temp is ESeriesMissing) 
+                else if (temp is ESeriesMissing)
                 {
                     ESeriesMissing value = (ESeriesMissing)temp;
                     string s = value.ToString().ToLower();
@@ -911,29 +959,19 @@ namespace Gekko
                 {
                     line += name + " = ???;";
                 }
-                if (G.Equal(Program.options.interface_mode, "data") && line.StartsWith("option solve ", StringComparison.OrdinalIgnoreCase))
-                {
-                    //do nothing
-                }
-                else
-                {
-                    lines.Add(line);
-                }
+
+                lines.Add(line);
+
             }
 
             lines.Sort(StringComparer.InvariantCulture);
             foreach (string s in lines)
-            {
-                if (s.Contains("option r exe path")) continue; //renamed to folder
+            {       
                 G.Writeln(s);
             }
-            G.Writeln();
-            if (G.Equal(Program.options.interface_mode, "data"))
-            {
-                G.Writeln("+++ NOTE: option solve... are not listed in data-mode");
-            }
+            G.Writeln();            
 
-            if (path == "Program.options")
+            if (path == "")
             {
                 StringBuilder sb = new StringBuilder();
                 if (true)

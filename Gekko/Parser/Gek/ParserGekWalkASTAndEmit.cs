@@ -4936,11 +4936,18 @@ namespace Gekko.Parser.Gek
                         {
                             if (Globals.newOption)
                             {
-                                Tuple<string, string> tup = HandleOptionAndBlock(node, false);
-
-                                node.Code.A(tup.Item1 + " = " + tup.Item2 + ";" + G.NL);
-                                //TODO: print out
-                                //node.Code.A("G.Writeln2(`" + ss7 + "`);");
+                                if (node[0].Text == "?")
+                                {
+                                    node.Code.A("Program.PrintOptions(``);");
+                                }
+                                else
+                                {
+                                    Tuple<string, string> tup = HandleOptionAndBlock(node, false);
+                                    node.Code.A(tup.Item1 + " = " + tup.Item2 + ";" + G.NL);
+                                    node.Code.A("Program.PrintOptions(`" + tup.Item1 + "`);");
+                                    //TODO: print out
+                                    //node.Code.A("G.Writeln2(`" + ss7 + "`);");
+                                }
                             }
                             else
                             {
@@ -6586,11 +6593,20 @@ namespace Gekko.Parser.Gek
             for (int i = 0; i < node.ChildrenCount() - 1; i++)
             {
                 if (!first) ss7 += " ";
-                string s = null;
-                if (node[i].ChildrenCount() == 0) s = node[i].Text.ToLower();  //the specially treated tokens, cf. #jsadklgasj4j
-                else s = node[i][0].Text.ToLower();
+                string s = null;                
+                s = node[i][0].Text.ToLower();
                 ss7 += s;
                 first = false;
+            }
+
+            //the list is short, ok to not use a Dictionary here
+            foreach (List<string> ss in Globals.listSyntaxAlias)
+            {                
+                if (ss[0] == ss7)
+                {
+                    ss7 = ss[1];
+                    break;
+                }
             }
 
             List<string> rv = null;
@@ -6606,6 +6622,12 @@ namespace Gekko.Parser.Gek
             if (rv == null || rv[1] == null)
             {
                 G.Writeln("*** ERROR: Option type problem");
+                throw new GekkoException();
+            }
+
+            if (!isBlock && rv[0] == "series dyn")
+            {
+                G.Writeln("*** ERROR: You cannot use 'option series dyn ...', use 'block series dyn ...' instead.");
                 throw new GekkoException();
             }
 
@@ -6721,23 +6743,11 @@ namespace Gekko.Parser.Gek
             aa2 = G.GetListWithCommas(args.GetRange(2, args.Count - 2));
             if (args.Count - 2 > 0) aa2 = ", " + aa2;
         }
-
-        //private static void FunctionHelper3(ASTNode node, int lagIndex, int lagIndexOffset, List<string> args, int i)
-        //{            
-        //    args.Add(node[i].Code.ToString());
-        //    //args += ", " + node[i].Code;
-        //}
-
+        
         private static void FunctionHelper2(ASTNode node, List<string> args, int i)
-        {
-            
+        {            
                 string result = GetFuncArgumentCode(node, i);
-                args.Add(result);
-                //args += ", " + result;
-            
-            
-
-            //return args;
+                args.Add(result);                
         }
 
         private static void FunctionHelper4(ASTNode node, string functionName, ASTNode child)

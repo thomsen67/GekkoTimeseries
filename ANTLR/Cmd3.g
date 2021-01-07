@@ -3090,8 +3090,8 @@ block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({tok
 
 blockOpt1:                  blockOpt1h (COMMA2 blockOpt1h)* -> blockOpt1h+;
 
-blockOpt1h:                 SERIES DYN '='? yesNoSimple -> ^(ASTBLOCKOPTION SERIES DYN ^(ASTBOOL yesNoSimple))
-						  | TIME dates -> ^(ASTDATES_BLOCK dates?)
+blockOpt1h:              //   SERIES DYN '='? yesNoSimple -> ^(ASTBLOCKOPTION SERIES DYN ^(ASTBOOL yesNoSimple))
+						    TIME dates -> ^(ASTDATES_BLOCK dates?)
 						  | optionType1 -> ^(ASTBLOCKOPTION optionType1)
 						  | optionType2 -> ^(ASTBLOCKOPTION optionType2)
 							;
@@ -3236,6 +3236,7 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 
 option:                     OPTION optionType1 -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType1)
                           | OPTION optionType2 -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType2)
+						  | OPTION question -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} question)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3910,33 +3911,57 @@ optionType1:   //These catch unquoted filenames. Because of parser problems, thi
 			   //would look like filenames.
 			   //In the long term (Gekko 4.0, it is perhaps best to make EQUAL ('=') mandatory).
                //See also #jsadklgasj4j
+			   /*
 			   DATABANK FILE GBK INTERNAL EQUAL? fileName ->  DATABANK FILE GBK INTERNAL fileName
-             | FOLDER BANK           EQUAL? fileName ->  FOLDER BANK fileName
-             | FOLDER BANK1          EQUAL? fileName ->  FOLDER BANK1 fileName
-             | FOLDER BANK2          EQUAL? fileName ->  FOLDER BANK2 fileName
-             | FOLDER COMMAND        EQUAL? fileName ->  FOLDER COMMAND fileName
-             | FOLDER COMMAND1       EQUAL? fileName ->  FOLDER COMMAND1 fileName
-             | FOLDER COMMAND2       EQUAL? fileName ->  FOLDER COMMAND2 fileName
-             | FOLDER HELP           EQUAL? fileName ->  FOLDER HELP fileName
-             | FOLDER MENU           EQUAL? fileName ->  FOLDER MENU fileName
-             | FOLDER MODEL          EQUAL? fileName ->  FOLDER MODEL fileName
-             | FOLDER PIPE           EQUAL? fileName ->  FOLDER PIPE fileName
-             | FOLDER TABLE          EQUAL? fileName ->  FOLDER TABLE fileName
-             | FOLDER TABLE1         EQUAL? fileName ->  FOLDER TABLE1 fileName
-             | FOLDER TABLE2         EQUAL? fileName ->  FOLDER TABLE2 fileName
-             | FOLDER WORKING        EQUAL? fileName ->  FOLDER WORKING fileName
-             | GAMS EXE FOLDER       EQUAL? fileName ->  GAMS EXE FOLDER fileName
-             | INTERFACE REMOTE FILE EQUAL? fileName ->  INTERFACE REMOTE FILE fileName
-             | MENU STARTFILE        EQUAL? fileName ->  MENU STARTFILE fileName
-             | PLOT USING            EQUAL? fileName ->  PLOT USING fileName
-             | PYTHON EXE FOLDER     EQUAL? fileName ->  PYTHON EXE FOLDER fileName
-             | R EXE FOLDER          EQUAL? fileName ->  R EXE FOLDER fileName			 
+             | FOLDER BANK           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER BANK fileName)
+             | FOLDER BANK1          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER BANK1 fileName)
+             | FOLDER BANK2          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER BANK2 fileName)
+             | FOLDER COMMAND        EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER COMMAND fileName)
+             | FOLDER COMMAND1       EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER COMMAND1 fileName)
+             | FOLDER COMMAND2       EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER COMMAND2 fileName)
+             | FOLDER HELP           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER HELP fileName)
+             | FOLDER MENU           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER MENU fileName)
+             | FOLDER MODEL          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER MODEL fileName)
+             | FOLDER PIPE           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER PIPE fileName)
+             | FOLDER TABLE          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER TABLE fileName)
+             | FOLDER TABLE1         EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER TABLE1 fileName)
+             | FOLDER TABLE2         EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER TABLE2 fileName)
+             | FOLDER WORKING        EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER WORKING fileName)
+             | GAMS EXE FOLDER       EQUAL? fileName ->  ^(ASTPLACEHOLDER GAMS EXE FOLDER fileName)
+             | INTERFACE REMOTE FILE EQUAL? fileName ->  ^(ASTPLACEHOLDER INTERFACE REMOTE FILE fileName)
+             | MENU STARTFILE        EQUAL? fileName ->  ^(ASTPLACEHOLDER MENU STARTFILE fileName)
+             | PLOT USING            EQUAL? fileName ->  ^(ASTPLACEHOLDER PLOT USING fileName)
+             | PYTHON EXE FOLDER     EQUAL? fileName ->  ^(ASTPLACEHOLDER PYTHON EXE FOLDER fileName)
+             | R EXE FOLDER          EQUAL? fileName ->  ^(ASTPLACEHOLDER R EXE FOLDER fileName)
 			   ;
+			   */
 
+			                  DATABANK FILE GBK INTERNAL EQUAL? fileName ->  ^(ASTPLACEHOLDER DATABANK) ^(ASTPLACEHOLDER FILE) ^(ASTPLACEHOLDER GBK) ^(ASTPLACEHOLDER INTERNAL) fileName
+             | FOLDER BANK           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER BANK) fileName
+             | FOLDER BANK1          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER BANK1) fileName
+             | FOLDER BANK2          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER BANK2) fileName
+             | FOLDER COMMAND        EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER COMMAND) fileName
+             | FOLDER COMMAND1       EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER COMMAND1) fileName
+             | FOLDER COMMAND2       EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER COMMAND2) fileName
+             | FOLDER HELP           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER HELP) fileName
+             | FOLDER MENU           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER MENU) fileName
+             | FOLDER MODEL          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER MODEL) fileName
+             | FOLDER PIPE           EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER PIPE) fileName
+             | FOLDER TABLE          EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER TABLE) fileName
+             | FOLDER TABLE1         EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER TABLE1) fileName
+             | FOLDER TABLE2         EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER TABLE2) fileName
+             | FOLDER WORKING        EQUAL? fileName ->  ^(ASTPLACEHOLDER FOLDER) ^(ASTPLACEHOLDER WORKING) fileName
+             | GAMS EXE FOLDER       EQUAL? fileName ->  ^(ASTPLACEHOLDER GAMS) ^(ASTPLACEHOLDER EXE) ^(ASTPLACEHOLDER FOLDER) fileName
+             | INTERFACE REMOTE FILE EQUAL? fileName ->  ^(ASTPLACEHOLDER INTERFACE) ^(ASTPLACEHOLDER REMOTE) ^(ASTPLACEHOLDER FILE) fileName
+             | MENU STARTFILE        EQUAL? fileName ->  ^(ASTPLACEHOLDER MENU) ^(ASTPLACEHOLDER STARTFILE) fileName
+             | PLOT USING            EQUAL? fileName ->  ^(ASTPLACEHOLDER PLOT) ^(ASTPLACEHOLDER USING) fileName
+             | PYTHON EXE FOLDER     EQUAL? fileName ->  ^(ASTPLACEHOLDER PYTHON) ^(ASTPLACEHOLDER EXE) ^(ASTPLACEHOLDER FOLDER) fileName
+             | R EXE FOLDER          EQUAL? fileName ->  ^(ASTPLACEHOLDER R) ^(ASTPLACEHOLDER EXE) ^(ASTPLACEHOLDER FOLDER) fileName
+			 ;
 optionType2:                
                             ident+ EQUAL? name -> ident+ name
                           | ident+ EQUAL? expression -> ident+ expression						  
-						    ; 
+						    ;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical END -------------------------------------------------------------------------------

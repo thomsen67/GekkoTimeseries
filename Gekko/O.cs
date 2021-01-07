@@ -528,16 +528,16 @@ namespace Gekko
         public static int XInt(IVariable x)
         {
             int x_int = O.ConvertToInt(x);
-            return x_int;
-        }
-
-        public static int XSint(IVariable x)
-        {
-            int x_int = XInt(x);
             if (x_int < 0)
             {
                 G.Writeln2("*** ERROR: Expected integer >= 0, not " + x_int);
             }
+            return x_int;
+        }
+
+        public static int XSint(IVariable x)  //signed int
+        {
+            int x_int = O.ConvertToInt(x);            
             return x_int;
         }
 

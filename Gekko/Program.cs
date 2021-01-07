@@ -11104,15 +11104,7 @@ namespace Gekko
         }
 
         public static void RunR(Gekko.O.R_run o)
-        {
-            //This is just a rename, can be remove at some point in the future
-            if (Program.options.r_exe_folder == null || Program.options.r_exe_folder == "")
-            {
-                if (Program.options.r_exe_path != null && Program.options.r_exe_path != "")
-                {
-                    Program.options.r_exe_folder = Program.options.r_exe_path;
-                }
-            }
+        {           
 
             string RFileName = Globals.localTempFilesLocation + "\\tempRFile.r";
             string RExportFileName = Globals.localTempFilesLocation + "\\tempR2Gekko.txt";
@@ -11214,8 +11206,8 @@ namespace Gekko
 
             if (RPathUsedHere == "[[RDetectFailed]]")
             {
-                G.Writeln2("*** ERROR: R.exe path could not be auto-detected.");
-                G.Writeln("           Please state the R.exe path manually with OPTION r exe folder = ...");
+                G.Writeln2("*** ERROR: R.exe folder could not be auto-detected.");
+                G.Writeln("           Please state the R.exe folder manually with OPTION r exe folder = ...");
                 throw new GekkoException();
             }
 
