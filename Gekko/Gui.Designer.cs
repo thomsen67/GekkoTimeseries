@@ -1732,14 +1732,18 @@ namespace Gekko
 
                 // Find the position of the caret
                 Point point = this.textBox2.GetPositionFromCharIndex(textBox2.SelectionStart);
-                point.Y += (int)Math.Ceiling(this.textBox2.Font.GetHeight()) + 2 + 2;
-                point.X += 2; // for Courier, may need a better method
-                Point location = this.textBox2.PointToScreen(Point.Empty);
-                Globals.windowIntellisense.VerticalOffset = point.Y + location.Y;
-                Globals.windowIntellisense.HorizontalOffset = point.X + location.X;
+                Point pp = this.textBox2.PointToScreen(point);                
+                double xx = double.NaN;
+                double yy = double.NaN;
+                int ixx = 0;
+                int iyy = 0;
+                TransformFromPixels(out xx, out yy, pp.X + 10, pp.Y);  //+ 10: else too close. We need to convert because we are mixing Winforms and WPF
+                Globals.windowIntellisense.VerticalOffset = yy;
+                Globals.windowIntellisense.HorizontalOffset = xx;
                 Globals.windowIntellisense.IsOpen = true;
                 Globals.windowIntellisense.listBox1.SelectedIndex = 0;
-                Globals.windowIntellisense.listBox1.ScrollIntoView(Globals.windowIntellisense.listBox1.SelectedItem);
+                Globals.windowIntellisense.listBox1.ScrollIntoView(Globals.windowIntellisense.listBox1.SelectedItem);                                                                                      
+
             }
         }
 
