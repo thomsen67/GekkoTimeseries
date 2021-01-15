@@ -405,13 +405,12 @@
     <Compile Include="Table.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Timer.cs" />
-    <Compile Include="Translators.cs" />
-    <Compile Include="Translator_AREMOS_Gekko30.cs" />
-    <Compile Include="TspUtilitiesDataGui.cs">
+    <Compile Include="Translate.cs" />
+    <Compile Include="GuiTspUtilitiesData.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TspUtilitiesDataGui.Designer.cs">
-      <DependentUpon>TspUtilitiesDataGui.cs</DependentUpon>
+    <Compile Include="GuiTspUtilitiesData.Designer.cs">
+      <DependentUpon>GuiTspUtilitiesData.cs</DependentUpon>
     </Compile>
     <Compile Include="G.cs" />
     <Compile Include="Globals.cs" />
@@ -422,9 +421,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TspUtilitiesDataGui.resx">
+    <EmbeddedResource Include="GuiTspUtilitiesData.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>TspUtilitiesDataGui.cs</DependentUpon>
+      <DependentUpon>GuiTspUtilitiesData.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Graph.resx">
       <SubType>Designer</SubType>
@@ -435,9 +434,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="TspUtilitiesGui.resx">
+    <EmbeddedResource Include="GuiTspUtilities.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>TspUtilitiesGui.cs</DependentUpon>
+      <DependentUpon>GuiTspUtilities.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -459,11 +458,11 @@
     <Compile Include="StringTokenizer2.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TspUtilities.cs" />
-    <Compile Include="TspUtilitiesGui.cs">
+    <Compile Include="GuiTspUtilities.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TspUtilitiesGui.Designer.cs">
-      <DependentUpon>TspUtilitiesGui.cs</DependentUpon>
+    <Compile Include="GuiTspUtilities.Designer.cs">
+      <DependentUpon>GuiTspUtilities.cs</DependentUpon>
     </Compile>
     <Compile Include="UserSettings.cs" />
     <Compile Include="WindowDecomp.xaml.cs">
