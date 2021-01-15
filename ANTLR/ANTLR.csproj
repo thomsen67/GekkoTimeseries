@@ -136,16 +136,10 @@
     <Compile Include="ModelParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="T1Lexer.cs" />
-    <Compile Include="T1Parser.cs" />
-    <Compile Include="T2Lexer.cs" />
-    <Compile Include="T2Parser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cmd3.g" />
     <None Include="Model.g" />
-    <None Include="T1.g" />
-    <None Include="T2.g" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

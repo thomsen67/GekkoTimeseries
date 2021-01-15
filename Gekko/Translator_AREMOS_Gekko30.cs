@@ -12,6 +12,8 @@ namespace Gekko
         public static GekkoDictionary<string, string> matrixMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+        //This class translates from AREMOS to Gekko 3.0
+
         public static string Translate(string input)
         {
 
@@ -1145,6 +1147,8 @@ namespace Gekko
         //public static GekkoDictionary<string, string> matrixMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         //public static GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         
+        //This class translates from Gekko 2.0 to 3.0
+
         public static string Translate(string input)
         {
             //difference() --> except()

@@ -11329,19 +11329,12 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: The destination file '" + zz + "' already exists:");                    
                     throw new GekkoException();
-                }                
+                }
                 if (G.Equal(opt_gekko18, "yes"))
-                {                    
-                    string ss = Translators.Translate1(true, xxx);
-                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
-                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                    {
-                        sw.Write(ss);
-                        sw.Flush();
-                        sw.Close();
-                    }
-                    G.Writeln2("Translated file into: " + zz);
-                    G.Writeln("Please note that the translated file is 2.0 not 3.0 syntax");
+                {
+                    G.Writeln2("*** ERROR: The translator from Gekko 1.8 to 2.0 is no longer available for Gekko 3.1.x.");
+                    G.Writeln("*** ERROR: Please use Gekko 3.0 or 2.x.x to do this.");
+                    throw new GekkoException();
                 }
                 else if (G.Equal(opt_gekko20, "yes"))
                 {
@@ -11384,32 +11377,17 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_aremos, "yes"))
                 {
-                    if (true)
+                    string ss = Translator_AREMOS_Gekko30.Translate(xx);
+                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
-                        string ss = Translator_AREMOS_Gekko30.Translate(xx);
-                        using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
-                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                        {
-                            sw.Write(ss);
-                            sw.Flush();
-                            sw.Close();
-                        }
-                        G.Writeln2("Translated file into: " + zz);
-                        G.Writeln("Translate comments: see /* TRANSLATE: .... */");
-                        G.Writeln("Note that <dyn> is not automatically set in SERIES (like in the Gekko 2.0 translator).");
+                        sw.Write(ss);
+                        sw.Flush();
+                        sw.Close();
                     }
-                    else
-                    {
-                        string ss = Translator2.Translate2(true, xxx);
-                        using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
-                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                        {
-                            sw.Write(ss);
-                            sw.Flush();
-                            sw.Close();
-                        }
-                        G.Writeln2("Translated file into: " + zz);
-                    }
+                    G.Writeln2("Translated file into: " + zz);
+                    G.Writeln("Translate comments: see /* TRANSLATE: .... */");
+                    G.Writeln("Note that <dyn> is not automatically set in SERIES (like in the Gekko 2.0 translator).");
                 }
                 else
                 {
