@@ -8467,12 +8467,6 @@ namespace Gekko
             }
         }
 
-        public static void PrintOptions(string path)
-        {
-            Program.options.Write(path);
-        }
-
-
         public static void WriteHtml(StringBuilder sb, string s)
         {
             sb.AppendLine("<p>" + s + "</p>");
@@ -19527,13 +19521,10 @@ namespace Gekko
         {
 
             if (s == null)
-            {
-                //s = "I_OVERVIEW";
-                s = "introduction";
-                //G.WriteDirs("large");
+            {                
+                s = Globals.helpStartPage;             
             }
             string s2 = s;
-
             if (!s2.EndsWith(".htm", StringComparison.OrdinalIgnoreCase)) s2 += ".htm";  //called from command line
             List<string> folders = new List<string>();
             if (Program.options.interface_help_copylocal) folders.Add(Globals.localTempFilesLocation + "\\"); //try here first, the file is copied from the path below (helpful if StartupPath is on a network drive)
@@ -35518,8 +35509,7 @@ namespace Gekko
             string pplotType = "emf";
 
             XmlDocument doc = new XmlDocument();
-
-            //Gpt gpt = null;
+                        
             if (o.opt_using != null || Program.options.plot_using != "")
             {
                 XmlDocument doc1 = null;
@@ -37108,15 +37098,7 @@ namespace Gekko
                 }
             }
             return left + ":" + right;
-        }            
-
-        private static string GnuplotHeading(O.Prt o, Gpt gpt)
-        {
-            string heading = null;            
-            try { heading = gpt.title; } catch (NullReferenceException) { };
-            if (o.opt_title != null) heading = o.opt_title;
-            return heading;
-        }
+        }               
 
         private static double ParseIntoDouble(string x)
         {

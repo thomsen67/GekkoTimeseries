@@ -417,7 +417,7 @@ namespace Gekko
         public static StringBuilder errorMemory = null;
         
         public static bool unitTestIntegration = false;
-        public static SimpleUnitTestWindow unitTestWindow = null;
+        
         public static string unitTestIntegrationMessage = "Set Globals.unitTestIntegration = true to run integration tests";
         public static List<ToFrom> unitTestCopyHelper = null;
         public static bool unitTestCopyHelper2 = false;
@@ -736,7 +736,9 @@ namespace Gekko
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();
         public static CounterHelper ch = new CounterHelper();
 
-        public static bool revertSimpleJ = true;        
+        public static bool revertSimpleJ = true;
+
+        public static string helpStartPage = "introduction";
 
         public static List<string> helpTopics = new List<string>() {  //this list corresponds to items in "Gekko commands" in the help files
             //done april 2019, see also Globals.extraNames and Globals.commandNames

@@ -2742,7 +2742,7 @@ namespace Gekko
         private void manualToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //System.Windows.Forms.Help.ShowHelp(this, Application.StartupPath + "\\helpfiles\\gekko.chm", "i_overview.htm");
-            Program.Help("i_overview.htm");
+            Program.Help(Globals.helpStartPage);
         }
 
         private void viewDatabanksToolStripMenuItem_Click(object sender, EventArgs e)

@@ -1992,94 +1992,7 @@ namespace Gekko.Parser.Gek
                             GetCodeFromAllChildren(node);
                             //AddSplitMarkers(node);                        
                         }
-                        break;
-                    //case "ASTIFSTATEMENTS":
-                    //    {
-                    //        GetCodeFromAllChildren(node[0]);
-                    //        GetCodeFromAllChildren(node);
-                    //    }
-                    //    break;
-                    //case "ASTELSESTATEMENTS":
-                    //    {
-                    //        GetCodeFromAllChildren(node[0]);
-                    //        GetCodeFromAllChildren(node);
-                    //    }
-                    //    break;
-                    //case "ASTFUNCTIONDEFCODE":
-                    //    {
-                    //        GetCodeFromAllChildren(node);
-                    //        //AddSplitMarkers(node);                        
-                    //    }
-                    //    break;
-
-                    // ================= INDENTATION CODE START ==================
-                    // ================= INDENTATION CODE START ==================
-                    // ================= INDENTATION CODE START ==================
-
-                    //case "ASTRETURNTUPLE":  //see ASTRETURN
-                    //    {
-                    //        node.Code.A(Globals.splitSTOP);                            
-                            
-                    //        if (w.uFunctionsHelper == null)
-                    //        {
-                    //            if (!node[0].Code.IsNull())
-                    //            {
-                    //                G.Writeln2("*** ERROR: RETURN with multiple values only allowed inside FUNCTION");
-                    //                throw new GekkoException();
-                    //            }
-                    //        }
-                    //        else
-                    //        {
-                    //            if (w.uFunctionsHelper.lhsTypes.Count != node.ChildrenCount())
-                    //            {
-                    //                G.Writeln2("*** ERROR: Return with " + node.ChildrenCount() + " items instead of " + w.uFunctionsHelper.lhsTypes.Count);
-                    //                throw new GekkoException();
-                    //            }
-
-                    //            string tempCs = "temp" + ++Globals.counter;
-                    //            string classCs = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
-
-                    //            string s = null;
-                    //            string s2 = null;
-                    //            int counter = -1;
-                    //            foreach (ASTNode child in node.ChildrenIterator())
-                    //            {
-                    //                counter++;
-                    //                string tn = "temp" + ++Globals.counter;
-
-                    //                if (w.uFunctionsHelper.lhsTypes[counter] == "series")
-                    //                {
-                    //                    string tempName = "temp" + ++Globals.counter;
-                    //                    s += "Series " + tempName + " = new Series(Program.options.freq, null);" + G.NL;
-                    //                    s += "foreach (GekkoTime t2 in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))" + G.NL;
-                    //                    s += GekkoTimeIteratorStartCode(w, node);  //node is where this text is put below
-                    //                    s += "    double data = O.ConvertToVal(" + child.Code + ", t);" + G.NL;  //uuu
-                    //                    s += "    " + tempName + ".SetData(t, data);" + G.NL;                                        
-                    //                    s += GekkoTimeIteratorEndCode();
-                    //                    s += "IVariable " + tn + " = new MetaTimeSeries(" + tempName + ");" + G.NL;
-                    //                }
-                    //                else
-                    //                {
-                    //                    s += "IVariable " + tn + " = " + child.Code + ";" + G.NL;
-                    //                }
-                    //                s2 += tn + ", ";
-                    //            }
-                    //            if (s2.EndsWith(", ")) s2 = s2.Substring(0, s2.Length - 2);
-
-                    //            node.Code.A(s + classCs + " " + tempCs + " = new " + classCs + "(" + s2 + ");" + G.NL);
-
-                    //            if (node.ChildrenCount() != w.uFunctionsHelper.lhsTypes.Count)
-                    //            {
-                    //                G.Writeln2("*** ERROR: RETURN with " + node.ChildrenCount() + " values encountered in '" + w.uFunctionsHelper.functionName + "' function");
-                    //                throw new GekkoException();
-                    //            }
-
-                    //            node.Code.A("return " + tempCs + ";" + G.NL);
-                    //        }
-
-                    //        node.Code.A(Globals.splitSTART);
-                    //    }
-                    //    break;
+                        break;                    
 
                     case "ASTRETURN":
                         {                                                                
@@ -2222,146 +2135,29 @@ namespace Gekko.Parser.Gek
 
                     case "ASTBLOCK":
                         {
-                            if (Globals.newOption)
-                            {                               
 
-                                string record = null;
-                                string alter = null;
-                                string play = null;
+                            string record = null;
+                            string alter = null;
+                            string play = null;
 
-                                foreach (ASTNode child in node[0].ChildrenIterator())
-                                {
-                                    if (child.Text == "ASTDATES_BLOCK")
-                                    {
-                                        //handle BLOCK time ...
-
-                                        string ss = child.Code.ToString();
-                                        if (ss != null)
-                                        {
-                                            string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
-                                            int n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
-                                            alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
-                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
-                                            n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                            alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
-                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                        }
-                                        else
-                                        {
-                                            G.Writeln2("*** ERROR: Internal error related to BLOCK");
-                                            throw new GekkoException();
-                                        }
-                                    }
-                                    else if (child.Text == "ASTBLOCKOPTION")
-                                    {
-                                        //StringBuilder s = new StringBuilder();
-                                        //string o = "";
-                                        //CreateOptionVariableOldDelete(child, true, s, ref o);
-
-                                        Tuple<string, string> tup = HandleOptionAndBlock(child, true);
-
-                                        if (tup.Item1 == "Program.options.freq")
-                                        {
-                                            //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
-                                            int n = ++Globals.counter;
-                                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
-                                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
-                                            alter += "Program.AdjustFreq();" + G.NL;                      //Program.AdjustFreq();
-                                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
-                                                                                                          // global perStart
-                                            n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
-                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
-                                            // global perEnd
-                                            n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                        }
-                                        else
-                                        {
-                                            int n = ++Globals.counter;
-                                            record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
-                                            alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
-                                            play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
-                                        }
-                                    }
-                                    else
-                                    {
-                                        G.Writeln2("*** ERROR: Internal error related to BLOCK");
-                                        throw new GekkoException();
-                                    }
-                                }
-                                node.Code.A(record);
-                                node.Code.A(alter);
-                                GetCodeFromAllChildren(node, node[1][0]);
-                                node.Code.A(play);
-
-                            }
-                            else
+                            foreach (ASTNode child in node[0].ChildrenIterator())
                             {
-
-                                string record = null;
-                                string alter = null;
-                                string play = null;
-
-                                foreach (ASTNode child in node[0].ChildrenIterator())
+                                if (child.Text == "ASTDATES_BLOCK")
                                 {
-                                    if (child.Text == "ASTDATES_BLOCK")
+                                    //handle BLOCK time ...
+
+                                    string ss = child.Code.ToString();
+                                    if (ss != null)
                                     {
-                                        //handle BLOCK time ...
-
-                                        string ss = child.Code.ToString();
-                                        if (ss != null)
-                                        {
-                                            string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
-                                            int n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
-                                            alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
-                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
-                                            n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                            alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
-                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                        }
-                                        else
-                                        {
-                                            G.Writeln2("*** ERROR: Internal error related to BLOCK");
-                                            throw new GekkoException();
-                                        }
-                                    }
-                                    else if (child.Text == "ASTBLOCKOPTION")
-                                    {
-                                        StringBuilder s = new StringBuilder();
-                                        string o = "";
-
-                                        CreateOptionVariableOldDelete(child, true, s, ref o);
-
-                                        if (o == "Program.options.freq")
-                                        {
-                                            //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
-                                            int n = ++Globals.counter;
-                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
-                                            alter += s.ToString();                                //Program.options.freq = EFreq.Q;
-                                            alter += "Program.AdjustFreq();" + G.NL;              //Program.AdjustFreq();
-                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
-                                                                                                  // global perStart
-                                            n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
-                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
-                                            // global perEnd
-                                            n = ++Globals.counter;
-                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
-                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
-                                        }
-                                        else
-                                        {
-                                            int n = ++Globals.counter;
-                                            record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options....;
-                                            alter += s.ToString();                                //Program.options.... = ...;
-                                            play += o + " = record" + n + ";" + G.NL;             //Program.options.... = record117
-                                        }
+                                        string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
+                                        alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
+                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                        alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
+                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
                                     }
                                     else
                                     {
@@ -2369,11 +2165,53 @@ namespace Gekko.Parser.Gek
                                         throw new GekkoException();
                                     }
                                 }
-                                node.Code.A(record);
-                                node.Code.A(alter);
-                                GetCodeFromAllChildren(node, node[1][0]);
-                                node.Code.A(play);
+                                else if (child.Text == "ASTBLOCKOPTION")
+                                {
+                                    //StringBuilder s = new StringBuilder();
+                                    //string o = "";
+                                    //CreateOptionVariableOldDelete(child, true, s, ref o);
+
+                                    Tuple<string, string> tup = HandleOptionAndBlock(child, true);
+
+                                    if (tup.Item1 == "Program.options.freq")
+                                    {
+                                        //see also #89073589324, must also record global time settings, since these are implicitly altered when changing frequency
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
+                                        alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
+                                        alter += "Program.AdjustFreq();" + G.NL;                      //Program.AdjustFreq();
+                                        play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                                                                                      // global perStart
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;
+                                        play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;
+                                        // global perEnd
+                                        n = ++Globals.counter;
+                                        record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                        play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                    }
+                                    else
+                                    {
+                                        int n = ++Globals.counter;
+                                        record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options....;
+                                        alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.... = ...;
+                                        alter += "O.PrintOptions(`" + tup.Item1 + "`);" + G.NL;       //O.PrintOptions(...)
+                                        alter += "O.HandleOptions(`" + tup.Item1 + "`, 1, p);" + G.NL;   //O.HandleOptions(...)
+                                        play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.... = record117
+                                        play += "O.HandleOptions(`" + tup.Item1 + "`, 2, p);" + G.NL;    //O.HandleOptions(...)
+                                    }
+                                }
+                                else
+                                {
+                                    G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                    throw new GekkoException();
+                                }
                             }
+                            node.Code.A(record);
+                            node.Code.A(alter);
+                            GetCodeFromAllChildren(node, node[1][0]);  //code inside the block
+                            node.Code.A(play);
+
                         }
                         break;
 
@@ -4934,116 +4772,18 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTOPTION":
                         {
-                            if (Globals.newOption)
+                            if (node[0].Text == "?")
                             {
-                                if (node[0].Text == "?")
-                                {
-                                    node.Code.A("Program.PrintOptions(null);");
-                                }
-                                else
-                                {
-                                    Tuple<string, string> tup = HandleOptionAndBlock(node, false);
-                                    node.Code.A(tup.Item1 + " = " + tup.Item2 + ";" + G.NL);
-                                    node.Code.A("Program.PrintOptions(`" + tup.Item1 + "`);");
-                                    //TODO: print out
-                                    //node.Code.A("G.Writeln2(`" + ss7 + "`);");
-                                }
+                                node.Code.A("O.PrintOptions(null);");
                             }
                             else
                             {
-
-                                if (node.GetChild(0).Text == "?")
-                                {
-                                    node.Code.A("Program.PrintOptions(`Program.options`);");
-                                }
-                                else
-                                {
-                                    string o = "";
-                                    //Use GekkoStringBuilder??
-                                    StringBuilder s = new StringBuilder();
-
-                                    CreateOptionVariableOldDelete(node, false, s, ref o);
-
-                                    node.Code.A(s.ToString());
-                                    if (G.Equal(o, "freq"))
-                                    {
-                                        //see also #89073589324
-                                        node.Code.A("Program.AdjustFreq();");
-                                    }
-                                    else if (G.Equal(o, "interface_sound_type"))
-                                    {
-                                        if (!p.hasBeenCmdFile)
-                                        {
-                                            node.Code.A("Program.PlaySound();");
-                                        }
-                                    }
-                                    else if (G.Equal(o, "interface_edit_style"))
-                                    {
-                                        node.Code.A("CrossThreadStuff.SetChecked();");
-                                    }
-                                    else if (G.Equal(o, "folder_menu") || G.Equal(o, "menu_startfile"))
-                                    {
-                                        node.Code.A("CrossThreadStuff.RestartMenuBrowser();");
-                                    }
-                                    else if (G.Equal(o, "interface_zoom"))
-                                    {
-                                        node.Code.A("CrossThreadStuff.Zoom();");
-                                    }
-                                    else if (G.Equal(o, "folder_working"))
-                                    {
-                                        node.Code.A("CrossThreadStuff.WorkingFolder(``);");
-                                    }
-                                    else if (G.Equal(o, "interface_remote"))
-                                    {
-                                        node.Code.A("Program.RemoteInit();");
-                                    }
-                                    else if (G.Equal(o, "solve_gauss_reorder"))
-                                    {
-                                        node.Code.A("G.Writeln();");
-                                        node.Code.A("G.Writeln(`+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.`);");
-                                        node.Code.A("G.Writeln(`+++       (In command files, place this option before any MODEL statements).`);");
-
-                                    }
-                                    else if (G.Equal(o, "series_dyn"))
-                                    {
-                                        node.Code.A("G.Writeln();");
-                                        node.Code.A("G.Writeln(`*** ERROR: Deprecated option`);");
-                                        node.Code.A("G.Writeln();");
-                                        node.Code.A("G.Writeln(`+++ NOTE: The 'dyn' option has been deprecated. Instead, you may use <dyn> on individual series`);");
-                                        node.Code.A("G.Writeln(`+++       statements, or use 'BLOCK series dyn = yes; ... ; END;' to set the option for several`);");
-                                        node.Code.A("G.Writeln(`+++       series statemens. See more in the help, under the BLOCK command.`);");
-                                        node.Code.A("G.Writeln();");
-                                        node.Code.A("throw new GekkoException();");
-                                    }
-                                    else if (G.Equal(o, "timefilter_type"))  //TODO: only issue if really avg
-                                    {
-                                        node.Code.A("G.Writeln2(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
-                                    }
-                                    else if (G.Equal(o, "solve_forward_nfair_damp") || G.Equal(o, "solve_forward_fair_damp") || G.Equal(o, "solve_gauss_damp"))
-                                    {
-                                        node.Code.A("G.Writeln2(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
-                                    }
-                                    else if (G.Equal(o, "r_exe_path"))
-                                    {
-                                        node.Code.A("G.Writeln2(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
-                                    }
-                                    else if (G.Equal(o, "series_array_ignoremissing"))
-                                    {
-                                        node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series array print missing = skip;' and 'OPTION series array calc missing = zero;' instead`);");
-                                        node.Code.A("throw new GekkoException();");
-                                    }
-                                    else if (G.Equal(o, "table_ignoremissingvars"))
-                                    {
-                                        node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series normal table missing = m;' instead`);");
-                                        node.Code.A("throw new GekkoException();");
-                                    }
-                                    else if (G.Equal(o, "series_data_ignoremissing"))
-                                    {
-                                        node.Code.A("G.Writeln2(`*** ERROR: This option can no longer be used.`);");
-                                        node.Code.A("throw new GekkoException();");
-                                    }
-                                }
+                                Tuple<string, string> tup = HandleOptionAndBlock(node, false);
+                                node.Code.A(tup.Item1 + " = " + tup.Item2 + ";" + G.NL);
+                                node.Code.A("O.PrintOptions(`" + tup.Item1 + "`);" + G.NL);
+                                node.Code.A("O.HandleOptions(`" + tup.Item1 + "`, 0, p);" + G.NL);
                             }
+
                         }
                         break;
                     case "ASTOPT1":  //PRT-type statement
@@ -5530,31 +5270,6 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;                    
-                    case "ASTEXPRESSIONTUPLE":  //see ASTRETURNTUPLE
-                        {
-                            int counter = 0;
-                            List<string> types = new List<string>();
-
-                            string classCs = G.GetVariableType(node.ChildrenCount());
-                            //CreateTupleClass(w.uHeaderCs, node.ChildrenCount(), classCs, w.tupleClasses);
-
-                            string tempCs = "temp" + ++Globals.counter;                            
-                                                        
-                            string s = null;
-                            foreach (ASTNode child in node.ChildrenIterator())
-                            {
-                                //counter++;                                
-                                //node.Code.A(tempCs + ".tuple" + (counter - 1) + " = " + child.Code + ";" + G.NL;
-                                s += child.Code + ", ";
-                            }
-                            if (s.EndsWith(", ")) s = s.Substring(0, s.Length - 2);
-
-                            node.Code.CA("(new " + classCs + "(" + s + "))");
-
-                            //node.Code.A(classCs + " " + tempCs + " = new " + classCs + "(" + s + ");" + G.NL;
-                            //node.Code.A("return " + tempCs + ";" + G.NL;
-                        }
-                        break;
                     
                     case "ASTSIGN":
                         {
@@ -6345,74 +6060,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
-                    //case "ASTTUPLE":
-                    //    {
-                    //        string rhsCode = node[1].Code.ToString();
-
-                    //        if (node[1].Text == "ASTFUNCTION" && (G.Equal(node[1][0].Text.ToLower(), "laspchain") || G.Equal(node[1][0].Text.ToLower(), "laspfixed")))
-                    //        {
-                    //            //hack to make it work. Problem is that method cannot run year-by-year.
-                    //            if (node[0].ChildrenCount() != 2)
-                    //            {
-                    //                G.Writeln2("laspchain() and laspfixed() must be called with (series x, series y) on left side");
-                    //                throw new GekkoException();
-                    //            }
-                    //            //string cs1 = "IVariable p" + Num(node) + "= " + node[0][0][2].Code + ";";
-                    //            //string cs2 = "IVariable q" + Num(node) + " = " + node[0][1][2].Code + ";";
-                    //            //string cs3 = "GekkoTuple.Tuple2 temp = " + rhsCode + ";";
-                    //            node.Code.A("Functions.HELPER_HandleLasp(" + rhsCode + ", " + node[0][0][2].Code + ", " + node[0][1][2].Code + ");" + G.NL);                            
-                    //        }
-                    //        else
-                    //        {
-
-
-                    //            string tempName = "temp" + ++Globals.counter;
-                    //            string nodeCodeTemp = null;
-                    //            int number = 0;
-                    //            foreach (ASTNode child in node[0].ChildrenIterator())
-                    //            {
-                    //                if (child.Text != "ASTTUPLEITEM")
-                    //                {
-                    //                    G.Writeln2("*** ERROR #74343641");
-                    //                    throw new GekkoException();
-                    //                }
-                    //                number++;
-
-                    //                if (child[0].Text == "val")
-                    //                {
-                    //                    nodeCodeTemp += HandleVal(child[1], tempName + ".tuple" + (number - 1), w);
-                    //                }
-                    //                else if (child[0].Text == "date")
-                    //                {
-                    //                    nodeCodeTemp += HandleDate(child[1], tempName + ".tuple" + (number - 1));
-                    //                }
-                    //                else if (child[0].Text == "name")
-                    //                {
-                    //                    nodeCodeTemp += HandleString(child[1], tempName + ".tuple" + (number - 1), true);
-                    //                }
-                    //                else if (child[0].Text == "string")
-                    //                {
-                    //                    nodeCodeTemp += HandleString(child[1], tempName + ".tuple" + (number - 1), false);
-                    //                }
-                    //                else if (child[0].Text == "series")
-                    //                {
-                    //                    ClearLocalStatementCache(w);
-                    //                    nodeCodeTemp += HandleGenr(child, Num(child), child[1].Code.ToString(), child[2].Code.ToString(), tempName + ".tuple" + (number - 1), w, null);
-                    //                }
-                    //                else if (child[0].Text == "list")
-                    //                {
-                    //                    string s = "o" + Num(child[1]) + ".listItems.AddRange(O.GetList(" + tempName + ".tuple" + (number - 1) + "));" + G.NL;
-                    //                    nodeCodeTemp += HandleList(child[1], s);
-                    //                }
-                    //            }
-
-                    //            string className = G.GetVariableType(number);
-                    //            node.Code.A(className + " " + tempName + " = " + rhsCode + ";" + G.NL);  //for instance "ScalarVal_ScalarVal temp117 = f()"                            
-                    //            node.Code.A(nodeCodeTemp);
-                    //        }
-                            
-                    //    }
-                    //    break;
+                    
                     case "ASTYES":
                         {
                             node.Code.A("new ScalarString(`yes`)");
@@ -8251,307 +7899,307 @@ namespace Gekko.Parser.Gek
         }        
 
         
-        private static void CreateOptionVariableOldDelete(ASTNode node, bool block, StringBuilder s, ref string o)
-        {
-            StringBuilder s1 = new StringBuilder();
-            StringBuilder s1a = new StringBuilder();
-            StringBuilder s2 = new StringBuilder();
-            string type = null;
-            s2.Append("Program.options.");
-            for (int i = 0; i < node.ChildrenCount(); ++i)
-            {
-                ASTNode child = node[i];
+        //private static void CreateOptionVariableOldDelete(ASTNode node, bool block, StringBuilder s, ref string o)
+        //{
+        //    StringBuilder s1 = new StringBuilder();
+        //    StringBuilder s1a = new StringBuilder();
+        //    StringBuilder s2 = new StringBuilder();
+        //    string type = null;
+        //    s2.Append("Program.options.");
+        //    for (int i = 0; i < node.ChildrenCount(); ++i)
+        //    {
+        //        ASTNode child = node[i];
 
-                if (child.Text == "?")
-                {
-                    s.Append("Program.PrintOptions(`" + s2.ToString() + s1.ToString() + "`);");
-                    return;
-                }
+        //        if (child.Text == "?")
+        //        {
+        //            s.Append("O.PrintOptions(`" + s2.ToString() + s1.ToString() + "`);");
+        //            return;
+        //        }
 
-                if (i < node.ChildrenCount() - 2)  //up to and including third-last
-                {
-                    s1.Append(child.Text.ToLower() + "_");
-                }
-                else if (i == node.ChildrenCount() - 2)  //second-last
-                {
-                    s1.Append(child.Text.ToLower());
-                }
-                else if (i == node.ChildrenCount() - 1)  //last
-                {
-                    if (child.Text == "ASTINTEGER")
-                    {
-                        type = "val";
-                        if (child.GetChild(0).Text == "-")
-                        {
-                            s1a.Append(child.GetChild(0).Text);
-                            s1a.Append(child.GetChild(1).Text);
-                        }
-                        else
-                        {
-                            s1a.Append(child.GetChild(0).Text);
-                        }
-                    }
-                    else if (child.Text == "ASTDOUBLE")
-                    {
-                        type = "val";
-                        int index = 0;
-                        if (child.GetChild(0).Text == "-")
-                        {
-                            s1a.Append(child.GetChild(0).Text);
-                            index = 1;
-                        }
-                        string s5 = child.GetChild(index).Text;
-                        s5 = Program.MaybeAddPointAndZero(s5);
-                        s1a.Append(s5);
-                    }
-                    else if (child.Text == "ASTBOOL")
-                    {
-                        type = "string";
-                        if (G.Equal(child.GetChild(0).Text, "astyes") || G.Equal(child.GetChild(0).Text, "true"))
-                        {
-                            s1a.Append("true");
-                        }
-                        else if (G.Equal(child.GetChild(0).Text, "astno") || G.Equal(child.GetChild(0).Text, "false"))
-                        {
-                            s1a.Append("false");
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR with options");
-                            throw new GekkoException();
-                        }
-                    }
-                    else if (child.Text == "ASTSTRINGSIMPLE")
-                    {
+        //        if (i < node.ChildrenCount() - 2)  //up to and including third-last
+        //        {
+        //            s1.Append(child.Text.ToLower() + "_");
+        //        }
+        //        else if (i == node.ChildrenCount() - 2)  //second-last
+        //        {
+        //            s1.Append(child.Text.ToLower());
+        //        }
+        //        else if (i == node.ChildrenCount() - 1)  //last
+        //        {
+        //            if (child.Text == "ASTINTEGER")
+        //            {
+        //                type = "val";
+        //                if (child.GetChild(0).Text == "-")
+        //                {
+        //                    s1a.Append(child.GetChild(0).Text);
+        //                    s1a.Append(child.GetChild(1).Text);
+        //                }
+        //                else
+        //                {
+        //                    s1a.Append(child.GetChild(0).Text);
+        //                }
+        //            }
+        //            else if (child.Text == "ASTDOUBLE")
+        //            {
+        //                type = "val";
+        //                int index = 0;
+        //                if (child.GetChild(0).Text == "-")
+        //                {
+        //                    s1a.Append(child.GetChild(0).Text);
+        //                    index = 1;
+        //                }
+        //                string s5 = child.GetChild(index).Text;
+        //                s5 = Program.MaybeAddPointAndZero(s5);
+        //                s1a.Append(s5);
+        //            }
+        //            else if (child.Text == "ASTBOOL")
+        //            {
+        //                type = "string";
+        //                if (G.Equal(child.GetChild(0).Text, "astyes") || G.Equal(child.GetChild(0).Text, "true"))
+        //                {
+        //                    s1a.Append("true");
+        //                }
+        //                else if (G.Equal(child.GetChild(0).Text, "astno") || G.Equal(child.GetChild(0).Text, "false"))
+        //                {
+        //                    s1a.Append("false");
+        //                }
+        //                else
+        //                {
+        //                    G.Writeln2("*** ERROR with options");
+        //                    throw new GekkoException();
+        //                }
+        //            }
+        //            else if (child.Text == "ASTSTRINGSIMPLE")
+        //            {
 
-                        bool resolvePath = false;
-                        List<string> folder = new List<string>();
-                        folder.Add("folder_bank");
-                        folder.Add("folder_bank1");
-                        folder.Add("folder_bank2");
-                        folder.Add("folder_command");
-                        folder.Add("folder_command1");
-                        folder.Add("folder_command2");
-                        folder.Add("folder_help");
-                        folder.Add("folder_menu");
-                        folder.Add("folder_model");
-                        folder.Add("folder_pipe");
-                        folder.Add("folder_table");
-                        folder.Add("folder_table1");
-                        folder.Add("folder_table2");
-                        folder.Add("folder_working");
-                        folder.Add("gams_exe_folder");
-                        folder.Add("r_exe_folder");
-                        if (folder.Contains(s1.ToString().ToLower())) resolvePath = true;
+        //                bool resolvePath = false;
+        //                List<string> folder = new List<string>();
+        //                folder.Add("folder_bank");
+        //                folder.Add("folder_bank1");
+        //                folder.Add("folder_bank2");
+        //                folder.Add("folder_command");
+        //                folder.Add("folder_command1");
+        //                folder.Add("folder_command2");
+        //                folder.Add("folder_help");
+        //                folder.Add("folder_menu");
+        //                folder.Add("folder_model");
+        //                folder.Add("folder_pipe");
+        //                folder.Add("folder_table");
+        //                folder.Add("folder_table1");
+        //                folder.Add("folder_table2");
+        //                folder.Add("folder_working");
+        //                folder.Add("gams_exe_folder");
+        //                folder.Add("r_exe_folder");
+        //                if (folder.Contains(s1.ToString().ToLower())) resolvePath = true;
 
-                        type = "string";
-                        string temp = "";
-                        string s7 = null;
-                        if (child[0].Code.IsNull())
-                        {
-                            s7 = "`" + child[0].Text + "`";
-                        }
-                        else
-                        {
-                            s7 = "O.ConvertToString(" + child[0].Code + ")";
-                        }
-                        if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
-                        {
-                            s7 = "G.GetFreq(" + s7 + ")";
-                        }
-                        if (G.Equal(node[0].Text, "series") && G.Equal(node[3].Text, "missing"))  //OPTION series array print missing = ...
-                        {
-                            s7 = "G.GetMissing(" + s7 + ")";
-                        }
-                        if (G.Equal(node[0].Text, "series") && G.Equal(node[1].Text, "data") && G.Equal(node[2].Text, "missing"))  //OPTION series data missing = ...
-                        {
-                            s7 = "G.GetMissing(" + s7 + ")";
-                        }
-                        if (resolvePath)
-                        {
-                            s7 = "O.ResolvePath(" + s7 + ")";
-                        }
-                        temp += s7;
-                        //}
-                        s1a.Append(temp);
-                    }
-                    else
-                    {
-                        throw new GekkoException();
-                    }
-                }
-                else throw new GekkoException();
-            }
+        //                type = "string";
+        //                string temp = "";
+        //                string s7 = null;
+        //                if (child[0].Code.IsNull())
+        //                {
+        //                    s7 = "`" + child[0].Text + "`";
+        //                }
+        //                else
+        //                {
+        //                    s7 = "O.ConvertToString(" + child[0].Code + ")";
+        //                }
+        //                if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
+        //                {
+        //                    s7 = "G.GetFreq(" + s7 + ")";
+        //                }
+        //                if (G.Equal(node[0].Text, "series") && G.Equal(node[3].Text, "missing"))  //OPTION series array print missing = ...
+        //                {
+        //                    s7 = "G.GetMissing(" + s7 + ")";
+        //                }
+        //                if (G.Equal(node[0].Text, "series") && G.Equal(node[1].Text, "data") && G.Equal(node[2].Text, "missing"))  //OPTION series data missing = ...
+        //                {
+        //                    s7 = "G.GetMissing(" + s7 + ")";
+        //                }
+        //                if (resolvePath)
+        //                {
+        //                    s7 = "O.ResolvePath(" + s7 + ")";
+        //                }
+        //                temp += s7;
+        //                //}
+        //                s1a.Append(temp);
+        //            }
+        //            else
+        //            {
+        //                throw new GekkoException();
+        //            }
+        //        }
+        //        else throw new GekkoException();
+        //    }
 
-            s.Append(s2);
-            s.Append(s1);
-            if (!block) o = s1.ToString();
-            else o = s2.ToString() + s1.ToString();
-            s.Append(" = ");
-            s.Append(s1a);
-            s.AppendLine(";");
+        //    s.Append(s2);
+        //    s.Append(s1);
+        //    if (!block) o = s1.ToString();
+        //    else o = s2.ToString() + s1.ToString();
+        //    s.Append(" = ");
+        //    s.Append(s1a);
+        //    s.AppendLine(";");
 
-            StringBuilder s3 = new StringBuilder();
-            s3.Append("option_");
-            s3.Append(s1);
-            s3.Append(" = ");
-            string s1b = s1a.ToString();
-            if (s1b.StartsWith("@")) s1b = s1b.Substring(1);
-            s3.Append(s1b);
-            s3.Replace(@"\", @"\\");
-            s3.Replace("_", " ");
-            s3.Replace("`", "");
-            s3.Replace("true", "yes");
-            s3.Replace("false", "no");
-            if (!block) s.AppendLine("G.Writeln();");
-            //#987350932752
-            //s.AppendLine("G.Writeln(Program.SubstituteAssignVars(`" + s3.ToString() + "`));");
+        //    StringBuilder s3 = new StringBuilder();
+        //    s3.Append("option_");
+        //    s3.Append(s1);
+        //    s3.Append(" = ");
+        //    string s1b = s1a.ToString();
+        //    if (s1b.StartsWith("@")) s1b = s1b.Substring(1);
+        //    s3.Append(s1b);
+        //    s3.Replace(@"\", @"\\");
+        //    s3.Replace("_", " ");
+        //    s3.Replace("`", "");
+        //    s3.Replace("true", "yes");
+        //    s3.Replace("false", "no");
+        //    if (!block) s.AppendLine("G.Writeln();");
+        //    //#987350932752
+        //    //s.AppendLine("G.Writeln(Program.SubstituteAssignVars(`" + s3.ToString() + "`));");
 
-            string sss = s1a.ToString();
-            s1 = s1.Replace("_", " ");
+        //    string sss = s1a.ToString();
+        //    s1 = s1.Replace("_", " ");
 
-            //#0934580980
-            sss = sss.Replace("True", "`yes`");
-            sss = sss.Replace("False", "`no`");
-            sss = sss.Replace("true", "`yes`");
-            sss = sss.Replace("false", "`no`");
-            sss = "(" + sss + ").ToString().ToLower()";  //may be an enum
+        //    //#0934580980
+        //    sss = sss.Replace("True", "`yes`");
+        //    sss = sss.Replace("False", "`no`");
+        //    sss = sss.Replace("true", "`yes`");
+        //    sss = sss.Replace("false", "`no`");
+        //    sss = "(" + sss + ").ToString().ToLower()";  //may be an enum
 
-            if (!block) s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
+        //    if (!block) s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
 
-        }
+        //}
 
-        private static void CreateOptionVariableOLD(ASTNode node, StringBuilder s, ref string o)
-        {
-            StringBuilder s1 = new StringBuilder();
-            StringBuilder s1a = new StringBuilder();
-            StringBuilder s2 = new StringBuilder();
-            s2.Append("Program.options.");
-            for (int i = 0; i < node.ChildrenCount(); ++i)
-            {
-                ASTNode child = node[i];
+        //private static void CreateOptionVariableOLD(ASTNode node, StringBuilder s, ref string o)
+        //{
+        //    StringBuilder s1 = new StringBuilder();
+        //    StringBuilder s1a = new StringBuilder();
+        //    StringBuilder s2 = new StringBuilder();
+        //    s2.Append("Program.options.");
+        //    for (int i = 0; i < node.ChildrenCount(); ++i)
+        //    {
+        //        ASTNode child = node[i];
 
-                if (child.Text == "?")
-                {
-                    s.Append("Program.PrintOptions(`" + s2.ToString() + s1.ToString() + "`);");
-                    return;
-                }
+        //        if (child.Text == "?")
+        //        {
+        //            s.Append("O.PrintOptions(`" + s2.ToString() + s1.ToString() + "`);");
+        //            return;
+        //        }
 
-                if (i < node.ChildrenCount() - 2)  //up to and including third-last
-                {
-                    s1.Append(child.Text.ToLower() + "_");
-                }
-                else if (i == node.ChildrenCount() - 2)  //second-last
-                {
-                    s1.Append(child.Text.ToLower());
-                }
-                else if (i == node.ChildrenCount() - 1)  //last
-                {
-                    if (child.Text == "ASTINTEGER")
-                    {
-                        if (child.GetChild(0).Text == "-")
-                        {
-                            s1a.Append(child.GetChild(0).Text);
-                            s1a.Append(child.GetChild(1).Text);
-                        }
-                        else
-                        {
-                            s1a.Append(child.GetChild(0).Text);
-                        }
-                    }
-                    else if (child.Text == "ASTDOUBLE")
-                    {
-                        int index = 0;
-                        if (child.GetChild(0).Text == "-")
-                        {
-                            s1a.Append(child.GetChild(0).Text);
-                            index = 1;
-                        }
-                        string s5 = child.GetChild(index).Text;
-                        s5 = Program.MaybeAddPointAndZero(s5);
-                        s1a.Append(s5);
-                    }
-                    else if (child.Text == "ASTBOOL")
-                    {
-                        if (G.Equal(child.GetChild(0).Text, "yes") || G.Equal(child.GetChild(0).Text, "true"))
-                        {
-                            s1a.Append("true");
-                        }
-                        else if (G.Equal(child.GetChild(0).Text, "no") || G.Equal(child.GetChild(0).Text, "false"))
-                        {
-                            s1a.Append("false");
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR with options");
-                            throw new GekkoException();
-                        }
-                    }
-                    else if (child.Text == "ASTSTRINGSIMPLE")
-                    {
-                        string temp = "";
-                        //if (child.GetChild(0).Text == "ASTFILENAME")  //very unlikely this should ever be used as a string name here
-                        //{
-                        //    ////When does this happen??????????????
-                        //    //string s4 = "";
-                        //    //ASTNode gchild = child.GetChild(0);
-                        //    //foreach (ASTNode child2 in gchild.ChildrenIterator())
-                        //    //{
-                        //    //    s4 += child2.Text;
-                        //    //}
-                        //    //s4 = G.StripQuoates(s4);
-                        //    //temp += ("@`" + s4 + "`");  //@ because it can contain slashes
+        //        if (i < node.ChildrenCount() - 2)  //up to and including third-last
+        //        {
+        //            s1.Append(child.Text.ToLower() + "_");
+        //        }
+        //        else if (i == node.ChildrenCount() - 2)  //second-last
+        //        {
+        //            s1.Append(child.Text.ToLower());
+        //        }
+        //        else if (i == node.ChildrenCount() - 1)  //last
+        //        {
+        //            if (child.Text == "ASTINTEGER")
+        //            {
+        //                if (child.GetChild(0).Text == "-")
+        //                {
+        //                    s1a.Append(child.GetChild(0).Text);
+        //                    s1a.Append(child.GetChild(1).Text);
+        //                }
+        //                else
+        //                {
+        //                    s1a.Append(child.GetChild(0).Text);
+        //                }
+        //            }
+        //            else if (child.Text == "ASTDOUBLE")
+        //            {
+        //                int index = 0;
+        //                if (child.GetChild(0).Text == "-")
+        //                {
+        //                    s1a.Append(child.GetChild(0).Text);
+        //                    index = 1;
+        //                }
+        //                string s5 = child.GetChild(index).Text;
+        //                s5 = Program.MaybeAddPointAndZero(s5);
+        //                s1a.Append(s5);
+        //            }
+        //            else if (child.Text == "ASTBOOL")
+        //            {
+        //                if (G.Equal(child.GetChild(0).Text, "yes") || G.Equal(child.GetChild(0).Text, "true"))
+        //                {
+        //                    s1a.Append("true");
+        //                }
+        //                else if (G.Equal(child.GetChild(0).Text, "no") || G.Equal(child.GetChild(0).Text, "false"))
+        //                {
+        //                    s1a.Append("false");
+        //                }
+        //                else
+        //                {
+        //                    G.Writeln2("*** ERROR with options");
+        //                    throw new GekkoException();
+        //                }
+        //            }
+        //            else if (child.Text == "ASTSTRINGSIMPLE")
+        //            {
+        //                string temp = "";
+        //                //if (child.GetChild(0).Text == "ASTFILENAME")  //very unlikely this should ever be used as a string name here
+        //                //{
+        //                //    ////When does this happen??????????????
+        //                //    //string s4 = "";
+        //                //    //ASTNode gchild = child.GetChild(0);
+        //                //    //foreach (ASTNode child2 in gchild.ChildrenIterator())
+        //                //    //{
+        //                //    //    s4 += child2.Text;
+        //                //    //}
+        //                //    //s4 = G.StripQuoates(s4);
+        //                //    //temp += ("@`" + s4 + "`");  //@ because it can contain slashes
 
-                        //    temp += ("O.ConvertToString(" + child[0].Code + ")");  //@ because it can contain slashes
-                        //}
-                        //else
-                        //{
-                        string s7 = null;
-                        if (child[0].Code.IsNull())
-                        {
-                            s7 = "`" + child[0].Text + "`";
-                        }
-                        else
-                        {
-                            s7 = "O.ConvertToString(" + child[0].Code + ")";                            
-                        }
-                        if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
-                        {
-                            s7 = "G.GetFreq(" + s7 + ")";
-                        }
-                        temp += s7;
-                        //}
-                        s1a.Append(temp);
-                    }
-                    else
-                    {
-                        throw new GekkoException();
-                    }
-                }
-                else throw new GekkoException();
-            }
-            o = s1.ToString();            
-            s.Append(s2);
-            s.Append(s1);
-            s.Append(" = ");
-            s.Append(s1a);
-            s.AppendLine(";");
-            StringBuilder s3 = new StringBuilder();
-            s3.Append("option_");
-            s3.Append(s1);
-            s3.Append(" = ");
-            string s1b = s1a.ToString();
-            if (s1b.StartsWith("@")) s1b = s1b.Substring(1);
-            s3.Append(s1b);
-            s3.Replace(@"\", @"\\");
-            s3.Replace("_", " ");
-            s3.Replace("`", "");
-            s3.Replace("true", "yes");
-            s3.Replace("false", "no");
-            s.AppendLine("G.Writeln();");
-            //#987350932752
-            //s.AppendLine("G.Writeln(Program.SubstituteAssignVars(`" + s3.ToString() + "`));");
-        }
+        //                //    temp += ("O.ConvertToString(" + child[0].Code + ")");  //@ because it can contain slashes
+        //                //}
+        //                //else
+        //                //{
+        //                string s7 = null;
+        //                if (child[0].Code.IsNull())
+        //                {
+        //                    s7 = "`" + child[0].Text + "`";
+        //                }
+        //                else
+        //                {
+        //                    s7 = "O.ConvertToString(" + child[0].Code + ")";                            
+        //                }
+        //                if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
+        //                {
+        //                    s7 = "G.GetFreq(" + s7 + ")";
+        //                }
+        //                temp += s7;
+        //                //}
+        //                s1a.Append(temp);
+        //            }
+        //            else
+        //            {
+        //                throw new GekkoException();
+        //            }
+        //        }
+        //        else throw new GekkoException();
+        //    }
+        //    o = s1.ToString();            
+        //    s.Append(s2);
+        //    s.Append(s1);
+        //    s.Append(" = ");
+        //    s.Append(s1a);
+        //    s.AppendLine(";");
+        //    StringBuilder s3 = new StringBuilder();
+        //    s3.Append("option_");
+        //    s3.Append(s1);
+        //    s3.Append(" = ");
+        //    string s1b = s1a.ToString();
+        //    if (s1b.StartsWith("@")) s1b = s1b.Substring(1);
+        //    s3.Append(s1b);
+        //    s3.Replace(@"\", @"\\");
+        //    s3.Replace("_", " ");
+        //    s3.Replace("`", "");
+        //    s3.Replace("true", "yes");
+        //    s3.Replace("false", "no");
+        //    s.AppendLine("G.Writeln();");
+        //    //#987350932752
+        //    //s.AppendLine("G.Writeln(Program.SubstituteAssignVars(`" + s3.ToString() + "`));");
+        //}
     }
 
     public class W

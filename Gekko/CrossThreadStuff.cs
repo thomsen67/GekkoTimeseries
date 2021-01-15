@@ -236,10 +236,8 @@ namespace Gekko
         {
             if (G.IsUnitTesting())
             {
-                Globals.unitTestScreenOutput = new StringBuilder();
-                //just ignore it: do not clear the stuff
-                //Globals.unitTestWindow.Clear();
-                //Console.Clear();
+                Globals.unitTestScreenOutput = new StringBuilder();  //used to capture text written on the GUI screen, for testing purposes
+                //just ignore it: do not clear the stuff                
                 return;
             }
             if (Gui.gui.textBoxTab3.InvokeRequired)

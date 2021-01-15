@@ -196,34 +196,7 @@ namespace UnitTests
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
 
             Program.InitUfunctionsAndArithmeticsAndMore();
-
-            //Globals.unitTestCounter++;
-            //if (Globals.unitTestWindow == null)
-            //{
-            //    Thread thread = new Thread(() =>
-            //    {
-            //        Globals.unitTestWindow = new SimpleUnitTestWindow();
-            //        Globals.unitTestWindow.Show();
-            //        //Globals.unitTestWindow.Closed += (sender2, e2) =>
-            //        //Globals.unitTestWindow.Dispatcher.InvokeShutdown();
-            //        System.Windows.Threading.Dispatcher.Run();
-            //    });
-            //    thread.SetApartmentState(ApartmentState.STA);
-            //    thread.Start();
-
-            //    System.Threading.Thread.Sleep(1000);  //wait 1 sec. to make sure the window is finished coming up.
-            //    //better would be to check for this, but that would demand a delegate...:
-            //    //for (int i = 0; i < 100; i++)
-            //    //{
-            //    //    if (Globals.unitTestWindow != null && Globals.unitTestWindow.IsLoaded) break;
-            //    //    System.Threading.Thread.Sleep(1000);  //wait 1 sec.
-            //    //    System.Windows.Forms.MessageBox.Show("Waited " + (i + 1) + " seconds");
-            //    //}
-
-
-            //    //Globals.unitTestWindow = new SimpleUnitTestWindow();
-            //    //Globals.unitTestWindow.Show();
-            //}
+            
         }
 
         // Use ClassCleanup to run code after all tests in a class have run

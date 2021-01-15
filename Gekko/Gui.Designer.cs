@@ -1411,7 +1411,7 @@ namespace Gekko
                 //
                 // F1
                 //
-                Program.Help("I_OVERVIEW");
+                Program.Help(Globals.helpStartPage);
             }            
             else if (e.KeyCode == Keys.F2)
             {

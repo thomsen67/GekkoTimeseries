@@ -336,8 +336,6 @@
     <Compile Include="GekkoError.cs" />
     <Compile Include="GekkoNull.cs" />
     <Compile Include="GekkoTime.cs" />
-    <Compile Include="GekkoTuple.cs" />
-    <Compile Include="GraphTemplate.cs" />
     <Compile Include="GuiDialogMakeShortcut.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -345,7 +343,6 @@
       <DependentUpon>GuiDialogMakeShortcut.cs</DependentUpon>
     </Compile>
     <Compile Include="CrossThreadStuff.cs" />
-    <Compile Include="DfsaneSolver.cs" />
     <Compile Include="Genr.cs" />
     <Compile Include="GListBox.cs">
       <SubType>Component</SubType>
@@ -419,9 +416,6 @@
     <Compile Include="ScalarString.cs" />
     <Compile Include="ScalarVal.cs" />
     <Compile Include="Series.cs" />
-    <Compile Include="SimpleUnitTestWindow.xaml.cs">
-      <DependentUpon>SimpleUnitTestWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="SplitContainerFix.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -530,10 +524,6 @@
     <Compile Include="WindowTreeViewWithCheckBoxes.xaml.cs">
       <DependentUpon>WindowTreeViewWithCheckBoxes.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XML_To_TreeView.xaml.cs">
-      <DependentUpon>XML_To_TreeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ZipWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -604,7 +594,6 @@
     <EmbeddedResource Include="yellow.gif" />
     <Content Include="Gekko.ico" />
     <Content Include="Images\Gekko.ico" />
-    <Content Include="__syntax.txt" />
     <Content Include="__progress.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -619,12 +608,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Menu.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="SimpleUnitTestWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <Generator>MSBuild:Compile</Generator>
@@ -693,12 +676,6 @@
     <Page Include="WindowTreeViewWithCheckBoxes.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="XML_To_TreeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup />

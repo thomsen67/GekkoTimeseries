@@ -2832,14 +2832,8 @@ namespace Gekko
                 else return false;
             }
             else return false;
-        }
+        }        
         
-        public static string GetVariableType(int n)
-        {
-            if (n == 1) return "IVariable";            
-            else return "GekkoTuple.Tuple" + n;
-        }
-
         public static string ReplaceGlueNew(string s)
         {
             //int length = s.Length;

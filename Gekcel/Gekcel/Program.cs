@@ -24,10 +24,7 @@ using Extensibility;
 //      Setting up immediate window, activate if not activated, focus, perhaps clear. Putting it on top??
 //      How to issue commands one by one?
 //      Do plots work??
-//      Clean up file mess, possible to put all in xll file?? 
 //      Decorate Excel with Gekko version number.
-//      Fix the Re() or RESET issue.
-//      Fix syntax regarding PUT/GET.
 //      See what EViews does.
 
 namespace Gekcel
@@ -306,9 +303,6 @@ namespace Gekcel
             // -----------------------------------------------------
             codeText +=
             @"
-Public Sub h(word)
-  MsgBox word
-End Sub
 
 Public Function Gekko(commands As String) As String  
   Dim gekcel As Object
@@ -340,21 +334,19 @@ Public Sub Gekko_Put()
   temp = CreateObject(""Gekcel.COMLibrary"").Gekko_Put(x1, 1)
 End Sub
 
-Public Sub Gekko_Demo()
-  Gekko ""tell 'Hello from Gekko';""
+Public Sub Gekko_Demo()  
   Gekko ""time 2015 2020;""
   Gekko ""x1 = 1, 2, 3, 4, 5, 6;""
   Gekko ""x2 = 2, 3, 4, 5, 6, 7;""
-  Gekko ""sheet x1, x2;""
-  Gekko_Get
   Gekko ""clone;""
-  Range(""C2"").Value = 777   '2016
-  Range(""D2"").Value = 888   '2017
+  Gekko ""sheet x1, x2;""
+  Gekko_Get  
+  Range(""C2"").Value = 2.1
+  Range(""D3"").Value = 3.9
   Gekko_Put
-  Gekko ""import <2017 2019 xlsx> gekcel;""
-  Gekko ""compare <2010 2020> file=knr_compare.txt;""
-  Gekko ""edit knr_compare.txt;""
-  Gekko ""prt x1[2015], x1[2016], x1[2017], x1[2018];""
+  Gekko ""import <xlsx> gekcel;""
+  Gekko ""compare file=compare.txt;""
+  Gekko ""edit compare.txt;""
 End Sub
 
 ";
@@ -363,12 +355,7 @@ End Sub
             // -----------------------------------------------------
 
             codeModule.InsertLines(lineNum, codeText);
-            targetExcelFile.Save();  //saves file
-
-            if (true)
-            {
-                app.Run("h", @"Gekko environment is set up and ready.");
-            }
+            targetExcelFile.Save();  //saves file            
 
             //app.Quit();
         }                
@@ -417,7 +404,7 @@ End Sub
 
             try
             {
-                Program.obeyCommandCalledFromGUI(commands, new P());
+                Program.RunCommandCalledFromGUI(commands, new P());
             }
             catch (Exception e)
             {

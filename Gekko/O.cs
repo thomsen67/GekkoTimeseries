@@ -596,6 +596,70 @@ namespace Gekko
             return rv;
         }
 
+        public static void PrintOptions(string path)
+        {
+            Program.options.Write(path);
+        }
+
+        //isBlock = 0 (not), 1 (first time), 2 (second time)
+        public static void HandleOptions(string s, int isBlock, P p)
+        {
+            string s2 = s.Replace("Program.options.", "");
+            if (G.Equal(s2, "freq"))
+            {
+                //see also #89073589324
+                Program.AdjustFreq();
+            }
+            else if (isBlock == 0 && G.Equal(s2, "interface_sound_type"))
+            {
+                if (!p.hasBeenCmdFile)
+                {
+                    Program.PlaySound();
+                }
+            }
+            else if (G.Equal(s2, "interface_edit_style"))
+            {
+                CrossThreadStuff.SetChecked();  //sets checkmarks regarding editor choice
+            }
+            else if (G.Equal(s2, "folder_menu") || G.Equal(s2, "menu_startfile"))
+            {
+                CrossThreadStuff.RestartMenuBrowser();
+            }
+            else if (G.Equal(s2, "interface_zoom"))
+            {
+                CrossThreadStuff.Zoom();
+            }
+            else if (G.Equal(s2, "folder_working"))
+            {
+                CrossThreadStuff.WorkingFolder("");
+            }
+            else if (G.Equal(s2, "interface_remote"))
+            {
+                Program.RemoteInit();
+            }
+            else if (isBlock == 0 && G.Equal(s2, "solve_gauss_reorder"))
+            {
+                G.Writeln();
+                G.Writeln("+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.");
+                G.Writeln("+++       (In command files, place this option before any MODEL statements).");
+            }
+            else if (isBlock == 0 && G.Equal(s2, "series_dyn"))
+            {
+                G.Writeln();
+                G.Writeln("*** ERROR: Deprecated option");
+                G.Writeln();
+                G.Writeln("+++ NOTE: The 'dyn' option has been deprecated. Instead, you may use <dyn> on individual series");
+                G.Writeln("+++       statements, or use 'BLOCK series dyn = yes; ... ; END;' to set the option for several");
+                G.Writeln("+++       series statemens. See more in the help, under the BLOCK command.");
+                G.Writeln();
+                throw new GekkoException();
+            }
+            else if (isBlock == 0 && G.Equal(s2, "timefilter_type"))  //TODO: only issue if really avg
+            {
+                G.Writeln2("+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.");
+            }                        
+        }
+
         public static List ExplodeIvariablesSeqFor(bool isNaked, IVariable iv)
         {
             List m = ExplodeIvariablesSeq(isNaked, iv);
