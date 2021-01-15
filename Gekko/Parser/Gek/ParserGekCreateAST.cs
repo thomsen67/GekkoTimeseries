@@ -40,7 +40,9 @@ namespace Gekko.Parser.Gek
             Cmd3Lexer lexer3 = new Cmd3Lexer(input);
             //usually debugTokens=false, and this is stepped into manually (otherwise the tokens are consumed and preliminary steps cannot be run)
             if (Globals.runningOnTTComputer && Globals.debugTokens)
+            {
                 Gekko.Parser.ParserCommon.DebugTokens(lexer3);
+            }
 
             // Create a stream of tokens pulled from the lexer
             CommonTokenStream tokens3 = new CommonTokenStream(lexer3);
