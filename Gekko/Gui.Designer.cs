@@ -36,8 +36,7 @@ namespace Gekko
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.listBoxAutoComplete = new Gekko.GListBox();
+            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();            
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
@@ -196,8 +195,7 @@ namespace Gekko
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.textBox2);
-            this.splitContainer1.Panel2.Controls.Add(this.listBoxAutoComplete);
+            this.splitContainer1.Panel2.Controls.Add(this.textBox2);            
             this.splitContainer1.Size = new System.Drawing.Size(966, 575);
             this.splitContainer1.SplitterDistance = 441;
             this.splitContainer1.SplitterWidth = 9;
@@ -292,21 +290,7 @@ namespace Gekko
             this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(221, 30);
             this.selectAllToolStripMenuItem.Text = "Select All (Ctrl+A)";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
-            // 
-            // listBoxAutoComplete
-            // 
-            this.listBoxAutoComplete.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listBoxAutoComplete.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.listBoxAutoComplete.ImageList = this.imageList1;
-            this.listBoxAutoComplete.Location = new System.Drawing.Point(204, 443);
-            this.listBoxAutoComplete.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.listBoxAutoComplete.Name = "listBoxAutoComplete";
-            this.listBoxAutoComplete.Size = new System.Drawing.Size(311, 80);
-            this.listBoxAutoComplete.TabIndex = 3;
-            this.listBoxAutoComplete.Visible = false;
-            this.listBoxAutoComplete.SelectedIndexChanged += new System.EventHandler(this.listBoxAutoComplete_SelectedIndexChanged);
-            this.listBoxAutoComplete.DoubleClick += new System.EventHandler(this.listBoxAutoComplete_DoubleClick);
-            this.listBoxAutoComplete.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listBoxAutoComplete_KeyDown);
+                        
             // 
             // imageList1
             // 
@@ -1234,9 +1218,7 @@ namespace Gekko
         #endregion
 
         public TabControl tabControl1;
-        public System.Windows.Forms.RichTextBox textBox2;        
-        private GListBox listBoxAutoComplete;
-        private GListBox testGL;
+        public System.Windows.Forms.RichTextBox textBox2;                
 
         //private System.Windows.Forms.TreeView treeViewItems;
         private System.Windows.Forms.TextBox textBoxTooltip;
@@ -1757,33 +1739,7 @@ namespace Gekko
         private void richTextBox1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             // Hide the listview and the tooltip
-            this.textBoxTooltip.Hide();
-            this.listBoxAutoComplete.Hide();
-        }
-
-        private void listBoxAutoComplete_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-        {
-            // Ignore any keys being pressed on the listview
-            this.textBox2.Focus();
-        }
-
-        private void listBoxAutoComplete_DoubleClick(object sender, System.EventArgs e)
-        {
-            // Item double clicked, select it
-            if (this.listBoxAutoComplete.SelectedItems.Count == 1)
-            {
-                this.wordMatched = true;
-                this.selectItem();
-                this.listBoxAutoComplete.Hide();
-                this.textBox2.Focus();
-                this.wordMatched = false;
-            }
-        }
-
-        private void listBoxAutoComplete_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-            // Make sure when an item is selected, control is returned back to the richtext
-            this.textBox2.Focus();
+            this.textBoxTooltip.Hide();            
         }
 
         private void textBoxTooltip_Enter(object sender, System.EventArgs e)
@@ -1791,69 +1747,7 @@ namespace Gekko
             // Stop the fake tooltip's text being selected
             this.textBox2.Focus();
         }
-
-        /// <summary>
-        /// Called when a "." is pressed - the previous word is found,
-        /// and if matched in the treeview, the members listbox is
-        /// populated with items from the tree, which are first sorted.
-        /// </summary>
-        /// <returns>Whether an items are found for the word</returns>
-        private bool populateListBox(string s)
-        {
-            return true;
-            //bool result = true;
-            //VBScriptParser parser = new VBScriptParser();
-            //StringReader reader = new StringReader(s);
-            //NonTerminalNode syntaxNode = parser.Parse(reader) as NonTerminalNode;
-            //string exp = "";
-            //string[] s5 = new string[TreeBuilder.VBScriptParser.expectedStatement.Count];
-            //int i = 0;
-            //this.listBoxAutoComplete.Items.Clear();
-            //foreach (string s3 in TreeBuilder.VBScriptParser.expectedStatement)
-            //{
-            //    exp = exp + s3 + " ";
-            //    s5[i] = (string)s3;
-            //    this.listBoxAutoComplete.Items.Add(new GListBoxItem(s3, 0));
-            //    i++;
-            //}
-            //Program.ShowPeriodInStatusField(" | Expects: " + exp);  //also updates expected statements
-            //if (syntaxNode != null)
-            //{
-            //}
-            //else
-            //{
-            //}
-            ////this.listBoxAutoComplete.Items.Add(new GListBoxItem("genr", -1));
-            ////this.listBoxAutoComplete.Items.Add(new GListBoxItem("upd", -1));
-            //return result;
-        }
-
-        /// <summary>
-        /// Autofills the selected item in the member listbox, by
-        /// taking everything before and after the "." in the richtextbox,
-        /// and appending the word in the middle.
-        /// </summary>
-        private void selectItem()
-        {
-            if (this.wordMatched)
-            {
-                int selstart = this.textBox2.SelectionStart;
-                int prefixend = this.textBox2.SelectionStart - typed.Length;
-                int suffixstart = this.textBox2.SelectionStart + typed.Length;
-
-                if (suffixstart >= this.textBox2.Text.Length)
-                {
-                    suffixstart = this.textBox2.Text.Length;
-                }
-
-                string prefix = this.textBox2.Text.Substring(0, prefixend);
-                string fill = this.listBoxAutoComplete.SelectedItem.ToString();
-                string suffix = this.textBox2.Text.Substring(suffixstart, this.textBox2.Text.Length - suffixstart);
-
-                this.textBox2.Text = prefix + fill + suffix;
-                this.textBox2.SelectionStart = prefix.Length + fill.Length;
-            }
-        }
+        
         public ToolStripButton toolStripButton2;
         private ToolStripMenuItem comparecheckDatabanksToolStripMenuItem;
         private ToolStripMenuItem comparecheckEquationsToolStripMenuItem;

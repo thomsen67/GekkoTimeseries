@@ -107,8 +107,7 @@ namespace Gekko
         public static Gui gui;
 
         public Gui()
-        {
-            this.listBoxAutoComplete = new GListBox();
+        {            
             this.textBox1 = new RichTextBoxEx();
             //this.settings1 = new Settings();
             this.splitContainer1 = new SplitContainerFix();

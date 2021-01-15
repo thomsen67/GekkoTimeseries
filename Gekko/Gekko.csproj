@@ -306,9 +306,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arrow.cs" />
-    <Compile Include="AutoComplete.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="GuiCompareUtility3Way.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -344,9 +341,6 @@
     </Compile>
     <Compile Include="CrossThreadStuff.cs" />
     <Compile Include="Genr.cs" />
-    <Compile Include="GListBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Databank.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -367,12 +361,6 @@
     </Compile>
     <Compile Include="IBank.cs" />
     <Compile Include="InputBox.cs" />
-    <Compile Include="Intelli.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Intelli.Designer.cs">
-      <DependentUpon>Intelli.cs</DependentUpon>
-    </Compile>
     <Compile Include="IVariable.cs" />
     <Compile Include="List.cs" />
     <Compile Include="ListViewDragDropManager.cs" />
@@ -381,9 +369,6 @@
     <Compile Include="Map.cs" />
     <Compile Include="MapMultidim.cs" />
     <Compile Include="Matrix.cs" />
-    <Compile Include="Menu.xaml.cs">
-      <DependentUpon>Menu.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Model.cs" />
     <Compile Include="MouseUtilities.cs" />
     <Compile Include="O.cs" />
@@ -439,10 +424,6 @@
     <EmbeddedResource Include="GuiDialogMakeBatfile.resx">
       <SubType>Designer</SubType>
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Intelli.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>Intelli.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TspUtilitiesDataGui.resx">
       <SubType>Designer</SubType>
@@ -607,12 +588,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Menu.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="WindowDecomp.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
