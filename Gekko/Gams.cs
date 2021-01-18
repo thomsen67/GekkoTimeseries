@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Gekko
 {
-    internal class Gdxcs : IDisposable
+    internal class GdxFast : IDisposable
     {
         private IntPtr pgdx;
         private bool extHandle;
@@ -1984,7 +1984,7 @@ namespace Gekko
             return libloader(dirName, libName, ref msgBuf);
         }
 
-        public Gdxcs(ref string msgBuf)
+        public GdxFast(ref string msgBuf)
         {
             bool gdxIsReady;
 
@@ -2000,7 +2000,7 @@ namespace Gekko
             }
             msgBuf = "Error while creating object";
         }
-        public Gdxcs(string dirName, ref string msgBuf)
+        public GdxFast(string dirName, ref string msgBuf)
         {
             bool gdxIsReady;
 
@@ -2016,7 +2016,7 @@ namespace Gekko
             }
             msgBuf = "Error while creating object";
         }
-        public Gdxcs(string dirName, string libName, ref string msgBuf)
+        public GdxFast(string dirName, string libName, ref string msgBuf)
         {
             bool gdxIsReady;
 
@@ -2032,7 +2032,7 @@ namespace Gekko
             }
             msgBuf = "Error while creating object";
         }
-        public Gdxcs(IntPtr gdxHandle, ref string msgBuf)
+        public GdxFast(IntPtr gdxHandle, ref string msgBuf)
         {
             bool gdxIsReady;
 
@@ -2047,7 +2047,7 @@ namespace Gekko
             if (!gdxIsReady) return;
             pgdx = gdxHandle;
         }
-        public Gdxcs(IntPtr gdxHandle, string dirName, ref string msgBuf)
+        public GdxFast(IntPtr gdxHandle, string dirName, ref string msgBuf)
         {
             bool gdxIsReady;
 
@@ -2063,7 +2063,7 @@ namespace Gekko
             pgdx = gdxHandle;
         }
 
-        ~Gdxcs()
+        ~GdxFast()
         {
             Dispose(true);
         }

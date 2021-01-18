@@ -1,6 +1,6 @@
 ﻿/* 
     Gekko Timeseries Software (www.t-t.dk/gekko).
-    Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
+    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

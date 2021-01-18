@@ -327,9 +327,8 @@
     <Compile Include="Databank_1_1.cs" />
     <Compile Include="DataFrame.cs" />
     <Compile Include="Decomp.cs" />
-    <Compile Include="DragAdorner.cs" />
     <Compile Include="Functions.cs" />
-    <Compile Include="Gdxcs.cs" />
+    <Compile Include="Gams.cs" />
     <Compile Include="GekkoError.cs" />
     <Compile Include="GekkoNull.cs" />
     <Compile Include="GekkoTime.cs" />
@@ -360,7 +359,7 @@
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
     </Compile>
     <Compile Include="IBank.cs" />
-    <Compile Include="InputBox.cs" />
+    <Compile Include="GuiInputBox.cs" />
     <Compile Include="IVariable.cs" />
     <Compile Include="List.cs" />
     <Compile Include="ListViewDragDropManager.cs" />
@@ -414,7 +413,7 @@
     </Compile>
     <Compile Include="G.cs" />
     <Compile Include="Globals.cs" />
-    <Compile Include="Graph.cs" />
+    <Compile Include="GuiGraph.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GuiDialogMakeBatfile.resx">
@@ -425,9 +424,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>GuiTspUtilitiesData.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Graph.resx">
+    <EmbeddedResource Include="GuiGraph.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>Graph.cs</DependentUpon>
+      <DependentUpon>GuiGraph.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -568,7 +567,6 @@
       <DependentUpon>Gui.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="yellow.gif" />
     <Content Include="Gekko.ico" />
     <Content Include="Images\Gekko.ico" />
     <Content Include="__progress.txt" />

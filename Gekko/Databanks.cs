@@ -1,6 +1,6 @@
 /* 
     Gekko Timeseries Software (www.t-t.dk/gekko).
-    Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
+    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -271,8 +271,6 @@ namespace Gekko
         {
             databank = this.storage[existI];  //the databank at the slot where the new databank is to be put in
             Databank rv = databank;
-            //databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
-            //readFromFile = false;
             if (openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition != 1))
             {
                 G.Writeln2("*** ERROR: Databank '" + rv.name + "' is already open. Use CLOSE to close it first.");
@@ -359,11 +357,6 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: OPEN <ref> not allowed.");
                 throw new GekkoException();
-                //m.Add(this.storage[0]);         //first
-                //m.Add(databank);                //ref
-                //m.Add(this.storage[1]);
-                //for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                //G.Writeln2("Opening databank '" + databank.name + "' as ref");
             }
             else if (ShouldPutBankLast(openType, openPosition))
             {

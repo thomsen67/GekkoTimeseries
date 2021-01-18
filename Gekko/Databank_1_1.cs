@@ -1,24 +1,35 @@
-﻿using System;
+﻿/* 
+    Gekko Timeseries Software (www.t-t.dk/gekko).
+    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program (see the file COPYING in the root folder).
+    Else, see <http://www.gnu.org/licenses/>.        
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using System.Text.RegularExpressions;
-//using System;
-
 using System.IO;
-//using System.Text;
-//using System.Collections.Generic;
 using System.Collections;
 using System.Globalization;
-
 using System.Threading;
-
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Drawing;
-
 using System.Data;
 using Microsoft.CSharp;
 using System.CodeDom;
@@ -28,18 +39,12 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Runtime.InteropServices;
-//using SevenZip;
 using System.Security.Permissions;
 using Microsoft.Win32;
 using System.Security.Cryptography;
 using System.Reflection.Emit;
 using System.Runtime.Serialization.Formatters.Binary;
-//using ProtoBuf;
-//using ProtoBuf.Meta;
-//using System.Diagnostics;
 using System.Collections.ObjectModel;
-
-//using System.Linq;
 using Gekko;
 using ProtoBuf;
 
@@ -1087,7 +1092,6 @@ namespace Gekko
                 databank.Clear();
             }
 
-
             if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
             double[] tempArray = new double[100000]; //we don't expect series with more than 100000 obs.
             int counter = 0;
@@ -1312,16 +1316,7 @@ namespace Gekko
                             GekkoTime gt2 = new GekkoTime(freq, d2, d2sub);
 
                             int offset = 0;
-
-                            ////See similar code in px reader
-                            //if (dates != null)
-                            //{
-                            //    var tuple = Program.GetFirstLastDates(dates, gt1, gt2);
-                            //    gt1 = tuple.Item1;
-                            //    gt2 = tuple.Item2;
-                            //    offset = tuple.Item3;
-                            //}
-
+                            
                             int nob = GekkoTime.Observations(gt1, gt2);
                             if (nob > 0)
                             {
@@ -1450,6 +1445,5 @@ namespace Gekko
             readInfo.startPerInFile = minYearInProtobufFile;
             readInfo.endPerInFile = maxYearInProtobufFile;
         }
-
     }
 }

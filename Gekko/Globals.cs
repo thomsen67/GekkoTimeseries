@@ -1,6 +1,6 @@
 /* 
     Gekko Timeseries Software (www.t-t.dk/gekko).
-    Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
+    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,15 +33,15 @@ using System.CodeDom.Compiler;
 
 
 namespace Gekko
-{   
-    
+{
+
     /// <summary>
     /// Contains global variables, settings etc.
     /// </summary>
-    public class Globals        
+    public class Globals
     {
         public static string smpl = "§¤£";  //this line must be at top
-        
+
         public static string versionInternal = "";
 
         public static bool bugStack = false;
@@ -50,6 +50,9 @@ namespace Gekko
 
         public static bool if_old_helper = false;
 
+        //Must be near the top of Globals.cs
+        public static int counter = 0;  //used when emitting C# code to avoid name collisions
+
         public static bool oldcontrol = true;
         public static bool oldcontrol2 = false;
 
@@ -57,17 +60,15 @@ namespace Gekko
 
         public static bool decompSubstitute = false;
 
-        public static StreamWriter sw = null; 
-        
+        public static StreamWriter sw = null;
+
         public static bool gnuplotfix = true;
 
         public static bool prompting = true;
         public static List<string> unitTestsPromtingHelper = null;
 
-        //public static EArrowType arrowType = EArrowType.Ver1_0__with_time_int_and_underscore_name;
-        
         public static bool excelDna = false;  //true for use with ExcelDna solution
-        public static bool excelDna2 = false;  
+        public static bool excelDna2 = false;
         public static StringBuilder excelDnaOutput = null;
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
         public static ExcelDnaData excelDnaData = null;
@@ -86,10 +87,6 @@ namespace Gekko
         // GRADIENT
         // ----------------------------------------------------------------
 
-        //public static bool gradientSolve = false;
-        //public static double naiveGradient = double.NaN; // 0.000002d;  //NaN to switch off
-        //public static double naiveMomentum = double.NaN; // 0.9d;  //NaN to switch off
-
         public static bool gradientSolve = false;
         public static double naiveGradient = double.NaN; //0.000002d;  //NaN to switch off
         public static double naiveMomentum = double.NaN; //0.9d;  //NaN to switch off
@@ -102,10 +99,8 @@ namespace Gekko
         public static int newtonRobustHelper1 = -12345;
         public static double[] newtonRobustHelper2 = new double[1000];
         public const double newtonRobustHelper3 = 0.000001d;
-        //public const double special_value2 = 1e6d;
-        //public static int disableStartingValuesFix = 0;        
         // ----------------------------------------------------------------
-        
+
         //Using GekkoArg instead of IVariable as function parameters
         //with both false and true: below code is about 12.6 sec in debug mode --> 166.000 per second
         //CODE: function val f(val %x); return %x + 1; end; %y = 0; for(val %i = 1 to 2e6); %y = f(%y); end; prt %y;
@@ -132,7 +127,7 @@ namespace Gekko
         public static string blockHelper = "<[time]>";
 
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction        
-        public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTIF_OLD", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" }};
+        public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTIF_OLD", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" } };
 
         public static string errorHelper = null;
 
@@ -141,14 +136,13 @@ namespace Gekko
         public static bool series_dynamic = true;
 
         public static bool fixLookup = true;
-        //public static bool seriesSpeedup = false; 
 
-        public static bool useIndexerAlone = false;               
+        public static bool useIndexerAlone = false;
 
         public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
         public static string isAProto = "Is_a_protobuffer_file";
-        
+
         public const int smplOffset = 2;       //<2026 2200 p> x = pch(@x); --> had to set it from 1 to 2...! 
         public const int smplInitStart = 0;  //could be -2
         public const int smplInitEnd = 0;
@@ -156,7 +150,7 @@ namespace Gekko
         public static int foldingButtonCounter = 0;
 
         public static int decompPerLag = -2;
-                
+
         public static GekkoDictionary<string, int> precedents = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
 
@@ -170,10 +164,8 @@ namespace Gekko
 
         public static bool testFileChange = true;
 
-        //public static bool smartLabels = true;
-
         public static string extensionPlot = "gpt";
-        public static string extensionCommand = "gcm";        
+        public static string extensionCommand = "gcm";
         public const string defaultCommandFileExtension = "gcm";  //merge this with the above...
         public static string extensionDatabank = "gbk";
         public static string extensionTable = "gtb";
@@ -185,16 +177,14 @@ namespace Gekko
         public static string serviceMessageTruncated = "[further service messages truncated]";
 
         public static bool nameFix = true;
-        
-        public static bool readImportFilter = false;
 
-        //public const bool timeSeriesLightShallowCopy = true;
+        public static bool readImportFilter = false;
 
         public static bool excelFix = true;
 
         //Convert to Dictionary if this becomes big.
         public static List<string> lagFunctions = new List<string> { "dlog", "dif", "diff", "pch", "dlogy", "dify", "diffy", "pchy", "movsum", "movavg", "lag", "avgt", "sumt" };
-                
+
         public static Dictionary<string, string> parentheses = new Dictionary<string, string> { { "(", ")" }, { "[", "]" }, { "{", "}" } };
         public static Dictionary<string, string> parenthesesInvert = new Dictionary<string, string> { { ")", "(" }, { "]", "[" }, { "}", "{" } };
         public static string comma = ";";
@@ -207,10 +197,6 @@ namespace Gekko
         public static string artificial = "artificial_parent_at_the_top_of_the_node_tree";
 
         public static bool newSplit = true;
-        //public static string splitSTART2 = "//[[splitSTART]]";
-        //public static string splitSTOP2 = "//[[splitSTOP]]";
-        //public static string splitSTART = G.NL + splitSTART2 + G.NL;        
-        //public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
         public static string functionParameterCode = "param_";
 
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
@@ -218,37 +204,20 @@ namespace Gekko
 
         public static Dictionary<int, Func<GraphHelper, string>> printCs = new Dictionary<int, Func<GraphHelper, string>>();
 
-        ////User functions: more can be added if necessary, or users can use LIST or DICT.
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable>> ufunctions0 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable>> ufunctions1 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable>> ufunctions2 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable>> ufunctions3 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions4 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions5 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions6 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions7 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions8 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions9 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions10 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions11 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions12 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions13 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-        //public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions14 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
-
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,IVariable>> ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, bool,IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, IVariable>> ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, IVariable>> ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew3 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew4 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew5 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew6 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew7 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew8 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew9 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew10 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();        
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>> ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>> ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable>> ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew3 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew4 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew5 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew6 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew7 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew8 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew9 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew10 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
 
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
@@ -261,20 +230,14 @@ namespace Gekko
         public static System.Windows.Forms.Form mFrmDummyHost = new System.Windows.Forms.Form();
 
         public static int graphBackground = 255; //221 before
-        
-        //public static string splitCommandBlockStart = "//[[commandStart]]";
-        //public static string splitCommandBlockEnd = "//[[commandEnd]]";
 
         public const string brandNewFile = "brand new file";
 
         public const string bankNumberiName = "bankNumber";
         public const string bankNumberiMax = "1";
 
-        public static bool showTimings = false;  //use comand TIMINGS
+        public static bool showTimings = false;  //use comand TIMINGS                
 
-        
-        
-        //public static int stackedTimePeriods = 5;
         public static string stackedTimeSeparator = "___";
         public static bool stackedPrintTimings = false;
 
@@ -284,32 +247,27 @@ namespace Gekko
         public static bool useRfFr = false;
 
         public static bool fixIndexerMaybeTransform = false;
-                
-        public static List<string> r_fileContent = null;        
+
+        public static List<string> r_fileContent = null;
         public static List<string> python_fileContent = null;
 
         public static bool useCache = false;  //also makes sure vars GetTimeSeries is outside time loop in SERIES statement! See #9875235      
         public static bool useDotFunctionalityInParser = false;
-        
+
         public static bool UNITTESTFOLLOWUP = false;
         public static bool UNITTESTFOLLOWUP_important = false;
 
         public static bool holesFix = true;
-                
+
         public static string restartSnippet = "restart; mode data;";
 
         public static int firstPeriodPositionInArrayNull = int.MaxValue;
         public static int lastPeriodPositionInArrayNull = int.MinValue;
 
-        //public static bool isAlphaVersion = false;
-        //public static bool isBetaVersion = false;
-        //public static bool isGammaVersion = false; 
-        //public static bool isPreviewVersion = false; //for preview of 2.0    
-
         public static List<string> unitTestDependents = null;
 
         public const string stringConversionNote = "+++ NOTE: You can use a string %s as a variable name with {%s}";
-        
+
         public const string Work = "Work";
         public const string Ref = "Ref";
         public const string First = "First";
@@ -319,7 +277,7 @@ namespace Gekko
 
         //only used as keys in switches etc.
         public const string ref_name = "ref";
-        public const string first_name = "first";        
+        public const string first_name = "first";
         public const string local_name = "local";
         public const string global_name = "global";
 
@@ -327,7 +285,7 @@ namespace Gekko
 
         public const string symbolRefShortcut = "@";
 
-        public const string printCode_n = "n";        
+        public const string printCode_n = "n";
         public const string operator_p = "p";
         public const string operator_d = "d";
         public const string operator_dp = "dp";
@@ -348,7 +306,7 @@ namespace Gekko
         public const string fixedParameterText = "everything fixed (parameter)";
 
         public List<Databank> bankOpen = new List<Databank>();
-        
+
         public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
 
@@ -356,9 +314,6 @@ namespace Gekko
 
         public static List<Action<string, GekkoTime>> predictActions = null;
 
-        //public static string functionT1Cs = "t";
-        //public static string functionT2Cs = "GekkoTime t";
-        
         public static string functionTP1Cs = Globals.smpl + ", p";
         public static string functionTP2Cs = "GekkoTime " + Globals.smpl + ", P p";
 
@@ -368,35 +323,21 @@ namespace Gekko
         public static string functionP1Cs = "p";
         public static string functionP2Cs = "P p";
 
-        //public static string uProc = "UProc";
-        //public static Dictionary<string, string> uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
 
-        //public static bool useTestParser = true;  //for debugging, use trial parser        
         public static bool substituteAssignVars = false;
 
         public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
         public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0
 
-        //public static string clearTsCsCode = "ClearTS(p);";  //so it is easier to track the location of these
-
-        //Must be near the top of Globals.cs
-
-        public static int counter = 0;  //used when emitting C# code to avoid name collisions
-                
         public static string startGekkoTimeIteratorCode = "{" + G.NL + "  t = t2; " + G.NL;
         public static string endGekkoTimeIteratorCode = "}" + G.NL + "t = GekkoTime.tNull; " + G.NL;
 
         public static string gekkoSmplIteratorName = "{__GekkoCounter__}";
         public static string startGekkoSmplIteratorCode = "for (int iSmpl" + gekkoSmplIteratorName + " = 0; iSmpl" + gekkoSmplIteratorName + " < int.MaxValue; iSmpl" + gekkoSmplIteratorName + "++) {" + G.NL;
         public static string endGekkoSmplIteratorCode = G.NL + "if (" + Globals.smpl + ".HasError()) O.TryNewSmpl(" + Globals.smpl + ", iSmpl" + gekkoSmplIteratorName + "); else break;" + G.NL + "}";
-        
-
-        //public static string startGekkoListIteratorCode = "{" + G.NL + " //HEJ1 " + G.NL;
-        //public static string endGekkoListIteratorCode = "}" + G.NL + " //HEJ2 " + G.NL;
 
         public const string indexerAloneCheatString = "[<{THIS IS AN IndexerAlone CALL}>]";
         public const string labelCheatString = "[<{THIS IS A LABEL}>]";
@@ -413,15 +354,15 @@ namespace Gekko
 
         //See also #80927435209843
         public static string dateStamp = Program.GetDateStamp();
-        
+
         public static StringBuilder errorMemory = null;
-        
+
         public static bool unitTestIntegration = false;
-        
+
         public static string unitTestIntegrationMessage = "Set Globals.unitTestIntegration = true to run integration tests";
         public static List<ToFrom> unitTestCopyHelper = null;
         public static bool unitTestCopyHelper2 = false;
-                
+
         public static Table unitTestTablePointer = null;  //used to see if table generated in PRT etc looks ok (regardless of how it actually prints)
 
         public static bool alwaysEnablcPackForSimulation = false;  //if true, packing of non-failing simulations is easy (but this costs time)
@@ -443,15 +384,13 @@ namespace Gekko
         // ----
         public static List<List<string>> listSyntaxAlias = new List<List<string>>();
         public static List<List<string>> listSyntax = Options.Syntax();  //this is created once and for all and is used for the entire Gekko session (not redone in RESET/RESTART)
-        
+
         public static bool patch_zvar = true;
-        
-        //public const string symbolTurtle = "¤";
+
         public const string symbolTurtle = "___";
 
         public const string symbolBankColon = ":";
         public const char symbolBankColon2 = ':';
-        //public const char symbolTilde = '!';
         public const char symbolCollection = '#';
         public const char symbolScalar = '%';
         public const string symbolDollar = "$";
@@ -487,8 +426,8 @@ namespace Gekko
         public static int freezeDecompRows = 1;
         public static int freezeDecompCols = 1;
         public static int guiTableCellWidth = 100;
-        public static int guiTableCellHeight = 20;        
-                
+        public static int guiTableCellHeight = 20;
+
         public static double pruneDecomp = 0.10d;
         public static double guiPruneDecomp = 0.20d;  //bind this to combobox in gui -- not used?
 
@@ -500,7 +439,7 @@ namespace Gekko
         public static bool printTimerResults = false;  //normally false
         public static bool printStopWhenErrors = false;  //normally false
         public static bool printOnlyErrors = true;  //normally false
-                
+
         public static bool bugfix_speedup2 = false; //!! does not really offer speedup.... :-(   faster sum() for array-sreies
         public static bool bugfix_speedup3 = false; //!! entails problem with PRT<r>, problematic...
 
@@ -513,12 +452,12 @@ namespace Gekko
         public const string labelCounter = "labelCounter";
 
         public static string reportLabel1 = "O.ReportLabel(" + Globals.smpl + ", ";
-        public const string reportLabel2 = ")";        
+        public const string reportLabel2 = ")";
 
         public static int guiTimerCounter = 0;
         public static System.Timers.Timer guiTimer = null;  //only runs when executing a command
 
-        public static int guiTimerCounter2 = 0;  
+        public static int guiTimerCounter2 = 0;
         public static System.Timers.Timer guiTimer2 = null;  //runs the entire time (listens for remote.gcm)
 
         public static bool remoteIsInvestigating = false;  //to provide some thread safety
@@ -536,15 +475,15 @@ namespace Gekko
 
         public static StringBuilder unitTestScreenOutput = new StringBuilder();
 
-        public static bool pipe = false;        
-        public static PipeFileHelper pipeFileHelper = new PipeFileHelper();            
+        public static bool pipe = false;
+        public static PipeFileHelper pipeFileHelper = new PipeFileHelper();
 
         public static bool pipe2 = false;
         public static PipeFileHelper pipeFileHelper2 = new PipeFileHelper();  //pipe 2 is for printing etc. when user choses "p fy file=myfile.txt"
-        
+
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
-        
-        public static bool saffierPrintIterations = false;        
+
+        public static bool saffierPrintIterations = false;
 
         public static List<string>[] globalAl;
         public static List<string>[] globalAlType;
@@ -554,34 +493,34 @@ namespace Gekko
 
         public static string blankUsedAsPadding = " ";  //to be able to remove that stuff sometime when I understand padding in richtextbox!
 
-        public static int globalMax;        
+        public static int globalMax;
 
         public static string expectedStatement = "";
-        
+
         //global time settings
 
         public static GekkoTime globalPeriodStart = GekkoTime.tNull;
         public static GekkoTime globalPeriodEnd = GekkoTime.tNull;
         public static GekkoTimeSpans globalPeriodTimeSpans = new GekkoTimeSpans();  //nothing in .data yet.
         public static GekkoTimeSpans globalPeriodTimeFilters = new GekkoTimeSpans();  //nothing in .data yet.
-        public static List<GekkoTime> globalPeriodTimeFilters2 = new List<GekkoTime>();        
+        public static List<GekkoTime> globalPeriodTimeFilters2 = new List<GekkoTime>();
 
         public static string decompText0 = "Expression";
         public static string decompText1 = "[Data error]";
         public static string decompText1a = "[Difference]";
         public static string decompText2 = "[Decomp. error]";
         public static string decompText2a = "[Right hand side]";
-        
+
         public static int solveJacobiSparse = 0;
-        
+
         public static int solveNewtonSimpleBacktrack = 1;
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
 
         public static string gekkoExePath = "";  //probably strange when unit testing or calling Gekcel
-        public static string gekkoVersion = "";        
+        public static string gekkoVersion = "";
 
-        public static bool useDfsane = false;        
-        
+        public static bool useDfsane = false;
+
         public static double invertRelativeConvergence = 0.0001d;  //old val=0.003d
         public static double invertAbsoluteConvergence = 1.0e-8d;
         public static int invertIterations = 500;  //old val=1000000
@@ -609,7 +548,7 @@ namespace Gekko
         public static int printRelativeWidthSmall = 7;  //this way, it can print -112.00% for instance, 6 is too small
         public static int printRelativeWidthLarge = 10;  //to give more room for variable names
 
-        public static int printFrnnFile = 1;        
+        public static int printFrnnFile = 1;
 
         public static double NewtonAbsoluteCrit = 1.0e-4;  //1.0 e-4 tol for newton algorithm  
         public static double jacobiDeltaProbe = 1.0e-4; //1.0 e-4 stepsize for gradient computation        
@@ -619,7 +558,7 @@ namespace Gekko
         public static bool solveUseStrictCrits = true;
         public static bool solveCheckThatAllDataGetsFromBArrayToTimeSeries = true;
 
-        public static List<string> checkoff = new List<string>();        
+        public static List<string> checkoff = new List<string>();
 
         public static string userSettingsPath = "";
 
@@ -634,19 +573,19 @@ namespace Gekko
 
         public static string cmdPathAndFileName = "";
         public static string cmdFileName = "";
-        public static List<string> cmdFileLines = null;        
+        public static List<string> cmdFileLines = null;
 
         public static string tableOption = "";
 
         public static int modelRandomID = 12345678;  //used in order to make a unique name for a temp folder that is later zipped (and the folder is deleted)
-        
+
         public static readonly Random random777 = new Random();
         public static readonly object randomSyncLock = new object();
         public static int tempVarIndexCounter = 0;
 
         public static Random random = new Random();  //for reuse in functions runif() and rnorm()
 
-        public static string[] convergenceCheckVariables = new string[1];        
+        public static string[] convergenceCheckVariables = new string[1];
         public static bool initializeDataArrayWithNaN = true;
         public static bool simulationCheckThatAllDataGetsFromBArrayToTimeSeries = true;
 
@@ -660,20 +599,20 @@ namespace Gekko
         public static double toleranceRegardingBrokenLagsOrLeads = 0.000001;
 
         public static String modelFileExtension = "frm";
-        
+
         public static UserSettings userSettings = new UserSettings();
 
         /// <summary>
         /// Used when parsing, puts in extra blank lines for safety (to avoid out-of-array problems)
         /// </summary>
         public static int extra = 10;  //
-        
+
         /// <summary>
         /// For internal use only, to set a default size for double[] arrays.
         /// </summary>
         public static int defaultPeriodsWhenCreatingTimeSeries = 200;  //200
         public static double defaultExpandRateForDataArrays = 1.5d;
-        
+
         /// <summary>
         /// Used for kind of an internal hack
         /// </summary>
@@ -694,8 +633,6 @@ namespace Gekko
         public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
         public static List<Func<GekkoSmpl, IVariable>> expressions = null;  //used for x[#i] kind of equations
 
-        //public static List<string> freeIndexedListsDecomp = null;
-
         public static bool concatPointer = true;
 
         public static int removeAllLags = 0;
@@ -711,17 +648,17 @@ namespace Gekko
 
         public static string protectSymbol = "\u2714";
 
-        public static Timer timer = new Timer();        
+        public static Timer timer = new Timer();
 
         public static bool setPrintMute = false;
         public static bool doNotSaveUserSettings = false;
 
         public static string ols1 = "OLS estimation";
         public static string ols2 = "Dep. variable = ";
-                
+
         public static CompilerOptions co = new CompilerOptions();
         public static string compilerOptions32 = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
-        public static string compilerOptions64 = "/optimize /platform:x64";  
+        public static string compilerOptions64 = "/optimize /platform:x64";
 
         public static ArrayList alFunctions;
         public static CaseInsensitiveHashtable userFunctions;
@@ -730,117 +667,116 @@ namespace Gekko
         public static bool btnStopThread = false;
         public static LongProcess workerThread = null;
         public static Queue<string> tasks = new Queue<string>();
-                
+
         public static List<Graph> windowsGraph = new List<Graph>();
         public static List<Window1> windowsDecomp = new List<Window1>();
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();
         public static CounterHelper ch = new CounterHelper();
 
         public static bool revertSimpleJ = true;
-
+        
         public static string helpStartPage = "introduction";
 
         public static List<string> helpTopics = new List<string>() {  //this list corresponds to items in "Gekko commands" in the help files
-            //done april 2019, see also Globals.extraNames and Globals.commandNames
-
-                                                "ACCEPT",
-                                                "ANALYZE",
-                                                "BLOCK",
-                                                "CHECKOFF",
-"CLEAR",
-"CLIP",
-"CLONE",
-"CLOSE",
-"CLS",
-"COLLAPSE",
-"COMPARE",
-"COPY",
-"COUNT",
-"CUT",
-"CREATE",
-"DATE",
-"DECOMP",
-"DELETE",
-"DISP",
-"DOC",
-"DOWNLOAD",
-"EDIT",
-"END",
-"ENDO",
-"EXIT",
-"EXO",
-"EXPORT",
-"FINDMISSINGDATA",
-"FOR",
-"FUNCTION",
-"GLOBAL",
-"GOTO",
-"HDG",
-"HELP",
-"IF",
-"IMPORT",
-"INDEX",
-"INI",
-"INTERPOLATE",
-"ITERSHOW",
-"LIST",
-"LOCAL",
-"LOCK",
-"MAP",
-"MATRIX",
-"MEM",
-"MENU",
-"MODE",
-"MODEL",
-"MULPRT",
-"OLS",
-"OPEN",
-"OPTION",
-"PAUSE",
-"PIPE",
-"PLOT",
-"PROCEDURE",
-"PRT",
-"R_EXPORT",
-"R_FILE",
-"R_RUN",
-"REBASE",
-"READ",
-"RENAME",
-"RESET",
-"RESTART",
-"RETURN",
-"RUN",
-"SERIES",
-"SHEET",
-"SIGN",
-"SIM",
-"SMOOTH",
-"SPLICE",
-"STOP",
-"STRING",
-"SYS",
-"TABLE",
-"TARGET",
-"TELL",
-"TIME",
-"TIMEFILTER",
-"TRANSLATE",
-"TRUNCATE",
-"UNFIX",
-"UNLOCK",
-"VAL",
-"VAR",
-"WRITE",
-"X12A",
-"XEDIT"
+            //done January 2021, see also Globals.extraNames and Globals.commandNames
+            "ACCEPT",
+            "ANALYZE",
+            "BLOCK",
+            "CHECKOFF",
+            "CLEAR",
+            "CLIP",
+            "CLONE",
+            "CLOSE",
+            "CLS",
+            "COLLAPSE",
+            "COMPARE",
+            "COPY",
+            "COUNT",
+            "CUT",
+            "CREATE",
+            "DATE",
+            "DECOMP",
+            "DELETE",
+            "DISP",
+            "DOC",
+            "DOWNLOAD",
+            "EDIT",
+            "END",
+            "ENDO",
+            "EXIT",
+            "EXO",
+            "EXPORT",
+            "FINDMISSINGDATA",
+            "FOR",
+            "FUNCTION",
+            "GLOBAL",
+            "GOTO",
+            "HDG",
+            "HELP",
+            "IF",
+            "IMPORT",
+            "INDEX",
+            "INI",
+            "INTERPOLATE",
+            "ITERSHOW",
+            "LIST",
+            "LOCAL",
+            "LOCK",
+            "MAP",
+            "MATRIX",
+            "MEM",
+            "MENU",
+            "MODE",
+            "MODEL",
+            "MULPRT",
+            "OLS",
+            "OPEN",
+            "OPTION",
+            "PAUSE",
+            "PIPE",
+            "PLOT",
+            "PROCEDURE",
+            "PRT",
+            "PREDICT",            
+            "R_RUN",
+            "PYTHON_RUN",
+            "REBASE",
+            "READ",
+            "RENAME",
+            "RESET",
+            "RESTART",
+            "RETURN",
+            "RUN",
+            "SERIES",
+            "SHEET",
+            "SIGN",
+            "SIM",
+            "SMOOTH",
+            "SPLICE",
+            "STOP",
+            "STRING",
+            "SYS",
+            "TABLE",
+            "TARGET",
+            "TELL",
+            "TIME",
+            "TIMEFILTER",
+            "TRANSLATE",
+            "TRUNCATE",
+            "UNFIX",
+            "UNLOCK",
+            "VAL",
+            "VAR",
+            "WRITE",
+            "X12A",
+            "XEDIT"
         };
 
         public static List<string> extraNames = new List<string>() { "P", "PRI", "PRINT", "SER" };
         public static List<string> commandNames = Program.Add2Lists(Globals.helpTopics, Globals.extraNames);  //must be after the two lists
 
         public static bool showZero = true;
-        
+
         public static int yearIndicator = 1500;
 
         public static int _tmptmpCounter = 0;
@@ -875,10 +811,10 @@ namespace Gekko
         public static Dictionary<long, GekkoAction> linkAction = new Dictionary<long, GekkoAction>();
 
         public static string gekkoExeParameters = null;
-        
+
         public static bool runningOnTTComputer = false;
         public static DateTime timeHelper = DateTime.Now;
-        
+
         public static bool splitCsCodeIntoChunks = true; //can be switched with "ssplit"
         public static int splitCsCodeIntoChunksLinesPerChunk = 10;
         public static bool simpleCode = false;  //activates ast_upd(), can be switched with "ssimple"
@@ -899,7 +835,7 @@ namespace Gekko
         public static bool histo = false;
 
         public static bool printAST = false;  //for debugging, gets true when "ast" is typed at command prompt        
-        
+
         public static Excel.Application objApp = null;
         public static int excelLastThreadID = int.MinValue;
 
@@ -914,12 +850,12 @@ namespace Gekko
 
         public static string detectedRPath = null;
         public static string detectedPythonPath = null;
-        
+
         public static string guiDialogErrorText = "ERROR: Would you like to abort (Y), or ignore the error (N)";
         public static string guiDialogErrorCaption = "Error handling";
 
         public static int endOfLinePositionWhenLastEnterPressed = -12345;
-        public static int startOfLinePositionWhenLastEnterPressed = -12345;        
+        public static int startOfLinePositionWhenLastEnterPressed = -12345;
 
         public static bool timing = true;
 
@@ -931,7 +867,7 @@ namespace Gekko
                                                 //so glue is only when preceeding chars is ident
         public static string lbrackGlue = "½";  //f[x] --> f€x]. But f [x] --> f [x] and f[(3+1)-2] --> f€(3+1)-2)
                                                 //so glue is only when preceeding chars is ident
-        
+
         public static bool printGrayLinesForDebugging = false;
         public static int debugCounter = 0;
 
@@ -947,10 +883,10 @@ namespace Gekko
 
         public static int convertTableCounter = 0;
         public static int convertTableErrorCounter = 0;
-                
+
         public static string tableConverterText1 = "// ----------------------------------------------------------------------";
         public static string tableConverterText2 = "// This file is auto-generated, made from a XML table file";
-        public static string tableConverterText3 = "// XML table filename: ";        
+        public static string tableConverterText3 = "// XML table filename: ";
         public static string tableConverterText4 = "// ----------------------------------------------------------------------";
         public static string tableConverterText5 = "//";
 
@@ -965,8 +901,8 @@ namespace Gekko
         public static int convertMenuErrorCounter = 0;
 
         public static int convertTabToTextCounter = 0;
-        public static int convertTabToTextErrorCounter = 0;                
-        
+        public static int convertTabToTextErrorCounter = 0;
+
         public static System.Drawing.Color warningColor = System.Drawing.Color.OrangeRed;
         public static System.Windows.Media.Color GrayExcelLine = System.Windows.Media.Color.FromArgb(255, 208, 215, 229); //as in Excel
         public static System.Windows.Media.Color GrayExcelSelect = System.Windows.Media.Color.FromArgb(255, 234, 236, 245);  //as in Excel
@@ -980,8 +916,8 @@ namespace Gekko
 
         public static double missingVariableZero = 0d;
         public static double missingVariableArtificialNumber = 3e303d;  //max value for double is 1.7976931348623157E+308. GAMS uses e300, so we use e303
-        public static double missingVariableArtificialNumberLow = 2.999e303d; 
-        public static double missingVariableArtificialNumberHigh = 3.001e303d; 
+        public static double missingVariableArtificialNumberLow = 2.999e303d;
+        public static double missingVariableArtificialNumberHigh = 3.001e303d;
 
         public static char pxInternalDelimiter = '¤';
 
@@ -989,11 +925,11 @@ namespace Gekko
 
         public static CodeDomProvider csCompiler = CodeDomProvider.CreateProvider("CSharp");
         public static ICodeCompiler iCodeCompiler = Globals.csCompiler.CreateCompiler();
-                
+
         public static string gekkoSmplInit = "GekkoSmpl " + Globals.smpl + " = new GekkoSmpl(); O.InitSmpl(" + Globals.smpl + ", p);";
         public static string gekkoSmplInitCommand = "O.InitSmpl(" + Globals.smpl + ", p);";
         public static string GekkoSmplNull = "" + Globals.smpl + " = null;";
-        
+
         public static string iniFileSecretName = "[[RunGekkoIniFile]]";
 
         public static WindowIntellisense windowIntellisense = null;
@@ -1019,7 +955,7 @@ namespace Gekko
     public class CounterHelper
     {
         public int windowsGraphCloseCounter = 0;
-        public int windowsDecompCloseCounter = 0;        
+        public int windowsDecompCloseCounter = 0;
         public int windowsGraphUpdateCounter = 0;
         public int windowsDecompUpdateCounter = 0;
         public int windowsGraphUpdateFailedCounter = 0;

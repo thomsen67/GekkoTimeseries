@@ -59,24 +59,12 @@ namespace Gekko
     public interface IVariable
     {
         //The following classes implement this interface:
-        // ScalarVal, ScalarString, ScalarDate, List, MetaTimeSeries. (matrix/vector will come...)
+        //Series, ScalarVal, ScalarString, ScalarDate, List, Matrix, Map
         //
         //NOTE: At some point we need to create a lot of overloads, InjectAdd() with double as 1. or 2. or both arguments,
         //      same for InjectMinus() etc. etc. Maybe also with dates and strings.
         //      That will speed up i=i+1 stuff up a lot.
-        //      How to do this consistently without duplicating code???
-
-        // ----------------------------------------------------
-        // --------------object functions start----------------
-        // ----------------------------------------------------
-
-        //IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x);
-
-        //IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x);
-
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------
+        //      How to do this consistently without duplicating code???        
 
         IVariable Add(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
         

@@ -134,7 +134,6 @@
     <Compile Include="Cmd3Parser.cs" />
     <Compile Include="ModelLexer.cs" />
     <Compile Include="ModelParser.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

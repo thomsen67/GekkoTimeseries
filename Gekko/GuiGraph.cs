@@ -1,6 +1,6 @@
 /* 
     Gekko Timeseries Software (www.t-t.dk/gekko).
-    Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
+    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ namespace Gekko
         public bool isLogTransform = false;
     }
 
-        public class Graph : Form
+    public class Graph : Form
     {
         //public string csCode = null;
 
@@ -56,14 +56,7 @@ namespace Gekko
         public RadioButton radioButton8;
         public CheckBox checkBox1;
         private GroupBox groupBox1;
-
-        //public string emfName = "";
-        //public List<string> graphVars;
-        //public List<string> graphVarsNames;
-        //public GekkoTime tStart;
-        //public List<Dictionary<string, string>> precedents;
-        //public int tSubStart;
-
+        
         private ToolTip toolTip1;
         private IContainer components;
 
@@ -72,19 +65,16 @@ namespace Gekko
         private Button button3;
         private System.Windows.Forms.Label label1;
         private Button button4;
-        //public GekkoTime tEnd;
-        //public int tSubEnd;
+        
         public GraphOptions graphOptions = null;
         public Table dd;
-        //public string csSnippet = null;
+        
         public bool graphErrors = false;
 
         public Graph(GraphOptions input)
         {
             this.graphOptions = input;
-            this.StartPosition = FormStartPosition.Manual;
-            //if (this.graphOptions.csSnippet == null) this.graphOptions.csSnippet = Globals.lastPrtCsSnippet;
-            //if (this.graphOptions.csSnippetHeader == null) this.graphOptions.csSnippetHeader = Globals.lastPrtCsSnippetHeader;
+            this.StartPosition = FormStartPosition.Manual;            
 
             InitializeComponent();
             Shown += Form1_Shown;
@@ -304,7 +294,7 @@ namespace Gekko
             this.Controls.Add(this.button1);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.groupBox1);
-            //this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            
             this.KeyPreview = true;
             this.Name = "Graph";
             this.Text = "Graph";
@@ -368,21 +358,14 @@ namespace Gekko
             else if (isDiff && !isMultiplier) s = "d";
             else if (isDlog && isMultiplier) s = "m";
             else if (isDlog && !isMultiplier) s = "d";
-
-            //if (isDlog || isLog) this.graphOptions.o.guiGraphIsLogTransform = true;
-            //this.graphOptions.o.interactivePrintCode = s;                                 
-            //this.graphOptions.o.printCodes.Add(new OptString(s, "yes"));
-            //this.graphOptions.o.guiGraphIsRefreshing = true;
-
+            
             GraphHelper gh = new Gekko.GraphHelper();
             gh.operator2 = s;
             if (isDlog || isLog) gh.isLogTransform = true;
             gh.isRefreshing = true;
 
             string emfName = Globals.printCs[this.graphOptions.printCsCounter](gh);
-
-            //this.graphOptions.o.Exe();            
-            //this.graphOptions.emfName = this.graphOptions.o.guiGraphRefreshingFilename;            
+                               
             this.graphOptions.emfName = emfName;
             Invalidate();
         }
@@ -569,8 +552,7 @@ namespace Gekko
                 if (Globals.windowsGraph != null && this != null) Globals.windowsGraph.Remove(this);
             }
             catch { }
-            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
-            //CrossThreadStuff.ShowPeriodInStatusField();
+            
         }
     }
 
@@ -587,8 +569,7 @@ namespace Gekko
         public GekkoTime tEnd;
         public LocalBanks localBanks = new LocalBanks();
         public string title;
-        //public string csSnippet = null;
-        //public string csSnippetHeader = null;
+        
         public bool windowIsShown = false;
         public long counter = -12345;
         public int printCsCounter = -12345;

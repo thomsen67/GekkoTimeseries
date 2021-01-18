@@ -1,6 +1,6 @@
 /*
     Gekko Timeseries Software (www.t-t.dk/gekko)..
-    Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
+    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -5705,7 +5705,7 @@ namespace Gekko
                     int d;
                     if (gamsDir == null) gamsDir = "";                    
 
-                    Gdxcs gdx = new Gdxcs(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
+                    GdxFast gdx = new GdxFast(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
                     if (msg != string.Empty)
                     {
                         G.Writeln("*** ERROR: Could not load GDX library");
@@ -6160,7 +6160,7 @@ namespace Gekko
             }
         }
 
-        //static void WriteData(string s, double V, Gdxcs gdx)
+        //static void WriteData(string s, double V, GdxFast gdx)
         //{
         //    string[] Indx = new string[gamsglobals.maxdim];
         //    double[] Values = new double[gamsglobals.val_max];
@@ -6231,8 +6231,8 @@ namespace Gekko
                 
                 //Sysdir = arguments[1];
                 //Console.WriteLine("XP_Example1 using GAMS system directory: " + gamsDir);
-                Gdxcs gdx = new Gdxcs(gamsDir, ref Msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
-                //Gdxcs gdx = new gdxcs(Sysdir, ref Msg);
+                GdxFast gdx = new GdxFast(gamsDir, ref Msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
+                //GdxFast gdx = new gdxcs(Sysdir, ref Msg);
                 if (Msg != string.Empty)
                 {
                     Console.WriteLine("**** Could not load GDX library");
@@ -6712,7 +6712,7 @@ namespace Gekko
         //    return counterVariables;
         //}
 
-        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, Gdxcs gdx, Series ts2, string[] ss, double[] gdxValues)
+        private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GdxFast gdx, Series ts2, string[] ss, double[] gdxValues)
         {
             
             if (ts2.type == ESeriesType.Timeless)
@@ -6772,7 +6772,7 @@ namespace Gekko
         }
 
 
-        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, string[] domainStrings, int dimensions, Gdxcs gdx, int timeIndex, int i)
+        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, string[] domainStrings, int dimensions, GdxFast gdx, int timeIndex, int i)
         {
             int timeDimNr = -12345;
             gdx.gdxSymbolGetDomain(i, ref domainSyNrs);

@@ -1,6 +1,6 @@
 ﻿/*
     Gekko Timeseries Software (www.t-t.dk/gekko).
-    Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
+    Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,15 +20,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-//using Rtf.Core;
-//using Rtf.Util;
 using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Collections.ObjectModel;
-
-
 
 
 namespace Gekko
@@ -506,10 +502,7 @@ namespace Gekko
                 Globals.ch.windowsDecompUpdateFailedCounter++;
             }
         }
-
-
         
-
         //weird delegate pattern, but it works!
         delegate void CutButtonCallbackEnabled(bool status);
         public static void CutButtonEnabled(bool status)

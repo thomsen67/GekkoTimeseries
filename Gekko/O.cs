@@ -19,7 +19,7 @@ namespace Gekko
     public class DecompPrecedent
     {
         public string s = null;
-        //public IVariable x = null;
+        
         public DecompPrecedent(string s, IVariable iv)
         {
             this.s = s;
@@ -65,8 +65,7 @@ namespace Gekko
         public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
         public O.ELookupType type = O.ELookupType.RightHandSide;
         public bool canSearch = true;
-        public short depth = 0; //used to avoid recursions with #alias list. #6324987324234
-       // public string label = null;
+        public short depth = 0; //used to avoid recursions with #alias list. #6324987324234       
 
         public LookupSettings()
         {            
