@@ -649,7 +649,7 @@ namespace Gekko
         public static string protectSymbol = "\u2714";
         
         public static bool setPrintMute = false;
-        public static bool doNotSaveUserSettings = false;
+        public static bool doNotSaveUserSettings = false; 
 
         public static string ols1 = "OLS estimation";
         public static string ols2 = "Dep. variable = ";
