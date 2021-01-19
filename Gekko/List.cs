@@ -38,29 +38,7 @@ namespace Gekko
                 m.Add(new ScalarString(s));
             }
             this.list = m;
-        }
-
-        // ----------------------------------------------------
-        // --------------object methods start----------------
-        // ----------------------------------------------------
-
-        //public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        //{
-        //    return Functions.append(isLhs, this, x);
-        //}
-
-        
-
-        //public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        //{
-        //    return Functions.extend(isLhs, this, x);
-        //}
-
-        
-
-        // ----------------------------------------------------
-        // --------------object methods end------------------
-        // ----------------------------------------------------
+        }        
 
         //!!!This has nothing to do #m1+#m2 etc., see Add(GekkoSmpl t, IVariable x) instead.
         //   This method is just to avoid x.list.Add(...)
@@ -101,7 +79,7 @@ namespace Gekko
                     }
 
                     return this.list[ival - 1];
-                    //return this.list[ival - 1].DeepClone();
+                    //return this.list[ival - 1].DeepClone(); --> not necessary to clone: probably %y = #y[3] gets cloned anyway when assigning with '='
 
                 }
                 else if (index.Type() == EVariableType.Range)
@@ -465,7 +443,7 @@ namespace Gekko
             {
                 foreach (IVariable iv in this.list)
                 {
-                    if (!Object.ReferenceEquals(this, iv))
+                    if (!Object.ReferenceEquals(this, iv))  //avoid problems if the list contains itself
                     {                        
                         temp.Add(iv.DeepClone(truncate));
                     }
@@ -476,8 +454,7 @@ namespace Gekko
                     }
                 }
             }
-            List l = new List(temp);
-            //l.isFromNakedList = this.isFromNakedList;
+            List l = new List(temp); //l.isFromNakedList should not be set, not relevant when cloning
             return l;
         }
 
@@ -485,9 +462,8 @@ namespace Gekko
         {            
             foreach (IVariable iv in this.list)
             {
-                if (!Object.ReferenceEquals(this, iv))
-                {
-                    //Globals.mem++;
+                if (!Object.ReferenceEquals(this, iv))  //avoid problems if the list contains itself
+                {                    
                     iv.DeepTrim();
                 }
             }         
@@ -498,7 +474,7 @@ namespace Gekko
             if (this.list == null) this.list = new List<IVariable>();
             foreach (IVariable iv in this.list)
             {
-                if (!Object.ReferenceEquals(this, iv))
+                if (!Object.ReferenceEquals(this, iv))  //avoid problems if the list contains itself
                 {
                     iv.DeepCleanup();
                 }

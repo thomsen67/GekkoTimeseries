@@ -33,12 +33,10 @@ namespace Gekko
 {
     [Serializable]
     public class Model2Cache
-    {
-        //private Dictionary<string, Model2> cache = null;
+    {        
         public LruCache lru = null;
         public Model2Cache()
-        {
-            //cache = new Dictionary<string, Model2>();
+        {            
             lru = new LruCache(Program.options.model_cache_max);
         }        
     }
@@ -49,8 +47,7 @@ namespace Gekko
     {        
         //see also endogenousOriginallyInModel       
         [ProtoMember(1)]
-        public GekkoDictionary<string, string> endogenous = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        //public CaseInsensitiveHashtable endogenousBNumbersOLD = new CaseInsensitiveHashtable();
+        public GekkoDictionary<string, string> endogenous = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);        
         [ProtoMember(2)]
         public GekkoDictionary<string, string> endoSubstitution = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         [ProtoMember(3)]

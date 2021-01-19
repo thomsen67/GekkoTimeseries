@@ -28,26 +28,6 @@ namespace Gekko
             this.storage = map;
         }
 
-        // ----------------------------------------------------
-        // --------------object functions start----------------
-        // ----------------------------------------------------
-
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------     
-
         //!!!This has nothing to do #m1+#m2 etc., see Add(GekkoSmpl t, IVariable x) instead.
         //   This method is just to avoid x.list.Add(...)        
         public void Add(string s, IVariable x)
@@ -245,9 +225,6 @@ namespace Gekko
                 string varnameWithFreq = G.AddFreq(varName, freq, EVariableType.Var, O.ELookupType.LeftHandSide);
                 O.LookupHelperLeftside(smpl, this, varnameWithFreq, freq, rhsExpression, EVariableType.Var, options);
                 
-                //IVariable iv = this.GetIVariable(s);
-                //if (iv != null) this.RemoveIVariable(s);
-                //this.AddIVariable(s, rhsExpression);                
             }
             else
             {
@@ -261,7 +238,7 @@ namespace Gekko
             Map temp = new Map();
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                if (!Object.ReferenceEquals(this, kvp.Value))
+                if (!Object.ReferenceEquals(this, kvp.Value))  //if it contains itself
                 {
                     temp.storage.Add(kvp.Key, kvp.Value.DeepClone(truncate));
                 }
@@ -278,7 +255,7 @@ namespace Gekko
         {            
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                if (!Object.ReferenceEquals(this, kvp.Value))
+                if (!Object.ReferenceEquals(this, kvp.Value)) //if it contains itself
                 {
                     //Globals.mem++;
                     kvp.Value.DeepTrim();
@@ -291,7 +268,7 @@ namespace Gekko
             if (this.storage == null) this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
-                if (!Object.ReferenceEquals(this, kvp.Value))
+                if (!Object.ReferenceEquals(this, kvp.Value)) //if it contains itself
                 {
                     kvp.Value.DeepCleanup();
                 }
