@@ -14472,7 +14472,7 @@ namespace Gekko
             compilerParams.GenerateInMemory = true;
             compilerParams.IncludeDebugInformation = false;
             compilerParams.ReferencedAssemblies.Add("system.dll");
-            ParserOLD.ReferencedAssembliesGekko(compilerParams);
+            Gekko.Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
             compilerParams.GenerateExecutable = false;
             string code2 = s2.ToString();
             CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code2);

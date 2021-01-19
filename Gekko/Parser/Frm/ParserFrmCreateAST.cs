@@ -232,5 +232,139 @@ namespace Gekko.Parser.Frm
             return wh;
         }
 
+
+        public static void PrintModelParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        {
+            if (Globals.threadIsInProcessOfAborting) return;
+            Program.StopPipeAndMute(2);
+            int number = 0;
+            foreach (string s in errors)
+            {
+                number++;
+                if (errors.Count > 1)
+                {
+                    if (number == 1) G.Writeln();
+                    G.Writeln("--------------------- error #" + number + " of " + errors.Count + "-----------------");
+                    //G.Writeln();
+                }
+                else G.Writeln();
+
+
+                string[] ss = s.Split(Globals.parserErrorSeparator);
+                int lineNumber = 0;
+                int lineNo = 0;
+                int positionNo = 0;
+                string errorMessage = "General error";
+
+                try
+                {
+                    lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                    lineNo = lineNumber + 1;  //1-based
+                    positionNo = int.Parse(ss[1]) + 1;  //1-based
+                    errorMessage = ss[3];
+                }
+                catch
+                {
+
+                }
+
+                if (Globals.addGlue)
+                {
+                    errorMessage = G.ReplaceGlueNew(errorMessage);
+                }
+
+                if (lineNo > inputFileLines.Count)
+                {
+                    {
+                        G.Writeln2("*** ERROR: " + errorMessage);
+                    }
+
+                    continue;  //doesn't give meaning
+                }
+                string line = "";
+                int firstWordPosInLine = -12345;
+                bool previousLineProbablyCulprit = false;
+                if (lineNo > 0)
+                {
+                    line = inputFileLines[lineNo - 1];
+                    firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
+                }
+
+                if (true)
+                {
+                    if (positionNo == firstWordPosInLine && errorMessage.Contains("no viable"))
+                    {
+                        //get preceding line (or really: statement) -- most probably the culprit.
+                        previousLineProbablyCulprit = true;
+                    }
+
+                    if (ph.isOneLinerFromGui == true && lineNo != 1)
+                    {
+                        G.Writeln("*** ERROR: Parsing this line:");
+                        G.Writeln("    " + G.ReplaceGlueNew(inputFileLines[0]), Color.Blue);
+                        G.Writeln("*** ERROR: " + errorMessage);
+                    }
+                    else
+                    {
+                        if (ph.isOneLinerFromGui == false)
+                        {
+                            string fn = ph.fileName;
+                            string extra = "";
+                            if (lineNo >= 1 && positionNo > 0)
+                            {
+                                extra = " line " + lineNo + " pos " + positionNo;
+                            }
+
+                            if (fn == null || fn == "")
+                            {
+                                G.Writeln("*** ERROR: User input block," + extra);
+                            }
+                            else
+                            {
+                                G.Writeln("*** ERROR: Parsing file: " + fn + extra);
+                            }
+                            G.Writeln("           " + errorMessage);
+                        }
+                        else
+                        {
+                            if (positionNo > 0)
+                            {
+                                G.Writeln("*** ERROR: Parsing pos " + positionNo + ":  " + errorMessage);
+                            }
+                            else G.Writeln("*** ERROR: " + errorMessage);
+                        }
+                        line = line + "  ";  //hack to avoid ending problems.....
+
+                        if (positionNo - 1 >= 0)
+                        {
+                            string lineTemp = line;
+                            string line0 = lineTemp.Substring(0, positionNo - 1);
+                            string line1 = lineTemp.Substring(positionNo - 1, 1);
+                            string line2 = lineTemp.Substring(positionNo - 1 + 1);
+
+                            if (previousLineProbablyCulprit && lineNo > 1)
+                            {
+                                G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
+                                string lineBefore = inputFileLines[lineNo - 1 - 1];
+                                G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
+                            }
+
+                            G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
+                            G.Write(G.ReplaceGlueNew(line1), Color.Red);
+                            G.Writeln(G.ReplaceGlueNew(line2), Color.Blue);
+
+                            G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                            G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                            //G.Writeln();
+                        }
+
+                    }
+                }
+
+            }
+            if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
+        }
+
+
     }
 }

@@ -1610,7 +1610,181 @@ namespace Gekko.Parser.Frm
             return G.Equal(code.Substring(0, 1), Globals.equationCodeP);
         }
 
+        private static void PrintEquationCodeWarning(EquationHelper eh)
+        {
+            if (false)
+            {
+                //Probably no need to report these
+                G.Writeln("+++ WARNING: equation type set to _I for this equation:" + G.NL + eh.equationText);
+            }
+            return;
+        }
 
+        private static void printVariableAsBType(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, string variable, int lag, bool leftSide, bool humanReadable, bool isModel, bool isBaseBank, string absoluteTime, string namedBank)
+        {
+            if (EquationIsNotRunAtAll(eh))
+            {
+                //these equations are not part of the model at all, only used for PREDICT
+                //so they are not counted regarding lags, leads, etc.
+                if (!leftSide)
+                {
+                    LongVersionAndHumanVersion(wh2, variable, lag);  //so PREDICT has some code
+                }
+                return;
+            }
+
+            if (isModel)  //for equations in model/frm
+            {
+                //ATypeData dataA = model.varsAType[variable];
+                ATypeData dataA = null; model.varsAType.TryGetValue(variable, out dataA);
+
+                //lag is -1 for fY(-1). It is positive for leads.
+
+                if (dataA == null)
+                {
+                    dataA = new ATypeData();
+                    dataA.aNumber = model.varsAType.Count;
+                    dataA.varName = variable;  //only reason to add this is when we want to get the right lower/uppercase of the variable
+                    model.varsAType.Add(variable, dataA);
+                }
+
+                if (true)
+                {
+
+                    if (lag < 0)
+                    {
+                        if (-lag > model.largestLag) model.largestLag = -lag;  //model.largestLag is always 0 or positive
+                        if (-lag > eh.largestLag) eh.largestLag = -lag;  //eh.largestLag is always 0 or positive
+                    }
+                    else if (lag > 0)
+                    {
+                        if (!EquationIsRunSeparatelyAfterSim(eh))
+                        {
+                            //not type T, Y, reverted J
+                            if (lag > model.largestLeadOutsideRevertedPart) model.largestLeadOutsideRevertedPart = lag;  //model.largestLeadOutsideRevertedPart is always 0 or positive
+                            if (!model.leadedVariables.ContainsKey(dataA.aNumber)) model.leadedVariables.Add(dataA.aNumber, 1);  //1 is just artificial
+                        }
+                        if (lag > model.largestLead) model.largestLead = lag;  //model.largestLead is always 0 or positive                    
+                                                                               // --- in the equation ---
+                        if (lag > eh.largestLead) eh.largestLead = lag;  //eh.largestLead is always 0 or positive                    
+                    }
+                }
+
+                string input = variable + Globals.lagIndicator + lag;
+                //BTypeData data = (BTypeData)model.varsBType[input];
+                BTypeData data = null; model.varsBType.TryGetValue(input, out data);
+                if (data == null)
+                {
+                    data = new BTypeData();
+                    data.variable = variable;
+                    data.bNumber = model.varsBType.Count;
+                    data.lag = lag;
+                    //data.equations = new ArrayList();
+                    data.leftHandSideEquation = -12345;  //-12345 means none
+                    data.aNumber = dataA.aNumber;
+                    model.varsBType.Add(input, data);
+                    model.varsBTypeInverted.Add(data.bNumber, input);
+                }
+
+                //TODO: maybe move test of leftside/rightside out of method to calling method
+                if (leftSide == true)
+                {
+                    string var2 = "";
+                    if (lag == 0)
+                    {
+                        var2 = variable;
+                    }
+                    else
+                    {
+                        var2 = variable + "[" + lag + "]";
+                    }
+
+                    wh2.leftHandSideHumanReadable.Append(var2);
+                    wh2.leftHandSideBNumber = data.bNumber;
+                    wh2.leftHandSideCsCodeGauss.Append("b[" + data.bNumber + "]");
+                    wh2.leftHandSideCsCodeJacobi.Append("c[" + data.bNumber + "]");
+
+                }
+                else
+                {
+                    //right side
+                    //Here we do both the short, long and human version individually
+
+                    if (lag >= 1)
+                    {
+                        wh2.rightHandSideCsCode.shortVersion.Append("Gekko.Program.Lead(b, " + data.bNumber + ")");
+                    }
+                    else
+                    {
+                        //normal way for non-lead variables
+                        wh2.rightHandSideCsCode.shortVersion.Append("b[" + data.bNumber + "]");
+                    }
+
+                    //This is probably so that equations can be GENR'ed
+                    LongVersionAndHumanVersion(wh2, variable, lag);
+                }
+            }
+            else  //for genr and prt statements
+            {
+                string bank = "databank";
+                if (isBaseBank) bank = "baseDatabank";
+
+                if (namedBank != null)
+                {
+                    //all this stuff is pretty messy, especially for PPLOT and WPLOT (PRT a bit better).
+                    //we should merge PRT, PPLOT and WPLOT functionality at some point.
+                    //the use of NamedDatabankHelper() is only present when using colons, so it should not
+                    //be able to break anything regarding Gekko 1.6 and PRT/PPLOT/WPLOT. Or if it breaks,
+                    //it only affects colons.
+                    //isBaseBank can not be true here (not legal syntax to mix ':' and @)
+                    bank = "Program.NamedDatabankHelper(`" + namedBank + "`, databank)";  //databank is either Work or Base (looping over these)
+                }
+
+                string variableSubst = variable;
+
+                if (leftSide)
+                {
+                    wh2.leftHandSideCsCodeGauss.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).SetData(Program.options.freq, t, data)");
+                }
+                else
+                {
+                    if (absoluteTime == null)
+                    {
+                        if (lag == 0)
+                        {
+                            //wh2.rightHandSideCsCode.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).GetData(Program.options.freq ,t)");
+                            wh2.rightHandSideCsCode.Append("Program.GetData(`" + variableSubst + "`, " + bank + ", t)");
+                        }
+                        else
+                        {
+                            //wh2.rightHandSideCsCode.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).GetData(t.CloneAndAdd(" + lag + "))");
+                            wh2.rightHandSideCsCode.Append("Program.GetData(`" + variableSubst + "`, " + bank + ", t.Add(" + lag + "))");
+                        }
+                    }
+                    else
+                    {
+                        GekkoTime t = GekkoTime.FromStringToGekkoTime(absoluteTime);
+                        //wh2.rightHandSideCsCode.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).GetData(new GekkoTime(" + t.year + ", " + t.sub + "))");
+                        wh2.rightHandSideCsCode.Append("Program.GetData(`" + variableSubst + "`, " + bank + ", new GekkoTime(" + t.super + ", " + t.sub + "))");
+                    }
+                }
+
+                //dublets are not allowed. TODO: fY and fy can coexist -- find a List<string> doing upper/lowercase
+                if (!wh2.allReferencedTimeSeriesOrListsWork.Contains(variable)) wh2.allReferencedTimeSeriesOrListsWork.Add(variable);
+                //TODO: prettify all these calls...
+                //if (Program.ExtractPrintOptions(helper.prtOption).isMultiplier | useBaseBank == "TRUE")
+                if (isBaseBank)
+                {
+                    if (!wh2.allReferencedTimeSeriesOrListsBase.Contains(variable)) wh2.allReferencedTimeSeriesOrListsBase.Add(variable);
+                }
+            }
+        }
+
+        private static void LongVersionAndHumanVersion(WalkerHelper2 wh2, string variable, int lag)
+        {
+            wh2.rightHandSideCsCode.longVersion.Append("O.PredictGetValue(`" + variable + "`, gt.Add(" + lag + "))");
+            wh2.rightHandSideCsCode.humanVersion.Append(variable + "[" + lag + "]");
+        }
 
     }
 }
