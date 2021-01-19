@@ -19786,7 +19786,21 @@ namespace Gekko
             else
             {
                 DateTime t1 = DateTime.Now;
-                ParserOLD.EmitModelFromANTLR(textInput, fileName);
+                //ParseModel() is reasonably fast. But needs only to be run when new model is called.
+                //[[1]]
+                GekkoDictionary<string, string> vals = ParserOLD.ParserFrmCreateAst(textInput, fileName);
+                //TIMING: the rest of this method takes 0.5 sec on dec09, that is nearly as much as parsing and CreateASTNodesForModel()
+                //This loop below alone takes 0.5 seconds on dec09, but it also does all the stuff regarding
+                //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
+                //  takes some time. It also writes out actual C# code to be used later on when compiling.
+                ParserOLD.ParserFrmWalkAST(vals);
+                Program.GuiSetModelName();
+                if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
+                {
+                    G.Writeln2("*** ERROR: There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest");
+                    G.Writeln("           lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables", Color.Red);
+                    throw new GekkoException();
+                }
                 parsingSeconds = G.Seconds(t1);
                 ParserOLD.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
                 ParserOLD.ParserFrmMakeProtobuf();

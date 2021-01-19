@@ -159,27 +159,8 @@ namespace Gekko
             {
                 helper.equationText = wh.frmlItems[wh.frmlItemsCounter];
             }
-        }             
-
-        public static void EmitModelFromANTLR(string textInput, string modelName)
-        {
-            //ParseModel() is reasonably fast. But needs only to be run when new model is called.
-            //[[1]]
-            GekkoDictionary<string, string> vals = ParserFrmCreateAst(textInput, modelName);
-            //TIMING: the rest of this method takes 0.5 sec on dec09, that is nearly as much as parsing and CreateASTNodesForModel()
-            //This loop below alone takes 0.5 seconds on dec09, but it also does all the stuff regarding
-            //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
-            //  takes some time. It also writes out actual C# code to be used later on when compiling.
-            ParserFrmWalkAST(vals);
-            Program.GuiSetModelName();
-            if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
-            {
-                G.Writeln2("*** ERROR: There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest");
-                G.Writeln("           lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables", Color.Red);
-                throw new GekkoException();
-            }
-        }
-
+        }       
+        
         public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper)
         {
             StringBuilder varList = null;
@@ -353,7 +334,7 @@ namespace Gekko
             return ss.ToString();
         }        
 
-        private static void ParserFrmWalkAST(GekkoDictionary<string, string> vals)
+        public static void ParserFrmWalkAST(GekkoDictionary<string, string> vals)
         {
             WalkerHelper2 wh2 = new WalkerHelper2();
             wh2.vals = vals;
@@ -524,7 +505,7 @@ namespace Gekko
             Program.model.modelGekko.modelInfo.endoAfter2 = after2Vars;
         }
 
-        private static GekkoDictionary<string, string> ParserFrmCreateAst(string textInput, string modelName)
+        public static GekkoDictionary<string, string> ParserFrmCreateAst(string textInput, string modelName)
         {
             //[[2]]
             ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
