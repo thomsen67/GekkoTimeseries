@@ -5975,16 +5975,7 @@ namespace Gekko
                 string VarName = string.Empty;
                 int VarTyp = 0;
                 int D;
-               // if (Environment.GetCommandLineArgs().Length != 2 &&
-               //Environment.GetCommandLineArgs().Length != 3)
-               // {
-               //     Console.WriteLine("**** XP_Example1: incorrect number of parameters");
-               //     //return 1;
-               // }
-                //String[] arguments = Environment.GetCommandLineArgs();
-                
-                //Sysdir = arguments[1];
-                //Console.WriteLine("XP_Example1 using GAMS system directory: " + gamsDir);
+               
                 GdxFast gdx = new GdxFast(gamsDir, ref Msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
                 //GdxFast gdx = new gdxcs(Sysdir, ref Msg);
                 if (Msg != string.Empty)
@@ -6072,27 +6063,11 @@ namespace Gekko
                     //int counter = 0;
                     foreach (ToFrom bnv in list)
                     {
-
-                        //string name = bnv.s1;
-
-                        ////if (!G.StartsWithSigil(bnv.name))
-                        ////{
-                        ////    name = G.Chop_FreqAdd(name, Program.options.freq);
-                        ////}
-                        //string nameWithoutFreq = G.Chop_FreqRemove(name);
-
-                        //Databank gdb = GetBankFromBankNameVersion(bnv.bank);
-                        //IVariable iv = gdb.GetIVariable(name);
-
+                        
                         IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError, true);
 
                         string name = bnv.s2;
                         string nameWithoutFreq = G.Chop_GetName(name);
-
-                        //if (iv == null)
-                        //{
-                        //    G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
-                        //}
 
                         if (iv.Type() == EVariableType.Series)
                         {
@@ -6206,9 +6181,7 @@ namespace Gekko
                     //ReportIOError(ErrNr);
                     throw new GekkoException();
                 }
-                //return 0;
-                //G.Writeln2("Wrote " + syCnt + " variables to gdx file (" + G.Seconds(t) + ")");
-
+                
                 G.Writeln2("Wrote " + counterVariables + " variables and " + exportedSets + " sets to " + pathAndFilename + " (" + G.Seconds(t) + ")");
                 if (skippedSets > 0) G.Writeln("+++ NOTE: " + skippedSets + " sets with dim > 1 were not imported");
 
@@ -6312,21 +6285,13 @@ namespace Gekko
             {
                 string name = bnv.s2;  // bnv.name;
                 
-                //if (!G.StartsWithSigil(bnv.name))
-                //{
-                //    name = G.Chop_FreqAdd(name, Program.options.freq);
-                //}
+                
                 string nameWithoutFreq = G.Chop_RemoveFreq(name);
-
-                //Databank gdb = GetBankFromBankNameVersion(bnv.bank);
-                //IVariable iv = gdb.GetIVariable(name);
+                
 
                 IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError, true);
 
-                //if (iv == null)
-                //{
-                //    G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
-                //}
+                
                 Series ts = iv as Series;
                 if (ts == null) continue;  //only write timeseries at the moment
 
@@ -6445,26 +6410,7 @@ namespace Gekko
             return;
         }
 
-        //private static int WriteGdxHelper(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, Series ts, GAMSVariable gvar)
-        //{
-
-        //    if (ts.type == ESeriesType.ArraySuper)
-        //    {
-        //        foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
-        //        {
-        //            string[] ss = kvp.Key.storage;
-        //            WriteGdxHelper2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);
-        //        }
-        //    }
-
-        //    else
-        //    {
-        //        //normal timeseries
-        //        WriteGdxHelper2(t1, t2, usePrefix, gvar, ts, new string[0]);
-        //    }
-        //    counterVariables++;
-        //    return counterVariables;
-        //}
+        
 
         private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GdxFast gdx, Series ts2, string[] ss, double[] gdxValues)
         {
@@ -7943,52 +7889,7 @@ namespace Gekko
                 }
             }
             return eqs;
-        }
-
-        //private static void UpdHelper(Series ts, String op, GekkoTime per, double inputVal, Series tsOld, ESeriesUpdTypes updType)
-        //{
-        //    GekkoTime PerMinusOne = per.Add(-1);
-        //    //todo: also do updprt here.
-
-        //    if ((op == "=" && updType == ESeriesUpdTypes.none) || updType == ESeriesUpdTypes.n)
-        //    {
-        //        //TODO: sequence
-        //        ts.SetData(per, inputVal);
-        //    }
-        //    else if (op == "%" || updType == ESeriesUpdTypes.p)
-        //    {
-        //        ts.SetData(per, ts.GetData(null, PerMinusOne) * (1 + inputVal / 100d));
-        //    }
-        //    else if (op == "*")
-        //    {
-        //        ts.SetData(per, ts.GetData(null, per) * inputVal);
-        //    }
-        //    else if (updType == ESeriesUpdTypes.q)
-        //    {
-        //        ts.SetData(per, ts.GetData(null, per) * (1 + inputVal / 100d));  //different from * operator
-        //    }
-        //    else if (op == "+" || updType == ESeriesUpdTypes.m)
-        //    {
-        //        ts.SetData(per, ts.GetData(null, per) + inputVal);
-        //    }
-        //    else if (op == "^" || updType == ESeriesUpdTypes.d)
-        //    {
-        //        ts.SetData(per, ts.GetData(null, PerMinusOne) + inputVal);
-        //    }
-        //    else if (op == "#" || updType == ESeriesUpdTypes.mp)
-        //    {
-        //        //we have to use stored old growth rate for a[var,t], because of the complexity of the operator
-        //        double ol = tsOld.GetData(null, per);
-        //        double ol1 = tsOld.GetData(null, PerMinusOne);
-        //        double tslag = ts.GetData(null, PerMinusOne);
-        //        ts.SetData(per, tslag * (ol / ol1 + inputVal / 100d));
-        //    }
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Unrecognized operator in SERIES command");
-        //        throw new GekkoException();
-        //    }
-        //}
+        }       
 
         public static void EmitCodeFromANTLR(string text, string fileName, bool isLibrary, int skip, P p)
         {
@@ -8270,21 +8171,7 @@ namespace Gekko
             if (settings_print_end == null)
             {
                 G.Writeln2("*** ERROR: JSON: print_end not found"); throw new GekkoException();
-            }
-
-            //string include_y_type = null;
-            //try { include_y_type = (string)jsonTree["include_y_type"]; } catch { }
-            //if (include_y_type == null)
-            //{
-            //    G.Writeln2("*** ERROR: JSON: include_y_type"); throw new GekkoException();
-            //}
-
-            //string include_t_type = null;
-            //try { include_t_type = (string)jsonTree["include_t_type"]; } catch { }
-            //if (include_t_type == null)
-            //{
-            //    G.Writeln2("*** ERROR: JSON: include_t_type"); throw new GekkoException();
-            //}
+            }            
 
             string include_p_type = null;
             try { include_p_type = (string)jsonTree["include_p_type"]; } catch { }
@@ -9162,25 +9049,13 @@ namespace Gekko
 
         }
 
-        //private static void BrowserWritePrintLine(Series ts, StringBuilder sb3, GekkoTime gt)
-        //{
-        //    if (Program.options.freq == EFreq.A) sb3.Append((gt.super) + " ");
-        //    else sb3.Append(gt.super + ts.freq.ToString() + gt.sub + " ");
-
-        //    double n1 = ts.GetDataSimple(gt);
-        //    double n0 = ts.GetDataSimple(gt.Add(-1));
-
-        //    double level1 = n1;
-        //    double pch1 = ((n1 / n0 - 1) * 100d);
-
-        //    if (n1 == n0) pch1 = 0d;
-
-        //    string levelFormatted;
-        //    string pchFormatted;
-        //    Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
-
-        //    sb3.Append(levelFormatted + " " + pchFormatted + " ");
-        //}
+        // =====================================
+        // =====================================
+        // =====================================
+        //     oprydning til her!
+        // =====================================
+        // =====================================
+        // =====================================
 
         private static void BrowserCleanupFolders(string rootFolder, string varsFolder)
         {
