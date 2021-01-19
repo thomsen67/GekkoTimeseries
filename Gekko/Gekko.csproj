@@ -386,7 +386,6 @@
     <Compile Include="Parser\Gek\ParserGekCreateAST.cs" />
     <Compile Include="Parser\Gek\ParserGekTemplates.cs" />
     <Compile Include="Parser\Gek\ParserGekWalkASTAndEmit.cs" />
-    <Compile Include="Parser\Gek\Tokens.cs" />
     <Compile Include="Parser\ParserCommon.cs" />
     <Compile Include="Private.cs" />
     <Compile Include="Range.cs" />

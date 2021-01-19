@@ -35,6 +35,8 @@ using System.Collections;
 using System.Security.Cryptography;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using ProtoBuf;
+using ProtoBuf.Meta;
 
 namespace Gekko
 {
@@ -64,6 +66,7 @@ namespace Gekko
 
         public static void CreateASTNodesForModel(CT ast, ASTNode equationNode, int depth, WalkHelper wh, ModelGekko model)
         {
+            //[[3]]
             if (ast.Text == "ASTVAL")
             {
                 //nothing done here
@@ -161,11 +164,116 @@ namespace Gekko
         public static void EmitModelFromANTLR(string textInput, string modelName)
         {
             //ParseModel() is reasonably fast. But needs only to be run when new model is called.
-            ParseModel(textInput, modelName);  //bool resTypeGaussSeidel = false;
+            //[[1]]
+            GekkoDictionary<string, string> vals = ParserFrmCreateAst(textInput, modelName);
+            //TIMING: the rest of this method takes 0.5 sec on dec09, that is nearly as much as parsing and CreateASTNodesForModel()
+            //This loop below alone takes 0.5 seconds on dec09, but it also does all the stuff regarding
+            //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
+            //  takes some time. It also writes out actual C# code to be used later on when compiling.
+            ParserFrmWalkAST(vals);
             Program.GuiSetModelName();
+            if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
+            {
+                G.Writeln2("*** ERROR: There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest");
+                G.Writeln("           lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables", Color.Red);
+                throw new GekkoException();
+            }
         }
 
-        public static void OrderAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement, bool isFix)
+        public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper)
+        {
+            StringBuilder varList = null;
+
+            string fileNameTemp = null;
+            bool foundInFrm = false;
+            if (modelCommentsHelper.cutout_varlist != null && modelCommentsHelper.cutout_varlist.Length > 0)
+            {
+                foundInFrm = true;
+                varList = new StringBuilder(modelCommentsHelper.cutout_varlist);
+            }
+            else
+            {
+                //try to find it externally, look also in model path!
+                List<string> folders = new List<string>();
+                folders.Add(Program.options.folder_model);
+                fileNameTemp = Program.FindFile("varlist.dat", folders);
+                if (fileNameTemp != null)
+                {
+                    string s = Program.GetTextFromFileWithWait(fileNameTemp);  //can read an ANSI file without problems
+                    s = "varlist$" + "\n" + s; //a bit hacky, just like the string-StringBuilder-StringReader stuff is convoluted. Anyway, not critical code here.
+                    varList = new StringBuilder(s);
+                }
+            }
+
+            if (varList != null && varList.Length > 0)
+            {
+                string s = Program.UnfoldVariableList(new StringReader(varList.ToString()));
+                if (foundInFrm)
+                {
+                    if (s != null) s = s + " (found inside .frm file)";
+                }
+                else
+                {
+                    if (s != null && fileNameTemp != null) s = s + " (" + fileNameTemp + ")";  //should always be != null, but for safety...
+                }
+                Program.model.modelGekko.modelInfo.varlistStatus = s;
+            }
+            else
+            {
+                Program.model.modelGekko.modelInfo.varlistStatus = "Not found inside .frm file or as 'varlist.dat' file";
+            }
+        }
+
+        public static void ParserFrmMakeProtobuf()
+        {
+            try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+            {
+                DateTime dt1 = DateTime.Now;
+
+                PutListsIntoModelListHelper();
+
+                //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                RuntimeTypeModel serializer = TypeModel.Create();
+                serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+
+
+                // ----- SERIALIZE
+                //string outputPath = Globals.localTempFilesLocation;
+                //DeleteFolder(outputPath);
+                //Directory.CreateDirectory(outputPath);
+                string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + ".mdl";
+                string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                {
+                    //Serializer.Serialize(fs, m);
+                    serializer.Serialize(fs, Program.model.modelGekko);
+                }
+                //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
+                G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+            }
+            catch (Exception e)
+            {
+                //do nothing, not the end of the world if it fails
+            }
+        }
+
+        public static void PutListsIntoModelListHelper()
+        {
+            ModelListHelper modelListHelper = new ModelListHelper();
+
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "all")) modelListHelper.all = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "all"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "endo")) modelListHelper.endo = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "endo"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exo")) modelListHelper.exo = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exo"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exod")) modelListHelper.exod = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exod"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exodjz"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoj")) modelListHelper.exoj = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoj"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exotrue"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoz"));
+
+            Program.model.modelGekko.modelInfo.modelListHelper = modelListHelper;
+        }
+
+        public static void ParserFrmOrderAndCompileAST(ECompiledModelType modelType, bool isCalledFromModelStatement, bool isFix)
         {
             //seems modelType is not used at all
             bool newM2 = false;
@@ -243,97 +351,10 @@ namespace Gekko
             //if (G.Equal(Program.options.solve_forward_method, "stacked")) stacked = "true";  //stacked is obsolete
             ss.Append("Stacked: " + stacked);            
             return ss.ToString();
-        }
+        }        
 
-        private static void ParseModel(string textInput, string modelName)
+        private static void ParserFrmWalkAST(GekkoDictionary<string, string> vals)
         {
-            ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
-
-            List<string> errors = null;
-            CommonTree t = null;
-
-            // Create a lexer attached to that input
-            ModelLexer lexer = new ModelLexer(input);
-            // Create a stream of tokens pulled from the lexer
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            // Create a parser attached to the token stream
-            ModelParser parser = new ModelParser(tokens);
-            // Invoke the program rule in get return value
-            ModelParser.expr_return r = null;
-            DateTime t0 = DateTime.Now;
-
-            //takes 0.5 sec for dec09
-            r = parser.expr();
-
-            errors = parser.GetErrors();
-            t = (CommonTree)r.Tree;
-
-            if (Globals.printAST)
-            {
-                AST(t, 0);
-            }
-
-            WalkHelper wh = CreateWalkHelper(textInput);
-            wh.frmlItems = parser.GetFrmlItems();
-
-            List<string> inputFileLines = wh.inputFileLines;
-
-            ParseHelper ph = new ParseHelper();
-            ph.isOneLinerFromGui = false;
-            ph.isModel = true;
-            ph.fileName = modelName;
-
-            if (errors.Count > 0)
-            {
-                PrintModelParserErrors(errors, inputFileLines, ph);
-                throw new GekkoException();
-            }
-            else
-            {
-                //G.Writeln("No errors when parsing");
-            }
-
-            GekkoDictionary<string, string> vals = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (CT child in t.Children)
-            {
-                if (child.Text == "ASTVAL")
-                {
-                    string key = child.GetChild(0).Text;
-                    string value = child.GetChild(1).Text;
-                    if (child.GetChild(2) != null)
-                    {
-                        if (G.Equal(child.GetChild(2).Text, "-"))
-                        {
-                            value = "-" + value;
-                        }
-                    }
-
-                    if (vals.ContainsKey(key))
-                    {
-                        G.Writeln2("*** ERROR: Model parsing error: seems VAL '" + key + "' is defined several times.");
-                        throw new GekkoException();
-                    }
-                    else
-                    {
-                        string key2 = key;
-                        if (!key.StartsWith(Globals.symbolScalar.ToString())) key2 = Globals.symbolScalar + key;
-                        vals.Add(key2, value);
-                    }
-                }
-            }
-
-            ASTNode equationNode = new ASTNode(null);  //unknown text for now
-            wh.print = false;
-            //takes 0.1 sec for dec09
-            CreateASTNodesForModel(t, equationNode, 0, wh, Program.model.modelGekko); //creates a List<> of equations, with a tree of EquationNodes for each equation
-
-            if (wh.print) wh.writer.Close();
-
-            //TIMING: the rest of this method takes 0.5 sec on dec09, that is nearly as much as parsing and CreateASTNodesForModel()
-            //This loop below alone takes 0.5 seconds on dec09, but it also does all the stuff regarding
-            //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
-            //  takes some time. It also writes out actual C# code to be used later on when compiling.
-
             WalkerHelper2 wh2 = new WalkerHelper2();
             wh2.vals = vals;
             foreach (EquationHelper eh in Program.model.modelGekko.equations)
@@ -343,7 +364,7 @@ namespace Gekko
                 wh2.leftHandSideCsCodeGauss = new StringBuilder();  //clearing it for each equation
                 wh2.leftHandSideCsCodeJacobi = new StringBuilder();  //clearing it for each equation
                 wh2.leftHandSideHumanReadable = new StringBuilder(); //clearing it for each equation
-                EmitCsCodeForModel(eh, eh.equationsNodeRoot, 0, wh2, Program.model.modelGekko, 0, true); //last arg is lag
+                ParserFrmWalkASTEquation(eh, eh.equationsNodeRoot, 0, wh2, Program.model.modelGekko, 0, true); //last arg is lag
 
                 if (Globals.printAST) AST2(eh.equationsNodeRoot, 0);
 
@@ -388,7 +409,7 @@ namespace Gekko
                 wh3.rightHandSideCsCode = new StringBuilder2();  //clearing it for each equation
                 wh3.leftHandSideCsCodeGauss = new StringBuilder();  //clearing it for each equation
                 wh3.leftHandSideCsCodeJacobi = new StringBuilder();  //clearing it for each equation
-                EmitCsCodeForModel(eh, eh.equationsNodeRoot, 0, wh3, Program.model.modelGekko, 0, true);  //last arg is lag
+                ParserFrmWalkASTEquation(eh, eh.equationsNodeRoot, 0, wh3, Program.model.modelGekko, 0, true);  //last arg is lag
                 if (Globals.printAST) AST2(eh.equationsNodeRoot, 0);
                 //TODO: could be nice to also have it human readable, by calling PrintVariable...() with humanReadable=true
                 eh.csCodeRhs = wh3.rightHandSideCsCode.shortVersion.ToString();
@@ -398,7 +419,7 @@ namespace Gekko
                 eh.bNumberLhs = wh3.leftHandSideBNumber;
             }
             //-------------------------------------------------------------------------
-            
+
             //---------------------------------------------------------------------------------
             // now model.equations contains real endogenous, and model.equationsReverted contains Y-type and reverted (not real endogenous)
 
@@ -501,8 +522,93 @@ namespace Gekko
             Program.model.modelGekko.modelInfo.endoNoAfter = nonAfterVars;
             Program.model.modelGekko.modelInfo.endoAfter = afterVars;
             Program.model.modelGekko.modelInfo.endoAfter2 = after2Vars;
+        }
 
-            return;
+        private static GekkoDictionary<string, string> ParserFrmCreateAst(string textInput, string modelName)
+        {
+            //[[2]]
+            ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
+
+            List<string> errors = null;
+            CommonTree t = null;
+
+            // Create a lexer attached to that input
+            ModelLexer lexer = new ModelLexer(input);
+            // Create a stream of tokens pulled from the lexer
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            // Create a parser attached to the token stream
+            ModelParser parser = new ModelParser(tokens);
+            // Invoke the program rule in get return value
+            ModelParser.expr_return r = null;
+            DateTime t0 = DateTime.Now;
+
+            //takes 0.5 sec for dec09
+            r = parser.expr();
+
+            errors = parser.GetErrors();
+            t = (CommonTree)r.Tree;
+
+            if (Globals.printAST)
+            {
+                AST(t, 0);
+            }
+
+            WalkHelper wh = CreateWalkHelper(textInput);
+            wh.frmlItems = parser.GetFrmlItems();
+
+            List<string> inputFileLines = wh.inputFileLines;
+
+            ParseHelper ph = new ParseHelper();
+            ph.isOneLinerFromGui = false;
+            ph.isModel = true;
+            ph.fileName = modelName;
+
+            if (errors.Count > 0)
+            {
+                PrintModelParserErrors(errors, inputFileLines, ph);
+                throw new GekkoException();
+            }
+            else
+            {
+                //G.Writeln("No errors when parsing");
+            }
+
+            GekkoDictionary<string, string> vals = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (CT child in t.Children)
+            {
+                if (child.Text == "ASTVAL")
+                {
+                    string key = child.GetChild(0).Text;
+                    string value = child.GetChild(1).Text;
+                    if (child.GetChild(2) != null)
+                    {
+                        if (G.Equal(child.GetChild(2).Text, "-"))
+                        {
+                            value = "-" + value;
+                        }
+                    }
+
+                    if (vals.ContainsKey(key))
+                    {
+                        G.Writeln2("*** ERROR: Model parsing error: seems VAL '" + key + "' is defined several times.");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        string key2 = key;
+                        if (!key.StartsWith(Globals.symbolScalar.ToString())) key2 = Globals.symbolScalar + key;
+                        vals.Add(key2, value);
+                    }
+                }
+            }
+
+            ASTNode equationNode = new ASTNode(null);  //unknown text for now
+            wh.print = false;
+            //takes 0.1 sec for dec09
+            CreateASTNodesForModel(t, equationNode, 0, wh, Program.model.modelGekko); //creates a List<> of equations, with a tree of EquationNodes for each equation
+
+            if (wh.print) wh.writer.Close();
+            return vals;
         }
 
         private static bool EquationIsRunSeparatelyAfterSim(EquationHelper eh)
@@ -1552,7 +1658,7 @@ namespace Gekko
             return wh;
         }
 
-        public static void EmitCsCodeForModel(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel)
+        public static void ParserFrmWalkASTEquation(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel)
         {
             bool visitChildren = true;
             int numberOfRightParentheses = 0;
@@ -2661,7 +2767,7 @@ namespace Gekko
 
                         //------------------ before each child end ----------------
 
-                        EmitCsCodeForModel(eh, equationNodeChild, depth + 1, wh2, model, subTreeLag, isModel);
+                        ParserFrmWalkASTEquation(eh, equationNodeChild, depth + 1, wh2, model, subTreeLag, isModel);
 
                         //------------------ after each child ----------------
 
@@ -2760,7 +2866,7 @@ namespace Gekko
             for (int i = start; i <= end; i++)
             {
                 wh2.rightHandSideCsCode.Append("(");
-                EmitCsCodeForModel(eh, equationNode.Children[i], depth + 1, wh2, model, subTreeLag, isModel);
+                ParserFrmWalkASTEquation(eh, equationNode.Children[i], depth + 1, wh2, model, subTreeLag, isModel);
                 wh2.rightHandSideCsCode.Append(")");
                 if (i == start) wh2.rightHandSideCsCode.Append(", ");
             }

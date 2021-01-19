@@ -19755,54 +19755,15 @@ namespace Gekko
             Program.model.modelGekko = new ModelGekko();
             Program.model.modelGekko.modelInfo.fileName = fileName;
             //this also creates Program.model.modelGekko.varlist if there is a varlist
-
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
-
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
 
             if (Program.options.model_cache == true)
             {
                 if (File.Exists(mdlFileNameAndPath))
                 {
-                    try
-                    {
-                        DateTime dt1 = DateTime.Now;
-                        //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                        //RuntimeTypeModel serializer = TypeModel.Create();
-                        //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                        // ----- DESERIALIZE
-                        //DeleteFolder(outputPath);
-                        //Directory.CreateDirectory(outputPath);
-                        //WaitForZipRead(outputPath, mdlFileNameAndPath);
-                        using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
-                        {
-                            Program.model.modelGekko = Serializer.Deserialize<ModelGekko>(fs);
-                        }
-
-                        GetListsFromModelListHelper();
-
-                        //=============================================
-                        //FOR SAFETY: see mail from TKD 5/3 2013
-                        Program.model.modelGekko.simulateResults = new double[10];
-                        //=============================================
-
-                        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                        Program.model.modelGekko.modelInfo.loadedFromMdlFile = true;
-                        Program.model.modelGekko.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
-                    }
-                    catch (Exception e)
-                    {
-                        if (G.IsUnitTesting())
-                        {
-                            throw;
-                        }
-                        else
-                        {
-                            //do nothing, we then have to parse the file
-                            Program.model.modelGekko.modelInfo.loadedFromMdlFile = false;
-                        }
-                    }
+                    ParserFrmGetProtobuf(fileName, mdlFileNameAndPath);
                 }
             }
             else
@@ -19827,48 +19788,11 @@ namespace Gekko
                 DateTime t1 = DateTime.Now;
                 ParserOLD.EmitModelFromANTLR(textInput, fileName);
                 parsingSeconds = G.Seconds(t1);
-
-                if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
-                {
-                    G.Writeln2("*** ERROR: There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest");
-                    G.Writeln("           lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables", Color.Red);
-                    throw new GekkoException();
-                }
-
-                ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.
-
-                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-                {
-                    DateTime dt1 = DateTime.Now;
-
-                    PutListsIntoModelListHelper();
-
-                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-                    RuntimeTypeModel serializer = TypeModel.Create();
-                    serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-
-
-                    // ----- SERIALIZE
-                    //string outputPath = Globals.localTempFilesLocation;
-                    //DeleteFolder(outputPath);
-                    //Directory.CreateDirectory(outputPath);
-                    string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + ".mdl";
-                    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
-                    {
-                        //Serializer.Serialize(fs, m);
-                        serializer.Serialize(fs, Program.model.modelGekko);
-                    }
-                    //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
-                    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-                }
-                catch (Exception e)
-                {
-                    //do nothing, not the end of the world if it fails
-                }
+                ParserOLD.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
+                ParserOLD.ParserFrmMakeProtobuf();
             }
 
-            HandleVarlist(modelCommentsHelper);
+            ParserOLD.ParserFrmHandleVarlist(modelCommentsHelper);
 
             if (!G.NullOrEmpty(modelCommentsHelper.cutout_runbefore))
             {
@@ -19884,6 +19808,48 @@ namespace Gekko
             Program.model.modelGekko.modelInfo.timeUsedTotal = G.Seconds(dt0);
 
             Program.model.modelGekko.modelInfo.Print();
+        }
+
+        private static void ParserFrmGetProtobuf(string fileName, string mdlFileNameAndPath)
+        {
+            try
+            {
+                DateTime dt1 = DateTime.Now;
+                //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                //RuntimeTypeModel serializer = TypeModel.Create();
+                //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                // ----- DESERIALIZE
+                //DeleteFolder(outputPath);
+                //Directory.CreateDirectory(outputPath);
+                //WaitForZipRead(outputPath, mdlFileNameAndPath);
+                using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
+                {
+                    Program.model.modelGekko = Serializer.Deserialize<ModelGekko>(fs);
+                }
+
+                GetListsFromModelListHelper();
+
+                //=============================================
+                //FOR SAFETY: see mail from TKD 5/3 2013
+                Program.model.modelGekko.simulateResults = new double[10];
+                //=============================================
+
+                G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                Program.model.modelGekko.modelInfo.loadedFromMdlFile = true;
+                Program.model.modelGekko.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+            }
+            catch (Exception e)
+            {
+                if (G.IsUnitTesting())
+                {
+                    throw;
+                }
+                else
+                {
+                    //do nothing, we then have to parse the file
+                    Program.model.modelGekko.modelInfo.loadedFromMdlFile = false;
+                }
+            }
         }
 
         public static void WalkTokens(TokenList nodes, WalkTokensHelper th)
@@ -21273,67 +21239,7 @@ namespace Gekko
                 }
             }
             return lagLead;
-        }
-
-        private static void HandleVarlist(ModelCommentsHelper modelCommentsHelper)
-        {
-            StringBuilder varList = null;
-
-            string fileNameTemp = null;
-            bool foundInFrm = false;
-            if (modelCommentsHelper.cutout_varlist != null && modelCommentsHelper.cutout_varlist.Length > 0)
-            {
-                foundInFrm = true;
-                varList = new StringBuilder(modelCommentsHelper.cutout_varlist);
-            }
-            else
-            {
-                //try to find it externally, look also in model path!
-                List<string> folders = new List<string>();
-                folders.Add(Program.options.folder_model);
-                fileNameTemp = Program.FindFile("varlist.dat", folders);
-                if (fileNameTemp != null)
-                {
-                    string s = Program.GetTextFromFileWithWait(fileNameTemp);  //can read an ANSI file without problems
-                    s = "varlist$" + "\n" + s; //a bit hacky, just like the string-StringBuilder-StringReader stuff is convoluted. Anyway, not critical code here.
-                    varList = new StringBuilder(s);
-                }
-            }
-
-            if (varList != null && varList.Length > 0)
-            {
-                string s = Program.UnfoldVariableList(new StringReader(varList.ToString()));
-                if (foundInFrm)
-                {
-                    if (s != null) s = s + " (found inside .frm file)";
-                }
-                else
-                {
-                    if (s != null && fileNameTemp != null) s = s + " (" + fileNameTemp + ")";  //should always be != null, but for safety...
-                }
-                Program.model.modelGekko.modelInfo.varlistStatus = s;
-            }
-            else
-            {
-                Program.model.modelGekko.modelInfo.varlistStatus = "Not found inside .frm file or as 'varlist.dat' file";
-            }
-        }
-
-        private static void PutListsIntoModelListHelper()
-        {
-            ModelListHelper modelListHelper = new ModelListHelper();
-            
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "all")) modelListHelper.all = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "all"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "endo")) modelListHelper.endo = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "endo"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exo")) modelListHelper.exo = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exo"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exod")) modelListHelper.exod = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exod"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exodjz"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoj")) modelListHelper.exoj = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoj"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exotrue"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoz"));
-
-            Program.model.modelGekko.modelInfo.modelListHelper = modelListHelper;
-        }
+        }        
 
         private static void GetListsFromModelListHelper()
         {
@@ -22515,7 +22421,7 @@ namespace Gekko
                     so.method = "newton";
                     modelType = GetModelTypeFromOptions(so);  //5 types
                 }
-                ParserOLD.OrderAndCompileModel(modelType, false, so.isFix);
+                ParserOLD.ParserFrmOrderAndCompileAST(modelType, false, so.isFix);
             }
             else
             {
@@ -22531,7 +22437,7 @@ namespace Gekko
                     Type assembly = GetAssemblyFromModelType(modelType);
                     if (assembly == null)
                     {
-                        ParserOLD.OrderAndCompileModel(modelType, false, so.isFix);
+                        ParserOLD.ParserFrmOrderAndCompileAST(modelType, false, so.isFix);
                         assembly = GetAssemblyFromModelType(modelType);
                         if (assembly == null)
                         {
@@ -22542,7 +22448,7 @@ namespace Gekko
                 }
                 else
                 {
-                    ParserOLD.OrderAndCompileModel(ECompiledModelType.After, false, so.isFix);
+                    ParserOLD.ParserFrmOrderAndCompileAST(ECompiledModelType.After, false, so.isFix);
                 }
             }
             //TODO Cleanup end
