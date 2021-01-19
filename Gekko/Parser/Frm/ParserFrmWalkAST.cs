@@ -1788,7 +1788,7 @@ namespace Gekko.Parser.Frm
 
         public class WalkerHelper2
         {
-            public StringBuilder2 rightHandSideCsCode = new StringBuilder2();
+            public StringBuilder2 rightHandSideCsCode = new StringBuilder2(); 
             public StringBuilder leftHandSideCsCodeGauss = new StringBuilder();  // b[117]
             public StringBuilder leftHandSideCsCodeJacobi = new StringBuilder();  // c[117]
             public StringBuilder leftHandSideHumanReadable = new StringBuilder();  //fy
