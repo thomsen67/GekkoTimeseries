@@ -937,6 +937,157 @@ namespace Gekko.Parser.Frm
             }
         }
 
+        public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper)
+        {
+            StringBuilder varList = null;
+
+            string fileNameTemp = null;
+            bool foundInFrm = false;
+            if (modelCommentsHelper.cutout_varlist != null && modelCommentsHelper.cutout_varlist.Length > 0)
+            {
+                foundInFrm = true;
+                varList = new StringBuilder(modelCommentsHelper.cutout_varlist);
+            }
+            else
+            {
+                //try to find it externally, look also in model path!
+                List<string> folders = new List<string>();
+                folders.Add(Program.options.folder_model);
+                fileNameTemp = Program.FindFile("varlist.dat", folders);
+                if (fileNameTemp != null)
+                {
+                    string s = Program.GetTextFromFileWithWait(fileNameTemp);  //can read an ANSI file without problems
+                    s = "varlist$" + "\n" + s; //a bit hacky, just like the string-StringBuilder-StringReader stuff is convoluted. Anyway, not critical code here.
+                    varList = new StringBuilder(s);
+                }
+            }
+
+            if (varList != null && varList.Length > 0)
+            {
+                string s = Program.UnfoldVariableList(new StringReader(varList.ToString()));
+                if (foundInFrm)
+                {
+                    if (s != null) s = s + " (found inside .frm file)";
+                }
+                else
+                {
+                    if (s != null && fileNameTemp != null) s = s + " (" + fileNameTemp + ")";  //should always be != null, but for safety...
+                }
+                Program.model.modelGekko.modelInfo.varlistStatus = s;
+            }
+            else
+            {
+                Program.model.modelGekko.modelInfo.varlistStatus = "Not found inside .frm file or as 'varlist.dat' file";
+            }
+        }
+
+        public static void PrintModelLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        {
+            if (Globals.threadIsInProcessOfAborting) return;
+            if (false && ph.fileName == null && ph.commandsText == null)
+            {
+                //NO: this will show for instance a stray '?' in the model file
+                //ignore, probably an error dublet
+                return;
+            }
+            Program.StopPipeAndMute(2);
+            int number = 0;
+            foreach (string s in errors)
+            {
+                number++;
+                if (errors.Count > 1)  //always just one
+                {
+                    if (number == 1) G.Writeln();
+                    G.Writeln("--------------------- error #" + number + " of " + errors.Count + "-----------------");
+                    //G.Writeln();
+                }
+                else G.Writeln();
+
+                string[] ss = s.Split(Globals.parserErrorSeparator);
+                int lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                int lineNo = lineNumber + 1;  //1-based
+                int positionNo = int.Parse(ss[1]) + 1;  //1-based
+
+                string errorMessage = ss[3];
+
+                errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
+
+                if (lineNo > inputFileLines.Count)
+                {
+                    {
+                        G.Writeln("*** ERROR: " + errorMessage);
+                    }
+
+                    continue;  //doesn't give meaning
+                }
+                string line = inputFileLines[lineNo - 1];
+                int firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
+
+                bool previousLineProbablyCulprit = false;
+                if (positionNo == firstWordPosInLine && errorMessage.Contains("no viable"))
+                {
+                    //get preceding line (or really: statement) -- most probably the culprit.
+                    previousLineProbablyCulprit = true;
+                }
+
+                string paranthesesError = "";
+
+                if (ph.isOneLinerFromGui == true && lineNo != 1)
+                {
+                    G.Writeln("*** ERROR: Parsing this line:");
+                    G.Writeln("    " + G.ReplaceGlueNew(inputFileLines[0]), Color.Blue);
+                    G.Writeln("*** ERROR: " + errorMessage);
+                }
+                else
+                {
+                    if (ph.isOneLinerFromGui == false)
+                    {
+                        string fn = ph.fileName;
+                        if (fn == null || fn == "")
+                        {
+                            G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
+                        }
+                        else
+                        {
+                            G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNo + " pos " + positionNo);
+                        }
+
+                        string e2 = errorMessage.Replace("Der blev udløst en undtagelse af typen ", "");
+                        G.Writeln("           " + e2);
+
+                    }
+                    else
+                    {
+                        G.Writeln("*** ERROR: Parsing pos " + positionNo + ":  " + errorMessage);
+                    }
+                    line = line + "  ";  //hack to avoid ending problems.....
+                    string lineTemp = line;
+                    string line0 = lineTemp.Substring(0, positionNo - 1);
+                    string line1 = lineTemp.Substring(positionNo - 1, 1);
+                    string line2 = lineTemp.Substring(positionNo - 1 + 1);
+
+                    if (previousLineProbablyCulprit && lineNo > 1)
+                    {
+                        G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
+                        string lineBefore = inputFileLines[lineNo - 1 - 1];
+                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
+                    }
+
+                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
+                    G.Write(G.ReplaceGlueNew(line1), Color.Red);
+                    G.Writeln(G.ReplaceGlueNew(line2), Color.Blue);
+
+                    G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                    G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                    //G.Writeln();
+                }
+
+                if (paranthesesError != "") G.Writeln(paranthesesError);
+
+            }
+            if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
+        }
+
 
 
 

@@ -187,14 +187,15 @@ namespace Gekko.Parser.Gek
                         lexer = true;
                         List<string> temp = new List<string>();
                         temp.Add(exception);
-                        ParserOLD.PrintModelLexerErrors(temp, Globals.modelFileLines, new ParseHelper());
+                        Parser.Frm.ParserFrmCompileAST.PrintModelLexerErrors(temp, Globals.modelFileLines, new ParseHelper());
                     }
                     if (exception.Contains("¤Cmd lexer error:"))
                     {
+                        //Hmmm, uses model lexer error printing...?
                         lexer = true;
                         List<string> temp = new List<string>();
                         temp.Add(exception);
-                        ParserOLD.PrintModelLexerErrors(temp, Globals.cmdFileLines, new ParseHelper());
+                        Parser.Frm.ParserFrmCompileAST.PrintModelLexerErrors(temp, Globals.cmdFileLines, new ParseHelper());
                     }
                     
                     if (originalFileName == "" && commandLines.Count == 1)  //more-liners get file-type error messages

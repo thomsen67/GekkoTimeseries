@@ -21,6 +21,13 @@ namespace Gekko.Parser.Frm
 {
     class ParserFrmWalkAST
     {
+        public enum EEmitType
+        {
+            bothHumanAndComputerReadable,
+            computerReadable,
+            humanReadable
+        }
+
         public static void ParserFrmWalkASTHelper(GekkoDictionary<string, string> vals)
         {
             WalkerHelper2 wh2 = new WalkerHelper2();
@@ -1802,6 +1809,51 @@ namespace Gekko.Parser.Frm
             public ASTNodeSimple rhs = null;
             public Dictionary<string, string> vals = null;
         }
+
+        public class StringBuilder2
+        {
+            public StringBuilder shortVersion = new StringBuilder();
+            public StringBuilder longVersion = new StringBuilder();
+            public StringBuilder humanVersion = new StringBuilder();
+
+            public void Append(string s)
+            {
+                Append(s, 0);
+            }
+
+            public void Append(string s, EEmitType which)
+            {  //0: all, 1: nonhuman, 2: human
+                if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.computerReadable)
+                {
+                    shortVersion.Append(s);
+                    longVersion.Append(s);
+                }
+                if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.humanReadable)
+                {
+                    humanVersion.Append(s);
+                }
+            }
+
+            public void AppendLine(string s)
+            {
+                AppendLine(s, 0);
+            }
+
+            public void AppendLine(string s, EEmitType which)
+            {
+                if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.computerReadable)
+                {
+                    shortVersion.AppendLine(s);
+                    longVersion.AppendLine(s);
+                }
+                if (which == EEmitType.bothHumanAndComputerReadable || which == EEmitType.humanReadable)
+                {
+                    humanVersion.AppendLine(s);
+                }
+            }
+        }
+
+
 
     }
 }

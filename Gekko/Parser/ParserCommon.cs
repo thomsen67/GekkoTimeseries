@@ -27,8 +27,23 @@ namespace Gekko.Parser
                 Console.WriteLine(s, Color.Orange);
             }
             MessageBox.Show("See console, 100 tokens printed. See start of Cmd3Lexer.cs to translate numbers.");
-        }        
+        }
 
-        
+    }
+
+    public class ParseHelper
+    {
+        public bool isOneLinerFromGui = false;
+        public string commandsText = null;
+        public string fileName = null;
+        public bool isModel = false;
+    }
+
+    public class ConvertHelper
+    {
+        public string code;
+        public List<string> errors;
+        public string commandsText;
+        //public string codeUFunctions;        
     }
 }

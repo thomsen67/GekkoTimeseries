@@ -365,6 +365,53 @@ namespace Gekko.Parser.Frm
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
         }
 
+        public class WalkHelper
+        {
+            public List<string> frmlItems;
+            public int frmlItemsCounter = -1;  //incremented for each ASTFRML, so becomes 0 when first ASTFRML is hit.
+            public bool print = false;
+            public bool printFile = false;
+            //public int eqs = 0;
+            public List<string> functions = new List<string>();
+            //pointers into the tree of equations
+            //public List<EquationsHelper> equations = new List<EquationsHelper>();
+            //public EquationNode currentRootEquationNode = null;
+            public StreamWriter writer = null;
+            public PositionInFile positionInFileStart = new PositionInFile();
+            public PositionInFile positionInFileEnd = new PositionInFile();
+            public string inputFile = "";
+            public StringReader inputFileStringReader = null;
+            public List<string> inputFileLines = new List<string>();
+            public bool afterEncountered = false;
+            public bool after2Encountered = false;
+            public string modelBlock = "Unnamed";
+        }
+
+
+        public class PositionInFile
+        {
+            public int line; //0-based!
+            public int charPosition;  //0-based
+            public PositionInFile()
+            {
+                line = -12345;
+                charPosition = -12345;
+            }
+            public void LookForLargerPosition(CT ast)
+            {
+                if (ast.Line - 1 > this.line) //subtract 1 to make it 0-based
+                {
+                    this.line = ast.Line - 1; //subtract 1 to make it 0-based
+                    this.charPosition = ast.CharPositionInLine;
+                }
+                else if (ast.Line - 1 == this.line)  //subtract 1 to make it 0-based
+                {
+                    if (ast.CharPositionInLine > this.charPosition) this.charPosition = ast.CharPositionInLine;
+                }
+            }
+        }
+
+
 
     }
 }
