@@ -369,7 +369,6 @@
     <Compile Include="MapMultidim.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Model.cs" />
-    <Compile Include="MouseUtilities.cs" />
     <Compile Include="O.cs" />
     <Compile Include="OnlineDatabanks.cs" />
     <Compile Include="Operators.cs" />
