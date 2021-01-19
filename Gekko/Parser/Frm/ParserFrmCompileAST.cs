@@ -16,6 +16,8 @@ using System.Collections;
 using System.Security.Cryptography;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using ProtoBuf;
+using ProtoBuf.Meta;
 
 namespace Gekko.Parser.Frm
 {

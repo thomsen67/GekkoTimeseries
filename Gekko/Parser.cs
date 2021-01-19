@@ -365,20 +365,5 @@ namespace Gekko
         public bool isModel = false;
     }
 
-    public class WalkerHelper2
-    {
-        public StringBuilder2 rightHandSideCsCode = new StringBuilder2();
-        public StringBuilder leftHandSideCsCodeGauss = new StringBuilder();  // b[117]
-        public StringBuilder leftHandSideCsCodeJacobi = new StringBuilder();  // c[117]
-        public StringBuilder leftHandSideHumanReadable = new StringBuilder();  //fy
-        public int leftHandSideBNumber = -12345;  //only used for model
-        public List<string> allReferencedTimeSeriesOrListsWork = new List<string>();  //only used for expressions in cmd
-        public List<string> allReferencedTimeSeriesOrListsBase = new List<string>();  //only used for expressions in cmd
-        public List<string> problematicFrmlCodes = new List<string>();
-        public string frmlCode = "";
-        public string leftSideFunction = "";
-        public string variableOrFunctionIndicator = "";
-        public ASTNodeSimple rhs = null;
-        public Dictionary<string, string> vals = null;
-    }    
+    
 }

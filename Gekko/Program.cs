@@ -996,7 +996,7 @@ namespace Gekko
         [ProtoMember(24)]
         public string Zname = "";
         //[ProtoMember()] !!!!!!!! ignore this!
-        public ASTNodeSimple equationsNodeRoot = null;
+        public Gekko.Parser.ASTNodeSimple equationsNodeRoot = null;
         [ProtoMember(25)]
         public bool isAfterModel = false;  //if equation is after 
         [ProtoMember(26)]
@@ -1246,7 +1246,7 @@ namespace Gekko
                     string s2 = p.GetStackCommandFileText(p.GetDepth());
                     string s3 = "";
                     if (s2 != null) s3 = s2;
-                    ParserOLD.PrintModelParserErrors(Program.CreateListOfStringsFromString(e2.Message), Program.CreateListOfStringsFromString(s3), ph);
+                    Gekko.Parser.Frm.ParserFrmCreateAST.PrintModelParserErrors(Program.CreateListOfStringsFromString(e2.Message), Program.CreateListOfStringsFromString(s3), ph);
                 }
                 if (FindException(e2, "***") || FindException(e2, "+++"))
                 {
