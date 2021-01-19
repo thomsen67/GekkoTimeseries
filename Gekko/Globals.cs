@@ -934,7 +934,7 @@ namespace Gekko
 
         public static WindowIntellisense windowIntellisense = null;
 
-        public static Table lastPrtOrMulprtTable = null;
+        public static Table lastPrtOrMulprtTable = null; 
         public static Table lastDecompTable = null;  //only used for unit tests
         public static bool showDecompTable = false;  //only used for unit tests
         public static string decompResidualName = "a_residual__";
