@@ -765,6 +765,12 @@ namespace Gekko.Parser.Frm
             return ss.ToString();
         }
 
+        private static void NewtonStartingValuesFixHelper2(StringBuilder sb)
+        {
+            sb = sb.Replace("O.Log(", "O.Special_Log(");
+            sb = sb.Replace("O.Pow(", "O.Special_Pow(");
+        }
+
 
 
     }

@@ -508,11 +508,7 @@ namespace Gekko
         }
         
         
-        private static void NewtonStartingValuesFixHelper2(StringBuilder sb)
-        {
-            sb = sb.Replace("O.Log(", "O.Special_Log(");
-            sb = sb.Replace("O.Pow(", "O.Special_Pow(");
-        }
+        
 
         public static void ReferencedAssembliesGekko(CompilerParameters compilerParams)
         {
@@ -542,10 +538,7 @@ namespace Gekko
         
 
         
-        private static bool IsEquationTypeP(string code)
-        {
-            return G.Equal(code.Substring(0, 1), Globals.equationCodeP);
-        }
+        
 
         private static void PrintEquationCodeWarning(EquationHelper eh)
         {

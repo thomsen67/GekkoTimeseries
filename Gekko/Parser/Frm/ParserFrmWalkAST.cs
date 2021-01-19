@@ -1605,6 +1605,11 @@ namespace Gekko.Parser.Frm
             wh2.rightHandSideCsCode.Append(")");
         }
 
+        private static bool IsEquationTypeP(string code)
+        {
+            return G.Equal(code.Substring(0, 1), Globals.equationCodeP);
+        }
+
 
 
     }
