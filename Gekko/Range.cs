@@ -19,70 +19,19 @@ namespace Gekko
         {
             this.first = xx1;
             this.last = xx2;
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions start----------------
-        // ----------------------------------------------------
-
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------
+        }        
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             G.Writeln2("*** ERROR: Wrong use of Range class");
             throw new GekkoException();
-        }
-
-
-        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        //{
-        //    G.Writeln2("*** ERROR: Wrong use of Range class");
-        //    throw new GekkoException();
-        //}
-
-        //public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        //{
-        //    G.Writeln2("*** ERROR: Wrong use of Range class");
-        //    throw new GekkoException();
-        //}
-
-        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        //{
-        //    G.Writeln2("*** ERROR: Wrong use of Range class");
-        //    throw new GekkoException();
-        //}
-
-        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        //{
-        //    G.Writeln2("*** ERROR: Wrong use of Range class");
-        //    throw new GekkoException();
-        //}
-
+        }        
+        
         public IVariable Negate(GekkoSmpl t)
         {
             G.Writeln2("*** ERROR: Wrong use of Range class");
             throw new GekkoException();
-        }
-
-        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        //{
-        //    G.Writeln2("*** ERROR: Wrong use of Range class");
-        //    throw new GekkoException();
-        //}
+        }        
 
         public double GetValOLD(GekkoSmpl t)
         {

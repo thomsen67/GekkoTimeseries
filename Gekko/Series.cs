@@ -200,32 +200,7 @@ namespace Gekko
             {
                 return G.Chop_RemoveFreq(this.GetName());
             }            
-        }
-
-        //public Series(ETimeSeriesType type, GekkoSmpl smpl)
-        //{
-        //    // ------------------------------
-        //    //Constructing a SeriesLight
-        //    //type is just a decorator (not used), so that it is easier to 
-        //    //see when a light timeseries is created.
-        //    // ------------------------------
-        //    this.freq = smpl.t0.freq;  //same as for t1, t2 or t3
-        //    this.name = null; //light
-        //    this.meta = null; //light
-        //    int n = smpl.Observations03();
-        //    this.dataArray = new double[n];  //we make the array as compact as possible --> faster
-        //    InitializeDataArray(this.dataArray);
-        //    this.anchorPeriod = smpl.t0;            
-        //    this.anchorPeriodPositionInArray = 0;
-        //}
-
-        //public Series(ESeriesType type, GekkoTime t1, GekkoTime t2) : this(type, t1, t2)
-        //{
-        //}
-
-        //public Series(ESeriesType type, EFreq freq) : this(type, GekkoTime.tNull, GekkoTime.tNull, true, freq)
-        //{
-        //}
+        }        
 
         public Series(ESeriesType type, GekkoTime t1, GekkoTime t2)
         {
@@ -834,7 +809,6 @@ namespace Gekko
             //Also, if using this, beware of OPTION series data missing.
             //You may have to transform NaN to 0 if this option is set.
             //See also #87943523987543
-
           
             this.SetDirty(true); //we have to mark dirty manually
 
@@ -851,8 +825,7 @@ namespace Gekko
             //beware that this is the actual data array, not a copy of it.
             //Also, if using this, beware of OPTION series data missing.
             //You may have to transform NaN to 0 if this option is set.
-            //See also #87943523987543
-                                 
+            //See also #87943523987543                                 
 
             return this.data.GetDataArray_ONLY_INTERNAL_USE();
         }
@@ -1004,26 +977,7 @@ namespace Gekko
             }
             this.SetDirty(true);
 
-        }
-
-        //public void SetDirtyGhost(bool b1, bool b2)
-        //{
-        //    this.SetDirty(b1);
-        //    this.SetGhost(b2);
-        //}        
-
-        //public bool IsTimeless()
-        //{
-        //    return this.type == ESeriesType.Timeless;
-        //}
-
-        //public void SetTimeless()
-        //{
-        //    //this.isTimeless = true;
-        //    this.type = ESeriesType.Timeless
-        //    this.dataArray = new double[1];  //wipe anything existing out
-        //    this.dataArray[0] = double.NaN;
-        //}
+        }        
 
         /// <summary>
         /// Overload with no offset.
@@ -2476,34 +2430,9 @@ namespace Gekko
         public static bool IsLagOrLead(int i)
         {
             return i > -100 && i < 100;
-        }
+        }        
 
-
-
-        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index)
-        //{
-        //    G.Writeln2("Ts error 8");
-        //    return null;
-        //}
-
-        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange index1, IVariablesFilterRange index2)
-        //{
-        //    G.Writeln2("Ts error 9");
-        //    return null;
-        //}
-
-        //public IVariable Indexer(GekkoSmpl smpl, IVariable index, IVariablesFilterRange indexRange)
-        //{
-        //    G.Writeln2("Ts error 10");
-        //    return null;
-        //}
-
-        //public IVariable Indexer(GekkoSmpl smpl, IVariablesFilterRange indexRange, IVariable index)
-        //{
-        //    G.Writeln2("Ts error 11");
-        //    return null;
-        //}
-
+        //TT jan 2021: it seems this is actually used.
         public void InjectAdd(GekkoSmpl smpl, IVariable y)
         {            
             if (this.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
@@ -2678,12 +2607,7 @@ namespace Gekko
                 if (this.meta != null) this.meta.SetDirty(b1);
             }
         }
-
-        //public void SetGhost(bool b2)
-        //{
-        //    if (meta != null) this.meta.SetGhost(b2);
-        //}
-
+        
         public int GetAnchorPeriodPositionInArray()
         {
             //this.data is not null when this is called
@@ -2696,16 +2620,7 @@ namespace Gekko
             if (meta == null) return false; //not used for light Series
             return this.meta.IsDirty();
         }
-
-        //public bool IsLight()
-        //{
-        //    return this.meta == null;
-        //}
-
-        //public bool IsArrayTimeseries()
-        //{
-        //    return this.dimensions > 0;
-        //}
+        
 
         /// <summary>
         /// Creates a clone of the Series, copying all fields. Used for copying databanks in RAM.
@@ -2830,7 +2745,7 @@ namespace Gekko
         }
     }    
 
-        [ProtoContract]
+    [ProtoContract]
     public class SeriesDataInformation
     {
         [ProtoMember(1, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped) 
@@ -2910,23 +2825,11 @@ namespace Gekko
             this.isDirty = b1;
         }
         
-
-        //public void SetGhost(bool b2)
-        //{
-        //    this.isGhost = b2;
-        //}
-
         public bool IsDirty()
         {
             return this.isDirty;
         }
-
-        //public bool IsGhost()
-        //{
-        //    return this.isGhost;
-        //}
-    }
-
-    
+        
+    }    
 
 }

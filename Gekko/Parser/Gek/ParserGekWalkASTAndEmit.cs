@@ -5789,8 +5789,7 @@ namespace Gekko.Parser.Gek
                             string s = G.StripQuotes(node[0].Text);
                             //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
                             //but @ will keep backslashes.
-                            s = G.HandleQuoteInQuote(s);
-                            //node.Code.CA("new ScalarString(ScalarString.SubstituteScalarsInString(@`" + s + "`, true, false))");
+                            s = G.HandleQuoteInQuote(s);                            
                             node.Code.CA("O.HandleString(new ScalarString(@`" + s + "`))");
                         }
                         break;

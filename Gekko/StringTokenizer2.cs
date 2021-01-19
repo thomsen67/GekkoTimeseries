@@ -1185,11 +1185,7 @@ namespace Gekko
             for (int i = 0; i < emptyTokensAtEnd; i++) a.Add(new TokenHelper());
             return new TokenList(a);
         }
-
-        //public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw)
-        //{
-        //    return GetTokensWithLeftBlanksRecursive(textInputRaw, null, null, null, null);
-        //}
+                
 
         public static TokenHelper GetTokensWithLeftBlanksRecursive(string textInputRaw, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
@@ -1234,9 +1230,7 @@ namespace Gekko
 
         public static TokenList GetTokensWithLeftBlanksRecursiveHelper(TokenList input, ref int startI, TokenHelper startparen)
         {
-            TokenList rv = new TokenList();  
-            
-            
+            TokenList rv = new TokenList();              
                       
             List<TokenHelper> output = new List<TokenHelper>();
             //if (first != null) output.Add(first);  //a left parenthesis      

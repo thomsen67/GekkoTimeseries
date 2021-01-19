@@ -11869,7 +11869,7 @@ namespace Gekko
             //G.Writeln();
 
             string label2 = G.ReplaceGlueNew(label);
-            label2 = ScalarString.SubstituteScalarsInString(label2, false, true);
+            label2 = ScalarString.SubstituteScalarsInString(label2, false, true);  //#lkjadsfkalsdfjaskl
 
             PrintLabel(label2);
             foreach (string s in xx)

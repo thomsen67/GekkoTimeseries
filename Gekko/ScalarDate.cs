@@ -20,27 +20,7 @@ namespace Gekko
         public ScalarDate(GekkoTime gt)
         {
             date = gt;
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions start----------------
-        // ----------------------------------------------------
-
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------
+        }        
 
         public double GetValOLD(GekkoSmpl t)
         {
@@ -107,12 +87,7 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-
-        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        //{
-        //    G.Writeln2("*** ERROR: You cannot use add on DATE");                
-        //    throw new GekkoException();
-        //}
+        
 
         public IVariable Add(GekkoSmpl t, IVariable x)
         {

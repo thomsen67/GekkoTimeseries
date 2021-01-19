@@ -11,7 +11,6 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public double val;
-
         public bool hasRepStar = false;  //no protobuf. To indicate for instance x = 1, 2 rep 2, 3 rep *; ---> 1, 2, 2, 3, where 3 has this flag set. See #76328234 for similar functionality
         public byte numberOfLeadingZeroes = 0; //no protobuf. See #76328234 for similar functionality. See definition in #8952042732435
 
@@ -30,19 +29,7 @@ namespace Gekko
             this.val = d;
             this.numberOfLeadingZeroes = b;
         }
-
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-            List<string> xx = null;
-        }
-
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
+        
 
         public double GetValOLD(GekkoSmpl t)
         {
@@ -129,9 +116,7 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();
-        }
-        
-                
+        }       
 
         public List<IVariable> ConvertToList()
         {
@@ -151,45 +136,8 @@ namespace Gekko
         public IVariable Negate(GekkoSmpl t)
         {            
             return new ScalarVal(-this.val);
-        }        
-
-        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        //{
-        //    if (x.Type() == EVariableType.Val)
-        //    {
-        //        if (y.Type() == EVariableType.Val)
-        //        {
-        //            //Probably good to have this case first, to speed up the (VAL, VAL) combination
-
-        //            //We have to inject the value into the object. If we were to return a new object (or use the Add()
-        //            //method), the Dictionary holding the %-names would point to an old object with an old value.
-        //            //And this way, we also save 1 object creation which is good for performance.
-        //            this.val = ((ScalarVal)x).val + ((ScalarVal)y).val;
-        //        }
-        //        else if (y.Type() == EVariableType.Date)
-        //        {
-        //        }
-        //        else if (y.Type() == EVariableType.String)
-        //        {
-        //        }
-        //    }
-        //    else if (x.Type() == EVariableType.Date)
-        //    {
-        //        G.Writeln("*** ERROR: Cannot convert from date to value");
-        //        throw new GekkoException();
-        //    }
-        //    else if (x.Type() == EVariableType.String)
-        //    {
-        //        G.Writeln("*** ERROR: Cannot convert from string to value");
-        //        throw new GekkoException();
-        //    }
-        //    else
-        //    {
-        //        G.Writeln("*** ERROR: Internal Gekko error #98734543");
-        //        throw new GekkoException();
-        //    }
-        //}
-
+        }    
+        
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
             if (G.IsGekkoNull(input)) return input;
