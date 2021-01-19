@@ -19788,12 +19788,12 @@ namespace Gekko
                 DateTime t1 = DateTime.Now;
                 //ParseModel() is reasonably fast. But needs only to be run when new model is called.
                 //[[1]]
-                GekkoDictionary<string, string> vals = ParserOLD.ParserFrmCreateAst(textInput, fileName);
+                GekkoDictionary<string, string> vals = Parser.Frm.ParserFrmCreateAST.ParserFrmCreateASTHelper(textInput, fileName);
                 //TIMING: the rest of this method takes 0.5 sec on dec09, that is nearly as much as parsing and CreateASTNodesForModel()
                 //This loop below alone takes 0.5 seconds on dec09, but it also does all the stuff regarding
                 //  formula codes DJZ, dlog() on left and right side, broken lags etc. etc. So maybe fair enough it
                 //  takes some time. It also writes out actual C# code to be used later on when compiling.
-                ParserOLD.ParserFrmWalkAST(vals);
+                Parser.Frm.ParserFrmWalkAST.ParserFrmWalkASTHelper(vals);
                 Program.GuiSetModelName();
                 if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
                 {
@@ -19802,8 +19802,8 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 parsingSeconds = G.Seconds(t1);
-                ParserOLD.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
-                ParserOLD.ParserFrmMakeProtobuf();
+                Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
+                Parser.Frm.ParserFrmCompileAST.ParserFrmMakeProtobuf();
             }
 
             ParserOLD.ParserFrmHandleVarlist(modelCommentsHelper);
@@ -22435,7 +22435,7 @@ namespace Gekko
                     so.method = "newton";
                     modelType = GetModelTypeFromOptions(so);  //5 types
                 }
-                ParserOLD.ParserFrmOrderAndCompileAST(modelType, false, so.isFix);
+                Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(modelType, false, so.isFix);
             }
             else
             {
@@ -22451,7 +22451,7 @@ namespace Gekko
                     Type assembly = GetAssemblyFromModelType(modelType);
                     if (assembly == null)
                     {
-                        ParserOLD.ParserFrmOrderAndCompileAST(modelType, false, so.isFix);
+                        Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(modelType, false, so.isFix);
                         assembly = GetAssemblyFromModelType(modelType);
                         if (assembly == null)
                         {
@@ -22462,7 +22462,7 @@ namespace Gekko
                 }
                 else
                 {
-                    ParserOLD.ParserFrmOrderAndCompileAST(ECompiledModelType.After, false, so.isFix);
+                    Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(ECompiledModelType.After, false, so.isFix);
                 }
             }
             //TODO Cleanup end
