@@ -944,7 +944,7 @@ namespace Gekko.Parser.Gek
 
                             node.Code.CA("new ScalarString(`[`)");
 
-                            if (Globals.concatPointer)
+                            if (true)
                             {
                                 for (int i = 0; i < node.ChildrenCount(); i++)
                                 {
@@ -986,7 +986,7 @@ namespace Gekko.Parser.Gek
                                         if (!isFirst)
                                         {
                                             ss1 = null;
-                                            if (Globals.concatPointer)
+                                            if (true)
                                             {
                                                 ss1 = ".Concat(null, ";
                                             }                                            
@@ -4368,7 +4368,7 @@ namespace Gekko.Parser.Gek
                                         //bank indicator  
                                         string bankNameCs = null;
                                         bankNameCs = node[0][0].Code.ToString();
-                                        if (Globals.concatPointer)
+                                        if (true)
                                         {
                                             nameAndBankCode = "(" + bankNameCs + ")" + ".Concat(" + Globals.smpl + ", O.scalarStringColon)" + ".Concat(" + Globals.smpl + ", " + node[1].Code + ")";
                                         }                                        
@@ -4434,7 +4434,7 @@ namespace Gekko.Parser.Gek
                                 if (s2)
                                 {
                                     //%a!q, does not make sense...
-                                    if (Globals.concatPointer)
+                                    if (true)
                                     {
                                         node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }
@@ -4443,7 +4443,7 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //%a
-                                    if (Globals.concatPointer)
+                                    if (true)
                                     {
                                         node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")");
                                     }
@@ -4455,7 +4455,7 @@ namespace Gekko.Parser.Gek
                                 if (s2)
                                 {
                                     //a!q
-                                    if (Globals.concatPointer)
+                                    if (true)
                                     {
                                         node.Code.A("(" + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }                                    
@@ -4482,7 +4482,7 @@ namespace Gekko.Parser.Gek
                                     }
                                     else
                                     {
-                                        if (Globals.concatPointer)
+                                        if (true)
                                         {
                                             node.Code.A(".Concat(" + Globals.smpl + ", " + child.Code + ")");
                                         }                                        

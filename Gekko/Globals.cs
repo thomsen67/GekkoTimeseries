@@ -403,21 +403,10 @@ namespace Gekko
         public static PipeFileHelper pipeFileHelper2 = new PipeFileHelper();  //pipe 2 is for printing etc. when user choses "p fy file=myfile.txt"
 
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
-        
-        public static List<string>[] globalAl;
-        public static List<string>[] globalAlType;
-
-        public static List<string> globalAlAFTER;
-        public static List<string> globalAlTypeAFTER;
-
+                
         public static string blankUsedAsPadding = " ";  //to be able to remove that stuff sometime when I understand padding in richtextbox!
-
-        public static int globalMax;
-
-        public static string expectedStatement = "";
-
+        
         //global time settings
-
         public static GekkoTime globalPeriodStart = GekkoTime.tNull;
         public static GekkoTime globalPeriodEnd = GekkoTime.tNull;
         public static GekkoTimeSpans globalPeriodTimeSpans = new GekkoTimeSpans();  //nothing in .data yet.
@@ -429,17 +418,12 @@ namespace Gekko
         public static string decompText1a = "[Difference]";
         public static string decompText2 = "[Decomp. error]";
         public static string decompText2a = "[Right hand side]";
-
-        public static int solveJacobiSparse = 0;
-
-        public static int solveNewtonSimpleBacktrack = 1;
+                
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
 
         public static string gekkoExePath = "";  //probably strange when unit testing or calling Gekcel
         public static string gekkoVersion = "";
-
-        public static bool useDfsane = false;
-
+        
         public static double invertRelativeConvergence = 0.0001d;  //old val=0.003d
         public static double invertAbsoluteConvergence = 1.0e-8d;
         public static int invertIterations = 500;  //old val=1000000
@@ -455,27 +439,16 @@ namespace Gekko
 
         // see ----> Program.options.solve_newton_backtrack = true //default: true (set to false can be GOOD for some problems)        
 
-        public static bool solveUseFastSteps = true;     //default: true (mostly good)
-        public static bool solveScaleNewton = false;     //default: false (can be used for eg nested CES)        
+        public static bool solveUseFastSteps = true;     //default: true (mostly good)        
 
         public static GekkoTime dispLastDispStart;  //kind of a hack to be able to click on variable links and print with same time settings
         public static GekkoTime dispLastDispEnd;  //kind of a hack        
         public static bool guiHomeMainEnabled = false;
         public static bool guiHomeMenuEnabled = false;
-
-        public static int printLevelWidth = 14;
-        public static int printRelativeWidthSmall = 7;  //this way, it can print -112.00% for instance, 6 is too small
-        public static int printRelativeWidthLarge = 10;  //to give more room for variable names
-
-        public static int printFrnnFile = 1;
-
-        public static double NewtonAbsoluteCrit = 1.0e-4;  //1.0 e-4 tol for newton algorithm  
+                
         public static double jacobiDeltaProbe = 1.0e-4; //1.0 e-4 stepsize for gradient computation        
-
-        public static double solveFastCritFactor = 4d;  //optimum seems around 30, but that seems a bit wild
-        public static bool solveUseFastCrits = true;
+        
         public static bool solveUseStrictCrits = true;
-        public static bool solveCheckThatAllDataGetsFromBArrayToTimeSeries = true;
 
         public static List<string> checkoff = new List<string>();
 
@@ -516,9 +489,7 @@ namespace Gekko
         /// A lag like fY(-2.000000004) --> fY(-2), to avoid rounding errors
         /// </summary>
         public static double toleranceRegardingBrokenLagsOrLeads = 0.000001;
-
-        public static String modelFileExtension = "frm";
-
+        
         public static UserSettings userSettings = new UserSettings();
 
         /// <summary>
@@ -536,12 +507,7 @@ namespace Gekko
         /// Used for kind of an internal hack
         /// </summary>
         public static int disableRationButtons = 0;
-
-        /// <summary>
-        /// For global access when compiling genr's
-        /// </summary>
-        public static System.IO.StringWriter res;
-
+        
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;
 
@@ -552,7 +518,15 @@ namespace Gekko
         public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
         public static List<Func<GekkoSmpl, IVariable>> expressions = null;  //used for x[#i] kind of equations
 
-        public static bool concatPointer = true;
+        // =====================================
+        // =====================================
+        // =====================================
+        //     oprydning til her!
+        // =====================================
+        // =====================================
+        // =====================================
+
+
 
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';
