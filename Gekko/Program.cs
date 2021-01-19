@@ -22152,12 +22152,7 @@ namespace Gekko
                 G.Writeln();
                 G.Writeln();
             }
-        }
-
-        public static bool IsStacked()
-        {
-            return G.Equal(Program.options.solve_forward_method, "stacked");
-        }
+        }        
 
         public static void Sim(O.Sim o)
         {
@@ -22460,24 +22455,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-
-            if (G.Equal(Program.options.solve_forward_method, "stacked"))
-            {
-                G.Writeln2("*** ERROR: 'forward method = stacked' is not working -- please use 'forward method = nfair' instead");
-                throw new GekkoException();
-
-                if (GekkoTime.Observations(tStart, tEnd) > Program.options.solve_forward_stacked_horizon)
-                {
-                    usingFairTaylor = true;
-                    G.Writeln2("Since there are more observations (" + GekkoTime.Observations(tStart, tEnd) + ") than the horizon (" + Program.options.solve_forward_stacked_horizon + "), Fair-Taylor is used together with stacked time");
-                }
-                else if (GekkoTime.Observations(tStart, tEnd) < Program.options.solve_forward_stacked_horizon)
-                {
-                    G.Writeln2("*** ERROR: There are fewer observations (" + GekkoTime.Observations(tStart, tEnd) + ") than the horizon (" + Program.options.solve_forward_stacked_horizon + ")");
-                    throw new GekkoException();
-                }
-            }
-
+            
             List<string> outputText = new List<string>();
 
             bool debug = false;
@@ -22679,12 +22657,7 @@ namespace Gekko
 
             GekkoTime tEnd_withRE = tEnd.Add(Program.model.modelGekko.largestLeadOutsideRevertedPart);
 
-            int horizon2 = 0;
-            if (IsStacked())
-            {
-                horizon2 = Program.options.solve_forward_stacked_horizon - 1;
-                tEnd_withRE = tEnd_withRE.Add(horizon2);  //horizon2=0 is the same as normal newton
-            }            
+            int horizon2 = 0;            
 
             //DateTime dt1 = DateTime.Now;
             //G.Writeln("Code up to a[] load: used " + (dt1 - startTime).TotalMilliseconds / 1000d);
@@ -22882,16 +22855,8 @@ namespace Gekko
 
                         if (Globals.simulationCheckThatAllDataGetsFromBArrayToTimeSeries)
                         {
-                            if (IsStacked())
-                            {
-                                bCheck = new double[Program.model.modelGekko.stackedModel.b.Length];
-                                System.Array.Copy(Program.model.modelGekko.stackedModel.b, bCheck, Program.model.modelGekko.stackedModel.b.Length);
-                            }
-                            else
-                            {
-                                bCheck = new double[Program.model.modelGekko.b.Length];
-                                System.Array.Copy(Program.model.modelGekko.b, bCheck, Program.model.modelGekko.b.Length);
-                            }
+                            bCheck = new double[Program.model.modelGekko.b.Length];
+                            System.Array.Copy(Program.model.modelGekko.b, bCheck, Program.model.modelGekko.b.Length);
                         }
 
                         DateTime t0 = DateTime.Now;
@@ -22899,33 +22864,18 @@ namespace Gekko
                         try
                         {
                             if (modelType == ECompiledModelType.After)
-                            {
-                                if (IsStacked())
-                                {
-                                    G.Writeln2("*** ERROR: You cannot use option 'forward method = stacked' together with the EFTER command");
-                                    throw new GekkoException();
-                                }
+                            {                                
                                 SolveAfter();
                                 SolveRevertedT();
                                 SolveRevertedY();
                                 SolveRevertedAuto();                                
                             }
                             else if (modelType == ECompiledModelType.Res)
-                            {
-                                if (IsStacked())
-                                {
-                                    G.Writeln2("*** ERROR: You cannot use option 'forward method = stacked' together with the RES command");
-                                    throw new GekkoException();
-                                }
+                            {                                
                                 SolveRes(Program.model.modelGekko.b);
                             }
                             else if (modelType == ECompiledModelType.Gauss || modelType == ECompiledModelType.GaussFailSafe)
-                            {
-                                if (IsStacked())
-                                {
-                                    G.Writeln2("*** ERROR: You cannot use option 'forward method = stacked' together with the Gauss algorithm");
-                                    throw new GekkoException();
-                                }
+                            {                                
                                 if (so.isFix && hasEndoExo)
                                 {
                                     //This should never happen
@@ -22942,25 +22892,8 @@ namespace Gekko
                                 nah.tEnd = tEnd;
 
                                 ModelGekko tempModel = Program.model.modelGekko;
-
-                                if (IsStacked())
-                                {
-                                    Program.model.modelGekko = Program.model.modelGekko.stackedModel;
-                                    ParserOLD.OrderAndCompileModel(ECompiledModelType.Newton, false, so.isFix);
-                                }
-
-                                
                                 
                                 SolveNewton(modelType, nah);
-                                
-
-                                if (IsStacked())
-                                {
-                                    //TODO: what if exception, in that case we should also revert
-                                    //TODO: what if exception, in that case we should also revert
-                                    //TODO: what if exception, in that case we should also revert
-                                    Program.model.modelGekko = tempModel;
-                                }
                             }
                             else throw new GekkoException();  //should be one of these
                         }
@@ -23225,15 +23158,7 @@ namespace Gekko
         private static void SetTerminalType(ETerminalCondition terminal)
         {
             Program.model.modelGekko.simulateResults[8] = 0;
-            if (G.Equal(Program.options.solve_forward_method, "stacked"))
-            {
-                if (!(terminal == ETerminalCondition.Exogenous))
-                {
-                    G.Writeln2("*** ERROR: method 'stacked' only works with terminal = exo at the moment");
-                    throw new GekkoException();
-                }
-                Program.model.modelGekko.simulateResults[8] = 0;
-            }
+            
             if (G.Equal(Program.options.solve_forward_method, "none"))
             {
                 Program.model.modelGekko.simulateResults[8] = 0;
@@ -23296,11 +23221,7 @@ namespace Gekko
                     //this has to do with data initialization, because in the first FT-iteration we typically take initial leaded variable values
                     //from lagged variable values (remember the leaded variable may be all missing values).
                     //This interacts badly with shocks, so we do it from FT-iteration 2 and onwards
-                    if (IsStacked())
-                    {
-                        G.Writeln2("*** ERROR: You cannot use stacked and newton-fair-taylor at the same time");
-                        throw new GekkoException();
-                    }
+                    
                     int counter = -1;
                     foreach (int leadVar in leadedVarsList)
                     {
@@ -23681,224 +23602,167 @@ namespace Gekko
 
         private static bool FromBToA(ref bool hasIssuedSeedWarning, double[] bCheck, int[] extraWritebackPointers, int[] revertedPointers, int[] aNumberPointers, int[] endoNoLagPointers, string[] varNamePointers, double[,] a, int tInt)
         {
-            if (IsStacked())
+
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
             {
-                ModelGekko thisModel = Program.model.modelGekko.stackedModel;
-                for (int i = 0; i < thisModel.varsBType.Count; i++)
+                //#84750237
+                //This would probably be better done by comparing Program.model.modelGekko.b and bCheck, and if different
+                //put it into a[]. But there are some issues with Infinity and NaN to be sorted out.
+                //For now, probably best to keep it as it is.
+                //Changing it would require investigating x.Equals(y), to see if it is appropriate for Infinity and NaN.
+                if (endoNoLagPointers[i] == 1 || revertedPointers[i] == 1 || extraWritebackPointers[i] == 1)
                 {
-                    //TODO: fix this in #84750237
-
-                    double x1 = bCheck[i];
-                    double x2 = thisModel.b[i];
-
-                    long longX1 = BitConverter.DoubleToInt64Bits(x1);
-                    long longX2 = BitConverter.DoubleToInt64Bits(x2);
-
-                    if (longX1 != longX2)
+                    a[aNumberPointers[i], tInt] = Program.model.modelGekko.b[i];
+                    if (!hasIssuedSeedWarning && Program.model.modelGekko.b[i] == Globals.missingValueSeedNumber)
                     {
-                        string s = thisModel.varsBTypeInverted[i];
-                        string[] ss = s.Split(new string[] { Globals.stackedTimeSeparator }, StringSplitOptions.None);
-                        string name = ss[0];
-                        string[] ss2 = ss[1].Split(new string[] { Globals.lagIndicator }, StringSplitOptions.None);
-                        int offset = int.Parse(ss2[0]) - 100;
-                        //using the old model .varsAType
-                        int aI = Program.model.modelGekko.varsAType[name].aNumber;
-                        int tt = tInt + offset;
-                        a[aI, tt] = x2;
-                        //Slack: see #98327432498
-
-                        if (!hasIssuedSeedWarning && thisModel.b[i] == Globals.missingValueSeedNumber)
+                        //For safety:
+                        G.WritelnGray("DEBUGGING: It seems there may be a problem with initializing missing values: 0.123454321: " + varNamePointers[i] + " t: " + tInt + ".");
+                        hasIssuedSeedWarning = true;
+                    }
+                }
+                else
+                {
+                    if (Globals.simulationCheckThatAllDataGetsFromBArrayToTimeSeries)
+                    {
+                        if (Program.model.modelGekko.b[i] != bCheck[i])  //probably is false if left side is 0 and right side is NaN. Not good.
                         {
-                            //For safety:
-                            G.WritelnGray("DEBUGGING: It seems there may be a problem with initializing missing values: 0.123454321: " + varNamePointers[i] + " t: " + tInt + ".");
-                            hasIssuedSeedWarning = true;
+                            //should change according to b[] arrays, but does not get written back.
+                            string var = Program.model.modelGekko.varsBTypeInverted[i];
+                            G.Writeln();
+                            G.Writeln("*** ERROR: While backwriting from SIM command -- please report this error to the Gekko editor");
+                            G.Writeln("*** ERROR: Variable: " + var);
+                            G.Writeln();
+                            throw new GekkoException();
                         }
                     }
                 }
             }
-            else
-            {
-                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
-                {
-                    //#84750237
-                    //This would probably be better done by comparing Program.model.modelGekko.b and bCheck, and if different
-                    //put it into a[]. But there are some issues with Infinity and NaN to be sorted out.
-                    //For now, probably best to keep it as it is.
-                    //Changing it would require investigating x.Equals(y), to see if it is appropriate for Infinity and NaN.
-                    if (endoNoLagPointers[i] == 1 || revertedPointers[i] == 1 || extraWritebackPointers[i] == 1)
-                    {
-                        a[aNumberPointers[i], tInt] = Program.model.modelGekko.b[i];
-                        if (!hasIssuedSeedWarning && Program.model.modelGekko.b[i] == Globals.missingValueSeedNumber)
-                        {
-                            //For safety:
-                            G.WritelnGray("DEBUGGING: It seems there may be a problem with initializing missing values: 0.123454321: " + varNamePointers[i] + " t: " + tInt + ".");
-                            hasIssuedSeedWarning = true;
-                        }
-                    }
-                    else
-                    {
-                        if (Globals.simulationCheckThatAllDataGetsFromBArrayToTimeSeries)
-                        {
-                            if (Program.model.modelGekko.b[i] != bCheck[i])  //probably is false if left side is 0 and right side is NaN. Not good.
-                            {
-                                //should change according to b[] arrays, but does not get written back.
-                                string var = Program.model.modelGekko.varsBTypeInverted[i];
-                                G.Writeln();
-                                G.Writeln("*** ERROR: While backwriting from SIM command -- please report this error to the Gekko editor");
-                                G.Writeln("*** ERROR: Variable: " + var);
-                                G.Writeln();
-                                throw new GekkoException();
-                            }
-                        }
-                    }
-                }
-            }
+
             return hasIssuedSeedWarning;
         }
 
         private static void FromAToB(bool usingFairTaylor, bool usingNewtonFairTaylor, NewtonFairTaylorHelper1 shock, int ft, ErrorContainer ec, Databank work, Series[] timeSeriesPointers, int[] extraWritebackPointers, int[] lagPointers, int[] aNumberPointers, int[] endoNoLagPointers, int[] endoLeadPointers, int[] endoPointers, string[] varNamePointers, int[] isDJZvarPointers, double[,] a, int tInt, GekkoTime t, GekkoTime tStart, GekkoTime tEnd, SimOptions so)
         {
             bool ftOrNft = usingFairTaylor || usingNewtonFairTaylor;
-            if (IsStacked())
-            {
-                Program.model.modelGekko.stackedModel.b = G.CreateArrayDouble(Program.model.modelGekko.stackedModel.varsBType.Count, double.NaN);  //slack: do we need to initialize?
-                foreach (string s in Program.model.modelGekko.stackedModel.varsBType.Keys)  //not too good #980753249852
-                {
-                    string[] ss = s.Split(new string[] {Globals.stackedTimeSeparator}, StringSplitOptions.None);
-                    string name = ss[0];
-                    string[] ss2 = ss[1].Split(new string[] { Globals.lagIndicator }, StringSplitOptions.None);
-                    int offset = int.Parse(ss2[0]) - 100;
-                    int aI = Program.model.modelGekko.varsAType[name].aNumber;
-                    int tt = tInt + offset;
-                    double value = a[aI, tt];
-                    int bI = Program.model.modelGekko.stackedModel.varsBType[s].bNumber;
-                    //Slack: aI, tInt and bI could be stored in faster containers
-                    //See #98327432498
-                    Program.model.modelGekko.stackedModel.b[bI] = value;
-                }
 
-            }
-            else
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
             {
 
-                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
-                {
-
-                    /*
-                     * The logic is more or less like this for the simple case with init=yes and no fair-taylor 
-                     * 
-                    IF series does not exist
-                        IF DJZ-type series
-                            create series and set value to 0
-                        ELSE
-                            abort with error
+                /*
+                 * The logic is more or less like this for the simple case with init=yes and no fair-taylor 
+                 * 
+                IF series does not exist
+                    IF DJZ-type series
+                        create series and set value to 0
                     ELSE
-                        IF endo with no lag   
-                            use lagged value, or the value 0.12345
-                        ELSE
-                            IF databank value = NaN
-                                IF DJZ-type series
-                                    set value to 0
-                                ELSE
-                                    use value from databank
- 
-                    */
+                        abort with error
+                ELSE
+                    IF endo with no lag   
+                        use lagged value, or the value 0.12345
+                    ELSE
+                        IF databank value = NaN
+                            IF DJZ-type series
+                                set value to 0
+                            ELSE
+                                use value from databank
+
+                */
 
 
-                    double val = double.NaN;
-                    Series ts = timeSeriesPointers[i];
-                    string variable = varNamePointers[i];
-                    if (ts == null)
+                double val = double.NaN;
+                Series ts = timeSeriesPointers[i];
+                string variable = varNamePointers[i];
+                if (ts == null)
+                {
+                    if (isDJZvarPointers[i] == 1)
                     {
-                        if (isDJZvarPointers[i] == 1)
-                        {
-                            val = 0d;  //DJZ set to 0 --> will end up in b[]
-                            //J-factor or D or Z variable
-                            //see also #7235432894539
-                            Series tsNew = new Series(Program.options.freq, variable + Globals.freqIndicator + G.GetFreq(Program.options.freq));
-                            work.AddIVariable(tsNew.name, tsNew);
-                            timeSeriesPointers[i] = tsNew;
-                            extraWritebackPointers[i] = 1;  //to make sure it gets written back from b[] to a[,] array
+                        val = 0d;  //DJZ set to 0 --> will end up in b[]
+                                   //J-factor or D or Z variable
+                                   //see also #7235432894539
+                        Series tsNew = new Series(Program.options.freq, variable + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+                        work.AddIVariable(tsNew.name, tsNew);
+                        timeSeriesPointers[i] = tsNew;
+                        extraWritebackPointers[i] = 1;  //to make sure it gets written back from b[] to a[,] array
 
-                            //Program.model.modelGekko.b[i] = setValue;
-                            //if it is a J type, and it has become endogenous, a 0 is fine as starting value (better than lagged J)
-                        }
-                        else
-                        {
-                            //missing variable, and not a DJZ-type variable
-                            //This will probably never happen, since it gets checked before
-                            G.Writeln2("*** ERROR: time series '" + variable + "' does not exist in the Work bank");
-                            //FIXME: undo, or at least write if DJZ variables have been created.
-                            throw new GekkoException();
-                        }
+                        //Program.model.modelGekko.b[i] = setValue;
+                        //if it is a J type, and it has become endogenous, a 0 is fine as starting value (better than lagged J)
                     }
                     else
                     {
-                        //Variable exists in Work bank
+                        //missing variable, and not a DJZ-type variable
+                        //This will probably never happen, since it gets checked before
+                        G.Writeln2("*** ERROR: time series '" + variable + "' does not exist in the Work bank");
+                        //FIXME: undo, or at least write if DJZ variables have been created.
+                        throw new GekkoException();
+                    }
+                }
+                else
+                {
+                    //Variable exists in Work bank
 
-                        //---- regarding NaN or 0 ---------
-                        //  if options.solve_data_ignoremissing is true, all NaN are replaced by 0,
-                        //  except lagged endogeous -- these are treated as usual (given 0.12345).
-                        //---------------------------------
+                    //---- regarding NaN or 0 ---------
+                    //  if options.solve_data_ignoremissing is true, all NaN are replaced by 0,
+                    //  except lagged endogeous -- these are treated as usual (given 0.12345).
+                    //---------------------------------
 
-                        val = double.NaN;
-                        int yy = aNumberPointers[i];
+                    val = double.NaN;
+                    int yy = aNumberPointers[i];
 
-                        //HERE we should have a big IF, if it is NFT doing a "real" shock (not the baseline).
-                        //if so, we jump directly to //oiauewrwuer
+                    //HERE we should have a big IF, if it is NFT doing a "real" shock (not the baseline).
+                    //if so, we jump directly to //oiauewrwuer
 
 
-                        int alternative = -12345;
-                        if (endoNoLagPointers[i] == 1 && ft == 0)
-                        {
-                            //Will only init if init option is = yes, and never in later FT-iterations
-                            //Note that all shocks will always be set to alternative = 3 later on.
-                            alternative = 1;
-                        }
-                        else if (Program.options.solve_data_init && ftOrNft && ft == 0 && endoLeadPointers[i] == 1)
-                        {
-                            alternative = 2;
-                        }
-                        else
-                        {
-                            alternative = 3;  //takes plain value
-                        }
-                        if (!shock.isFirstBaseline)
-                        {
-                            //for NFT, a lot of the simulations are used to create jacobi matrix
-                            //these cases should NEVER have leaded variables initialized, since
-                            //these variables are perturbed just before calling this method.
-                            //Regarding the first Fair-Taylor iteration (ft = 0), the baseline 'shock'
-                            //of these should be initialized (alternative 2), but the following non-baseline
-                            //calls should not. Hence, these will be overwritten from alternative = 2 to
-                            //alternative = 3 here.
-                            alternative = 3;
-                        }
-
-                        switch (alternative)
-                        {
-                            case 1:
-                                {
-                                    //Will only init if init option is = yes
-                                    InitEndoNoLag(ec, a, tInt, ref t, so, ref val, ts, yy);
-                                }
-                                break;
-                            case 2:
-                                {
-                                    val = InitEndoLeaded(a, tInt, val, yy);
-                                }
-                                break;
-                            case 3:
-                                {
-                                    InitEndoLaggedOrExo(extraWritebackPointers, lagPointers, endoPointers, isDJZvarPointers, a, tInt, ref t, ref tStart, ref tEnd, i, ref val, ts, variable, yy, so.isStatic);
-                                }
-                                break;
-                        } //end switch
+                    int alternative = -12345;
+                    if (endoNoLagPointers[i] == 1 && ft == 0)
+                    {
+                        //Will only init if init option is = yes, and never in later FT-iterations
+                        //Note that all shocks will always be set to alternative = 3 later on.
+                        alternative = 1;
+                    }
+                    else if (Program.options.solve_data_init && ftOrNft && ft == 0 && endoLeadPointers[i] == 1)
+                    {
+                        alternative = 2;
+                    }
+                    else
+                    {
+                        alternative = 3;  //takes plain value
+                    }
+                    if (!shock.isFirstBaseline)
+                    {
+                        //for NFT, a lot of the simulations are used to create jacobi matrix
+                        //these cases should NEVER have leaded variables initialized, since
+                        //these variables are perturbed just before calling this method.
+                        //Regarding the first Fair-Taylor iteration (ft = 0), the baseline 'shock'
+                        //of these should be initialized (alternative 2), but the following non-baseline
+                        //calls should not. Hence, these will be overwritten from alternative = 2 to
+                        //alternative = 3 here.
+                        alternative = 3;
                     }
 
-                    Program.model.modelGekko.b[i] = val;
-                } //for each b[i]
-            }
+                    switch (alternative)
+                    {
+                        case 1:
+                            {
+                                //Will only init if init option is = yes
+                                InitEndoNoLag(ec, a, tInt, ref t, so, ref val, ts, yy);
+                            }
+                            break;
+                        case 2:
+                            {
+                                val = InitEndoLeaded(a, tInt, val, yy);
+                            }
+                            break;
+                        case 3:
+                            {
+                                InitEndoLaggedOrExo(extraWritebackPointers, lagPointers, endoPointers, isDJZvarPointers, a, tInt, ref t, ref tStart, ref tEnd, i, ref val, ts, variable, yy, so.isStatic);
+                            }
+                            break;
+                    } //end switch
+                }
+
+                Program.model.modelGekko.b[i] = val;
+            } //for each b[i]
+
             return;
         }
 

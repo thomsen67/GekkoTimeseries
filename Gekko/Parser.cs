@@ -28,27 +28,17 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Reflection;
 using CT = Antlr.Runtime.Tree.CommonTree;
-//using Antlr4.StringTemplate;
 using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
 using System.Collections;
-//using SevenZip;
 using System.Security.Cryptography;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
 namespace Gekko
 {
-
-    public enum EPrtType
-    {
-        Prt,  //includes gmulprt and vprt (and mulprt, mulpct, pctprt)
-        Pplot,
-        Wplot,
-        Cplot
-    }
-
+    
     public enum EEmitType
     {
         bothHumanAndComputerReadable,
@@ -193,17 +183,7 @@ namespace Gekko
                 G.WritelnGray("¤¤¤ Has to do .m2 stuff: "+cacheKey);
                 newM2 = true;
                 Program.model.modelGekko.m2 = new Model2();  //deleting everything here, this is most safe rather than reusing the object
-
-                if (Program.IsStacked())
-                {
-                    //Here, we kind of cheat, transforming Program.model into a model without lags or leads, where
-                    //y(-1) is y(99), y is y100, y(+1) is y(101), etc.
-                    //In that way, a lot of the current functionality can be just reused.
-                    if (Globals.stackedPrintTimings) G.Writeln2("StackedTimeStuff start");
-                    StackedTimeStuff();
-                    if (Globals.stackedPrintTimings) G.Writeln2("StackedTimeStuff end");
-                } 
-
+                                
                 //this runs very fast
                 if (Globals.stackedPrintTimings) G.Writeln2("EndogenizeExogenizeStuff start");
                 Program.EndogenizeExogenizeStuff(isFix); //depends upon which endo/exo variables are set
@@ -236,159 +216,7 @@ namespace Gekko
             if (isCalledFromModelStatement) PrintInfoFilesCreateVarsEtc(isCalledFromModelStatement);  //so the "endogenous" are endogenous in original model without ENDO/EXO.
 
             if (newM2) Program.model.modelGekko.m2cache.lru.Add(cacheKey, Program.model.modelGekko.m2);
-        }
-
-        private static void StackedTimeStuff()
-        {
-            //Remember Globals.stackedTImePeriods...
-            //Remember endoexostuff...
-
-            ModelGekko modelTemp = new ModelGekko();
-
-            modelTemp.largestLag = 0;
-            modelTemp.largestLead = 0;
-            modelTemp.largestLeadOutsideRevertedPart = 0;
-
-            modelTemp.varsBType = new GekkoDictionary<string, BTypeData>(StringComparer.OrdinalIgnoreCase);
-            modelTemp.varsBTypeInverted = new GekkoDictionary<int, string>();
-            modelTemp.varsAType = new GekkoDictionary<string, ATypeData>(StringComparer.OrdinalIgnoreCase);
-            
-            //Dictionary<string, int> varsATypeTemp = new Dictionary<string, int>();
-            Dictionary<string, int> BNumberConverter = new Dictionary<string, int>(); 
-
-            int equationCounter = -1;
-
-            if (Globals.stackedPrintTimings) G.Writeln2("Folding out eqs start");
-            
-            for (int i = 0; i < Program.options.solve_forward_stacked_horizon; i++)
-            {
-                foreach (EquationHelper eh in Program.model.modelGekko.equations)
-                {
-                    equationCounter++;
-                    modelTemp.endogenousOriginallyInModel.Add(eh.lhs + Globals.stackedTimeSeparator + (100 + i), "");
-                                        
-                    List<string> vars = new List<string>();
-                    vars.Add(eh.lhsWithLagIndicator);                    
-                    vars.AddRange(eh.precedentsWithLagIndicator.Keys);                    
-
-                    bool first = true;
-                    foreach (string s in vars)
-                    {
-                        int bNumberOriginal = Program.model.modelGekko.varsBType[s].bNumber;
-
-                        string varName = null;
-                        int varLag = 0;
-                        G.ExtractVariableAndLag(s, out varName, out varLag);
-                        int correction = 100 + i + varLag;
-                        string lhsTemp = varName + Globals.stackedTimeSeparator + correction + Globals.lagIndicator + "0";                        
-
-                        if (!modelTemp.varsBType.ContainsKey(lhsTemp))
-                        {
-                            BTypeData btd = new BTypeData();
-                            btd.bNumber = modelTemp.varsBType.Count;
-                            btd.aNumber = modelTemp.varsAType.Count;
-                            btd.lag = 0;
-                            btd.variable = varName + Globals.stackedTimeSeparator + correction;
-                            btd.leftHandSideEquation = -12345;
-
-                            string xx = bNumberOriginal + "¤" + i;
-                            if (!BNumberConverter.ContainsKey(xx)) BNumberConverter.Add(xx, btd.bNumber);
-
-                            if (first)
-                            {
-                                //is so, it is a left-hand side variable.
-                                btd.leftHandSideEquation = equationCounter;
-                                modelTemp.fromVariableToEquationNumber.Add(lhsTemp, modelTemp.varsBType.Count);
-                            }
-                            modelTemp.varsBType.Add(lhsTemp, btd);
-                            modelTemp.varsBTypeInverted.Add(btd.bNumber, lhsTemp);
-                        }
-                        else
-                        {                            
-                            string xx = bNumberOriginal + "¤" + i;
-                            if (!BNumberConverter.ContainsKey(xx)) BNumberConverter.Add(xx, modelTemp.varsBType[lhsTemp].bNumber);
-                        }
-
-                        if (!modelTemp.varsAType.ContainsKey(lhsTemp))
-                        {
-                            ATypeData atd = new ATypeData();
-                            atd.aNumber = modelTemp.varsAType.Count;
-                            atd.varName = varName + Globals.stackedTimeSeparator + correction; ;
-                            modelTemp.varsAType.Add(lhsTemp, atd);
-                        }                        
-                        
-                        first = false;  //must be last statement in loop
-                    }
-                    
-
-                    //eh.precedentsWithLagIndicator
-                }
-            }
-
-            if (Globals.stackedPrintTimings) G.Writeln2("Folding out eqs end");
-
-            if (Globals.stackedPrintTimings) G.Writeln2("Folding out eqs again start");
-
-            Dictionary<string, string> endoTemp = new Dictionary<string, string>();
-            for (int i = 0; i < Program.options.solve_forward_stacked_horizon; i++)
-            {
-                foreach (EquationHelper eh in Program.model.modelGekko.equations)
-                {
-                    List<int> bNumbers = new List<int>();
-                    List<int> bNumbersNew = new List<int>();                                                      
-                    
-                    //modelTemp.equations
-                    int number = (100 + i);
-                    EquationHelper ehTemp = new EquationHelper();
-                    ehTemp.lhs = eh.lhs + Globals.stackedTimeSeparator + (100 + i);
-                    ehTemp.lhsWithLagIndicator = ehTemp.lhs + Globals.lagIndicator + "0";
-                    bNumbers.Add(modelTemp.varsBType[ehTemp.lhsWithLagIndicator].bNumber);
-                    BTypeData btd = modelTemp.varsBType[ehTemp.lhsWithLagIndicator];
-                    ehTemp.bNumberLhs = btd.bNumber;
-                    modelTemp.endogenousBNumbersOriginallyInModel.Add(ehTemp.bNumberLhs, "");
-                    ehTemp.precedentsWithLagIndicator = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                    bNumbersNew.Add(Program.model.modelGekko.varsBType[eh.lhsWithLagIndicator].bNumber);
-
-                    foreach (string s in eh.precedentsWithLagIndicator.Keys)
-                    {
-                        string varName = null;
-                        int varLag = 0;
-                        G.ExtractVariableAndLag(s, out varName, out varLag);
-                        ehTemp.precedentsWithLagIndicator.Add(varName + Globals.stackedTimeSeparator + (100 + i + varLag) + Globals.lagIndicator + "0", "");                                                
-                        bNumbers.Add(modelTemp.varsBType[varName + Globals.stackedTimeSeparator + (100 + i + varLag) + Globals.lagIndicator + "0"].bNumber);
-                        bNumbersNew.Add(Program.model.modelGekko.varsBType[s].bNumber);
-                    }                    
-
-                    string codeLhs = eh.csCodeLhsGauss;
-                    string codeRhs = eh.csCodeRhs;
-                    codeLhs = codeLhs.Replace("b[", "bb[");  //so that equation will fail if not all b[...] are replaced
-                    codeRhs = codeRhs.Replace("b[", "bb[");  //so that equation will fail if not all b[...] are replaced
-
-                    foreach (int bNumber in bNumbersNew)
-                    {
-                        int bNumber2 = BNumberConverter[bNumber + "¤" + i];
-                        codeLhs = codeLhs.Replace("bb[" + bNumber + "]", "b[" + bNumber2 + "]");
-                        codeRhs = codeRhs.Replace("bb[" + bNumber + "]", "b[" + bNumber2 + "]");                        
-                    }
-
-                    ehTemp.csCodeLhsGauss = codeLhs;
-                    ehTemp.csCodeRhs = codeRhs;
-
-                    ehTemp.equationNumber = modelTemp.equations.Count;
-                    modelTemp.equations.Add(ehTemp);                   
-
-                }
-            }
-
-            if (Globals.stackedPrintTimings) G.Writeln2("Folding out eqs again end");
-            //Model oldModel = Program.model;
-            //Program.model = modelTemp;
-            //Program.model.modelGekko.oldModel = oldModel;  //in order to be able to revert to this old model when done
-            Program.model.modelGekko.stackedModel = modelTemp;
-        }
-
-        
+        }        
 
         private static string GetCacheKey(bool isFix)
         {
@@ -412,7 +240,7 @@ namespace Gekko
             ss.Remove(ss.Length - 1, 1);
             ss.Append(". ");
             string stacked = "false";
-            if (G.Equal(Program.options.solve_forward_method, "stacked")) stacked = "true";
+            //if (G.Equal(Program.options.solve_forward_method, "stacked")) stacked = "true";  //stacked is obsolete
             ss.Append("Stacked: " + stacked);            
             return ss.ToString();
         }
@@ -728,23 +556,7 @@ namespace Gekko
                 if (Globals.addGlue)
                 {
                     errorMessage = G.ReplaceGlueNew(errorMessage);
-                }
-
-                //if (!Globals.useTestParser)
-                //{
-                //    errorMessage = errorMessage.Replace(" RPARGLUE", " ')'");
-                //    errorMessage = errorMessage.Replace(" LPARGLUE", " '('");
-                //    errorMessage = errorMessage.Replace(" RPAR", " ')'");
-                //    errorMessage = errorMessage.Replace(" LPAR", " '('");
-                //    errorMessage = errorMessage.Replace(" RP", " ')'");
-                //    errorMessage = errorMessage.Replace(" LP", " '('");
-                //    errorMessage = errorMessage.Replace("EOF", "[End of input]");
-                //    errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
-                //    errorMessage = errorMessage.Replace("expecting set", "");  //not meningful
-                //    errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
-                //    errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
-                //}
-
+                }                
 
                 if (lineNo > inputFileLines.Count)
                 {
@@ -866,16 +678,7 @@ namespace Gekko
                 int positionNo = int.Parse(ss[1]) + 1;  //1-based
 
                 string errorMessage = ss[3];
-
-                //if (!Globals.useTestParser)
-                //{
-                //    errorMessage = errorMessage.Replace(" RPGLUE", " ')'");
-                //    errorMessage = errorMessage.Replace(" LPGLUE", " '('");
-                //    errorMessage = errorMessage.Replace(" RP", " ')'");
-                //    errorMessage = errorMessage.Replace(" LP", " '('");
-                //    //errorMessage = errorMessage.Replace("expecting set", "");  //remove this, is confusing
-                //}
-
+                                
                 errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
 
                 if (lineNo > inputFileLines.Count)
@@ -1087,26 +890,7 @@ namespace Gekko
 
             }
         }
-
-
-        //private static List<string> GetList(string listName)
-        //{
-        //    IVariable storedList = null;
-        //    if (Program.scalars.ContainsKey(Globals.symbolCollection + listName))
-        //    {
-        //        //use tryget...: faster
-        //        storedList = Program.scalars[Globals.symbolCollection + listName];
-        //        List x = O.GetList(storedList);
-        //        x.list.Clear();
-        //    }
-        //    else
-        //    {
-        //        storedList = new List(new List<string>());
-        //        Program.scalars.Add(Globals.symbolCollection + listName, storedList);
-        //    }
-        //    return Program.GetListOfStringsFromList((List)storedList);
-        //}
-
+        
         private static void EmitCsCodeAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement)
         {
             DateTime t0 = DateTime.Now;
@@ -3366,14 +3150,6 @@ namespace Gekko
                 }
             }
         }        
-
-        private static void CheckCurrow(string cr)
-        {
-            if (!G.Equal(cr, "currow"))
-            {
-                G.Writeln2("*** ERROR: Expected .CurRow");
-            }
-        }        
     }
 
     public class ConvertHelper
@@ -3404,79 +3180,6 @@ namespace Gekko
         public bool afterEncountered = false;
         public bool after2Encountered = false;
         public string modelBlock = "Unnamed";
-    }
-    
-
-    public enum GekkoStringBuilderTypes
-    {
-        Normal,
-        StartNormal,
-        EndNormal,
-        StartIf,
-        EndIf,
-        StartFor,
-        EndFor
-    }
-
-    public class GekkoStringBuilderHelper
-    {
-        public StringBuilder s = new StringBuilder();
-        public GekkoStringBuilderTypes type = GekkoStringBuilderTypes.Normal;
-    }
-
-    public class GekkoStringBuilder
-    {
-        public List<GekkoStringBuilderHelper> data = new List<GekkoStringBuilderHelper>();
-
-        public GekkoStringBuilder()
-        {
-            data.Add(new GekkoStringBuilderHelper());
-        }
-
-        public void NewBlock(GekkoStringBuilderTypes type)
-        {
-            GekkoStringBuilderHelper temp = new GekkoStringBuilderHelper();
-            temp.type = type;
-            data.Add(temp);
-        }
-
-        public void AppendLine(string s)
-        {
-            data[data.Count - 1].s.AppendLine(s);
-        }
-        public void AppendLine()
-        {
-            data[data.Count - 1].s.AppendLine();
-        }
-
-        public void Append(string s)
-        {
-            data[data.Count - 1].s.Append(s);
-        }
-
-        public void Append(StringBuilder s)
-        {
-            data[data.Count - 1].s.Append(s);
-        }
-
-        public void Replace(string s1, string s2)
-        {
-            foreach (GekkoStringBuilderHelper g in data)
-            {
-                g.s.Replace(s1, s2);
-            }
-        }
-
-        public string ToString()
-        {
-            StringBuilder temp = new StringBuilder();
-            foreach (GekkoStringBuilderHelper sb in data)
-            {
-                temp.Append(sb.s);
-            }
-            return temp.ToString();
-        }
-
     }
 
     public class ASTNode
@@ -3633,12 +3336,7 @@ namespace Gekko
             }
         }
     }
-
-    //public class IntelliHelper
-    //{
-    //    public bool abort = false;
-    //}
-
+    
     public class ParseHelper
     {
         public bool isOneLinerFromGui = false;

@@ -7,10 +7,7 @@ namespace Gekko
 {
     public static class Operators
     {
-        //This class stores methods that perform an operation on two different IVariable types. For instance, adding
-        //VAL 1.2 and a STRING 'a' produces 1.2a, whereas adding STRING 'a' and VAL 1.2 produces a1.2. But the internal
-        //logic is the same, so we provide a StringVal() method with optional swap parameter. This way, the logic can be
-        //stored in one place, instead of two places (in the ScalarString and ScalarVal classes).
+        
 
         public static class DateVal
         {

@@ -180,7 +180,7 @@ namespace Gekko
         public double solve_forward_fair_damp = 0.0; //redefined in 2.0
         public int solve_forward_fair_itermax = 200;        
         public int solve_forward_fair_itermin = 0;
-        public string solve_forward_method = "fair";  //or "stacked" or "nfair" or "none"        
+        public string solve_forward_method = "fair";  //or "nfair" or "none"  //"stacked" is removed   
         public string solve_forward_nfair_conv = "conv1";
         public double solve_forward_nfair_conv1_abs = 0.001d;
         public double solve_forward_nfair_conv1_rel = 0.001d;
