@@ -107,5 +107,637 @@ namespace Gekko.Parser.Frm
             }
         }
 
+        private static void EmitCsCodeAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement)
+        {
+            DateTime t0 = DateTime.Now;
+
+            bool failSafe = false;
+            if (modelType == ECompiledModelType.GaussFailSafe) failSafe = true;
+            string failSafeString = "";
+            if (failSafe) failSafeString = "FailSafe";
+
+            string type = Enum.GetName(typeof(ECompiledModelType), modelType);
+            bool didWork = false;
+
+            // =====
+            // ===== Gauss-type
+            // =====
+
+            if ((modelType == ECompiledModelType.Gauss && Program.model.modelGekko.m2.assemblyGauss == null) ||
+                (modelType == ECompiledModelType.GaussFailSafe && Program.model.modelGekko.m2.assemblyGaussFailSafe == null) ||
+                (modelType == ECompiledModelType.Res && Program.model.modelGekko.m2.assemblyRes == null))
+            {
+                didWork = true;
+                StringBuilder codeGauss = new StringBuilder();
+                {
+
+                    codeGauss.Append(
+                        @"using System;
+                using System.Collections.Generic;
+                using System.Text;
+                namespace Gekko
+                {
+                public class " + type +
+                        @"{
+                public static void eqs(double[] b)
+                {");
+
+                    if (modelType == ECompiledModelType.Res)
+                    {
+                        codeGauss.AppendLine("double [] c = new double[b.Length];");
+                        codeGauss.AppendLine("for (int i5 = 0; i5 < c.Length; i5++)");
+                        codeGauss.AppendLine("{");
+                        codeGauss.AppendLine("   c[i5]=b[i5];");
+                        codeGauss.AppendLine("}");
+                    }
+
+                    List<EquationHelper> prologue = new List<EquationHelper>();
+                    List<EquationHelper> eqs = new List<EquationHelper>();
+                    List<EquationHelper> epilogue = new List<EquationHelper>();
+
+                    if (Globals.fastGauss)
+                    {
+                        foreach (int endoNumber in Program.model.modelGekko.m2.prologue)
+                        {
+                            EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                            prologue.Add(eh);
+                        }
+
+                        if (Program.options.solve_gauss_reorder)
+                        {
+                            foreach (int endoNumber in Program.model.modelGekko.m2.simulRecursive)
+                            {
+                                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                                eqs.Add(eh);
+                            }
+
+                            foreach (int endoNumber in Program.model.modelGekko.m2.simulFeedback)
+                            {
+                                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                                eqs.Add(eh);
+                            }
+                        }
+                        else
+                        {
+
+                            //This is old code: it is checked that the
+                            //ArrayList al = new ArrayList();
+                            //al.AddRange(Program.model.modelGekko.m2.simulRecursive);
+                            //al.AddRange(Program.model.modelGekko.m2.simulFeedback);
+                            //SortedList<int, EquationHelper> sorted = new SortedList<int, EquationHelper>();
+                            //foreach (int eq in al)
+                            //{
+                            //    EquationHelper eh = Program.model.modelGekko.equations[eq];
+                            //    sorted.Add(eh.equationNumber, eh);
+                            //}
+                            //for (int i = 0; i < sorted.Count; i++)
+                            //{
+                            //    eqs.Add(sorted.Values[i]);
+                            //}
+
+                            List<int> allSimul = Program.GetLeftsideBNumbers();
+                            foreach (int i in allSimul)
+                            {
+                                eqs.Add(Program.model.modelGekko.equations[i]);
+                            }
+
+                        }
+
+                        foreach (int endoNumber in Program.model.modelGekko.m2.epilogue)
+                        {
+                            EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                            epilogue.Add(eh);
+                        }
+
+                        //G.Writeln(Program.model.modelGekko.equations.Count + " == " + (prologue.Count + eqs.Count + epilogue.Count));
+                        if (Program.model.modelGekko.equations.Count - (prologue.Count + eqs.Count + epilogue.Count) != 0) throw new GekkoException();
+                    }
+
+                    List<EquationHelper> gaussEquations = Program.model.modelGekko.equations;
+                    if (Globals.fastGauss) gaussEquations = eqs;
+
+                    foreach (EquationHelper eh in gaussEquations)
+                    {
+                        if (modelType == ECompiledModelType.Res)
+                        {
+                            codeGauss.Append(eh.csCodeLhsJacobi);
+                        }
+                        else  //Gauss of GaussFailSafe
+                        {
+                            codeGauss.Append(eh.csCodeLhsGauss);
+                        }
+
+                        codeGauss.Append(" = ");
+                        codeGauss.AppendLine(eh.csCodeRhs);
+                        codeGauss.AppendLine(";");
+
+                        if (modelType == ECompiledModelType.GaussFailSafe)  //cannot be jacobi failsafe...
+                        {
+                            codeGauss.AppendLine("if(Double.IsInfinity(" + eh.csCodeLhsGauss + ") || Double.IsNaN(" + eh.csCodeLhsGauss + ")) {");
+                            codeGauss.AppendLine("Program.model.modelGekko.simulateResults[1] = 12345;");
+                            codeGauss.AppendLine("Program.model.modelGekko.simulateResults[2] = " + eh.equationNumber + ";");
+                            codeGauss.AppendLine("return;");
+                            codeGauss.AppendLine("}");
+                        }
+                    }
+
+                    codeGauss.AppendLine();
+                    codeGauss.AppendLine();
+
+
+                    if (modelType == ECompiledModelType.Res)
+                    {
+                        codeGauss.AppendLine("for (int i5 = 0; i5 < c.Length; i5++)");
+                        codeGauss.AppendLine("{");
+                        codeGauss.AppendLine("   b[i5]=c[i5];");
+                        codeGauss.AppendLine("}");
+                    }
+                    codeGauss.AppendLine(@"}");  //end of eqs()
+                    codeGauss.AppendLine(@"" + "}}");  //namespace and class
+
+                    CompilerParameters compilerParams = new CompilerParameters();
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
+                    compilerParams.GenerateInMemory = true;
+                    compilerParams.IncludeDebugInformation = false;
+                    compilerParams.ReferencedAssemblies.Add("system.dll");
+                    ReferencedAssembliesGekko(compilerParams);
+                    compilerParams.GenerateExecutable = false;
+
+                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, codeGauss.ToString());
+
+                    if (cr.Errors.HasErrors)
+                    {
+                        G.Writeln2("*** ERROR: model not compiled due to errors while compiling for Gauss-Seidel algorithm.");
+                        throw new GekkoException();
+                    }
+                    if (modelType == ECompiledModelType.Gauss)
+                    {
+                        //Assembly temp = Assembly.LoadFile(@"c:\Users\Thomas\AppData\Local\Temp\gauss.dll");
+                        //Program.model.modelGekko.m2.assemblyGauss = temp.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyGauss = cr.CompiledAssembly.GetType("Gekko." + type);
+                    }
+                    else if (modelType == ECompiledModelType.GaussFailSafe)
+                    {
+                        Program.model.modelGekko.m2.assemblyGaussFailSafe = cr.CompiledAssembly.GetType("Gekko." + type);
+                    }
+                    else if (modelType == ECompiledModelType.Res)
+                    {
+                        Program.model.modelGekko.m2.assemblyRes = cr.CompiledAssembly.GetType("Gekko." + type);
+                    }
+                    else throw new GekkoException();  //must be one of these
+                }
+            }
+
+
+            // =====
+            // ===== Newton-type
+            // =====
+
+            if ((modelType == ECompiledModelType.Newton && Program.model.modelGekko.m2.assemblyNewton == null))
+            {
+                didWork = true;
+                StringBuilder codeNewton = new StringBuilder();
+                {
+                    codeNewton.AppendLine("using System;");
+                    codeNewton.AppendLine("using System.Collections.Generic;");
+                    codeNewton.AppendLine("using System.Text;");
+                    codeNewton.AppendLine("namespace Gekko");
+                    codeNewton.AppendLine("{");
+                    codeNewton.AppendLine("public class " + type);
+                    codeNewton.AppendLine("{");
+
+                    codeNewton.AppendLine("public static void simulPrologue(double[] b)");
+                    codeNewton.AppendLine("{");
+                    foreach (int endoNumber in Program.model.modelGekko.m2.simulRecursive)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                        sb.Append(eh.csCodeLhsGauss);
+                        sb.Append(" = ");
+                        sb.AppendLine(eh.csCodeRhs);
+                        sb.AppendLine(";");
+                        sb.AppendLine();
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
+                        codeNewton.Append(sb);
+
+                    }
+                    codeNewton.AppendLine("}");
+
+                    codeNewton.AppendLine("public static void simulFeedbackAll(double[] b, double[] r, double[] scale)");
+                    codeNewton.AppendLine("{");
+
+                    for (int i = 0; i < Program.model.modelGekko.m2.simulFeedback.Count; i++)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        int endoNumber = (int)Program.model.modelGekko.m2.simulFeedback[i];
+                        EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                        sb.Append("r[" + i + "] = ");
+                        sb.Append(eh.csCodeLhsGauss);
+                        sb.Append(" -( ");
+                        sb.AppendLine(eh.csCodeRhs);
+                        sb.AppendLine(")");
+                        sb.AppendLine(";");
+                        sb.AppendLine();
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
+                        codeNewton.Append(sb);
+                    }
+                    codeNewton.AppendLine("}");
+
+
+                    codeNewton.AppendLine("public static void simulFeedbackSingle(double[] b, double[] r, int n, double[] scale)");
+                    codeNewton.AppendLine("{");
+                    codeNewton.AppendLine("switch(n)");
+                    codeNewton.AppendLine("{");
+
+                    for (int i = 0; i < Program.model.modelGekko.m2.simulFeedback.Count; i++)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        int endoNumber = (int)Program.model.modelGekko.m2.simulFeedback[i];
+                        EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                        sb.AppendLine("case " + i + ":");
+                        sb.Append("r[" + i + "] = ");
+                        sb.Append(eh.csCodeLhsGauss);
+                        sb.Append(" -( ");
+                        sb.AppendLine(eh.csCodeRhs);
+                        sb.AppendLine(" ); ");
+                        sb.Append("break;");
+                        sb.AppendLine();
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
+                        codeNewton.Append(sb);
+                    }
+                    codeNewton.AppendLine("}");  //case
+                    codeNewton.AppendLine("}");  //method
+
+                    codeNewton.AppendLine("}");  //class
+                    codeNewton.AppendLine("}");  //namespace
+                    //codeNewton.Flush();
+                    //codeNewton.Close();
+
+                    CompilerParameters compilerParams = new CompilerParameters();
+                    compilerParams = new CompilerParameters();
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
+                    compilerParams.GenerateInMemory = true;
+                    compilerParams.IncludeDebugInformation = false;
+                    compilerParams.ReferencedAssemblies.Add("system.dll");
+                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+                    ReferencedAssembliesGekko(compilerParams);
+                    compilerParams.GenerateExecutable = false;
+                    string s = codeNewton.ToString();
+                    //CompilerResults cr = Program.model.modelGekko.iCodeCompiler.CompileAssemblyFromFile(compilerParams, Globals.localTempFilesLocation + "\\" + type + ".cs");
+                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
+                    if (modelType == ECompiledModelType.Newton)
+                    {
+                        Program.model.modelGekko.m2.assemblyNewton = cr.CompiledAssembly.GetType("Gekko." + type);
+                    }
+                    else throw new GekkoException();  //must be one of these
+                }
+            }
+
+
+            // =====
+            // ===== Is always used, both for Gauss and Newton
+            // ===== Reverted (auto-JZ and Y-equations) -- put in .model, not .model.m2, because it is common for all EXO/ENDO set.
+            // =====
+
+            if ((!failSafe && Program.model.modelGekko.assemblyReverted == null) ||
+               (failSafe && Program.model.modelGekko.assemblyRevertedFailSafe == null))
+            {
+
+                didWork = true;
+
+                StringBuilder code = new StringBuilder();
+                {
+                    code.Append(
+                        @"using System;
+                using System.Collections.Generic;
+                using System.Text;
+                namespace Gekko
+                {
+                public class " + "Reverted" + failSafeString +
+                        @"{");
+
+                    EmitRevertedEquations(code);  //Same code with and without failsafe. Could maybe introduce failsafe here, for the Y-equations. But never mind for now.
+                    //Are static given model, in principle they could be shared for Program.model.modelGekko, and not Program.model.modelGekko.m2 (but maybe not worth the trouble and risk of errors)
+
+                    code.AppendLine("}");  //class
+                    code.AppendLine("}");  //namespace
+
+                    CompilerParameters compilerParams = new CompilerParameters();
+                    compilerParams = new CompilerParameters();
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
+                    compilerParams.GenerateInMemory = true;
+                    compilerParams.IncludeDebugInformation = false;
+                    compilerParams.ReferencedAssemblies.Add("system.dll");
+                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+                    ReferencedAssembliesGekko(compilerParams);
+                    compilerParams.GenerateExecutable = false;
+
+                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code.ToString());
+
+                    if (cr.Errors.HasErrors)
+                    {
+                        throw new GekkoException();
+                    }
+
+                    if (!failSafe)
+                    {
+                        Program.model.modelGekko.assemblyReverted = cr.CompiledAssembly.GetType("Gekko.Reverted");
+                    }
+                    else
+                    {
+                        Program.model.modelGekko.assemblyRevertedFailSafe = cr.CompiledAssembly.GetType("Gekko.RevertedFailSafe");
+                    }
+                }
+            }
+
+            // =====
+            // ===== Is always used, both for Gauss and Newton
+            // ===== Prologue/Epilogue (depends upon ENDO/EXO set, so put in .m2)
+            // =====
+
+            if ((!failSafe && Program.model.modelGekko.m2.assemblyPrologueEpilogue == null) ||
+                (failSafe && Program.model.modelGekko.m2.assemblyPrologueEpilogueFailSafe == null))
+            {
+                didWork = true;
+                StringBuilder code = new StringBuilder();
+                {
+                    code.Append(
+                        @"using System;
+                using System.Collections.Generic;
+                using System.Text;
+                namespace Gekko
+                {
+                public class " + "PrologueEpilogue" + failSafeString +
+                        @"{");
+
+                    EmitPrologue(failSafeString, code);  //=====> but these are not static with endo/exo???
+                    EmitEpilogue(failSafeString, code);  //=====> but these are not static with endo/exo???
+
+                    code.AppendLine("}");  //class
+                    code.AppendLine("}");  //namespace
+
+                    CompilerParameters compilerParams = new CompilerParameters();
+                    compilerParams = new CompilerParameters();
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
+                    compilerParams.GenerateInMemory = true;
+                    compilerParams.IncludeDebugInformation = false;
+                    compilerParams.ReferencedAssemblies.Add("system.dll");
+                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+                    ReferencedAssembliesGekko(compilerParams);
+                    compilerParams.GenerateExecutable = false;
+
+                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code.ToString());
+
+                    if (cr.Errors.HasErrors)
+                    {
+                        throw new GekkoException();
+                    }
+
+                    if (failSafeString == "")
+                    {
+                        Program.model.modelGekko.m2.assemblyPrologueEpilogue = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogue");
+                    }
+                    else
+                    {
+                        Program.model.modelGekko.m2.assemblyPrologueEpilogueFailSafe = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogueFailSafe");
+                    }
+                }
+            }
+
+            // =====
+            // ===== After (put in .model, not .model.m2, because it is common for all EXO/ENDO set.)
+            // =====
+            // TODO: after introduction of M2 object, checking for failsafe here is probably not necessay at all
+            if (modelType == ECompiledModelType.After && ((!failSafe && Program.model.modelGekko.assemblyAfter == null) ||
+                (failSafe && Program.model.modelGekko.assemblyAfterFailSafe == null)))
+            {
+                //TODO: does not always have to be done, but for now we just keep it.
+                didWork = true;
+                StringBuilder code = new StringBuilder();
+                {
+                    code.Append(
+                        @"using System;
+                using System.Collections.Generic;
+                using System.Text;
+                namespace Gekko
+                {
+                public class " + "After" + failSafeString +
+                        @"{");
+
+                    EmitAfter(failSafeString, code);    //Are static given model, after() and after2() methods, , in principle they could be shared for Program.model.modelGekko, and not Program.model.modelGekko.m2 (but maybe not worth the trouble and risk of errors)
+
+                    code.AppendLine("}");  //class
+                    code.AppendLine("}");  //namespace
+
+                    CompilerParameters compilerParams = new CompilerParameters();
+                    compilerParams = new CompilerParameters();
+                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
+                    compilerParams.GenerateInMemory = true;
+                    compilerParams.IncludeDebugInformation = false;
+                    compilerParams.ReferencedAssemblies.Add("system.dll");
+                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+                    ReferencedAssembliesGekko(compilerParams);
+                    compilerParams.GenerateExecutable = false;
+
+                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code.ToString());
+
+                    if (cr.Errors.HasErrors)
+                    {
+                        throw new GekkoException();
+                    }
+
+                    if (failSafeString == "")
+                    {
+                        Program.model.modelGekko.assemblyAfter = cr.CompiledAssembly.GetType("Gekko.After");
+                    }
+                    else
+                    {
+                        Program.model.modelGekko.assemblyAfterFailSafe = cr.CompiledAssembly.GetType("Gekko.AfterFailSafe");
+                    }
+                }
+            }  //finished After
+            if (didWork)
+            {
+                string duration = G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds);
+                if (isCalledFromModelStatement)
+                {
+                    Program.model.modelGekko.modelInfo.lastCompileDuration = duration;
+                }
+                else
+                {
+                    G.Writeln("Compiling lasted " + duration);
+                }
+            }
+        }
+
+        private static void EmitEpilogue(string failsafe, StringBuilder codeCommon)
+        {
+            codeCommon.AppendLine("public static void epilogue(double[] b)");
+            codeCommon.AppendLine("{");
+
+            foreach (int endoNumber in Program.model.modelGekko.m2.epilogue)
+            {
+                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+
+                codeCommon.Append(eh.csCodeLhsGauss);
+                codeCommon.Append(" = ");
+                codeCommon.AppendLine(eh.csCodeRhs);
+                codeCommon.AppendLine(";");
+                codeCommon.AppendLine();
+                if (failsafe != "")
+                {
+                    codeCommon.AppendLine("if(Double.IsInfinity(" + eh.csCodeLhsGauss + ") || Double.IsNaN(" + eh.csCodeLhsGauss + ")) {");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[1] = 12345;");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[2] = " + eh.equationNumber + ";");
+                    codeCommon.AppendLine("return;");
+                    codeCommon.AppendLine("}");
+                }
+            }
+            codeCommon.AppendLine("}");
+        }
+
+        private static void EmitPrologue(string failsafe, StringBuilder codeCommon)
+        {
+            codeCommon.AppendLine("public static void prologue(double[] b)");
+            codeCommon.AppendLine("{");
+
+            foreach (int endoNumber in Program.model.modelGekko.m2.prologue)
+            {
+                EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
+                codeCommon.Append(eh.csCodeLhsGauss);
+                codeCommon.AppendLine(" = ");
+                codeCommon.AppendLine(eh.csCodeRhs);
+                codeCommon.AppendLine(";");
+                codeCommon.AppendLine();
+
+                if (failsafe != "")
+                {
+                    codeCommon.AppendLine("if(Double.IsInfinity(" + eh.csCodeLhsGauss + ") || Double.IsNaN(" + eh.csCodeLhsGauss + ")) {");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[1] = 12345;");
+                    codeCommon.AppendLine("Program.model.modelGekko.simulateResults[2] = " + eh.equationNumber + ";");
+                    codeCommon.AppendLine("return;");
+                    codeCommon.AppendLine("}");
+                }
+            }
+            codeCommon.AppendLine("}");
+        }
+
+        private static void EmitAfter(string failsafe, StringBuilder codeCommon)
+        {
+            //This is for safety: EmitAfter must not depend upon stuff in .m2!
+            Model2 temp = Program.model.modelGekko.m2;
+            Program.model.modelGekko.m2 = null;
+
+            try
+            {
+                int count = 0, count2 = 0;
+                codeCommon.AppendLine("public static void after(double[] b) {");
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
+                {
+                    if (eh.isAfterModel && !eh.isAfter2Model)  //if both are set, it is considered after2
+                    {
+                        codeCommon.Append(eh.csCodeLhsGauss);
+                        codeCommon.Append(" = ");
+                        codeCommon.AppendLine(eh.csCodeRhs);
+                        codeCommon.AppendLine(";");
+                        count++;
+                    }
+                }
+                codeCommon.AppendLine("}");  //end of after()
+                codeCommon.AppendLine();
+
+                codeCommon.AppendLine("public static void after2(double[] b) {");
+                foreach (EquationHelper eh in Program.model.modelGekko.equations)
+                {
+                    if (eh.isAfter2Model)  //eh.isAfterModel may or not be true here --> in any case it is considered after2
+                    {
+                        codeCommon.Append(eh.csCodeLhsGauss);
+                        codeCommon.Append(" = ");
+                        codeCommon.AppendLine(eh.csCodeRhs);
+                        codeCommon.AppendLine(";");
+                        count2++;
+                    }
+                }
+                codeCommon.AppendLine("}");  //end of after2()
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                Program.model.modelGekko.m2 = temp;
+            }
+        }
+
+        private static void EmitRevertedEquations(StringBuilder code)
+        {
+            //This is for safety: EmitAfter must not depend upon stuff in .m2!
+            Model2 temp = Program.model.modelGekko.m2;
+            Program.model.modelGekko.m2 = null;
+
+            foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
+            {
+                if (!EquationIsRunSeparatelyAfterSim(eh))
+                {
+                    //Sanity check: each eq must be either auto, Y, T or L
+                    //Should not be possible
+                    G.Writeln2("*** ERROR: Model equation code error #843784272449");
+                    throw new GekkoException();
+                }
+            }
+
+            try
+            {
+                code.AppendLine("public static void revertedAuto(double[] b) {");
+                foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
+                {
+                    if (eh.equationType == EEquationType.RevertedAutoGenerated)
+                    {
+                        code.Append(eh.csCodeLhsGauss);
+                        code.Append(" = ");
+                        code.AppendLine(eh.csCodeRhs);
+                        code.AppendLine(";");
+                    }
+                }
+                code.AppendLine("}");  //end of revertedAuto()
+
+                code.AppendLine("public static void reverted" + Globals.equationCodeY.ToUpper() + "(double[] b) {");
+                foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
+                {
+                    if (eh.equationType == EEquationType.RevertedY)
+                    {
+                        code.Append(eh.csCodeLhsGauss);
+                        code.Append(" = ");
+                        code.AppendLine(eh.csCodeRhs);
+                        code.AppendLine(";");
+                    }
+                }
+                code.AppendLine("}");  //end of revertedY()
+
+                code.AppendLine("public static void reverted" + Globals.equationCodeT.ToUpper() + "(double[] b) {");
+                foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
+                {
+                    if (eh.equationType == EEquationType.RevertedT)
+                    {
+                        code.Append(eh.csCodeLhsGauss);
+                        code.Append(" = ");
+                        code.AppendLine(eh.csCodeRhs);
+                        code.AppendLine(";");
+                    }
+                }
+                code.AppendLine("}");  //end of revertedX()                
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                Program.model.modelGekko.m2 = temp;
+            }
+        }
+
+
     }
 }

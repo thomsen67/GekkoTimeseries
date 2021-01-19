@@ -1363,5 +1363,48 @@ namespace Gekko.Parser.Frm
                 }
             }
         }
+
+        private static void EmitCsDoVariableStuff(EquationHelper eh, WalkerHelper2 wh2, ModelGekko model, bool isModel, string variable3, int lag, bool isBaseBank, string absoluteTime, string namedBank)
+        {
+            printVariableAsBType(eh, wh2, model, variable3, lag, false, false, isModel, isBaseBank, absoluteTime, namedBank); //false=rightside
+            //doing model frml
+            string atSign = "";
+            if (isBaseBank) atSign = "@";  //this way, fY lagged from basebank becomes "@fy¤-1". Used only when doing PRT or GENR statements, not for models.
+
+            string varWithLag = "";
+            if (absoluteTime == null)
+            {
+                if (namedBank == null)
+                {
+                    //@fY¤-2
+                    varWithLag = atSign + variable3 + Globals.lagIndicator + lag;
+                }
+                else
+                {
+                    //adambk:fY¤-2
+                    varWithLag = namedBank + ":" + variable3 + Globals.lagIndicator + lag;
+                }
+            }
+            else
+            {
+                if (namedBank == null)
+                {
+                    //@fY¤¤2001q3  (two ¤¤ indicate absolute time)
+                    varWithLag = atSign + variable3 + Globals.lagIndicator + Globals.lagIndicator + absoluteTime;
+                }
+                else
+                {
+                    varWithLag = namedBank + ":" + variable3 + Globals.lagIndicator + Globals.lagIndicator + absoluteTime;
+                }
+            }
+
+            string varWithLag2 = varWithLag;
+
+            if (!eh.precedentsWithLagIndicator.ContainsKey(varWithLag2))
+            {
+                eh.precedentsWithLagIndicator.Add(varWithLag2, "");
+            }
+
+        }
     }
 }
