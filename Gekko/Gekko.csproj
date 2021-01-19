@@ -400,7 +400,6 @@
     </Compile>
     <Compile Include="Table.cs" />
     <Compile Include="Task.cs" />
-    <Compile Include="Timer.cs" />
     <Compile Include="Translate.cs" />
     <Compile Include="GuiTspUtilitiesData.cs">
       <SubType>Form</SubType>

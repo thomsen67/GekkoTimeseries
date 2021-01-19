@@ -647,9 +647,7 @@ namespace Gekko
         public static string reverseIndicator2 = "REVERSE2";
 
         public static string protectSymbol = "\u2714";
-
-        public static Timer timer = new Timer();
-
+        
         public static bool setPrintMute = false;
         public static bool doNotSaveUserSettings = false;
 
