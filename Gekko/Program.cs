@@ -43,10 +43,8 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 using Office = Microsoft.Office.Core;
-//using VBIDE = Microsoft.Vbe.Interop;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
-//using SevenZip;
 using System.Security.Permissions;
 using Microsoft.Win32;
 using System.Security.Cryptography;
@@ -58,26 +56,13 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using GAMS;
 using System.Linq;
-//using EPPlus;
 using OfficeOpenXml;
 using System.Data;
 using System.IO.Compression;
 
 namespace Gekko
 {
-    //public class GekkoLagFunction
-    //{
-    //    public GekkoTime t0 = GekkoTime.tNull;
-    //    public GekkoTime t3 = GekkoTime.tNull;
-    //    public Func<GekkoSmpl, IVariable> func = null;
-    //    public GekkoLagFunction(GekkoTime t0, GekkoTime t3, Func<GekkoSmpl, IVariable> func)
-    //    {
-    //        this.t0 = t0;
-    //        this.t3 = t3;
-    //        this.func = func;
-    //    }
-    //}
-
+    
     public enum EEquationType
     {
         D,
@@ -258,24 +243,13 @@ namespace Gekko
         public int restartInterval = -12345; //if -12345 --> will use n, setting to 1 --> basic steepest gradient, setting to n is normal conjugate gradient
         // -------------
         public int evals = 0;  //!!!!!!! do not change
-    }
-
-    //public class EquationsStorage
-    //{
-    //    Dictionary<string, List<ModelGamsEquation>> equationsByVarname = new Dictionary<string, List<ModelGamsEquation>>();
-    //    Dictionary<string, ModelGamsEquation> equationsByEqname = new Dictionary<string, ModelGamsEquation>();
-    //}
+    }    
 
     public class GekkoArg
     {
         public Func<GekkoSmpl, IVariable> f1 = null;
         public Func<GekkoSmpl, IVariable> f2 = null;
-        public EGekkoArg type = EGekkoArg.Normal;  //Special: inside <...>
-
-        //public GekkoArg()
-        //{
-
-        //}
+        public EGekkoArg type = EGekkoArg.Normal;  //Special: inside <...>        
 
         public GekkoArg(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2)
         {
@@ -361,12 +335,7 @@ namespace Gekko
         {
             this.t1 = t1;
             this.t2 = t2;
-        }
-
-        //public GekkoSmplSimple(bool allObservations)
-        //{
-        //    this.allObservations = allObservations;
-        //}
+        }        
     }
 
     public class GekkoSmpl2
@@ -500,17 +469,7 @@ namespace Gekko
         public string s;
         public long size;
     }
-
-    //public class ExcelDataForClip
-    //{
-    //    public bool transpose = false;
-    //    public double[,] data;
-    //    public string[,] varnames;
-    //    public string[,] dates;
-    //    public string stamp = null;
-    //    public string heading = null;
-    //}
-
+    
     public class BankNameVersion
     {
         public string bank = null;
@@ -1197,14 +1156,7 @@ namespace Gekko
         /// Contains names of the open databanks. Not case-sensitive. The name of any bank points to a
         /// storage with variable names. Which again points to a double[] array with data for each period.
         /// </summary>
-        public static Databanks databanks = new Databanks();
-
-        //going to be obsolete
-        //public static Dictionary<string, Assigns> assigns = new Dictionary<string, Assigns>(StringComparer.OrdinalIgnoreCase);  //keys: assign-vars without the '#'
-
-        //public static GekkoDictionary<string, IVariable> scalars = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);  //keys: assign-vars without the '%'
-        //public static GekkoDictionary<string, List<string>> lists = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);  //lists generated in .cmd files -- contain strings of variables
-        //public static CaseInsensitiveHashtable macros = new CaseInsensitiveHashtable();  //macros -- contain strings of anything
+        public static Databanks databanks = new Databanks();        
         public static Dictionary<string, Table> tables = new Dictionary<string, Table>(StringComparer.OrdinalIgnoreCase);
         public static CompiledGenrStatements compiledGenrStatements = new CompiledGenrStatements();
 
@@ -1354,14 +1306,7 @@ namespace Gekko
                 Globals.linkContainer.Add(lc.counter, lc);
                 G.Write(" ("); G.WriteLink("more", "stacktrace:" + lc.counter); G.Write(")"); G.Writeln();
 
-                //if (Globals.excelDna)
-                //{
-                //    if (Globals.excelDnaStorage != null)
-                //    {
-                //        MessageBox.Show("Gekko failed with the following error: " + Globals.excelDnaStorage.ToString());
-                //    }
-                //}
-
+                
             }
             Gui.gui.ThreadFinished();  //removes the job from the stack of jobs, otherwise we will wait for this halted job forever. Could use thread stop instead??
         }
@@ -1448,8 +1393,7 @@ namespace Gekko
             if (direct)
             {
                 Globals.globalPeriodStart = t1;
-                Globals.globalPeriodEnd = t2;
-                //Globals.setPerEncountered = true;
+                Globals.globalPeriodEnd = t2;                
             }
         }
 
@@ -1469,7 +1413,6 @@ namespace Gekko
             {
                 Globals.globalPeriodStart = t1;
                 Globals.globalPeriodEnd = t2;
-                //Globals.setPerEncountered = true;
             }
         }
 
@@ -2582,17 +2525,7 @@ namespace Gekko
                     // -----------------------
 
                     databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI, create); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
-
-                    //if (createBrandNew)
-                    //{
-                    //    //OPEN <edit> on a gbk file that does not exist yet --> create brand new bank
-                        
-                    //}
-                    //else
-                    //{
-
-                    //}
-
+                                        
                     databank.editable = false;
                     if (oRead.openType == EOpenType.Edit) databank.editable = true;
 
@@ -3540,125 +3473,7 @@ namespace Gekko
             int maxYearInProtobufFile = int.MinValue;
             int minYearInProtobufFile = int.MaxValue;
 
-            if (false /* mergeOrTimeLimit */ )
-            {
-                ////Cannot do a simple deflate in this case: has to move stuff from deflated file into existing first databank
-
-                ////
-                //// ------ WORK ----------            ------ FILE ---------
-                ////
-                ////           x1     x2                  x1      x3
-                ////
-                //// 2000       2                                1000
-                //// 2001       3     100                 10     2000
-                //// 2002       4     200                 11
-                //// 2003             300                 12
-                ////                    
-                //// We merge in the two dimensions:
-                ////
-                //// ------ WORK ----------        
-                ////
-                ////           x1     x2     x3       
-                ////
-                //// 2000       2            1000     
-                //// 2001      10     100    2000  
-                //// 2002      11     200          
-                //// 2003      12     300          
-                ////
-                //// If non-series or array-series, just replace any File object already in Work (never mind time truncation)
-                //// SERIES: Easy copy if series is not in Work (x3)
-                //// SERIES: If in Work, only inject over the overlap of date period and series data period)
-                //// ARRAYSERIES: do as above, just for these subseries
-                ////                  
-
-                //foreach (KeyValuePair<string, IVariable> kvp in deserializedDatabank.storage)  //for each ivar in temp (deserialized) databank 
-                //{
-                //    string name = kvp.Key;
-                //    IVariable iv = kvp.Value;
-
-                //    if (iv.Type() == EVariableType.Series)
-                //    {
-                //        //NOTE: we only time-truncate series and array-series at the direct level, not series inside lists, maps etc.
-
-                //        Series tsExisting = GetTsExisting(databank, name);  //may be null
-                //        Series tsProtobuf = iv as Series;  //cannot be null
-
-                //        if (tsProtobuf.type == ESeriesType.ArraySuper)
-                //        {
-                //            //---------------------------
-                //            // handle array-timeseries
-                //            //---------------------------
-
-                //            if (tsExisting == null)
-                //            {
-                //                databank.AddIVariable(name, tsProtobuf); //the sub-timeseries will follow automatically!
-                //            }
-                //            else
-                //            {
-                //                if (tsExisting.dimensions == tsProtobuf.dimensions)
-                //                {
-                //                    //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
-                //                    MapMultidim gmapExisting = tsExisting.dimensionsStorage;
-                //                    MapMultidim gmapProtobuf = tsProtobuf.dimensionsStorage;
-
-                //                    foreach (KeyValuePair<MapMultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
-                //                    {
-                //                        MapMultidimItem nameDimProtobuf = kvpGmap.Key;
-                //                        Series tsDimProtobuf = kvp.Value as Series;  //must be timeseries, no need to check that the type is so
-
-                //                        IVariable ivDimExisting = null; gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
-                //                        Series tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as Series;
-
-                //                        //now we have a tsDimProtobuf, and if tsDimExisting != null, we merge the data
-
-                //                        if (tsDimExisting == null)
-                //                        {
-                //                            //add this sub-series to the array-timeseries                                   
-                //                            tsProtobuf.Truncate(dates);
-                //                            gmapProtobuf.AddIVariableWithOverwrite(nameDimProtobuf, tsProtobuf);
-                //                        }
-                //                        else
-                //                        {
-                //                            //now we need to merge the two series
-                //                            //also see #98520983
-                //                            bool shouldOverwriteLaterOn = false;
-                //                            MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
-                //                            MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, shouldOverwriteLaterOn);
-                //                        }
-                //                    }
-                //                }
-                //                else
-                //                {
-                //                    //dimensions do not match, wipt existing out!
-                //                    databank.AddIVariableWithOverwrite(name, tsProtobuf);  //the sub-timeseries will follow automatically!
-                //                }
-                //            }
-                //        }
-                //        else
-                //        {
-                //            //---------------------------
-                //            // handle normal timeseries
-                //            //---------------------------
-
-                //            //also see #98520983
-                //            bool wipeExistingOut = false;
-                //            MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
-                //            MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsProtobuf, wipeExistingOut);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        //Non-series
-                //        //Easy: string, val, date, list, map, matrix
-                //        databank.AddIVariableWithOverwrite(name, iv);
-                //    }
-                //}
-                //readInfo.startPerInFile = minYearInProtobufFile;
-                //readInfo.endPerInFile = maxYearInProtobufFile;
-                //readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
-                //readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
-            }
-            else
+            if (true)
             {
                 //Can do it fast, just swapping the deserialized bank instead of the current, with no copying around
                 try
@@ -4785,25 +4600,9 @@ namespace Gekko
             readInfo.endPerInFile = endYear.super;
             readInfo.variables = vars;
             readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
-
-            //See almost identical code in readTsd and readCsv and readPcim and...
-            //if (merge)
-            //{
-            //    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-            //    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-            //}
-            //else
-            //{
-                readInfo.startPerResultingBank = readInfo.startPerInFile;
-                readInfo.endPerResultingBank = readInfo.endPerInFile;
-            //}
-            //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-            //currentBank.yearStart = readInfo.startPerResultingBank;
-            //currentBank.yearEnd = readInfo.endPerResultingBank;
-
-            //readInfo.databank.info1 = readInfo.info1;
-            //readInfo.databank.date = readInfo.date;
-            //readInfo.databank.FileNameWithPath = readInfo.fileName;
+            
+            readInfo.startPerResultingBank = readInfo.startPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;            
 
             return;
 
@@ -4820,17 +4619,7 @@ namespace Gekko
                 int firstYearWarnings = 0;
 
                 DateTime dt1 = DateTime.Now;
-                //G.Writeln();
-                //file = StripQuotes(file);
-                //string originalFileName = file;
-                //string extension = "bnk";
-                //bool cancel = false;
-                int variableCounter = 0;
-
-                //if (!merge)
-                //{
-                //    databank.Clear();
-                //}
+                int variableCounter = 0;                
 
                 //Is all code without זרו, so no need to use GetTextFromFile() to handle ANSI
                 using (FileStream fs = WaitForFileStream(fileLocal, GekkoFileReadOrWrite.Read))
@@ -4954,7 +4743,7 @@ namespace Gekko
 
                         Series ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.A);
 
-                        if (true /* oRead.t1.IsNull() */)
+                        if (true)
                         {
                             //faster
                             for (int per = 0; per < antalper; per++)
@@ -4970,19 +4759,7 @@ namespace Gekko
                             variableCounter++;
                             //G.Writeln(varName + " var# " + var);
                         }
-                        else
-                        {
-
-                            //for (int per = 0; per < antalper; per++)
-                            //{
-                            //    short year = fid[per];
-                            //    GekkoTime t = new GekkoTime(EFreq.A, year, 1);
-
-                            //    float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
-                            //    ts.SetData(t, ss);
-
-                            //}
-                        }
+                        
                     }
 
                     readInfo.startPerInFile = year1;
@@ -4992,21 +4769,10 @@ namespace Gekko
 
                     readInfo.variables = variableCounter;  //does not count emptyWarnings
                     readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
-
-                    //See almost identical code in readTsd and readCsv
-                    //if (merge)
-                    //{
-                    //    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-                    //    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-                    //}
-                    //else
-                    //{
-                        readInfo.startPerResultingBank = readInfo.startPerInFile;
-                        readInfo.endPerResultingBank = readInfo.endPerInFile;
-                    //}
-                    //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-                    //currentBank.yearStart = readInfo.startPerResultingBank;
-                    //currentBank.yearEnd = readInfo.endPerResultingBank;
+                    
+                    readInfo.startPerResultingBank = readInfo.startPerInFile;
+                    readInfo.endPerResultingBank = readInfo.endPerInFile;
+                    
 
                     if (firstYearWarnings > 0) G.Writeln("+++ WARNING: " + firstYearWarnings + " variables had data before databank time period (data skipped)");
 
@@ -6105,25 +5871,9 @@ namespace Gekko
 
             readInfo.variables = counterVariables + counterParameters;
             readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
-
-            //See almost identical code in readTsd and readCsv
-            //if (merge)
-            //{
-            //    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-            //    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-            //}
-            //else
-            //{
-                readInfo.startPerResultingBank = readInfo.startPerInFile;
-                readInfo.endPerResultingBank = readInfo.endPerInFile;
-            //}
-            //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-            //currentBank.yearStart = readInfo.startPerResultingBank;
-            //currentBank.yearEnd = readInfo.endPerResultingBank;
-
-            //readInfo.databank.info1 = readInfo.info1;
-            //readInfo.databank.date = readInfo.date;
-            //readInfo.databank.FileNameWithPath = readInfo.fileName;
+            
+            readInfo.startPerResultingBank = readInfo.startPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;            
 
             databank.FileNameWithPath = readInfo.fileName;
 
@@ -6172,16 +5922,7 @@ namespace Gekko
                 }
             }
         }
-
-        //static void WriteData(string s, double V, GdxFast gdx)
-        //{
-        //    string[] Indx = new string[gamsglobals.maxdim];
-        //    double[] Values = new double[gamsglobals.val_max];
-        //    Indx[0] = s;
-        //    Values[gamsglobals.val_level] = V;
-        //    gdx.gdxDataWriteStr(Indx, Values);
-        //}
-
+        
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
         {
             //merge and date truncation:
