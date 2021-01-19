@@ -1106,18 +1106,11 @@ namespace Gekko.Parser.Frm
                             }
 
                             bool z = false;
-                            if (Globals.patch_zvar)
+                            if (true)
                             {
                                 //With this patch, we always do the inverted Z-eqation, even if there are no J, JD, or JR. So this may be an FRML _D__D for instance. Then the Z-variable will always be ready after simulation.
                                 z = true;
-                            }
-                            else
-                            {
-                                if (eh.equationCodeJadditive || eh.equationCodeJmultiplicative)
-                                {
-                                    z = true;
-                                }
-                            }
+                            }                            
 
                             if (z)
                             {

@@ -4378,56 +4378,6 @@ namespace Gekko.Parser.Gek
                                     node.AlternativeCode = new GekkoSB();
                                     node.AlternativeCode.A("" + nameAndBankCode + "");     
                                 }
-
-                                //if (Globals.bugfix_speedup)
-                                //{
-                                //    ASTNode highest = SearchUpwardsInTree7a(node);
-                                //    if (highest != null)
-                                //    {
-                                //        if (lookupCode.Contains(Globals.listLoopInternalName))
-                                //        {
-                                //            //that would not be good, for instance #i in a x{#i}y variable inside the name
-                                //        }
-                                //        else
-                                //        {
-                                            
-                                //            string name = Globals.listLoopMovedStuff + ++Globals.counter;
-                                //            w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
-                                //            lookupCode = name;                                            
-                                //            //highest.CodeSentFromSubTree+=
-                                //        }
-                                //    }
-                                //}
-
-                                if (Globals.bugfix_speedup2)
-                                {
-                                    ASTNode highest = SearchUpwardsInTree7a(node);
-                                    if (highest != null)
-                                    {
-                                        if (lookupCode.Contains(Globals.listLoopInternalName))
-                                        {
-                                            //that would not be good, for instance #i in a x{#i}y variable inside the name
-                                        }
-                                        else
-                                        {
-                                                                                        
-                                            string name = Globals.listLoopMovedStuff + ++Globals.counter;
-
-                                            if (Globals.bugfix_speedup3)
-                                            {
-                                                highest.localInsideLoopVariablesCs+= "IVariable " + name + " = " + lookupCode + ";" + G.NL;
-                                                lookupCode = name;
-                                            }
-                                            else
-                                            {                                                
-                                                w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
-                                                lookupCode = name;
-                                                //highest.CodeSentFromSubTree+=
-                                            }
-                                        }
-                                    }
-                                }
-
                                 node.Code.A(lookupCode);
                             }
                             break;
@@ -4994,14 +4944,7 @@ namespace Gekko.Parser.Gek
                             }
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
 
-                            //if (true)
-                            //{
-                            //    ParseHelper ph = new ParseHelper();
-                            //    ph.commandsText = "x = " + givenLabel + ";" + G.NL;
-                            //    ph.commandsText = "tell 'adsf';" + G.NL;
-                            //    ph.isOneLinerFromGui = true;
-                            //    ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, new P());
-                            //}
+                            
 
                             string freelists = null;
                             if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)

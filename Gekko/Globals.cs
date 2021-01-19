@@ -273,9 +273,7 @@ namespace Gekko
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
-
-        public static bool substituteAssignVars = false;
-
+        
         public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
         public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0
 
@@ -285,8 +283,8 @@ namespace Gekko
         public static string gekkoSmplIteratorName = "{__GekkoCounter__}";
         public static string startGekkoSmplIteratorCode = "for (int iSmpl" + gekkoSmplIteratorName + " = 0; iSmpl" + gekkoSmplIteratorName + " < int.MaxValue; iSmpl" + gekkoSmplIteratorName + "++) {" + G.NL;
         public static string endGekkoSmplIteratorCode = G.NL + "if (" + Globals.smpl + ".HasError()) O.TryNewSmpl(" + Globals.smpl + ", iSmpl" + gekkoSmplIteratorName + "); else break;" + G.NL + "}";
-
-        public const string indexerAloneCheatString = "[<{THIS IS AN IndexerAlone CALL}>]";
+        
+        //Seems this is used
         public const string labelCheatString = "[<{THIS IS A LABEL}>]";
 
         public const string firstCheatString = "[FIRST]";
@@ -294,9 +292,7 @@ namespace Gekko
         public static int freqASubperiods = 1;
         public static int freqQSubperiods = 4;
         public static int freqMSubperiods = 12;
-
-        public static bool fixReturnProblem = true;
-
+        
         public static bool databanksAsProtobuffers = true;
 
         //See also #80927435209843
@@ -305,19 +301,16 @@ namespace Gekko
         public static StringBuilder errorMemory = null;
 
         public static bool unitTestIntegration = false;
-
         public static string unitTestIntegrationMessage = "Set Globals.unitTestIntegration = true to run integration tests";
         public static List<ToFrom> unitTestCopyHelper = null;
-        public static bool unitTestCopyHelper2 = false;
-
-        public static Table unitTestTablePointer = null;  //used to see if table generated in PRT etc looks ok (regardless of how it actually prints)
+        public static bool unitTestCopyHelper2 = false;        
 
         public static bool alwaysEnablcPackForSimulation = false;  //if true, packing of non-failing simulations is easy (but this costs time)
         public static UndoSim undoSim = null;
         public static PackSim packSim = null;
-
-        public static bool newOption = true;
+                
         // ----
+        //This is used for OPTION intellisense
         public static string xbool = "bool";
         public static string xstring = "string";
         public static string xint = "int"; // >= 0
@@ -331,9 +324,7 @@ namespace Gekko
         // ----
         public static List<List<string>> listSyntaxAlias = new List<List<string>>();
         public static List<List<string>> listSyntax = Options.Syntax();  //this is created once and for all and is used for the entire Gekko session (not redone in RESET/RESTART)
-
-        public static bool patch_zvar = true;
-
+        
         public const string symbolTurtle = "___";
 
         public const string symbolBankColon = ":";
@@ -360,16 +351,11 @@ namespace Gekko
         public static readonly ScalarString scalarStringStar = new ScalarString("*");
         public static readonly ScalarString scalarStringYes = new ScalarString("yes");
         public static readonly ScalarString scalarStringNo = new ScalarString("no");
-
-        public static bool poolGenrLines = false;
-
-        public static bool fastGauss = true;  //Beware: RES command should switch it off
-
-        public static bool useNewRTFVersionForHelpTab = false; //handles links inside rtf files. but a bit unstable.        
-
+        
+        public static bool fastGauss = true;  //Beware: RES command should switch the option off
+                
         public static double[] scaleNewtonValues = new double[0];
-        public static bool emitRCode = false;
-
+        
         public static int freezeDecompRows = 1;
         public static int freezeDecompCols = 1;
         public static int guiTableCellWidth = 100;
@@ -377,21 +363,9 @@ namespace Gekko
 
         public static double pruneDecomp = 0.10d;
         public static double guiPruneDecomp = 0.20d;  //bind this to combobox in gui -- not used?
-
-        public static bool samAbsolute = false;  //normally false
-        public static bool samOnlyExo = false;  //normally false, prblem is: Z and J-vars pollute this
-        public static int samNumber = 50;  //normally 100        
-        public static bool obeyStepByStep = false;  //normally false
-        public static bool obeyEcho = false;  //normally false
-        public static bool printTimerResults = false;  //normally false
-        public static bool printStopWhenErrors = false;  //normally false
-        public static bool printOnlyErrors = true;  //normally false
-
-        public static bool bugfix_speedup2 = false; //!! does not really offer speedup.... :-(   faster sum() for array-sreies
-        public static bool bugfix_speedup3 = false; //!! entails problem with PRT<r>, problematic...
-
+        
         public const string freelists = "|||";
-        public static bool fixWildcardLabel = true;
+        public static bool fixWildcardLabel = true;  //keep this variable, it points to something to bugfix
         public static string wildcardText = "wildcard";
 
         public static string reportInterior1 = "O.ReportInterior(" + Globals.smpl + ", ";
@@ -429,9 +403,7 @@ namespace Gekko
         public static PipeFileHelper pipeFileHelper2 = new PipeFileHelper();  //pipe 2 is for printing etc. when user choses "p fy file=myfile.txt"
 
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
-
-        public static bool saffierPrintIterations = false;
-
+        
         public static List<string>[] globalAl;
         public static List<string>[] globalAlType;
 
