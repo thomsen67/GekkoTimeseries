@@ -996,7 +996,7 @@ namespace Gekko
         [ProtoMember(24)]
         public string Zname = "";
         //[ProtoMember()] !!!!!!!! ignore this!
-        public ASTNode equationsNodeRoot = null;
+        public ASTNodeSimple equationsNodeRoot = null;
         [ProtoMember(25)]
         public bool isAfterModel = false;  //if equation is after 
         [ProtoMember(26)]

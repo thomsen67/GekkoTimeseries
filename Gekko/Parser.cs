@@ -64,7 +64,7 @@ namespace Gekko
     public static class ParserOLD
     {       
 
-        public static void CreateASTNodesForModel(CT ast, ASTNode equationNode, int depth, WalkHelper wh, ModelGekko model)
+        public static void CreateASTNodesForModel(CT ast, ASTNodeSimple equationNode, int depth, WalkHelper wh, ModelGekko model)
         {
             //[[3]]
             if (ast.Text == "ASTVAL")
@@ -110,7 +110,7 @@ namespace Gekko
             if (depth == 1 && ast.Text == "ASTFRML")
             {
                 wh.frmlItemsCounter++;
-                equationNode = new ASTNode(ast.Text);  //the root node for this equation
+                equationNode = new ASTNodeSimple(ast.Text);  //the root node for this equation
                 equationNode.parent = null;  //has no parent
                 helper = new EquationHelper();
                 helper.modelBlock = wh.modelBlock;
@@ -139,13 +139,13 @@ namespace Gekko
             }
 
             int num = ast.Children.Count;
-            equationNode.Children = new List<ASTNode>(num);
+            equationNode.Children = new List<ASTNodeSimple>(num);
 
             //Console.WriteLine();
             for (int i = 0; i < num; ++i)
             {
                 CT d = (CT)(ast.Children[i]);
-                ASTNode equationNodeChild = new ASTNode(null);  //unknown text
+                ASTNodeSimple equationNodeChild = new ASTNodeSimple(null);  //unknown text
                 equationNodeChild.parent = equationNode;
                 equationNode.Add(equationNodeChild);
                 CreateASTNodesForModel(d, equationNodeChild, depth + 1, wh, model);
@@ -583,7 +583,7 @@ namespace Gekko
                 }
             }
 
-            ASTNode equationNode = new ASTNode(null);  //unknown text for now
+            ASTNodeSimple equationNode = new ASTNodeSimple(null);  //unknown text for now
             wh.print = false;
             //takes 0.1 sec for dec09
             CreateASTNodesForModel(t, equationNode, 0, wh, Program.model.modelGekko); //creates a List<> of equations, with a tree of EquationNodes for each equation
@@ -1639,7 +1639,7 @@ namespace Gekko
             return wh;
         }
 
-        public static void ParserFrmWalkASTEquation(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel)
+        public static void ParserFrmWalkASTEquation(EquationHelper eh, ASTNodeSimple equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel)
         {
             bool visitChildren = true;
             int numberOfRightParentheses = 0;
@@ -1659,7 +1659,7 @@ namespace Gekko
                     visitChildren = false;  //is done
                     break;
                 case "ASTLEFTSIDE":
-                    ASTNode child = equationNode.GetChild(0);
+                    ASTNodeSimple child = equationNode.GetChild(0);
                     wh2.variableOrFunctionIndicator = child.Text;
                     wh2.leftSideFunction = "";
                     if (wh2.variableOrFunctionIndicator == "ASTSIMPLEFUNCTION")
@@ -1765,24 +1765,24 @@ namespace Gekko
                              *               log (e)   subtree
                              *
                              * */
-                            ASTNode subTree = equationNode.GetChild(1);
+                            ASTNodeSimple subTree = equationNode.GetChild(1);
                             equationNode.Text = "nothing";  //function that does nothing
                             equationNode.Children.Clear();
-                            ASTNode b = new ASTNode("-");  //subtraction
+                            ASTNodeSimple b = new ASTNodeSimple("-");  //subtraction
                             equationNode.Add(b);
-                            ASTNode d = new ASTNode("ASTFUNCTION");
-                            ASTNode c = new ASTNode("ASTLAG");
-                            b.Children = new List<ASTNode>();
+                            ASTNodeSimple d = new ASTNodeSimple("ASTFUNCTION");
+                            ASTNodeSimple c = new ASTNodeSimple("ASTLAG");
+                            b.Children = new List<ASTNodeSimple>();
                             b.Add(d);
                             b.Add(c);
-                            ASTNode c1 = new ASTNode("-");  //it is a lag
-                            ASTNode c2 = new ASTNode(lag.ToString()); //n period lag
-                            c.Children = new List<ASTNode>();
+                            ASTNodeSimple c1 = new ASTNodeSimple("-");  //it is a lag
+                            ASTNodeSimple c2 = new ASTNodeSimple(lag.ToString()); //n period lag
+                            c.Children = new List<ASTNodeSimple>();
                             c.Add(d);
                             c.Add(c1);
                             c.Add(c2);
-                            ASTNode e = new ASTNode("log");
-                            d.Children = new List<ASTNode>();
+                            ASTNodeSimple e = new ASTNodeSimple("log");
+                            d.Children = new List<ASTNodeSimple>();
                             d.Add(e);
                             d.Add(subTree);
                         }
@@ -1831,23 +1831,23 @@ namespace Gekko
                              *
                              *
                              * */
-                            ASTNode f = new ASTNode("*", true);
-                            ASTNode g = new ASTNode("-", true);
+                            ASTNodeSimple f = new ASTNodeSimple("*", true);
+                            ASTNodeSimple g = new ASTNodeSimple("-", true);
                             f.Add(g);
-                            f.Add(new ASTNode("ASTDOUBLE", "100"));
-                            ASTNode subTree = equationNode.GetChild(1);
+                            f.Add(new ASTNodeSimple("ASTDOUBLE", "100"));
+                            ASTNodeSimple subTree = equationNode.GetChild(1);
                             equationNode.Text = "nothing";  //function that does nothing
                             equationNode.Children.Clear();
-                            ASTNode b = new ASTNode("/", true);  //subtraction
+                            ASTNodeSimple b = new ASTNodeSimple("/", true);  //subtraction
                             g.Add(b);
-                            g.Add(new ASTNode("ASTDOUBLE", "1"));
+                            g.Add(new ASTNodeSimple("ASTDOUBLE", "1"));
                             equationNode.Add(f);
-                            ASTNode d = subTree;
-                            ASTNode c = new ASTNode("ASTLAG", true);
+                            ASTNodeSimple d = subTree;
+                            ASTNodeSimple c = new ASTNodeSimple("ASTLAG", true);
                             b.Add(d);
                             b.Add(c);
-                            ASTNode c1 = new ASTNode("-");  //it is a lag
-                            ASTNode c2 = new ASTNode(lag.ToString()); //n period lag
+                            ASTNodeSimple c1 = new ASTNodeSimple("-");  //it is a lag
+                            ASTNodeSimple c2 = new ASTNodeSimple(lag.ToString()); //n period lag
                             c.Add(d);
                             c.Add(c1);
                             c.Add(c2);
@@ -1861,7 +1861,7 @@ namespace Gekko
                             }
                             recognized = true;
 
-                            ASTNode lags = equationNode.GetChild(2);
+                            ASTNodeSimple lags = equationNode.GetChild(2);
                             int intLags = GetLags(wh2, function, lags);
 
                             /*
@@ -1887,14 +1887,14 @@ namespace Gekko
                            *
                            * */
 
-                            ASTNode subTree = equationNode.GetChild(1);
+                            ASTNodeSimple subTree = equationNode.GetChild(1);
                             equationNode.Text = "nothing";  //function that does nothing
                             equationNode.Children.Clear();
-                            ASTNode c = new ASTNode("ASTLAG");
-                            ASTNode c1 = new ASTNode("-"); //it is a lag
-                            ASTNode c2 = new ASTNode(intLags.ToString()); //n period lag
+                            ASTNodeSimple c = new ASTNodeSimple("ASTLAG");
+                            ASTNodeSimple c1 = new ASTNodeSimple("-"); //it is a lag
+                            ASTNodeSimple c2 = new ASTNodeSimple(intLags.ToString()); //n period lag
                             equationNode.Add(c);
-                            c.Children = new List<ASTNode>();
+                            c.Children = new List<ASTNodeSimple>();
                             c.Add(subTree);
                             c.Add(c1);
                             c.Add(c2);
@@ -1939,18 +1939,18 @@ namespace Gekko
                             //wh2.s.Append("(");
                             //numberOfRightParentheses++;
                             // see "dlog" for explanation
-                            ASTNode subTree = equationNode.GetChild(1);
+                            ASTNodeSimple subTree = equationNode.GetChild(1);
                             equationNode.Text = "nothing";  //function that does nothing
                             equationNode.Children.Clear();
-                            ASTNode b = new ASTNode("-");//subtraction
+                            ASTNodeSimple b = new ASTNodeSimple("-");//subtraction
                             equationNode.Add(b);
-                            ASTNode c = new ASTNode("ASTLAG");
-                            b.Children = new List<ASTNode>();
+                            ASTNodeSimple c = new ASTNodeSimple("ASTLAG");
+                            b.Children = new List<ASTNodeSimple>();
                             b.Add(subTree);
                             b.Add(c);
-                            ASTNode c1 = new ASTNode("-"); //it is a lag
-                            ASTNode c2 = new ASTNode(lag.ToString()); //n period lag
-                            c.Children = new List<ASTNode>();
+                            ASTNodeSimple c1 = new ASTNodeSimple("-"); //it is a lag
+                            ASTNodeSimple c2 = new ASTNodeSimple(lag.ToString()); //n period lag
+                            c.Children = new List<ASTNodeSimple>();
                             c.Add(subTree);
                             c.Add(c1);
                             c.Add(c2);
@@ -1965,7 +1965,7 @@ namespace Gekko
                             }
                             recognized = true;
 
-                            ASTNode lags = equationNode.GetChild(2);
+                            ASTNodeSimple lags = equationNode.GetChild(2);
 
                             int intLags = GetLags(wh2, function, lags);
 
@@ -1996,40 +1996,40 @@ namespace Gekko
                             //wh2.s.Append("(");
                             //numberOfRightParentheses++;
                             // see "dlog" for explanation
-                            ASTNode subTree = equationNode.GetChild(1);
+                            ASTNodeSimple subTree = equationNode.GetChild(1);
                             equationNode.Text = "nothing";  //function that does nothing
                             equationNode.Children.Clear();
 
-                            ASTNode container = new Gekko.ASTNode("nothing");
-                            container.Children = new List<Gekko.ASTNode>();
+                            ASTNodeSimple container = new Gekko.ASTNodeSimple("nothing");
+                            container.Children = new List<Gekko.ASTNodeSimple>();
 
-                            ASTNode cRightOld = new ASTNode("+"); //addition
-                            cRightOld.Children = new List<ASTNode>();
+                            ASTNodeSimple cRightOld = new ASTNodeSimple("+"); //addition
+                            cRightOld.Children = new List<ASTNodeSimple>();
 
                             container.Add(cRightOld);
 
                             for (int i = 0; i < intLags - 1; i++)
                             {
-                                ASTNode cLeft = new ASTNode("ASTLAG");
-                                cLeft.Children = new List<ASTNode>();
+                                ASTNodeSimple cLeft = new ASTNodeSimple("ASTLAG");
+                                cLeft.Children = new List<ASTNodeSimple>();
                                 cLeft.Add(subTree);
-                                cLeft.Add(new ASTNode("-"));
-                                cLeft.Add(new ASTNode(i.ToString()));
+                                cLeft.Add(new ASTNodeSimple("-"));
+                                cLeft.Add(new ASTNodeSimple(i.ToString()));
 
-                                ASTNode cRightNew = null;
+                                ASTNodeSimple cRightNew = null;
 
                                 if (i < intLags - 2)
                                 {
-                                    cRightNew = new ASTNode("+"); //addition
-                                    cRightNew.Children = new List<ASTNode>();
+                                    cRightNew = new ASTNodeSimple("+"); //addition
+                                    cRightNew.Children = new List<ASTNodeSimple>();
                                 }
                                 else
                                 {
-                                    cRightNew = new ASTNode("ASTLAG");
-                                    cRightNew.Children = new List<ASTNode>();
+                                    cRightNew = new ASTNodeSimple("ASTLAG");
+                                    cRightNew.Children = new List<ASTNodeSimple>();
                                     cRightNew.Add(subTree);
-                                    cRightNew.Add(new ASTNode("-"));
-                                    cRightNew.Add(new ASTNode((i + 1).ToString()));
+                                    cRightNew.Add(new ASTNodeSimple("-"));
+                                    cRightNew.Add(new ASTNodeSimple((i + 1).ToString()));
                                 }
                                 cRightOld.Add(cLeft);
                                 cRightOld.Add(cRightNew);
@@ -2043,10 +2043,10 @@ namespace Gekko
                             }
                             else
                             {
-                                ASTNode temp = new ASTNode("/");
-                                temp.Children = new List<Gekko.ASTNode>();
+                                ASTNodeSimple temp = new ASTNodeSimple("/");
+                                temp.Children = new List<Gekko.ASTNodeSimple>();
                                 temp.Add(container);
-                                temp.Add(new ASTNode("ASTDOUBLE", intLags.ToString()));
+                                temp.Add(new ASTNodeSimple("ASTDOUBLE", intLags.ToString()));
                                 equationNode.Add(temp);
                             }
                         }
@@ -2219,29 +2219,29 @@ namespace Gekko
                                 int highInt = (int)Math.Ceiling(lagDouble);
                                 double lambdaHigh = lagDouble - (double)lowInt;
                                 double lambdaLow = (double)highInt - lagDouble;
-                                ASTNode low = new ASTNode("*", true);
-                                ASTNode high = new ASTNode("*", true);
-                                ASTNode low1 = new ASTNode("ASTVARIABLELAGLEAD", true);
-                                ASTNode low2 = new ASTNode("ASTDOUBLE", "" + lambdaLow);
+                                ASTNodeSimple low = new ASTNodeSimple("*", true);
+                                ASTNodeSimple high = new ASTNodeSimple("*", true);
+                                ASTNodeSimple low1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);
+                                ASTNodeSimple low2 = new ASTNodeSimple("ASTDOUBLE", "" + lambdaLow);
                                 low.Add(low1);
                                 low.Add(low2);
-                                ASTNode high1 = new ASTNode("ASTVARIABLELAGLEAD", true);
-                                ASTNode high2 = new ASTNode("ASTDOUBLE", "" + lambdaHigh);
+                                ASTNodeSimple high1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);
+                                ASTNodeSimple high2 = new ASTNodeSimple("ASTDOUBLE", "" + lambdaHigh);
                                 high.Add(high1);
                                 high.Add(high2);
-                                low1.Add(new ASTNode(equationNode.GetChild(0).Text));  //varname
-                                if (lowInt < 0) low1.Add(new ASTNode("-"));
-                                else low1.Add(new ASTNode("+"));
-                                low1.Add(new ASTNode(Math.Abs(lowInt) + ""));
-                                if (isModel == false) low1.Add(new ASTNode(equationNode.GetChild(3).Text));  //if base bank
-                                high1.Add(new ASTNode(equationNode.GetChild(0).Text));  //varname
-                                if (highInt < 0) high1.Add(new ASTNode("-"));
-                                else high1.Add(new ASTNode("+"));
-                                high1.Add(new ASTNode(Math.Abs(highInt) + ""));
-                                if (isModel == false) high1.Add(new ASTNode(equationNode.GetChild(3).Text));  //if base bank
+                                low1.Add(new ASTNodeSimple(equationNode.GetChild(0).Text));  //varname
+                                if (lowInt < 0) low1.Add(new ASTNodeSimple("-"));
+                                else low1.Add(new ASTNodeSimple("+"));
+                                low1.Add(new ASTNodeSimple(Math.Abs(lowInt) + ""));
+                                if (isModel == false) low1.Add(new ASTNodeSimple(equationNode.GetChild(3).Text));  //if base bank
+                                high1.Add(new ASTNodeSimple(equationNode.GetChild(0).Text));  //varname
+                                if (highInt < 0) high1.Add(new ASTNodeSimple("-"));
+                                else high1.Add(new ASTNodeSimple("+"));
+                                high1.Add(new ASTNodeSimple(Math.Abs(highInt) + ""));
+                                if (isModel == false) high1.Add(new ASTNodeSimple(equationNode.GetChild(3).Text));  //if base bank
                                 equationNode.Children.Clear();  //stripping children, in order to add the new subtree
                                 equationNode.Text = "nothing";  //nothing is done in this node
-                                ASTNode plus = new ASTNode("+", true);
+                                ASTNodeSimple plus = new ASTNodeSimple("+", true);
                                 plus.Add(low);
                                 plus.Add(high);
                                 equationNode.Add(plus);
@@ -2280,12 +2280,12 @@ namespace Gekko
                     printVariableAsBType(eh, wh2, model, wh2.variableOrFunctionIndicator, 0, true, false, isModel, false, null, null);  //no lag //true=leftside //no named bank
                     //wh2.rightHandSideCsCode.Append(" = ");  //added manually later on
                     wh2.rhs = equationNode.GetChild(0);
-                    ASTNode rhs = wh2.rhs;
+                    ASTNodeSimple rhs = wh2.rhs;
                     eh.lhsWithLagIndicator = wh2.variableOrFunctionIndicator + Globals.lagIndicator + "0";  //lag is 0 on left hand side
                     eh.lhs = wh2.variableOrFunctionIndicator;
 
-                    ASTNode root0 = rhs;
-                    ASTNode root1 = root0;  //default value, if it is not changed
+                    ASTNodeSimple root0 = rhs;
+                    ASTNodeSimple root1 = root0;  //default value, if it is not changed
                     if (wh2.leftSideFunction == "")
                     {
                         //do nothing
@@ -2307,7 +2307,7 @@ namespace Gekko
                         //These are left-hand side functions
                         if (G.Equal(wh2.leftSideFunction, "log"))
                         {
-                            root1 = new ASTNode("ASTFUNCTION", "exp");
+                            root1 = new ASTNodeSimple("ASTFUNCTION", "exp");
                             root1.Add(root0);
                         }
                         else if (G.Equal(wh2.leftSideFunction, "dlog") || G.Equal(wh2.leftSideFunction, "dlogy"))
@@ -2318,17 +2318,17 @@ namespace Gekko
                                 lag = O.CurrentSubperiods();
                                 Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
-                            root1 = new ASTNode("*", true);
-                            ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
-                            ASTNode child2 = new ASTNode("ASTFUNCTION", true);
+                            root1 = new ASTNodeSimple("*", true);
+                            ASTNodeSimple child1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);
+                            ASTNodeSimple child2 = new ASTNodeSimple("ASTFUNCTION", true);
                             root1.Add(child1);
                             root1.Add(child2);
-                            child1.Add(new ASTNode(eh.lhs));
-                            child1.Add(new ASTNode("-"));  //lag
-                            child1.Add(new ASTNode(lag.ToString()));  //lag n
+                            child1.Add(new ASTNodeSimple(eh.lhs));
+                            child1.Add(new ASTNodeSimple("-"));  //lag
+                            child1.Add(new ASTNodeSimple(lag.ToString()));  //lag n
                             //for GENR, cannot be a @-variable on left side, so:
-                            child1.Add(new ASTNode("FALSE"));  //not baseline bank
-                            child2.Add(new ASTNode("exp"));
+                            child1.Add(new ASTNodeSimple("FALSE"));  //not baseline bank
+                            child2.Add(new ASTNodeSimple("exp"));
                             child2.Add(root0);
                         }
                         else if (G.Equal(wh2.leftSideFunction, "pch") || G.Equal(wh2.leftSideFunction, "pchy"))
@@ -2339,20 +2339,20 @@ namespace Gekko
                                 lag = O.CurrentSubperiods();
                                 Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
-                            root1 = new ASTNode("*", true);
-                            ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
-                            ASTNode child2 = new ASTNode("+", true);
+                            root1 = new ASTNodeSimple("*", true);
+                            ASTNodeSimple child1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);
+                            ASTNodeSimple child2 = new ASTNodeSimple("+", true);
                             root1.Add(child1);
                             root1.Add(child2);
-                            child1.Add(new ASTNode(eh.lhs));
-                            child1.Add(new ASTNode("-"));  //lag
-                            child1.Add(new ASTNode(lag.ToString()));  //lag n
+                            child1.Add(new ASTNodeSimple(eh.lhs));
+                            child1.Add(new ASTNodeSimple("-"));  //lag
+                            child1.Add(new ASTNodeSimple(lag.ToString()));  //lag n
                             //for GENR, cannot be a @-variable on left side, so:
-                            child1.Add(new ASTNode("FALSE"));  //not baseline bank
-                            ASTNode child21 = new ASTNode("/", true);
-                            ASTNode child22 = new ASTNode("ASTDOUBLE", "1.0");
+                            child1.Add(new ASTNodeSimple("FALSE"));  //not baseline bank
+                            ASTNodeSimple child21 = new ASTNodeSimple("/", true);
+                            ASTNodeSimple child22 = new ASTNodeSimple("ASTDOUBLE", "1.0");
                             child21.Add(root0);
-                            child21.Add(new ASTNode("ASTDOUBLE", "100"));
+                            child21.Add(new ASTNodeSimple("ASTDOUBLE", "100"));
                             child2.Add(child21);
                             child2.Add(child22);
                         }                        
@@ -2364,16 +2364,16 @@ namespace Gekko
                                 lag = O.CurrentSubperiods();
                                 Program.model.modelGekko.subPeriods = lag; //this is used as a safety check, so that if the model is loaded/compiled during one freq, and run during another, we will get an error.
                             }
-                            root1 = new ASTNode("+", true);
-                            ASTNode child1 = new ASTNode("ASTVARIABLELAGLEAD", true);
-                            ASTNode child2 = root0;
+                            root1 = new ASTNodeSimple("+", true);
+                            ASTNodeSimple child1 = new ASTNodeSimple("ASTVARIABLELAGLEAD", true);
+                            ASTNodeSimple child2 = root0;
                             root1.Add(child1);
                             root1.Add(child2);
-                            child1.Add(new ASTNode(eh.lhs));
-                            child1.Add(new ASTNode("-"));  //lag
-                            child1.Add(new ASTNode(lag.ToString()));  //lag n
+                            child1.Add(new ASTNodeSimple(eh.lhs));
+                            child1.Add(new ASTNodeSimple("-"));  //lag
+                            child1.Add(new ASTNodeSimple(lag.ToString()));  //lag n
                             //for GENR, cannot be a @-variable on left side, so:
-                            child1.Add(new ASTNode("FALSE"));  //not baseline bank
+                            child1.Add(new ASTNodeSimple("FALSE"));  //not baseline bank
                         }
                         else
                         {
@@ -2436,7 +2436,7 @@ namespace Gekko
                      * */
                     ExtractDJZAndEquationTypeFromEquationCode(eh, model, isModel);  //Note: code may be changed to "_i" here
                     string codeError = "";
-                    ASTNode root2 = root1;  //default value, without DJZ-vars
+                    ASTNodeSimple root2 = root1;  //default value, without DJZ-vars
                     if (!(EquationIsRunSeparatelyAfterSim(eh) || EquationIsNotRunAtAll(eh)))
                     {
                         //adding J-variables
@@ -2457,58 +2457,58 @@ namespace Gekko
                         if (eh.equationCodeJmultiplicative)
                         {
                             //multiplicative
-                            root2 = new ASTNode("*", true);
-                            ASTNode child2 = new ASTNode("+", true);
+                            root2 = new ASTNodeSimple("*", true);
+                            ASTNodeSimple child2 = new ASTNodeSimple("+", true);
                             root2.Add(root1);
                             root2.Add(child2);
-                            child2.Add(new ASTNode("ASTDOUBLE", "1.0"));
-                            child2.Add(new ASTNode("ASTVARIABLE", eh.Jname, "FALSE"));  //cannot be base bank
+                            child2.Add(new ASTNodeSimple("ASTDOUBLE", "1.0"));
+                            child2.Add(new ASTNodeSimple("ASTVARIABLE", eh.Jname, "FALSE"));  //cannot be base bank
                             AddToDictionary(model.varsJTypeAutoGenerated, eh.Jname, model);
                         }
                         else if (eh.equationCodeJadditive)
                         {
                             //additive
-                            root2 = new ASTNode("+", true);
+                            root2 = new ASTNodeSimple("+", true);
                             root2.Add(root1);
-                            root2.Add(new ASTNode("ASTVARIABLE", eh.Jname, "FALSE"));  //cannot be base bank
+                            root2.Add(new ASTNodeSimple("ASTVARIABLE", eh.Jname, "FALSE"));  //cannot be base bank
                             AddToDictionary(model.varsJTypeAutoGenerated, eh.Jname, model);
                         }
                     }
-                    ASTNode root3 = root2;  //default value
+                    ASTNodeSimple root3 = root2;  //default value
                     if (!(EquationIsRunSeparatelyAfterSim(eh) || EquationIsNotRunAtAll(eh)))
                     {
                         //D- and Z-vars, including reverted equations
                         if (G.Equal(eh.equationCodeD, "d"))
                         {
-                            root3 = new ASTNode("+", true);
+                            root3 = new ASTNodeSimple("+", true);
                             eh.Dname = "D" + eh.lhs;
                             eh.Zname = "Z" + eh.lhs;
                             AddToDictionary(model.varsDTypeAutoGenerated, eh.Dname, model);
                             AddToDictionary(model.varsZTypeAutoGenerated, eh.Zname, model);
-                            ASTNode child1 = new ASTNode("*", true);
-                            ASTNode child2 = new ASTNode("*", true);
+                            ASTNodeSimple child1 = new ASTNodeSimple("*", true);
+                            ASTNodeSimple child2 = new ASTNodeSimple("*", true);
                             root3.Add(child1);
                             root3.Add(child2);
-                            ASTNode child12 = new ASTNode("-", true);
+                            ASTNodeSimple child12 = new ASTNodeSimple("-", true);
                             child1.Add(root2);  //this root may have J-factors included
                             child1.Add(child12);
-                            child12.Add(new ASTNode("ASTDOUBLE", "1.0"));
-                            child12.Add(new ASTNode("ASTVARIABLE", eh.Dname, "FALSE")); //cannot be base bank
-                            child2.Add(new ASTNode("ASTVARIABLE", eh.Dname, "FALSE"));  //cannot be base bank
-                            child2.Add(new ASTNode("ASTVARIABLE", eh.Zname, "FALSE"));  //cannot be base bank
+                            child12.Add(new ASTNodeSimple("ASTDOUBLE", "1.0"));
+                            child12.Add(new ASTNodeSimple("ASTVARIABLE", eh.Dname, "FALSE")); //cannot be base bank
+                            child2.Add(new ASTNodeSimple("ASTVARIABLE", eh.Dname, "FALSE"));  //cannot be base bank
+                            child2.Add(new ASTNodeSimple("ASTVARIABLE", eh.Zname, "FALSE"));  //cannot be base bank
                             //create reverted equations for J- and Z-variables
                             if (eh.equationCodeJadditive)
                             {
                                 //TODO: clean up, reorder, rename, do diagram
-                                ASTNode FrmlJ = new ASTNode("ASTFRML", true);  //super-root
-                                ASTNode root4 = new ASTNode("-", true);
-                                FrmlJ.Add(new ASTNode("ASTFRMLCODE", "AUTOGENERATED"));
-                                FrmlJ.Add(new ASTNode("ASTLEFTSIDE", eh.Jname));
-                                ASTNode ex = new ASTNode("ASTEXPRESSION", true);
+                                ASTNodeSimple FrmlJ = new ASTNodeSimple("ASTFRML", true);  //super-root
+                                ASTNodeSimple root4 = new ASTNodeSimple("-", true);
+                                FrmlJ.Add(new ASTNodeSimple("ASTFRMLCODE", "AUTOGENERATED"));
+                                FrmlJ.Add(new ASTNodeSimple("ASTLEFTSIDE", eh.Jname));
+                                ASTNodeSimple ex = new ASTNodeSimple("ASTEXPRESSION", true);
                                 ex.Add(root4);
                                 FrmlJ.Add(ex);
-                                ASTNode child41 = new ASTNode("ASTVARIABLE", eh.lhs);
-                                ASTNode child42 = root1;
+                                ASTNodeSimple child41 = new ASTNodeSimple("ASTVARIABLE", eh.lhs);
+                                ASTNodeSimple child42 = root1;
                                 root4.Add(child41);
                                 root4.Add(child42);
                                 EquationHelper ehJ = new EquationHelper();
@@ -2522,18 +2522,18 @@ namespace Gekko
                             if (eh.equationCodeJmultiplicative)
                             {
                                 //TODO: clean up, reorder, rename, do diagram
-                                ASTNode FrmlJR = new ASTNode("ASTFRML", true);  //super-root
-                                ASTNode root4 = new ASTNode("-", true);
-                                ASTNode root4child = new ASTNode("/", true);
+                                ASTNodeSimple FrmlJR = new ASTNodeSimple("ASTFRML", true);  //super-root
+                                ASTNodeSimple root4 = new ASTNodeSimple("-", true);
+                                ASTNodeSimple root4child = new ASTNodeSimple("/", true);
                                 root4.Add(root4child);
-                                root4.Add(new ASTNode("ASTDOUBLE", "1"));
-                                FrmlJR.Add(new ASTNode("ASTFRMLCODE", "AUTOGENERATED"));
-                                FrmlJR.Add(new ASTNode("ASTLEFTSIDE", eh.Jname));
-                                ASTNode ex = new ASTNode("ASTEXPRESSION", true);
+                                root4.Add(new ASTNodeSimple("ASTDOUBLE", "1"));
+                                FrmlJR.Add(new ASTNodeSimple("ASTFRMLCODE", "AUTOGENERATED"));
+                                FrmlJR.Add(new ASTNodeSimple("ASTLEFTSIDE", eh.Jname));
+                                ASTNodeSimple ex = new ASTNodeSimple("ASTEXPRESSION", true);
                                 ex.Add(root4);
                                 FrmlJR.Add(ex);
-                                ASTNode child41 = new ASTNode("ASTVARIABLE", eh.lhs);
-                                ASTNode child42 = root1;
+                                ASTNodeSimple child41 = new ASTNodeSimple("ASTVARIABLE", eh.lhs);
+                                ASTNodeSimple child42 = root1;
                                 root4child.Add(child41);
                                 root4child.Add(child42);
                                 EquationHelper ehJR = new EquationHelper();
@@ -2562,11 +2562,11 @@ namespace Gekko
                             if(z)
                             {
                                 //TODO: clean up, reorder, rename, do diagram
-                                ASTNode FrmlZ = new ASTNode("ASTFRML", true);  //super-root
-                                FrmlZ.Add(new ASTNode("ASTFRMLCODE", "AUTOGENERATED"));
-                                FrmlZ.Add(new ASTNode("ASTLEFTSIDE", eh.Zname));
-                                ASTNode ex = new ASTNode("ASTEXPRESSION", true);
-                                ex.Add(new ASTNode("ASTVARIABLE", eh.lhs));
+                                ASTNodeSimple FrmlZ = new ASTNodeSimple("ASTFRML", true);  //super-root
+                                FrmlZ.Add(new ASTNodeSimple("ASTFRMLCODE", "AUTOGENERATED"));
+                                FrmlZ.Add(new ASTNodeSimple("ASTLEFTSIDE", eh.Zname));
+                                ASTNodeSimple ex = new ASTNodeSimple("ASTEXPRESSION", true);
+                                ex.Add(new ASTNodeSimple("ASTVARIABLE", eh.lhs));
                                 FrmlZ.Add(ex);
                                 EquationHelper ehZ = new EquationHelper();
                                 ehZ.lhs = eh.Zname;
@@ -2585,15 +2585,15 @@ namespace Gekko
                                 if (Globals.revertSimpleJ)
                                 {
                                     //TODO: clean up, reorder, rename, do diagram
-                                    ASTNode FrmlJ = new ASTNode("ASTFRML", true);  //super-root
-                                    ASTNode root4 = new ASTNode("-", true);
-                                    FrmlJ.Add(new ASTNode("ASTFRMLCODE", "AUTOGENERATED"));
-                                    FrmlJ.Add(new ASTNode("ASTLEFTSIDE", eh.Jname));
-                                    ASTNode ex = new ASTNode("ASTEXPRESSION", true);
+                                    ASTNodeSimple FrmlJ = new ASTNodeSimple("ASTFRML", true);  //super-root
+                                    ASTNodeSimple root4 = new ASTNodeSimple("-", true);
+                                    FrmlJ.Add(new ASTNodeSimple("ASTFRMLCODE", "AUTOGENERATED"));
+                                    FrmlJ.Add(new ASTNodeSimple("ASTLEFTSIDE", eh.Jname));
+                                    ASTNodeSimple ex = new ASTNodeSimple("ASTEXPRESSION", true);
                                     ex.Add(root4);
                                     FrmlJ.Add(ex);
-                                    ASTNode child41 = new ASTNode("ASTVARIABLE", eh.lhs);
-                                    ASTNode child42 = root1;
+                                    ASTNodeSimple child41 = new ASTNodeSimple("ASTVARIABLE", eh.lhs);
+                                    ASTNodeSimple child42 = root1;
                                     root4.Add(child41);
                                     root4.Add(child42);
                                     EquationHelper ehJ = new EquationHelper();
@@ -2612,18 +2612,18 @@ namespace Gekko
                                     if (Globals.revertSimpleJ)
                                     {
                                         //TODO: clean up, reorder, rename, do diagram
-                                        ASTNode FrmlJR = new ASTNode("ASTFRML", true);  //super-root
-                                        ASTNode root4 = new ASTNode("-", true);
-                                        ASTNode root4child = new ASTNode("/", true);
+                                        ASTNodeSimple FrmlJR = new ASTNodeSimple("ASTFRML", true);  //super-root
+                                        ASTNodeSimple root4 = new ASTNodeSimple("-", true);
+                                        ASTNodeSimple root4child = new ASTNodeSimple("/", true);
                                         root4.Add(root4child);
-                                        root4.Add(new ASTNode("ASTDOUBLE", "1"));
-                                        FrmlJR.Add(new ASTNode("ASTFRMLCODE", "AUTOGENERATED"));
-                                        FrmlJR.Add(new ASTNode("ASTLEFTSIDE", eh.Jname));
-                                        ASTNode ex = new ASTNode("ASTEXPRESSION", true);
+                                        root4.Add(new ASTNodeSimple("ASTDOUBLE", "1"));
+                                        FrmlJR.Add(new ASTNodeSimple("ASTFRMLCODE", "AUTOGENERATED"));
+                                        FrmlJR.Add(new ASTNodeSimple("ASTLEFTSIDE", eh.Jname));
+                                        ASTNodeSimple ex = new ASTNodeSimple("ASTEXPRESSION", true);
                                         ex.Add(root4);
                                         FrmlJR.Add(ex);
-                                        ASTNode child41 = new ASTNode("ASTVARIABLE", eh.lhs);
-                                        ASTNode child42 = root1;
+                                        ASTNodeSimple child41 = new ASTNodeSimple("ASTVARIABLE", eh.lhs);
+                                        ASTNodeSimple child42 = root1;
                                         root4child.Add(child41);
                                         root4child.Add(child42);
                                         EquationHelper ehJR = new EquationHelper();
@@ -2674,7 +2674,7 @@ namespace Gekko
                 int num = equationNode.Children.Count;
                 for (int i = 0; i < num; ++i)
                 {
-                    ASTNode equationNodeChild = equationNode.Children[i];
+                    ASTNodeSimple equationNodeChild = equationNode.Children[i];
                     bool last2 = false;
                     if (i == equationNode.Children.Count - 1) last2 = true;
                     bool first2 = false;
@@ -2786,7 +2786,7 @@ namespace Gekko
             }
         }
 
-        private static int GetLags(WalkerHelper2 wh2, string function, ASTNode lags)
+        private static int GetLags(WalkerHelper2 wh2, string function, ASTNodeSimple lags)
         {
             int intLags = -12345;
             if (lags.Text == "ASTINTEGER")
@@ -2818,7 +2818,7 @@ namespace Gekko
             return intLags;
         }
 
-        private static string HandleModelVal(ASTNode equationNode, WalkerHelper2 wh2)
+        private static string HandleModelVal(ASTNodeSimple equationNode, WalkerHelper2 wh2)
         {
             //string key = equationNode.GetChild(0).Text.Substring(1);
             string key = equationNode.GetChild(0).Text;
@@ -2833,7 +2833,7 @@ namespace Gekko
         }
 
 
-        private static void HandlePowFunction(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel, bool function)
+        private static void HandlePowFunction(EquationHelper eh, ASTNodeSimple equationNode, int depth, WalkerHelper2 wh2, ModelGekko model, int subTreeLag, bool isModel, bool function)
         {
             wh2.rightHandSideCsCode.Append("O.Pow(", EEmitType.computerReadable);
             wh2.rightHandSideCsCode.Append("Pow(", EEmitType.humanReadable);
@@ -3225,14 +3225,14 @@ namespace Gekko
             }
         }
 
-        public static void AST2(ASTNode node, int depth)
+        public static void AST2(ASTNodeSimple node, int depth)
         {
             G.Writeln(G.Blanks(depth * 2) + node.Text);
             if (node.Children != null)
             {
                 for (int i = 0; i < node.Children.Count; ++i)
                 {
-                    ASTNode child = (ASTNode)(node.Children[i]);
+                    ASTNodeSimple child = (ASTNodeSimple)(node.Children[i]);
                     AST2(child, depth + 1);
                 }
             }
@@ -3267,96 +3267,7 @@ namespace Gekko
         public bool afterEncountered = false;
         public bool after2Encountered = false;
         public string modelBlock = "Unnamed";
-    }
-
-    public class ASTNode
-    {
-        public IEnumerable ChildrenIterator()
-        {
-            //One good thing about this iterator is that you can use
-            //  foreach (ASTNode child in node.ChildrenIterator())
-            //even if node.Children = null. In that case, nothing
-            //is iterated, just as if node.Children.Count was 0.
-            //This is practical.
-            //Another benefit is that we may set .Children private at some
-            //point, so that its implementation may change (we use a List<> now).
-            if (this.Children != null)
-            {
-                foreach(ASTNode child in this.Children)
-                {
-                    yield return child;
-                }
-            }
-        }
-
-        public List<ASTNode> Children = null;  //make this private at some point
-        public ASTNode parent = null;
-        public string Text = null;
-        public int Line = 0;
-        public ASTNode(string text)
-        {
-            this.Text = text;
-        }
-        public ASTNode(string text, bool withChildren)
-        {
-            this.Text = text;
-            if (withChildren)
-            {
-                this.Children = new List<ASTNode>();
-            }
-        }
-
-        public ASTNode(string text, string textChild)
-        {
-            //adds a node with text and a singla child with textChild
-            this.Text = text;
-            this.Children = new List<ASTNode>();
-            this.Children.Add(new ASTNode(textChild));
-        }
-
-        public ASTNode(string text, string textChild1, string textChild2)
-        {
-            //adds a node with text and a singla child with textChild
-            this.Text = text;
-            this.Children = new List<ASTNode>();
-            this.Children.Add(new ASTNode(textChild1));
-            this.Children.Add(new ASTNode(textChild2));
-        }
-
-        public ASTNode GetChild(int i)
-        {
-            if (this.Children == null) return null;
-            if (i >= this.Children.Count) return null;  //does not exist
-            return this.Children[i];
-        }
-
-        public string GetChildString(int i)
-        {
-            //will be obsolete
-            //---> "@`stringcontent`"
-            ASTNode node = this.GetChild(i);
-            if (node == null) return "null";
-            else return "@`" + node.Text + "`";
-        }
-
-        public string GetChildText(int i)
-        {
-            ASTNode node = this.GetChild(i);
-            if (node == null) return null;
-            else return node.Text;
-        }
-
-        public void Add(ASTNode child)
-        {
-            this.Children.Add(child);
-            child.parent = this;
-        }
-
-        public string ToString()
-        {
-            return this.Text;
-        }
-    }
+    }    
 
     public class PositionInFile
     {
@@ -3445,7 +3356,7 @@ namespace Gekko
         public string frmlCode = "";
         public string leftSideFunction = "";
         public string variableOrFunctionIndicator = "";
-        public ASTNode rhs = null;
+        public ASTNodeSimple rhs = null;
         public Dictionary<string, string> vals = null;
     }    
 }

@@ -376,6 +376,7 @@
     <Compile Include="Parser.cs">
     </Compile>
     <Compile Include="Parser\ASTNode.cs" />
+    <Compile Include="Parser\ASTNodeSimple.cs" />
     <Compile Include="Parser\Frm\ParserFrmCommon.cs" />
     <Compile Include="Parser\Frm\ParserFrmCompileAST.cs" />
     <Compile Include="Parser\Frm\ParserFrmCreateAST.cs" />
