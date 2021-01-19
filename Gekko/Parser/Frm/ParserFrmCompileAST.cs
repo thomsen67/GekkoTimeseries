@@ -678,7 +678,7 @@ namespace Gekko.Parser.Frm
 
             foreach (EquationHelper eh in Program.model.modelGekko.equationsReverted)
             {
-                if (!EquationIsRunSeparatelyAfterSim(eh))
+                if (! Parser.Frm.ParserFrmWalkAST.EquationIsRunSeparatelyAfterSim(eh))
                 {
                     //Sanity check: each eq must be either auto, Y, T or L
                     //Should not be possible
@@ -737,6 +737,34 @@ namespace Gekko.Parser.Frm
                 Program.model.modelGekko.m2 = temp;
             }
         }
+
+        private static string GetCacheKey(bool isFix)
+        {
+            //isFix: if active, the endo/exo goals are added as lists
+            //       if inactive, the endo/exo goals are always reported as [none] no matter if there ARE goals or not
+            //       like this, we can use the same dll for a model with SIM and any endo/exo goals set -- the 
+            //       difference only kick in regarding SIM<fix>            
+            List<string> temp1 = new List<string>();
+            if (isFix) foreach (string s in Program.model.modelGekko.endogenized.Keys) temp1.Add(s.ToLower());
+            List<string> temp2 = new List<string>();
+            if (isFix) foreach (string s in Program.model.modelGekko.exogenized.Keys) temp2.Add(s.ToLower());
+            temp1.Sort();
+            temp2.Sort();
+            StringBuilder ss = new StringBuilder("ENDO-EXO-info. Endogenized: ");
+            foreach (string s in temp1) ss.Append(s + ",");
+            if (temp1.Count == 0) ss.Append("[none],");
+            ss.Remove(ss.Length - 1, 1);
+            ss.Append(". Exogenized: ");
+            foreach (string s in temp2) ss.Append(s + ",");
+            if (temp2.Count == 0) ss.Append("[none],");
+            ss.Remove(ss.Length - 1, 1);
+            ss.Append(". ");
+            string stacked = "false";
+            //if (G.Equal(Program.options.solve_forward_method, "stacked")) stacked = "true";  //stacked is obsolete
+            ss.Append("Stacked: " + stacked);
+            return ss.ToString();
+        }
+
 
 
     }
