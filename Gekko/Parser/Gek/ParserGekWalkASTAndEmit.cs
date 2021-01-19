@@ -4546,118 +4546,8 @@ namespace Gekko.Parser.Gek
                                 //do nothing, probably we can never end here
                             }
                         }
-                        break;
-                    case "ASTNAMEWITHDOT":
-                        {
-                            //Can only have 2 ASTNAME's as children
-                            if (node.ChildrenCount() == 1)
-                            {                                
-                                //no dot in this name
-                                node.Code.A(node[0].Code);
-                                node.nameSimpleIdent = node[0].nameSimpleIdent;  //inherits this info
-                            }
-                            else if (node[1].Text == "ASTINTEGER")
-                            {
-                                //stuff like fy.1
-                                if (Globals.useDotFunctionalityInParser)
-                                {
-                                    //for instance in fy.1                            
-                                    node.Code.A(node[0].Code);
-                                    node.nameSimpleIdent = node[0].nameSimpleIdent;  //inherits this info
-                                    node.dotNumber = node[1].Code.ToString();
-                                }
-                                else
-                                {
-                                    G.Writeln2("*** ERROR: Problem with .1, .2, etc. -- please use [-1], [-2], etc.");
-                                    throw new GekkoException();
-                                    node.Code.A(node[0].Code);
-                                    node.nameSimpleIdent = node[0].nameSimpleIdent;  //inherits this info
-                                }
-
-                            }
-                            else
-                            {
-                                ////NOT ACTIVE AT THE MOMENT
-                                ////NOT ACTIVE AT THE MOMENT (versions, like fY.sim1)
-                                ////NOT ACTIVE AT THE MOMENT
-                                //G.Writeln2("*** ERROR: name with versions (e.g. fY.s0) not allowed at this point");
-                                //throw new GekkoException();
-                                node.Code.A("O.Add(" + Globals.smpl + ", O.Add(" + Globals.smpl + ", " + node[0].Code + ", new ScalarString(`.`)), " + node[1].Code + ")");
-                                if (node[0].nameSimpleIdent != null && node[1].nameSimpleIdent != null)
-                                {
-                                    node.nameSimpleIdent = node[0].nameSimpleIdent + "." + node[1].nameSimpleIdent;
-                                    node.Code.CA("new ScalarString(`" + node.nameSimpleIdent + "`)");  //overrides
-                                }                               
-                            }
-                        }
-                        break;
-                    //case "ASTNAMESLIST":
-                    //    {
-                    //        node.Code.A("o" + Num(node) + ".namesList = new List<string>();" + G.NL);
-                    //        foreach (ASTNode child in node.ChildrenIterator())
-                    //        {
-                    //            node.Code.A("o" + Num(node) + ".namesList.Add(O.ConvertToString(" + child.Code + "));" + G.NL);
-                    //        }
-                    //    }
-                    //    break;
-                    //case "ASTLISTWITHBANK":
-                    //    {
-                    //        node.Code.A(AstBankHelperList(node, w));
-                    //    }
-                    //    break;
-                    //case "ASTNAMEWITHBANK":
-                    //    {
-                    //        if (Globals.version24)
-                    //        {
-
-                    //        }
-                    //        else
-                    //        {
-
-                    //            //Must always have 2 children, ASTBANK and ASTNAMEWITHDOT
-                    //            string lagTypeCs = null;
-                    //            if (node[1].Text == "ASTNAMEWITHDOT")  //probably is always so, but we check it.
-                    //            {
-                    //                if (Globals.useDotFunctionalityInParser)
-                    //                {
-                    //                    lagTypeCs = node[1].dotNumber;
-                    //                }
-                    //            }
-
-                    //            if (node[0].ChildrenCount() == 0 && node[1].ChildrenCount() == 1 && node[1][0].Text == "ASTNAME" && node[1][0].ChildrenCount() == 1 && node[1][0][0].Text == "ASTSCALAR")
-                    //            {
-                    //                G.Writeln2("*** ERROR #24737643");
-                    //                throw new GekkoException();
-                    //                ////For instance this structure corresponding to "%b". This is interpreted as a VAL scalar even though it might be a STRING scalar pointing to a timeseries.
-                    //                ////ASTNAMEWITHBANK
-                    //                ////  ASTBANK
-                    //                ////  ASTNAMEWITHDOT
-                    //                ////    ASTNAME
-                    //                ////      ASTSCALAR
-                    //                ////        ASTPERCENTNAMESIMPLE
-                    //                ////          b
-                    //                //node[1][0][0].Code = null;  //sub-nodes have been visited: this result gets overridden
-                    //                //HandleScalar(node[1][0][0], false, wh2);
-                    //                //node.Code.CA(node[1][0][0].Code;                                
-                    //            }
-                    //            else
-                    //            {
-
-                    //                string code = AstBankHelper(node, w, 0);
-                    //                if (Globals.useDotFunctionalityInParser && lagTypeCs != null)
-                    //                {
-                    //                    //This is a fY.1 type of variable.
-                    //                    //Why does this work, and why is 'code' not used??
-                    //                    node.Code.CA("O.Indexer(smpl, " + node.Code + ", false, " + lagTypeCs + ")");
-                    //                }
-                    //                else
-                    //                {
-                    //                    node.Code.A(code);
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-                    //    break;
+                        break;                    
+                    
                     case "ASTNO":
                         {
                             node.Code.CA("new ScalarString(`no`)");
@@ -7513,7 +7403,7 @@ namespace Gekko.Parser.Gek
                 if (fa != null) choice = 1;
                 else choice = 2;
             }
-            if (choice == 2 && Globals.useCache == false) choice = 3;
+            if (choice == 2) choice = 3;
         }
 
         private static string HandleNegate(ASTNode node)
@@ -7529,11 +7419,7 @@ namespace Gekko.Parser.Gek
                     minus = "-";
                     node.Parent.IgnoreNegate = true;
                 }
-                else if (node.Parent.Text == "ASTNAMEWITHDOT")
-                {
-                    //For parent ASTNAMEWITHBANK nothing is ignored 
-                    minus = "-";                    
-                }
+                
             }
             return minus;
         }

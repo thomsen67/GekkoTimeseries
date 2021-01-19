@@ -197,23 +197,13 @@ namespace Gekko
         public const string bankNumberiName = "bankNumber";
         public const string bankNumberiMax = "1";
 
-        public static bool showTimings = false;  //use comand TIMINGS                
-
-        public static string stackedTimeSeparator = "___";
-        public static bool stackedPrintTimings = false;
+        public static bool showTimings = false;  //use comand TIMINGS                        
 
         public static string protobufFileName = "databank.bin";
         public static string protobufFileName2 = "databank.data"; //In Gekko 2.2 it might be wise to change to for instance databank.data, this setting is only for reading, and it tests Program.options.databank_file_gbk_internal too
-
-        public static bool useRfFr = false;
-
-        public static bool fixIndexerMaybeTransform = false;
-
+        
         public static List<string> r_fileContent = null;
         public static List<string> python_fileContent = null;
-
-        public static bool useCache = false;  //also makes sure vars GetTimeSeries is outside time loop in SERIES statement! See #9875235      
-        public static bool useDotFunctionalityInParser = false;
 
         public static bool UNITTESTFOLLOWUP = false;
         public static bool UNITTESTFOLLOWUP_important = false;
@@ -265,14 +255,10 @@ namespace Gekko
 
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";
-
-        public List<Databank> bankOpen = new List<Databank>();
-
+        
         public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
-
-        public static bool smart1 = true;
-
+        
         public static List<Action<string, GekkoTime>> predictActions = null;
 
         public static string functionTP1Cs = Globals.smpl + ", p";

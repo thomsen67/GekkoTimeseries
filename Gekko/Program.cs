@@ -7610,7 +7610,7 @@ namespace Gekko
                 }
             }
 
-            if (Globals.stackedPrintTimings) G.Writeln2("Ordering...");
+            
             //=================================
             //=================================
             //======== Ordering start =========
@@ -7744,7 +7744,7 @@ namespace Gekko
             //=================================
             //=================================
 
-            if (Globals.stackedPrintTimings) G.Writeln2("Ordering end");
+            
 
             simulRecursive = null;  //the ordering is not correct in simulRecursive: we use simulPrologue instead below.
             //at the moment, this is not strictly necessary, but still give a nicer ordering
@@ -7820,54 +7820,7 @@ namespace Gekko
 
             Dictionary<int, string> fromEqNumberToBNumberRecursiveHelper = new Dictionary<int, string>();
             foreach (int i in Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW) fromEqNumberToBNumberRecursiveHelper.Add(i, null);
-
-            if (Globals.useRfFr)
-            {
-
-                if (Globals.stackedPrintTimings) G.Writeln2("RF start");
-                //sparseInfoSmartCondensed knows for a recursive var feedback vars
-                //it depends upon.
-                //Corresponds to RF part of matrix
-                //never relevant for goals search, since means are feedback type.
-                CaseInsensitiveHashtable checkRecursiveHashtable = new CaseInsensitiveHashtable();
-                foreach (int varRows in Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW)
-                {
-                    checkRecursiveHashtable.Add(varRows, "1");
-                    List<int> varsRows = Program.model.modelGekko.m2.sparseInfoSmartCondensed[varRows];
-                    List<int> toRemove = new List<int>();
-                    List<int> toAdd = new List<int>();
-                    foreach (int varCols in varsRows)
-                    {
-                        //slack to use a Contains() on a List here?
-                        //if (model.m2.fromEqNumberToBNumberRecursiveNEW.Contains(varCols))
-                        if (fromEqNumberToBNumberRecursiveHelper.ContainsKey(varCols))
-                        {
-                            if (!checkRecursiveHashtable.Contains(varCols))
-                            {
-                                G.Writeln2("*** ERROR in feedback/recursive");
-                            }
-                            //recursive type: look into which feedback vars have already been
-                            //fed into it, and pass them on.
-                            foreach (int var2 in Program.model.modelGekko.m2.sparseInfoSmartCondensed[varCols])
-                            {
-                                if (Array.IndexOf(Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW, var2) != -1)
-                                {
-                                    if (!toAdd.Contains(var2))
-                                    {
-                                        toAdd.Add(var2);
-                                    }
-                                }
-                            }
-                            toRemove.Add(varCols);
-                        }
-                    }
-                    RemoveArrayListFromArrayList(varsRows, toRemove);
-                    AddArrayListToArrayList(varsRows, toAdd);
-                }
-                if (Globals.stackedPrintTimings) G.Writeln2("RF end");
-            }
-
-            if (Globals.stackedPrintTimings) G.Writeln2("transpose start");
+            
             //transposing matrix
             //never relevant for goals search, since means are feedback type.
             Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed = new List<List<int>>();
@@ -7879,42 +7832,7 @@ namespace Gekko
                     Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed[i] = new List<int>();
                 }
             }
-            if (Globals.stackedPrintTimings) G.Writeln2("transpose end");
-
-            if (Globals.useRfFr)
-            {
-                if (Globals.stackedPrintTimings) G.Writeln2("FR start");
-
-                //Corresponds to FR part of matrix
-                //never relevant for goals search, since means are feedback type.
-                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
-                {
-                    if (Program.model.modelGekko.m2.sparseInfoSmartCondensed[i] != null)
-                    {
-                        List<int> row = Program.model.modelGekko.m2.sparseInfoSmartCondensed[i];
-                        foreach (int j in row)
-                        {
-                            if (!(Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed[j]).Contains(i))
-                            {
-                                //((ArrayList)model.m2.sparseInfoSmartCondensedTransposed[j]).Add(i);
-
-                                //slack to use a Contains() on a List here?
-                                //if (model.m2.fromEqNumberToBNumberRecursiveNEW.Contains(i))
-                                if (fromEqNumberToBNumberRecursiveHelper.ContainsKey(i))
-                                {
-                                    //this is an extra condition, implying that we only get
-                                    //RF-type array for all the first n columns
-                                    //the transposed version is not identical to non-transposed
-                                    (Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed[j]).Add(i);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (Globals.stackedPrintTimings) G.Writeln2("FR end");
-            }
-
+            
             //never relevant for goals search, since means are feedback type.
             Program.model.modelGekko.m2.sparseInfoSmartTransposed = new List<List<int>>();
             for (int i = 0; i < Program.model.modelGekko.m2.sparseInfoSmart.Count; i++)
@@ -12448,10 +12366,7 @@ namespace Gekko
 
         private static void LUDecompose(ref double[,] lu, ref int[] indx)
         {
-            if (Globals.stackedPrintTimings)
-            {
-                Density(lu);
-            }
+            
 
             //Running a 1000x1000 dense matrix with code below takes about 2800 ms
             //Compare this with the 1200 ms described here: http://mathnetnumerics.codeplex.com/discussions/360326
@@ -12545,11 +12460,7 @@ namespace Gekko
                 }
             }
 
-            if (Globals.stackedPrintTimings)
-            {
-                //G.Writeln("Sparsity AFTER:");
-                //Density(lu);
-            }
+            
 
         }
 
@@ -15367,27 +15278,7 @@ namespace Gekko
                         G.Writeln("Timings shown...");
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == 5)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "cache"))
-                    {
-                        if (Globals.useCache == true)
-                        {
-                            Globals.useCache = false;
-                            G.Writeln2("Set useCache to false");
-                        }
-                        else if (Globals.useCache == false)
-                        {
-                            Globals.useCache = true;
-                            G.Writeln2("Set useCache to true");
-                        }
-                        return "";
-                    }
-
-                }
+                }                
                 
                 if (s2.Length == 5)
                 {

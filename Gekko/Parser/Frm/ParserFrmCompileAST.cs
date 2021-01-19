@@ -43,13 +43,13 @@ namespace Gekko.Parser.Frm
                 Program.model.modelGekko.m2 = new Model2();  //deleting everything here, this is most safe rather than reusing the object
 
                 //this runs very fast
-                if (Globals.stackedPrintTimings) G.Writeln2("EndogenizeExogenizeStuff start");
+                
                 Program.EndogenizeExogenizeStuff(isFix); //depends upon which endo/exo variables are set
-                if (Globals.stackedPrintTimings) G.Writeln2("EndogenizeExogenizeStuff end");
+                
                 //takes about 0.6 sec on dec09
-                if (Globals.stackedPrintTimings) G.Writeln2("FeedbackOrderingStuff start");
+                
                 Program.FeedbackOrderingStuff(modelType, isCalledFromModelStatement); //depends upon which endo/exo variables are set
-                if (Globals.stackedPrintTimings) G.Writeln2("FeedbackOrderingStuff end");
+                
             }
 
             //The .m2 object is in principle recreated each time this method is called (for instance because of ENDO/EXO statement),
@@ -65,9 +65,9 @@ namespace Gekko.Parser.Frm
                 EmitCsCodeAndCompileModel(ECompiledModelType.Gauss, isCalledFromModelStatement);  //This method is only called from here
             }
 
-            //if (Globals.stackedPrintTimings) G.Writeln2("Emit start");
+            
             EmitCsCodeAndCompileModel(modelType, isCalledFromModelStatement);  //This method is only called from here
-            //if (Globals.stackedPrintTimings) G.Writeln2("Emit end");
+            
 
             G.WritelnGray("¤¤¤ Hash: " + cacheKey);
 
