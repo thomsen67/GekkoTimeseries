@@ -2874,75 +2874,9 @@ namespace Gekko.Parser.Gek
                                 }
                             }
                         }
-                        break;
-
-                    case "ASTFUNCTIONDEFARGS":
-                        {
-                            //No code to be harvested, function args are completely primitive {type, name} items put in functionArguments container.
-                        }
-                        break;
-                    case "ASTFUNCTIONDEFARG":
-                        {
-                            //No code to be harvested, function args are completely primitive {type, name} items put in functionArguments container.
-                            //handled in ASTFUNCTIONDEFRHSSIMPLE and ASTFUNCTIONDEFRHSTUPLE
-                        }
-                        break;
-                    case "ASTFUNCTIONDEFRHSTUPLE":
-                        {                            
-                            //TODO TODO TODO check that args have different names     
-                            int counter = 0;
-                            int paramCount = -12345;
-                            foreach (ASTNode child in node.ChildrenIterator())
-                            {
-                                counter++;
-                                if (counter == 1) paramCount = w.uFunctionsHelper.storage.Count;
-                                FunctionArgumentsHelperElements fah = new FunctionArgumentsHelperElements();                                
-                                fah.parameterName = child[1].Text;
-                                fah.type = child[0].Text;
-                                fah.tupleNameCode = Globals.functionParameterCode + fah.type + "_" + paramCount;
-                                fah.parameterCode = Globals.functionParameterCode + fah.type + "_" + paramCount + ".tuple" + (counter - 1);
-                                fah.tupleCount = node.ChildrenCount();
-                                w.uFunctionsHelper.storage.Add(fah);
-                            }                            
-                        }
-                        break;
-                    case "ASTFUNCTIONDEFRHSSIMPLE":
-                        {
-                            //TODO TODO TODO check that args have different names                         
-                            ASTNode child = node[0];
-                            FunctionArgumentsHelperElements fah = new FunctionArgumentsHelperElements();
-                            fah.parameterName = child[1].Text;
-                            fah.type = child[0].Text;
-                            fah.parameterCode = Globals.functionParameterCode + fah.type + "_" + fah.parameterName + w.uFunctionsHelper.storage.Count;
-                            w.uFunctionsHelper.storage.Add(fah);
-                        }
-                        break;                                        
-                    case "ASTFUNCTIONDEFLHSTUPLE":
-                        {
-                            //do nothing
-                        }
-                        break;                    
-                    case "ASTFUNCTIONDEFTYPE":
-                            {
-                                if (node[0].Text == "ASTFUNCTIONDEFLHSTUPLE")
-                                {                                    
-                                    foreach (ASTNode child in node[0].ChildrenIterator())
-                                    {
-                                        w.uFunctionsHelper.lhsTypes.Add(child.Text);
-                                    }                                    
-                                }
-                                else
-                                {
-                                    w.uFunctionsHelper.lhsTypes.Add(node[0].Text);
-                                }
-
-                            }
-                            break;
-                    case "ASTFUNCTIONDEFNAME":
-                        {
-                            w.uFunctionsHelper.functionName = node[0].Text;
-                        }
-                        break;
+                        break;                                       
+                    
+                    
                     case "ASTGENERIC1":
                         {
                             //This catches name:name or identDigit.                            
@@ -3999,7 +3933,7 @@ namespace Gekko.Parser.Gek
                                         //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
                                     }
 
-                                    if (Globals.series_dynamic)
+                                    if (true)
                                     {
                                         //node.Code.A(sb);
 
@@ -6005,38 +5939,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("`" + node[0].Code + "`");
                         }
-                        break;
-                    case "ASTVAL":
-                        {
-                            if (node[0].Text == "?")
-                            {
-                                if (node.ChildrenCount() > 1)
-                                {
-                                    node.Code.A("O.Val.Q(`" + node[1].Text + "`);" + G.NL);
-                                }
-                                else
-                                {
-                                    node.Code.A("Program.Mem(`val`);" + G.NL);
-                                }
-                            }
-                            else
-                            {
-                                if (Globals.version24)
-                                {
-                                    string s1 = node[0].Code.ToString();
-                                    string s2 = node[1].Code.ToString();
-
-                                    node.Code.A("O.Assign(" + s1 + ", " + s2 + ", " + "EVariableType.Val");
-
-
-                                }
-                                else
-                                {
-                                    node.Code.A(HandleVal(node, node[1].Code.ToString(), w));
-                                }
-                            }
-                        }
-                        break;
+                        break;                    
                     case "ASTMETA":
                         {
                             GetCodeFromAllChildren(node);
@@ -7074,15 +6977,7 @@ namespace Gekko.Parser.Gek
             else destination = w.headerCs;
             return destination;
         }
-
-        //private static void AddSplitMarkers(ASTNode node)
-        //{
-        //    if (Globals.newSplit)
-        //    {
-        //        node.Code.Prepend(Globals.splitSTART);
-        //        node.Code.A(Globals.splitSTOP);
-        //    }
-        //}
+                
 
         private static void AstListHelper(ASTNode node, W w, string simpleIdent, bool stringify)
         {
@@ -7355,112 +7250,7 @@ namespace Gekko.Parser.Gek
                 return s + sb.ToString();
             }
             return s;
-        }
-
-        //private static void HandleScalar(ASTNode node, bool isCurlyWithoutPercent, W w)
-        //{
-        //    bool stringify = false;
-        //    if (node.ChildrenCount() > 0 && (node[0].Text == "ASTDOLLARPERCENTNAMESIMPLE" || node[0].Text == "ASTDOLLARPERCENTPAREN")) stringify = true;
-            
-        //    bool transformationAllowed = true;
-        //    bool isPartOfComposedName = false;
-            
-        //    if ((node.Number == 1 && node.Parent.Text == "ASTNAMEWITHBANK") 
-        //        || node.Parent.Text == "ASTNAME"
-        //        || node.Parent.Text == "ASTCURLY"
-        //        || node.Parent.Text == "ASTCURLYSIMPLE")
-        //    {
-        //        //For instance base:%s. If %s is NAME 'fy', this would be equal to base:fy.                            
-        //        //In that case, O.GetScalar must not be allowed to transform the string/name into a timeseries,
-        //        //because we are going to look up the timeseries in the databank (in the example: base databank).
-        //        //Therefore we call an overload of O.GetScalar()
-        //        transformationAllowed = false;
-        //    }
-
-        //    if (Globals.nameFix)
-        //    {
-        //        if (node.Parent.Text == "ASTLISTITEM")
-        //        {
-        //            transformationAllowed = false;
-        //        }                
-        //    }
-
-        //    if ((node.Parent.Text == "ASTNAME" && node.Parent.ChildrenCount() > 1)
-        //        || (node.Parent.Text == "ASTCURLY" && node.Parent.ChildrenCount() == 1))
-        //    {
-        //        isPartOfComposedName = true; //composed names cannot be looked up in cache                                            
-        //    }
-            
-        //    string scalarSimpleIdent = null;
-        //    if (isCurlyWithoutPercent)
-        //    {
-        //        // {s}
-        //        scalarSimpleIdent = node.Text;
-        //    }
-        //    else
-        //    {
-        //        if (node[0].Text == "ASTPERCENTNAMESIMPLE" || node[0].Text == "ASTDOLLARPERCENTNAMESIMPLE")
-        //        {
-        //            // %s, not %(...), the %s may be inside {} like {%s}
-        //            scalarSimpleIdent = node[0][0].Text;
-        //        }
-        //    }
-
-        //    if (scalarSimpleIdent != null)
-        //    {
-        //        //either {s} or %s
-        //        string fa = FindFunctionArguments(node, w, scalarSimpleIdent);
-        //        if (fa != null)
-        //        {
-        //            node.Code.A(fa);  //????????? What is this????????
-        //        }
-        //        else
-        //        {                   
-
-        //            //hmmm why do we have isPartOfComposedName and transformationAllowed at the same time
-        //            //is it not the same thing?
-
-        //            if (!isPartOfComposedName && w.wh.localStatementCache != null)
-        //            {
-        //                //not for instance a%s or %(%s) but clean %s, and part of GENR statement                        
-        //                //In that case, we look for the variable in the local GENR cache
-        //                string refCode = "ts" + ++Globals.counter;
-
-        //                string fallBackCode = null;
-
-        //                string t = "false";
-        //                if (transformationAllowed) t = "true";
-        //                string s = "false";
-        //                if (stringify) s = "true";
-
-        //                fallBackCode = "O.GetScalar(`" + scalarSimpleIdent + "`, " + t + ", " + s + ")";
-                        
-        //                string xx = null; w.wh.localStatementCache.TryGetValue(fallBackCode, out xx);
-        //                if (xx != null)
-        //                {
-        //                    //This complicated timeseries (or scalar) has been seen before in this particular GENR statement                        
-        //                    node.Code.CA(xx);
-        //                }
-        //                else
-        //                {
-        //                    //has not been seen before
-        //                    w.wh.localStatementCache.Add(fallBackCode, refCode);
-        //                    node.Code.CA(refCode);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                string notUsed = null;
-        //                node.Code.A(CacheRefScalarCs(out notUsed, scalarSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.OnRightHandSide, null, false, transformationAllowed, stringify));
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //not {s} or {%s}, but something like {%s1+%s2}
-        //        node.Code.A("O.ZScalar(" + node[0].Code + ")");
-        //    }
-        //}
+        }        
 
         //This method converts a simple scalar like '%s' into a reference to 'scalar117' (global IVariable), via the method O.GetScalarFromCache()
         private static string CacheRefScalarCs(out string scalarNameInGlobalCache, string scalarSimpleIdent, GekkoDictionary<string, string> scalarCache, StringBuilder headerCs, EScalarRefType type, string rhsCs, bool isName, bool transformationAllowed, bool stringify)

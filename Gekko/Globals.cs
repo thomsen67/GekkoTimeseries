@@ -60,11 +60,8 @@ namespace Gekko
 
         public static bool decompSubstitute = false;
 
-        public static StreamWriter sw = null;
-
-        public static bool gnuplotfix = true;
-
-        public static bool prompting = true;
+        public static StreamWriter sw = null;        
+        
         public static List<string> unitTestsPromtingHelper = null;
 
         public static bool excelDna = false;  //true for use with ExcelDna solution
@@ -120,24 +117,14 @@ namespace Gekko
 
         public static bool eliminateConcatenator = true;
 
-        public static bool modeIntendedWarning = false;
-
-        public static bool fixFOr = true;
+        public static bool modeIntendedWarning = false;        
 
         public static string blockHelper = "<[time]>";
 
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction        
         public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTIF_OLD", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" } };
 
-        public static string errorHelper = null;
-
-        public static bool newEval = true;
-
-        public static bool series_dynamic = true;
-
-        public static bool fixLookup = true;
-
-        public static bool useIndexerAlone = false;
+        public static string errorHelper = null;        
 
         public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
@@ -153,17 +140,7 @@ namespace Gekko
 
         public static GekkoDictionary<string, int> precedents = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
-
-        public static bool autoSigils = false; //adds sigils in "ACCEPT val v = ...", for loop "FOR string s = ...", function/proc-def "FUNCTION val f(string s, ...)", assign "string s = ..."
-
-        public static bool version30 = true;
-
-        public static bool version24 = true;
-
-        public static bool parser3 = true;
-
-        public static bool testFileChange = true;
-
+        
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";
         public const string defaultCommandFileExtension = "gcm";  //merge this with the above...
@@ -175,29 +152,16 @@ namespace Gekko
 
         public static string serviceMessage = "[service message]";
         public static string serviceMessageTruncated = "[further service messages truncated]";
-
-        public static bool nameFix = true;
-
-        public static bool readImportFilter = false;
-
-        public static bool excelFix = true;
-
-        //Convert to Dictionary if this becomes big.
-        public static List<string> lagFunctions = new List<string> { "dlog", "dif", "diff", "pch", "dlogy", "dify", "diffy", "pchy", "movsum", "movavg", "lag", "avgt", "sumt" };
-
+        
         public static Dictionary<string, string> parentheses = new Dictionary<string, string> { { "(", ")" }, { "[", "]" }, { "{", "}" } };
         public static Dictionary<string, string> parenthesesInvert = new Dictionary<string, string> { { ")", "(" }, { "]", "[" }, { "}", "{" } };
-        public static string comma = ";";
-
+        
         public static string splitStart = "//[[commandStart]]";
         public static string splitBit = "//[[command";
         public static string splitSpecial = "//[[commandSpecial]]";
         public static string splitEnd = "//[[commandEnd]]";
 
         public static string artificial = "artificial_parent_at_the_top_of_the_node_tree";
-
-        public static bool newSplit = true;
-        public static string functionParameterCode = "param_";
 
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
@@ -222,12 +186,9 @@ namespace Gekko
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
 
-        public const string procedure = "procedure___";
-        public const string functionAndProcedureQuestion = "?";
+        public const string procedure = "procedure___";        
 
         public static string databankformatUrl = @"www.t-t.dk/gekko/databankformat";
-
-        public static System.Windows.Forms.Form mFrmDummyHost = new System.Windows.Forms.Form();
 
         public static int graphBackground = 255; //221 before
 

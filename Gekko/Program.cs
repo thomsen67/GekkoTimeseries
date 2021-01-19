@@ -19555,10 +19555,7 @@ namespace Gekko
 
             try
             {
-
-                System.Windows.Forms.Help.ShowHelp(null, path, s2);  //seems to give the same
-                //System.Windows.Forms.Help.ShowHelp(Globals.mFrmDummyHost, path, s2);  //problem if F1 and then HELP tell
-
+                System.Windows.Forms.Help.ShowHelp(null, path, s2);  //seems to give the same                
             }
             catch (Exception e)
             {
@@ -20736,27 +20733,14 @@ namespace Gekko
 
         public static void CallEval(string conditionals, string statement)
         {
-            if (!Globals.newEval)
+            string c = null;
+            if (!G.NullOrEmpty(conditionals))
             {
-                Program.RunCommandCalledFromGUI("EVAL " + statement, new P()); //produces Func<> Globals.expression with the expression 
+                c = "$ (" + conditionals + ")";
             }
-            else
-            {
-                string c = null;
-                if (!G.NullOrEmpty(conditionals))
-                {
-                    c = "$ (" + conditionals + ")";
-                }
-                string s = c + " = " + statement;
-                Program.RunCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
-
-                if (Globals.expressions == null)
-                {
-
-                }
-
-
-            }
+            string s = c + " = " + statement;
+            Program.RunCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
+            
         }
 
         private static int ReadGamsEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname,  TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
@@ -27605,7 +27589,7 @@ namespace Gekko
                 G.Writeln();
                 throw new GekkoException();
             }
-            if (Globals.testFileChange)
+            if (true)
             {
                 if (removed.fileHash == null)
                 {
@@ -36428,16 +36412,12 @@ namespace Gekko
                         }
                         else
                         {
-                            if (Globals.gnuplotfix)
+                            if (true)
                             {
                                 double d = -0.5;
                                 xAdjustment = "($" + (iii + 1) + " +(" + d + "))" + ":(" + ss + ")" + ":(" + d_width3 + ")";
                             }
-                            else
-                            {
-
-                                xAdjustment = "" + (iii + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
-                            }
+                            
                         }
                     }
                     else
@@ -36445,7 +36425,7 @@ namespace Gekko
                         //adjusting horizontal position for clustered boxes
                         double d = (boxesYCounter + boxesY2Counter - 1) * d_width - left;
 
-                        if (Globals.gnuplotfix)
+                        if (true)
                         {
                             if (!isInside) d = d - 0.5;
                         }
@@ -40783,7 +40763,7 @@ namespace Gekko
                 workbooks.Close();
                 Marshal.ReleaseComObject(workbooks);
                 excel.Quit();
-                if (!Globals.excelFix) Marshal.ReleaseComObject(excel);
+                // Marshal.ReleaseComObject(excel);
             }
             //G.Writeln("full excel " + G.Seconds(t00));
             return matrix;
