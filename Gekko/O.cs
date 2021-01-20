@@ -9330,7 +9330,7 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Efter(this.t1, this.t2);
+                SolveCommon.Efter(this.t1, this.t2);
             }
         }
 
@@ -10703,7 +10703,7 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Sim(this);
+                SolveCommon.Sim(this);
                 if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     if (Globals.modeIntendedWarning)
