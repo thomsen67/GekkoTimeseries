@@ -378,12 +378,10 @@
     <Compile Include="Parser\Frm\ParserFrmCommon.cs" />
     <Compile Include="Parser\Frm\ParserFrmCompileAST.cs" />
     <Compile Include="Parser\Frm\ParserFrmCreateAST.cs" />
-    <Compile Include="Parser\Frm\ParserFrmTemplates.cs" />
     <Compile Include="Parser\Frm\ParserFrmWalkAST.cs" />
     <Compile Include="Parser\Gek\ParserGekCommon.cs" />
     <Compile Include="Parser\Gek\ParserGekCompileAndRunAST.cs" />
     <Compile Include="Parser\Gek\ParserGekCreateAST.cs" />
-    <Compile Include="Parser\Gek\ParserGekTemplates.cs" />
     <Compile Include="Parser\Gek\ParserGekWalkASTAndEmit.cs" />
     <Compile Include="Parser\ParserCommon.cs" />
     <Compile Include="Private.cs" />
