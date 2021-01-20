@@ -6391,7 +6391,7 @@ namespace Gekko.Parser.Gek
         public string Orientation
         {
             get { return orientation; }
-            set { FailIfImmutable(); orientation = value; }
+            set { FailIfImmutable(); orientation = value; } 
         }
 
     }
