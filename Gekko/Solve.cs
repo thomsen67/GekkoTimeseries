@@ -15,6 +15,90 @@ namespace Gekko
 {
     public static class SolveCommon
     {
+        public static void UndoAndPackStuff(out LinkContainer lc1, out LinkContainer lc2, GekkoTime tStart, GekkoTime tEnd, GekkoTime tStart0, int obsWithLags, int obsSimPeriod, double[,] a2)
+        {
+            lc1 = new LinkContainer("");
+            Globals.linkContainer.Add(lc1.counter, lc1);
+            Globals.undoSim = new UndoSim();
+            Globals.undoSim.id = lc1.counter;
+            Globals.undoSim.a = a2;
+            Globals.undoSim.tStart0 = tStart0.Add(0); //probably not necessary to clone, but for safety...
+            Globals.undoSim.tStart = tStart.Add(0);
+            Globals.undoSim.tEnd = tEnd.Add(0);
+            Globals.undoSim.obsWithLags = obsWithLags;
+            Globals.undoSim.obsSimPeriod = obsSimPeriod;
+            lc2 = new LinkContainer("");
+            Globals.linkContainer.Add(lc2.counter, lc2);
+            Globals.packSim = new PackSim();
+            Globals.packSim.id = lc2.counter;
+            Globals.packSim.a = a2;
+            Globals.packSim.tStart0 = tStart0.Add(0); //probably not necessary to clone, but for safety...
+            Globals.packSim.tStart = tStart.Add(0);
+            Globals.packSim.tEnd = tEnd.Add(0);
+            Globals.packSim.obsWithLags = obsWithLags;
+            Globals.packSim.obsSimPeriod = obsSimPeriod;
+        }
+
+
+
+        public static void SimulateResiduals(double[] b, double[] r, Type assembly)
+        {
+            Object[] args = new Object[3];
+            args[0] = b;
+            args[1] = r;
+            args[2] = Globals.scaleNewtonValues;
+            assembly.InvokeMember("simulFeedbackAll", BindingFlags.InvokeMethod, null, null, args);
+
+            if (Program.options.solve_newton_robust)
+            {
+                double newtonStartingValuesFixExtra = 0d;
+                for (int i = 0; i < Globals.newtonRobustHelper1; i++)
+                {
+                    newtonStartingValuesFixExtra += Globals.newtonRobustHelper2[i];
+                    //G.Writeln2(i + " " + Globals.newtonStartingValuesHelper2[i]);
+                }
+                for (int i = 0; i < r.Length; i++)
+                {
+                    double number = r[i];
+                    //double number0 = number;
+
+                    //The error must accumulate, so if the residual is negative, something more is subtracted.
+                    if (number < 0)
+                    {
+                        r[i] += -newtonStartingValuesFixExtra;
+                    }
+                    else
+                    {
+                        r[i] += newtonStartingValuesFixExtra;
+                    }
+
+                    //if (number * number < number0 * number0) throw new GekkoException(); //assert
+                    //f += number * number;                
+                }
+            }
+
+            if (Program.options.solve_newton_robust)
+            {
+                //do not record more
+                Globals.newtonRobustHelper1 = -12345;
+            }
+
+            return;
+        }
+
+        public static void SimulateResidual(double[] b, double[] r, int n, Type assembly)
+        {
+            Object[] args = new Object[4];
+            args[0] = b;
+            args[1] = r;
+            args[2] = n;
+            args[3] = Globals.scaleNewtonValues;
+            assembly.InvokeMember("simulFeedbackSingle", BindingFlags.InvokeMethod, null, null, args);
+            return;
+        }
+
+
+
         public static void SimulateSimulPrologue(Type assembly)
         {
             if (Program.options.solve_newton_robust)
@@ -997,8 +1081,8 @@ namespace Gekko
                                 G.Writeln();
                             }
                             double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers);
-                            LinkContainer lc1;
-                            LinkContainer lc2;
+                            Program.LinkContainer lc1;
+                            Program.LinkContainer lc2;
                             UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
                             if (Program.FindException(e, "simFailure"))
                             {
@@ -1037,7 +1121,7 @@ namespace Gekko
                             }
                             else if (modelType == ECompiledModelType.Res)
                             {
-                                SolveRes(Program.model.modelGekko.b);
+                                SolveGauss777.SolveRes(Program.model.modelGekko.b);
                             }
                             else if (modelType == ECompiledModelType.Gauss || modelType == ECompiledModelType.GaussFailSafe)
                             {
@@ -1694,6 +1778,21 @@ namespace Gekko
 
     public static class SolveGauss777
     {
+        /// <summary>
+        /// Solve by means of Gauss-Seidel method
+        /// </summary>
+        /// <param name="b">Array with variables</param>
+        /// <param name="simulateResults">Results</param>
+        /// <param name="culprit">Last variable to converge</param>
+        public static void SolveRes(double[] b)
+        {
+            Type assembly = SolveCommon.GetAssemblyFromModelType(ECompiledModelType.Res);
+            Object[] args = new Object[1];
+            args[0] = b;
+            assembly.InvokeMember("eqs", BindingFlags.InvokeMethod, null, null, args);
+        }
+
+
         public static void RunOneGaussIterationWithDamping(List<int> isDampedPointers, Type assembly, Object[] args, double[] bOld)
         {
             double[] b = (double[])args[0];
@@ -2152,6 +2251,450 @@ namespace Gekko
     public static class SolveNewton777
     {
 
+        //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.modelGekko.b[] via RSS(). These are typically the same, but what if not
+        public static void SolveNewtonAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
+        {
+            double[] bTemp = new double[Program.model.modelGekko.b.Length];
+            Array.Copy(Program.model.modelGekko.b, bTemp, Program.model.modelGekko.b.Length);
+
+            int iiMax = 2;
+
+            bool printErrors = true;
+            bool useIntelligent = false;
+
+            for (int ii = 0; ii < iiMax; ii++)
+            {
+                if (ii == 0)
+                {
+                    useIntelligent = true;
+                }
+
+                if (ii == 1)
+                {
+                    if (Program.options.solve_print_details)
+                    {
+                        G.Writeln("--------------------------------------");
+                        G.Writeln("First attempt failed, trying 1 last...");
+                        G.Writeln("--------------------------------------");
+                    }
+                    useIntelligent = false;
+                    Array.Copy(bTemp, Program.model.modelGekko.b, Program.model.modelGekko.b.Length);  //resetting
+                }
+
+                JacobiNull();  //mostly for safety, to make sure we do not have old stuff from other periods lying around
+
+                double krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2
+                //Ehm, RSS is divided by 2 now!
+                int n = Program.model.modelGekko.m2.fromEqNumberToBNumber.Length;
+
+                IElementalAccessVector residuals = new DenseVector(n);
+                IElementalAccessVector x0 = new DenseVector(n);
+
+                for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumber.Length; i++)
+                {
+                    x0.SetValue(i, b[Program.model.modelGekko.m2.fromEqNumberToBNumber[i]]);
+                }
+                RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
+
+                IElementalAccessVector residualsBase = new DenseVector(residuals.Length);
+                Blas.Default.Copy(residuals, residualsBase);
+
+                //RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
+
+                if (true)
+                {
+                    //hack here
+                    for (int i = 0; i < residuals.Length; i++)
+                    {
+                        double number = residuals.GetValue(i);
+                        if (double.IsNaN(number))
+                        {
+                            //we will accept infinity, for instance 1/0
+                            G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm had starting value problems");
+                            G.Writeln("+++ NOTE: You may try 'OPTION solve failsafe = yes;' to handle this problem.");
+                            throw new GekkoException();
+                        }
+                    }
+                }
+
+                double rss0 = SolveCommon.RssNonScaled(residuals);
+
+                if (Program.options.solve_print_details) G.Writeln("SQRT(RSS) start = " + Math.Sqrt(rss0) + " #residuals = " + residuals.Length);
+
+                double[] residualsArray = new double[residuals.Length];
+                //double[,] jacobiArray = PutJacobiIntoArray();
+
+                int backTrackCounter = 0;
+                int backTrackCounter2 = 0;
+
+                int iterations = 0;
+                if (rss0 > krit)  //else it is already converged
+                {
+                    for (int it = 0; it < int.MaxValue; it++)
+                    {
+                        iterations++;
+                        if (iterations >= Program.options.solve_newton_itermax) AbortNewtonAlgorithm(nah, printErrors);
+
+                        if (Program.options.solve_print_details) G.Writeln("SQRT(RSS) before iteration #" + it + " = " + Math.Sqrt(rss0), Color.Blue);
+
+                        if (Globals.runningOnTTComputer)
+                        {
+                            double sum = 0d;
+                            List<double> contribution = new List<double>();
+                            int largest = -12345;
+                            double largestValue = double.NegativeInfinity;
+                            for (int i = 0; i < residuals.Length; i++)
+                            {
+                                double temp = residuals.GetValue(i) * residuals.GetValue(i);
+                                sum += temp;
+                                if (temp > largestValue)
+                                {
+                                    largestValue = temp;
+                                    largest = i;
+                                }
+                                contribution.Add(temp);
+                            }
+                            if (largest >= 0)
+                            {
+                                double contributionLargest = contribution[largest] / sum;
+                                int bnum = Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[largest];
+                                string var = Program.model.modelGekko.varsBTypeInverted[bnum];
+                                string var2 = "";
+                                int lag = 0;
+                                G.ExtractVariableAndLag(var, out var2, out lag);
+                                if (Program.options.solve_print_details) G.Writeln("RSS: largest contribution is equation '" + var2 + "' (share of RSS = " + contributionLargest + ")");
+                            }
+                        }
+
+                        DateTime t0 = DateTime.Now;
+                        Jacobi(x0, assembly);
+
+                        if (Program.options.solve_print_details)
+                        {
+                            if (Globals.runningOnTTComputer) G.Writeln("New " + residuals.Length + "x" + residuals.Length + " Jacobi matrix constructed: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
+                            else G.Writeln("New Jacobi " + residuals.Length + "x" + residuals.Length + " matrix constructed: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
+                        }
+
+                        IElementalAccessVector dx = new DenseVector(n);
+
+                        t0 = DateTime.Now;
+                        bool ok = InvertMatrix(residuals, dx);  //jacobyMatrix is also used
+                        if (Program.options.solve_print_details)
+                        {
+                            if (Globals.runningOnTTComputer) G.Writeln("Jacobi " + residuals.Length + "x" + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds", Color.Orange);
+                            else G.Writeln("Jacobi " + residuals.Length + "x" + residuals.Length + " matrix inverted: " + (DateTime.Now - t0).TotalMilliseconds / 1000d + " seconds");
+                        }
+
+                        if (ok == false)
+                        {
+                            if (ii == 0)
+                            {
+                                goto metaIt;
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm stalled");
+                                throw new GekkoException();
+                            }
+                        }
+
+                        IElementalAccessVector x = new DenseVector(n);
+                        Blas.Default.Add(x0, dx, x); //x = x0 + dx
+
+                        SolveCommon.RSS(residuals, x, assembly);  //residuals are by-product (b[] also altered)
+                        double rss = SolveCommon.RssNonScaled(residuals);
+
+                        if (Program.options.solve_print_details) G.Writeln("iter = " + it + " SQRT(RSS) = " + Math.Sqrt(rss));
+
+                        if (rss < krit)
+                        {
+                            break;
+                        }
+
+                        //TODO TODO
+                        //TODO TODO
+                        //TODO TODO #98075324
+                        //TODO TODO
+
+                        if (rss < rss0)
+                        {
+
+                            if (Globals.solveUseFastSteps == false)
+                            {
+                                Blas.Default.Copy(x, x0);
+                                rss0 = rss;
+                                goto newIt;
+                            }
+
+                            //successful newton step: try cheaper steps now (_a)
+                            double rss0_a = rss;
+                            IElementalAccessVector x0_a = new DenseVector(x);
+                            for (int i = 0; i < int.MaxValue; i++)
+                            {
+                                iterations++;
+                                if (iterations >= Program.options.solve_newton_itermax) AbortNewtonAlgorithm(nah, printErrors);
+
+                                IElementalAccessVector dx_a = new DenseVector(n);
+
+                                bool isOk = InvertMatrix(residuals, dx_a); //jacobyMatrix is also used
+
+                                IElementalAccessVector x_a = new DenseVector(n);
+                                Blas.Default.Add(x0_a, dx_a, x_a); //x_a = x0_a + dx_a
+
+                                SolveCommon.RSS(residuals, x_a, assembly);  //residuals are by-product (b[] also altered)
+                                double rss_a = SolveCommon.RssNonScaled(residuals);
+
+                                if (Program.options.solve_print_details) G.Writeln("    fast iter (no jacobi update) = " + i + " SQRT(RSS) = " + Math.Sqrt(rss_a));
+                                if (rss_a > rss0_a)
+                                {
+                                    Blas.Default.Copy(x0_a, x0);
+                                    rss0 = rss0_a;
+                                    break;  //no more of these fast iterations, do a proper one
+                                }
+                                if (i >= Program.options.solve_newton_updatefreq - 1)
+                                {
+                                    Blas.Default.Copy(x_a, x0);
+                                    rss0 = rss_a;
+                                    break;  //no more of these fast iterations, do a proper one
+                                }
+                                if (rss_a < krit)
+                                {
+                                    Blas.Default.Copy(x_a, x);
+                                    rss0 = rss;
+                                    goto converged;
+                                }
+                                Blas.Default.Copy(x_a, x0_a);
+                                rss0_a = rss_a;
+                            }
+
+                            goto newIt;
+                        }
+                        //rss > rss0: rss did not diminish as it should: backtrack
+
+                        if (rss > rss0)
+                        {
+                            if (useIntelligent && Program.options.solve_newton_backtrack == true && backTrackCounter2 >= 20)
+                            {
+                                //jump into unknown
+
+                                iterations++;
+                                if (iterations >= Program.options.solve_newton_itermax) AbortNewtonAlgorithm(nah, printErrors);
+
+                                Jacobi(x, assembly);
+                                IElementalAccessVector dx2 = new DenseVector(n);
+                                bool ok2 = InvertMatrix(residuals, dx2);  //jacobyMatrix is also used
+                                if (ok == false)
+                                {
+                                    if (ii == 0)
+                                    {
+                                        goto metaIt;
+                                    }
+                                    else
+                                    {
+                                        G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm stalled");
+                                        throw new GekkoException();
+                                    }
+                                }
+                                IElementalAccessVector x2 = new DenseVector(n);
+                                Blas.Default.Add(x, dx2, x2); //x2 = x + dx2
+                                IElementalAccessVector residuals2 = new DenseVector(n);
+                                SolveCommon.RSS(residuals2, x2, assembly);  //residuals are by-product (b[] also altered)
+                                double rss2 = SolveCommon.RssNonScaled(residuals2);
+
+                                if (rss2 < rss0)
+                                {
+                                    if (Program.options.solve_print_details) G.Writeln("Did a successful jump to avoid backtracking");
+                                    Blas.Default.Copy(x2, x0);
+                                    rss0 = rss2;
+                                    backTrackCounter2 = 0;
+                                    goto newIt;
+                                }
+                                else
+                                {
+                                    //undo, revert jacobi (x and rss and dx are not touched, damping will follow if backtrack is set)
+                                    //if (Program.options.solve_print) G.Writeln("jump fail", Color.Orange);
+                                    Jacobi(x, assembly);
+                                    //--------------------------------------------------------
+                                    // It has been checked that this really undoes everything
+                                    // relevant, so that search proceeds as if an intelligent
+                                    // jump had not been tried out.
+                                    // In the long run, the whole algorithm shold
+                                    // be done without globals like jacobiMatrix and residuals.
+                                    //--------------------------------------------------------
+                                }
+                            }
+                        }
+
+                        if (Program.options.solve_newton_backtrack == false)
+                        {
+                            Blas.Default.Copy(x, x0);
+                            rss0 = rss;
+                            goto newIt;
+                        }
+
+                        double rss_best = double.MaxValue;
+                        IElementalAccessVector x_best = new DenseVector(n);
+                        for (int lam = 0; lam < int.MaxValue; lam++)
+                        {
+                            double lambda = 1d / Math.Pow(2d, lam + 1d);
+
+                            if (lambda < 0.01d)
+                            {
+                                backTrackCounter2++;
+                            }
+
+                            IElementalAccessVector dx_b = new DenseVector(dx);
+
+                            Blas.Default.Scale(lambda, dx_b);
+
+                            IElementalAccessVector x_b = new DenseVector(n);
+                            Blas.Default.Add(x0, dx_b, x_b);
+
+                            SolveCommon.RSS(residuals, x_b, assembly);  //residuals are by-product (b[] also altered)
+                            double rss_b = SolveCommon.RssNonScaled(residuals);
+
+                            if (rss_b < rss_best)
+                            {
+                                rss_best = rss_b;
+                                Blas.Default.Copy(x_b, x_best);
+                            }
+
+                            if (Program.options.solve_print_details) G.Writeln("  lambda=" + lambda + " rss_b=" + Math.Sqrt(rss_b));
+
+                            if (rss_b < rss0 && rss_b > rss_best)
+                            {
+                                Blas.Default.Copy(x_best, x0);
+                                rss0 = rss_best;
+                                break;
+                            }
+                            if (lambda < 1e-8)
+                            {
+                                backTrackCounter++;
+                                if (backTrackCounter >= 6)
+                                {
+                                    if (ii == 0)
+                                    {
+                                        goto metaIt;
+                                    }
+                                    else
+                                    {
+                                        G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " Newton backtrack could not make further progress.");
+                                        G.Writeln("    This may indicate that the problem is somehow misspecified, or some of the variables");
+                                        G.Writeln("    may have very different scale.");
+                                        throw new GekkoException();
+                                    }
+                                }
+
+                                Blas.Default.Copy(x_b, x0);  //this gives a small perturbation
+
+                                SolveCommon.RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)
+                                rss0 = SolveCommon.RssNonScaled(residuals);
+
+                                break;
+                            }
+                        }
+                    newIt:;
+                    }
+                }
+            converged:;
+                //converged
+                Program.model.modelGekko.simulateResults[0] = iterations;
+                Program.model.modelGekko.simulateResults[1] = Math.Sqrt(SolveCommon.RssNonScaled(residuals));
+                return;
+            metaIt:;
+            }  //ii
+        }
+
+
+
+        public static void ComputeGradientAndPutIntoFF(double delta, int j, int i, Type assembly, bool lu)
+        {
+            //int eq = simulFeedbackVarBtypeInverted[i];
+            int eq = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[i];
+            double val0 = Program.model.modelGekko.r[eq];
+            Program.model.modelGekko.b[j] += delta;
+            SolveCommon.SimulateResidual(Program.model.modelGekko.b, Program.model.modelGekko.r, eq, assembly);
+            double val1 = Program.model.modelGekko.r[eq];
+            Program.model.modelGekko.b[j] += -delta;
+            double grad = (val1 - val0) / delta;
+            Program.model.modelGekko.r[eq] = val0;
+            if (grad != 0d)
+            {
+                //int ii = simulFeedbackVarBtypeInverted[j];
+                int ii = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[j];
+                int jj = eq;
+                if (lu)
+                {
+                    Program.model.modelGekko.jacobiMatrixDense[jj, ii] = grad;
+                }
+                else
+                {
+                    Program.model.modelGekko.jacobiMatrix.SetValue(jj, ii, grad);
+                }
+            }
+        }
+
+        public static void Jacobi(IElementalAccessVector x, Type assembly)
+        {
+            JacobiNull();
+            int n = x.Length;
+
+            double delta = Globals.jacobiDeltaProbe;  //must be small enough for an endogenous var
+            //cannot be less than this! --> else errors
+            //TODO: have a specific delta for each endogenous, based on history
+
+            bool lu = (Program.options.solve_newton_invert == "lu");
+            if (lu)
+            {
+                Program.model.modelGekko.jacobiMatrixDense = new double[n, n];
+            }
+            else
+            {
+                Program.model.modelGekko.jacobiMatrix = new SparseRowMatrix(n, n, 5);  //seems faster
+            }
+
+            //Keep SimulateSimulPrologue() and SimulateResiduals() together
+            SolveCommon.SimulateSimulPrologue(assembly);
+            SolveCommon.SimulateResiduals(Program.model.modelGekko.b, Program.model.modelGekko.r, assembly);
+
+            double[] bOriginal = new double[Program.model.modelGekko.b.Length];
+            Array.Copy(Program.model.modelGekko.b, bOriginal, Program.model.modelGekko.b.Length);
+            double[] rOriginal = new double[Program.model.modelGekko.r.Length];
+            Array.Copy(Program.model.modelGekko.r, rOriginal, Program.model.modelGekko.r.Length);
+
+            int counter = -1;
+            foreach (int j in Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW)
+            {
+                counter++;
+                int eq_j = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[j];
+                Program.model.modelGekko.b[j] += delta;
+
+                //Keep SimulateSimulPrologue() and SimulateResiduals() together
+                SolveCommon.SimulateSimulPrologue(assembly);
+                SolveCommon.SimulateResiduals(Program.model.modelGekko.b, Program.model.modelGekko.r, assembly);
+
+                foreach (int i in Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW)
+                {
+                    int eq_i = Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[i];
+                    double grad = (Program.model.modelGekko.r[eq_i] - rOriginal[eq_i]) / delta;
+                    if (grad != 0d)
+                    {
+                        if (lu)
+                        {
+                            Program.model.modelGekko.jacobiMatrixDense[eq_i, eq_j] = grad;
+                        }
+                        else
+                        {
+                            Program.model.modelGekko.jacobiMatrix.SetValue(eq_i, eq_j, grad);
+                        }
+                    }
+                }
+
+                Array.Copy(bOriginal, Program.model.modelGekko.b, Program.model.modelGekko.b.Length);
+                Array.Copy(rOriginal, Program.model.modelGekko.r, Program.model.modelGekko.r.Length);
+            }
+        }
+
         public static void SolveNewton(ECompiledModelType modelType, NewtonAlgorithmHelper nah)
         {
 
@@ -2165,7 +2708,7 @@ namespace Gekko
 
             if (Globals.gradientSolve)
             {
-                SolveGradient.SolveGradientAlgorithmUsingAlglib(Program.model.modelGekko.b, Program.model.modelGekko.m2.assemblyNewton, nah);
+                SolveGradientDescent.SolveGradientAlgorithmUsingAlglib(Program.model.modelGekko.b, Program.model.modelGekko.m2.assemblyNewton, nah);
             }
             else
             {
@@ -2187,7 +2730,7 @@ namespace Gekko
 
     }
 
-    public static class SolveGradient
+    public static class SolveGradientDescent
     {
 
         public static CGSolverOutput SolveGradientAlgorithm(double[] x_input, Func<double[], CGSolverInput, double> func, CGSolverInput input)
