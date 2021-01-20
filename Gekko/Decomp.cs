@@ -860,7 +860,7 @@ namespace Gekko
                 {
                     if (link.expressions.Count == 1 && link.expressions[0] == null)
                     {
-                        ModelGamsEquation found = Program.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
+                        ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
                         link.expressions = found.expressions;
                         link.expressionText = found.lhs + " = " + found.rhs;
                     }
