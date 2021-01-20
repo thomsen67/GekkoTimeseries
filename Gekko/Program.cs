@@ -1555,18 +1555,7 @@ namespace Gekko
             }
             return -12345;
         }
-
-        static String addLag(String s, double lag)
-        {
-            //for instance "fy¤-1" with lag=-3
-            //gives "fy¤-1¤-3"
-            if (Globals.removeAllLags == 1)
-            {
-                lag = 0d;
-            }
-            s = s + Globals.lagIndicator + lag + "d";  //the "d" denotes double value. Used here since lags can be fractional (for instance fy(-0.5)
-            return s;
-        }
+        
 
         public static String RemoveTrailingD(String lag)
         {
@@ -14394,28 +14383,7 @@ namespace Gekko
                         return "";  //no need for the parser to chew on this afterwards!
                     }
                 }
-                if (s2.Length == 6)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "ssplit"))
-                    {
-                        Globals.splitCsCodeIntoChunks = !Globals.splitCsCodeIntoChunks;
-                        G.Writeln("SPLIT = " + Globals.splitCsCodeIntoChunks);
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
-                if (s2.Length == 7)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "ssimple"))
-                    {
-                        Globals.simpleCode = !Globals.simpleCode;
-                        G.Writeln("SIMPLE (ast_upd()) = " + Globals.simpleCode);
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
-
-                //simpleCode
+                
 
                 if (s2.Length == 7)
                 {
@@ -14606,16 +14574,7 @@ namespace Gekko
                     }
                 }
 
-
-                if (s2.Length == 5)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "histo"))
-                    {
-                        Globals.histo = !Globals.histo;
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
+                
 
                 if (s2.Length == 3)
                 {
@@ -23996,7 +23955,7 @@ namespace Gekko
                 Databank work = Program.databanks.GetFirst();
                 work.Clear();
                 G.CloneDatabank(work, Globals.undoBank);
-                if (!Globals.setPrintMute) G.Writeln("Old databank re-established");
+                G.Writeln("Old databank re-established");
             }
         }
 
@@ -25225,7 +25184,7 @@ namespace Gekko
                         
             WaitForZipWrite(tempTsdxPath, pathAndFileNameResultingFile);
             
-            if (!Globals.setPrintMute)
+            if (true)
             {
                 G.Writeln();
                 G.Writeln("Wrote " + count + " variables to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
@@ -25278,7 +25237,7 @@ namespace Gekko
             DateTime dt0 = DateTime.Now;            
             WriteTsdRecords(ref yr1, ref yr2, isCaps, list, databank, isTsdx, pathAndFilename, ref count);            
 
-            if (!Globals.setPrintMute)
+            if (true)
             {
                 G.Writeln();
                 G.Writeln("Wrote " + count + " variables to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
@@ -25323,7 +25282,7 @@ namespace Gekko
             DateTime dt0 = DateTime.Now;
             WriteFlatRecords(ref yr1, ref yr2, isCaps, list, databank, pathAndFilename, ref count);
 
-            if (!Globals.setPrintMute)
+            if (true)
             {
                 G.Writeln();
                 G.Writeln("Wrote " + count + " variables to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
@@ -26431,7 +26390,7 @@ namespace Gekko
                 file.Flush();
             }
 
-            if (!Globals.setPrintMute) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
+            if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
             return counter;
         }
 
@@ -40488,7 +40447,7 @@ namespace Gekko
                             {
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
-                                if (!Globals.setPrintMute) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
+                                if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
                             }
                             catch (Exception e)
                             {
@@ -41075,7 +41034,7 @@ namespace Gekko
                         }
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
-                        if (!Globals.setPrintMute) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
+                        if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
                     }
                     return null;
                 }

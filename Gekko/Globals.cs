@@ -517,43 +517,24 @@ namespace Gekko
         public static string expressionText = null;
         public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
         public static List<Func<GekkoSmpl, IVariable>> expressions = null;  //used for x[#i] kind of equations
-
-        // =====================================
-        // =====================================
-        // =====================================
-        //     oprydning til her!
-        // =====================================
-        // =====================================
-        // =====================================
-
-
-
-        public static int removeAllLags = 0;
+                
         public static char parserErrorSeparator = '¤';
         public static char parserExpressionSeparator = '¤';
         public static string lagIndicator = "¤";
         public static string leftParenthesisIndicator = "[";
         public static string rightParenthesisIndicator = "]";
-        public const char freqIndicator = '!';  //see also #09832752
-        public static string afterModelJIndicator = "Y";
-        public static string reverseIndicator1 = "REVERSE1";
-        public static string reverseIndicator2 = "REVERSE2";
+        public const char freqIndicator = '!';  //see also #09832752                
 
         public static string protectSymbol = "\u2714";
-        
-        public static bool setPrintMute = false;
+                
         public static bool doNotSaveUserSettings = false; 
 
         public static string ols1 = "OLS estimation";
         public static string ols2 = "Dep. variable = ";
-
-        public static CompilerOptions co = new CompilerOptions();
+                
         public static string compilerOptions32 = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
         public static string compilerOptions64 = "/optimize /platform:x64";
-
-        public static ArrayList alFunctions;
-        public static CaseInsensitiveHashtable userFunctions;
-
+        
         public static bool btnStartThread = false;
         public static bool btnStopThread = false;
         public static LongProcess workerThread = null;
@@ -563,8 +544,6 @@ namespace Gekko
         public static List<Window1> windowsDecomp = new List<Window1>();
         public static List<WindowDecomp> windowsDecomp2 = new List<WindowDecomp>();
         public static CounterHelper ch = new CounterHelper();
-
-        public static bool revertSimpleJ = true;
         
         public static string helpStartPage = "introduction";
 
@@ -665,13 +644,7 @@ namespace Gekko
 
         public static List<string> extraNames = new List<string>() { "P", "PRI", "PRINT", "SER" };
         public static List<string> commandNames = Program.Add2Lists(Globals.helpTopics, Globals.extraNames);  //must be after the two lists
-
-        public static bool showZero = true;
-
-        public static int yearIndicator = 1500;
-
-        public static int _tmptmpCounter = 0;
-
+        
         public static Dictionary<string, string> createdVariables = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
         public static WindowRunStatus windowRunStatus = null;
@@ -703,13 +676,8 @@ namespace Gekko
 
         public static string gekkoExeParameters = null;
 
-        public static bool runningOnTTComputer = false;
-        public static DateTime timeHelper = DateTime.Now;
-
-        public static bool splitCsCodeIntoChunks = true; //can be switched with "ssplit"
-        public static int splitCsCodeIntoChunksLinesPerChunk = 10;
-        public static bool simpleCode = false;  //activates ast_upd(), can be switched with "ssimple"
-
+        public static bool runningOnTTComputer = false;        
+        
         public static bool prettyTextTableRendering = false;  //see http://www.unicode.org/charts/PDF/U2500.pdf
 
         public static int numberOfErrors = 0;
@@ -722,12 +690,10 @@ namespace Gekko
         public static string lastDynamicCsCode = null;  //if it does not compile (internal error)
 
         public static int lockedCounter = 0;
-
-        public static bool histo = false;
-
+        
         public static bool printAST = false;  //for debugging, gets true when "ast" is typed at command prompt        
 
-        public static Excel.Application objApp = null;
+        public static Excel.Application objApp = null;  //used for the Excel PIA interface (not used much anymore, after EPPlus).
         public static int excelLastThreadID = int.MinValue;
 
         public static int waitFileTotalTime = 600;  //600 s = 10 min
@@ -740,16 +706,11 @@ namespace Gekko
         public static string autoExecCmdFileName = "gekko.ini";
 
         public static string detectedRPath = null;
-        public static string detectedPythonPath = null;
-
-        public static string guiDialogErrorText = "ERROR: Would you like to abort (Y), or ignore the error (N)";
-        public static string guiDialogErrorCaption = "Error handling";
+        public static string detectedPythonPath = null;        
 
         public static int endOfLinePositionWhenLastEnterPressed = -12345;
         public static int startOfLinePositionWhenLastEnterPressed = -12345;
-
-        public static bool timing = true;
-
+        
         public static bool debugTokens = false;  //tokens are printed 1 by 1, for debug purposes, show tokens, showtokens
         public static bool printGlue = false;  //for debugging purpose
         public static bool addGlue = true;
