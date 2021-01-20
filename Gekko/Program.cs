@@ -18743,17 +18743,6 @@ namespace Gekko
 
         
 
-        
-        
-
-        private static void WriteAboutFailsafeOption()
-        {
-            if (Program.options.solve_failsafe == true) return;
-            G.Writeln("+++ NOTE: Use 'OPTION solve failsafe = yes;' to help tracking the root of the problem", Globals.warningColor);
-        }
-
-        
-
         private static double InitEndoLeaded(double[,] a, int tInt, double val, int yy)
         {
             val = a[yy, tInt - 1];  //lagged value y(-1) set as init for y(+1) or y(+2) etc., but ONLY in the first FT-iteration
@@ -36817,12 +36806,6 @@ namespace Gekko
             }
         }
 
-        public class NewtonAlgorithmHelper
-        {
-            public GekkoTime t;
-            public GekkoTime tStart;
-            public GekkoTime tEnd;
-        }
 
         public class RememberWriteStatementsHelper
         {

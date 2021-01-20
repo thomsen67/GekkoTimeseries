@@ -11552,7 +11552,7 @@ namespace UnitTests
             input.deltaGradient = 1e-8;
             input.deltaGolden = 1e-8;
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
-            CGSolverOutput output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            CGSolverOutput output = SolveGradientDescent.SolveGradientAlgorithm(xstart, Function, input);
             Assert.AreEqual(3, output.iterations);
             Assert.AreEqual(184, output.evals);
             Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-10);
@@ -11562,7 +11562,7 @@ namespace UnitTests
             input.deltaGradient = 1e-8;
             input.deltaGolden = 1e-8;
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
-            output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            output = SolveGradientDescent.SolveGradientAlgorithm(xstart, Function, input);
             Assert.AreEqual(3, output.iterations);
             Assert.AreEqual(184, output.evals);
             Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-9);
@@ -11573,7 +11573,7 @@ namespace UnitTests
             input.deltaGolden = 1e-8;
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
             input.restartInterval = 1;
-            output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            output = SolveGradientDescent.SolveGradientAlgorithm(xstart, Function, input);
             Assert.AreEqual(266, output.iterations);
             Assert.AreEqual(15162, output.evals);
             Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-6);
@@ -11603,7 +11603,7 @@ namespace UnitTests
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
             input.restartInterval = -12345;
             //input.limitBeta = true;  --> more its
-            CGSolverOutput output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            CGSolverOutput output = SolveGradientDescent.SolveGradientAlgorithm(xstart, Function, input);
             Assert.AreEqual(18, output.iterations);
             Assert.AreEqual(902, output.evals);
             Assert.IsTrue((output.x[0] - 1d) * (output.x[0] - 1d) + (output.x[1] - 1d) * (output.x[1] - 1d) < 1e-7);
@@ -11616,7 +11616,7 @@ namespace UnitTests
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
             input.restartInterval = -12345;
             //input.limitBeta = true; --> more its
-            output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            output = SolveGradientDescent.SolveGradientAlgorithm(xstart, Function, input);
             Assert.AreEqual(1054, output.iterations);
             Assert.AreEqual(38148, output.evals);
             Assert.IsTrue((output.x[0] - 1d) * (output.x[0] - 1d) + (output.x[1] - 1d) * (output.x[1] - 1d) < 1e-7);

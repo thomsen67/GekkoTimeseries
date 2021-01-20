@@ -15,9 +15,9 @@ namespace Gekko
 {
     public static class SolveCommon
     {
-        public static void UndoAndPackStuff(out LinkContainer lc1, out LinkContainer lc2, GekkoTime tStart, GekkoTime tEnd, GekkoTime tStart0, int obsWithLags, int obsSimPeriod, double[,] a2)
+        public static void UndoAndPackStuff(out Program.LinkContainer lc1, out Program.LinkContainer lc2, GekkoTime tStart, GekkoTime tEnd, GekkoTime tStart0, int obsWithLags, int obsSimPeriod, double[,] a2)
         {
-            lc1 = new LinkContainer("");
+            lc1 = new Program.LinkContainer("");
             Globals.linkContainer.Add(lc1.counter, lc1);
             Globals.undoSim = new UndoSim();
             Globals.undoSim.id = lc1.counter;
@@ -27,7 +27,7 @@ namespace Gekko
             Globals.undoSim.tEnd = tEnd.Add(0);
             Globals.undoSim.obsWithLags = obsWithLags;
             Globals.undoSim.obsSimPeriod = obsSimPeriod;
-            lc2 = new LinkContainer("");
+            lc2 = new Program.LinkContainer("");
             Globals.linkContainer.Add(lc2.counter, lc2);
             Globals.packSim = new PackSim();
             Globals.packSim.id = lc2.counter;
@@ -294,7 +294,7 @@ namespace Gekko
         }
 
 
-        public static void SimCheckFirstPeriodForMissingStuff(bool usingFairTaylor, GekkoTime tStart, ErrorContainer ec, Series[] timeSeriesPointers, int[] lagPointers, int[] endoNoLagPointers, int[] endoLeadPointers, string[] varNamePointers, int[] isDJZvarPointers)
+        public static void SimCheckFirstPeriodForMissingStuff(bool usingFairTaylor, GekkoTime tStart, Program.ErrorContainer ec, Series[] timeSeriesPointers, int[] lagPointers, int[] endoNoLagPointers, int[] endoLeadPointers, string[] varNamePointers, int[] isDJZvarPointers)
         {
             if (true)  //for a period like 2006-2079, this check hardly consumes any time
             {
@@ -732,7 +732,7 @@ namespace Gekko
             if (!(G.Equal(so.method, "gauss") || G.Equal(so.method, "newton") || G.Equal(so.method, "res") || G.Equal(so.method, "reverted") || G.Equal(so.method, "eigen"))) G.Writeln("+++ WARNING: Seems to be a problem with model type");
             //isRes is true if called by Res(), isReverted if called by Efter()
 
-            ErrorContainer ec = new ErrorContainer();
+            Program.ErrorContainer ec = new Program.ErrorContainer();
 
             ECompiledModelType modelType = GetModelTypeFromOptions(so);  //6 types, including Reverted (for EFTER command)
 
@@ -1088,12 +1088,12 @@ namespace Gekko
                             {
                                 SimPrintErrorOptionsUndo(lc1);
                                 SimPrintErrorOptionsPack(lc2);
-                                WriteAboutFailsafeOption();
+                                SolveGauss777.WriteAboutFailsafeOption();
                             }
                             else
                             {
                                 SimPrintErrorOptionsUndo(lc1);
-                                WriteAboutFailsafeOption();
+                                SolveGauss777.WriteAboutFailsafeOption();
                             }
                             throw;
                         }
@@ -1156,12 +1156,12 @@ namespace Gekko
                             }
                             //write the stuff back to databank
                             double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, aTemp, NAN, bNumberPointers, endoNoLagPointers);
-                            LinkContainer lc1;
-                            LinkContainer lc2;
+                            Program.LinkContainer lc1;
+                            Program.LinkContainer lc2;
                             UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
                             SimPrintErrorOptionsUndo(lc1);
                             SimPrintErrorOptionsPack(lc2);
-                            WriteAboutFailsafeOption();
+                            SolveGauss777.WriteAboutFailsafeOption();
                             throw;
                         }
 
@@ -1215,12 +1215,12 @@ namespace Gekko
                             G.Writeln();
 
                             //G.Writeln("    You may undo the simulation and revert to pre-simulation databank");
-                            LinkContainer lc1;
-                            LinkContainer lc2;
+                            Program.LinkContainer lc1;
+                            Program.LinkContainer lc2;
                             UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
                             SimPrintErrorOptionsUndo(lc1);
                             SimPrintErrorOptionsPack(lc2);
-                            WriteAboutFailsafeOption();
+                            SolveGauss777.WriteAboutFailsafeOption();
                             throw new GekkoException();
                         }
                     }  //end of foreach t
@@ -1355,11 +1355,11 @@ namespace Gekko
             if (Globals.alwaysEnablcPackForSimulation)  //this is mostly for debugging, "packsim" activates the link showing up always.
             {
                 double[,] a2 = SolveDataInOut.FromAToDatabankWhileRememberingOldDatabank(tStart0, tStart, tEnd, debug, work, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a, NAN, bNumberPointers, endoNoLagPointers);
-                LinkContainer lc1;
-                LinkContainer lc2;
+                Program.LinkContainer lc1;
+                Program.LinkContainer lc2;
                 UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
                 SimPrintErrorOptionsPack(lc2);
-                WriteAboutFailsafeOption();
+                SolveGauss777.WriteAboutFailsafeOption();
             }
             else
             {
@@ -1588,7 +1588,7 @@ namespace Gekko
             return a2;
         }
 
-        public static void FromAToB(bool usingFairTaylor, bool usingNewtonFairTaylor, NewtonFairTaylorHelper1 shock, int ft, ErrorContainer ec, Databank work, Series[] timeSeriesPointers, int[] extraWritebackPointers, int[] lagPointers, int[] aNumberPointers, int[] endoNoLagPointers, int[] endoLeadPointers, int[] endoPointers, string[] varNamePointers, int[] isDJZvarPointers, double[,] a, int tInt, GekkoTime t, GekkoTime tStart, GekkoTime tEnd, SimOptions so)
+        public static void FromAToB(bool usingFairTaylor, bool usingNewtonFairTaylor, NewtonFairTaylorHelper1 shock, int ft, Program.ErrorContainer ec, Databank work, Series[] timeSeriesPointers, int[] extraWritebackPointers, int[] lagPointers, int[] aNumberPointers, int[] endoNoLagPointers, int[] endoLeadPointers, int[] endoPointers, string[] varNamePointers, int[] isDJZvarPointers, double[,] a, int tInt, GekkoTime t, GekkoTime tStart, GekkoTime tEnd, SimOptions so)
         {
             bool ftOrNft = usingFairTaylor || usingNewtonFairTaylor;
 
@@ -1778,6 +1778,12 @@ namespace Gekko
 
     public static class SolveGauss777
     {
+        public static void WriteAboutFailsafeOption()
+        {
+            if (Program.options.solve_failsafe == true) return;
+            G.Writeln("+++ NOTE: Use 'OPTION solve failsafe = yes;' to help tracking the root of the problem", Globals.warningColor);
+        }
+
         /// <summary>
         /// Solve by means of Gauss-Seidel method
         /// </summary>
@@ -2712,7 +2718,7 @@ namespace Gekko
             }
             else
             {
-                Program.SolveNewtonAlgorithm(Program.model.modelGekko.b, Program.model.modelGekko.m2.assemblyNewton, nah);
+                SolveNewton777.SolveNewtonAlgorithm(Program.model.modelGekko.b, Program.model.modelGekko.m2.assemblyNewton, nah);
             }
 
             args = new Object[1];
@@ -2726,6 +2732,14 @@ namespace Gekko
             Program.model.modelGekko.assemblyReverted.InvokeMember("reverted" + Globals.equationCodeY.ToUpper(), BindingFlags.InvokeMethod, null, null, args2);
             Program.model.modelGekko.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
 
+        }
+
+
+        public class NewtonAlgorithmHelper //inner class
+        {
+            public GekkoTime t;
+            public GekkoTime tStart;
+            public GekkoTime tEnd;
         }
 
     }
@@ -2978,7 +2992,7 @@ namespace Gekko
             //}
         }
 
-        public static void SolveGradientAlgorithmUsingAlglib(double[] b, Type assembly, NewtonAlgorithmHelper nah)
+        public static void SolveGradientAlgorithmUsingAlglib(double[] b, Type assembly, SolveNewton777.NewtonAlgorithmHelper nah)
         {
 
             double[] bTemp = new double[Program.model.modelGekko.b.Length];
