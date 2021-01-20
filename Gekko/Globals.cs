@@ -711,17 +711,10 @@ namespace Gekko
         public static int endOfLinePositionWhenLastEnterPressed = -12345;
         public static int startOfLinePositionWhenLastEnterPressed = -12345;
         
-        public static bool debugTokens = false;  //tokens are printed 1 by 1, for debug purposes, show tokens, showtokens
-        public static bool printGlue = false;  //for debugging purpose
-        public static bool addGlue = true;
-        public static string dotGlue = "¨";     //3.14 --> 3¨14. But 3. 14 --> 3. 14
-        public static string lparGlue = "§";    //f(x) --> f§(x). But f (x) --> f (x) and f((3+1)-2) --> f§(3+1)-2)
-                                                //so glue is only when preceeding chars is ident
-        public static string lbrackGlue = "½";  //f[x] --> f€x]. But f [x] --> f [x] and f[(3+1)-2] --> f€(3+1)-2)
-                                                //so glue is only when preceeding chars is ident
+        public static bool debugTokens = false;  //tokens are printed 1 by 1, for debug purposes, show tokens, showtokens        
+        public static bool addGlue = true;        
 
-        public static bool printGrayLinesForDebugging = false;
-        public static int debugCounter = 0;
+        public static bool printGrayLinesForDebugging = false;        
 
         public static bool noini = false;
 
