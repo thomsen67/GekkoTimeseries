@@ -1129,11 +1129,8 @@ namespace Gekko
     {
 
     }
-
-
-    /// <summary>
-    /// Contains methods regarding the "engine" (model solving part) of the software
-    /// </summary>
+    
+    
     public static class Program
     {
         /// <summary>
