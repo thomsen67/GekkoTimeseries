@@ -18550,13 +18550,7 @@ namespace Gekko
             }
         }
 
-        private static void JacobiNull()
-        {
-            Program.model.modelGekko.jacobiMatrix = null;
-            Program.model.modelGekko.jacobiMatrixDense = null;
-            //Program.model.modelGekko.jacobiMatrixInverted = null;  //we actually prefer to reuse this -- costly to new[] it for each fast step (it is often > 10.000 doubles)
-            Program.model.modelGekko.jacobiMatrixInvertedIndex = null;
-        }
+        
 
         public static double Lead(double[] b, int i)
         {
@@ -18618,59 +18612,10 @@ namespace Gekko
         
 
         
-        private static void HandleTerminalHelper()
-        {
-            Program.model.modelGekko.terminalHelper = null;  //will stay like this if terminal feed=external or there are no leads
-            if (G.Equal(Program.options.solve_forward_terminal_feed, "internal"))
-            {
-                if (Program.model.modelGekko.largestLeadOutsideRevertedPart > 0)
-                {
-                    Program.model.modelGekko.terminalHelper = new List<Dictionary<int, int>>();
-                    for (int i = 0; i < Program.model.modelGekko.largestLeadOutsideRevertedPart; i++)
-                    {
-                        Program.model.modelGekko.terminalHelper.Add(new Dictionary<int, int>());
-                    }
-                    foreach (BTypeData data in Program.model.modelGekko.varsBType.Values)
-                    {
-                        if (data.lag <= 0) continue;
-                        for (int i = 0; i < Program.model.modelGekko.largestLeadOutsideRevertedPart; i++)
-                        {
-                            if (i >= data.lag) continue;
-                            //BTypeData data2 = Program.model.modelGekko.varsBType[data.variable + Globals.lagIndicator + i];
-                            BTypeData data2 = null;
-                            Program.model.modelGekko.varsBType.TryGetValue(data.variable + Globals.lagIndicator + i, out data2);
-                            if (data2 != null) Program.model.modelGekko.terminalHelper[i].Add(data.bNumber, data2.bNumber);
-                        }
-                    }
-                }
-            }
-        }
-
+        
         
 
-        private static void HandleTerminals(int largestLag, int obsSimPeriod, double[,] a, List<int> leadedVarsList, ETerminalCondition terminal)
-        {
-            for (int lv = 0; lv < leadedVarsList.Count; lv++)
-            {
-                if (terminal != ETerminalCondition.Exogenous)
-                {
-                    for (int t2 = -largestLag + obsSimPeriod; t2 < (-largestLag + obsSimPeriod) + Program.model.modelGekko.largestLeadOutsideRevertedPart; t2++)
-                    {
-                        //NOTE: do not use damping here: terminal values should not be damped!
-                        if (terminal == ETerminalCondition.ConstantLevel)
-                        {
-                            //seems to be ok
-                            a[leadedVarsList[lv], t2] = a[leadedVarsList[lv], t2 - 1];
-                        }
-                        else if (terminal == ETerminalCondition.ConstantGrowthRate)
-                        {
-                            //seems to be ok
-                            a[leadedVarsList[lv], t2] = a[leadedVarsList[lv], t2 - 1] * a[leadedVarsList[lv], t2 - 1] / a[leadedVarsList[lv], t2 - 2];
-                        }
-                    }
-                }
-            }
-        }        
+                
 
         public static void IterLink(StringBuilder output, string s1, string s2, string s3)
         {
@@ -18680,123 +18625,12 @@ namespace Gekko
         }
         
 
-        private static void IterationPrint(ref string culprit, GekkoTime tStart, GekkoTime t, ECompiledModelType modelType, StringBuilder output, bool isGaussConverged, SimOptions so)
-        {
-            string s = "";
-
-            if (t.IsSamePeriod(tStart))
-            {
-                if (Program.options.solve_print_iter) G.Writeln();
-            }
-            if (culprit != "") culprit = G.ExtractOnlyVariableIgnoreLag(culprit);
-            if (G.Equal(so.method, "res"))
-            {
-                s += "Period " + (t) + " " + " -- single equation static forecast ";
-                //G.Write(s);
-            }
-            else if (G.Equal(so.method, "reverted"))
-            {
-                s += "Period " + (t) + " " + " -- reverted and after variables ";
-                //G.Write(s);
-            }
-            else
-            {
-                if (isGaussConverged && (Program.options.solve_print_details || Program.options.solve_gauss_dump) && (modelType == ECompiledModelType.Gauss || modelType == ECompiledModelType.GaussFailSafe))
-                {
-                    s += "Period " + (t) + " " + Program.model.modelGekko.simulateResults[0] + " iterations   --   last conv.: " + culprit;
-                    //G.Write(s);
-                }
-                else
-                {
-                    s += "Period " + (t) + " " + Program.model.modelGekko.simulateResults[0] + " iterations";
-                    //G.Write(s);
-                }
-                if (G.Equal(so.method, "gauss"))
-                {
-                    if (!isGaussConverged)
-                    {
-                        s += " *** NOT CONVERGED ";
-                        if (culprit != "")
-                        {
-                            s += "(" + culprit + ")";
-                        }
-                    }
-                }
-                if (G.Equal(so.method, "newton"))
-                {
-                    s += ",   crit = " + string.Format("{0:0.00000E+00}", Program.model.modelGekko.simulateResults[1]);
-                }
-            }
-            if (Program.options.solve_print_details && G.Equal(so.method, "newton"))
-            {
-                s += "\n";
-                s += "------------------------------------------------------------------\n";
-            }
-            //s += "\n";
-
-            if (Program.options.solve_print_iter)
-            {
-                if (s.Length != 0) G.Writeln(s);
-            }
-            output.AppendLine(s);
-        }
+        
+        
 
         
 
-        private static double InitEndoLeaded(double[,] a, int tInt, double val, int yy)
-        {
-            val = a[yy, tInt - 1];  //lagged value y(-1) set as init for y(+1) or y(+2) etc., but ONLY in the first FT-iteration
-            return val;
-        }
-
-        private static void InitEndoNoLag(ErrorContainer ec, double[,] a, int tInt, ref GekkoTime t, SimOptions so, ref double val, Series ts, int yy)
-        {
-            bool endoInitUsesLag = false;
-            //we know that lagPointers are always 0 here!
-            if (Program.options.solve_data_init)
-            {
-                endoInitUsesLag = true;
-                //initializing real endogenous variables
-                double alag = double.NaN;
-                if (tInt - 1 >= 0) alag = a[yy, tInt - 1];
-
-                if (Program.options.solve_data_init_growth)
-                {
-                    double rel = double.NaN;
-                    if (tInt - 2 >= 0) rel = alag / a[yy, tInt - 2];
-                    val = alag;
-                    if (!G.isNumericalError(rel))
-                    {
-                        if (rel > 1 + Program.options.solve_data_init_growth_min && rel < 1 + Program.options.solve_data_init_growth_max) val = alag * rel;
-                    }
-                }
-                else
-                {
-                    val = alag;
-                }
-            }
-            else
-            {
-                val = a[yy, tInt];  //no lag, just plain value
-            }
-
-            if (double.IsNaN(val) && (G.Equal(so.method, "gauss") || G.Equal(so.method, "newton")))  //if it is Res() or Efter() type, we should NEVER go here (where starting values for non-lagged endogenous are set to some arbitrary value
-            {
-                if (options.solve_data_ignoremissing == false)
-                {
-                    if (ec.simInitEndoMissingValueHelper == null) ec.simInitEndoMissingValueHelper = new List<string>();
-                    //todo: break? like for exo part? now we get both warning and error regarding aaa in 2005 if it is set to M and we sim in 2006.
-                    int lag = 0;
-                    if (endoInitUsesLag) lag = 1;
-                    ec.simInitEndoMissingValueHelper.Add(ts.name + " has a missing value in " + (t.Add(-lag)) + "          " + "sim period: " + t.ToString());
-                }
-
-                //====================================
-                val = Globals.missingValueSeedNumber; //lagged value of endogenous is missing --> set to this as starting value
-                //====================================
-            }
-        }
-
+        
         
 
 
@@ -23753,29 +23587,7 @@ namespace Gekko
             return;
         }
 
-        public static double[,] InvertMatrix(double[,] matrix)
-        {
-            return InvertMatrix(matrix, true);
-        }
-
-        public static double[,] InvertMatrix(double[,] matrix, bool printError)
-        {
-            int success = 0;
-            alglib.matinvreport report = new alglib.matinvreport();
-            alglib.rmatrixinverse(ref matrix, out success, out report);
-            if (success == 3)
-            {
-                if(printError) G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
-                throw new GekkoException();
-            }
-            else if (success != 1)
-            {
-                if (printError) G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
-                throw new GekkoException();
-            }
-            return matrix;
-        }
-               
+              
         public static double[,] XTransposeX(double[,] x)
         {
             //  1 2
@@ -31217,20 +31029,32 @@ namespace Gekko
             func = (a - x) * (a - x) + b * (y - x * x) * (y - x * x);
         }
 
-        private static void AbortNewtonAlgorithm(NewtonAlgorithmHelper nah, bool printError)
+        public static double[,] InvertMatrix(double[,] matrix)
         {
-            if (printError)
-            {
-
-                G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the maximum number of newton simulations (" + Program.options.solve_newton_itermax + ") was exceeded.");
-                G.Writeln("    You may augment this number, see the Newton options: 'OPTION solve newton ...'");
-            }
-            throw new GekkoException();
+            return InvertMatrix(matrix, true);
         }
 
-        
+        public static double[,] InvertMatrix(double[,] matrix, bool printError)
+        {
+            int success = 0;
+            alglib.matinvreport report = new alglib.matinvreport();
+            alglib.rmatrixinverse(ref matrix, out success, out report);
+            if (success == 3)
+            {
+                if (printError) G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
+                throw new GekkoException();
+            }
+            else if (success != 1)
+            {
+                if (printError) G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
+                throw new GekkoException();
+            }
+            return matrix;
+        }
 
-        private static bool InvertMatrix(IElementalAccessVector residuals, IElementalAccessVector dx)
+
+
+        public static bool InvertMatrix(IElementalAccessVector residuals, IElementalAccessVector dx)
         {
             if (Program.options.solve_newton_invert == "lu")
             {
@@ -32307,25 +32131,7 @@ namespace Gekko
         
 
         
-        private static void DampVariables(double[] b, double[] bOld, List<int> isDampedPointers)
-        {
-            foreach (int bNumber in isDampedPointers)
-            {
-                // NOTE NOTE NOTE NOTE: Damping is redefined in Gekko 2.0: dampNew = 1-dampOld
-                double alfa = 1d - Program.options.solve_gauss_damp;  //it is 0.5 per default <=> halfways between new and old value.
-                //in PCIM, the default value for alfa is 1.0 <=> no damping at all
-                //the smaller alfa is, the harder the damping
-                //if alfa were set to 0, there would be no progress at all
-                double bNew = alfa * b[bNumber] + (1 - alfa) * bOld[bNumber];
-                if (G.isNumericalError(bNew))
-                {
-                    //if this is so, should we keep the old value? or the new value?
-                    //Console.WriteLine();
-                }
-                b[bNumber] = bNew;
-            }
-        }
-
+        
         private static void PrintIterationVariables(double[] b, string[] vars, int iterCounter)
         {
             if (vars == null) return;
