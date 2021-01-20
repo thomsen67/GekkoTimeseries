@@ -5015,72 +5015,6 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
-                    //=========== HERE ============
-                    //=========== HERE ============
-                    //=========== HERE ============
-                    //=========== HERE ============
-
-                    case "ASTUPDOPERATOREQUAL":
-                        {
-                            node.Code.CA("=");
-                        }
-                        break;
-                    case "ASTUPDOPERATORSTAR":
-                        {
-                            node.Code.CA("*");
-                        }
-                        break;
-                    case "ASTUPDOPERATORHAT":
-                        {
-                            node.Code.CA("^");
-                        }
-                        break;
-                    case "ASTUPDOPERATORPLUS":
-                        {
-                            node.Code.CA("+");
-                        }
-                        break;
-                    case "ASTUPDOPERATORHASH":
-                        {
-                            node.Code.CA("#");
-                        }
-                        break;
-                    case "ASTUPDOPERATORPERCENT":
-                        {
-                            node.Code.CA("%");
-                        }
-                        break;
-                    case "ASTUPDOPERATOREQUALDOLLAR":
-                        {
-                            node.Code.CA("=$");
-                        }
-                        break;
-                    case "ASTUPDOPERATORSTARDOLLAR":
-                        {
-                            node.Code.CA("*$");
-                        }
-                        break;
-                    case "ASTUPDOPERATORHATDOLLAR":
-                        {
-                            node.Code.CA("^$");
-                        }
-                        break;
-                    case "ASTUPDOPERATORPLUSDOLLAR":
-                        {
-                            node.Code.CA("+$");
-                        }
-                        break;
-                    case "ASTUPDOPERATORHASHDOLLAR":
-                        {
-                            node.Code.CA("#$");
-                        }
-                        break;
-                    case "ASTUPDOPERATORPERCENTDOLLAR":
-                        {
-                            node.Code.CA("%$");
-                        }
-                        break;                   
-
                 }
             }  //end of switch on node.Text AFTER sub-nodes are done
 
@@ -5721,32 +5655,7 @@ namespace Gekko.Parser.Gek
             return rv;
         }
 
-        //private static void HandleGamsLikeSumFunction(string[] listNames, bool firstTime, W w, string code)
-        //{
-        //    if (firstTime)
-        //    {
-        //        //Add the item
-        //        if (w.wh.sumHelperListNames == null) w.wh.sumHelperListNames = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        //        w.wh.sumHelperListNames.Add(listNames[0], code);
-        //    }
-        //    else
-        //    {
-        //        //Remove the item
-        //        if (w.wh.sumHelperListNames == null)
-        //        {
-        //            G.Writeln2("*** ERROR: Internal error #7986432523");
-        //            throw new GekkoException();
-        //        }
-        //        if (!w.wh.sumHelperListNames.ContainsKey(listNames[0]))
-        //        {
-        //            G.Writeln2("*** ERROR: Internal error #7986432524");
-        //            throw new GekkoException();
-        //        }
-        //        w.wh.sumHelperListNames.Remove(listNames[0]);
-        //    }
-
-        //}
-
+        
 
 
         private static string GetSimpleHashName(ASTNode node)
@@ -5964,9 +5873,7 @@ namespace Gekko.Parser.Gek
             string rv = null;
             while (tmp != null)
             {
-                //if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
                 
-                //if (tmp.Text == "ASTMAPITEM" || tmp.Text == "ASTFUNCTIONDEFCODE" || tmp.Text == "ASTPROCEDUREDEFCODE") return true;
                 if (tmp.Text == "ASTMAPITEM") return true;
                 tmp = tmp.Parent;
             }
@@ -6211,36 +6118,7 @@ namespace Gekko.Parser.Gek
             string nodeCode = Globals.startGekkoTimeIteratorCode;
             if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode;                      
             return nodeCode;
-        }
-
-        //private static string GekkoListIteratorStartCode(W w, ASTNode node)
-        //{
-        //    string nodeCode = Globals.startGekkoListIteratorCode;
-        //    if (node.listLoopNestCode != null) nodeCode += node.listLoopNestCode;
-        //    return nodeCode;
-        //}
-
-        //private static void CreateTupleClass(StringBuilder headerCs, int number, string className, GekkoDictionary<string, bool> tupleClasses)
-        //{
-        //    //Tuples 2-10 are now predefined.
-
-        //    //if(tupleClasses.ContainsKey(className)) return;  //do not duplicate, has been encountered before/elsewhere            
-        //    ////a bit inefficient, but oh well
-        //    //string ss = null;
-        //    //string uu = null;
-        //    //string vv = null;
-        //    //int count = 0;
-        //    //for (int i = 0; i < number; i++)
-        //    //{
-        //    //    count++;
-        //    //    ss += "public IVariable tuple" + (count - 1) + ";" + G.NL;
-        //    //    uu += "tuple" + (count - 1) + " = ptuble" + (count - 1) + ";" + G.NL;
-        //    //    vv += "IVariable ptuble" + (count - 1) + ", ";
-        //    //}
-        //    //if (vv.EndsWith(", ")) vv = vv.Substring(0, vv.Length - 2);
-        //    //headerCs.AppendLine("public class " + className + " { " + ss + G.NL + "public " + className + "(" + vv + ") {" + G.NL + uu + "} }");
-        //    //tupleClasses.Add(className, true);
-        //}        
+        }        
 
         private static string Num(ASTNode node)
         {
@@ -6352,168 +6230,7 @@ namespace Gekko.Parser.Gek
                 receiver.A(child.Code + G.NL);
             }
         }
-
-
-        //private static string AstBankHelperList(ASTNode node, W wh2)
-        //{
-        //    string bankNumberCode = null;
-        //    if (wh2.wh.currentCommand == "ASTPRT")
-        //    {
-        //        bankNumberCode = "bankNumber";
-        //    }
-        //    else
-        //    {
-        //        bankNumberCode = "1";  //default: Work
-        //    }
-        //    string code = "O.GetListWithBankPrefix(" + node[0].Code + ", " + node[1].Code + ", " + bankNumberCode + ")";            
-        //    return code;
-        //}
-
-
-        //private static string AstBankHelper(ASTNode node, W wh2, int type)
-        //{
-        //    string isLhsSoCanAutoCreate = null;
-        //    if ((node.Number == 1 && (node.Parent.Text == "ASTGENR" || node.Parent.Text == "ASTGENRLHSFUNCTION")) || node.Parent.Text == "ASTTUPLEITEM" ||  wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
-        //    {
-        //        isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Can";
-        //    }
-        //    else if (node.Number == 0 && node.Parent.Text == "ASTCREATEEXPRESSION")
-        //    {
-        //        isLhsSoCanAutoCreate = ", O.ECreatePossibilities.Must";
-        //    }
-
-        //    string bankNumberCode = null;
-        //    if (wh2.wh.currentCommand == "ASTPRT" || wh2.wh.currentCommand == "ASTTABLESETVALUES")
-        //    {
-        //        bankNumberCode = "bankNumber";
-        //    }
-        //    else
-        //    {
-        //        bankNumberCode = "1";  //default: Work
-        //    }
-
-        //    if (type == 1)
-        //    {
-        //        string listFallBackCode = null;
-        //        if (node[0].ChildrenCount() == 0)
-        //        {
-        //            listFallBackCode = node[1].Code.ToString();  //this is a ScalarString already, and we want to avoid a superfluous 'Work:a' for an 'a' item. So this will run ok fast for simple items.
-        //        }
-        //        else
-        //        {
-        //            listFallBackCode = "new ScalarString(O.ConvertToString(" + node[0].Code + ") + `:` + O.ConvertToString(" + node[1].Code + "))";
-        //        }
-        //        return listFallBackCode;
-        //    }
-        //    else if (type == 2) //minus
-        //    {
-        //        string listFallBackCode = null;
-        //        if (node[0][0].ChildrenCount() == 0)
-        //        {
-        //            listFallBackCode = "O.Add(smpl, new ScalarString(`-`), " + node[0][1].Code + ")";  //this is a ScalarString already, and we want to avoid a superfluous 'Work:a' for an 'a' item. So this will run ok fast for simple items.
-        //        }
-        //        else
-        //        {
-        //            listFallBackCode = "new ScalarString(O.ConvertToString(" + node[0][0].Code + ") + `:-` + O.ConvertToString(" + node[0][1].Code + "))";
-        //        }
-        //        return listFallBackCode;
-        //    }
-
-        //    string fallBackCode = "O.ConvertToString(" + node[0].Code + ") + `:` + O.ConvertToString(" + node[1].Code + ")";
-
-        //    string simpleHash = null;
-        //    //node[1].ChildrenCount() is always > 0
-        //    if (node[0].ChildrenCount() > 0)
-        //    {
-        //        //there is a bank like a:b or %x:b or %x:%y
-        //        if (node[0][0].nameSimpleIdent != null && node[1][0].nameSimpleIdent != null)
-        //        {
-        //            //simple names like a:b
-        //            simpleHash = node[0][0].nameSimpleIdent + ":" + node[1][0].nameSimpleIdent;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //name like a or %x
-        //        if (node[1][0].nameSimpleIdent != null)
-        //        {
-        //            //simple name like a
-        //            simpleHash = node[1][0].nameSimpleIdent;
-        //        }
-        //    }
-
-        //    bool isSimple = false; if (simpleHash != null) isSimple = true;
-
-        //    string code = null;
-
-        //    string fa;
-        //    int choice;
-        //    GetChoice(node, wh2, simpleHash, isSimple, out fa, out choice);
-
-        //    if (choice == 1)
-        //    {
-        //        node.Code.A(fa);
-        //    }
-        //    else if (choice == 2)
-        //    {
-        //        //isSimple means that the name is simple like a or b:a.
-        //        //Then we look for it in the global cache
-
-        //        GekkoDictionary<string, string> tsCache = GetTsCache(wh2);
-
-        //        string s = null; tsCache.TryGetValue(simpleHash, out s);
-        //        if (s == null)
-        //        {
-        //            //has not been seen before
-        //            string ivWithNumber = "iv" + ++Globals.counter;
-        //            tsCache.Add(simpleHash, ivWithNumber);
-        //            GetHeaderCs(wh2).AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...                    
-        //            node.Code.A("O.GetTimeSeriesFromCache(ref " + ivWithNumber + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-        //        }
-        //        else
-        //        {
-        //            node.Code.A("O.GetTimeSeriesFromCache(ref " + s + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-        //        }
-        //    }
-        //    else if (choice == 3)
-        //    {
-        //        //This means that the name is complicated like %x or b:%x or %y:a or %x:%y (or fx%i)                
-        //        if (wh2.wh.seriesHelper != WalkHelper.seriesType.SeriesLhs && wh2.wh.localStatementCache != null)
-        //        {
-        //            //GENR statement for instance, maybe also VAL if indexer fY[2010]??
-        //            //This means there is a GENR statement at the top of the AST tree
-        //            //In that case, we look for the variable in the local cache
-        //            string fallBackCode2 = "O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")";  //here, bankNumberCode will always be = "1", since this is not a PRT statement
-        //            string xx = null; wh2.wh.localStatementCache.TryGetValue(fallBackCode2, out xx);
-        //            if (xx != null)
-        //            {
-        //                //This complicated timeseries (or scalar) has been seen before in this particular GENR/PRT statement                        
-        //                code = xx;                                                
-        //            }
-        //            else
-        //            {
-        //                string refCode = "ts" + ++Globals.counter;
-        //                wh2.wh.localStatementCache.Add(fallBackCode2, refCode);
-        //                code = refCode;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (wh2.wh.seriesHelper == WalkHelper.seriesType.SeriesLhs)
-        //            {
-        //                node.Code.A("O.FindTimeSeries(" + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-        //            }
-        //            else
-        //            {
-        //                node.Code.A("O.GetTimeSeries(smpl, " + fallBackCode + ", " + bankNumberCode + isLhsSoCanAutoCreate + ")");
-        //                //Complicated name, but not inside a GENR statement: just use the statement directly without use of any caches
-        //            }
-        //        }
-        //    }
-        //    else throw new GekkoException();
-        //    return code;
-        //}
-
+        
         private static void GetChoice(ASTNode node, W wh2, string simpleHash, bool isSimple, out string fa, out int choice)
         {
             fa = null;
