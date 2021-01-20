@@ -9036,15 +9036,7 @@ namespace Gekko
 
             G.Writeln2("End of html browser generation, " + G.Seconds(dt0));
 
-        }
-
-        // =====================================
-        // =====================================
-        // =====================================
-        //     oprydning til her!
-        // =====================================
-        // =====================================
-        // =====================================
+        }        
 
         private static void BrowserCleanupFolders(string rootFolder, string varsFolder)
         {
@@ -9527,100 +9519,7 @@ namespace Gekko
             throw new GekkoException();            
 
             return null;
-        }
-
-        //private static void ReportTimeseriesNotFound(string variable, string bank)
-        //{
-        //    string b = "any open";
-        //    if (bank != null) b = "'" + bank + "'";
-
-        //    G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + G.PrettifyTimeseriesHash(variable, true, false) + "' could not be found in " + b + " databank");
-
-        //    bool changeFreq = false;
-
-        //    foreach (EFreq freq in Enum.GetValues(typeof(EFreq)))
-        //    {
-        //        List<string> found = new List<string>();
-        //        foreach (Databank db in Program.databanks.storage)
-        //        {
-        //            Series ts = db.GetIVariable(variable);
-        //            if (ts != null)
-        //            {
-        //                found.Add("'" + db.name + "'");
-        //                if (freq != Program.options.freq) changeFreq = true;  //mention that freq change could be used
-        //            }
-        //        }
-        //        if (found.Count > 0)
-        //        {
-        //            G.Writeln("       --> Note: " + G.GetFreqString(freq) + " timeseries '" + variable + "' exists in: " + G.GetListWithCommas(found), Color.Red);
-        //        }
-        //    }
-
-        //    if (changeFreq)
-        //    {
-        //        G.Writeln("       --> Note: You may change frequency by means of OPTION freq = ... ;", Color.Red);
-        //    }
-
-        //    //Program.databanks.storage
-
-        //}
-
-        ////See also O.GetTimeSeries()
-        //public static Series GetTimeSeriesFromString(string s, O.ECreatePossibilities isLhsSoCanAutoCreate)
-        //{
-        //    ExtractBankAndRestHelper h = ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
-        //    Series ts = FindOrCreateTimeseries(h.bank, h.name, isLhsSoCanAutoCreate, h.hasColon, false);
-        //    return ts;
-        //}
-
-        //public static List<string> MatchWildcard(string wildcard, List<IVariable> input, string endsWith)
-        //{
-        //    //endsWith might be for instance "=q" to indicate quarters. Can also be null.
-        //    Wildcard wc = new Wildcard(wildcard, RegexOptions.IgnoreCase);
-        //    List<string> found = new List<string>();
-
-        //    if (endsWith == null)
-        //    {
-        //        foreach (IVariable iv in input)
-        //        {
-        //            string s = O.ConvertToString(iv);
-        //            //if (s.Contains(Globals.freqIndicator)) continue;  //#09875230984, filters out fy=q, fy=m, etc. A bit of a hack. Could also check the second-last char to see if it is '='
-        //            if (wc.IsMatch(s)) found.Add(s);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        foreach (IVariable iv in input)
-        //        {
-        //            string s = O.ConvertToString(iv);
-        //            if (!s.EndsWith(endsWith)) continue;
-        //            string s2 = s.Substring(0, s.Length - endsWith.Length);
-        //            if (wc.IsMatch(s2))
-        //            {
-        //                found.Add(s2);
-        //            }
-        //        }
-        //    }
-        //    found.Sort(StringComparer.OrdinalIgnoreCase);
-        //    return found;
-        //}
-
-        //public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
-        //{
-        //    List<IVariable> input = new List<IVariable>();
-
-        //    input.AddRange(db.storage.Keys);
-        //    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
-        //    {
-        //        Series xx = kvp.Value as Series; if (xx != null && xx.type == ESeriesType.ArraySuper) continue;  //ignore ghosts
-        //        input.Add(new ScalarString(kvp.Key));
-        //    }
-
-        //    string endsWith = null;
-        //    string endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
-        //    List<string> output = Program.MatchWildcard(wildcard, input, endsWith);
-        //    return output;
-        //}
+        }        
 
         public static void MaybePlaySound(P p)
         {
@@ -10754,112 +10653,7 @@ namespace Gekko
             return null;
         }
 
-        //public static string Python()
-        //{            
-        //    string cmd = "p.py";
-        //    string args = "";
-
-        //    string pythonPathUsedHere = null;
-        //    if (Program.options.python_exe_folder.Trim() == "")
-        //    {
-        //        //no path stated manually
-        //        if (Globals.detectedPythonPath == null || Globals.detectedPythonPath == "[[PythonDetectFailed]]")
-        //        {
-        //            //do not do this every time Python is called!
-        //            string pythonPath = GetPythonPath();
-        //            if (pythonPath == null || pythonPath.Trim() == "") Globals.detectedPythonPath = "[[PythonDetectFailed]]";
-        //            else Globals.detectedPythonPath = pythonPath;
-        //        }
-        //        else
-        //        {
-        //            //either second etc. time, or previous detect fail                    
-        //        }
-        //        pythonPathUsedHere = Globals.detectedPythonPath;
-        //    }
-        //    else
-        //    {
-        //        //overrides
-        //        if (Program.options.python_exe_folder.ToLower().EndsWith("\\python.exe"))
-        //        {
-        //            pythonPathUsedHere = Program.options.python_exe_folder;
-        //        }
-        //        else
-        //        {
-        //            if (Program.options.python_exe_folder.EndsWith("\\")) pythonPathUsedHere = Program.options.python_exe_folder + "python.exe";
-        //            else pythonPathUsedHere = Program.options.python_exe_folder + "\\python.exe";
-        //        }
-        //    }
-
-        //    //Now pythonPathUsedHere should be either
-        //    // - A file path ending with "\python.exe"
-        //    // - "[[PythonDetectFailed]]"
-
-        //    if (pythonPathUsedHere == "[[PythonDetectFailed]]")
-        //    {
-        //        G.Writeln2("*** ERROR: python.exe path could not be auto-detected.");
-        //        G.Writeln("           Please state the python.exe path manually with OPTION python exe folder = ...");
-        //        throw new GekkoException();
-        //    }
-
-        //    ProcessStartInfo start = new ProcessStartInfo();
-        //    start.FileName = pythonPathUsedHere;
-        //    start.Arguments = string.Format("\"{0}\" \"{1}\"", cmd, args);
-        //    start.UseShellExecute = false;// Do not use OS shell
-        //    start.CreateNoWindow = true; // We don't need new window
-        //    start.RedirectStandardOutput = true;// Any output, generated by application will be redirected back
-        //    start.RedirectStandardError = true; // Any error in standard output will be redirected back (for example exceptions)
-        //    start.WindowStyle = ProcessWindowStyle.Hidden;  //???
-            
-        //    try
-        //    {
-        //        using (Process process = Process.Start(start))
-        //        {
-        //            using (StreamReader reader = process.StandardOutput)
-        //            {
-        //                string stderr = process.StandardError.ReadToEnd(); // Here are the exceptions from our Python script
-        //                string result = reader.ReadToEnd(); // Here is the result of StdOut(for example: print "test")
-        //                return result + G.NL + stderr; ;
-        //            }
-        //        }
-        //    }
-        //    //Now PythonPathUsedHere is a file path ending with "\python.exe"            
-        //    catch (Exception e)
-        //    {
-        //        if (!File.Exists(start.FileName))
-        //        {
-        //            if (Program.options.python_exe_folder.Trim() == "")
-        //            {
-        //                //auto-detect
-        //                G.Writeln2("*** ERROR: Error message: " + e.Message);
-        //                G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
-        //                G.Writeln("           You may try to manually set \"OPTION python exe folder = ... , if you know the");
-        //                G.Writeln("           python.exe location.");
-        //                G.Writeln("           To locate your python.exe file location, you may try this:");
-        //                G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
-        //                G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
-        //            }
-        //            else
-        //            {
-        //                //stated manually
-        //                G.Writeln2("*** ERROR: Error message: " + e.Message);
-        //                G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " does not seem to exist.");
-        //                G.Writeln("           You may try to set \"OPTION python exe path = '';\" (or remove the option),");
-        //                G.Writeln("           which will make Gekko try to auto-detect the python.exe path.");
-        //                G.Writeln("           To locate your python.exe file location, you may try this:");
-        //                G.Writeln("             SYS 'python -c \"import sys; print(sys.executable)\"';");
-        //                G.Writeln("           This works for Python 3, for Python 2 you must omit the parentheses.");
-        //            }
-        //        }
-        //        else
-        //        {
-        //            G.Writeln2("*** ERROR: Error message: " + e.Message);
-        //            G.Writeln("*** ERROR: The file " + pythonPathUsedHere + " exists, but Python fails");
-        //        }
-        //        throw new GekkoException();
-        //    }            
-            
-        //}
-
+        
         public static void AddToPrecedents(Databank db, string varnameWithFreq)
         {
             
@@ -12554,18 +12348,7 @@ namespace Gekko
 
         public static void Decomp(O.Decomp1 o)
         {
-
-            //This is the starting point of a decomposition call
-            //Calls: Program.Decomp(decompOptions);
-            //       Program.DecompThreadFunction(Object o) --> doing stuff with EVal() function
-            //       Window1.RecalcCellsWithNewType();
-            //       Program.Decompose(DecompOptions o)
-            //
-            //CLICKING: Mouse_Down(), cf. #98732498724
-            //
-            //Actual calculation is in Decompose(DecompOptions o)
-
-            //We need to merge DecompHelper2() into Decompose()
+            
 
             DecompOptions decompOptions = new DecompOptions();                        
             decompOptions.t1 = o.t1;
@@ -14215,130 +13998,10 @@ namespace Gekko
                 return sequence[k - 1] + d * (sequence[k] - sequence[k - 1]);
             }
         }
-
-        ////Overload
-        //public static ExtractBankAndRestHelper ExtractBankAndRest(string input, EExtrackBankAndRest type)
-        //{
-        //    return ExtractBankAndRest(input, type, true);
-        //}
+        
 
         public static TwoInts f(int x) { return new TwoInts(); }
 
-        ////Does not allow wildcards in bankname
-        ////returns whether there is a ':' or not
-        //public static ExtractBankAndRestHelper ExtractBankAndRest(string input, EExtrackBankAndRest type, bool errorIfTimeseriesIsNotFound)
-        //{                        
-        //    //If noErrorIfTimeseriesIsNotFound = false, and the timeseries is not fund, the h.ts will be = null
-        //    ExtractBankAndRestHelper h = new ExtractBankAndRestHelper();
-        //    string[] split = input.Split(':');
-        //    if (split.Length == 1)
-        //    {
-        //        if (type == EExtrackBankAndRest.OnlyStringNoFirstName) h.bank = null;  //so that we can see that the name is not explicitly indicated
-        //        else h.bank = Program.databanks.GetFirst().name;
-        //        h.name = split[0].Trim();
-        //    }
-        //    else if (split.Length == 2)
-        //    {
-        //        h.bank = split[0].Trim();
-        //        if (h.bank == Globals.firstCheatString)
-        //        {
-        //            h.bank = Program.databanks.GetFirst().name;
-        //        }
-        //        else if (h.bank == "@")
-        //        {
-        //            h.bank = Program.databanks.GetRef().name;
-        //            h.hasColon = true;
-        //        }
-        //        else
-        //        {
-        //            h.hasColon = true;
-        //        }
-        //        h.name = split[1].Trim();
-        //    }
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Did not expect more than 1 colon in '" + input + "'");
-        //        throw new GekkoException();
-        //    }
-
-        //    if (h.bank != null && (h.bank.Contains("*") || h.bank.Contains("?")))
-        //    {
-        //        G.Writeln2("*** ERROR: Wildcard not allowed for bankname");
-        //        throw new GekkoException();
-        //    }
-
-        //    if (type == EExtrackBankAndRest.GetDatabank || type == EExtrackBankAndRest.GetDatabankAndTimeSeries)
-        //    {
-        //        //Will return databank object
-        //        h.databank = Program.databanks.GetDatabank(h.bank);
-        //        if (h.databank == null)
-        //        {
-        //            G.Writeln2("*** ERROR: Could not find databank '" + h.bank + "': is the databank open?");
-        //            throw new GekkoException();
-        //        }
-        //    }
-
-        //    if (type == EExtrackBankAndRest.GetDatabankAndTimeSeries)
-        //    {
-        //        //Will return timeseries object
-        //        h.ts = h.databank.GetVariable(h.name);
-        //        if (h.ts == null)
-        //        {
-        //            if (errorIfTimeseriesIsNotFound)
-        //            {
-        //                G.Writeln2("*** ERROR: Could not find timeseries '" + h.name + "' in '" + h.bank + "' databank");
-        //                throw new GekkoException();
-        //            }
-        //            else
-        //            {
-        //                //Do nothing, h.ts = null is returned. But we do not allow this ignore regarding a databank name.
-        //            }
-        //        }
-        //    }
-
-        //    return h;
-        //}
-
-        //public static void PutListIntoListOrListfile(List<string> listItems, string name, string listFile)
-        //{
-        //    List<string> newList = new List<string>();
-
-        //    if (name != null && listFile == null)
-        //    {
-        //        //newList = Program.CreateNewList(listItems, name);
-        //        List xxx = new List(listItems);
-        //        O.AddIVariableWithOverwriteFromString(name, xxx);
-        //    }
-        //    else if (name == null && listFile != null)
-        //    {
-        //        string file = listFile;
-        //        Program.WriteExternalListFile(file, listItems);
-        //    }
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Unexpected error #87230944 related to list name/listfile");
-        //        throw new GekkoException();
-        //    }
-
-        //    //Remove null element, if only one (used for "LIST xx = null")                
-        //    for (int i = 0; i < newList.Count; i++)
-        //    {
-        //        if (G.Equal(newList[i], "null"))
-        //        {
-        //            if (newList.Count == 1)
-        //            {
-        //                newList.Clear();  //remove the null element
-        //            }
-        //            else
-        //            {
-        //                G.Writeln2("*** ERROR: Null element is only allowed if it is the first and only list element");
-        //                throw new GekkoException();
-        //            }
-        //        }
-        //    }
-        //}
-
-        
         
 
         public static string HandleOneLiners(string text)
@@ -14655,23 +14318,7 @@ namespace Gekko
                     return "";
                 }
 
-                //if (s2.Length == 4)
-                //{
-                //    string sub = s2;
-                //    if (G.Equal(sub, "ast2"))
-                //    {
-                //        //typing "ast2" on the prompt means AST tree is printed out on screen
-                //        //and test parser is used
-                //        //only for debugging
-                //        //not intended for "normal" Gekko users.
-                //        Globals.printAST = true;
-                //        Globals.useTestParser = true;
-                //        G.Writeln("AST tree will be printed...");
-                //        G.Writeln("Testparser is used...");
-                //        return "";  //no need for the parser to chew on this afterwards!
-                //    }
-                //}
-
+                
                 if (s2.Length == "killexcel".Length)
                 {
                     if (G.Equal(s2, "killexcel"))
@@ -16775,22 +16422,8 @@ namespace Gekko
                     }
                 }
 
-                //List<string> varExpl = Program.GetVariableExplanation(varnameWithoutFreq);
-                //foreach (string line in varExpl)
-                //{
-                //    if (line != "")
-                //    {
-                //        G.Writeln(line);
-                //    }
-                //}
+                
 
-                //ts.label = "BNP i faste priser";
-                //ts.expression = "SERIES y = c + i + g;";
-                //ts.stamp = "20-1-2016 10:34";
-
-                //if (!G.NullOrBlanks(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
-                //if (!G.NullOrBlanks(ts.meta.source)) G.Writeln("Series source: " + ts.meta.source);
-                //if (!G.NullOrBlanks(ts.meta.units)) G.Writeln("Series units: " + ts.meta.units);
 
                 List<string> expls = Program.GetVariableExplanationNEW(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull);
                 foreach (string expl in expls) G.Writeln(expl);
@@ -19777,73 +19410,7 @@ namespace Gekko
             return new Tuple<GekkoDictionary<string, string>, StringBuilder>(dependents, hashHelper);
         }
 
-        //private static void Sneeze()
-        //{
-        //    List mm1 = new List();
-
-        //    StreamWriter sb = new StreamWriter(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\eqsunfold.txt");
-        //    foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
-        //    {
-        //        ModelGamsEquation eq = kvp.Value[0];
-
-        //        List mm2 = new List();
-        //        mm2.Add(new ScalarString(eq.nameGams));
-
-        //        //List: idea is to have a list m0 in this format:
-        //        //m0 is a list of (list) m1
-        //        //each m1 corresponds to a GAMS-eq. First element of m1 is the name, the rest are sub-equations (lists) m2
-        //        //each m2 is a list of strings (variable names)
-
-        //        sb.WriteLine();
-        //        sb.WriteLine("-----------------------------------------------------------");
-        //        sb.WriteLine(eq.nameGams + ", #subeqs: " + eq.expressions.Count);
-        //        sb.WriteLine("$condition: " + eq.conditionals);
-        //        sb.WriteLine(eq.lhs + " = " + eq.rhs);
-        //        if (eq.expressionVariablesWithSets == null)
-        //        {
-        //            sb.WriteLine("FULL  ditto");
-        //        }
-        //        else
-        //        {
-        //            if (eq.expressionVariablesWithSets.Count == 0)
-        //            {
-        //                sb.WriteLine("FULL  ditto, eqcount0");
-        //            }
-        //            else
-        //            {
-        //                for (int i = 0; i < eq.expressionVariablesWithSets.Count; i++)
-        //                {
-        //                    //for each sub-equation
-
-        //                    List mm3 = new List();
-
-        //                    List<string> m2 = eq.expressionVariablesWithSets[i];
-
-        //                    if (m2 != null)
-        //                    {
-        //                        foreach (string s2 in m2)
-        //                        {
-        //                            ScalarString ss2 = new ScalarString(s2);
-        //                            mm3.Add(ss2);
-        //                        }
-        //                    }
-
-        //                    sb.WriteLine("FULL  " + G.GetListWithCommas(m2));
-
-        //                    mm2.Add(mm3);
-        //                }
-        //            }
-        //        }
-        //        mm1.Add(mm2);
-        //    }
-        //    sb.Flush();
-        //    sb.Close();
-
-        //    Program.databanks.GetFirst().Clear();
-        //    Program.databanks.GetFirst().AddIVariable("#m", mm1);
-        //    WriteGbk(Program.databanks.GetFirst(), GekkoTime.tNull, GekkoTime.tNull, @"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\model.gbk", false, null, null, true, false);
-        //}
-
+        
 
         private static void Sniff2()
         {
@@ -20606,20 +20173,12 @@ namespace Gekko
             }
             else if(pause)
             {
-                //try
-                //{
-                //    Globals.pipeFileHelper.isPiping = false;
-                //}
-                //catch { };  //not the end of the world if it fails, for instance if the pipeFileHelper is not there
+                
                 Globals.pipe = false;
             }
             else if(continue2)
             {
-                //try
-                //{
-                //    Globals.pipeFileHelper.isPiping = true;
-                //}
-                //catch { };  //not the end of the world if it fails, for instance if the pipeFileHelper is not there
+                
                 Globals.pipe = true;
             }
             else
@@ -24283,218 +23842,7 @@ namespace Gekko
             }
         }
 
-        //==============================================================
-        //==============================================================
-        //==============================================================
-
-
-
-        //public static void Upd(O.Upd o)
-        //{
-        //    //We start with expansion of o.data (regarding REP n, REP *)
-
-        //    ESeriesUpdTypes updType = ESeriesUpdTypes.none;
-        //    if (G.Equal(o.opt_d, "yes")) updType = ESeriesUpdTypes.d;
-        //    else if (G.Equal(o.opt_p, "yes")) updType = ESeriesUpdTypes.p;
-        //    else if (G.Equal(o.opt_m, "yes")) updType = ESeriesUpdTypes.m;
-        //    else if (G.Equal(o.opt_q, "yes")) updType = ESeriesUpdTypes.q;
-        //    else if (G.Equal(o.opt_mp, "yes")) updType = ESeriesUpdTypes.mp;
-        //    else if (G.Equal(o.opt_n, "yes")) updType = ESeriesUpdTypes.n;
-
-        //    if (o.op != "=" && updType != ESeriesUpdTypes.none)
-        //    {
-        //        G.Writeln2("*** ERROR: You cannot mix <" + updType.ToString() + "> and '" + o.op + "' operator at the same time");
-        //        throw new GekkoException();
-        //    }
-
-        //    bool updTypeDollar = false;
-
-        //    if (G.Equal(o.opt_keep, "p"))
-        //    {
-        //        updTypeDollar = true;
-        //    }
-        //    else
-        //    {
-        //        if (o.opt_keep != null)
-        //        {
-        //            G.Writeln2("*** ERROR: Only <keep=p> is supported at the moment");
-        //            throw new GekkoException();
-        //        }
-        //    }
-
-        //    if (o.opDollar && updTypeDollar)
-        //    {
-        //        G.Writeln2("*** ERROR: You cannot use <keep> and the '$' operator at the same time");
-        //        throw new GekkoException();
-        //    }
-
-        //    GekkoTime tStart = o.t1;
-        //    GekkoTime tEnd = o.t2;
-        //    int expectedNumberOfObservations = GekkoTime.Observations(tStart, tEnd);
-
-        //    List<double> data2 = new List<double>();
-        //    bool enlarge = false;
-        //    for (int i = 0; i < o.data.Length; i++)
-        //    {
-        //        double data = o.data[i];
-        //        double rep = o.rep[i];
-
-        //        if (rep == 1d)
-        //        {
-        //            data2.Add(data);
-        //        }
-        //        else if (rep == -12345d)
-        //        {
-        //            if (i != o.data.Length - 1)
-        //            {
-        //                G.Writeln2("*** ERROR: You can only use 'REP *' on the last UPD item");
-        //                throw new GekkoException();
-        //            }
-        //            data2.Add(data);
-        //            enlarge = true;
-        //        }
-        //        else
-        //        {
-        //            int repI = (int)rep;
-
-        //            if (repI != rep)
-        //            {
-        //                G.Writeln2("*** ERROR: UPD: REP " + rep + " is not an integer value");
-        //                throw new GekkoException();
-        //            }
-
-        //            if (repI < 1)
-        //            {
-        //                G.Writeln2("*** ERROR: UPD: REP " + repI + " should not be zero or negative");
-        //                throw new GekkoException();
-        //            }
-        //            else if (repI > 10000)
-        //            {
-        //                G.Writeln2("*** ERROR: UPD: REP " + repI + " seems too large... (> 10.000)");
-        //                throw new GekkoException();
-        //            }
-        //            //Now we know that repI is 1, 2, 3, ... up to a resonable number
-        //            for (int j = 0; j < repI; j++)
-        //            {
-        //                data2.Add(data);
-        //            }
-        //        }
-        //    }
-        //    o.data = data2.ToArray();
-        //    if (enlarge) o.data = UpdEnlargeDataArray(expectedNumberOfObservations, o.data);
-
-        //    //ErrorIfDatabanksSwapped();
-        //    Databank first = Program.databanks.GetFirst();
-
-        //    string op = o.op;
-
-        //    foreach(string name in o.listItems)
-        //    {
-        //        string var = name;
-        //        Series ts = GetTimeSeriesFromString(var, O.ECreatePossibilities.Can);
-        //        if (ts == null)
-        //        {
-        //            if (op != "=")
-        //            {
-        //                IssueCreateWarning(var);
-        //                continue;
-        //            }
-        //            else
-        //            {
-        //                if (var.ToLower().StartsWith("xx", true, null))
-        //                {
-        //                    //only vars beginning with "xx", and only "="-operator
-        //                    //G.Writeln("+++ NOTE: upd: variable " + var + " not found in databank -- is created");
-        //                    ts = new Series(Program.options.freq, var);
-        //                    first.AddVariable(ts);
-        //                }
-        //                else
-        //                {
-        //                    IssueCreateWarning(var);
-        //                    continue;
-        //                }
-        //            }
-        //        }
-
-        //        bool endo = false;
-        //        if (Program.model != null && Program.model.modelGekko.m2.endogenous != null)
-        //        {
-        //            endo = Program.model.modelGekko.m2.endogenous.ContainsKey(ts.name);
-        //            if (endo) G.Writeln("+++ NOTE: You are updating a left-hand side variable (" + ts.name + ")");
-        //        }
-
-        //        //Series ts = work.GetVariable(var2);
-        //        Series tsOld = null;
-        //        if (op == "#" || updTypeDollar || o.opDollar || updType == ESeriesUpdTypes.mp)
-        //        {
-        //            tsOld = ts.DeepClone(null) as Series;  //make a copy for use in # or $ or <mp> operator
-        //        }
-
-        //        if (o.data.Length > expectedNumberOfObservations)
-        //        {
-        //            //TODO: truncate it
-        //            G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
-        //            throw new GekkoException();
-        //        }
-
-        //        if (o.data.Length < expectedNumberOfObservations)
-        //        {
-        //            if (o.data.Length == 1)
-        //            {
-        //                //enlarge
-        //                o.data = UpdEnlargeDataArray(expectedNumberOfObservations, o.data);
-        //            }
-        //            else
-        //            {
-        //                G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
-        //                throw new GekkoException();
-        //            }
-        //        }
-
-        //        GekkoTime tStartM1 = tStart.Add(-1);
-        //        if (op == "%" || op == "^" || op == "#" || updType == ESeriesUpdTypes.p || updType == ESeriesUpdTypes.d || updType == ESeriesUpdTypes.mp)
-        //        {
-        //            double dataLag = ts.GetData(null, tStartM1);
-        //            if (double.IsNaN(dataLag)) G.Writeln("+++ NOTE: variable '" + ts.name + "' is missing in period " + (tStartM1) + ", so the result will be missing values");
-        //        }
-
-        //        int counter = 0;
-        //        foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-        //        {
-        //            UpdHelper(ts, op, t, o.data[counter], tsOld, updType);
-        //            counter++;  //IMPORTANT!
-        //        }
-
-        //        if (o.opDollar || updTypeDollar)
-        //        {
-        //            GekkoTime last = ts.GetPeriodLast();
-        //            GekkoTime tEndP1 = tEnd.Add(1);
-        //            foreach (GekkoTime t in new GekkoTimeIterator(tEndP1, last))
-        //            {
-        //                GekkoTime tM1 = t.Add(-1);
-        //                double old = tsOld.GetData(null, t);
-        //                double oldLag = tsOld.GetData(null, tM1);
-        //                double newLag = ts.GetData(null, tM1);
-        //                double v = old / oldLag;
-        //                if (old == 0d && oldLag == 0d)
-        //                {
-        //                    v = 0d;  //same in PCIM
-        //                }
-        //                ts.SetData(t, newLag * v);
-        //            }
-        //        }
-        //        ts.Stamp();
-
-        //        if (o.meta != null)
-        //        {
-        //            //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
-        //            string s = O.ShowDatesAsString(tStart, tEnd);
-        //            ts.meta.source = s + o.meta;                    
-        //            ts.SetDirty(true);
-        //        }
-        //    }
-        //}
-
+        
         private static double[] UpdEnlargeDataArray(int expectedNumberOfObservations, double[] input)
         {
             if (input.Length > expectedNumberOfObservations)
@@ -28151,93 +27499,10 @@ namespace Gekko
 
                 G.Writeln2("Created: " + G.GetListWithCommas(vars));
                    
-                //bool usedInCreateCommand = true;
-                //int counter = CreateVariables(vars, usedInCreateCommand);
-                //if (Program.options.databank_create_message)
-                //{
-                //    if (counter == 0) G.Writeln2("Did not create any variables");
-                //    else
-                //    {
-                //        if (o.p.IsSimple())
-                //        {
-                //            if (counter == 1)
-                //            {
-                //                G.Writeln2("Created 1 variable with freq '" + Program.options.freq + "'" + " ");
-                //            }
-                //            else
-                //            {
-                //                G.Writeln2("Created " + counter + " variables with freq '" + Program.options.freq + "'" + " ");
-                //            }
-                //        }
-                //    }
-                //}
-                //G.Writeln();
+                
             }
         }
 
-        //public static int CreateVariables(List<string> vars, bool usedInCreateCommand)
-        //{
-        //    int counter = 0;
-        //    foreach (string s in vars)
-        //    {
-        //        string defaultBank = null;
-        //        List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
-
-        //        foreach(BankNameVersion bnv in list)
-        //        {
-        //            //See //#89052349875, maybe merge it
-        //            Databank db = null;
-        //            if (bnv.bank == null) db = Program.databanks.GetFirst();
-        //            else
-        //            {
-        //                db = Program.databanks.GetDatabank(bnv.bank);
-        //                if (db == null)
-        //                {
-        //                    G.Writeln2("*** ERROR: Could not find databank '" + bnv.bank + "'");
-        //                    throw new GekkoException();
-        //                }
-        //            }
-        //            Series ts = db.GetVariable(bnv.name); //#getvar
-        //            if (ts == null)
-        //            {
-        //                //#642842749283
-        //                ts = new Series(Program.options.freq, bnv.name);
-        //                if (!Globals.globalPeriodStart.IsNull())
-        //                {
-        //                    //WHY is this done. For efficiency afterwards??
-        //                    //TO get start/end date??
-        //                    foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
-        //                    {
-        //                        ts.SetData(gt, double.NaN);
-        //                    }
-        //                }
-
-        //                //We know the timeseries does not already exist
-        //                //database will throw a protecterror if it is non-editable
-        //                db.AddVariable(ts);
-
-        //                if (usedInCreateCommand == true)
-        //                {
-        //                    //normally it shouldn't exist, but we check for safety
-        //                    if (!Globals.createdVariables.ContainsKey(AddFreqAtEndOfVariableName(ts.name)))
-        //                    {
-        //                        Globals.createdVariables.Add(AddFreqAtEndOfVariableName(ts.name), "");
-        //                    }
-        //                }
-        //                counter++;
-        //            }
-        //            else
-        //            {
-        //                if (usedInCreateCommand && Program.options.databank_create_message)
-        //                {
-        //                    G.Writeln2("+++ WARNING: CREATE: variable " + db.name + ":" + ts.name + " already exists");
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return counter;
-        //}       
         
 
         public static void Collapse(List lhs, List rhs, string method, P p)
@@ -30142,59 +29407,7 @@ namespace Gekko
             }
         }
 
-        //private static void UnfoldVarsAndLabels(ref int k, ref double[,] tsData, GekkoTime t1, GekkoTime t2, List<string> labels, int n, List<O.Prt.Element> elements, int constant)
-        //{           
-        //    foreach (O.Prt.Element e in elements)
-        //    {
-        //        foreach (O.Prt.SubElement se in e.subElements)
-        //        {
-        //            k += 1;
-        //            if (se.label != null) labels.Add(G.ReplaceGlueNew(se.label));
-        //            else labels.Add(G.ReplaceGlueNew(e.label));
-        //        }
-        //    }
-        //    if(constant == 1)
-        //    {
-        //        labels.Add("CONSTANT");
-        //    }
-        //    if (k == 0)
-        //    {
-        //        G.Writeln2("*** ERROR: Number of explanatory variables = 0");  //probably not possible unless empty list
-        //        throw new GekkoException();
-        //    }
-        //    k += constant;
-
-        //    tsData = new double[n, k];
-        //    Databank work = Program.databanks.GetFirst();
-        //    int countT = -1;
-        //    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-        //    {
-        //        countT++;
-        //        int countK = -1;
-        //        foreach (O.Prt.Element e in elements)
-        //        {
-        //            foreach (O.Prt.SubElement se in e.subElements)
-        //            {
-        //                countK++;
-        //                double v = (se.tsWork as Series).GetData(null, t);
-        //                if (G.isNumericalError(v))
-        //                {
-        //                    G.Writeln2("*** ERROR: Missing value: " + labels[countK] + " in " + t.ToString());
-        //                    G.Writeln("           Workaround: see command FINDMISSINGDATA<replace>");
-        //                    throw new GekkoException();
-        //                }
-        //                tsData[countT, countK] = v;
-        //            }
-        //        }
-        //        if (constant == 1)
-        //        {
-        //            countK++;
-        //            tsData[countT, countK] = 1d;
-        //        }
-        //    }
-        //}
-
-       
+        
 
         public static DialogResult InputBox(string title, string promptText, ref string value)
         {
@@ -30259,47 +29472,7 @@ namespace Gekko
             return Math.Floor(Math.Log10(Math.Abs(d))) + 1;
         }
 
-        //public static void PrtNew(O.Prt o)
-        //{
-
-        //    //precedentsInput may contain #var, @var, var¤-1, @var¤-1, and also also fy#i or fy{i} (or var¤¤2010m7)
-
-        //    LocalBanks localBanks = new LocalBanks();
-        //    o.opt_filename = StripQuotes(o.opt_filename);  //necessary???
-
-        //    if (o.prtElements.Count == 0)
-        //    {
-        //        //should not be possible
-        //        G.Writeln2("*** ERROR: No variables given");
-        //        throw new GekkoException();
-        //    }
-
-        //    //==================================================================================
-
-        //    if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip"))
-        //    {
-        //        //do nothing, do not start pipe2
-        //    }
-        //    else
-        //    {
-        //        MaybeStartPipe2(o.opt_filename);
-        //    }
-        //    try
-        //    {
-        //        Program.PrtNew2(o);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        bool message = false;
-        //        if (Globals.pipe2) message = true;
-        //        ReleasePipe2();  //no harm if it is not active
-        //        if (message) G.Writeln2("Data written to file '" + o.opt_filename + "'");
-        //    }
-        //}
+        
 
         public static void AllSeriesCheckRecursive(IVariable x, ref bool fail, ref int seriesCounter)
         {
@@ -30318,59 +29491,7 @@ namespace Gekko
             }
         }
 
-        //public static bool AllSeriesCheck(O.Prt oPrt, EPrintTypes type)
-        //{
-
-        //    //all are val or series
-        //    //at least one series            
-
-        //    int seriesCounter = 0;
-        //    if (type == EPrintTypes.Print)
-        //    {
-        //        //check if elements are non-series, or lists with non-series
-        //        foreach (O.Prt.Element element in oPrt.prtElements)
-        //        {
-        //            for (int i = 0; i < 2; i++)
-        //            {
-        //                IVariable x = element.variable[i];
-        //                bool fail = false;
-        //                if (x != null)
-        //                {
-        //                    List temp = x as List;
-        //                    if (temp != null)
-        //                    {
-        //                        foreach (IVariable iv in temp.list)
-        //                        {
-        //                            AllSeriesHelper(ref seriesCounter, ref fail, iv);
-        //                            if (fail) break;
-        //                        }
-        //                    }
-        //                    else
-        //                    {
-
-        //                        AllSeriesHelper(ref seriesCounter, ref fail, x);
-        //                    }
-        //                }
-        //                if (fail) return false;                   
-        //            }                 
-                    
-        //        }
-        //        if (seriesCounter == 0) return false;  //seriesCounter also includes GekkoNull objects
-        //    }
-        //    else
-        //    {
-        //        //not prt
-        //        return true;
-        //    }
-        //    return true;
-        //}
-
-        //private static void AllSeriesHelper(ref int seriesCounter, ref bool fail, IVariable iv)
-        //{
-        //    if (!IsSeriesType(iv)) fail = true;
-        //    if (iv.Type() == EVariableType.Series || G.IsGekkoNull(iv)) seriesCounter++;
-        //}
-
+        
         private static bool IsSeriesType(IVariable iv)
         {
             //if (iv == null) return false;
@@ -30999,21 +30120,7 @@ namespace Gekko
                 }
             }
 
-            //int max = int.MinValue;
-            //for (int j2 = 0; j2 < n; j2++)
-            //{
-            //    max = Math.Max(max, colCounter[j2]);
-            //}
-            //for (int j2 = 0; j2 < n; j2++)
-            //{
-            //    for (int i2 = colCounter[j2]; i2 < max; i2++)
-            //    {
-            //        table.Set(i2 + 1, j2 + 1, "M");
-            //        table.SetAlign(i2 + 1, j2 + 1, Align.Right);
-            //        table.Set(i2 + 1, n + j2 + 1, "M", CellType.Text);
-            //        table.SetAlign(i2 + 1, n + j2 + 1, Align.Right);
-            //    }
-            //}
+            
 
 
             return plotTable;
@@ -32345,100 +31452,7 @@ namespace Gekko
             return lbl;
         }
 
-        //public static bool OprintHandleArraySeriesWithoutIndex(O.Prt o, int i, List<string> labelsHandmade, ref List mm0, ref List mm1)
-        //{
-        //    //int i = 0;
-        //    bool isArraySeriesWithoutIndex = false;
-        //    if (((o.prtElements[i].variable[0] != null && o.prtElements[i].variable[0].Type() == EVariableType.Series) || (o.prtElements[i].variable[1] != null && o.prtElements[i].variable[1].Type() == EVariableType.Series)))
-        //    {
-        //        string label = o.prtElements[i].labelGiven[0];
-
-        //        bool[] banks = new bool[2];  //first, ref
-        //        foreach (string printCode in o.prtElements[i].printCodesFinal)
-        //        {
-        //            int bankCombi = GetBankCombi(printCode);
-        //            if (bankCombi == 0) banks[0] = true;
-        //            else if (bankCombi == 1) banks[1] = true;
-        //            else if (bankCombi == 2)
-        //            {
-        //                banks[0] = true;
-        //                banks[1] = true;
-        //            }
-        //        }
-
-        //        Series tsFirst = null;
-        //        Series tsRef = null;
-        //        if (banks[0]) tsFirst = o.prtElements[i].variable[0] as Series;
-        //        if (banks[1]) tsRef = o.prtElements[i].variable[1] as Series;
-
-        //        string name = null;
-        //        if (tsFirst != null) name = tsFirst.name;
-        //        else name = tsRef.name;
-
-        //        if ((tsFirst != null && tsFirst.type == ESeriesType.ArraySuper) || (tsRef != null && tsRef.type == ESeriesType.ArraySuper))
-        //        {
-        //            //Print an array-timeseries
-
-        //            List<MapMultidimItem> keys = null;
-
-        //            if (tsFirst != null) keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
-        //            else if (tsRef != null) keys = tsRef.dimensionsStorage.storage.Keys.ToList();
-
-        //            if (keys.Count == 0)
-        //            {
-        //                G.Writeln2("Array-series " + G.GetNameAndFreqPretty(name) + " has no elements");
-        //                throw new GekkoException();
-        //            }
-        //            keys.Sort(CompareMapMultidimItems);
-                    
-        //            foreach (MapMultidimItem key in keys)
-        //            {
-        //                try
-        //                {
-        //                    if (banks[0])
-        //                    {
-        //                        if (mm0 == null) mm0 = new Gekko.List();
-        //                        mm0.Add(tsFirst.dimensionsStorage.storage[key]);
-        //                    }
-        //                    if (banks[1])
-        //                    {
-        //                        if (mm1 == null) mm1 = new Gekko.List();
-        //                        mm1.Add(tsRef.dimensionsStorage.storage[key]);
-        //                    }
-        //                }
-        //                catch
-        //                {
-        //                    G.Writeln2("*** ERROR: Array elements do not match in first-position and ref databank");
-        //                    throw new GekkoException();
-        //                }
-        //                string bankName = null;
-
-        //                bool isSimple = true;
-        //                foreach (char c in label)
-        //                {
-        //                    if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
-        //                    {
-        //                        //ok
-        //                    }
-        //                    else
-        //                    {
-        //                        isSimple = false;
-        //                        break;
-        //                    }
-        //                }
-
-        //                string blanks = "  ";
-        //                if (isSimple) blanks = "";
-                                               
-        //                labelsHandmade.Add(label + blanks + "[" + key.ToString() + "]");                        
-        //            }
-                    
-        //            isArraySeriesWithoutIndex = true;
-        //        }
-        //    }
-
-        //    return isArraySeriesWithoutIndex;
-        //}
+        
 
         private static int GetBankCombi(string operator2)
         {
@@ -32788,146 +31802,6 @@ namespace Gekko
                 th.subnodes[th.subnodes.storage.Count - 1].s = "";
             }
         }
-
-        //public static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<O.LabelHelperIVariable>> labelHelper2)
-        //{
-        //    //string elementLabel = G.ReplaceGlueNew(xelementLabel);
-
-        //    labels2 = new List<string>();
-
-        //    /*
-        //     * For instance p x1[#m]+x2[#n]+sum(#k,x[#m,#n,#k]);   
-        //     * Here freelists will be 'm' and 'n'.
-        //     * If these are a,b and x,y we get labelHelper2 like this:
-        //     * 
-        //     * a x a x e
-        //     * a y a y e
-        //     * b x b x e
-        //     * b y b y e
-        //     * 
-        //     * labelHelper2 only records inside [] or {} at the top level (not nested)
-        //     * 
-        //     * The tokens are like this:                 
-        //     */
-        //    //               
-        //    /*
-
-        //    x1 
-        //      [
-        //       #                    
-        //       m                    
-        //      ]                    
-        //    + 
-        //     x2 
-        //       [
-        //       #                    
-        //       n                    
-        //       ]                    
-        //     + 
-        //     sum 
-        //       (
-        //       #                    
-        //       k                    
-        //       , 
-        //       x                    
-        //         [
-        //         #                    
-        //         m                    
-        //         , 
-        //         #                    
-        //         n                    
-        //         , 
-        //         #                    
-        //         k                    
-        //         ]                    
-        //       )                    
-        //         EOF
-        //         */
-
-        //    //So we walk the tokens, inserting from labelHelper2. Here, only STRING/DATE/VAL from labelHelper2are accepted, with 
-        //    //one exception: if the token is a #x AND the token is not in freelists, we keep the '#x' and not the string from
-        //    //labelHelper2. For instance: sum(#x, x[#x, #y, %s]). Here %s string is set in (easy). Also, the string in the
-        //    //place of #y is set in, because 'y' is in freelists. Regarding #x, it is kept as it is.
-
-        //    string[] freelists = new string[0];
-        //    string rawLabel = elementLabel;
-        //    string[] ss = elementLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
-
-        //    if (ss.Length > 1)
-        //    {
-        //        rawLabel = ss[1];
-        //        freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
-        //        for (int i = 0; i < freelists.Length; i++)
-        //        {
-        //            freelists[i] = freelists[i].Trim();  //there may be a blank
-        //        }
-        //    }
-
-        //    //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
-
-        //    var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
-
-        //    TokenHelper helperParent = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
-        //    TokenList tokens2 = helperParent.subnodes;
-
-        //    if (false && Globals.runningOnTTComputer)
-        //    {
-        //        TokenHelper.Print(tokens2, 0);
-        //        //TokenHelper.Print(tokens2.DeepClone(), 0);
-        //    }
-
-            
-        //    foreach (List<O.LabelHelperIVariable> list in labelHelper2)
-        //    {
-        //        bool problem = false;
-        //        string result = null;
-        //        try
-        //        {
-        //            int counter = -1;
-
-        //            TokenList temp = tokens2.DeepClone(helperParent);
-
-        //            problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
-        //            if (!problem) result = temp.ToString();
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            problem = true;
-        //        }
-        //        if (problem)
-        //        {
-        //            //this way, there is not a complete crash, and the users get something.
-        //            //they may complain that the label is non-informative though.
-        //            //string[] sss = rawLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
-        //            //if (ss.Length > 1) rawLabel = ss[1];
-        //            labels2.Add(rawLabel);
-        //        }
-        //        else
-        //        {
-        //            labels2.Add(result);
-        //        }
-        //        //
-        //    }
-
-        //    return;
-        //}
-
-        //private static void UnfoldLabelsHelper(List<TokenHelper> a, string list0, ref string ss2, ref int i, string freelist, ref bool flag)
-        //{
-        //    if (a[i].s == "{" && a[i + 1].s == "#" && a[i + 3].s == "}" && G.Equal(a[i + 2].s, freelist))
-        //    {
-        //        ss2 += list0;  //no leftblanks                                
-        //        i += 3;
-        //        flag = true;
-        //    }
-        //    else if (a[i].s == "#" && G.Equal(a[i + 1].s, freelist))
-        //    {
-        //        ss2 += a[i].leftblanks + list0;
-        //        i++;
-        //        flag = true;
-        //    }
-        //}
-
         
         private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string operator2, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {
@@ -33008,57 +31882,7 @@ namespace Gekko
                 double varPch = double.NaN;
                 Program.ComputeValueForPrintPlotNew(out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, false, sumOver);
                 return var1;
-            }
-            else
-            {
-                //int filterSkip = 0;
-                //if (t.freq == EFreq.U) filterSkip = skipCounter[0];
-                //else if (t.freq == EFreq.A) filterSkip = skipCounter[1];
-                //else if (t.freq == EFreq.Q) filterSkip = skipCounter[2];
-                //else if (t.freq == EFreq.M) filterSkip = skipCounter[3];
-
-                //double dWork = 0d;
-                //double dRef = 0d;
-                //double dWorkLag = 0d;
-                //double dWorkLag2 = 0d;
-                //double dRefLag = 0d;
-                //double dRefLag2 = 0d;
-                //for (int i = 0; i < sumOver + filterSkip; i++)
-                //{
-                //    if (tsWork != null)
-                //    {
-                //        dWork += tsWork.GetData(smpl, t.Add(-i));
-                //        dWorkLag += tsWork.GetData(smpl, t.Add(-i - 1));
-                //        dWorkLag2 += tsWork.GetData(smpl, t.Add(-i - 2));
-                //    }
-                //    if (tsRef != null)
-                //    {
-                //        dRef += tsRef.GetData(smpl, t.Add(-i));
-                //        dRefLag += tsRef.GetData(smpl, t.Add(-i - 1));
-                //        dRefLag2 += tsRef.GetData(smpl, t.Add(-i - 2));
-                //    }
-                //}
-
-                ////double var1 = double.NaN;
-                ////double varPch = double.NaN;
-                ////Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, false, false);
-
-                //if (G.Equal(printcode, Globals.printCode_n)) return dWork;
-                //else if (G.Equal(printcode, Globals.printCode_m)) return dWork - dRef;
-                //else if (G.Equal(printcode, Globals.printCode_q)) return (dWork / dRef - 1d) * 100d;
-                //else if (G.Equal(printcode, Globals.printCode_d)) return dWork - dWorkLag;
-                //else if (G.Equal(printcode, Globals.printCode_p)) return (dWork / dWorkLag - 1d) * 100d;
-                //else if (G.Equal(printcode, Globals.printCode_dp)) return (dWork / dWorkLag - 1d) * 100d - (dWorkLag / dWorkLag2 - 1d) * 100d;
-                //else if (G.Equal(printcode, Globals.printCode_r) || G.Equal(printcode, Globals.printCode_rn)) return dRef;
-                //else if (G.Equal(printcode, Globals.printCode_rd)) return dRef - dRefLag;
-                //else if (G.Equal(printcode, Globals.printCode_rp)) return (dRef / dRefLag - 1d) * 100d;
-                //else if (G.Equal(printcode, Globals.printCode_rdp)) return (dRef / dRefLag - 1d) * 100d - (dRefLag / dRefLag2 - 1d) * 100d;
-                //else
-                //{
-                //    G.Writeln2("*** ERROR: Transformation error");
-                //    throw new GekkoException();
-                //}
-            }
+            }            
         }
 
         private static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, int sumOver, int[] skipCounter)
@@ -34170,16 +32994,7 @@ namespace Gekko
             G.Writeln("*** ERROR: You are trying to put data into a variable or list ('" + variable + "') that does not exist.");
             G.Writeln("           Please create the variable or list first (CREATE or LIST command), or use a");
             G.Writeln("           name that starts with the characters 'xx'.");
-            //if (Program.options.calc_ignoremissingvars)
-            //{
-            //    G.Writeln("           The error is ignored: set 'OPTION calc ignoremissingvars = no' to enforce such errors");
-            //}
-            //else
-            //{
-            //    G.Writeln("           Since Gekko 1.5.1 and onwards, Gekko will abort execution in such cases.");
-            //    G.Writeln("           You may set 'OPTION calc ignoremissingvars = yes' to ignore such problems.");
-            //    throw new GekkoException();
-            //}
+            
         }
 
 
@@ -39069,32 +37884,7 @@ namespace Gekko
             return;
         }
 
-
-        //The model's residuals (y) depend upon the values of the endogenous (x),
-        //for each year simulated (same number of y and x).
-        //public static int runModel(IElementalAccessVector y, IElementalAccessVector x, Type assembly)
-        //{
-        //    int numericalProblem = -12345;
-        //    //y er residualer, mens x er endogene
-        //    for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-        //    {
-        //        model.b[model.m2.fromEqNumberToBNumber[i]] = x.GetValue(i);
-        //    }
-
-        //    model.r = new double[model.m2.fromEqNumberToBNumber.Length];
-        //    SimulateResiduals(model.b, model.r, assembly);
-
-        //    //y er residualer, mens x er endogene
-        //    for (int i = 0; i < model.m2.fromEqNumberToBNumber.Length; i++)
-        //    {
-        //        if (G.isNumericalError(model.r[i]))
-        //        {
-        //            numericalProblem = i;
-        //        }
-        //        y.SetValue(i, model.r[i]);
-        //    }
-        //    return numericalProblem;  //problem identifies if there is an inf or NaN (-12345 means no problem)
-        //}
+        
 
         public static void Jacobi(IElementalAccessVector x, Type assembly)
         {
@@ -39188,30 +37978,7 @@ namespace Gekko
             return z;
         }
 
-        //public static double[,] MultiplyMatrix(double[,]a, double[,]b)
-        //{
-        //    double[,] c = null;
-        //    if (a.GetLength(1) == b.GetLength(0))
-        //    {
-        //        c = new double[a.GetLength(0), b.GetLength(1)];
-        //        for (int i = 0; i < c.GetLength(0); i++)
-        //        {
-        //            for (int j = 0; j < c.GetLength(1); j++)
-        //            {
-        //                c[i, j] = 0;
-        //                for (int k = 0; k < a.GetLength(1); k++) // OR k<b.GetLength(0)
-        //                    c[i, j] = c[i, j] + a[i, k] * b[k, j];
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Number of columns in First Matrix should be equal to Number of rows in Second Matrix.");
-        //        throw new GekkoException();
-        //    }
-        //    return c;
-        //}
-
+        
 
         private static void EigenValues()
         {
@@ -41733,49 +40500,7 @@ namespace Gekko
         }
 
 
-        //public static void MakeFlatOrZero(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool zero)
-        //{
-        //    Databank db = Program.databanks.GetFirst();
-        //    List<string> unfoldedList = list;
-
-        //    List<string> listUsedHere = new List<string>();
-        //    if (list.Count == 0)
-        //    {
-        //        Dictionary<string, Series> vars = db.storage;
-        //        foreach (string var in vars.Keys)
-        //        {
-        //            listUsedHere.Add(var);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        listUsedHere.AddRange(list);
-        //    }
-
-        //    foreach (string var in listUsedHere)
-        //    {
-        //        Series ts = db.GetVariable(var);
-        //        if (ts == null)
-        //        {
-        //            G.Writeln2("*** ERROR: variable '" + var + "' not found");
-        //            throw new GekkoException();
-        //        }
-        //        GekkoTime tStartM1 = tStart.Add(-1);
-        //        double lastVal = ts.GetData(null, tStartM1);
-        //        foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
-        //        {
-        //            if (zero)
-        //            {
-        //                ts.SetData(t, 0d);
-        //            }
-        //            else
-        //            {
-        //                ts.SetData(t, lastVal);
-        //            }
-        //        }
-        //    }
-        //}
-
+        
         public static void CompareModelDatabankVarlist()
         {
             if (!G.HasModelGekko())
@@ -43139,76 +41864,7 @@ namespace Gekko
             G.Writeln("Use 'DISP <" + G.FromDateToString(t) + " " + G.FromDateToString(t) + " info> variable;' or 'DECOMP <" + G.FromDateToString(t) + " " + G.FromDateToString(t) + "> variable;' to trace further.");
             G.Writeln();
         }
-
-        //obsolete???
-        //private static void UpdPrt(List<string> al, List<string> alType)
-        //{
-        //    //         0        1        2      3
-        //    //      updprt <operator> <var1> <var2>
-        //    Databank work = Program.databanks.GetFirst();
-        //    Databank base2 = Program.databanks.GetRef();
-        //    string op = (string)al[1];
-
-        //    GekkoTime tStart = Globals.globalPeriodStart;
-        //    GekkoTime tEnd = Globals.globalPeriodEnd;
-
-        //    string extra = "¤ ";
-        //    extra = "";
-
-        //    for (int j = 2; j < al.Count; j++)
-        //    {
-        //        string var = (String)al[j];
-
-        //        if (work.ContainsIVariable(var + "!a"))  //use tryGet for speedup
-        //        {
-        //            G.Writeln();
-        //            Series ts = work.GetIVariable(var + "!a") as Series; //#getvar
-
-        //            G.Write(extra + "upd " + var + " " + tStart.super + " " + tEnd.super + " " + op + " ");
-        //            int counter = 0;
-
-        //            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-        //            {
-        //                if (counter % 5 == 0)
-        //                {
-        //                    G.Writeln();
-        //                    G.Write(extra);
-        //                }
-        //                double data = double.NaN;
-        //                if (op == "=")
-        //                {
-        //                    data = ts.GetData(null, t);
-        //                }
-        //                else if (op == "+")
-        //                {
-        //                    if (base2.ContainsIVariable(var + "!a"))
-        //                    {
-        //                        Series tsgrund = base2.GetIVariable(var + "!a") as Series; //#getvar
-        //                        data = ts.GetData(null, t) - tsgrund.GetData(null, t);
-        //                    }
-        //                    else
-        //                    {
-        //                        G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in base bank");
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    G.Writeln2("*** ERROR: updprt: operator not supported");
-        //                    return;
-        //                }
-        //                string s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
-        //                if (data >= 0) G.Write(" ");
-        //                G.Write(" " + s);
-        //                counter++;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in work bank");
-        //        }
-        //    }
-        //    G.Writeln();
-        //}
+        
 
         public static string AddFreqAtEndOfVariableName(string var)  //used most of the time, uses global freq
         {
