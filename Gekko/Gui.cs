@@ -1474,7 +1474,7 @@ namespace Gekko
                     }
                     else
                     {
-                        Program.FromAToDatabank(Globals.undoSim.tStart, Globals.undoSim.tEnd, false, Program.databanks.GetFirst(), Globals.undoSim.obsWithLags, Globals.undoSim.obsSimPeriod, Globals.undoSim.a, null, null);
+                        SolveDataInOut.FromAToDatabank(Globals.undoSim.tStart, Globals.undoSim.tEnd, false, Program.databanks.GetFirst(), Globals.undoSim.obsWithLags, Globals.undoSim.obsSimPeriod, Globals.undoSim.a, null, null);
                         G.Writeln();
                         G.Writeln("Restored pre-simulation values for the period " + Globals.undoSim.tStart.ToString() + "-" + Globals.undoSim.tEnd.ToString());
                     }
@@ -1492,7 +1492,7 @@ namespace Gekko
                         G.Writeln();
                         G.Writeln("Starting to pack zip file...");
 
-                        Program.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetFirst(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null);
+                        SolveDataInOut.FromAToDatabank(Globals.packSim.tStart, Globals.packSim.tEnd, false, Program.databanks.GetFirst(), Globals.packSim.obsWithLags, Globals.packSim.obsSimPeriod, Globals.packSim.a, null, null);
                         Zipper zipper = new Zipper("gekko_sim_error.zip");
 
                         Program.WriteGbk(Program.databanks.GetFirst(), Globals.packSim.tStart0, Globals.packSim.tEnd, zipper.tempFolder + "\\bank", false, new List<ToFrom>(), "" + Globals.extensionDatabank + "", true, false);

@@ -10169,7 +10169,7 @@ namespace Gekko
                     double valueWork = tsWork.GetDataSimple(t);
                     double valueBase = tsBase.GetDataSimple(t);
                     double relative = double.NaN;
-                    bool isOk = CheckRelativeDifferenceSmart(1d, false, maxVariance, absCrit, relCritSmart, valueWork, valueBase, out relative);
+                    bool isOk = SolveGauss777.CheckRelativeDifferenceSmart(1d, false, maxVariance, absCrit, relCritSmart, valueWork, valueBase, out relative);
 
                     if (!isOk)
                     {
@@ -18419,7 +18419,7 @@ namespace Gekko
         
 
         //See #98745239543
-        private static YesNoNull GetYesNoNullLocalOption(string opt)
+        public static YesNoNull GetYesNoNullLocalOption(string opt)
         {
             YesNoNull rv = YesNoNull.Null;
             if (opt == null) rv = YesNoNull.Null;
@@ -18617,22 +18617,7 @@ namespace Gekko
 
         
 
-        private static void SetTerminalType(ETerminalCondition terminal)
-        {
-            Program.model.modelGekko.simulateResults[8] = 0;
-            
-            if (G.Equal(Program.options.solve_forward_method, "none"))
-            {
-                Program.model.modelGekko.simulateResults[8] = 0;
-            }
-            else
-            {
-                if (terminal == ETerminalCondition.Exogenous) Program.model.modelGekko.simulateResults[8] = 0;
-                else if (terminal == ETerminalCondition.ConstantLevel) Program.model.modelGekko.simulateResults[8] = 1;
-                else if (terminal == ETerminalCondition.ConstantGrowthRate) Program.model.modelGekko.simulateResults[8] = 2;  //not working
-            }
-        }
-
+        
         private static void HandleTerminalHelper()
         {
             Program.model.modelGekko.terminalHelper = null;  //will stay like this if terminal feed=external or there are no leads
@@ -18685,19 +18670,9 @@ namespace Gekko
                     }
                 }
             }
-        }
+        }        
 
-        
-
-        private static void FillAWithNaN(int vars, double[,] a, double[] NAN)
-        {
-            for (int i = 0; i < vars; i++)
-            {
-                Buffer.BlockCopy(NAN, 0, a, 8 * i * NAN.Length, 8 * NAN.Length);  //TODO: what if out of bounds regarding x???
-            }
-        }
-
-        private static void IterLink(StringBuilder output, string s1, string s2, string s3)
+        public static void IterLink(StringBuilder output, string s1, string s2, string s3)
         {
             LinkContainer lc = new LinkContainer(output.ToString());
             Globals.linkContainer.Add(lc.counter, lc);
@@ -18728,19 +18703,7 @@ namespace Gekko
             Globals.packSim.obsSimPeriod = obsSimPeriod;
         }
 
-        private static void SimPrintErrorOptionsPack(LinkContainer lc2)
-        {
-            G.Write("    Create error report with model + data packed in a zip file ");
-            G.WriteLink("here", "packsim:" + lc2.counter);
-            G.Writeln("");
-        }
-
-        private static void SimPrintErrorOptionsUndo(LinkContainer lc1)
-        {
-            G.Write("    Undo the simulation, reverting to pre-simulation values ");
-            G.WriteLink("here", "undosim:" + lc1.counter);
-            G.Writeln("");
-        }
+        
 
         
 
@@ -18805,130 +18768,10 @@ namespace Gekko
             output.AppendLine(s);
         }
 
-        private static bool FromBToA(ref bool hasIssuedSeedWarning, double[] bCheck, int[] extraWritebackPointers, int[] revertedPointers, int[] aNumberPointers, int[] endoNoLagPointers, string[] varNamePointers, double[,] a, int tInt)
-        {
-
-            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
-            {
-                //#84750237
-                //This would probably be better done by comparing Program.model.modelGekko.b and bCheck, and if different
-                //put it into a[]. But there are some issues with Infinity and NaN to be sorted out.
-                //For now, probably best to keep it as it is.
-                //Changing it would require investigating x.Equals(y), to see if it is appropriate for Infinity and NaN.
-                if (endoNoLagPointers[i] == 1 || revertedPointers[i] == 1 || extraWritebackPointers[i] == 1)
-                {
-                    a[aNumberPointers[i], tInt] = Program.model.modelGekko.b[i];
-                    if (!hasIssuedSeedWarning && Program.model.modelGekko.b[i] == Globals.missingValueSeedNumber)
-                    {
-                        //For safety:
-                        G.WritelnGray("DEBUGGING: It seems there may be a problem with initializing missing values: 0.123454321: " + varNamePointers[i] + " t: " + tInt + ".");
-                        hasIssuedSeedWarning = true;
-                    }
-                }
-                else
-                {
-                    if (Globals.simulationCheckThatAllDataGetsFromBArrayToTimeSeries)
-                    {
-                        if (Program.model.modelGekko.b[i] != bCheck[i])  //probably is false if left side is 0 and right side is NaN. Not good.
-                        {
-                            //should change according to b[] arrays, but does not get written back.
-                            string var = Program.model.modelGekko.varsBTypeInverted[i];
-                            G.Writeln();
-                            G.Writeln("*** ERROR: While backwriting from SIM command -- please report this error to the Gekko editor");
-                            G.Writeln("*** ERROR: Variable: " + var);
-                            G.Writeln();
-                            throw new GekkoException();
-                        }
-                    }
-                }
-            }
-
-            return hasIssuedSeedWarning;
-        }
+        
 
         
-        private static void InitEndoLaggedOrExo(int[] extraWritebackPointers, int[] lagPointers, int[] endoPointers, int[] isDJZvarPointers, double[,] a, int tInt, ref GekkoTime t, ref GekkoTime tStart, ref GekkoTime tEnd, int i, ref double val, Series ts, string variable, int yy, YesNoNull isStaticLocalOption)
-        {
-            //not a nolag-endogenous or lead-endogenous, so lagged endo or exogenous (may in principle be leaded exogenous)
-            //these are just copied into b[] raw
-            //FOR sim and fastsim, try doing it without simgauss, to see what goes into gauss
-
-
-            val = a[yy, tInt + lagPointers[i]];
-
-            if (options.solve_data_ignoremissing && double.IsNaN(val)) val = 0d;
-            //this way, missing DJZ vars also get value = 0
-
-            if (double.IsInfinity(val))
-            {
-                //this can be possible in successive simulations, see notes in top of method regarding .IsInfinity()
-                if (isDJZvarPointers[i] == 1)
-                {
-                    //probably should issue warning here
-                    //J-factor or D or Z variable
-                    val = 0;
-                    extraWritebackPointers[i] = 1;
-                }
-            }
-
-            if (double.IsNaN(val))
-            {
-                //this can be possible for autogenerated DJZ-variables -- not for other types since these are checked above ("real" exogenous and lagged endogenous)
-                if (isDJZvarPointers[i] == 1)
-                {
-                    //J-factor or D or Z variable
-                    val = 0;
-                    extraWritebackPointers[i] = 1;
-                }
-                else
-                {
-                    //real lagged endo or exo (or leaded endo/exo)
-                    //it should not be possible to encounter a missing lagged endo here, since lagged endo vars are checked
-                    //before simulating first period -- and program breaks if simulation does not converge.
-                    //but it could be an exogenous or lagged exogenous with a missing somewhere in the simulation period.
-                    //todo: write if exo, lagged endo, and the lag
-                    string lag = "";
-                    if (lagPointers[i] < 0) lag = Globals.leftParenthesisIndicator + lagPointers[i] + Globals.rightParenthesisIndicator;
-                    else if (lagPointers[i] > 0) lag = Globals.leftParenthesisIndicator + "+" + lagPointers[i] + Globals.rightParenthesisIndicator;
-                    string type = "exogenous";
-                    if (endoPointers[i] == 1) type = "endogenous";
-
-                    G.Writeln("*** ERROR while simulating " + tStart.ToString() + "-" + tEnd.ToString() + ": in " + t.ToString() + " the " + type + " variable '" + variable + lag + "' has a missing value");
-                    GekkoTime tLag = t.Add(-1);
-                    //G.Writeln("    Simulated " + tStart.ToString() + "-" + tLag + ", but " + t.ToString() + "-" + tEnd + " failed.");
-                    bool simFailure = false;
-                    if (endoPointers[i] == 1)
-                    {
-                        if (lagPointers[i] == -1 && t.LargerThanOrEqual(tStart))
-                        {
-                            G.Writeln("    The problem probably has to do with non-convergence of period " + tLag.ToString());
-                            //WriteAboutFailsafeOption();  --> will issue this note 2 times, so deleted here
-                        }
-                        simFailure = true;
-                    }
-                    else
-                    {
-                        G.Writeln("    Please check the databank for missing data regarding exogenous variable '" + variable + "'");
-                    }
-
-                    if (simFailure) throw new GekkoException("GekkoException: simFailure");
-                    else throw new GekkoException();
-                    //FIXME: undo, or at least write if DJZ variables have been created.
-                }
-            }
-            else
-            {
-                //TODO: check static sim -- seems ok but could need a good check (also with endo/exo stuff)
-                if (CheckYesNoNullLogic(isStaticLocalOption, Program.options.solve_static))
-                {
-                    //This does not run fast, but is seldom used
-                    //is also done for exogenous, maybe more safe only for lagged endo.
-                    Series tsUndoBank = Globals.undoBank.GetIVariable(ts.name) as Series;
-                    //overrides the value -- takes it from the undoBank -- if exo there should be no change
-                    val = tsUndoBank.GetDataSimple(t.Add(lagPointers[i]));
-                }
-            }
-        }
+        
 
         private static void WriteAboutFailsafeOption()
         {
@@ -18993,195 +18836,8 @@ namespace Gekko
         }
 
         
+
         
-
-        private static bool IsDjz(string variable)
-        {
-            return Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(variable) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(variable) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(variable);
-        }
-
-        private static void SimCheckFirstPeriodForMissingStuff(bool usingFairTaylor, GekkoTime tStart, ErrorContainer ec, Series[] timeSeriesPointers, int[] lagPointers, int[] endoNoLagPointers, int[] endoLeadPointers, string[] varNamePointers, int[] isDJZvarPointers)
-        {
-            if (true)  //for a period like 2006-2079, this check hardly consumes any time
-            {
-                GekkoTime t = tStart.Add(0);
-                //Fail-fast check of what data is missing in order to simulate
-                if (Program.databanks.GetFirst().storage.Count == 0)
-                {
-                    G.Writeln2("*** ERROR: There were no variables in the databank. Did you forget to load a databank?");
-                    G.Writeln("           Simulation is aborted");
-                    throw new GekkoException();
-                }
-
-                List<string> missingVariables = new List<string>();
-                List<string> exoOrLaggedEndoWithNaN = new List<string>();
-
-                for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
-                {
-                    Series ts = timeSeriesPointers[i];
-
-                    string variable = varNamePointers[i];
-
-                    if (ts == null)
-                    {
-                        if (isDJZvarPointers[i] == 1)
-                        {
-                            //we don't do anything about these now if they are missing:
-                            //they are handled below (created and given value = 0)
-                        }
-                        else
-                        {
-                            //missing variable, and not a DJZ-type variable
-                            //G.Writeln("*** ERROR: time series " + variable + " (and possibly more) does not exist in Work bank");
-                            //G.Writeln("    Did you forget to load a databank? Simulation is stopped.");
-                            if (!missingVariables.Contains(variable))
-                            {
-                                missingVariables.Add(variable);
-                            }
-                            //FIXME: undo, or at least write if DJZ variables have been created.
-                            //return -12345;
-                        }
-                    }
-                    else
-                    {
-                        //Variable exists in Work bank
-                        //The variable could be a autogenerated DJZ-variable
-                        int endoLag = -endoNoLagPointers[i];  //these are 0 or 1 (endo with no lag)
-                        if (!Program.options.solve_data_init) endoLag = 0;  //overrides with this option. Typically for use in residual type simulation.
-                        double val = ts.GetDataSimple(t.Add(lagPointers[i] + endoLag));
-
-                        if (double.IsNaN(val))
-                        {
-                            if (options.solve_data_ignoremissing)
-                            {
-                                val = 0d;
-                            }
-                        }
-
-                        if (endoNoLagPointers[i] == 1)
-                        {
-                            //do nothing here
-                        }
-                        else if (Program.options.solve_data_init && usingFairTaylor && endoLeadPointers[i] == 1)
-                        {
-                            //do nothing here for leaded variables
-                        }
-                        else
-                        {
-                            //not a nolag-endogenous, so lagged endo or exogenous (including DJZ-vars)
-                            //endoNoLagPointers[i] = 0.
-
-                            if (double.IsInfinity(val))
-                            {
-                                //value is NaN -- real problem.... not just starting value question
-                                if (isDJZvarPointers[i] == 1)
-                                {
-                                    //this should be reported maybe: if equation is a JR: log(y) = log(x);
-                                    //then y>0 and x=0 gives JR=infinity -- there is no solution. This is
-                                    //ok if equation is exogenized with the dummy, but what then if the
-                                    //dummy is switched off again? Sim values may jump...
-                                    //Setting the J-variable to 0 is a workaround. Happens implicitly
-                                    //when writing the bank, since infinity is treated as missing.
-                                }
-                            }
-
-                            if (double.IsNaN(val))
-                            {
-                                //value is NaN -- real problem.... not just starting value question
-                                if (isDJZvarPointers[i] == 1)
-                                {
-                                    //see notes regarding .IsInfinity() above
-                                }
-                                else
-                                {
-                                    //real lagged endo or exo
-                                    //todo: write if exo, lagged endo, and the lag
-                                    //G.Writeln("*** ERROR: In period " + (t + lagPointers[i]) + " the variable " + variable + " has a missing");
-                                    //G.Writeln("    value. Please check your data bank -- simulation is not performed.");
-                                    //FIXME: undo, or at least write if DJZ variables have been created.
-                                    //return -12345;
-
-                                    string s = "";
-                                    if (lagPointers[i] <= 0) s = variable + "[" + lagPointers[i] + "]";
-                                    else s = variable + "[+" + lagPointers[i] + "]";
-
-                                    if (!exoOrLaggedEndoWithNaN.Contains(s))
-                                    {
-                                        exoOrLaggedEndoWithNaN.Add(s);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (missingVariables.Count > 0)
-                {
-                    if (ec.simNonExistingVariable == null) ec.simNonExistingVariable = new List<string>();
-                    missingVariables.Sort(StringComparer.InvariantCulture);
-                    ec.simNonExistingVariable.Add("When model variables do not exist in the databank, simulation can not be");
-                    ec.simNonExistingVariable.Add("performed. Please make sure the variable(s) exist before simulating.");
-                    ec.simNonExistingVariable.Add("There were " + missingVariables.Count + " missing variable(s):");
-                    ec.simNonExistingVariable.Add("");
-                    StringBuilder sb = new StringBuilder();
-                    int count = 0;
-                    foreach (string s in missingVariables)
-                    {
-                        count++;
-                        string blank = "";
-                        if (count > 0) blank = Globals.blankUsedAsPadding;
-                        string count2 = count.ToString();
-                        ec.simNonExistingVariable.Add(blank + " " + G.Blanks(4 - count2.Length) + "#" + count + ": The variable " + s + " does not exist in Work databank");
-                    }
-                    ec.simNonExistingVariable.Add("");
-                }
-
-                if (exoOrLaggedEndoWithNaN.Count > 0)
-                {
-                    if (ec.simMissingValueExoOrLaggedEndo == null) ec.simMissingValueExoOrLaggedEndo = new List<string>();
-                    exoOrLaggedEndoWithNaN.Sort(StringComparer.InvariantCulture);
-                    ec.simMissingValueExoOrLaggedEndo.Add("When there are missing values regarding exogenous variables or lagged endogenous variables,");
-                    ec.simMissingValueExoOrLaggedEndo.Add("simulation can not be performed. Please make sure the relevant data exist before simulating.");
-                    ec.simMissingValueExoOrLaggedEndo.Add("There were " + exoOrLaggedEndoWithNaN.Count + " variables with missing values:");
-                    ec.simMissingValueExoOrLaggedEndo.Add("");
-                    DateTime t0 = DateTime.Now;
-                    StringBuilder sb = new StringBuilder();
-                    int count = 0;
-                    foreach (string s in exoOrLaggedEndoWithNaN)
-                    {
-                        count++;
-                        string s2 = s.Replace("[0]", "");
-                        //s2 = s2.Replace("[", "(");
-                        //s2 = s2.Replace("]", ")");
-                        string count2 = count.ToString();
-                        string blank = "";
-                        if (count > 0) blank = Globals.blankUsedAsPadding;
-                        ec.simMissingValueExoOrLaggedEndo.Add(blank + " " + G.Blanks(4 - count2.Length) + "#" + count + ": Period " + tStart + ": variable " + s2 + " had a missing value in Work databank");
-                    }
-                    ec.simMissingValueExoOrLaggedEndo.Add("");
-                }
-
-                if (missingVariables.Count > 0 || exoOrLaggedEndoWithNaN.Count > 0)
-                {
-                    //G.writeAbstractScroll("", null, true, Color.Empty, false, ETabs.Output, true);
-                    G.Writeln2("*** ERROR: Gekko had problems simulating the first period in the simulation (" + t + "):");
-                    if (missingVariables.Count > 0)
-                    {
-                        G.Write("    There were "); G.WriteLink(missingVariables.Count.ToString() + " missing variables", "tab:output" + ec.counter + "b"); G.Writeln(".");
-                    }
-                    if (exoOrLaggedEndoWithNaN.Count > 0)
-                    {
-                        G.Write("    There were missing values in "); G.WriteLink(exoOrLaggedEndoWithNaN.Count.ToString() + " variables", "tab:output" + ec.counter + "c"); G.Writeln(".");
-                    }
-                    G.Writeln();
-                    if (!Globals.outputTabTextContainer.ContainsKey(ec.counter.ToString()))
-                    {
-                        Globals.outputTabTextContainer.Add(ec.counter.ToString(), ec);
-                    }
-                    throw new GekkoException();
-                }
-            }
-        }
 
         private static void SolveRevertedAuto()
         {
@@ -19214,35 +18870,6 @@ namespace Gekko
         }
 
         
-
-        private static ECompiledModelType GetModelTypeFromOptions(SimOptions so)
-        {
-            ECompiledModelType modelType = ECompiledModelType.Unknown;
-            if (G.Equal(so.method, "gauss"))
-            {
-                if (Program.options.solve_failsafe)
-                {
-                    modelType = ECompiledModelType.GaussFailSafe;
-                }
-                else modelType = ECompiledModelType.Gauss;
-            }
-            else if (G.Equal(so.method, "res"))
-            {
-                modelType = ECompiledModelType.Res;
-            }
-            else if (G.Equal(so.method, "newton"))
-            {
-                modelType = ECompiledModelType.Newton;
-            }
-            else if (G.Equal(so.method, "reverted"))
-            {
-                modelType = ECompiledModelType.After;
-            }
-            else throw new GekkoException();
-            return modelType;
-        }
-
-
 
         public static void Time(GekkoTime t1, GekkoTime t2)
         {
@@ -33534,69 +33161,9 @@ namespace Gekko
             }
         }
 
-
         
 
-        private static void RunOneGaussIterationWithDamping(List<int> isDampedPointers, Type assembly, Object[] args, double[] bOld)
-        {
-            double[] b = (double[])args[0];
-            //double[] simulateResults = (double[])args[1];
-            assembly.InvokeMember("eqs", BindingFlags.InvokeMethod, null, null, args);
-            if (Program.model.modelGekko.simulateResults[1] != 12345)
-            {
-                //Do not damp if the iteration just failed -- that will just pollute the results.
-                //It is in that case better to keep the results excactly as they were when returning
-                //from the assembly (these results will later on in the Sim() method be written
-                //back to timerseries.
-                DampVariables(b, bOld, isDampedPointers);
-            }
-        }
-
         
-
-        private static bool CheckRelativeDifferenceSmart(double dampingCorrection, bool factor, double historicalVariance, double absCrit, double relCrit, double valNew, double valOld, out double rel1)
-        {
-            rel1 = double.NaN;
-            double histVar = historicalVariance;
-            if (histVar == -12345d)
-            {
-                G.Writeln2("*** ERROR: hist variance");
-                throw new GekkoException();
-            }
-            if (histVar == double.NaN)
-            {
-                //fortunetely this is quite seldom, and the line below means relative check gets completely switched off...
-                histVar = double.MaxValue;
-            }
-            double absolute = Math.Abs(valNew - valOld) * dampingCorrection; //for damped variables, this gives the "true" non-damped difference between iterations
-            double relative = absolute / histVar;  //denominator is always >= 0, or positive infinity or NaN
-            if (G.isNumericalError(relative))  //happens when historicalVariance = 0
-            {
-                relative = double.MaxValue;  //same as saying relative crit MUST be met.
-                //if so, we have 0/0 = NaN or x/0 = inf.
-                //the first one could be deemed ok, but it will be ok by absolute crit anyway.
-                //then we need to meet the absolute crit instead
-                //maybe this is bad for some large variables, could alternatively
-                //ignore the variable altogether
-            }
-            bool good = false;
-            if (factor)
-            {
-                absolute = 2d * absolute;
-                relative = 2d * relative;
-            }
-            if (absolute < absCrit || relative < relCrit)
-            {
-                good = true;
-            }
-            else
-            {
-                good = false;
-            };
-            rel1 = relative;  //rel1 is returned
-            return good;
-        }
-
 
         /// <summary>
         /// Solve by means of Gauss-Seidel method
@@ -33606,7 +33173,7 @@ namespace Gekko
         /// <param name="culprit">Last variable to converge</param>
         public static void SolveRes(double[] b)
         {
-            Type assembly = GetAssemblyFromModelType(ECompiledModelType.Res);
+            Type assembly = SolveCommon.GetAssemblyFromModelType(ECompiledModelType.Res);
             Object[] args = new Object[1];
             args[0] = b;
             assembly.InvokeMember("eqs", BindingFlags.InvokeMethod, null, null, args);
@@ -33649,32 +33216,7 @@ namespace Gekko
             }
         }
 
-        private static Type GetAssemblyFromModelType(ECompiledModelType modelType)
-        {
-            Type assembly = null;
-            if (modelType == ECompiledModelType.Res)
-            {
-                assembly = Program.model.modelGekko.m2.assemblyRes;
-            }
-            else if (modelType == ECompiledModelType.Gauss)
-            {
-                assembly = Program.model.modelGekko.m2.assemblyGauss;
-            }
-            else if (modelType == ECompiledModelType.GaussFailSafe)
-            {
-                assembly = Program.model.modelGekko.m2.assemblyGaussFailSafe;
-            }
-            else if (modelType == ECompiledModelType.Newton)
-            {
-                assembly = Program.model.modelGekko.m2.assemblyNewton;
-            }
-            //else if (modelType == ECompiledModelType.After)
-            //{
-            //    assembly = model.m2.assemblyReverted;
-            //}
-            else throw new GekkoException();
-            return assembly;
-        }
+        
 
         public static void SimulateResiduals(double[] b, double[] r, Type assembly)
         {
