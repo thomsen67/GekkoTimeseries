@@ -393,6 +393,7 @@
     <Compile Include="ScalarString.cs" />
     <Compile Include="ScalarVal.cs" />
     <Compile Include="Series.cs" />
+    <Compile Include="Solve.cs" />
     <Compile Include="SplitContainerFix.cs">
       <SubType>Component</SubType>
     </Compile>

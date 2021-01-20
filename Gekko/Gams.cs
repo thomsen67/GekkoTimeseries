@@ -8,12 +8,14 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Drawing;
 using GAMS;
+using ProtoBuf;
+using ProtoBuf.Meta;
 
 namespace Gekko
 {
     public static class GamsModel
     {
-        private static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
+        public static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
         {
 
             if (G.Equal(Path.GetExtension(fileName), ".csv"))
@@ -36,7 +38,7 @@ namespace Gekko
             Tuple<GekkoDictionary<string, string>, StringBuilder> tup = GetDependentsGams(o);
             GekkoDictionary<string, string> dependents = tup.Item1;
             string dependentsHash = tup.Item2.ToString();
-            string modelHash = Program.HandleModelFilesGams(textInputRaw + dependentsHash);
+            string modelHash = HandleModelFilesGams(textInputRaw + dependentsHash);
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
 
@@ -47,7 +49,7 @@ namespace Gekko
                     try
                     {
                         DateTime dt1 = DateTime.Now;
-                        using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
+                        using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, Program.GekkoFileReadOrWrite.Read))
                         {
                             Program.model.modelGams = Serializer.Deserialize<ModelGams>(fs);
                             Program.model.modelGams.modelInfo.loadedFromMdlFile = true;
@@ -96,7 +98,7 @@ namespace Gekko
                     // ----- SERIALIZE                    
                     string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
                     {
                         serializer.Serialize(fs, Program.model.modelGams);
                     }
@@ -509,7 +511,7 @@ namespace Gekko
 
             if (G.Equal(Program.options.model_gams_dep_method, "lhs"))
             {
-                GetLhsVariable(lhsTokensGams2, ref lhs);
+                Program.GetLhsVariable(lhsTokensGams2, ref lhs);
             }
             else if (G.Equal(Program.options.model_gams_dep_method, "eqname"))
             {
@@ -665,7 +667,7 @@ namespace Gekko
 
                 string rhs = eq.rhs.Trim();
                 string lhs = eq.lhs.Trim();
-                string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
+                string s1 = Program.EquationLhsRhs(lhs, rhs, true) + ";";
 
                 if (eq.expressions == null || eq.expressions.Count == 0)
                 {
@@ -674,7 +676,7 @@ namespace Gekko
                     try
                     {
                         DateTime dt1 = DateTime.Now;
-                        CallEval(eq.conditionals, s1);
+                        Program.CallEval(eq.conditionals, s1);
                         ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
                         n1++;
                     }
@@ -714,7 +716,7 @@ namespace Gekko
                             List<string> m2 = new List<string>();
                             foreach (string s in dd.cellsContribD.storage.Keys)
                             {
-                                string ss5 = DecompGetNameFromContrib(s);
+                                string ss5 = Program.DecompGetNameFromContrib(s);
                                 if (!m1.Contains(ss5, StringComparer.OrdinalIgnoreCase))
                                 {
                                     m1.Add(ss5);
@@ -846,9 +848,440 @@ namespace Gekko
             return new Tuple<GekkoDictionary<string, string>, StringBuilder>(dependents, hashHelper);
         }
 
+        private static bool CheckIfVarIsASet(string name, WalkTokensHelper th)
+        {
+            bool isSetWithIndexer = false;
+            if (th.checkIfVariableIsASet)
+            {
+
+                IVariable iv = Program.databanks.GetFirst().GetIVariable("#" + name);
+                if (iv != null && iv.Type() == EVariableType.List)
+                {
+                    isSetWithIndexer = true;
+                }
+            }
+            return isSetWithIndexer;
+        }
+
+        public static void WalkTokens(TokenList nodes, WalkTokensHelper th)
+        {
+            foreach (TokenHelper child in nodes.storage)
+            {
+                WalkTokens(child, th);
+            }
+        }
+
+        public static void WalkTokens(TokenHelper node, WalkTokensHelper th)
+        {
+            //Performs these transformations:
+            //- GAMS functions are not touched (log, etc)
+            //-      but sqr() becomes sqrt()
+            //- sum() function has # put in on sets
+            //- parameter t is removed, and lags/leads like t-1 are transformed into [-1] etc. So x(a, t) --> x[#a], and x(t) --> x not x().
+            //- tBase handled
+            //- strings have quotes removed, x['a'] --> x[a]
+            //- stuff like a.val becomes #a.val(), whereas t.val is ignored for now
+            //- sameas(i,j) and sameas(i,'a') become #i==#j and #i=='a'
+            //- single '=' becomes '=='
+            //
+            //- all t or t+1 or t-1 etc. are recorded, together with any tBase
+
+            if (node.HasNoChildren())
+            {
+                //not a sub-node
+                if (node.s != "" && node.type == ETokenType.Word)
+                {
+                    //an IDENT-type leaf node, not symbols etc.
+                    //patterns like "log(" or "exp(" or "sum(" are skipped, also stuff like "*(" is avoided
+
+                    string word = node.s;
+
+                    TokenHelper nextNode = node.Offset(1);
+                    if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == 0)
+                    {
+                        //a pattern like "x(" with no blanks in between                    
+
+                        if (G.Equal(node.s, "sameas"))
+                        {
+                            List<TokenHelperComma> split = nextNode.SplitCommas(false);
+                            if (split.Count != 2)
+                            {
+                                G.Writeln2("*** ERROR: Expected sameas() function with 2 arguments");
+                                throw new GekkoException();
+                            }
+
+                            node.s = "";
+                            split[1].comma.s = "==";
 
 
+                        }
+                        else if (Globals.gamsFunctions.ContainsKey(node.s))
+                        {
+                            string x = Globals.gamsFunctions[node.s];
+                            if (x != null)
+                            {
+                                node.s = x;  //sqr() --> sqrt()
+                            }
 
+                            //"sum(" or "log(" or "exp(" etc.
+                            if (G.Equal(node.s, "sum"))
+                            {
+                                if (nextNode.subnodes.Count() > 0)
+                                {
+                                    if (nextNode.subnodes[1].HasNoChildren())
+                                    {
+                                        //stuff like "sum(i, x(i))"
+                                        if (nextNode.subnodes[1].type == ETokenType.Word && (G.Equal(nextNode.subnodes[2].s, ",") || G.Equal(nextNode.subnodes[2].s, "$")))
+                                        {
+                                            //checks that it has "sum(x," or sum(x$" pattern
+                                            nextNode.subnodes[1].s = "#" + nextNode.subnodes[1].s;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //stuff like "sum((i, j), x(i, j))"
+                                        List<TokenHelperComma> list2 = nextNode.subnodes[1].SplitCommas(true);
+                                        foreach (TokenHelperComma item in list2)
+                                        {
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            //TODO CHECK
+                                            if (item.list.Count() == 1 && item.list[0].type == ETokenType.Word)
+                                            {
+                                                item.list[0].s = "#" + item.list[0].s;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    //a "sum()" --> not handled
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //first we check for stuff like a15t100(a), where a15t100 is a set, not a variable
+                            //so it should be #a15t100[#a], not a15t100[#a]
+
+                            bool isSetWithIndexer = CheckIfVarIsASet(node.s, th);
+                            if (isSetWithIndexer) node.s = "#" + node.s;
+
+                            bool removeParenthesis = false;
+                            if (true)
+                            {
+                                //now we look at the arguments, x(a1, a2, 's', t) or x(a1, a2, 's', t-1) or x(a1, a2, 's')
+                                List<TokenHelperComma> split = nextNode.SplitCommas(true);
+
+                                for (int iSplit = 0; iSplit < split.Count; iSplit++)
+                                {
+                                    TokenHelperComma helper = split[iSplit];
+                                    if (helper.list.storage.Count == 0)
+                                    {
+                                        //empty parenthesis, how is that possible?
+                                    }
+                                    else if (helper.list.storage.Count == 1)
+                                    {
+                                        //a single token in the slot , .... , so this is not an expression like t+1 etc.
+
+                                        if (helper.list[0].type == ETokenType.Word)
+                                        {
+                                            //helper.list[0] is the single token
+
+                                            if (iSplit == split.Count - 1 && (G.Equal(helper.list[0].s, th.t) || G.Equal(helper.list[0].s, th.tBase)))
+                                            {
+                                                //t or tBase at last position
+
+                                                if (G.Equal(helper.list[0].s, th.t))
+                                                {
+                                                    //normal t
+                                                    //remove the trailing t
+                                                    helper.list[0].Clear();
+                                                    if (helper.comma == null)
+                                                    {
+                                                        removeParenthesis = true;  //t is the only argument as in "x(t)" which becomes "x" not "x()"
+                                                    }
+                                                    else
+                                                    {
+                                                        helper.comma.Clear();
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    //tBase
+                                                    //x(i, tBase) --> x[#i][%tBase]                                                
+                                                    //we need to transform one []-subnode into two consequtive
+                                                    //see also #89075203489
+
+                                                    TokenHelper nextNode2 = new TokenHelper(); nextNode2.subnodes = new TokenList();
+                                                    //[%tBase]
+                                                    nextNode2.subnodes.storage.Add(new TokenHelper("["));
+                                                    nextNode2.subnodes.storage.Add(new TokenHelper(Globals.symbolScalar + helper.list[0].s));
+                                                    nextNode2.subnodes.storage.Add(new TokenHelper("]"));
+
+                                                    TokenHelper nextNode1 = new TokenHelper(); nextNode1.subnodes = new TokenList();
+                                                    if (split.Count > 1)
+                                                    {
+                                                        nextNode1.subnodes.storage.Add(new TokenHelper("["));
+                                                        for (int iii = 0; iii < split.Count - 1; iii++)
+                                                        {
+                                                            if (split[iii].comma != null) nextNode1.subnodes.storage.Add(split[iii].comma);
+                                                            nextNode1.subnodes.storage.AddRange(split[iii].list.storage);
+                                                        }
+                                                        nextNode1.subnodes.storage.Add(new TokenHelper("]"));
+                                                    }
+                                                    else
+                                                    {
+                                                        //x(i, tBase) --> x[#i][%tBase], but x(tBase) --> x[%tBase]
+                                                    }
+
+                                                    int id = nextNode.id;
+                                                    TokenHelper parent = nextNode.parent;
+
+                                                    parent.subnodes.storage.RemoveAt(id);
+                                                    parent.subnodes.storage.Insert(id, nextNode2);
+                                                    parent.subnodes.storage.Insert(id, nextNode1);
+                                                    parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok                                                   
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                //x(i) --> x(#i) --actually--> x[#i]
+                                                helper.list[0].s = "#" + helper.list[0].s;
+                                            }
+                                        }
+                                        else if (helper.list[0].type == ETokenType.QuotedString)
+                                        {
+                                            //remove the quotes
+                                            helper.list[0].s = G.StripQuotes(helper.list[0].s);
+                                        }
+                                    }
+                                    else if (helper.list.storage.Count == 3)  //x and plusminus and number
+                                    {
+
+                                        //the ... argument in (... , ... , ... , ...) is an expression, for instance t-1 etc.
+                                        if (helper.list[0].type == ETokenType.Word)
+                                        {
+                                            //if (iSplit == split.Count - 1 && helper.list[0].s == "t")                                        
+                                            if (true)
+                                            {
+                                                //does not need to be last. Can be "t" in "x(a, 'b', t-1)", but also "a" in "x(y, a-1, t)"
+                                                if (helper.list[1] != null && (helper.list[1].s == "-" || helper.list[1].s == "+"))
+                                                {
+                                                    //...t+... or ...t-...
+                                                    if (helper.list[2] != null && (helper.list[2].type == ETokenType.Number))
+                                                    {
+                                                        string plusMinus = helper.list[1].s;
+                                                        if (plusMinus != "+" && plusMinus != "-")
+                                                        {
+                                                            G.Writeln2("*** ERROR: Expected t plus/minus an integer, " + helper.list[2].LineAndPosText());
+                                                            throw new GekkoException();
+                                                        }
+                                                        string number = helper.list[2].s;
+                                                        int iNumber = -12345;
+                                                        bool ok = int.TryParse(number, out iNumber);
+                                                        if (!ok)
+                                                        {
+                                                            G.Writeln2("*** ERROR: Expected '" + number + "' to be an integer, " + helper.list[2].LineAndPosText());
+                                                            throw new GekkoException();
+                                                        }
+                                                        //if (plusMinus == "-") iNumber = -iNumber;
+
+                                                        if (iSplit == split.Count - 1 && G.Equal(helper.list[0].s, th.t))
+                                                        {
+                                                            if (iSplit == 0)
+                                                            {
+                                                                //x(t-1) --> x[-1]
+                                                                //helper.comma will be = null
+                                                                helper.list[0].Clear(); //kill the 't'completely including blanks
+                                                                helper.list[1].leftblanks = 0; //no blanks to the left of for instance '-1'
+                                                            }
+                                                            else
+                                                            {
+                                                                //x(i, t-1) --> x[#i][-1]
+                                                                //we need to transform one []-subnode into two consequtive
+                                                                //see also #89075203489
+                                                                TokenHelper nextNode2 = new TokenHelper(); nextNode2.subnodes = new TokenList();
+                                                                nextNode2.subnodes.storage.Add(new TokenHelper("["));
+                                                                for (int iii = 1; iii < helper.list.storage.Count; iii++)
+                                                                {
+                                                                    nextNode2.subnodes.storage.Add(helper.list[iii]);
+                                                                }
+                                                                nextNode2.subnodes.storage.Add(new TokenHelper("]"));
+
+                                                                TokenHelper nextNode1 = new TokenHelper(); nextNode1.subnodes = new TokenList();
+                                                                nextNode1.subnodes.storage.Add(new TokenHelper("["));
+                                                                for (int iii = 0; iii < split.Count - 1; iii++)
+                                                                {
+                                                                    if (split[iii].comma != null) nextNode1.subnodes.storage.Add(split[iii].comma);
+                                                                    nextNode1.subnodes.storage.AddRange(split[iii].list.storage);
+                                                                }
+                                                                nextNode1.subnodes.storage.Add(new TokenHelper("]"));
+
+                                                                int id = nextNode.id;
+                                                                TokenHelper parent = nextNode.parent;
+
+                                                                parent.subnodes.storage.RemoveAt(id);
+                                                                parent.subnodes.storage.Insert(id, nextNode2);
+                                                                parent.subnodes.storage.Insert(id, nextNode1);
+                                                                parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            helper.list[0].s = "#" + helper.list[0].s;
+                                                        }
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (removeParenthesis)
+                            {
+                                nextNode.subnodes[0].Clear();
+                                nextNode.subnodes[nextNode.subnodes.Count() - 1].Clear();
+                            }
+                            else
+                            {
+                                nextNode.subnodes[0].s = "[";
+                                nextNode.subnodes[nextNode.subnodes.Count() - 1].s = "]";
+                                nextNode.subnodes[nextNode.subnodes.Count() - 1].leftblanks = 0; //we do not want x[#i, #j ], x[#i, #j] is nicer.
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        //could be a standalone a here: ... $ (sameas(a, '15'))
+                        bool isSetWithIndexer = CheckIfVarIsASet(node.s, th);
+                        if (isSetWithIndexer) node.s = "#" + node.s;
+
+                        TokenHelper nextNode1 = node.Offset(1);
+                        TokenHelper nextNode2 = node.Offset(2);
+
+                        if (nextNode1 != null && nextNode2 != null)
+                        {
+
+                            if (nextNode1.s == "." && G.Equal(nextNode2.s, "val"))
+                            {
+                                //a pattern like a.val or t.val, used in for instance a.val > 15 etc.
+                                //now we transform a.val into #a.val().
+                                //it must use val(), since the #a elements are strings.
+                                //the fact that x[#a+1] works is a special exception.
+                                //node.s = "#" + node.s;
+                                nextNode2.s = nextNode2.s + "()";
+                            }
+                        }
+                    }
+                }
+                else if (node.s == "=")
+                {
+                    TokenHelper prevNode1 = node.Offset(-1);
+                    if (prevNode1 != null && (prevNode1.s == "<" || prevNode1.s == ">"))
+                    {
+                        //do nothing, we do not want <= to become <== !
+                    }
+                    else
+                    {
+                        node.s = "==";  //stuff like ... $ (a.val = 15) 
+                    }
+                }
+                else if (node.s == "$")
+                {
+                    TokenHelper nextNode = node.Offset(1);  //b
+                    TokenHelper nextNode2 = node.Offset(2);  //(i, j)
+                    //We look for the pattern "a $ b(i, j)", where Gekko does not allow simply a $ b[#i, #j], but must use a $ (b[#i, #j])
+                    if (nextNode != null && nextNode.s != "" && nextNode.type == ETokenType.Word)
+                    {
+                        if (nextNode2 != null && nextNode2.HasChildren() && nextNode2.SubnodesType() == "(" && nextNode2.subnodes[0].leftblanks == 0)
+                        {
+                            int id = nextNode.id;
+                            TokenHelper parent = nextNode.parent;
+                            TokenHelper newNode = new TokenHelper(); newNode.subnodes = new TokenList();
+                            newNode.subnodes.storage.Add(new TokenHelper("("));
+                            newNode.subnodes.storage.Add(nextNode);
+                            newNode.subnodes.storage.Add(nextNode2);
+                            newNode.subnodes.storage.Add(new TokenHelper(")"));
+                            parent.subnodes.storage.RemoveAt(id);
+                            parent.subnodes.storage.Insert(id, newNode);
+                            parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //an empty node with children
+
+                //foreach (TokenHelper child in node.subnodes.storage)
+                //{
+                //    WalkTokens(child);
+                //}
+
+                for (int i = 0; i < node.subnodes.storage.Count; i++)  //the count may increase, because subnodes may be added dynamically (translating x[i, t-1] into x[#i][-1])
+                {
+                    WalkTokens(node.subnodes.storage[i], th);
+                }
+            }
+        }
+
+        public static void WalkTokensHandleParentheses(TokenList nodes)
+        {
+            foreach (TokenHelper child in nodes.storage)
+            {
+                WalkTokensHandleParentheses(child);
+            }
+        }
+
+
+        public static void WalkTokensHandleParentheses(TokenHelper node)
+        {
+            //All [, {, } and ] are changed into soft parentheses ( )
+            if (node.HasNoChildren())
+            {
+                //not a sub-node
+                if (node.s == "[") node.s = "(";
+                else if (node.s == "{") node.s = "(";
+                else if (node.s == "]") node.s = ")";
+                else if (node.s == "}") node.s = ")";
+                return;
+            }
+            else
+            {
+                //an empty node with children
+
+                foreach (TokenHelper child in node.subnodes.storage)
+                {
+                    WalkTokensHandleParentheses(child);
+                }
+            }
+        }
+
+
+        public static string HandleModelFilesGams(string input)
+        {
+            List<string> lines = G.ExtractLinesFromText(input);
+            return GetModelHashGams(lines);
+        }
+
+        private static string GetModelHashGams(List<string> lines)
+        {
+            string trueHash = Program.GetMD5Hash(G.ExtractTextFromLines(lines).ToString()); //Pretty unlikely that two different gams files could produce the same hash.
+            trueHash = trueHash.Trim();  //probably not necessary
+            return trueHash;
+        }
     }
 
     public static class GamsData
@@ -1923,6 +2356,7 @@ namespace Gekko
 
             return timeDimNr;
         }
+
         
 
     }
