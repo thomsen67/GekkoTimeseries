@@ -18770,9 +18770,7 @@ namespace Gekko
                 }
             }
             return Globals.linkAction[n];
-        }
-
-        
+        }        
 
         public static void DeleteGekkoActions(EGekkoActionTypes type, string name)
         {
