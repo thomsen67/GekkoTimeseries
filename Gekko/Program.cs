@@ -22975,46 +22975,8 @@ namespace Gekko
             }
             return s;
         }
-
-
-
-        private static void ComputeValueForVprt(out double var1, out double varPch, PrtOptionsHelper po, GekkoTime gt0, GekkoTime gt1, Series tsWork, Series tsBase)
-        {
-
-            GekkoTime gt0MinusOne = gt0.Add(-1);
-            var1 = 0;
-            varPch = 0;
-            if (po.isLevel == true)
-            {
-                Series ts = tsWork; if (po.isBaseline) ts = tsBase;
-
-                double sum = 0d;
-                double count = 0d;
-                foreach (GekkoTime gt in new GekkoTimeIterator( gt0, gt1))
-                {
-                    double x = ts.GetDataSimple(gt);
-                    sum += x;
-                    count += 1d;
-                }
-                double avg = sum / count;
-
-                double x1 = ts.GetDataSimple(gt1);
-                double x0MinusOne = ts.GetDataSimple(gt0MinusOne);
-
-                double avgGrowth = (Math.Pow(x1 / x0MinusOne, 1 / count) - 1) * 100d;
-                if (x1 == x0MinusOne) avgGrowth = 0d;   //0 and 0 gives 0%
-
-                var1 = avg;
-                varPch = avgGrowth;
-
-            }
-            else
-            {
-                G.Writeln2("*** ERROR in VPRT regarding option field, only <r> can be used.");
-                throw new GekkoException();
-            }
-            return;
-        }
+               
+        
 
         public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsBase, bool isLogTransform, bool isCalledFromTable, int sumOver)
         {
@@ -24341,118 +24303,7 @@ namespace Gekko
             tab.Set(new Coord(i, j), null, d, CellType.Number, "f13.4");
         }
         
-        public static DataTable GetInversedDataTableOLD(DataTable table, string rowVariable, string colVariable, string valuesVariable, string nullValue, bool sumValues)
-        {
-            //https://www.codeproject.com/Articles/22008/C-Pivot-Table
-
-            //Create a DataTable to Return
-            DataTable returnTable = new DataTable();
-
-            if (colVariable == "") colVariable = table.Columns[0].ColumnName;
-
-            //Add a Column at the beginning of the table
-            returnTable.Columns.Add(rowVariable);
-
-            //Read all DISTINCT values from columnX Column in the provided DataTale
-            List<string> columnXValues = new List<string>();
-
-            foreach (DataRow dr in table.Rows)
-            {
-                //colVariable could be several, columnXTemp = s1, s2, s3, ... 
-                string columnXTemp = dr[colVariable].ToString();
-                if (!columnXValues.Contains(columnXTemp))
-                {
-                    //Read each row value, if it's different from others provided, add to 
-                    //the list of values and creates a new Column with its value.
-                    columnXValues.Add(columnXTemp);
-                    returnTable.Columns.Add(columnXTemp);
-                }
-            }
-
-            //Verify if Y and Z Axis columns re provided
-            if (rowVariable != "" && valuesVariable != "")
-            {
-                //Read DISTINCT Values for Y Axis Column
-                List<string> columnYValues = new List<string>();
-
-                foreach (DataRow dr in table.Rows)
-                {
-                    if (!columnYValues.Contains(dr[rowVariable].ToString()))
-                        columnYValues.Add(dr[rowVariable].ToString());
-                }
-
-                //Loop all Column Y Distinct Value
-                foreach (string columnYValue in columnYValues)
-                {
-                    //Creates a new Row
-                    DataRow drReturn = returnTable.NewRow();
-                    drReturn[0] = columnYValue;
-                    //foreach column Y value, The rows are selected distincted
-                    DataRow[] rows = table.Select(rowVariable + "='" + columnYValue + "'");
-
-                    //Read each row to fill the DataTable
-                    foreach (DataRow dr in rows)
-                    {
-                        string rowColumnTitle = dr[colVariable].ToString();
-
-                        //Read each column to fill the DataTable
-                        foreach (DataColumn dc in returnTable.Columns)
-                        {
-                            if (dc.ColumnName == rowColumnTitle)
-                            {
-                                //If Sum of Values is True it try to perform a Sum
-                                //If sum is not possible due to value types, the value 
-                                // displayed is the last one read
-                                if (sumValues)
-                                {
-                                    try
-                                    {
-                                        Object o1 = drReturn[rowColumnTitle];
-                                        Object o2 = dr[valuesVariable];
-                                        decimal d1 = Convert.ToDecimal(o1);
-                                        decimal d2 = Convert.ToDecimal(o2);                                        
-                                        drReturn[rowColumnTitle] = d1 + d2;
-
-                                     //   drReturn[rowColumnTitle] =
-                                     //Convert.ToDecimal(drReturn[rowColumnTitle]) +
-                                     //Convert.ToDecimal(dr[columnZ]);
-                                    }
-                                    catch
-                                    {
-                                        drReturn[rowColumnTitle] = dr[valuesVariable];
-                                    }
-                                }
-                                else
-                                {
-                                    drReturn[rowColumnTitle] = dr[valuesVariable];
-                                }
-                            }
-                        }
-                    }
-                    returnTable.Rows.Add(drReturn);
-                }
-            }
-            else
-            {
-                throw new Exception("The columns to perform inversion are not provided");
-            }
-
-            //if a nullValue is provided, fill the datable with it
-            if (nullValue != "")
-            {
-                foreach (DataRow dr in returnTable.Rows)
-                {
-                    foreach (DataColumn dc in returnTable.Columns)
-                    {
-                        if (dr[dc.ColumnName].ToString() == "")
-                            dr[dc.ColumnName] = nullValue;
-                    }
-                }
-            }
-
-            return returnTable;
-        }       
-
+        
         
         
         private static bool DecomposePutIntoTableIsError(bool showErrors, int i)
@@ -24511,11 +24362,6 @@ namespace Gekko
             }
             return a;
         }        
-
-        
-        
-
-        
 
         
         
