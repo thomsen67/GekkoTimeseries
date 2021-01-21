@@ -554,7 +554,7 @@ namespace Gekko
         public static Tuple<int, int> FindOptionFieldInSeriesAssignment(List<TokenHelper> line)
         {
             //not completely bulletproof, for instance "COMMAND <...> .... file = xx;" will fail, where command is a user-defined procedure
-            if (Program.IsNonSeriesStatement(line))return new Tuple<int, int>(-12345, -12345);
+            if (EquationBrowser.IsNonSeriesStatement(line))return new Tuple<int, int>(-12345, -12345);
             int i1 = FindS(line, "<");
             if (i1 == -12345) return new Tuple<int, int>(-12345, -12345);
             int i2 = FindS(line, i1 + 1, ">");

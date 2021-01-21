@@ -306,6 +306,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arrow.cs" />
+    <Compile Include="EquationBrowser.cs" />
     <Compile Include="GuiCompareUtility3Way.cs">
       <SubType>Form</SubType>
     </Compile>

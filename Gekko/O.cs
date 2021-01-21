@@ -9192,7 +9192,7 @@ namespace Gekko
             {
                 if (G.Equal(this.opt_browser, "yes"))
                 {
-                    Program.Browser();
+                    EquationBrowser.Browser();
                     return;
                 }
                 else
