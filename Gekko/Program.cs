@@ -17994,6 +17994,10 @@ namespace Gekko
             }
         }        
 
+        // ===========================
+        // qwerty TO HERE
+        // ===========================
+
         private static string ReadHelper(string fileName, ref bool cancel, string extension)
         {
             string rv = null;
