@@ -25,6 +25,8 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Globalization;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Gekko
 {
@@ -1724,5 +1726,587 @@ namespace Gekko
             }
             return s2;
         }
+    }
+
+    public static class TableStuff
+    {
+        public static void XmlTable(string filename, string html, string window, P p)
+        {
+
+            string tempfile = Globals.localTempFilesLocation + "\\" + "tablecode." + Globals.defaultCommandFileExtension;
+            if (File.Exists(tempfile))
+            {
+                Program.WaitForFileDelete(tempfile);  //for safety
+            }
+
+            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse/translate XML table start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+
+            XmlDocument doc = new XmlDocument();
+
+            string xmlText = Program.GetTextFromFileWithWait(filename);
+
+            XmlHelper xh = new XmlHelper();
+            //using (FileStream fs = WaitForFileStream(filename, GekkoFileReadOrWrite.Read))
+            //{
+
+            //To convert to lower case: http://mel-green.com/2009/04/lowercase-xml-regex-csharp/
+            //            Regex.Replace(
+            //xml,
+            //@"<[^<>]+>",
+            //m => { return m.Value.ToLower(); },
+            //RegexOptions.Multiline | RegexOptions.Singleline);
+
+            //xmlText = xmlText.Replace("'", "´");
+            //xmlText = xmlText.Replace("`", "´");
+
+            try
+            {
+                doc.LoadXml(xmlText);
+            }
+            catch (Exception e)
+            {
+                G.Writeln();
+                G.Writeln("*** ERROR: Table file: '" + filename + "'");
+                Program.WriteXmlError(e, filename);
+                throw new GekkoException();
+            }
+
+            VisitChildrenAndPutAssignvarsIntoNodes(doc, 0);
+
+            CountRowsCols(doc, 0, xh);
+            VisitChildren(doc, 0, xh);
+
+            XmlNode rows = doc.SelectSingleNode("//rows");
+            foreach (XmlNode row in rows.ChildNodes)
+            {
+                HandleXmlRow(xh, row);
+            }
+
+            bool isHtml = false;
+            if (G.Equal(Program.options.table_type, "html")) isHtml = true;
+            if (G.Equal(html, "yes")) isHtml = true;  //overrides if 'yes'
+
+            StringBuilder s3 = new StringBuilder();
+            if (isHtml && !G.Equal(window, "main"))
+            {
+                s3.AppendLine("TABLE tab.Print('html');");
+            }
+            else if (isHtml && G.Equal(window, "main"))
+            {
+                s3.AppendLine("TABLE tab.Print('html_main');");
+            }
+            else
+            {
+                //This will catch other cases, that is, txt
+                s3.AppendLine("TABLE tab.Print();");
+            }
+
+            StringBuilder s2 = new StringBuilder();
+
+
+            s2.AppendLine(Globals.tableConverterText1);
+            s2.AppendLine(Globals.tableConverterText2);
+            s2.AppendLine(Globals.tableConverterText3 + filename);
+            s2.AppendLine(Globals.tableConverterText4);
+            s2.AppendLine(Globals.tableConverterText5);
+
+            s2.AppendLine("DATE %__t1 = %__tabletimestart;");
+            s2.AppendLine("DATE %__t2 = %__tabletimeend;");
+            s2.AppendLine("TABLE tab = new Table();");
+            s2.AppendLine("VAL %__periods = %__t2 - %__t1 + 1 - filteredperiods(%__t1, %__t2);");
+            s2.AppendLine("VAL %__c1 = 1;");
+
+            string s = s2.ToString() + xh.s.ToString() + xh.sEnd.ToString() + s3.ToString();
+
+            using (FileStream fs2 = Program.WaitForFileStream(tempfile, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter tempfile2 = G.GekkoStreamWriter(fs2))
+            {
+                tempfile2.Write(s);
+                tempfile2.Flush();
+                tempfile2.Close();
+            }
+
+            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse/translate XML table end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+            //}
+        }
+        
+
+        private static void HandleXmlRow(XmlHelper xh, XmlNode row)
+        {
+
+            if (row.Name == "row")
+            {
+                xh.rowCounter++;
+                if (xh.rowCounter == xh.totalRows)
+                    xh.isLastRow = true;
+            }
+
+            if (row.Name == "rowformat")
+            {
+                Attrib a = new Attrib();
+                GetAttributes(row, a);
+                MergeAttributes(xh.rowGlobal, a);
+            }
+
+            if (row.Name == "colbordershow")
+            {
+                if (row.ChildNodes.Count > 0)
+                {
+                    G.Writeln2("*** ERROR: XML table: element '" + row.Name + "' should not have sub-elements");
+                    throw new GekkoException();
+                }
+                if (!xh.isLastRow)
+                {
+                    xh.s.AppendLine("TABLE tab.CurRow.ShowBorders();");
+                }
+            }
+
+            if (row.Name == "colborderhide")
+            {
+                int totalBorders = xh.colLeftBorders.Count + xh.colRightBorderPlusOne.Count;
+                string nodeText = row.InnerText;
+                List<int> killCols = new List<int>();
+                //nodeText="" means all borders
+                if (row.ChildNodes.Count > 1)
+                {
+                    G.Writeln2("*** ERROR: XML table: element '" + row.Name + "' should not have sub-elements");
+                    throw new GekkoException();
+                }
+
+                if (nodeText != "" && nodeText != "inner" && nodeText != "outer")
+                {
+                    string[] cols2 = nodeText.Split(',');
+                    foreach (string s in cols2)
+                    {
+                        int col = -12345;
+                        if (!int.TryParse(s, out col))
+                        {
+                            G.Writeln2("*** ERROR: XML table: could not convert '" + s + "' to list of integers");
+                        }
+                        killCols.Add(col);
+                    }
+                }
+
+                if (killCols.Count == 0)
+                {
+                    for (int i = 1; i <= totalBorders; i++)
+                    {
+                        if (nodeText == "outer" && (i > 1 && i < totalBorders)) continue;
+                        if (nodeText == "inner" && (i == 1 || i == totalBorders)) continue;
+                        XmlDisableBorder(xh, i);
+                    }
+                }
+                else
+                {
+                    foreach (int i in killCols)
+                    {
+                        XmlDisableBorder(xh, i);
+                    }
+                }
+
+
+
+            }
+
+            if (row.Name == "row")
+            {
+                //G.Writeln("+++ " + row.Name + ":" + row.InnerText);
+
+                Attrib rowA = new Attrib();
+                GetAttributes(row, rowA);
+                int counter = 0;
+                foreach (XmlNode node in row.ChildNodes)
+                {
+                    string nodeName = node.Name;
+                    string nodeText = node.InnerText;
+
+                    if (nodeText.Contains("'"))
+                    {
+                        //G.Writeln();
+                        //G.Writeln("+++ WARNING: XML table should not contain this hyphen: '");
+                        //G.Writeln("             The hyphen is changed to this hyphen: ´ (see the key to the left of the backspace key)");
+                        //G.Writeln("             Please change the table file, in order for this warning to disappear. The reason the");
+                        //G.Writeln("             hyphen is problematic is that it is used to denote strings in Gekko command files.");
+                        //G.Writeln("             File: " + filename);
+                        //G.Writeln("    " + "[" + G.IntFormat(i + 1, 4) + "]:" + "   " + G.ReplaceGlueNew(line), Color.Blue);
+                        nodeText = nodeText.Replace("'", "´");
+                    }
+
+                    if (nodeText.Contains("`"))
+                    {
+                        //G.Writeln();
+                        //G.Writeln("+++ WARNING: XML table should not contain this hyphen: `");
+                        //G.Writeln("             The hyphen is changed to this hyphen: ´ (see the key to the left of the backspace key)");
+                        //G.Writeln("             Please change the table file, in order for this warning to disappear. The reason the");
+                        //G.Writeln("             hyphen is problematic is that it is used internally in Gekko for other purposes.");
+                        //G.Writeln("             File: " + filename);
+                        //G.Writeln("    " + "[" + G.IntFormat(i + 1, 4) + "]:" + "   " + G.ReplaceGlueNew(line), Color.Blue);
+                        nodeText = nodeText.Replace("`", "´");
+                    }
+
+                    if (nodeText.Contains("\""))
+                    {
+                        //nodeText = nodeText.Replace("\"", "´");  NO!
+                    }
+
+                    //nodeText = nodeText.Trim();  //also removes blank lines if there are any by accident
+
+                    counter++;
+                    if (counter > xh.cols.Count)
+                    {
+                        G.Writeln2("*** ERROR in XML table: there were more elements put into a <row> than defined columns");
+                        G.Writeln("    Please note that since Gekko 1.5.7, the behavoior regarding attribute 'colspan' has ");
+                        G.Writeln("    been changed so that for instance after '<txt colspan = \"3\">', the next column");
+                        G.Writeln("    will be the 4. column (and not the 2. column as in Gekko versions prior to 1.5.7.");
+                        G.Writeln("    So if you use 'colspan', you may have to remove some empty <txt> tags...");
+                        throw new GekkoException();
+                    }
+                    Attrib colInfo = xh.cols[counter - 1].attrib;
+                    Attrib childA = new Attrib();
+                    GetAttributes(node, childA);
+
+                    Attrib a = new Attrib();
+                    MergeAttributes(a, xh.table);       //completely global options
+                    MergeAttributes(a, colInfo);        //options related to a specific column
+                    MergeAttributes(a, xh.rowGlobal);   //options defined in <rowformat>
+                    MergeAttributes(a, rowA);           //options defined in particular <row>
+                    MergeAttributes(a, childA);         //options defined in particular item in row (i.e., column)
+
+                    string a_vardisplay = a.Get("vardisplay");
+                    if (a_vardisplay == null) a_vardisplay = "n";
+
+                    string a_varscale = a.Get("varscale");
+                    if (a_varscale == null) a_varscale = "1.0";
+
+                    string a_varformat = a.Get("varformat");
+                    if (a_varformat == null) a_varformat = "f12.2";  //we say that is default is nothing is stated at all
+
+                    string a_datealign = a.Get("datealign");
+                    if (a_datealign == null) a_datealign = "right";
+
+                    string a_txtalign = a.Get("txtalign");
+                    if (a_txtalign == null) a_txtalign = "left";
+
+                    string a_colspan = a.Get("colspan");
+                    if (a_colspan == null) a_colspan = "1";
+                    int a_colspanint = GetIntFromAttrib(a_colspan);
+
+                    //G.Writeln(nodeName);
+
+                    if (nodeName == "txt")
+                    {
+                        if (nodeText == "$")
+                        {
+                            //text taken from next <var> tag
+                            XmlNode next = node.NextSibling;
+                            if (next != null)
+                            {
+                                string nextName = next.Name;
+                                string nextText = next.InnerText;
+                                if (nextName == "var")
+                                {
+                                    if (nextText != "")
+                                    {
+                                        nodeText = nextText;
+
+                                        if (nodeText.Contains("'"))
+                                        {
+                                            nodeText = nodeText.Replace("'", "´");
+                                        }
+
+                                        if (nodeText.Contains("`"))
+                                        {
+                                            nodeText = nodeText.Replace("`", "´");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if ((nodeText == null || nodeText == "") && a_colspanint <= 1)
+                        {
+                            //#872483274
+                            //do nothing, no need to do any MergeCols etc. for an empty <txt/> without span.
+                            //and this would also interfere with subcolborder that would become broken.
+                        }
+                        else
+                        {
+                            xh.s.AppendLine("TABLE tab.CurRow.SetText(%__c" + counter + ", '" + nodeText + "');");
+                            if (a_txtalign == "center")
+                            {
+                                xh.s.AppendLine("TABLE tab.CurRow.AlignCenter(%__c" + counter + ");");
+                            }
+                            else if (a_txtalign == "right")
+                            {
+                                xh.s.AppendLine("TABLE tab.CurRow.AlignRight(%__c" + counter + ");");
+                            }
+                            //could this not be omitted if a_colspanint is = 1???
+                            //NO: THE COLS MIGHT GET SPANNED DUE TO DATES: SO THIS LOGIC IS NEEDED for stuff spanning through dates!!!!
+                            xh.s.AppendLine("TABLE tab.CurRow.MergeCols(%__c" + counter + ", %__c" + (counter + a_colspanint) + " - 1);");
+                        }
+
+                        //If colspan is 2, this skips one more column to the right than normal
+                        //Corresponds to HTML table behavior.
+                        //Gekko versions < 1.5.7 did not have this skip.
+                        counter += a_colspanint - 1;
+                    }
+                    else if (nodeName == "var")
+                    {
+                        string nodeText2 = nodeText.Trim();
+                        if (nodeText2.ToLower().StartsWith("genr "))
+                            nodeText2 = nodeText2.Substring("genr ".Length);
+                        else if (nodeText2.ToLower().StartsWith("ser "))
+                            nodeText2 = nodeText2.Substring("ser ".Length);
+                        else if (nodeText2.ToLower().StartsWith("series "))
+                            nodeText2 = nodeText2.Substring("series ".Length);
+
+                        nodeText2 = nodeText2.Replace("´", "'");
+
+                        if (colInfo.Get("type") == "expand")
+                        {
+                            xh.s.AppendLine("TABLE tab.CurRow.SetValues(%__c" + counter + ", %__t1, %__t2, " + nodeText2 + ", '" + a_vardisplay + "', " + a_varscale + ", '" + a_varformat + "');");
+                        }
+                        else if (colInfo.Get("period") != null)
+                        {
+                            string date = colInfo.Get("period");
+                            xh.s.AppendLine("TABLE tab.CurRow.SetValues(%__c" + counter + ", " + date + ", " + date + ", " + nodeText2 + ", '" + a_vardisplay + "', " + a_varscale + ", '" + a_varformat + "');");
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: You are trying to put a variable into a column that is not expandable or of 'period' type");
+                            throw new GekkoException();
+                        }
+                        //G.Writeln(nodeName + ":" + nodeText);
+                    }
+                    else if (nodeName == "date")
+                    {
+                        if (colInfo.Get("type") == "expand")
+                        {
+                            xh.s.AppendLine("TABLE tab.CurRow.SetDates(%__c" + counter + ", %__t1, %__t2);");
+                        }
+                        else if (colInfo.Get("period") != null)
+                        {
+                            string date = colInfo.Get("period");
+                            xh.s.AppendLine("TABLE tab.CurRow.SetDates(%__c" + counter + ", " + date + ", " + date + ");");
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: You are trying to put a date into a column that is not expandable or of 'period' type");
+                            throw new GekkoException();
+                        }
+                        //G.Writeln(nodeName + ":" + nodeText);
+                    }
+                }
+            }
+
+            if (row.Name == "rowborder")
+            {
+                if (xh.isLastRow)
+                {
+                    xh.s.AppendLine("TABLE tab.CurRow.SetBottomBorder(1, %__c" + (xh.cols.Count + 1) + " - 1);");
+                }
+                else
+                {
+                    xh.s.AppendLine("TABLE tab.CurRow.SetTopBorder(1, %__c" + (xh.cols.Count + 1) + " - 1);");
+                }
+            }
+            if (row.Name == "row")  //this must be the last part of XML row handling
+            {
+                if (!xh.isLastRow)
+                {
+                    xh.s.AppendLine("TABLE tab.CurRow.Next();");
+                }
+            }
+        }
+
+        private static void XmlDisableBorder(XmlHelper xh, int i)
+        {
+            int totalBorders = xh.colLeftBorders.Count + xh.colRightBorderPlusOne.Count;
+
+            if (i < 1 || i > totalBorders)
+            {
+                G.Writeln2("*** ERROR: XML table: <colborderhide> should have numbers between 1 and " + totalBorders + " (inclusive)");
+                throw new GekkoException();
+            }
+            if (i < totalBorders)
+            {
+                //This can maybe fail ([i-1] call)
+                if (i - 1 >= 0 && i - 1 < xh.colLeftBorders.Count)
+                {
+                    xh.s.AppendLine("TABLE tab.CurRow.HideLeftBorder(%__c" + xh.colLeftBorders[i - 1] + ");");
+                }
+
+            }
+            else
+            {
+                //This can fail ([0] call)
+                if (0 < xh.colRightBorderPlusOne.Count)
+                {
+                    xh.s.AppendLine("TABLE tab.CurRow.HideRightBorder(%__c" + xh.colRightBorderPlusOne[0] + " - 1);");
+                }
+            }
+        }
+
+        private static int GetIntFromAttrib(string input)
+        {
+            int parsed = -12345;
+            if (!int.TryParse(input, out parsed))
+            {
+                G.Writeln2("*** ERROR: Could not parse colspan '" + input + "' into an integer");
+                throw new GekkoException();
+            }
+            return parsed;
+        }
+
+        static void CountRowsCols(XmlNode node, int level, XmlHelper xh)
+        {
+            if (node.Name == "col") xh.totalCols++;
+            if (node.Name == "row") xh.totalRows++;
+
+            foreach (XmlNode echild in node.ChildNodes)
+            {
+                CountRowsCols(echild, level + 1, xh);
+            }
+        }
+
+        static void VisitChildren(XmlNode node, int level, XmlHelper xh)
+        {
+            //G.Writeln("-".PadLeft(level + 1) + "" + node.Name + ": " + node.Value);
+
+            if (node.Name == "cols")
+            {
+                Attrib a = new Attrib();
+                GetAttributes(node, a);
+            }
+
+            if (node.Name == "col")
+            {
+                xh.cols.Add(new XmlColInfo());
+            }
+
+            if (node.Attributes != null)
+            {
+                Attrib a = null;
+                if (node.Name == "table")
+                {
+                    a = xh.table;
+                }
+                else if (node.Name == "col")
+                {
+                    a = xh.cols[xh.cols.Count - 1].attrib;
+                }
+                if (a != null)
+                {
+                    GetAttributes(node, a);
+                }
+            }
+
+            if (node.Name == "col")
+            {
+                int last = 0;
+                if (xh.colB.Count > 0) last = xh.colB[xh.colB.Count - 1];
+                xh.colA.Add(last + 1);
+                Attrib aa = xh.cols[xh.cols.Count - 1].attrib;
+                string add = "1";
+                if (aa.Get("type") == "expand")
+                {
+                    add = "%__periods";
+                }
+                xh.s.AppendLine("VAL %__c" + (xh.cols.Count + 1) + " = %__c" + (xh.cols.Count) + " + " + add + ";");
+            }
+
+            if (node.Name == "colborder")
+            {
+                if (xh.cols.Count < xh.totalCols)
+                {
+                    int temp = xh.cols.Count + 1;
+                    xh.sEnd.AppendLine("TABLE tab.CurRow.SetLeftBorder(%__c" + temp + ");");
+                    xh.colLeftBorders.Add(temp);
+
+                }
+                else
+                {
+                    int temp = xh.cols.Count + 1;
+                    xh.sEnd.AppendLine("TABLE tab.CurRow.SetRightBorder(%__c" + temp + " - 1);");
+                    xh.colRightBorderPlusOne.Add(temp);
+                }
+            }
+
+            if (node.Name == "subcolborder")  //must be child of <col>, puts data into this <col> (its parent)
+            {
+                Attrib a = new Attrib();
+                if (node.Attributes != null)
+                {
+                    GetAttributes(node, a);
+                }
+                XmlColInfo xci = xh.cols[xh.cols.Count - 1];
+                string per = a.Get("period");
+                xci.subcolborders.Add(per);
+
+                xh.sEnd.AppendLine("TABLE tab.CurRow.SetRightBorder(%__c" + xh.cols.Count + " + (date(" + per + ") - %__t1) - filteredperiods(%__t1, date(" + per + ")), 'gray');");
+
+
+            }
+
+            foreach (XmlNode echild in node.ChildNodes)
+            {
+                VisitChildren(echild, level + 1, xh);
+            }
+        }
+
+        static void VisitChildrenAndPutAssignvarsIntoNodes(XmlNode node, int level)
+        {
+            //G.Write(G.Blanks(level) + node.Name + " ");
+            if (node.Attributes != null)
+            {
+                foreach (XmlAttribute achild in node.Attributes)
+                {
+                    //achild.Value = achild.Value + "_12345";
+                    //string name = achild.LocalName;
+                    //string value = achild.Value;
+                    //achild.Value = SubstituteAssignVarsInExpression(achild.Value);
+                    //G.Write("[attrib] " + name + "=\"" + value + "\" ");
+                }
+            }
+
+            //why isnt .Value used in other places (seems innertext or so)
+            //here we could substitute, remember the \\# etc.
+            //string text = null;
+            if (node.NodeType == XmlNodeType.Text || node.NodeType == XmlNodeType.CDATA)
+            {
+                node.Value = node.Value;
+                //text = node.Value;
+            }
+            //G.Writeln("[value] \"" + text + "\"");
+
+            foreach (XmlNode echild in node.ChildNodes)
+            {
+                VisitChildrenAndPutAssignvarsIntoNodes(echild, level + 1);
+            }
+        }
+
+        private static void GetAttributes(XmlNode node, Attrib a)
+        {
+            if (node.Attributes == null) return;
+            foreach (XmlAttribute achild in node.Attributes)
+            {
+                string name = achild.LocalName;
+                string value = achild.Value;
+                if (a.Set(name, value) == false)
+                {
+                    G.Writeln2("*** ERROR: XML table has duplicate attribute name: " + name);
+                }
+            }
+        }
+
+        private static void MergeAttributes(Attrib result, Attrib newItems)
+        {
+            foreach (var item in newItems.data)
+            {
+                result.data[item.Key] = item.Value;
+            }
+        }
+
+
     }
 }

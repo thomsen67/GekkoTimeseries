@@ -10284,7 +10284,7 @@ namespace Gekko
                     string tableFileName = Program.TableHelper(this.fileName, this.menuTable);
 
                     Globals.lastCalledMenuTable = tableFileName;
-                    Program.XmlTable(tableFileName, this.opt_html, this.opt_window, p);
+                    TableStuff.XmlTable(tableFileName, this.opt_html, this.opt_window, p);
                     O.Run o = new O.Run();
                     o.fileName = Globals.localTempFilesLocation + "\\" + "tablecode." + Globals.defaultCommandFileExtension;
                     o.p = p;
