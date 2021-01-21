@@ -1162,12 +1162,6 @@ namespace Gekko
         public static int guiBrowseHelpNumber = 0;
         public static List<string> guiBrowseHelpHistory = new List<string>();
 
-        public static int TempVarIndex()
-        {
-            Globals.tempVarIndexCounter++;
-            return Globals.tempVarIndexCounter;
-        }
-
         public static int RandomInt(int min, int max)
         {
             lock (Globals.randomSyncLock)
@@ -1391,16 +1385,6 @@ namespace Gekko
             }
         }
 
-        public static void SetGlobalTimePeriodDirect(GekkoTime t1, GekkoTime t2)
-        {
-            SetGlobalTimePeriodAbstract(true, t1, t2);
-        }
-
-        public static void SetGlobalTimePeriod(GekkoTime t1, GekkoTime t2)
-        {
-            SetGlobalTimePeriodAbstract(false, t1, t2);
-        }
-
         public static void SetGlobalTimePeriodAbstractNew(bool direct, GekkoTime t1, GekkoTime t2)
         {
             if (direct)
@@ -1410,75 +1394,14 @@ namespace Gekko
             }
         }
 
-        public static void SetGlobalTimePeriodDirectNew(GekkoTime t1, GekkoTime t2)
-        {
-            SetGlobalTimePeriodAbstractNew(true, t1, t2);
-        }
-
-        public static void SetGlobalTimePeriodNew(GekkoTime t1, GekkoTime t2)
-        {
-            SetGlobalTimePeriodAbstractNew(false, t1, t2);
-        }
-
-        public static void PrepareExcelDnaOld(string s)
-        {
-            Globals.excelDna = true;
-            Globals.excelDna2 = true;
-            Globals.excelDnaPath = s;            
-        }
-
+        //ok that it is not referenced to, is used in Gekcel
         public static void PrepareExcelDna(string s)
         {
             Globals.excelDna = true;
             Globals.excelDna2 = false;
             Globals.excelDnaPath = s;
-        }
-
-        /// <summary>
-        /// Creates a double[,] array to contain periodic (i.e. yearly/monthly) data.
-        /// Can be initialized to "NaN"'s, depending upon the global initializeDataArrayWithNaN (typically set to true), else is initialized with zeroes.
-        /// Initializing with zeroes may have unintended concequences if some data is missing.
-        /// </summary>
-        /// <param name="vars">Max number of variables to hold</param>
-        /// <param name="periods">Max number of periods to hold</param>
-        /// <returns></returns>
-        public static double[,] createDataArray(int vars, int periods)
-        {
-            double[,] a1 = new double[vars, periods];
-            if (Globals.initializeDataArrayWithNaN)
-            {
-                for (int i = 0; i < vars; i++)
-                {
-                    for (int j = 0; j < periods; j++)
-                    {
-                        a1[i, j] = double.NaN;
-                    }
-                }
-            }
-            return a1;
-        }
-
-        /// <summary>
-        /// Returns next pos that is not blank.
-        /// Also skips tabs. Returns -12345 if not found.
-        /// </summary>
-        /// <param name="c">Array of characters</param>
-        /// <param name="ii">Start position to search from</param>
-        /// <returns>Found position.</returns>
-        static int skipSpaces(char[] c, int ii)
-        {
-            int i;
-            //skip spaces (tab is included counted)
-            for (i = ii; i < int.MaxValue; i++)
-            {
-                if (c[i] == ' ' || c[i] == '\t')     //'\t' is tab
-                {
-                    //do nothing
-                }
-                else return i;
-            }
-            return -12345;
-        }
+        }        
+        
         static int skipSpaces(string c, int ii)
         {
             int i;
@@ -1514,41 +1437,7 @@ namespace Gekko
             return -12345;
         }
 
-        /// <summary>
-        /// Returns next pos that is the input character. Returns -12345 if not found.
-        /// </summary>
-        /// <param name="c">Array of characters</param>
-        /// <param name="ii">Start position to search from</param>
-        /// <param name="toFind">Input character</param>
-        /// <returns>Found position.</returns>
-        static int findChar(char[] c, int ii, char toFind)
-        {
-            int i;
-            for (i = ii; i < c.Length; i++)
-            {
-                if (c[i] == toFind) return i;
-            }
-            return -12345;
-        }
-
-        /// <summary>
-        /// Returns next pos that is the input character. Returns -12345 if not found.
-        /// </summary>
-        /// <param name="c">Array of characters</param>
-        /// <param name="ii">Start position to search from</param>
-        /// <param name="iiMax">Last position legal to search</param>
-        /// <param name="toFind">Input character</param>
-        /// <returns>Found position.</returns>
-        static int findChar(char[] c, int ii, int iiMax, char toFind)
-        {
-            int i;
-            for (i = ii; i < c.Length; i++)
-            {
-                if (i > iiMax) return -12345;
-                if (c[i] == toFind) return i;
-            }
-            return -12345;
-        }
+        
         
 
         public static String RemoveTrailingD(String lag)
@@ -1568,20 +1457,7 @@ namespace Gekko
             return lag1;
         }
 
-        private static String AddTrailingD(String lag)
-        {
-            String lag1 = "";
-            if (lag.EndsWith("d"))
-            {
-                //do nothing
-            }
-            else
-            {
-                lag1 = lag + "d";
-            }
-            return lag1;
-        }
-
+        
         /// <summary>
         /// s must be of form "var¤-1", multiple Globals.lagIndicator not allowed.
         /// if "var¤-1¤-1", .s1 is ok but .s2 not.
@@ -2990,21 +2866,7 @@ namespace Gekko
                 sum += (columnName[i] - 'A' + 1);
             }
             return sum;
-        }
-
-        public static string ExcelColumnNumberToName(int columnNumber)
-        {
-            int dividend = columnNumber;
-            string columnName = String.Empty;
-            int modulo;
-            while (dividend > 0)
-            {
-                modulo = (dividend - 1) % 26;
-                columnName = Convert.ToChar(65 + modulo).ToString() + columnName;
-                dividend = (int)((dividend - modulo) / 26);
-            }
-            return columnName;
-        }
+        }        
 
         public enum ESheetCollection
         {
@@ -5391,28 +5253,6 @@ namespace Gekko
                 Walk(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound, ref underscoreFound);
             }
         }
-
-        
-
-        
-        
-        
-        
-
-        private static void TestOfStrayT(string varName, StringBuilder sb, string s)
-        {
-            //
-            //
-            //  TEST OF STRAY T's
-            //
-            //
-            int xxxx = -12345;
-            bool xxxxx = int.TryParse(s, out xxxx);
-            if (xxxxx && Globals.runningOnTTComputer && xxxx != -12345 && (xxxx >= 1990 && xxxx <= 2150))
-            {
-                G.Writeln("GDX problem: " + s + "   " + xxxx + "  " + sb.ToString() + "   " + varName);
-            }
-        }
         
         
         public static string NumberFormat(double d, string format2)
@@ -6491,44 +6331,6 @@ namespace Gekko
             }
         }
 
-        private static void RemoveArrayListFromArrayList(ArrayList varsRows, ArrayList toRemove)
-        {
-            foreach (int i in toRemove)
-            {
-                varsRows.Remove(i);
-            }
-        }
-
-        private static void RemoveArrayListFromArrayList(List<int> varsRows, List<int> toRemove)
-        {
-            foreach (int i in toRemove)
-            {
-                varsRows.Remove(i);
-            }
-        }
-
-        private static void AddArrayListToArrayList(ArrayList varsRows, ArrayList toAdd)
-        {
-            foreach (int i in toAdd)
-            {
-                if (!varsRows.Contains(i))
-                {
-                    varsRows.Add(i);
-                }
-            }
-        }
-
-        private static void AddArrayListToArrayList(List<int> varsRows, List<int> toAdd)
-        {
-            foreach (int i in toAdd)
-            {
-                if (!varsRows.Contains(i))
-                {
-                    varsRows.Add(i);
-                }
-            }
-        }
-
         private static void Heuristic(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> feedback)
         {
             int max2 = -12345;
@@ -6710,18 +6512,7 @@ namespace Gekko
             }
         }
 
-        private static void PrintVector(IElementalAccessVector v)
-        {
-            for (int i1 = 0; i1 < v.Length; i1++)
-            {
-
-                double val = v.GetValue(i1);
-                int val1 = (int)val;
-                G.Write(val1 + " ");
-            }
-            G.Writeln();
-        }
-
+        
         private static ArrayList FindEqsWithVarOnRightHandSide(string var1)
         {
             ArrayList eqs = new ArrayList();
@@ -8354,30 +8145,7 @@ namespace Gekko
             temp.Sort(StringComparer.OrdinalIgnoreCase);
             return temp;
         }
-
         
-        public static string PerhapsOverrideWithDefaultBankName(string defaultBank, bool hasColon, string bank)
-        {
-
-            if (!hasColon)
-            {
-                if (defaultBank != null)
-                {
-                    bank = defaultBank;
-                }
-            }
-            return bank;
-        }
-
-        
-        private static Series HandleMissingVariable(string bank, string variable)
-        {
-            //This is probably not used at all
-            G.Writeln2("*** ERROR: #09845243875");
-            throw new GekkoException();            
-
-            return null;
-        }        
 
         public static void MaybePlaySound(P p)
         {
@@ -8547,29 +8315,7 @@ namespace Gekko
             }
             return s2;
         }
-
-        //TODO: Delete this when Parser.cs is deleted
-        private static void WriteCompileErrorMessage(string text, string fileName)
-        {
-            if (Globals.threadIsInProcessOfAborting) return;
-            G.Writeln(text, Color.Black, true);
-        }
-
-        public static void ClearTmpTmpVariables()
-        {
-            //Program.databanks.Getfirst().ClearTmpTmpVars();
-            //Program.databanks.GetSec().ClearTmpTmpVars();
-        }
-
-        public static void Vers()
-        {
-            G.Writeln2("*** ERROR: Please use: TELL gekkoVersion();");
-            throw new GekkoException();
-
-
-            //G.Writeln("Gekko version: " + G.PrintVersion(Globals.gekkoVersion));
-            G.Writeln("Gekko version: " + Globals.gekkoVersion);
-        }
+                
 
         public static void Unfix(Databank databank, string endoOrExoPrefix)
         {
