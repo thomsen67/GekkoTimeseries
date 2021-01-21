@@ -14748,31 +14748,67 @@ print(df2)
 
         [TestMethod]
         public void _Test_Table()
-        {
-            //table tablesmall
+        {                                 
+            //Pretty good check of both syntax and results, both when composing a table cell by cell,
+            //and using a xml table. Both txt and html output is checked.
+            //So is this test passes, tables are not completely defunct!
 
-            //just a test of syntax
             I("RESET;");
+            I("time 2000 2003;");
+            I("x1 = 100;");
+            I("x2 = 200;");
             I("table xx = new table();");
-            I("table xx.currow.setdates(1,2000,2010);");
+            I("table xx.currow.setdates(1,2000,2003);");
             I("table xx.currow.next();");
-            I("table xx.currow.setvalues(1,2000,2010,1,'n',0.001,'f10.3');");
+            I("table xx.currow.setvalues(1,2000,2003,x1,'n',0.001,'f10.3');");
             I("table xx.currow.next();");
-            I("table xx.currow.setvalues(1,2000,2010,1,'n',0.001,'f10.3');");
+            I("table xx.currow.setvalues(1,2000,2003,x2,'n',0.001,'f10.3');");
             I("table xx.currow.mergecols(3, 4);");
             I("table xx.currow.aligncenter(3);");
             I("table xx.currow.settopborder(2, 3);");
             I("table xx.currow.setleftborder(1);");
             I("table xx.currow.hideleftborder(1);");
             I("table xx.currow.next();");
-            I("table xx.currow.settext(1,'hejsa');");
-            I("table xx.currow.settext(2,'med dig');"); 
-            I("table xx.print();");
+            I("table xx.currow.settext(1,'hello');");
+            I("table xx.currow.settext(2,'you');");
+            Globals.unitTestScreenOutput.Clear();
+            I("table xx.print('txt');");
+            string s = Globals.unitTestScreenOutput.ToString();            
+            Assert.IsTrue(s.Contains("|       2000        2001        2002        2003"));
+            Assert.IsTrue(s.Contains("|      0.100       0.100       0.100       0.100"));
+            Assert.IsTrue(s.Contains("|            ------------------------"));
+            Assert.IsTrue(s.Contains("       0.200       0.200                   0.200"));
+            Assert.IsTrue(s.Contains("  hello       you"));
 
+            // ---
+            
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+            Globals.unitTestScreenOutput.Clear();
+            I("TABLE <2010 2014 window=main> tablesmall;");
+            s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains(">1.83</td>"));  //just simple test that some html was produced
+            Assert.IsTrue(s.Contains(">1.61</td>"));  //just simple test that some html was produced
+            Assert.IsTrue(s.Contains(">1.60</td>"));  //just simple test that some html was produced
+
+            // ---
+            
+            I("OPTION table type = txt;");
+            Globals.unitTestScreenOutput.Clear();
             I("TABLE <2010 2014> tablesmall;");
+            s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains("---------------------------------------------------------------------------------"));
+            Assert.IsTrue(s.Contains("|   Tabel 1.B  Forsyningsbalancen, realvækst (pct.)                             |"));
+            Assert.IsTrue(s.Contains("------------------------+--------------------------------------------------------"));
+            Assert.IsTrue(s.Contains("|                       |      2010       2011       2012       2013       2014 |"));
+            Assert.IsTrue(s.Contains("------------------------+--------------------------------------------------------"));
+            Assert.IsTrue(s.Contains("| Bruttonationalprodukt |         M          M       1.18       1.30       1.30 |"));
+            Assert.IsTrue(s.Contains("| Import                |         M          M       1.83       1.61       1.60 |"));
+            Assert.IsTrue(s.Contains("------------------------+--------------------------------------------------------"));
+            Assert.IsTrue(s.Contains("| *) Lagerinvesteringer i procent af bruttonationalprodukt                      |"));
+            
+
         }
 
         [TestMethod]
