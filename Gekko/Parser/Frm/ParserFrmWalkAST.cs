@@ -1633,7 +1633,7 @@ namespace Gekko.Parser.Frm
                 return;
             }
 
-            if (isModel)  //for equations in model/frm
+            if (isModel)  //for equations in model/frm, probably always true nowadays
             {
                 //ATypeData dataA = model.varsAType[variable];
                 ATypeData dataA = null; model.varsAType.TryGetValue(variable, out dataA);
@@ -1723,60 +1723,11 @@ namespace Gekko.Parser.Frm
                     //This is probably so that equations can be GENR'ed
                     LongVersionAndHumanVersion(wh2, variable, lag);
                 }
-            }
-            else  //for genr and prt statements
+            }      
+            else
             {
-                string bank = "databank";
-                if (isBaseBank) bank = "baseDatabank";
-
-                if (namedBank != null)
-                {
-                    //all this stuff is pretty messy, especially for PPLOT and WPLOT (PRT a bit better).
-                    //we should merge PRT, PPLOT and WPLOT functionality at some point.
-                    //the use of NamedDatabankHelper() is only present when using colons, so it should not
-                    //be able to break anything regarding Gekko 1.6 and PRT/PPLOT/WPLOT. Or if it breaks,
-                    //it only affects colons.
-                    //isBaseBank can not be true here (not legal syntax to mix ':' and @)
-                    bank = "Program.NamedDatabankHelper(`" + namedBank + "`, databank)";  //databank is either Work or Base (looping over these)
-                }
-
-                string variableSubst = variable;
-
-                if (leftSide)
-                {
-                    wh2.leftHandSideCsCodeGauss.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).SetData(Program.options.freq, t, data)");
-                }
-                else
-                {
-                    if (absoluteTime == null)
-                    {
-                        if (lag == 0)
-                        {
-                            //wh2.rightHandSideCsCode.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).GetData(Program.options.freq ,t)");
-                            wh2.rightHandSideCsCode.Append("Program.GetData(`" + variableSubst + "`, " + bank + ", t)");
-                        }
-                        else
-                        {
-                            //wh2.rightHandSideCsCode.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).GetData(t.CloneAndAdd(" + lag + "))");
-                            wh2.rightHandSideCsCode.Append("Program.GetData(`" + variableSubst + "`, " + bank + ", t.Add(" + lag + "))");
-                        }
-                    }
-                    else
-                    {
-                        GekkoTime t = GekkoTime.FromStringToGekkoTime(absoluteTime);
-                        //wh2.rightHandSideCsCode.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).GetData(new GekkoTime(" + t.year + ", " + t.sub + "))");
-                        wh2.rightHandSideCsCode.Append("Program.GetData(`" + variableSubst + "`, " + bank + ", new GekkoTime(" + t.super + ", " + t.sub + "))");
-                    }
-                }
-
-                //dublets are not allowed. TODO: fY and fy can coexist -- find a List<string> doing upper/lowercase
-                if (!wh2.allReferencedTimeSeriesOrListsWork.Contains(variable)) wh2.allReferencedTimeSeriesOrListsWork.Add(variable);
-                //TODO: prettify all these calls...
-                //if (Program.ExtractPrintOptions(helper.prtOption).isMultiplier | useBaseBank == "TRUE")
-                if (isBaseBank)
-                {
-                    if (!wh2.allReferencedTimeSeriesOrListsBase.Contains(variable)) wh2.allReferencedTimeSeriesOrListsBase.Add(variable);
-                }
+                G.Writeln2("*** ERROR: Internal error #980725238579");
+                throw new GekkoException();
             }
         }
 

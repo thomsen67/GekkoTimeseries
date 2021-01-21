@@ -4836,13 +4836,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                             node.Code.A(LocalCode2(Num(node), null)); //see LocalCode1
                         }
-                        break;                    
+                        break;                                        
                     
-                    case "ASTSTAMP":
-                        {
-                            node.Code.A("Program.Stamp();" + G.NL);
-                        }
-                        break;
                     case "ASTSTRINGINQUOTES":
                         {
                             string s = G.StripQuotes(node[0].Text);
@@ -4928,7 +4923,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTINI":
                         {
-                            node.Code.A("Program.Ini(p);");
+                            node.Code.A("O.Ini(p);");
                         }
                         break;
                     case "ASTINFO":
@@ -4961,8 +4956,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTPAUSE":
                         {                            
-                            if (node.ChildrenCount() == 0) node.Code.A("Program.Pause(``);");
-                            else node.Code.A("Program.Pause(O.ConvertToString(" + node[0].Code + "));");
+                            if (node.ChildrenCount() == 0) node.Code.A("O.Pause(``);");
+                            else node.Code.A("O.Pause(O.ConvertToString(" + node[0].Code + "));");
                             break;
                         }
                         break;                   

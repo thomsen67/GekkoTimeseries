@@ -9381,13 +9381,7 @@ namespace Gekko
 
             br.BaseStream.Position += 0x12;
             return (br.ReadInt16() & IMAGE_FILE_LARGE_ADDRESS_AWARE) == IMAGE_FILE_LARGE_ADDRESS_AWARE;
-        }
-
-        public static void Stamp()
-        {                        
-                G.Writeln2("*** ERROR: Please use: TELL currentDateTime();");
-                throw new GekkoException();            
-        }
+        }        
 
         public static void FlowChart(string s, string code, GekkoTime period)
         {
@@ -14003,45 +13997,7 @@ namespace Gekko
             RunHelper(o);
         }        
 
-        public static void Ini(P p)
-        {
-            string s = "gekko.ini";
-                       
-            List<string> folders = new List<string>();
-            folders.Add(G.GetProgramDir());
-            string fileName2 = FindFile(s, folders, false);  //also calls CreateFullPathAndFileName()
-            if (fileName2 == null)
-            {
-                G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
-            }
-            else
-            {
-                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-                Program.EmitCodeFromANTLR("", fileName2, false, 0, p);
-                G.Writeln();
-                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
-            }
-
-            folders = new List<string>();
-            folders.Add(Program.options.folder_command);
-            folders.Add(Program.options.folder_command1);
-            folders.Add(Program.options.folder_command2);
-            fileName2 = FindFile(s, folders, true);  //also calls CreateFullPathAndFileName()
-            if (fileName2 == null)
-            {
-                G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
-                return;  //used for gekko.ini file
-            }
-            else
-            {
-                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-                Program.EmitCodeFromANTLR("", fileName2, false, 0, p);
-                G.Writeln();
-                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
-            }
-        }
+        
 
         public static void RunHelper(O.Run o)
         {
@@ -20529,18 +20485,7 @@ namespace Gekko
             Gui.CloseAllDecompUdvalg(print);
         }
 
-        public static void Pause(string arg)
-        {
-            arg = HandleNewlines(arg);
-            if (arg.Length > 0)
-            {
-                G.Writeln();
-                G.Writeln(arg);
-            }
-            if (arg.Length > 0) arg += "\n" + "\n";
-            arg += "Press [Enter] to continue";
-            MessageBox.Show(arg);
-        }
+        
 
         public static string HandleNewlines(string arg)
         {
@@ -20732,7 +20677,7 @@ namespace Gekko
             if (ini)
             {
                 G.Writeln();
-                Program.Ini(p);
+                O.Ini(p);
             }
             try
             {

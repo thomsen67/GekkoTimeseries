@@ -2090,6 +2090,59 @@ namespace Gekko
             return G.Equal(dbName, Globals.All);
         }
 
+        public static void Pause(string arg)
+        {
+            arg = Program.HandleNewlines(arg);
+            if (arg.Length > 0)
+            {
+                G.Writeln();
+                G.Writeln(arg);
+            }
+            if (arg.Length > 0) arg += "\n" + "\n";
+            arg += "Press [Enter] to continue";
+            MessageBox.Show(arg);
+        }
+
+        public static void Ini(P p)
+        {
+            string s = "gekko.ini";
+
+            List<string> folders = new List<string>();
+            folders.Add(G.GetProgramDir());
+            string fileName2 = Program.FindFile(s, folders, false);  //also calls CreateFullPathAndFileName()
+            if (fileName2 == null)
+            {
+                G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
+            }
+            else
+            {
+                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                Program.EmitCodeFromANTLR("", fileName2, false, 0, p);
+                G.Writeln();
+                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
+            }
+
+            folders = new List<string>();
+            folders.Add(Program.options.folder_command);
+            folders.Add(Program.options.folder_command1);
+            folders.Add(Program.options.folder_command2);
+            fileName2 = Program.FindFile(s, folders, true);  //also calls CreateFullPathAndFileName()
+            if (fileName2 == null)
+            {
+                G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
+                return;  //used for gekko.ini file
+            }
+            else
+            {
+                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                Program.EmitCodeFromANTLR("", fileName2, false, 0, p);
+                G.Writeln();
+                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+            }
+        }
+
         public static void Cls(string tab)
         {
             CrossThreadStuff.Cls(tab);
