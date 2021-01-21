@@ -1417,46 +1417,8 @@ namespace Gekko
             return -12345;
         }
 
-        /// <summary>
-        /// Returns pos after next new line code ('\r\n'). Returns -12345 if not found.
-        /// </summary>
-        /// <param name="c">Array of characters</param>
-        /// <param name="ii">Start position to search from</param>
-        /// <returns>Found position.</returns>
-        static int skipPastNewLine(char[] c, int ii)
-        {  //
-            int i;
-            for (i = ii; i < c.Length; i++)
-            {
-                if (!(c[i] == '\r' && c[i + 1] == '\n'))
-                {
-                    //do nothing
-                }
-                else return i + 2;
-            }
-            return -12345;
-        }
-
         
         
-
-        public static String RemoveTrailingD(String lag)
-        {
-            String lag1 = "";
-            //problem is: all lags look like this: fy(-2d)
-            //the d is added to indicate double precision
-            if (lag.EndsWith("d"))
-            {
-                //remove last "d"
-                lag1 = lag.Substring(0, lag.Length - 1);
-            }
-            else
-            {
-                lag1 = lag;
-            }
-            return lag1;
-        }
-
         
         /// <summary>
         /// s must be of form "var¤-1", multiple Globals.lagIndicator not allowed.
@@ -2059,28 +2021,7 @@ namespace Gekko
             return coord;
         }
 
-        private static List<string> GetListFromWildcards(string w, Databank databank)
-        {
-            Wildcard wildcard = new Wildcard(w, RegexOptions.IgnoreCase);
-            List<string> found = new List<string>();
-            string end = Globals.freqIndicator.ToString() + Program.options.freq;  //.freq is always lower key
-            foreach (string s in databank.storage.Keys)
-            {
-                if (s.StartsWith("_tmptmp")) continue;  //Hack: these are deleted after each command, but in for instance PRT command a _tmptmp var is created just before
-                //Annoying slower code because the use of freqIndicator is not stringent.
-                //Should be fixed so that annual is always %a.
-                string s2 = s;
-                if (!s.Contains(Globals.freqIndicator)) s2 = s2 + Globals.freqIndicator + "a";
-                if (!s2.EndsWith(end)) continue;  //filter out variables with different frequency
-                string s3 = s2.Replace(end, "");
-                if (wildcard.IsMatch(s3))
-                {
-                    found.Add(s3);
-                }
-            }
-            found.Sort(StringComparer.InvariantCulture);  //what about a and A?
-            return found;
-        }
+        
 
         public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create)
         {
@@ -6498,20 +6439,6 @@ namespace Gekko
             columnsIndexes[i] = null;
         }
 
-        private static void PrintMatrix(IElementalAccessMatrix ic)
-        {
-            for (int i1 = 0; i1 < ic.RowCount; i1++)
-            {
-                for (int i2 = 0; i2 < ic.ColumnCount; i2++)
-                {
-                    double val = ic.GetValue(i1, i2);
-                    //int val1 = (int)val;
-                    G.Write(val + " ");
-                }
-                G.Writeln();
-            }
-        }
-
         
         private static ArrayList FindEqsWithVarOnRightHandSide(string var1)
         {
@@ -8102,18 +8029,7 @@ namespace Gekko
 
         // BROWSER END
 
-
-        public static List<string> MatchRangeInDatabank(string s1, string s2, Databank db)
-        {
-            List<string> input = new List<string>();
-            input.AddRange(db.storage.Keys);
-            string endsWith = null;
-            if (Program.options.freq != EFreq.A) endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
-            List<IVariable> m = new List<IVariable>();
-            foreach (string s in input) m.Add(new ScalarString(s));
-            List<string> temp = Program.MatchRange(s1, s2, m, endsWith);
-            return temp;
-        }
+            
 
         public static List<string> MatchRange(string s1, string s2, List<IVariable> input, string endsWith)
         {
@@ -8377,6 +8293,7 @@ namespace Gekko
             }
         }
 
+        //called from dynamic code, ought to be in O.cs
         public static void Sign()
         {
             StringBuilder sb = new StringBuilder();
@@ -8450,26 +8367,6 @@ namespace Gekko
             Unswap(true);
         }
 
-        private class ArrayComparer : IEqualityComparer<string[]>
-        {
-            public bool Equals(string[] item1, string[] item2)
-            {
-                if (item1[0] == item2[0] && item1[1] == item2[1] && item1[2] == item2[2] && item1[3] == item2[3])
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-
-            public int GetHashCode(string[] item)
-            {
-                return item[0].GetHashCode();
-            }
-        }
         
         private static string GetRhomeWin32NT(StringBuilder logger)
         {
@@ -8663,6 +8560,7 @@ namespace Gekko
             }
         }
 
+        //keep it even if not referenced
         public static List<string> DumpBin()
         {
             List<string> rv = new List<string>();
@@ -10232,19 +10130,7 @@ namespace Gekko
 
         }
 
-        private static void Density(double[,] lu)
-        {
-            double sum = 0d;
-            double zero = 0d;
-            foreach (double d in lu)
-            {
-                sum++;
-                if (d == 0d) zero++;
-            }
-            double ratio = zero / sum;
-            //G.Writeln2("Density = " + (1-ratio) * 100 + "%");
-        }
-
+        
         private static void Solve(ref double[] b, ref double[] x, int[] indx, double[,] lu)
         {
             if (b.Length != lu.GetLength(0) || x.Length != lu.GetLength(0))
@@ -10702,12 +10588,8 @@ namespace Gekko
             catch (Exception e) { };
             return output;
         }
-
-        private static string ReadFromDb()
-        {
-            return "abcdefghijklmnopqrstuvyxz0123456789abcdefghijklmnopqrstuvyxz0123456789abcdefghijklmnopqrstuvyxz0123456789" + 1;
-        }
-
+        
+        //called from dynamic code, ought to be in O.cs
         public static void Mem(string tpe)
         {
             //call with null, string, date, val --> will be lower-case when called
@@ -11051,35 +10933,7 @@ namespace Gekko
                 keys[i] = z + ii.ToString(); //b = 3, ii = 7 --> "0007"
             }
         }
-
-        public static IVariable GetListOfIVariablesFromListOfScalarStrings(IVariable rv)
-        {
-            List rv_list = rv as List;
-            List y = new List();
-            if (rv_list == null)
-            {
-                G.Writeln2("*** ERROR: #09874323987");
-                throw new GekkoException();
-            }
-            else
-            {
-                foreach (IVariable iv in rv_list.list)
-                {
-                    ScalarString iv_string = iv as ScalarString;
-                    if (iv_string == null)
-                    {
-                        G.Writeln2("*** ERROR: #09874323987");
-                        throw new GekkoException();
-                    }
-                    IVariable x = O.GetIVariableFromString(iv_string.string2, O.ECreatePossibilities.NoneReportError, true);  //should never return an error here
-                    y.Add(x);
-                }
-                rv = y;  //point to this instead, it is List<ScalarString> transformed into List<IVariable>
-            }
-
-            return rv;
-        }
-
+        
         public static IVariable[] GetListOfIVariablesFromListOfStrings(string[] indexes)
         {
             IVariable[] keys = new IVariable[indexes.Length];
@@ -11093,28 +10947,7 @@ namespace Gekko
             return keys;
         }
 
-        public static List<string> UnfoldFlexibleListIntoListOfStrings(IVariable iv)
-        {
-            List<string> rv = new List<string>();
-
-            if (iv.Type() == EVariableType.String)
-            {
-                rv.Add(iv.ConvertToString());
-            }
-            else if (iv.Type() == EVariableType.List)
-            {
-                List l = iv as List;
-                foreach(IVariable iv2 in l.list)
-                {
-                    if (iv2.Type() == EVariableType.String)
-                    {
-                        rv.Add(iv2.ConvertToString());
-                    }
-                }
-            }            
-            return rv;
-        }
-
+        
 
         public static void Decomp(DecompOptions decompOptions)
         {
@@ -12389,20 +12222,7 @@ namespace Gekko
 
             return;
         }
-
-        private static string IdentifyModelBlock(string s2)
-        {
-            string s3 = s2;
-            if (s2.Contains("###"))
-            {
-                string[] xx = s2.Split(new string[] { "###" }, StringSplitOptions.None);
-                if (xx.Length > 1)
-                {
-                    s3 = "MODELBLOCK " + xx[1].Trim();
-                }
-            }
-            return s3;
-        }
+        
 
         private static void ExtractComment(StringBuilder sb, string s2, ModelCommentsHelper modelCommentsHelper)
         {
@@ -12515,12 +12335,10 @@ namespace Gekko
                 double d = n - k;
                 return sequence[k - 1] + d * (sequence[k] - sequence[k - 1]);
             }
-        }
-        
+        }        
 
-        public static TwoInts f(int x) { return new TwoInts(); }
-
-        
+        //What is this, a test?
+        public static TwoInts f(int x) { return new TwoInts(); }        
 
         public static string HandleOneLiners(string text)
         {
@@ -13935,105 +13753,7 @@ namespace Gekko
         }
 
        
-
-        private static int GetNextIdent(string lineNewVersion, int i, out string ident)
-        {
-            //-12345 if no hit, else the first position to read for next thing to read
-            ident = null;
-            int rv = -12345;
-            bool first = true;
-            int start = -12345;
-            for (int ii = i; ii < lineNewVersion.Length; ii++)
-            {
-                if (start == -12345 && lineNewVersion[ii] == ' ') continue;
-                if (first) start = ii;
-                if (first && !G.IsLetterOrUnderscore(lineNewVersion[ii]))
-                {
-                    return -12345;  //first letter is non-valid
-                }
-                if (!first && !G.IsLetterOrDigitOrUnderscore(lineNewVersion[ii]))
-                {
-                    ident = lineNewVersion.Substring(start, ii - start);
-                    return ii;  //second+ letter is non-valid
-                }
-                first = false;
-            }
-
-            return rv;
-        }
-
-        private static int GetNextHash(string lineNewVersion, int i)
-        {
-            //-12345 if no hit, else the first position to read for next thing to read
-            int rv = -12345;
-            for (int ii = i; ii < lineNewVersion.Length; ii++)
-            {
-                if (lineNewVersion[ii] == ' ') continue;
-                if (lineNewVersion[ii] == '#')
-                {
-                    return ii + 1;
-                }
-                return -12345;
-            }
-            return rv;
-        }
-
-        private static int GetNextEquals(string lineNewVersion, int i)
-        {
-            //-12345 if no hit, else the first position to read for next thing to read
-            int rv = -12345;
-            for (int ii = i; ii < lineNewVersion.Length; ii++)
-            {
-                if (lineNewVersion[ii] == ' ') continue;
-                if (lineNewVersion[ii] == '=')
-                {
-                    return ii + 1;
-                }
-                return -12345;
-            }
-            return rv;
-        }
-
-        private static int GetNextEquals2(string lineNewVersion, int i)
-        {
-            for (int ii = i; ii < lineNewVersion.Length; ii++)
-            {
-                if (lineNewVersion[ii] != '=') continue;
-                return ii + 1;
-            }
-            return -12345;
-        }
-
-        private static int GetNextComment(string lineNewVersion, int i)
-        {
-            //-12345 if no hit, else the last position without the comment
-            //dows not require spaces
-            int rv = -12345;
-            for (int ii = i; ii < lineNewVersion.Length - 1; ii++)
-            {
-                if (lineNewVersion[ii] == '/' && (lineNewVersion[ii + 1] == '/' || lineNewVersion[ii + 1] == '*')) return ii - 1;
-            }
-            return rv;
-        }
-
-        private static bool IsCmdFileFound(string fileName)
-        {
-            bool found = false;
-            List<string> folders = new List<string>();
-            folders.Add(Program.options.folder_command);
-            folders.Add(Program.options.folder_command1);
-            folders.Add(Program.options.folder_command2);
-            //The assumption is that this check is ok to do at parse time (not run time), since it is not realistic
-            //to imagine .cmd files being created dynamically while the command files are running.
-            fileName = FindFile(fileName, folders);  //calls CreateFullPathAndFileName()
-            if (fileName != null) found = true;
-            return found;
-        }
-
-        public static double Periods(string per1, string per2)
-        {
-            return 1;
-        }
+        
 
         private static void HandleCollapseData(Series ts, Series counter, double data, GekkoTime gt, ECollapseMethod method, ref GekkoTime gt_min, ref GekkoTime gt_max)
         {
@@ -14317,14 +14037,7 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-
-        public static void FromXls(string s, out int rowOffset, out int colOffset, bool transpose)
-        {
-            //0-based
-            int i_data, j_data; Program.FromXls1Based(s, out i_data, out j_data, transpose);
-            rowOffset = i_data - 1;
-            colOffset = j_data - 1;
-        }
+        
 
         public static void FromXls1Based(string s, out int rowOffset, out int colOffset, bool transpose)
         {
@@ -15682,23 +15395,7 @@ namespace Gekko
             }
             return type;
         }
-
-        public static IVariable ff1(GekkoSmpl smpl, IVariable iv)
-        {
-            //used to test Func<> in function arguments, #980745824309
-            iv = O.Add(smpl, iv, Globals.scalarVal1);
-            return iv;
-        }        
-
-        public static IVariable ff3(GekkoSmpl smpl, GekkoArg arg1)
-        {
-            //used to test Func<> in function arguments, #980745824309
-            IVariable iv = arg1.f2(smpl);
-            iv = O.Add(smpl, iv, Globals.scalarVal1);
-            return iv;
-        }
-               
-
+        
         public static void Tell(string text, bool nocr)
         {            
             if (Globals.runningOnTTComputer && text == "arrow")
@@ -15836,13 +15533,8 @@ namespace Gekko
                 yield return item;
             }
         }
-
-        public static void Display(string text)
-        {
-            if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be DISPLAY 'text'; fixing it here
-            G.Writeln(text);
-        }
-
+        
+        //should be in O.cs
         public static void Hdg(string text)
         {
             if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be HDG 'text'; fixing it here
@@ -17672,73 +17364,7 @@ namespace Gekko
             return s;
         }
 
-        public static void ConvertPrn(string fileName)
-        {
-            //Maybe merge better with READ/OPEN/MULBK, so READ<prn> is possible.
-            //fileName = Program.SubstituteAssignVarsInExpression(fileName);
-            fileName = Program.AddExtension(fileName, "." + "prn");
-            List<string> folders = new List<string>();
-            string fileNameTemp = Program.FindFile(fileName, folders);
-            string prnFile = GetTextFromFileWithWait(fileNameTemp);
-            List<string> listFile2 = G.ExtractLinesFromText(prnFile);
-
-            if (fileNameTemp.ToLower().EndsWith(".prn"))
-            {
-                string fileNameCsv = fileNameTemp.Substring(0, fileNameTemp.Length - 4) + ".csv";
-                List<string> lines2 = new List<string>();
-                bool first = true;
-                StringBuilder sb = new StringBuilder();
-                foreach (string s in listFile2)
-                {
-                    if (s.Trim() == "") continue;  //ignore empty lines
-                    string[] split = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);  //could be variable name with blank such as "ab cd" or something to trim like " abcd", but that is strange/wrong anyway!
-                    foreach (string ss in split)
-                    {
-                        string ss2 = ss.Trim();  //probably superfluous
-                        if (ss2.StartsWith("\""))
-                        {
-                            if (!ss2.EndsWith("\""))
-                            {
-                                G.Writeln2("*** ERROR: item '" + ss2 + "' seems malformed");
-                                throw new GekkoException();
-                            }
-                            ss2 = ss2.Substring(1, ss2.Length - 2);
-                            if (ss2.Contains("\""))
-                            {
-                                G.Writeln2("*** ERROR: item '\"" + ss2 + "\"' seems malformed");
-                                throw new GekkoException();
-                            }
-                        }
-                        string s3 = "";
-                        if (first)
-                        {
-                            if (G.Equal(ss2, "date")) s3 = "";  //remove it
-                            if (G.Equal(ss2, "name")) s3 = "";  //remove it
-                        }
-                        else s3 = ss2;
-                        first = false;
-                        sb.Append(s3 + ";");
-                    }
-                    sb.AppendLine();
-                }
-
-                using (FileStream fs = Program.WaitForFileStream(fileNameCsv, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(sb);
-                    sw.Flush();
-                    sw.Close();
-                }
-                G.Writeln2("Converted PRN file '" + fileNameTemp + "' into");
-                G.Writeln("CSV file '" + fileNameCsv + "'.");
-                G.Writeln("You may use READ<csv cols> or READ<csv cols merge> to read it.");
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Internal error while converting prn file");
-                throw new GekkoException();
-            }
-        }        
+                
 
         // ===========================
         // qwerty TO HERE
