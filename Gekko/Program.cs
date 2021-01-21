@@ -4712,7 +4712,7 @@ namespace Gekko
                         }
 
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        Walk(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound, ref underscoreFound);
+                        WalkPxCombinations(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound, ref underscoreFound);
                         data = G.CreateArrayDouble(codesCombi.Count * dates.Count, double.NaN);  //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                     }
 
@@ -5138,7 +5138,7 @@ namespace Gekko
             return name3;
         }
 
-        private static void Walk(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound, ref bool underscoreFound)
+        private static void WalkPxCombinations(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound, ref bool underscoreFound)
         {
             //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
             if (depth > codes.Count - 1)
@@ -5191,7 +5191,7 @@ namespace Gekko
             {
                 string sCodesTemp = sCodes + Globals.pxInternalDelimiter + codesHeader[depth] + Globals.pxInternalDelimiter + codes[depth][i];
                 string sValuesTemp = sValues + ", " + values[depth][i];
-                Walk(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound, ref underscoreFound);
+                WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound, ref underscoreFound);
             }
         }
         
@@ -34971,57 +34971,7 @@ namespace Gekko
         public GekkoTime t2;
     }
 
-    class Person
-    {
-        private int id;
-        private int milesTraveled;
-        public int Id
-        {
-            get { return id; }
-            set { id = value; }
-        }
-        public string Name { get; private set; }
-        private static int InstanceCount;
-
-        public Person() : this(0) { }
-
-        public Person(int id) : this(id, string.Empty) { }
-
-        public Person(int id, string name)
-        {
-            Id = id;
-            Name = name;
-            InstanceCount++;
-        }
-
-        public char this[int index]
-        {
-            get { return Name[index]; }
-        }
-
-        private void Walk(int miles)
-        {
-            milesTraveled += miles;
-        }
-
-        private static void IncreaseInstanceCount()
-        {
-            InstanceCount++;
-        }
-
-        private static int GetInstanceCount()
-        {
-            return InstanceCount;
-        }
-
-        public static void Swap(ref int i, ref int j)
-        {
-            int tmp = i;
-            i = j;
-            j = tmp;
-        }
-    }
-
+    
     [Serializable]
     [ProtoContract]
     public class Proto
