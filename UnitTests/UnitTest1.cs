@@ -14766,7 +14766,7 @@ print(df2)
             I("table xx.currow.hideleftborder(1);");
             I("table xx.currow.next();");
             I("table xx.currow.settext(1,'hejsa');");
-            I("table xx.currow.settext(2,'med dig');");
+            I("table xx.currow.settext(2,'med dig');"); 
             I("table xx.print();");
 
             I("RESET;");
