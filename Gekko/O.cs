@@ -1004,11 +1004,7 @@ namespace Gekko
             string endoOrExoPrefix = "endo"; if (!type) endoOrExoPrefix = "exo";
 
             //Clear all endo_ or exo_ variables
-            if (false)
-            {
-                Program.Unfix(databank, endoOrExoPrefix);
-            }
-
+            
 
             GekkoTimes global = null;
             List<HandleEndoHelper> helper = null;
@@ -2123,6 +2119,83 @@ namespace Gekko
             }
             return xx;
         }
+
+        public static void PrintTable(Gekko.Table tab)
+        {
+            PrintTable(tab, true, null);
+        }
+
+        public static void PrintTable(Gekko.Table tab, string type)
+        {
+            PrintTable(tab, true, type);
+        }
+
+        public static void PrintTable(Gekko.Table tab, bool printDateEtc, string printType)
+        {
+            printType = Program.PrintTableHelper(tab, printDateEtc, printType);
+        }
+
+        public static void Unfix()  //formerly ClearGoals()
+        {
+            if (G.Equal(Program.options.model_type, "gams"))
+            {
+                Unfix(Program.databanks.GetFirst(), "endo");
+                Unfix(Program.databanks.GetFirst(), "exo");
+            }
+            else
+            {
+
+                if (G.HasModelGekko())
+                {
+                    if (Program.model.modelGekko.exogenized.Count == 0 && Program.model.modelGekko.endogenized.Count == 0)
+                    {
+                        G.Writeln2("No goals are set, so nothing to unfix");
+                    }
+                    else
+                    {
+                        string s = "Unfixed/cleared ";
+                        if (Program.model.modelGekko.exogenized != null)
+                        {
+                            s += Program.model.modelGekko.exogenized.Count + " EXO and ";
+                        }
+                        if (Program.model.modelGekko.endogenized != null)
+                        {
+                            s += Program.model.modelGekko.endogenized.Count + " ENDO variables.";
+                        }
+                        Program.Endo(null);  //--> better than clearing as above, since hasBeenEndoExoStatementsSinceLastSim flag is set
+                        Program.Exo(null);
+                        G.Writeln2(s);
+                        G.Writeln("Please note that only SIM<fix> (and not SIM) enforces the ENDO/EXO goals");
+                    }
+                }
+                else
+                {
+                    G.Writeln2("No model defined -- not possible to clear/unfix goals");
+                }
+            }
+        }
+
+        public static void Unfix(Databank databank, string endoOrExoPrefix)
+        {
+            List<string> delete = new List<string>();
+            foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
+            {
+                if (kvp.Key.StartsWith(endoOrExoPrefix + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
+                {
+                    //starts with endo_ or exo_ and is of annual type
+                    delete.Add(kvp.Key);
+                }
+            }
+            int count = 0;
+            foreach (string s in delete)
+            {
+                databank.RemoveIVariable(s);
+                count++;
+            }
+            if (count > 0) G.Writeln2("Removed " + count + " " + endoOrExoPrefix + "_... variables");
+        }
+
+
 
         public static void AdjustFreq()
         {

@@ -8233,66 +8233,8 @@ namespace Gekko
         }
                 
 
-        public static void Unfix(Databank databank, string endoOrExoPrefix)
-        {
-            List<string> delete = new List<string>();
-            foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
-            {
-                if (kvp.Key.StartsWith(endoOrExoPrefix + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
-                {
-                    //starts with endo_ or exo_ and is of annual type
-                    delete.Add(kvp.Key);
-                }
-            }
-            int count = 0;
-            foreach (string s in delete)
-            {
-                databank.RemoveIVariable(s);
-                count++;
-            }
-            if(count > 0) G.Writeln2("Removed " + count + " " + endoOrExoPrefix + "_... variables");
-        }
-
-        public static void Unfix()  //formerly ClearGoals()
-        {
-            if (G.Equal(Program.options.model_type, "gams"))            
-            {
-                Unfix(Program.databanks.GetFirst(), "endo");
-                Unfix(Program.databanks.GetFirst(), "exo");
-            }
-            else
-            {
-
-                if (G.HasModelGekko())
-                {
-                    if (Program.model.modelGekko.exogenized.Count == 0 && Program.model.modelGekko.endogenized.Count == 0)
-                    {
-                        G.Writeln2("No goals are set, so nothing to unfix");
-                    }
-                    else
-                    {
-                        string s = "Unfixed/cleared ";
-                        if (Program.model.modelGekko.exogenized != null)
-                        {
-                            s += Program.model.modelGekko.exogenized.Count + " EXO and ";
-                        }
-                        if (Program.model.modelGekko.endogenized != null)
-                        {
-                            s += Program.model.modelGekko.endogenized.Count + " ENDO variables.";
-                        }
-                        Endo(null);  //--> better than clearing as above, since hasBeenEndoExoStatementsSinceLastSim flag is set
-                        Exo(null);
-                        G.Writeln2(s);
-                        G.Writeln("Please note that only SIM<fix> (and not SIM) enforces the ENDO/EXO goals");
-                    }
-                }
-                else
-                {
-                    G.Writeln2("No model defined -- not possible to clear/unfix goals");
-                }
-            }
-        }
-
+        
+        
         
         public static void Unswap(bool print)
         {
@@ -10473,6 +10415,181 @@ namespace Gekko
             text = text.Replace("\"", "&quot;");
             text = text.Replace("'", "&#39;");
             return text;
+        }
+
+        public static string PrintTableHelper(Gekko.Table tab, bool printDateEtc, string printType)
+        {
+            Globals.lastPrtOrMulprtTable = tab;
+            CrossThreadStuff.CopyButtonEnabled(true);
+            //This method does NOT alter the table as a side-effect (because of ObjectCopier.Clone).
+            bool printRawCode = false;
+
+            //TODO: table types are a bit messy: clean this up at some point
+            if (G.Equal(printType, "html_main"))
+            {
+                printType = "html";
+                printRawCode = true;
+            }
+            if (printType == null && G.Equal(Program.options.table_type, "html"))
+            {
+                printType = "html";  //overrides txt, so "TABLE s1" or calling from menu will -> html table
+            }
+
+            List<string> ss = tab.Print(printType);
+
+            string fullFileNameAndPath = Globals.localTempFilesLocation + "\\" + "table.html";
+
+            StampTypes type = StampTypes.Normal;
+            if (G.Equal(Globals.tableOption, "m")) type = StampTypes.Multiplier;
+            else if (G.Equal(Globals.tableOption, Globals.operator_r)) type = StampTypes.Base;
+            List<string> lines = Program.GetDatabankInfo(type);
+            if (Program.options.table_stamp)
+            {
+                string printed = "Table printed: " + Program.GetDateTimeStamp();
+                lines.Add(printed);
+            }
+
+            string pTag = "<p CLASS=\"gfsize gfont\" style=\"color: silver; margin: 2px;\">";
+
+            if (printType == "html")
+            {
+                //---------------------
+                //         HTML
+                //---------------------
+                if (printRawCode)
+                {
+                    int widthRemember = Program.options.print_width;
+                    int fileWidthRemember = Program.options.print_filewidth;
+                    Program.options.print_width = int.MaxValue;
+                    Program.options.print_filewidth = int.MaxValue;
+                    try
+                    {
+                        G.Write(pTag);
+                        for (int i = 0; i < lines.Count; i++)
+                        {
+                            G.Write(lines[i]);
+                            if (i < lines.Count - 1) G.Writeln("<br>");
+                        }
+                        G.Writeln("</p>");
+                        foreach (string line in ss) G.Writeln(line);
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln2("*** ERROR: Table (in html format) could not be written");
+                        throw new GekkoException();
+                    }
+                    finally
+                    {
+                        //resetting, also if there is an error
+                        Program.options.print_width = widthRemember;
+                        Program.options.print_filewidth = fileWidthRemember;
+                    }
+                }
+                else
+                {
+                    string s1 = Globals.htmlFileStart1 + Program.GetHtmlHeaderCssStyles() + Globals.htmlFileStart2;
+                    string s2 = Globals.htmlFileEnd;
+
+                    using (FileStream fs = Program.WaitForFileStream(fullFileNameAndPath, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.Write(s1);
+
+                        string s5 = null;
+
+                        s5 += pTag + "<a href=\"#\"   onclick=\"document.getElementById('hiddenText').style.display='block'; return false;\">Transform options</a> " + "</p>";
+
+                        s5 += "<div style=\"display: none;\" id=\"hiddenText\">" + G.NL;
+                        string s = "style = \"margin:0; padding:0; opacity : 0.5;\"";
+
+                        s5 += "<table CLASS=\"gfsize gfont\"  style=\"color:gray\" >";
+                        s5 += " <tr>";
+                        s5 += "   <td></td>";
+                        s5 += "   <td>First &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </td>";
+                        s5 += "   <td>Reference &nbsp; &nbsp; &nbsp; &nbsp; </td>";
+                        s5 += "   <td>Multiplier</td>";
+                        s5 += " </tr>";
+                        s5 += " <tr>";
+                        s5 += "   <td>Levels &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  </td>";
+                        s5 += "   <td><input title=\"Levels as they are in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#n" + "';\"/>n</td>";
+                        s5 += "   <td><input title=\"Levels as they are in reference databank\"  CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rn" + "';\"/>r&thinsp;n</td>";
+                        s5 += "   <td></td>";
+                        s5 += " </tr>";
+                        s5 += " <tr>";
+                        s5 += "   <td>Abs. diff.</td>";
+                        s5 += "   <td><input title=\"Absolute time-change (difference) in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#d" + "';\"/>d</td>";
+                        s5 += "   <td><input title=\"Absolute time-change (difference) in reference databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rd" + "';\"/>r&thinsp;d</td>";
+                        s5 += "   <td><input title=\"Absolute multiplier difference\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#m" + "';\"/>m</td>";
+                        s5 += " </tr>";
+                        s5 += " <tr>";
+                        s5 += "   <td>Rel. diff.</td>";
+                        s5 += "   <td><input title=\"Percentage time growth rate in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#p" + "';\"/>p</td>";
+                        s5 += "   <td><input title=\"Percentage time growth rate in reference databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rp" + "';\"/>r&thinsp;p</td>";
+                        s5 += "   <td><input title=\"Percentage multiplier difference\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#q" + "';\"/>q</td>";
+                        s5 += " </tr>";
+                        s5 += " <tr>";
+                        s5 += " </tr>";
+                        s5 += " </table>";
+
+
+                        s5 += "</div>" + G.NL;
+
+                        if (Program.options.interface_table_operators) sw.Write(s5);
+                        sw.Write(pTag);
+                        for (int i = 0; i < lines.Count; i++)
+                        {
+                            sw.Write(lines[i]);
+                            if (i < lines.Count - 1) sw.WriteLine("<br>");
+                        }
+                        sw.WriteLine("</p>");
+
+                        foreach (string line in ss) sw.WriteLine(line);
+                        sw.Write(s2);
+                        sw.Close();
+                    }
+
+                    if (!G.IsUnitTesting())
+                    {
+                        CrossThreadStuff.SetTab("menu", true);
+                        Gui.gui.webBrowser.Url = new Uri("file:///" + Globals.localTempFilesLocation + "\\table.html");
+                        CrossThreadStuff.SetTab("menu", true);
+                    }
+                }
+            }
+            else
+            {
+                //---------------------
+                //         TXT
+                //---------------------
+                int widthRemember = Program.options.print_width;
+                int fileWidthRemember = Program.options.print_filewidth;
+                Program.options.print_width = int.MaxValue;
+                Program.options.print_filewidth = int.MaxValue;
+                G.Writeln();
+                try
+                {
+                    if (printDateEtc)
+                    {
+                        foreach (string s in lines) G.Writeln(s);
+                        //G.Writeln(printed);
+                    }
+                    foreach (string s in ss) G.Writeln(s);
+                    G.Writeln();
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: Table (in txt format) could not be written");
+                    throw new GekkoException();
+                }
+                finally
+                {
+                    //resetting, also if there is an error
+                    Program.options.print_width = widthRemember;
+                    Program.options.print_filewidth = fileWidthRemember;
+                }
+            }
+
+            return printType;
         }
 
         private static void TableConvertError(int u, string file, int counter, string line, string s)
@@ -16970,7 +17087,7 @@ namespace Gekko
             s2 = s.Substring(i, s.Length - i);
         }
 
-        private static string GetHtmlHeaderCssStyles()
+        public static string GetHtmlHeaderCssStyles()
         {
             StringBuilder lines = new StringBuilder();
             lines.AppendLine("<style type=\"text/css\">");
@@ -17451,7 +17568,7 @@ namespace Gekko
 
             //GekkoTime t1, t2; ConvertToGekkoTime(time, out t1, out t2);
 
-            Table tab = new Table();
+            Gekko.Table tab = new Gekko.Table();
             int row = 1;
 
             List<string> problems = new List<string>();
@@ -17535,7 +17652,7 @@ namespace Gekko
             }
             if (hasContent)
             {
-                Program.PrintTable(tab, false, null);
+                O.PrintTable(tab, false, null);
                 if (problems.Count > 0)
                 {
                     G.Writeln();
@@ -21666,191 +21783,9 @@ namespace Gekko
                 result.data[item.Key] = item.Value;
             }
         }
+                
 
-        public static void PrintTable(Table tab)
-        {
-            PrintTable(tab, true, null);
-        }
-
-        public static void PrintTable(Table tab, string type)
-        {
-            PrintTable(tab, true, type);
-        }
-
-        public static void PrintTable(Table tab, bool printDateEtc, string printType)
-        {
-            Globals.lastPrtOrMulprtTable = tab;
-            CrossThreadStuff.CopyButtonEnabled(true);
-            //This method does NOT alter the table as a side-effect (because of ObjectCopier.Clone).
-            bool printRawCode = false;
-
-            //TODO: table types are a bit messy: clean this up at some point
-            if (G.Equal(printType, "html_main"))
-            {
-                printType = "html";
-                printRawCode = true;
-            }
-            if (printType == null && G.Equal(Program.options.table_type, "html"))
-            {
-                printType = "html";  //overrides txt, so "TABLE s1" or calling from menu will -> html table
-            }
-
-            List<string> ss = tab.Print(printType);
-
-            string fullFileNameAndPath = Globals.localTempFilesLocation + "\\" + "table.html";
-
-            StampTypes type = StampTypes.Normal;
-            if (G.Equal(Globals.tableOption, "m")) type = StampTypes.Multiplier;
-            else if (G.Equal(Globals.tableOption, Globals.operator_r)) type = StampTypes.Base;
-            List<string> lines = GetDatabankInfo(type);
-            if (Program.options.table_stamp)
-            {
-                string printed = "Table printed: " + GetDateTimeStamp();
-                lines.Add(printed);
-            }
-
-            string pTag = "<p CLASS=\"gfsize gfont\" style=\"color: silver; margin: 2px;\">";
-
-            if (printType == "html")
-            {
-                //---------------------
-                //         HTML
-                //---------------------
-                if (printRawCode)
-                {
-                    int widthRemember = Program.options.print_width;
-                    int fileWidthRemember = Program.options.print_filewidth;
-                    Program.options.print_width = int.MaxValue;
-                    Program.options.print_filewidth = int.MaxValue;
-                    try
-                    {
-                        G.Write(pTag);
-                        for (int i = 0; i < lines.Count; i++)
-                        {
-                            G.Write(lines[i]);
-                            if (i < lines.Count - 1) G.Writeln("<br>");
-                        }
-                        G.Writeln("</p>");
-                        foreach (string line in ss) G.Writeln(line);
-                    }
-                    catch (Exception e)
-                    {
-                        G.Writeln2("*** ERROR: Table (in html format) could not be written");
-                        throw new GekkoException();
-                    }
-                    finally
-                    {
-                        //resetting, also if there is an error
-                        Program.options.print_width = widthRemember;
-                        Program.options.print_filewidth = fileWidthRemember;
-                    }
-                }
-                else
-                {
-                    string s1 = Globals.htmlFileStart1 + GetHtmlHeaderCssStyles() + Globals.htmlFileStart2;
-                    string s2 = Globals.htmlFileEnd;
-
-                    using (FileStream fs = Program.WaitForFileStream(fullFileNameAndPath, Program.GekkoFileReadOrWrite.Write))
-                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                    {
-                        sw.Write(s1);
-
-                        string s5 = null;
-
-                        s5 += pTag + "<a href=\"#\"   onclick=\"document.getElementById('hiddenText').style.display='block'; return false;\">Transform options</a> " + "</p>";
-
-                        s5 += "<div style=\"display: none;\" id=\"hiddenText\">" + G.NL;
-                        string s = "style = \"margin:0; padding:0; opacity : 0.5;\"";                        
-
-                        s5 += "<table CLASS=\"gfsize gfont\"  style=\"color:gray\" >";
-                        s5 += " <tr>";
-                        s5 += "   <td></td>";
-                        s5 += "   <td>First &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </td>";
-                        s5 += "   <td>Reference &nbsp; &nbsp; &nbsp; &nbsp; </td>";
-                        s5 += "   <td>Multiplier</td>";
-                        s5 += " </tr>";
-                        s5 += " <tr>";
-                        s5 += "   <td>Levels &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  </td>";
-                        s5 += "   <td><input title=\"Levels as they are in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#n" + "';\"/>n</td>";
-                        s5 += "   <td><input title=\"Levels as they are in reference databank\"  CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rn" + "';\"/>r&thinsp;n</td>";
-                        s5 += "   <td></td>";
-                        s5 += " </tr>";
-                        s5 += " <tr>";
-                        s5 += "   <td>Abs. diff.</td>";
-                        s5 += "   <td><input title=\"Absolute time-change (difference) in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#d" + "';\"/>d</td>";
-                        s5 += "   <td><input title=\"Absolute time-change (difference) in reference databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rd" + "';\"/>r&thinsp;d</td>";
-                        s5 += "   <td><input title=\"Absolute multiplier difference\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#m" + "';\"/>m</td>";
-                        s5 += " </tr>";
-                        s5 += " <tr>";
-                        s5 += "   <td>Rel. diff.</td>";
-                        s5 += "   <td><input title=\"Percentage time growth rate in first databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#p" + "';\"/>p</td>";
-                        s5 += "   <td><input title=\"Percentage time growth rate in reference databank\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#rp" + "';\"/>r&thinsp;p</td>";
-                        s5 += "   <td><input title=\"Percentage multiplier difference\" CLASS=\"gfsize gfont\" type=\"radio\" name=\"table\" " + s + " onclick=\"window.location='table.html#q" + "';\"/>q</td>";
-                        s5 += " </tr>";
-                        s5 += " <tr>";
-                        s5 += " </tr>";
-                        s5 += " </table>";
-
-
-                        s5 += "</div>" + G.NL;
-
-                        if (Program.options.interface_table_operators) sw.Write(s5);
-                        sw.Write(pTag);
-                        for (int i = 0; i < lines.Count; i++)
-                        {
-                            sw.Write(lines[i]);
-                            if (i < lines.Count - 1) sw.WriteLine("<br>");
-                        }
-                        sw.WriteLine("</p>");
-
-                        foreach (string line in ss) sw.WriteLine(line);
-                        sw.Write(s2);
-                        sw.Close();
-                    }
-
-                    if (!G.IsUnitTesting())
-                    {
-                        CrossThreadStuff.SetTab("menu", true);
-                        Gui.gui.webBrowser.Url = new Uri("file:///" + Globals.localTempFilesLocation + "\\table.html");
-                        CrossThreadStuff.SetTab("menu", true);
-                    }
-                }
-            }
-            else
-            {
-                //---------------------
-                //         TXT
-                //---------------------
-                int widthRemember = Program.options.print_width;
-                int fileWidthRemember = Program.options.print_filewidth;
-                Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
-                G.Writeln();
-                try
-                {
-                    if (printDateEtc)
-                    {
-                        foreach (string s in lines) G.Writeln(s);
-                        //G.Writeln(printed);
-                    }
-                    foreach (string s in ss) G.Writeln(s);
-                    G.Writeln();
-                }
-                catch (Exception e)
-                {
-                    G.Writeln2("*** ERROR: Table (in txt format) could not be written");
-                    throw new GekkoException();
-                }
-                finally
-                {
-                    //resetting, also if there is an error
-                    Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
-                }
-            }
-        }
-
-        private static List<string> GetDatabankInfo(StampTypes type)
+        public static List<string> GetDatabankInfo(StampTypes type)
         {
             Databank work = Program.databanks.GetFirst();
             Databank base2 = Program.databanks.GetRef();

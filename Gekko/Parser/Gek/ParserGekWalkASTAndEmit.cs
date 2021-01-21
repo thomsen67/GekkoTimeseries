@@ -4084,11 +4084,11 @@ namespace Gekko.Parser.Gek
                         {
                             if (node.ChildrenCount() > 1)
                             {
-                                node.Code.A("Program.PrintTable(O.GetTable(O.ConvertToString(" + node[0].Code + ")), O.ConvertToString(" + node[1].Code + "));" + G.NL);
+                                node.Code.A("O.PrintTable(O.GetTable(O.ConvertToString(" + node[0].Code + ")), O.ConvertToString(" + node[1].Code + "));" + G.NL);
                             }
                             else
                             {
-                                node.Code.A("Program.PrintTable(O.GetTable(O.ConvertToString(" + node[0].Code + ")), null);" + G.NL);
+                                node.Code.A("O.PrintTable(O.GetTable(O.ConvertToString(" + node[0].Code + ")), null);" + G.NL);
                             }
                         }
                         break;
@@ -4675,7 +4675,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTUNFIX":
-                        node.Code.A("Program.Unfix();" + G.NL);
+                        node.Code.A("O.Unfix();" + G.NL);
                         break;                    
                     
                     case "ASTPIPE":
