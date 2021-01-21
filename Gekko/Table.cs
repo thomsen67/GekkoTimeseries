@@ -2307,6 +2307,530 @@ namespace Gekko
             }
         }
 
+        public static StringBuilder ConvertPcimTable(string file)
+        {
+            StringBuilder x = new StringBuilder();
+            int start = 4;
+            int longest = 0;
+
+            for (int u = 0; u < 2; u++)
+            {
+                x = new StringBuilder();
+
+                string colformat = "";
+
+                x.AppendLine("<?xml version=`1.0` encoding=`Windows-1252`?>");
+                x.AppendLine("<gekkotable>");
+                x.AppendLine("  <tableversion>1.0</tableversion>");
+                x.AppendLine("  <header>");
+                x.AppendLine("    <printinfo type=`full` />");
+                x.AppendLine("  </header>");
+                x.AppendLine("  <table>");
+                x.AppendLine("    <cols>");
+                x.AppendLine("      <colborder />");
+                x.AppendLine("      <col txtalign=`left`></col>");
+                x.AppendLine("      <colglue />");
+                x.AppendLine("      <col txtalign=`right` />");
+                x.AppendLine("      <colborder />");
+                x.AppendLine("      <col type=`expand` txtalign=`center`></col>");
+                x.AppendLine("      <colborder />");
+                x.AppendLine("    </cols>");
+                x.AppendLine("    <rows>");
+
+                string tab = ",";
+                //string file = Program.options.folder_working + "\\s56b.TAB";
+                List<string> lines = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
+                int counter = 0;
+                foreach (string line2 in lines)
+                {
+                    counter++;
+                    string line = line2.Trim();
+                    //char[] c = line.ToCharArray();
+                    if (line.StartsWith("01"))
+                    {
+                        int ii = Program.ToInt(Program.Substring(line, 3, 5));
+                        if (ii == int.MaxValue || ii < 1)
+                        {
+                            TableConvertError(u, file, counter, line, "Number of variable fields < 1...??");
+                        }
+                        else if (ii > 1)
+                        {
+                            TableConvertError(u, file, counter, line, "Converter only works with 1 variable field.");
+                        }
+                        ii = 1;
+                    }
+                    else if (line.StartsWith("02"))
+                    {
+                        int w = Program.ToInt(Program.Substring(line, 3, 4));
+                        if (w == int.MaxValue || w < 1)
+                        {
+                            TableConvertError(u, file, counter, line, "Width problem....");
+                        }
+                        string code = Program.Substring(line, 5, 5).ToLower();
+                        if (code == "i")
+                        {
+                        }
+                        else if (code == "f")
+                        {
+                        }
+                        else
+                        {
+                            TableConvertError(u, file, counter, line, "Number format is not 'i' or 'f'...");
+                        }
+                        int decimals = int.MaxValue;
+                        if (line.Length > 5) decimals = Program.ToInt(Program.Substring(line, 6, 6));
+                        if (decimals == int.MaxValue)
+                        {
+                            if (code == "i")
+                            {
+                            }
+                            else
+                            {
+                                TableConvertError(u, file, counter, line, "Number of decimals not found for 'f'-number");
+                            }
+                            colformat = "f" + w + ".0";
+                        }
+                        else
+                        {
+                            colformat = "f" + w + "." + decimals;
+                        }
+                        x.AppendLine("      <rowformat varformat=`" + colformat + "`/>");
+                    }
+                    else if (line.StartsWith("03"))
+                    {
+                        //ignore these borders
+                    }
+                    else if (line.StartsWith("06"))
+                    {
+                        string s = line.Substring(start - 1);
+
+                        s = G.ReplaceFirstOccurrence(s, tab, "€");
+
+                        if (u == 0 && s != "" && !line.Substring(start - 2).StartsWith(" "))
+                        {
+                            start = 3;
+                            //continue;  //for instance 06Investments
+                        }
+                        string[] ss = s.Split('€');
+                        string s1 = ss[0].TrimEnd();
+                        string s2 = null;
+                        if (ss.Length > 1) s2 = ss[1].Trim();
+                        if (ss.Length > 2)
+                        {
+                            TableConvertError(u, file, counter, line, "Only expected 2 delimiter characters...");
+                        }
+                        if (s2 == null || s2 == "")
+                        {
+                            string span = "2";
+                            if (u == 1 && s1.Length > longest) span = "3";
+                            x.AppendLine("      <row>");
+                            x.AppendLine("        <txt colspan=`" + span + "`>" + s1 + "</txt>");
+                            x.AppendLine("      </row>");
+                            //if (s1.Length > longest) longest = s1.Length;
+                        }
+                        else
+                        {
+                            string lbl = "";
+                            string text = "";
+                            string var = "";
+                            if (s1 != "" && s2 != "")
+                            {
+                                if (s1.ToLower().EndsWith(s2.ToLower()))
+                                {
+                                    //easy, same name both places
+                                    if (s1.Length == s2.Length)
+                                    {
+                                        text = "";
+                                        lbl = "$";
+                                        var = s2;
+                                    }
+                                    else
+                                    {
+                                        string s3 = s1.Substring(s1.Length - s2.Length - 1, 1);
+                                        if (s3 == " " || s3 == "." || s3 == ",")
+                                        {
+                                            string temp = s1.Substring(0, s1.Length - s2.Length).TrimEnd();
+                                            if (temp.Length == 0) text = " ";
+                                            else text = temp;
+                                            lbl = "$";
+                                            var = s1.Substring(s1.Length - s2.Length).Trim();
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (text == "")
+                            {
+                                string lastWord = "";
+                                for (int i = s1.Length - 1; i >= 1; i--)
+                                {
+                                    if (!(G.IsLetterOrDigitOrUnderscore(s1[i]) || s1[i] == '+' || s1[i] == '-' || s1[i] == '*' || s1[i] == '/' || s1[i] == '(' || s1[i] == ')'))
+                                    {
+                                        if (s1[i] == ' ' && s1[i - 1] == ' ')  //two blanks before word
+                                        {
+                                            if (i < s1.Length - 1)
+                                            {
+                                                lastWord = s1.Substring(i + 1);
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+
+                                if (lastWord != "")
+                                {
+
+                                    //try looking at last word
+                                    text = s1.Substring(0, s1.Length - lastWord.Length).TrimEnd();
+                                    lbl = lastWord;
+                                    var = s2.Trim();
+                                }
+                            }
+
+                            if (text == "")
+                            {
+                                text = s1.TrimEnd();
+                                lbl = "";
+                                var = s2.Trim();
+                            }
+
+                            if (var.ToLower().StartsWith("series")) var = var.Substring(4);
+                            var = var.Replace("$", "");
+                            var = var.Replace(";", "");
+                            var = var.Trim();
+
+                            text = Program.SpecialXmlChars(text);
+
+                            x.AppendLine("      <row>");
+                            x.AppendLine("        <txt>" + text + "</txt>");
+                            x.AppendLine("        <txt>" + lbl + "</txt>");
+                            if (text.Length + lbl.Length + 2 > longest) longest = text.Length + lbl.Length + 2;
+                            if (var.ToLower() == "year")
+                            {
+                                x.AppendLine("        <date/>");
+                            }
+                            else
+                            {
+                                x.AppendLine("        <var>" + var + "</var>");
+                            }
+                            x.AppendLine("      </row>");
+                        }
+                    }
+                    else if (line.StartsWith("07"))
+                    {
+                        //blank line
+                        x.AppendLine("      <row/>");
+                    }
+                    else if (line.StartsWith("08"))
+                    {
+                        //sideskift
+                    }
+                    else if (line.StartsWith("11"))
+                    {
+                        string s = Program.Substring(line, 3, 3);
+                        if (s == null)
+                        {
+                            TableConvertError(u, file, counter, line, "Problem with delimiter character");
+                        }
+                        tab = s;
+                    }
+                    else if (line.StartsWith("12"))
+                    {
+                        if (line.Length > 2)
+                        {
+                            string s = line.Substring(2).Trim();
+                            x.AppendLine("<!-- " + Program.SpecialXmlChars(s) + " -->");
+                        }
+                    }
+                    else if (line.StartsWith("13"))
+                    {
+                        //finish of this table
+                    }
+                    else if (line.StartsWith("18"))
+                    {
+                        //new screen
+                    }
+                    else if (line.StartsWith("04") || line.StartsWith("05") || line.StartsWith("41"))
+                    {
+                        string s = "";
+                        if (line.Length == 2)
+                        {
+                        }
+                        else
+                        {
+                            s = line.Substring(start - 1);
+                            if (u == 0 && s != "" && !line.Substring(start - 2).StartsWith(" "))
+                            {
+                                start = 3;
+                                //continue;  //for instance 41Investments
+                            }
+                        }
+                        s = Program.SpecialXmlChars(s);
+                        string span = "2";
+                        if (u == 1 && s.Length > longest) span = "3";
+                        x.AppendLine("      <row>");
+                        x.AppendLine("        <txt colspan=`" + span + "`>" + s + "</txt>");
+                        x.AppendLine("      </row>");
+                        //if (s.Length > longest) longest = s.Length;
+                    }
+                    else if (line.StartsWith("20") || line.StartsWith("21"))
+                    {
+                        TableConvertError(u, file, counter, line, "Code 20 and 21 (multiplier) are not converted");
+                    }
+                    else if (line.StartsWith("22"))
+                    {
+                        TableConvertError(u, file, counter, line, "Code 22 (scaling) is not converted -- please fix with 'varscale' in XML table");
+                    }
+                    else if (line.StartsWith("24"))
+                    {
+                        TableConvertError(u, file, counter, line, "Code 24 (% growth under variables) is not converted");
+                    }
+                    else if (line.StartsWith("27"))
+                    {
+                        if (line.Substring(2, 1).ToLower() == "t")
+                        {
+                            x.AppendLine("      <rowformat vardisplay=`p`/>");
+                        }
+                        if (line.Substring(2, 1).ToLower() == "f")
+                        {
+                            x.AppendLine("      <rowformat vardisplay=`n`/>");
+                        }
+                    }
+                    else if (line.StartsWith("28"))
+                    {
+                        TableConvertError(u, file, counter, line, "Code 28 (differences) is not converted");
+                    }
+                    else if (line.StartsWith("30"))
+                    {
+                        TableConvertError(u, file, counter, line, "Code 28 (multiplier difference) is not converted");
+                    }
+                    else if (line.StartsWith("44") || line.StartsWith("45") || line.StartsWith("46") || line.StartsWith("47"))
+                    {
+                        //ignore table headers
+                    }
+                    else if (line.StartsWith("55"))
+                    {
+                        TableConvertError(u, file, counter, line, "Code 55 (alignment) is not converted");
+                    }
+                    else if (line.StartsWith("91"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("92"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("93"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("94"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("95"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("96"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("97"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("98"))
+                    {
+                        x.AppendLine("      <rowborder/>");
+                    }
+                    else if (line.StartsWith("99"))
+                    {
+                        //finish tabledef
+                    }
+                    else if (line.StartsWith("menu"))
+                    {
+                        //ignore menu calls
+                    }
+                    else if (line == "")
+                    {
+                    }
+                    else
+                    {
+                        string code = "";
+                        if (line.Length >= 2) code = line.Substring(0, 2);
+                        TableConvertError(u, file, counter, line, "Did not recognize this table code: " + code);
+                    }
+                }  //end of foreach
+
+                x.AppendLine("    </rows>");
+                x.AppendLine("  </table>");
+                x.AppendLine("</gekkotable>");
+
+                x.Replace("`", "\"");
+                //break;
+            }  // for u
+
+            return x;
+        }
+
+        private static void TableConvertError(int u, string file, int counter, string line, string s)
+        {
+            if (u > 0)
+            {
+                Globals.convertTableErrorCounter++;
+                G.Writeln();
+                G.Writeln2("*** ERROR: In " + file + " line " + counter);
+                G.Writeln("           Could not understand: " + line, Color.Red);
+                G.Writeln("           " + s, Color.Red);
+                G.Writeln("           " + "(Total error count: " + Globals.convertTableErrorCounter + ")");
+                G.Writeln();
+            }
+        }
+
+        private static void MenuConvertError(string file, int counter, string line, string s)
+        {
+            if (true)
+            {
+                Globals.convertMenuErrorCounter++;
+                G.Writeln();
+                G.Writeln2("*** ERROR: In " + file + " line " + counter);
+                G.Writeln("           Could not understand: " + line, Color.Red);
+                G.Writeln("           " + s, Color.Red);
+                G.Writeln("           " + "(Total error count: " + Globals.convertMenuErrorCounter + ")");
+                G.Writeln();
+            }
+        }
+
+        public static StringBuilder ConvertPcimMenu(int depth, string file)
+        {
+            StringBuilder x = new StringBuilder();
+
+            StringBuilder x2 = new StringBuilder();
+
+            string title = null;
+
+            List<string> lines = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
+            int counter = 0;
+
+            string path = "";
+            for (int i = 0; i < depth; i++)
+            {
+                path = path + "../";
+            }
+
+            foreach (string line2 in lines)
+            {
+                if (line2.ToLower() == "case") continue;  //kind of empty line
+                string line = line2.Trim();
+                counter++;
+                if (line.Contains("\""))
+                {
+                    MenuConvertError(file, counter, line, "Menu lines should not contain full quotes (\")");
+                }
+
+
+                if (line.ToLower().StartsWith("nymenu "))
+                {
+                }
+                else if (line.ToLower().StartsWith("select "))
+                {
+                }
+                else if (line.ToLower().StartsWith("case "))
+                {
+                    string lineTrunc = line.Substring(5);
+                    string[] split = lineTrunc.Split('/');
+                    if (split.Length == 1)
+                    {
+                        if (title == null)
+                        {
+                            title = split[0].Trim();  //only first time
+                        }
+                        else
+                        {
+                            //2. time and on
+                            x2.AppendLine("      <li>" + split[0].Trim() + "</li>");
+                        }
+                    }
+                    else if (split.Length == 2)
+                    {
+                        x2.AppendLine("      <li><a href=`" + split[1].Trim() + ".html`>" + split[0].Trim() + "</a></li>");
+                    }
+                    else if (split.Length >= 3)
+                    {
+                        if (split.Length > 3) MenuConvertError(file, counter, line, "There are more than 2 '/' in the line: cannot understand");
+
+                        string s1 = split[0].Trim();
+
+                        string lastWord = "";
+                        for (int i = s1.Length - 1; i >= 1; i--)
+                        {
+                            if (!(G.IsLetterOrDigitOrUnderscore(s1[i]) || s1[i] == '-' || s1[i] == '(' || s1[i] == ')'))
+                            {
+                                if (s1[i] == ' ' && s1[i - 1] == ' ')  //two blanks before word
+                                {
+                                    if (i < s1.Length - 1)
+                                    {
+                                        lastWord = s1.Substring(i + 1);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+
+                        string text = s1;
+                        string lbl = "";
+
+                        if (lastWord != "")
+                        {
+                            //try looking at last word
+                            text = s1.Substring(0, s1.Length - lastWord.Length).TrimEnd();
+                            lbl = lastWord;
+                        }
+                        text = text + " ";
+
+                        string img = "<img src=`" + path + "table.png`>";
+
+                        if (lbl != "")
+                        {
+                            x2.AppendLine("      <li><a href=`" + split[2].Trim() + "." + Globals.extensionTable + "`>" + img + " " + text + " <font color=`silver`>(" + lbl + ")</font>" + "</a>" + "</li>");
+                        }
+                        else
+                        {
+                            x2.AppendLine("      <li><a href=`" + split[2].Trim() + "." + Globals.extensionTable + "`>" + img + " " + text + "</a>" + "</li>");
+                        }
+                    }
+                }
+                else
+                {
+                    MenuConvertError(file, counter, line, "Could not recognize this as a menu line, skipping");
+                }
+            }
+
+            if (title == null) title = "Menu";
+
+            x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
+            x.AppendLine("<html>");
+            x.AppendLine("  <head>");
+            x.AppendLine("    <link rel=`stylesheet` href=`" + path + "styles.css` type=`text/css`>");
+            x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
+            x.AppendLine("    <title>" + title + "</title>");
+            x.AppendLine("  </head>");
+            x.AppendLine("  <body>");
+            x.AppendLine("  <big><b>" + title + "</b></big><br>");
+            x.AppendLine("    <ul>");
+            x.Append(x2);
+            x.AppendLine("    </ul>");
+            x.AppendLine("  </body>");
+            x.AppendLine("</html>");
+
+            x.Replace("`", "\"");
+
+            return x;
+        }
+
+
+
 
     }
 }
