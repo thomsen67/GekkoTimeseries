@@ -11029,7 +11029,7 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Ols(this);
+                Estimation.Ols(this);
             }            
         }
 
