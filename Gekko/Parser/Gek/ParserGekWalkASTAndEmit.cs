@@ -1015,8 +1015,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTCLS":
                         {
-                            node.Code.A("Program.Cls(``);"); //main window
-                            node.Code.A("Program.Cls(`output`);");  //output window
+                            node.Code.A("O.Cls(``);"); //main window
+                            node.Code.A("O.Cls(`output`);");  //output window
                         }
                         break;
                     case "ASTCOLLAPSE":
@@ -1255,22 +1255,19 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTCUT":
                         {
-                            node.Code.A("Program.Cut();" + G.NL);
+                            node.Code.A("O.Cut();" + G.NL);
                         }
                         break;
                     case "ASTEXIT":  // <command>
                         {
-                            node.Code.A("Program.Exit();" + G.NL);
-                            //#9807235423 return problem
-                            //node.Code.A("return true;" + G.NL;  //probably superfluous
+                            node.Code.A("O.Exit();" + G.NL);
+                            //#9807235423 return problem                            
                             node.Code.A("return;" + G.NL);  //probably superfluous
                         }
                         break;
 
                     case "ASTSTOP":
-                        {
-                            //node.Code.A("Program.Stop(p);" + G.NL);                            
-                            //node.Code.A("return;" + G.NL);  //probably superfluous                            
+                        {                                                       
                             node.Code.A("O.StopHelper(smpl, p);" + G.NL);
                         }
                         break;
@@ -1289,7 +1286,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTHDG":
-                        node.Code.A("Program.Hdg(O.ConvertToString(" + node[0].Code + "));");
+                        node.Code.A("O.Hdg(O.ConvertToString(" + node[0].Code + "));");
                         break;
                     case "ASTTELL":
                         {
@@ -1303,7 +1300,7 @@ namespace Gekko.Parser.Gek
                             {
                                 ss = node[0][0].Code.ToString();
                             }
-                            node.Code.A("Program.Tell(O.ConvertToString(" + ss + "), " + s + ");");                            
+                            node.Code.A("O.Tell(O.ConvertToString(" + ss + "), " + s + ");");                            
                         }
                         break;
                     case "ASTSYS":
@@ -1318,7 +1315,7 @@ namespace Gekko.Parser.Gek
                         {
                             string code = "null";
                             if (node.ChildrenCount() > 0) code = "O.ConvertToString(" + node[0].Code + ")";
-                            node.Code.A("Program.Help(" + code + ");" + G.NL);
+                            node.Code.A("O.Help(" + code + ");" + G.NL);
                         }
                         break;
                     case "ASTCREATEQUESTION":
@@ -1938,7 +1935,7 @@ namespace Gekko.Parser.Gek
                                         int n = ++Globals.counter;
                                         record += "var record" + n + " = " + tup.Item1 + ";" + G.NL;  //var record117 = Program.options.freq;
                                         alter += tup.Item1 + " = " + tup.Item2 + ";" + G.NL;          //Program.options.freq = EFreq.Q;
-                                        alter += "Program.AdjustFreq();" + G.NL;                      //Program.AdjustFreq();
+                                        alter += "O.AdjustFreq();" + G.NL;                            //O.AdjustFreq();
                                         play += tup.Item1 + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
                                                                                                       // global perStart
                                         n = ++Globals.counter;
@@ -3167,7 +3164,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTMEM":
                         {
-                            node.Code.A("Program.Mem(null);" + G.NL);
+                            node.Code.A("O.Mem(null);" + G.NL);
                         }
                         break;                    
                     case "ASTMODEL":
@@ -3229,7 +3226,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //val?, series?, etc.
                                 string type = node[1].Text.ToLower();                                
-                                node.Code.A("Program.Mem(`" + type + "`);" + G.NL);                                
+                                node.Code.A("O.Mem(`" + type + "`);" + G.NL);                                
                             }
                             else
                             {
@@ -4411,7 +4408,7 @@ namespace Gekko.Parser.Gek
                     
                     case "ASTSIGN":
                         {
-                            node.Code.A("Program.Sign();" + G.NL);
+                            node.Code.A("O.Sign();" + G.NL);
                         }
                         break;
                     case "ASTSIM":

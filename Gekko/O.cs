@@ -607,7 +607,7 @@ namespace Gekko
             if (G.Equal(s2, "freq"))
             {
                 //see also #89073589324
-                Program.AdjustFreq();
+                O.AdjustFreq();
             }
             else if (isBlock == 0 && G.Equal(s2, "interface_sound_type"))
             {
@@ -2093,6 +2093,401 @@ namespace Gekko
         {
             return G.Equal(dbName, Globals.All);
         }
+
+        public static void Cls(string tab)
+        {
+            CrossThreadStuff.Cls(tab);
+        }
+
+        public static void AdjustFreq()
+        {
+            //hash #980432
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            Tuple<GekkoTime, GekkoTime> freqs = Program.ConvertFreqs(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.options.freq);
+
+            if (Program.options.freq == EFreq.A)
+            {
+                G.Writeln("Freq changed to annual (A)");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;
+            }
+            else if (Program.options.freq == EFreq.Q)
+            {
+                G.Writeln("Freq changed to quarterly (Q) -- note that start/end quarters have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;
+            }
+            else if (Program.options.freq == EFreq.M)
+            {
+                G.Writeln("Freq changed to monthly (M) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;
+            }
+            else if (Program.options.freq == EFreq.D)
+            {
+                G.Writeln("Freq changed to daily (D) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;
+            }
+            else if (Program.options.freq == EFreq.U)
+            {
+
+                G.Writeln("Frequency changed to undated (U)");
+                Globals.globalPeriodStart = new GekkoTime(EFreq.U, Globals.globalPeriodStart.super, 1);
+                Globals.globalPeriodEnd = new GekkoTime(EFreq.U, Globals.globalPeriodEnd.super, 1);
+            }
+
+        }
+
+        public static bool Help(string s)
+        {
+
+            if (s == null)
+            {
+                s = Globals.helpStartPage;
+            }
+            string s2 = s;
+            if (!s2.EndsWith(".htm", StringComparison.OrdinalIgnoreCase)) s2 += ".htm";  //called from command line
+            List<string> folders = new List<string>();
+            if (Program.options.interface_help_copylocal) folders.Add(Globals.localTempFilesLocation + "\\"); //try here first, the file is copied from the path below (helpful if StartupPath is on a network drive)
+            folders.Add(Program.options.folder_help);  //looks here first, will actually before anything else look in working folder (which should not contain any help files)
+            folders.Add(Application.StartupPath + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
+
+            string path = Program.FindFile("gekko.chm", folders);  //calls CreateFullPathAndFileName()
+
+            if (path == null)
+            {
+                G.Writeln();
+                G.Writeln("Sorry: could not find the help system file ('gekko.chm').");
+                return false;
+            }
+
+            try
+            {
+                System.Windows.Forms.Help.ShowHelp(null, path, s2);  //seems to give the same                
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: It seems the help system is blocked -- maybe it is opened in another program?");
+                G.Writeln("           file: " + path);
+                throw new GekkoException();
+            }
+            return true;
+        }
+
+
+        public static void Cut()
+        {
+            Program.Cut(true);
+        }
+
+        public static void Tell(string text, bool nocr)
+        {
+            if (Globals.runningOnTTComputer && text == "arrow")
+            {
+                Arrow.Run();
+            }
+
+            if (nocr) G.Write(text);
+            else G.Writeln(text);
+        }
+
+        public static void Exit()
+        {
+            Globals.applicationIsInProcessOfAborting = true;
+            Globals.threadIsInProcessOfAborting = true;
+            throw new GekkoException();
+        }
+
+        public static void Hdg(string text)
+        {
+            if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be HDG 'text'; fixing it here
+            Program.databanks.GetFirst().info1 = text;
+            G.Writeln2("Databank heading for '" + Program.databanks.GetFirst().name + "' databank set to: '" + text + "'");
+        }
+
+        public static void Mem(string tpe)
+        {
+            //call with null, string, date, val --> will be lower-case when called
+
+            bool foundSomething = false;
+
+            List<Databank> banks = new List<Databank>();
+            banks.Add(Program.databanks.GetLocal());
+            banks.AddRange(Program.databanks.storage);
+            banks.Add(Program.databanks.GetGlobal());
+
+            if (tpe == null || tpe == "val" || tpe == "date" || tpe == "string")
+            {   //scalars
+
+                foreach (Databank db in banks)
+                {
+                    int counter = 0;
+
+                    List<string> keys = new List<string>();
+
+                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                    {
+                        if (kvp.Value.Type() == EVariableType.Val || kvp.Value.Type() == EVariableType.Date || kvp.Value.Type() == EVariableType.String)
+                        {
+                            if (tpe == null)
+                            {
+                                keys.Add(kvp.Key);
+                            }
+                            else
+                            {
+                                if (tpe == "val" && kvp.Value.Type() == EVariableType.Val) keys.Add(kvp.Key);
+                                else if (tpe == "date" && kvp.Value.Type() == EVariableType.Date) keys.Add(kvp.Key);
+                                else if (tpe == "string" && kvp.Value.Type() == EVariableType.String) keys.Add(kvp.Key);
+                            }
+                        }
+                    }
+
+                    if (keys.Count() == 0) continue;
+
+                    foundSomething = true;
+
+                    keys.Sort(StringComparer.OrdinalIgnoreCase);
+
+                    Gekko.Table tab = new Gekko.Table();
+                    int row = 1;
+                    tab.SetBorder(row, 1, row, 3, BorderType.Top);
+                    tab.Set(row, 1, "type      ");
+                    tab.Set(row, 2, "name    ");  //blanks to get some spacing
+                    tab.Set(row, 3, "value    ");
+                    tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
+                    row++;
+                    foreach (string s in keys)
+                    {
+                        IVariable a = db.storage[s];
+                        string value = "";
+                        if (a.Type() == EVariableType.Date)
+                        {
+                            if (tpe != null && tpe != "date") continue;
+                            value = G.FromDateToString(a.ConvertToDate(O.GetDateChoices.Strict));
+                        }
+                        else if (a.Type() == EVariableType.String)
+                        {
+                            if (tpe != null && tpe != "string") continue;
+                            value = "'" + a.ConvertToString() + "'";
+                        }
+                        else if (a.Type() == EVariableType.Val)
+                        {
+                            if (tpe != null && tpe != "val") continue;
+                            value = a.ConvertToVal().ToString();
+                            if (value == "NaN") value = "M";
+                        }
+
+                        string type = a.Type().ToString().ToUpper();
+
+                        tab.Set(row, 1, type);
+                        tab.Set(row, 2, s);
+                        tab.Set(row, 3, value);
+                        row++;
+                        counter++;
+                    }
+                    tab.SetBorder(row - 1, 1, row - 1, 3, BorderType.Bottom);
+
+                    string tpe2 = "";
+                    if (tpe != null) tpe2 = " " + tpe.ToUpper();
+                    G.Writeln2(db.name + " databank: " + counter + tpe2 + " scalar(s) found");
+                    foreach (string s in tab.Print()) G.Writeln(s);
+                }
+                if (!foundSomething)
+                {
+                    if (tpe == null) G.Writeln2("No scalars found in any open databank");
+                    else G.Writeln2("No " + tpe.ToUpper() + " scalar(s) found in any open databank");
+                }
+            }
+            else if (tpe == "ser" || tpe == "series")
+            {
+                Gekko.Table tab = new Gekko.Table();
+                int row = 1;
+                tab.SetBorder(row, 1, row, 2, BorderType.Top);
+
+                bool hit = false;
+
+                foreach (Databank db in banks)
+                {
+                    string s = null;
+                    Dictionary<EFreq, long> count = new Dictionary<EFreq, long>();
+                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                    {
+                        if (kvp.Value.Type() != EVariableType.Series) continue;
+                        Series ts = kvp.Value as Series;
+                        if (!count.ContainsKey(ts.freq)) count.Add(ts.freq, 0);
+                        count[ts.freq]++; hit = true;
+                    }
+                    foreach (KeyValuePair<EFreq, long> kvp in count)
+                    {
+                        s += kvp.Value + " (" + G.GetFreqString(kvp.Key) + "), ";
+                    }
+                    if (s != null)
+                    {
+                        s = s.Substring(0, s.Length - 2);
+                        tab.Set(row, 1, db.name);
+                        tab.Set(row, 2, s);
+                        row++;
+                    }
+                }
+                tab.SetBorder(row - 1, 1, row - 1, 2, BorderType.Bottom);
+
+                if (hit)
+                {
+                    G.Writeln();
+                    foreach (string s in tab.Print()) G.Writeln(s);
+                }
+                else
+                {
+                    G.Writeln2("No series found in any open databank");
+                }
+            }
+            else  //list, map, matrix
+            {
+                foreach (Databank db in banks)
+                {
+                    int counter = 0;
+
+                    List<string> keys = new List<string>();
+
+                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                    {
+                        if (tpe == "list" && kvp.Value.Type() == EVariableType.List) keys.Add(kvp.Key);
+                        else if (tpe == "map" && kvp.Value.Type() == EVariableType.Map) keys.Add(kvp.Key);
+                        else if (tpe == "matrix" && kvp.Value.Type() == EVariableType.Matrix) keys.Add(kvp.Key);
+                    }
+
+                    if (keys.Count() == 0) continue;
+
+                    foundSomething = true;
+
+                    keys.Sort(StringComparer.OrdinalIgnoreCase);
+
+                    Gekko.Table tab = new Gekko.Table();
+                    int row = 1;
+                    tab.SetBorder(row, 1, row, 4, BorderType.Top);
+                    tab.Set(row, 1, "type    ");
+                    tab.Set(row, 2, "name    ");
+                    tab.Set(row, 3, "size    ");  //blanks to get some spacing                    
+                    tab.SetBorder(row, 1, row, 4, BorderType.Bottom);
+                    row++;
+                    foreach (string s in keys)
+                    {
+                        IVariable a = db.storage[s];
+                        string value = "";
+                        string modelList = "";
+                        if (a.Type() == EVariableType.List)
+                        {
+                            List list = a as List;
+                            value = list.list.Count().ToString();
+                            if (G.Equal(db.name, "Global"))
+                            {
+                                if (G.Equal(s, "#all") || G.Equal(s, "#endo") || G.Equal(s, "#exo") || G.Equal(s, "#exod") || G.Equal(s, "#exodjz") || G.Equal(s, "#exoj") || G.Equal(s, "#exotrue") || G.Equal(s, "#exoz"))
+                                {
+                                    modelList = "(model list)";
+                                }
+                            }
+                        }
+                        else if (a.Type() == EVariableType.Map)
+                        {
+                            Map map = a as Map;
+                            value = map.storage.Count().ToString();
+                        }
+                        else if (a.Type() == EVariableType.Matrix)
+                        {
+                            Matrix matrix = a as Matrix;
+                            value = matrix.DimensionsAsString();
+                        }
+
+                        string type = a.Type().ToString().ToUpper();
+
+                        tab.Set(row, 1, type);
+                        tab.Set(row, 2, s);
+                        tab.Set(row, 3, value);
+                        tab.Set(row, 4, modelList);
+                        row++;
+                        counter++;
+                    }
+                    tab.SetBorder(row - 1, 1, row - 1, 4, BorderType.Bottom);
+
+                    G.Writeln2(db.name + " databank: " + counter + " " + tpe.ToUpper() + "s found");
+                    foreach (string s in tab.Print()) G.Writeln(s);
+                }
+                if (!foundSomething)
+                {
+                    G.Writeln2("No " + tpe.ToUpper() + " variables found in any open databank");
+                }
+            }
+        }
+
+
+        public static void Sign()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (!G.HasModelGekko())
+            {
+                G.Writeln2("*** ERROR: It seems no model is defined. See MODEL command.");
+                throw new GekkoException();
+            }
+            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
+            {
+                sb.AppendLine();
+                sb.AppendLine("You may add a signature to the model file by means of");
+                sb.AppendLine("the following line somewhere in the beginning of the model file:");
+                sb.AppendLine();
+                sb.AppendLine("  // Signature: " + Program.model.modelGekko.modelHashTrue);
+                sb.AppendLine();
+                sb.AppendLine("NOTE: You may use '()' instead of '//'.");
+            }
+            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
+            {
+                sb.AppendLine();
+                sb.AppendLine("You may (a) revert the model equations back to their original state,");
+                sb.AppendLine("or (b) insert the true hash code as a new signature in the model file.");
+            }
+            if (true)
+            {
+                sb.AppendLine();
+                sb.AppendLine("The signature is a so-called MD5 hash code, that is, a string of");
+                sb.AppendLine("characters representing the whole model file. The hash code can be");
+                sb.AppendLine("thought of as a check-sum or fingerprint.");
+                sb.AppendLine();
+                sb.AppendLine("When computing the hash code, Gekko ignores any empty lines, or");
+                sb.AppendLine("lines starting with the comment symbol ('//' or '()'). So you");
+                sb.AppendLine("may add or remove (whole-line) commentaries as you like, without ");
+                sb.AppendLine("altering the hash code, but changing or reordering the equations");
+                sb.AppendLine("in any way will result in a new hash code.");
+                sb.AppendLine();
+                sb.AppendLine("Any variable list after the VARLIST$ or VARLIST; tag will also be ignored");
+                sb.AppendLine("when computing the hash code.");
+            }
+            Program.LinkContainer lc = new Program.LinkContainer(sb.ToString());
+            Globals.linkContainer.Add(lc.counter, lc);
+
+            G.Writeln();
+            string s = Program.model.modelGekko.signatureFoundInFileHeader;
+            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
+            {
+                s = "[not found]";
+                G.Write("No signature was found in model file");
+            }
+            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.Ok)
+            {
+                G.Write("The signature matches the true hash code of the model file");
+            }
+            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
+            {
+                G.Write("The signature does not match the true hash code of the model file");
+            }
+            G.Write(" ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Write(")"); G.Writeln();
+            G.Writeln("- Signature in model file      : " + s);
+            G.Writeln("- True model file hash code    : " + Program.model.modelGekko.modelHashTrue);
+        }
+
 
 
         private static List ReadListFile(string varname)
@@ -3685,7 +4080,7 @@ namespace Gekko
                                                     G.Writeln();
                                                     Action a = () =>
                                                     {
-                                                        Program.Help("i_dynamic_statements");
+                                                        O.Help("i_dynamic_statements");
                                                     };
                                                     G.Writeln("           Read more about this error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.7 to a", Color.Red);
                                                     G.Writeln("           Gekko version >= 3.1.7, this error may come out of the blue. In that case, see the", Color.Red);
@@ -7197,7 +7592,7 @@ namespace Gekko
                 Action a = () =>
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                    Program.Cls("output");
+                    O.Cls("output");
                     string txt = "When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.";
                     G.Writeln(txt, ETabs.Output);
                 };
@@ -7629,7 +8024,7 @@ namespace Gekko
                             s += ss + G.NL;
                         }
                         Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                        Program.Cls("output");
+                        O.Cls("output");
                         G.Writeln(s, ETabs.Output);
                     };
                     G.Writeln("+++ NOTE: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
@@ -7649,7 +8044,7 @@ namespace Gekko
                             s += ss + G.NL;
                         }
                         Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                        Program.Cls("output");
+                        O.Cls("output");
                         G.Writeln(s, ETabs.Output);
                     };
                     G.Writeln("+++ NOTE: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
@@ -7921,210 +8316,7 @@ namespace Gekko
             }
         }
 
-        //public static void DynamicHelper0(GekkoSmpl smpl, out GekkoTime t1, out GekkoTime t2)
-        //{
-        //    t1 = smpl.t1;
-        //    t2 = smpl.t2;
-        //    smpl.omitDynamicSeries = false;
-        //}
-
-        //public static void DynamicHelper3(GekkoSmpl smpl, GekkoTime t1, GekkoTime t2)
-        //{
-        //    if (Program.options.series_dynamic)
-        //    {
-        //        smpl.t1 = t1;
-        //        smpl.t2 = t2;
-        //        smpl.omitDynamicSeries = false;
-        //    }
-        //}
-
-        //public static bool DynamicHelper2(GekkoSmpl smpl)
-        //{
-        //    return !Program.options.series_dynamic || smpl.omitDynamicSeries;
-        //}
-
-        //public static void DynamicHelper1(GekkoSmpl smpl, GekkoTime t)
-        //{
-        //    if (Program.options.series_dynamic)
-        //    {
-        //        smpl.t1 = t;
-        //        smpl.t2 = t;
-        //    }
-        //}
-
-        //public class Val
-        //{
-        //    public static void Q(string s)
-        //    {
-        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
-        //        if (a == null || a.Type() != EVariableType.Val)
-        //        {
-        //            G.Writeln2("*** ERROR: VAL " + Globals.symbolScalar.ToString() + s + " was not found");
-        //            throw new GekkoException();
-        //        }
-        //        string ss = a.GetValOLD(null).ToString();
-        //        if (ss == "NaN") ss = "M";
-        //        G.Writeln2("VAL " + s + " = " + ss);
-        //    }
-        //    public static void Q()
-        //    {
-        //        Program.Mem("val");
-        //    }
-        //}
-
-        //public class String2
-        //{
-        //    public static void Q(string s)
-        //    {
-        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
-        //        if (a == null || a.Type() != EVariableType.String)
-        //        {
-        //            G.Writeln2("*** ERROR: STRING " + Globals.symbolScalar.ToString() + s + " was not found");
-        //            throw new GekkoException();
-        //        }
-        //        G.Writeln2("STRING " + s + " = '" + a.ConvertToString() + "'");
-        //    }
-        //    public static void Q()
-        //    {
-        //        Program.Mem("string");
-        //    }
-        //}
-
-        //public class Matrix2
-        //{
-        //    public List<string> opt_rownames = null;
-        //    public List<string> opt_colnames = null;
-
-        //    public void Exe(IVariable name, IVariable rhs)
-        //    {
-        //        if (rhs == null && opt_rownames == null && opt_colnames == null)
-        //        {
-        //            G.Writeln2("*** ERROR: You must indicate either <rownames=...> or <colnames=...>");
-        //            throw new GekkoException();
-        //        }
-
-        //        Matrix value = null;
-        //        if (rhs != null) value = O.ConvertToMatrix(rhs);
-
-        //        if (value != null)
-        //        {
-        //            if (opt_rownames != null) value.rownames = opt_rownames;
-        //            if (opt_colnames != null) value.colnames = opt_colnames;
-        //        }
-
-        //        IVariable lhs = null;
-
-        //        string name2 = name.ConvertToString();
-        //        if (Program.scalars.TryGetValue(Globals.symbolCollection + name2, out lhs))
-        //        {
-        //            //Matrix is already existing, may inherit the row/columnames               
-        //            if (lhs.Type() == EVariableType.Matrix)
-        //            {
-        //                if (value == null)
-        //                {
-        //                    //do not touch the .data
-        //                }
-        //                else
-        //                {
-        //                    //Already existing lhs is a MATRIX, inject into it. Injecting is faster than recreating an object in the dictionary
-        //                    ((Matrix)lhs).data = value.data;
-        //                }
-        //                if (opt_rownames != null) ((Matrix)lhs).rownames = opt_rownames;
-        //                if (opt_colnames != null) ((Matrix)lhs).colnames = opt_colnames;
-        //            }
-        //            else
-        //            {
-        //                if (value == null)
-        //                {
-        //                    G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
-        //                    throw new GekkoException();
-        //                }
-        //                //The object has to die and be recreated, since it is of a wrong type.                                
-        //                Program.scalars.Remove(Globals.symbolCollection + name2);
-        //                //lhs = new ScalarDate(value);
-        //                Program.scalars.Add(Globals.symbolCollection + name2, value);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (value == null)
-        //            {
-        //                G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
-        //                throw new GekkoException();
-        //            }
-        //            //Scalar does not exist beforehand            
-        //            //lhs = new ScalarDate(value);
-        //            Program.scalars.Add(Globals.symbolCollection + name2, value);
-        //        }
-        //        //return (Matrix)lhs;
-        //    }
-
-        //    public static void Q(string s)
-        //    {
-        //        Show ss = new Show();
-        //        IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection.ToString() + s, out iv);
-        //        if (iv == null)
-        //        {
-        //            G.Writeln2("Matrix " + Globals.symbolCollection.ToString() + s + " not found");
-        //            return;
-        //        }
-        //        ss.input = iv;
-        //        ss.label = Globals.symbolCollection.ToString() + s;
-        //        ss.Exe();
-        //    }
-        //    public static void Q()
-        //    {
-        //        bool first = true;
-        //        int count = 0;
-        //        foreach (string s in Program.scalars.Keys)
-        //        {
-        //            IVariable a = Program.scalars[s];  //no need for tryget                    
-        //            if (a.Type() == EVariableType.Matrix)
-        //            {
-        //                Matrix m = (Matrix)a;
-        //                if (first) G.Writeln();
-        //                G.Writeln("MATRIX " + s + " with dimension " + m.data.GetLength(0) + " x " + m.data.GetLength(1));
-        //                first = false;
-        //                count++;
-        //            }
-        //        }
-        //        if (count == 0) G.Writeln2("Did not find any matrices");
-        //    }
-        //}
-
-        //public class Name
-        //{
-        //    public static void Q(string s)
-        //    {
-        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
-        //        if (a == null || a.Type() != EVariableType.String)
-        //        {
-        //            G.Writeln2("*** ERROR: NAME " + Globals.symbolScalar.ToString() + s + " was not found");
-        //        }
-        //        G.Writeln2("NAME " + s + " = '" + a.ConvertToString() + "'");
-        //    }
-        //    public static void Q()
-        //    {
-        //        Program.Mem("name");
-        //    }
-        //}
-
-        //public class Date
-        //{
-        //    public static void Q(string s)
-        //    {
-        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
-        //        if (a == null || a.Type() != EVariableType.Date)
-        //        {
-        //            G.Writeln2("*** ERROR: DATE " + Globals.symbolScalar.ToString() + s + " was not found");
-        //        }
-        //        G.Writeln2("DATE " + s + " = " + G.FromDateToString(O.ConvertToDate(a)));
-        //    }
-        //    public static void Q()
-        //    {
-        //        Program.Mem("date");
-        //    }
-        //}
+        
 
         public class Restart
         {

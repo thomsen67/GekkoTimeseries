@@ -322,7 +322,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.Help("i_dynamic_statements");
+                    O.Help("i_dynamic_statements");
                 };
 
                 G.Writeln("+++ NOTE: Starting with the Gekko 3.1.7 version, dynamic statements with lagged dependent/endogenous");
@@ -1370,7 +1370,7 @@ namespace Gekko
                             else if (letter == "b") liste = ec.simNonExistingVariable;
                             else if (letter == "c") liste = ec.simMissingValueExoOrLaggedEndo;
                             Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                            Program.Cls("output");
+                            O.Cls("output");
                             foreach (string s in liste)
                             {
                                 G.Writeln(s, ETabs.Output);
@@ -1432,7 +1432,7 @@ namespace Gekko
                     }
                     else
                     {
-                        Program.Help(input);
+                        O.Help(input);
                     }
                 }
                 else if (type == "stacktrace")
@@ -1456,7 +1456,7 @@ namespace Gekko
                 else if (type == "outputtab")
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                    Program.Cls("output");
+                    O.Cls("output");
                     string s = Globals.linkContainer[long.Parse(input)].s;
                     List<string> ss = G.ExtractLinesFromText(s);
                     foreach (string s2 in ss)
@@ -1516,7 +1516,7 @@ namespace Gekko
                 else if (type == "dispfix")
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                    Program.Cls("output");
+                    O.Cls("output");
                     Series ts = O.GetIVariableFromString(input, O.ECreatePossibilities.NoneReportError, false) as Series;
                     if (!(ts.type == ESeriesType.ArraySuper))
                     {
@@ -2006,7 +2006,7 @@ namespace Gekko
                 }                                
                 Action a = () =>
                 {
-                    Program.Help("i_missing_values");
+                    O.Help("i_missing_values");
                 };
                 G.Writeln("    Read more about missing values " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.8 to a", Globals.warningColor);
                 G.Writeln("    Gekko version >= 3.1.8, this warning may come out of the blue. In that case, as a work-around,", Globals.warningColor);
@@ -2741,7 +2741,7 @@ namespace Gekko
         private void manualToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //System.Windows.Forms.Help.ShowHelp(this, Application.StartupPath + "\\helpfiles\\gekko.chm", "i_overview.htm");
-            Program.Help(Globals.helpStartPage);
+            O.Help(Globals.helpStartPage);
         }
 
         private void viewDatabanksToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2987,7 +2987,7 @@ namespace Gekko
         private void toolStripButton6_Click(object sender, EventArgs e)
         {            
             //CrossThreadStuff.Cut();
-            Program.Cut();            
+            O.Cut();            
         }
 
         private void deleteTempFilesToolStripMenuItem_Click(object sender, EventArgs e)

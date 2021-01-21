@@ -8293,70 +8293,7 @@ namespace Gekko
             }
         }
 
-        //called from dynamic code, ought to be in O.cs
-        public static void Sign()
-        {
-            StringBuilder sb = new StringBuilder();
-            if (!G.HasModelGekko())
-            {
-                G.Writeln2("*** ERROR: It seems no model is defined. See MODEL command.");
-                throw new GekkoException();
-            }
-            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
-            {
-                sb.AppendLine();
-                sb.AppendLine("You may add a signature to the model file by means of");
-                sb.AppendLine("the following line somewhere in the beginning of the model file:");
-                sb.AppendLine();
-                sb.AppendLine("  // Signature: " + Program.model.modelGekko.modelHashTrue);
-                sb.AppendLine();
-                sb.AppendLine("NOTE: You may use '()' instead of '//'.");
-            }
-            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
-            {
-                sb.AppendLine();
-                sb.AppendLine("You may (a) revert the model equations back to their original state,");
-                sb.AppendLine("or (b) insert the true hash code as a new signature in the model file.");
-            }
-            if (true)
-            {
-                sb.AppendLine();
-                sb.AppendLine("The signature is a so-called MD5 hash code, that is, a string of");
-                sb.AppendLine("characters representing the whole model file. The hash code can be");
-                sb.AppendLine("thought of as a check-sum or fingerprint.");
-                sb.AppendLine();
-                sb.AppendLine("When computing the hash code, Gekko ignores any empty lines, or");
-                sb.AppendLine("lines starting with the comment symbol ('//' or '()'). So you");
-                sb.AppendLine("may add or remove (whole-line) commentaries as you like, without ");
-                sb.AppendLine("altering the hash code, but changing or reordering the equations");
-                sb.AppendLine("in any way will result in a new hash code.");
-                sb.AppendLine();
-                sb.AppendLine("Any variable list after the VARLIST$ or VARLIST; tag will also be ignored");
-                sb.AppendLine("when computing the hash code.");
-            }
-            LinkContainer lc = new LinkContainer(sb.ToString());
-            Globals.linkContainer.Add(lc.counter, lc);
-
-            G.Writeln();
-            string s = Program.model.modelGekko.signatureFoundInFileHeader;
-            if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
-            {
-                s = "[not found]";
-                G.Write("No signature was found in model file");
-            }
-            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.Ok)
-            {
-                G.Write("The signature matches the true hash code of the model file");
-            }
-            else if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignaturesDoNotMatch)
-            {
-                G.Write("The signature does not match the true hash code of the model file");
-            }
-            G.Write(" ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Write(")"); G.Writeln();
-            G.Writeln("- Signature in model file      : " + s);
-            G.Writeln("- True model file hash code    : " + Program.model.modelGekko.modelHashTrue);
-        }
-
+        
         public static void Unswap(bool print)
         {
             Databanks.Unswap();
@@ -10589,221 +10526,7 @@ namespace Gekko
             return output;
         }
         
-        //called from dynamic code, ought to be in O.cs
-        public static void Mem(string tpe)
-        {
-            //call with null, string, date, val --> will be lower-case when called
-
-            bool foundSomething = false;
-
-            List<Databank> banks = new List<Databank>();
-            banks.Add(Program.databanks.GetLocal());
-            banks.AddRange(Program.databanks.storage);
-            banks.Add(Program.databanks.GetGlobal());
-
-            if (tpe == null || tpe == "val" || tpe == "date" || tpe == "string")
-            {   //scalars
-
-                foreach (Databank db in banks)
-                {
-                    int counter = 0;
-
-                    List<string> keys = new List<string>();
-
-                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
-                    {
-                        if (kvp.Value.Type() == EVariableType.Val || kvp.Value.Type() == EVariableType.Date || kvp.Value.Type() == EVariableType.String)
-                        {
-                            if (tpe == null)
-                            {
-                                keys.Add(kvp.Key);
-                            }
-                            else
-                            {
-                                if (tpe == "val" && kvp.Value.Type() == EVariableType.Val) keys.Add(kvp.Key);
-                                else if (tpe == "date" && kvp.Value.Type() == EVariableType.Date) keys.Add(kvp.Key);
-                                else if (tpe == "string" && kvp.Value.Type() == EVariableType.String) keys.Add(kvp.Key);
-                            }
-                        }
-                    }
-
-                    if (keys.Count() == 0) continue;
-
-                    foundSomething = true;
-
-                    keys.Sort(StringComparer.OrdinalIgnoreCase);
-
-                    Table tab = new Table();
-                    int row = 1;
-                    tab.SetBorder(row, 1, row, 3, BorderType.Top);
-                    tab.Set(row, 1, "type      ");
-                    tab.Set(row, 2, "name    ");  //blanks to get some spacing
-                    tab.Set(row, 3, "value    ");
-                    tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
-                    row++;
-                    foreach (string s in keys)
-                    {
-                        IVariable a = db.storage[s];
-                        string value = "";
-                        if (a.Type() == EVariableType.Date)
-                        {
-                            if (tpe != null && tpe != "date") continue;
-                            value = G.FromDateToString(a.ConvertToDate(O.GetDateChoices.Strict));
-                        }
-                        else if (a.Type() == EVariableType.String)
-                        {
-                            if (tpe != null && tpe != "string") continue;
-                            value = "'" + a.ConvertToString() + "'";
-                        }
-                        else if (a.Type() == EVariableType.Val)
-                        {
-                            if (tpe != null && tpe != "val") continue;
-                            value = a.ConvertToVal().ToString();
-                            if (value == "NaN") value = "M";
-                        }
-
-                        string type = a.Type().ToString().ToUpper();
-
-                        tab.Set(row, 1, type);
-                        tab.Set(row, 2, s);
-                        tab.Set(row, 3, value);
-                        row++;
-                        counter++;
-                    }
-                    tab.SetBorder(row - 1, 1, row - 1, 3, BorderType.Bottom);
-
-                    string tpe2 = "";
-                    if (tpe != null) tpe2 = " " + tpe.ToUpper();
-                    G.Writeln2(db.name + " databank: " + counter + tpe2 + " scalar(s) found");
-                    foreach (string s in tab.Print()) G.Writeln(s);
-                }
-                if (!foundSomething)
-                {
-                    if (tpe == null) G.Writeln2("No scalars found in any open databank");
-                    else G.Writeln2("No " + tpe.ToUpper() + " scalar(s) found in any open databank");
-                }
-            }
-            else if (tpe == "ser" || tpe == "series")
-            {
-                Table tab = new Table();
-                int row = 1;
-                tab.SetBorder(row, 1, row, 2, BorderType.Top);
-
-                bool hit = false;
-
-                foreach (Databank db in banks)
-                {
-                    string s = null;
-                    Dictionary<EFreq, long> count = new Dictionary<EFreq, long>();
-                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
-                    {
-                        if (kvp.Value.Type() != EVariableType.Series) continue;
-                        Series ts = kvp.Value as Series;
-                        if (!count.ContainsKey(ts.freq)) count.Add(ts.freq, 0);
-                        count[ts.freq]++; hit = true;
-                    }
-                    foreach (KeyValuePair<EFreq, long> kvp in count)
-                    {
-                        s += kvp.Value + " (" + G.GetFreqString(kvp.Key) + "), ";
-                    }
-                    if (s != null)
-                    {
-                        s = s.Substring(0, s.Length - 2);
-                        tab.Set(row, 1, db.name);
-                        tab.Set(row, 2, s);
-                        row++;
-                    }
-                }
-                tab.SetBorder(row - 1, 1, row - 1, 2, BorderType.Bottom);
-
-                if (hit)
-                {
-                    G.Writeln();
-                    foreach (string s in tab.Print()) G.Writeln(s);
-                }
-                else
-                {
-                    G.Writeln2("No series found in any open databank");
-                }
-            }
-            else  //list, map, matrix
-            {
-                foreach (Databank db in banks)
-                {
-                    int counter = 0;
-
-                    List<string> keys = new List<string>();
-
-                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
-                    {
-                        if (tpe == "list" && kvp.Value.Type() == EVariableType.List) keys.Add(kvp.Key);
-                        else if (tpe == "map" && kvp.Value.Type() == EVariableType.Map) keys.Add(kvp.Key);
-                        else if (tpe == "matrix" && kvp.Value.Type() == EVariableType.Matrix) keys.Add(kvp.Key);
-                    }
-
-                    if (keys.Count() == 0) continue;
-
-                    foundSomething = true;
-
-                    keys.Sort(StringComparer.OrdinalIgnoreCase);
-
-                    Table tab = new Table();
-                    int row = 1;
-                    tab.SetBorder(row, 1, row, 4, BorderType.Top);
-                    tab.Set(row, 1, "type    ");
-                    tab.Set(row, 2, "name    ");
-                    tab.Set(row, 3, "size    ");  //blanks to get some spacing                    
-                    tab.SetBorder(row, 1, row, 4, BorderType.Bottom);
-                    row++;
-                    foreach (string s in keys)
-                    {
-                        IVariable a = db.storage[s];
-                        string value = "";
-                        string modelList = "";
-                        if (a.Type() == EVariableType.List)
-                        {
-                            List list = a as List;
-                            value = list.list.Count().ToString();
-                            if (G.Equal(db.name, "Global"))
-                            {
-                                if (G.Equal(s, "#all") || G.Equal(s, "#endo") || G.Equal(s, "#exo") || G.Equal(s, "#exod") || G.Equal(s, "#exodjz") || G.Equal(s, "#exoj") || G.Equal(s, "#exotrue") || G.Equal(s, "#exoz"))
-                                {
-                                    modelList = "(model list)";
-                                }
-                            }
-                        }
-                        else if (a.Type() == EVariableType.Map)
-                        {
-                            Map map = a as Map;
-                            value = map.storage.Count().ToString();
-                        }
-                        else if (a.Type() == EVariableType.Matrix)
-                        {
-                            Matrix matrix = a as Matrix;
-                            value = matrix.DimensionsAsString();
-                        }
-
-                        string type = a.Type().ToString().ToUpper();
-
-                        tab.Set(row, 1, type);
-                        tab.Set(row, 2, s);
-                        tab.Set(row, 3, value);
-                        tab.Set(row, 4, modelList);
-                        row++;
-                        counter++;
-                    }
-                    tab.SetBorder(row - 1, 1, row - 1, 4, BorderType.Bottom);
-                                        
-                    G.Writeln2(db.name + " databank: " + counter + " " + tpe.ToUpper() + "s found");
-                    foreach (string s in tab.Print()) G.Writeln(s);
-                }
-                if (!foundSomething)
-                {   
-                    G.Writeln2("No " + tpe.ToUpper() + " variables found in any open databank");
-                }
-            }
-        }
-
+        
         public static void SplitCommandBeingExecuted(out string originalFileName, out int lineNumber, string s)
         {
             string[] split = s.Split('¤');
@@ -14110,49 +13833,7 @@ namespace Gekko
         }
 
 
-        public static void AdjustFreq()
-        {
-            //hash #980432
-
-            //========================================================================================================
-            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
-            //========================================================================================================
-
-            Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.options.freq);
-
-            if (Program.options.freq == EFreq.A)
-            {
-                G.Writeln("Freq changed to annual (A)");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;                
-            }
-            else if (Program.options.freq == EFreq.Q)
-            {
-                G.Writeln("Freq changed to quarterly (Q) -- note that start/end quarters have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;                
-            }
-            else if (Program.options.freq == EFreq.M)
-            {
-                G.Writeln("Freq changed to monthly (M) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;                
-            }
-            else if (Program.options.freq == EFreq.D)
-            {
-                G.Writeln("Freq changed to daily (D) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
-                Globals.globalPeriodStart = freqs.Item1;
-                Globals.globalPeriodEnd = freqs.Item2;
-            }
-            else if (Program.options.freq == EFreq.U)
-            {
-
-                G.Writeln("Frequency changed to undated (U)");
-                Globals.globalPeriodStart = new GekkoTime(EFreq.U, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.U, Globals.globalPeriodEnd.super, 1);                
-            }                      
-
-        }
+        
 
         public static string GetSHA256Hash(string modelText)
         {
@@ -15396,16 +15077,7 @@ namespace Gekko
             return type;
         }
         
-        public static void Tell(string text, bool nocr)
-        {            
-            if (Globals.runningOnTTComputer && text == "arrow")
-            {
-                Arrow.Run();     
-            }
-
-            if (nocr) G.Write(text);
-            else G.Writeln(text);
-        }
+        
 
         public static string Find(O.Find o)  //returns equation name
         {
@@ -15532,15 +15204,8 @@ namespace Gekko
             {
                 yield return item;
             }
-        }
+        }               
         
-        //should be in O.cs
-        public static void Hdg(string text)
-        {
-            if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be HDG 'text'; fixing it here
-            Program.databanks.GetFirst().info1 = text;
-            G.Writeln2("Databank heading for '" + Program.databanks.GetFirst().name + "' databank set to: '" + text + "'");
-        }
 
         public static void Rename(O.Rename o)
         {
@@ -16589,42 +16254,7 @@ namespace Gekko
 
         
 
-        public static bool Help(string s)
-        {
-
-            if (s == null)
-            {                
-                s = Globals.helpStartPage;             
-            }
-            string s2 = s;
-            if (!s2.EndsWith(".htm", StringComparison.OrdinalIgnoreCase)) s2 += ".htm";  //called from command line
-            List<string> folders = new List<string>();
-            if (Program.options.interface_help_copylocal) folders.Add(Globals.localTempFilesLocation + "\\"); //try here first, the file is copied from the path below (helpful if StartupPath is on a network drive)
-            folders.Add(Program.options.folder_help);  //looks here first, will actually before anything else look in working folder (which should not contain any help files)
-            folders.Add(Application.StartupPath + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
-
-            string path = FindFile("gekko.chm", folders);  //calls CreateFullPathAndFileName()
-
-            if (path == null)
-            {
-                G.Writeln();
-                G.Writeln("Sorry: could not find the help system file ('gekko.chm').");
-                return false;
-            }
-
-            try
-            {
-                System.Windows.Forms.Help.ShowHelp(null, path, s2);  //seems to give the same                
-            }
-            catch (Exception e)
-            {
-                G.Writeln2("*** ERROR: It seems the help system is blocked -- maybe it is opened in another program?");
-                G.Writeln("           file: " + path);
-                throw new GekkoException();
-            }
-            return true;
-        }
-
+        
         public static void Info(GekkoTime tStart, GekkoTime tEnd, List list2)
         {
             if (!G.HasModelGekko())
@@ -16677,7 +16307,7 @@ namespace Gekko
                         if (showList)
                         {
                             Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                            Program.Cls("output");
+                            O.Cls("output");
                             //run in thread ideally
                             foreach (string s in a1)
                             {
@@ -20777,18 +20407,6 @@ namespace Gekko
             return ts;
         }
 
-        public static void Exit()
-        {
-            Globals.applicationIsInProcessOfAborting = true;
-            Globals.threadIsInProcessOfAborting = true;
-            throw new GekkoException();
-        }
-
-        public static void Cut()
-        {
-            Cut(true);
-        }
-
         public static void Cut(bool print)
         {
             Gui.CloseAllDecompUdvalg(print);
@@ -21017,7 +20635,7 @@ namespace Gekko
             Globals.expressions = null;
             //Globals.freeIndexedListsDecomp = null;
 
-        //Program.Cut(false);
+        
 
         RemoteInit();
 
@@ -21464,12 +21082,7 @@ namespace Gekko
             G.Writeln();
             G.Writeln("Temporary folder was flushed:");
             G.Writeln("  " + Globals.localTempFilesLocation);
-        }
-
-        public static void Cls(string tab)
-        {
-            CrossThreadStuff.Cls(tab);
-        }
+        }        
 
         public static void XmlTable(string filename, string html, string window, P p)
         {

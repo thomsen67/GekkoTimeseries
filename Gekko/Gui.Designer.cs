@@ -1389,7 +1389,7 @@ namespace Gekko
                 //
                 // F1
                 //
-                Program.Help(Globals.helpStartPage);
+                O.Help(Globals.helpStartPage);
             }            
             else if (e.KeyCode == Keys.F2)
             {
