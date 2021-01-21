@@ -44,11 +44,11 @@ namespace Gekko.Parser.Frm
 
                 //this runs very fast
                 
-                Program.EndogenizeExogenizeStuff(isFix); //depends upon which endo/exo variables are set
-                
+                SolveOrdering.EndogenizeExogenizeStuff(isFix); //depends upon which endo/exo variables are set
+
                 //takes about 0.6 sec on dec09
-                
-                Program.FeedbackOrderingStuff(modelType, isCalledFromModelStatement); //depends upon which endo/exo variables are set
+
+                SolveOrdering.FeedbackOrderingStuff(modelType, isCalledFromModelStatement); //depends upon which endo/exo variables are set
                 
             }
 

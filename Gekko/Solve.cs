@@ -28,6 +28,7 @@ using System.IO;
 using MathNet.Numerics.LinearAlgebra.Sparse.Linear;
 using MathNet.Numerics.LinearAlgebra.Sparse;
 using MathNet.Numerics.LinearAlgebra.Sparse.Tests;
+using System.Collections;
 
 namespace Gekko
 {    
@@ -3546,6 +3547,843 @@ namespace Gekko
             }
             return helper;
         }
+    }
+
+    public static class SolveOrdering
+    {
+        private static void WriteOrderingInfoToFile(List<List<int>> rowsIndexes)
+        {
+            string path = Program.GetModelInfoPath();
+
+            // Determine whether the directory exists, else create it (used for model related files)
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            using (FileStream fs = Program.WaitForFileStream(path + "\\" + Globals.modelFileName.Replace(".frm", "") + ".ordering", Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            {
+                res.WriteLine("Number of endogenous  = " + G.IntFormat(rowsIndexes.Count, 7));
+                res.WriteLine("----------------------------------");
+                res.WriteLine("Prologue              = " + G.IntFormat(Program.model.modelGekko.m2.prologue.Count, 7));
+                res.WriteLine("Simultaneous feedback = " + G.IntFormat(Program.model.modelGekko.m2.simulFeedback.Count, 7));
+                res.WriteLine("Simultanous recursive = " + G.IntFormat(Program.model.modelGekko.m2.simulRecursive.Count, 7));
+                res.WriteLine("Epilogue              = " + G.IntFormat(Program.model.modelGekko.m2.epilogue.Count, 7));
+                res.WriteLine();
+                res.Write("The prologue variables can be considered a kind of pre-model of recursive equations feeding into ");
+                res.Write("the simultanous block. The epilogue variables can be considered a kind of recursive after-model, depending ");
+                res.WriteLine("upon the simultanous block, but not being simultanous itself.");
+                res.Write("Inside the simulatenous block, there is a (typically) small kernel of intertwined variables being ");
+                res.Write("heavily simultanous: the feedback set. The simultaneous recursive set is a set of simultaneous variables ");
+                res.Write("being truly simultanous, but can be understood as being recursive relative to the feedback set. That is, ");
+                res.Write("given the feedback (and prologue) variables, the simultanous recursive set can be computed as a (typically) ");
+                res.Write("long chain of recursive equations depending only upon each other. These properties are used to reduce the ");
+                res.WriteLine("dimensionality of the problem when using the Newton method for goals/means etc.");
+                res.WriteLine("");
+                res.WriteLine("--- Prologue variables (" + Program.model.modelGekko.m2.prologue.Count + ") ---");
+                Program.PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.prologue, res);
+                res.WriteLine();
+                res.WriteLine("--- Simultaneous block #1 of 2: feedback variables (" + Program.model.modelGekko.m2.simulFeedback.Count + ") ---");
+                Program.PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.simulFeedback, res);
+                res.WriteLine();
+                res.WriteLine("--- Simultaneous block #2 of 2: recursive variables (" + Program.model.modelGekko.m2.simulRecursive.Count + ") ---");
+                Program.PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.simulRecursive, res);
+                res.WriteLine();
+                res.WriteLine("--- Epilogue variables (" + Program.model.modelGekko.m2.epilogue.Count + ") ---");
+                Program.PrintEquationLeftHandSideNames(Program.model.modelGekko.m2.epilogue, res);
+                res.WriteLine();
+                res.Flush();
+            }
+        }
+
+
+        private static void PutIntoIndidenceMatrix(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<List<int>> rowsIndexes2, List<List<int>> columnsIndexes2, int lhs, int rhsi)
+        {
+            rowsIndexes[lhs].Add(rhsi);
+            columnsIndexes[rhsi].Add(lhs);
+            rowsIndexes2[lhs].Add(rhsi);
+            columnsIndexes2[rhsi].Add(lhs);
+        }
+
+        private static void Heuristic(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> feedback)
+        {
+            int max2 = -12345;
+            int imax = -12345;
+            for (int i = 0; i < columnsIndexes.Count; i++)
+            {
+                List<int> a = columnsIndexes[i];
+                if (a != null)
+                {
+                    List<int> b = rowsIndexes[i];
+                    int sza = a.Count;
+                    int szb = b.Count;
+                    int prod = sza * szb;  //seems to be good rule
+                    //int prod = szb; //for jul05 reduces feedb set from 267 to 240, but is slower overall. Also for saffier.
+                    if (prod > max2)
+                    {
+                        max2 = prod;
+                        imax = i;
+                    }
+                }
+            }
+            if (imax != -12345)
+            {
+                feedback.Add(imax);
+                DeleteRowAndColumn(rowsIndexes, columnsIndexes, imax);
+            }
+        }
+
+        private static void FindRecursive(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> pro)
+        {
+            while (true)
+            {
+                bool hit = false;
+                for (int i = 0; i < rowsIndexes.Count; i++)
+                {
+
+                    List<int> a = rowsIndexes[i];
+                    if (a != null && a.Count == 0)
+                    {
+                        hit = true;
+                        //rowsum is 0 for this row
+                        pro.Add(i);
+                        DeleteRowAndColumn(rowsIndexes, columnsIndexes, i);
+                    }
+                }
+                if (!hit) break;
+            }
+        }
+
+
+
+        private static int FindEqWithVarOnLeftHandSide(string endo)
+        {
+            int eqEndo = -12345;
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
+            {
+                if (G.Equal(eh.lhs, endo))
+                {
+                    eqEndo = eh.equationNumber;
+                }
+            }
+            if (eqEndo == -12345) G.Writeln2("*** ERROR: variable " + endo + " is not found as left-hand side var");
+            return eqEndo;
+        }
+
+
+        private static ArrayList FindEqsWithVarOnRightHandSide(string var1)
+        {
+            ArrayList eqs = new ArrayList();
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
+            {
+                foreach (string rhsVar in eh.precedentsWithLagIndicator.Keys)
+                {
+                    if (G.Equal(rhsVar, var1 + Globals.lagIndicator + "0"))
+                    {
+                        eqs.Add(eh.equationNumber);
+                    }
+                }
+            }
+            return eqs;
+        }
+
+
+        private static void FindDiagonal(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> fb)
+        {
+            for (int i = 0; i < rowsIndexes.Count; i++)
+            {
+                List<int> a = rowsIndexes[i];
+                if (a != null)
+                {
+                    if (a.Contains(i))
+                    {
+                        fb.Add(i);
+                        DeleteRowAndColumn(rowsIndexes, columnsIndexes, i);
+                    }
+                }
+            }
+        }
+
+
+        private static void FindColsWithSum1(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> rec)
+        {
+            for (int i = 0; i < columnsIndexes.Count; i++)
+            {
+                List<int> a = columnsIndexes[i];
+                if (a != null)
+                {
+                    if (a.Count == 1)
+                    {
+                        int subst = (int)a[0];
+                        if (i != subst)
+                        {
+
+                            rec.Add(i);
+
+
+                            if (!(rowsIndexes[subst]).Contains(subst))
+                            {
+                                (rowsIndexes[subst]).Add(subst);
+                            }
+                            if (!(columnsIndexes[subst]).Contains(subst))
+                            {
+                                (columnsIndexes[subst]).Add(subst);
+                            }
+
+                            DeleteRowAndColumn(rowsIndexes, columnsIndexes, i);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void FindRowsWithSum1(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, List<int> rec)
+        {
+            for (int i = 0; i < rowsIndexes.Count; i++)
+            {
+                List<int> a = rowsIndexes[i];
+                if (a != null)
+                {
+                    if (a.Count == 1)
+                    {
+                        int subst = (int)a[0];  //the right-hand var (y in c = 0.8 y)
+                        if (i != subst)  //should not be equal -- meaning it depends only on itself
+                        {
+                            //this is an equation like "c = 0.8 y"
+                            rec.Add(i);  //add "c" to recursive set
+                            List<int> b = columnsIndexes[i];
+                            for (int j = 0; j < b.Count; j++)
+                            {
+                                //for each equation containing "c"
+                                int c = (int)b[j];  //the left-hand side of that eq (e.g. the equation i = 0.5 c)
+                                if (!(rowsIndexes[c]).Contains(subst))
+                                {
+                                    //if equation "i" does not contain "y", add it
+                                    (rowsIndexes[c]).Add(subst);
+                                }
+                                if (!(columnsIndexes[subst]).Contains(c))
+                                {
+                                    //if var "y" does not appear in equaton "i" add it
+                                    (columnsIndexes[subst]).Add(c);
+                                }
+
+
+                            }
+                            DeleteRowAndColumn(rowsIndexes, columnsIndexes, i);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private static void DeleteRowAndColumn(List<List<int>> rowsIndexes, List<List<int>> columnsIndexes, int i)
+        {
+            List<int> b = columnsIndexes[i];
+            for (int j = 0; j < b.Count; j++)
+            {
+                int c = (int)b[j];
+                List<int> d = rowsIndexes[c];
+                if (!d.Contains(i)) G.Writeln("error");
+                d.Remove(i);
+            }
+
+            List<int> b2 = rowsIndexes[i];
+            for (int j = 0; j < b2.Count; j++)
+            {
+                int c = (int)b2[j];
+                List<int> d = columnsIndexes[c];
+                if (!d.Contains(i)) G.Writeln("error");
+                d.Remove(i);
+            }
+
+
+            rowsIndexes[i] = null;
+            columnsIndexes[i] = null;
+        }
+
+
+        public static void EndogenizeExogenizeStuff(bool isFix)
+        {
+            Program.model.modelGekko.m2.endogenous.Clear();
+            foreach (string var in Program.model.modelGekko.endogenousOriginallyInModel.Keys)
+            {
+                Program.model.modelGekko.m2.endogenous.Add(var, "");
+            }
+
+            Program.model.modelGekko.m2.endoSubstitution.Clear();
+            Program.model.modelGekko.m2.endoSubstitutionBNumbers.Clear();
+
+            if (isFix)  //we skip this for normal SIM, just as if the ENDO/EXO lists were empty even if they are not
+            {
+                //TODO: Maybe model.endogenized and model.exogenized should be List<string> to begin with,
+                //      to preserve order. Might be better for simulation.
+                //      BUT then we would have to re-thing caching, where order is scrambled anyway. Probably
+                //      preserving order is not noticable anyway, especially when using direct inverter (LU).
+                List<string> endogeni = new List<string>();
+                List<string> exogeni = new List<string>();
+                IEnumerator e1 = null;
+                IEnumerator e2 = null;
+                e1 = Program.model.modelGekko.endogenized.GetEnumerator();
+                e2 = Program.model.modelGekko.exogenized.GetEnumerator();
+                while (e1.MoveNext())
+                {
+                    e2.MoveNext();
+                    //string s1 = (string)(((DictionaryEntry)e1.Current).Key);
+                    string s1 = ((KeyValuePair<string, string>)e1.Current).Key;
+                    string s2 = ((KeyValuePair<string, string>)e2.Current).Key;
+                    endogeni.Add(s1);
+                    exogeni.Add(s2);
+                }
+                //This sorting is so that we get the same order no matter which order (and case) the means/goals were set
+                //This is probably more safe regarding cacheing of the results. Not sorting might give hard to track errors.
+                endogeni.Sort(StringComparer.OrdinalIgnoreCase);
+                exogeni.Sort(StringComparer.OrdinalIgnoreCase);
+
+                //endogenous/exogenous are altered due to endogenized/exogenized
+                for (int i = 0; i < endogeni.Count; i++)
+                {
+                    string s1 = endogeni[i];
+                    string s2 = exogeni[i];
+                    //BTypeData ss1 = (BTypeData)Program.model.modelGekko.varsBType[s1 + Globals.lagIndicator + "0"];
+                    BTypeData ss1 = null; Program.model.modelGekko.varsBType.TryGetValue(s1 + Globals.lagIndicator + "0", out ss1);
+                    if (ss1 == null)
+                    {
+                        //TODO: general error handling regarding endo/exo
+                        //now we get runtime error
+                        G.Writeln2("*** ERROR: regarding endogenize: variable " + s1 + " does not exist in model");
+                        throw new GekkoException();
+                    }
+                    int s1BNumber = ss1.bNumber;
+                    //int varNumber = ss1.bNumber;
+                    if (Program.model.modelGekko.m2.endogenous.ContainsKey(s1))
+                    {
+                        G.Writeln2("*** ERROR: regarding endogenize: variable " + s1 + " is already endogenous");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        Program.model.modelGekko.m2.endogenous.Add(s1, "");
+                        //Program.model.modelGekko.endogenousBNumbers.Add(s1BNumber, "");  DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
+                        //BTypeData ss2 = (BTypeData)Program.model.modelGekko.varsBType[s2 + Globals.lagIndicator + "0"];
+                        BTypeData ss2 = null; Program.model.modelGekko.varsBType.TryGetValue(s2 + Globals.lagIndicator + "0", out ss2);
+                        if (ss2 == null)
+                        {
+                            //TODO: general error handling regarding endo/exo
+                            //now we get runtime error
+                            G.Writeln2("*** ERROR: regarding exogenize: variable " + s2 + " does not exist in model");
+                            throw new GekkoException();
+                        }
+                        int s2BNumber = ss2.bNumber;
+
+                        if (Program.model.modelGekko.m2.endogenous.ContainsKey(s2))
+                        {
+                            Program.model.modelGekko.m2.endogenous.Remove(s2);
+                            //Program.model.modelGekko.endogenousBNumbers.Remove(s2BNumber);  //DO NOT ACTIVATE THIS ONE -- endogenousBNumbers are dealt with in the ordering code
+                            Program.model.modelGekko.m2.endoSubstitution.Add(s2, s1);
+                            Program.model.modelGekko.m2.endoSubstitutionBNumbers.Add(s2BNumber, s1BNumber);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: regarding exogenize: variable " + s2 + " is not endogenous");
+                            throw new GekkoException();
+                        }
+                    }
+                }
+            }
+
+            // ---------------------- endogenous with b-number -- end ------------------------
+
+            Program.model.modelGekko.m2.fromEqNumberToBNumber = G.CreateArray(Program.model.modelGekko.m2.endogenous.Count, -12345);  //used in newton
+            Program.model.modelGekko.m2.fromBNumberToEqNumber = G.CreateArray(1000000, -12345);  //slack, fix, used in newton
+            Program.model.modelGekko.m2.sparseInfo = new List<int>[Program.model.modelGekko.m2.endogenous.Count]; //used in newton
+            Program.model.modelGekko.m2.sparseInfoLeftRightSeparated = new List<int>[Program.model.modelGekko.m2.endogenous.Count]; //used for ordering
+
+            foreach (EquationHelper eh in Program.model.modelGekko.equations)
+            {
+                int varNumber = eh.bNumberLhs;
+                List<int> arl = new List<int>();
+                List<int> arl2 = new List<int>();
+                Program.model.modelGekko.m2.sparseInfo[eh.equationNumber] = arl;
+                Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber] = arl2;
+
+                int x = -12345;
+                if (Program.model.modelGekko.m2.endoSubstitutionBNumbers.TryGetValue(varNumber, out x))
+                {
+                    varNumber = x;
+                }
+
+                Program.model.modelGekko.m2.fromEqNumberToBNumber[eh.equationNumber] = varNumber;
+                Program.model.modelGekko.m2.fromBNumberToEqNumber[varNumber] = eh.equationNumber;
+
+                //-------------------------
+
+                List<int> temp = new List<int>();
+                //Hmmm, using Contains() on a List<> could waste time instead of Dictionary, but these lists are probably short anyway
+                if (!Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Contains(varNumber))
+                {
+                    //to avoid duplicates
+                    Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Add(varNumber);
+                }
+                foreach (string s in eh.precedentsWithLagIndicator.Keys)
+                {
+                    BTypeData temp3 = (BTypeData)Program.model.modelGekko.varsBType[s];
+                    int rhsVarNumber = temp3.bNumber;
+                    if (Program.model.modelGekko.endogenousBNumbersOriginallyInModel.ContainsKey(rhsVarNumber))
+                    {
+                        if (!Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Contains(rhsVarNumber))
+                        {
+                            //to avoid duplicates
+                            Program.model.modelGekko.m2.sparseInfo[eh.equationNumber].Add(rhsVarNumber);
+                        }
+                        //if (!first && !((ArrayList)sparseInfoLeftRightSeparated[eqNumber]).Contains(varNumber1))
+                        if (!temp.Contains(rhsVarNumber))
+                        {
+                            //to avoid duplicates
+                            temp.Add(rhsVarNumber);
+                        }
+                    }
+                }
+                Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber].Add(varNumber);
+                Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber].AddRange(temp);
+            }
+        }
+
+        public static void FeedbackOrderingStuff(ECompiledModelType modelType, bool isCalledFromModelStatement)
+        {
+
+            //int xx;
+            //xx = fromEqNumberToBNumber.Length; //(a)
+            //xx = fromBNumberToEqNumber.Length; //(a1)
+
+            //xx = fromEqNumberToBNumberRecursiveNEW.Count;  //(b)
+            //xx = fromBNumberToEqNumberRecursiveNEW.Length; //(b1)
+
+            //xx = fromEqNumberToBNumberFeedbackNEW.Length;  //(c)
+            //xx = fromBNumberToEqNumberFeedbackNEW.Length;  //(c1)
+
+
+            //frml _i i1=0.5*g;
+            //frml _i i=i1;
+            //frml _i y=c+i+g+e-m;                          //frml _i g=g+y-(c+i+g+e-m);
+            //frml _i c=0.2*y+0.1*c+0.1*e;
+            //frml _i e=-0.2*m+0.2*c-0.1*y *y;
+            //frml _i m=m2;
+            //frml _i m2=m3;
+            //frml _i m3=m4;
+            //frml _i m4=m5;
+            //frml _i m5=m6;
+            //frml _i m6=m7;
+            //frml _i m7=m8;
+            //frml _i m8=0.1*c     ;
+            //frml _i x=2*y;
+            //frml _i z=2*x;
+
+
+            //   (a)   (b)    (c)
+            //-------------------------
+            //0   0    13     3
+            //1   2    12     4
+            //2   3    11
+            //3   4    10
+            //4   5    9
+            //5   6    8
+            //6   7    7
+            //7   8    6
+            //8   9    5
+            //9   10
+            //10  11
+            //11  12
+            //12  13
+            //13  14
+            //14  15
+
+
+            //   (a1)  (b2)  (c2)       <m> = -12345
+            //------------------------------------------
+            //0   0    <m>   <m>        prologue
+            //1  <m>   <m>   <m>        exo
+            //2   1    <m>   <m>        prologue
+            //3   2    <m>    1
+            //4   3    <m>    0
+            //5   4     8    <m>
+            //6   5     7    <m>
+            //7   6     6    <m>
+            //8   7     5    <m>
+            //9   8     4    <m>
+            //10  9     3    <m>
+            //11  10    2    <m>
+            //12  11    1    <m>
+            //13  12    0    <m>
+            //14  13   <m>   <m>        epilogue
+            //15  14   <m>   <m>        epilogue
+
+
+            // sparseInfoLeftRightSeparated
+            //
+            //    before                after endo/exo of g and e.
+            //------------------------------------------------
+            //0     0                 0     0,1                   ++  added 1
+            //1     2,0               1     2,0
+            //2     3,4,2,5,6         2     3,4,2,1,6             ++  1 instead of 5
+            //3     4,3,4,5           3     4,3,4                 ++  removed 5
+            //4     5,6,4,3           4     1,1,6,4,3             ++  1's instead of 5
+            //5     6,7               5     6,7
+            //6     7,8               6     7,8
+            //7     8,9               7     8,9
+            //8     9,10              8     9,10
+            //9     10,11             9     10,11
+            //10    11,12             10    11,12
+            //11    12,13             11    12,13
+            //12    13,4              12    13,4
+            //13    14,3              13    14,3
+            //14    15,14             14    15,14
+
+            //endogenized exo variable "g" (1):
+            //add the number at rhs in equations where it is found at rhs
+            //exogenized endo variable "e" (5):
+            //remove where it is found at   rhs
+            //at eq where it is at lhs: put in endogenized instead at lhs AND at rhs
+
+            DateTime t0 = DateTime.Now;
+
+            foreach (string endo in Program.model.modelGekko.m2.endoSubstitution.Keys)
+            {
+                //slack: iterate KeyValuePair<> instead
+                string exo = Program.model.modelGekko.m2.endoSubstitution[endo];
+                int exoBtype = Program.model.modelGekko.varsBType[exo + Globals.lagIndicator + "0"].bNumber;
+                int endoBtype = Program.model.modelGekko.varsBType[endo + Globals.lagIndicator + "0"].bNumber;
+                ArrayList eqsRhsExo = FindEqsWithVarOnRightHandSide(exo);
+                ArrayList eqsRhsEndo = FindEqsWithVarOnRightHandSide(endo);
+                int eqLhsEndo = FindEqWithVarOnLeftHandSide(endo);
+                //for each equation with exo var on rhs
+                foreach (int eq in eqsRhsExo)
+                {
+                    //EquationHelper eh = (EquationHelper)equations[eq];
+                    //eh.rhs.Add(exoBtype, "");
+                    List<int> al = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eq];
+                    for (int i = 1; i < al.Count; i++)
+                    {
+                        int number = al[i];
+                        if (number == exoBtype) G.Writeln2("*** ERROR #32108743");
+                    }
+                    al.Add(exoBtype);
+                }
+
+                foreach (int eq in eqsRhsEndo)
+                {
+                    List<int> al = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eq];
+                    int toRemoveI = -12345;
+                    for (int i = 1; i < al.Count; i++)
+                    {
+                        int number = al[i];
+                        if (number == endoBtype)
+                        {
+                            toRemoveI = i;
+                        }
+                    }
+                    al.RemoveAt(toRemoveI);
+                }
+                List<int> al1 = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eqLhsEndo];
+                al1[0] = exoBtype;
+                al1.Add(exoBtype);
+                //G.Writeln(exo + " " + endo + " " + eqsRhsEndo.ToString() + " " + eqsRhsExo.ToString() + eqLhsEndo);
+            }
+
+            Program.model.modelGekko.m2.sparseInfoSmart = new List<List<int>>();
+            Program.model.modelGekko.m2.sparseInfoSmartCondensed = new List<List<int>>();  //creates an identical copy here
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
+            {
+                Program.model.modelGekko.m2.sparseInfoSmart.Add(null);
+                Program.model.modelGekko.m2.sparseInfoSmartCondensed.Add(null);
+            }
+            for (int i = 0; i < Program.model.modelGekko.m2.sparseInfoLeftRightSeparated.Length; i++)
+            {
+                bool first = true;
+                List<int> vars = Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[i];
+                foreach (int var in vars)
+                {
+                    if (first == true)
+                    {
+                        //first index is left side
+                        Program.model.modelGekko.m2.sparseInfoSmart[vars[0]] = new List<int>();
+                        Program.model.modelGekko.m2.sparseInfoSmartCondensed[vars[0]] = new List<int>();
+                        first = false;
+                        continue;
+                    }
+                    Program.model.modelGekko.m2.sparseInfoSmart[vars[0]].Add(var);
+                    Program.model.modelGekko.m2.sparseInfoSmartCondensed[vars[0]].Add(var);
+                }
+            }
+
+
+            //=================================
+            //=================================
+            //======== Ordering start =========
+            //=================================
+            //=================================
+
+
+            List<List<int>> rowsIndexes = new List<List<int>>();
+            List<List<int>> columnsIndexes = new List<List<int>>();
+            for (int i = 0; i < Program.model.modelGekko.m2.endogenous.Count; i++)
+            {
+                rowsIndexes.Add(new List<int>());
+                columnsIndexes.Add(new List<int>());
+            }
+
+            List<List<int>> rowsIndexes2 = new List<List<int>>();
+            List<List<int>> columnsIndexes2 = new List<List<int>>();
+            for (int i = 0; i < Program.model.modelGekko.m2.endogenous.Count; i++)
+            {
+                rowsIndexes2.Add(new List<int>());
+                columnsIndexes2.Add(new List<int>());
+            }
+
+            //sparseInfoLeftRightSeparated has lhs at [0], content is b[]-type numbers
+            foreach (List<int> al2 in Program.model.modelGekko.m2.sparseInfoLeftRightSeparated)
+            {
+                bool shouldAddOnRightHandSide = false;
+                int lhs2 = al2[0];
+
+                if (Program.model.modelGekko.m2.endoSubstitutionBNumbers.ContainsKey(lhs2))
+                {
+                    shouldAddOnRightHandSide = true;
+                    lhs2 = Program.model.modelGekko.m2.endoSubstitutionBNumbers[lhs2];
+                    for (int i = 1; i < al2.Count; i++)
+                    {
+                        if (al2[i] == lhs2) shouldAddOnRightHandSide = false;
+                    }
+                }
+
+                int lhs = Program.model.modelGekko.m2.fromBNumberToEqNumber[lhs2];
+                for (int i = 1; i < al2.Count; i++)
+                {
+                    int rhsi2 = al2[i];
+                    int rhsi = Program.model.modelGekko.m2.fromBNumberToEqNumber[rhsi2];
+                    PutIntoIndidenceMatrix(rowsIndexes, columnsIndexes, rowsIndexes2, columnsIndexes2, lhs, rhsi);
+                }
+                if (shouldAddOnRightHandSide == true)
+                {
+                    PutIntoIndidenceMatrix(rowsIndexes, columnsIndexes, rowsIndexes2, columnsIndexes2, lhs, lhs);
+                }
+            }
+
+            Program.model.modelGekko.m2.prologue = new List<int>();
+            Program.model.modelGekko.m2.epilogue = new List<int>();
+            Program.model.modelGekko.m2.simulRecursive = new List<int>();
+            Program.model.modelGekko.m2.simulFeedback = new List<int>();
+
+            List<int> simulRecursive = new List<int>();
+            List<int> simulEpi = new List<int>();
+
+            FindRecursive(rowsIndexes, columnsIndexes, Program.model.modelGekko.m2.prologue);
+            FindRecursive(columnsIndexes, rowsIndexes, Program.model.modelGekko.m2.epilogue);  //note: should be reversed, see next statement
+            Program.model.modelGekko.m2.epilogue.Reverse();
+
+            int orderingIterations = 0;
+            for (int i6 = 0; i6 < int.MaxValue; i6++)
+            {
+                FindDiagonal(rowsIndexes, columnsIndexes, Program.model.modelGekko.m2.simulFeedback);
+                if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer)) FindRecursive(rowsIndexes, columnsIndexes, simulRecursive);
+
+                //this one is good:
+                //These are simple equations with 1 var on right-hand side
+                if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer)) FindRowsWithSum1(rowsIndexes, columnsIndexes, simulRecursive);
+
+
+                //this one is bad:
+                //These equations may have many right-hand vars, but impact is only in one other equation
+                if (1 == 0)
+                {
+                    FindColsWithSum1(rowsIndexes, columnsIndexes, simulRecursive);
+                }
+
+                Heuristic(rowsIndexes, columnsIndexes, Program.model.modelGekko.m2.simulFeedback);
+
+                bool flag = false;
+                for (int i = 0; i < columnsIndexes.Count; i++)
+                {
+                    if (columnsIndexes[i] != null)
+                    {
+                        flag = true;
+                        orderingIterations = i6;
+                        break;
+                    }
+                }
+                if (!flag) break;
+            }
+
+            if (!(Globals.solveNewtonOnlyFeedback && Globals.runningOnTTComputer))
+            {
+                Program.model.modelGekko.m2.simulFeedback.Sort();  //easier comparable to gauss-seidel inner loop
+            }
+
+            //A little bit cheating, since these numbers will always relate to the last .m2 model
+            //But never mind, typically only shown for non-fixed model
+            Program.model.modelGekko.modelInfo.endo3 = Program.model.modelGekko.m2.prologue.Count + Program.model.modelGekko.m2.simulFeedback.Count + simulRecursive.Count + Program.model.modelGekko.m2.epilogue.Count;
+            Program.model.modelGekko.modelInfo.prologue = Program.model.modelGekko.m2.prologue.Count;
+            Program.model.modelGekko.modelInfo.simultaneous = Program.model.modelGekko.m2.simulFeedback.Count + simulRecursive.Count;
+            Program.model.modelGekko.modelInfo.simultaneousFeedback = Program.model.modelGekko.m2.simulFeedback.Count;
+            Program.model.modelGekko.modelInfo.simultaneousRecursive = simulRecursive.Count;
+            Program.model.modelGekko.modelInfo.epilogue = Program.model.modelGekko.m2.epilogue.Count;
+
+            for (int i = 0; i < rowsIndexes2.Count; i++)
+            {
+                if (!simulRecursive.Contains(i))
+                {
+                    DeleteRowAndColumn(rowsIndexes2, columnsIndexes2, i);
+                }
+            }
+
+            FindRecursive(rowsIndexes2, columnsIndexes2, Program.model.modelGekko.m2.simulRecursive);
+            FindRecursive(columnsIndexes2, rowsIndexes2, simulEpi);  //this one is empty and should be!! Good test also.
+
+            if (!(simulEpi.Count == 0))
+            {
+                G.Writeln2("*** ERROR in feedback/recursive");
+            }
+
+            //=================================
+            //=================================
+            //======== Ordering end ===========
+            //=================================
+            //=================================
+
+
+
+            simulRecursive = null;  //the ordering is not correct in simulRecursive: we use simulPrologue instead below.
+            //at the moment, this is not strictly necessary, but still give a nicer ordering
+            //and a good check
+
+            WriteOrderingInfoToFile(rowsIndexes);
+
+            Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW = new List<int>();
+            foreach (int eq in Program.model.modelGekko.m2.simulRecursive)
+            {
+                Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW.Add(Program.model.modelGekko.m2.fromEqNumberToBNumber[eq]);
+            }
+            Program.model.modelGekko.m2.fromBNumberToEqNumberRecursiveNEW = G.CreateArray(Program.model.modelGekko.varsBType.Count, -12345);
+            for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW.Count; i++)
+            {
+                int j = (int)Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW[i];
+                Program.model.modelGekko.m2.fromBNumberToEqNumberRecursiveNEW[j] = i;
+            }
+            Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW = new int[Program.model.modelGekko.m2.simulFeedback.Count];
+            int i1 = -1;
+            foreach (int eq in Program.model.modelGekko.m2.simulFeedback)
+            {
+                i1++;
+                Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[i1] = Program.model.modelGekko.m2.fromEqNumberToBNumber[eq];
+            }
+
+            try
+            {
+                //TODO: This is a hack, but probably rare with > 1.000.000 b-elements
+                Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW = G.CreateArray(1000000, -12345);  //slack
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: Array size problem in MODEL command");
+                throw new GekkoException();
+            }
+
+            for (int i = 0; i < Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW.Length; i++)
+            {
+                int j = Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW[i];
+                Program.model.modelGekko.m2.fromBNumberToEqNumberFeedbackNEW[j] = i;
+            }
+
+            //at this point in feedb2.frm:
+            //===================================
+            //simulRecursive = 12,11,10,9,8,7,6,5,4
+            //simulFeedback = 3,2
+            //fromEqNumberToBNumberRecursiveNEW = 13,12,11,10,9,8,7,6,5
+            //fromEqNumberToBNumberFeedbackNEW = 4,3
+            //===================================
+            //equations 0,1 and 13,14 are prologue and epilogue
+
+            //            sparseInfoSmart
+            //fy    0	1,2,3,4
+            //fy.1  1	null (!endonolag)
+            //tg    2	null
+            //fi    3	0,3,4
+            //fe    4
+
+            //fy = fy.1 + tg + fi + fe
+            //fi = fy + fi + fe
+
+            //sæt fy exo og tg endo: ( 0 og 2 skifter plads)
+
+            //tg = fy – (fy.1 + fi + fe)
+            //fi = fy + tg + fi + fe
+
+            //tg    0	1,2,3,4
+            //fy.1  1	null (!endonolag)
+            //fy    2	null
+            //fi    3	2,3,4
+            //fe    4
+
+            Dictionary<int, string> fromEqNumberToBNumberRecursiveHelper = new Dictionary<int, string>();
+            foreach (int i in Program.model.modelGekko.m2.fromEqNumberToBNumberRecursiveNEW) fromEqNumberToBNumberRecursiveHelper.Add(i, null);
+
+            //transposing matrix
+            //never relevant for goals search, since means are feedback type.
+            Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed = new List<List<int>>();
+            for (int i = 0; i < Program.model.modelGekko.m2.sparseInfoSmartCondensed.Count; i++)
+            {
+                Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed.Add(null);
+                if (Program.model.modelGekko.m2.sparseInfoSmartCondensed[i] != null)
+                {
+                    Program.model.modelGekko.m2.sparseInfoSmartCondensedTransposed[i] = new List<int>();
+                }
+            }
+
+            //never relevant for goals search, since means are feedback type.
+            Program.model.modelGekko.m2.sparseInfoSmartTransposed = new List<List<int>>();
+            for (int i = 0; i < Program.model.modelGekko.m2.sparseInfoSmart.Count; i++)
+            {
+                Program.model.modelGekko.m2.sparseInfoSmartTransposed.Add(null);
+                if (Program.model.modelGekko.m2.sparseInfoSmart[i] != null)
+                {
+                    Program.model.modelGekko.m2.sparseInfoSmartTransposed[i] = new List<int>();
+                }
+            }
+
+            //never relevant for goals search, since means are feedback type.
+            for (int i = 0; i < Program.model.modelGekko.varsBType.Count; i++)
+            {
+                if (Program.model.modelGekko.m2.sparseInfoSmart[i] != null)
+                {
+                    List<int> row = Program.model.modelGekko.m2.sparseInfoSmart[i];
+                    foreach (int j in row)
+                    {
+                        if (!(Program.model.modelGekko.m2.sparseInfoSmartTransposed[j]).Contains(i))
+                        {
+                            //if (fromEqNumberToBNumberFeedbackNEW.Contains(i))
+                            if (Array.IndexOf(Program.model.modelGekko.m2.fromEqNumberToBNumberFeedbackNEW, i) != -1)
+                            {
+                                //this is an extra condition, implying that we only get
+                                //FR-type array for all the last n columns
+                                //the transposed version is not identical to non-transposed
+                                (Program.model.modelGekko.m2.sparseInfoSmartTransposed[j]).Add(i);
+                            }
+                        }
+                    }
+                }
+            }
+
+            //       feedb    recurs
+            // -------------|----------
+            // feedb   FF1  |  FR1
+            //        ------|------
+            // recur   RF1  |  RR1
+            //--------------|----------
+            //
+            //
+        }
+
     }
 
 
