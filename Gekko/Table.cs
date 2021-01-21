@@ -27,6 +27,7 @@ using System.IO;
 using System.Globalization;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Windows.Forms;
 
 namespace Gekko
 {
@@ -2828,6 +2829,124 @@ namespace Gekko
 
             return x;
         }
+
+        public static void ConvertMenu2()
+        {
+            string folder = "";
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = Program.options.folder_working;
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                folder = fbd.SelectedPath;
+            }
+            if (folder != "")
+            {
+                string outputPath = Globals.localTempFilesLocation + "\\" + "menufilesconversion";
+                Program.DeleteFolder(outputPath);
+                Directory.CreateDirectory(outputPath);
+
+                Globals.convertMenuCounter = 0;
+                Globals.convertMenuErrorCounter = 0;
+
+                G.Writeln("Starting conversion of menus...");
+
+                ConvertMenu(0, folder, folder, outputPath);
+
+                bool ok = true;
+                try
+                {
+                    string stylesFile = Application.StartupPath + "\\images\\" + "styles.css";
+                    string tableIconFile = Application.StartupPath + "\\images\\" + "table.png";
+                    Program.WaitForFileCopy(stylesFile, outputPath + "\\styles.css");
+                    Program.WaitForFileCopy(tableIconFile, outputPath + "\\table.png");
+                }
+                catch (Exception e)
+                {
+                    ok = false;
+                    G.Writeln2("*** ERROR: Problem with style-sheets, may impact the menus (files styles.css and table.png)");
+                }
+
+                G.Writeln();
+                G.Write("Zipping converted files... ");
+                string zipFileNameInput = Program.CreateFullPathAndFileName(Program.options.folder_working + "\\converted_menus.zip");
+                Program.WaitForZipWrite(outputPath, zipFileNameInput);
+                G.Writeln("... ended");
+                G.Writeln();
+                G.Writeln("Converted " + Globals.convertMenuCounter + " menus from folder: " + folder);
+                G.Writeln("There were " + Globals.convertMenuErrorCounter + " error messages.");
+                G.Writeln("See the file converted_menus.zip in the working folder.");
+                if (ok)
+                {
+                    G.Writeln("Note the two files styles.css and table.png in the root of the zip file: these");
+                    G.Writeln("two files are used to style the menus, without them the menus will look ugly!");
+                }
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: please choose a folder");
+            }
+        }
+
+        public static void ConvertMenu(int depth, string start, string folder, string outputPath)
+        {
+            foreach (string file in Directory.GetFiles(folder))
+            {
+                if (file.ToLower().EndsWith(".cmd"))
+                {
+                    //G.Writeln("table file: " + file);
+                    string extra = file.Replace(start, "");
+
+                    StringBuilder x = new StringBuilder();
+
+                    try
+                    {
+                        x = TableStuff.ConvertPcimMenu(depth, file);
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln();
+                        G.Writeln("Conversion failed completely: " + file);
+                        G.Writeln();
+                        x = null;
+                    }
+
+                    if (x != null)
+                    {
+                        Globals.convertMenuCounter++;
+                        string newfile = outputPath + extra;
+                        if (newfile.ToLower().EndsWith(".cmd"))
+                        {
+                            newfile = newfile.Substring(0, newfile.Length - 4);
+                            newfile = newfile + ".html";
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Converting menus: file name: " + newfile);
+                        }
+                        string path = Path.GetDirectoryName(newfile);
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
+
+                        using (FileStream fs = Program.WaitForFileStream(newfile, Program.GekkoFileReadOrWrite.Write))
+                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                        {
+                            sw.Write(x);
+                            sw.Flush();
+                        }
+                    }
+                }
+            }
+            if (true)  //we allow converting subfolders
+            {
+                foreach (string subDir in Directory.GetDirectories(folder))
+                {
+                    ConvertMenu(depth + 1, start, subDir, outputPath);
+                }
+            }
+        }
+
 
 
 

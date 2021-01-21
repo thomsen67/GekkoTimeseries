@@ -2518,7 +2518,7 @@ namespace Gekko
             DialogResult myDialogResult = MessageBox.Show(s.ToString(), "Convert PCIM menus", MessageBoxButtons.OKCancel);
             if (myDialogResult == DialogResult.OK)
             {
-                Program.ConvertMenu2();
+                TableStuff.ConvertMenu2();
             }
         }
 
