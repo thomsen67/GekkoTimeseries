@@ -2099,6 +2099,31 @@ namespace Gekko
             CrossThreadStuff.Cls(tab);
         }
 
+        public static void CreateNewTable(string name)
+        {
+            if (Program.tables.ContainsKey(name))
+            {
+                Program.tables.Remove(name);
+            }
+            Gekko.Table temp = new Gekko.Table();
+            temp.type = "table"; //not a "print" type table -- relevant regarding formatting
+            Program.tables.Add(name, temp);
+        }
+
+
+        public static Gekko.Table GetTable(string name)
+        {
+            Gekko.Table xx = null;
+            if (Program.tables.TryGetValue(name, out xx))
+            {
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Table '" + name + "' does not seem to exist");
+            }
+            return xx;
+        }
+
         public static void AdjustFreq()
         {
             //hash #980432
@@ -10153,7 +10178,7 @@ namespace Gekko
                 public List<Prt.Element> prtElements = new List<Prt.Element>();
                 public void Exe() {
                     G.CheckLegalPeriod(this.t1, this.t2);
-                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.operator2, this.scale, this.format);
+                    O.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.operator2, this.scale, this.format);
                 }
             }
         }

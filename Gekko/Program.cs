@@ -31282,29 +31282,8 @@ namespace Gekko
             return ht.Contains(endo);
         }
 
-        public static void CreateNewTable(string name)
-        {
-            if (Program.tables.ContainsKey(name))
-            {
-                Program.tables.Remove(name);
-            }
-            Table temp = new Table();
-            temp.type = "table"; //not a "print" type table -- relevant regarding formatting
-            Program.tables.Add(name, temp);
-        }
+        
 
-        public static Table GetTable(string name)
-        {
-            Table xx = null;
-            if (Program.tables.TryGetValue(name, out xx))
-            {
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Table '" + name + "' does not seem to exist");
-            }
-            return xx;
-        }
 
         public static string Add1ToFileName(string input, string inputLast, string workingFolder)
         {

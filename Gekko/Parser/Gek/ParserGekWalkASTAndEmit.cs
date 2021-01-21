@@ -4072,23 +4072,23 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTNEWTABLE":
                         {
-                            node.Code.A("Program.CreateNewTable(O.ConvertToString(" + node[0].Code + "));" + G.NL);
+                            node.Code.A("O.CreateNewTable(O.ConvertToString(" + node[0].Code + "));" + G.NL);
                         }
                         break;
                     case "ASTTABLENEXT":
                         {
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Next();");
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Next();");
                         }
                         break;
                     case "ASTTABLEPRINT":
                         {
                             if (node.ChildrenCount() > 1)
                             {
-                                node.Code.A("Program.PrintTable(Program.GetTable(O.ConvertToString(" + node[0].Code + ")), O.ConvertToString(" + node[1].Code + "));" + G.NL);
+                                node.Code.A("Program.PrintTable(O.GetTable(O.ConvertToString(" + node[0].Code + ")), O.ConvertToString(" + node[1].Code + "));" + G.NL);
                             }
                             else
                             {
-                                node.Code.A("Program.PrintTable(Program.GetTable(O.ConvertToString(" + node[0].Code + ")), null);" + G.NL);
+                                node.Code.A("Program.PrintTable(O.GetTable(O.ConvertToString(" + node[0].Code + ")), null);" + G.NL);
                             }
                         }
                         break;
@@ -4121,7 +4121,7 @@ namespace Gekko.Parser.Gek
                             //CheckCurrow(node.GetChild(1).Text);                            
                             string ss = "Top";
                             if (node.Text == "ASTTABLESETBOTTOMBORDER") ss = "Bottom";
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));" + G.NL);
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));" + G.NL);
                         }
                         break;
 
@@ -4137,11 +4137,11 @@ namespace Gekko.Parser.Gek
                             if (node.Text == "ASTTABLESETRIGHTBORDER") ss = "Right";
                             if (color)
                             {
-                                node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));" + G.NL);                               
+                                node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));" + G.NL);                               
                             }
                             else
                             {
-                                node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "));" + G.NL);                                                               
+                                node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "));" + G.NL);                                                               
                             }
                         }
                         break;
@@ -4151,18 +4151,18 @@ namespace Gekko.Parser.Gek
                         {                            
                             string ss = "Left";
                             if (node.Text == "ASTTABLEHIDERIGHTBORDER") ss = "Right";
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Hide" + ss + "Border(O.ConvertToInt(" + node[2].Code + "));" + G.NL);
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Hide" + ss + "Border(O.ConvertToInt(" + node[2].Code + "));" + G.NL);
                         }
                         break;
                     case "ASTTABLESHOWBORDERS":
                         {                            
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.ShowBorders();");
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.ShowBorders();");
                         }                        
                         break;
 
                     case "ASTTABLESETTEXT":
                         {
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetText(O.ConvertToInt(" + node[2].Code + "), O.ConvertToString(" + node[3].Code + "));");
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetText(O.ConvertToInt(" + node[2].Code + "), O.ConvertToString(" + node[3].Code + "));");
                         }
                         break;
 
@@ -4173,18 +4173,18 @@ namespace Gekko.Parser.Gek
                             string type = "Left";
                             if (node.Text == "ASTTABLEALIGNCENTER") type = "Center";
                             else if (node.Text == "ASTTABLEALIGNRIGHT") type = "Right";
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Align" + type + "(O.ConvertToInt(" + node[2].Code + "));");
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Align" + type + "(O.ConvertToInt(" + node[2].Code + "));");
                         }
                         break;
                     case "ASTTABLEMERGECOLS":
                         {
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.MergeCols(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));");
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.MergeCols(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));");
                         }
                         break;
 
                     case "ASTTABLESETDATES":
                         {                            
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetDates(O.ConvertToInt(" + node[2].Code + "), O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict), O.ConvertToDate(" + node[4].Code + ", O.GetDateChoices.Strict));");                            
+                            node.Code.A("O.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetDates(O.ConvertToInt(" + node[2].Code + "), O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict), O.ConvertToDate(" + node[4].Code + ", O.GetDateChoices.Strict));");                            
                         }
                         break;
 
