@@ -63,16 +63,7 @@ namespace Gekko.Parser.Gek
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
 
                 Assembly assembly = compilerResults.CompiledAssembly;
-
-                //if (Globals.runningOnTTComputer)
-                //{
-                //    List<Type> myTypes = assembly.GetTypes().ToList();
-                //    foreach (Type tt in myTypes)
-                //    {
-                //        MessageBox.Show(tt.FullName + "  " + tt.Name);
-                //    }
-                //}
-
+                
                 Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
                 tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method                     
 
@@ -85,9 +76,7 @@ namespace Gekko.Parser.Gek
                 //return;
             }
             finally
-            {
-                //always remove any _tmptmp-variables in banks if present
-                //G.Writeln("returned " + p.GetDepth() + " " + p.lastFileSentToANTLR);
+            {                
                 p.RemoveLast();
             }
 
@@ -272,16 +261,7 @@ namespace Gekko.Parser.Gek
                         q.Add(match.ToString());
                     string hit = null;
                     if (q.Count > 0)
-                    {
-                        //string line = G.ReplaceGlueNew(ch.commandsText);
-                        //for (int i = -20; i <= 20; i++)
-                        //{
-                        //    if (i == 0) continue;
-                        //    string s = null;
-                        //    if (i <= 0) s = G.StripQuoates(q[q.Count - 1]) + "(" + i + ")";
-                        //    else s = G.StripQuoates(q[q.Count - 1]) + "(+" + i + ")";
-                        //    if (line.Contains(s)) hit = s;
-                        //}
+                    {                        
                         //we use the last single quote match
                         G.Writeln("*** ERROR: The function " + q[q.Count - 1] + " does not seem to exist locally.", Color.Red);
                         G.Writeln("           You may use use FUNCTION to define a function in your gcm file.", Color.Red);

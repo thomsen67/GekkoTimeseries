@@ -146,7 +146,7 @@ namespace Gekko
         public TimeSeries_1_1(EFreq frequency, string variableName)
         {
             this.freqEnum = frequency;
-            this.frequency = G.GetFreq(frequency);
+            this.frequency = G.ConvertFreq(frequency);
             this.variableName = variableName;
         }
 
@@ -1238,7 +1238,7 @@ namespace Gekko
                             }
 
                             countdata = 0;
-                            freq = G.GetFreq(frequency);
+                            freq = G.ConvertFreq(frequency);
                             obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub), new GekkoTime(freq, d2, d2sub));
                             obsLeft = obs;
                             ts = null;

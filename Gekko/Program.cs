@@ -15,6 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program (see the file COPYING in the root folder).
     Else, see <http://www.gnu.org/licenses/>.
+
 */
 
 using System.Text.RegularExpressions;
@@ -292,7 +293,7 @@ namespace Gekko
                 if (ts == null)
                 {
                     //string s2 = G.Chop_AddFreq(s, "");
-                    ts = new Series(Program.options.freq, G.Chop_AddFreq("decomptemp", G.GetFreq(Program.options.freq)));
+                    ts = new Series(Program.options.freq, G.Chop_AddFreq("decomptemp", G.ConvertFreq(Program.options.freq)));
                     storage.Add(s, ts);
                 }
                 return ts;
@@ -1456,7 +1457,7 @@ namespace Gekko
             char delimiter = ';';
             if (G.Equal(Program.options.interface_csv_delimiter , "comma")) delimiter = ',';
                         
-            string freqHere = G.GetFreq(Program.options.freq);
+            string freqHere = G.ConvertFreq(Program.options.freq);
 
             string fullFileNameAndPath = CreateFullPathAndFileName(file);
 
@@ -2512,7 +2513,7 @@ namespace Gekko
 
                 if (Program.options.solve_data_create_auto == true)
                 {
-                    string freq = G.GetFreq(Program.options.freq);
+                    string freq = G.ConvertFreq(Program.options.freq);
 
                     if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))  //READ or READ<first>
                     {
@@ -3329,7 +3330,7 @@ namespace Gekko
                     //string ghostName = ss[0];
 
 
-                    string ghostName = ss[0] + Globals.freqIndicator + G.GetFreq(ts1.freqEnum);
+                    string ghostName = ss[0] + Globals.freqIndicator + G.ConvertFreq(ts1.freqEnum);
                     Series tsGhost = deserializedDatabank.GetIVariable(ghostName) as Series;
                     if (tsGhost == null)
                     {
@@ -3369,13 +3370,13 @@ namespace Gekko
 
                     if (ts1.IsTimeless())
                     {
-                        ts2 = new Series(ESeriesType.Timeless, ts1.freqEnum, name + Globals.freqIndicator + G.GetFreq(ts1.freqEnum));
+                        ts2 = new Series(ESeriesType.Timeless, ts1.freqEnum, name + Globals.freqIndicator + G.ConvertFreq(ts1.freqEnum));
                         ts2.SetTimelessData(double.NaN);
                         if (ts1.dataArray != null && ts1.dataArray.Length > 0) ts2.SetTimelessData(ts1.dataArray[0]);
                     }
                     else
                     {
-                        ts2 = new Series(ESeriesType.Normal, ts1.freqEnum, name + Globals.freqIndicator + G.GetFreq(ts1.freqEnum));
+                        ts2 = new Series(ESeriesType.Normal, ts1.freqEnum, name + Globals.freqIndicator + G.ConvertFreq(ts1.freqEnum));
 
                         GekkoTime t1 = ts1.GetRealDataPeriodFirst();
                         GekkoTime t2 = ts1.GetRealDataPeriodLast();
@@ -3786,7 +3787,7 @@ namespace Gekko
                                 }
 
                                 countdata = 0;
-                                freq = G.GetFreq(frequency);
+                                freq = G.ConvertFreq(frequency);
 
                                 obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub, d1subsub), new GekkoTime(freq, d2, d2sub, d2subsub));
 
@@ -4192,14 +4193,14 @@ namespace Gekko
                     string name = name1;
                     if (!G.Equal(name2, "null"))
                     {
-                        if (!G.Equal(name2, G.GetFreq(freq)))
+                        if (!G.Equal(name2, G.ConvertFreq(freq)))
                         {
                             //for instance quarterly x.sol (not x.q)
-                            G.Writeln2("+++ WARNING: Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.GetFreq(freq));
+                            G.Writeln2("+++ WARNING: Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
                             name += "_" + name2;
                         }
                     }
-                    name = name + Globals.freqIndicator + G.GetFreq(freq);
+                    name = name + Globals.freqIndicator + G.ConvertFreq(freq);
                     Series ts = new Series(freq, name);
                     if (databank.ContainsIVariable(name))
                     {
@@ -4956,7 +4957,7 @@ namespace Gekko
 
                 //put in the array-timeseries ghost
                 string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
-                Series tsGhost = new Series(G.GetFreq(freq), varNameWithFreq);
+                Series tsGhost = new Series(G.ConvertFreq(freq), varNameWithFreq);
                 tsGhost.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
                 //Databank databank = Program.databanks.GetFirst();
                 databank.AddIVariableWithOverwrite(tsGhost.name, tsGhost);
@@ -4966,7 +4967,7 @@ namespace Gekko
                 {
                     Series ts = null;
                     
-                    ts = new Series(ESeriesType.Normal, G.GetFreq(freq), Globals.seriesArraySubName + Globals.freqIndicator + freq);
+                    ts = new Series(ESeriesType.Normal, G.ConvertFreq(freq), Globals.seriesArraySubName + Globals.freqIndicator + freq);
 
                     ts.meta.label = valuesCombi[j];
                     ts.meta.source = source;
@@ -5027,7 +5028,7 @@ namespace Gekko
                     {
                         string name2 = codesCombi[j].Replace(Globals.pxInternalDelimiter, '_');
                         string name3 = G.Chop_AddFreq(name2, freq);
-                        ts = new Series(G.GetFreq(freq), name3);
+                        ts = new Series(G.ConvertFreq(freq), name3);
                         ts.meta.label = valuesCombi[j];
                         ts.meta.source = source;
                         ts.meta.stamp = Globals.dateStamp;
@@ -5305,13 +5306,13 @@ namespace Gekko
             }
             else if (ts.freq == EFreq.Q || ts.freq == EFreq.M)
             {
-                freq = G.GetFreq(ts.freq).ToUpper();
+                freq = G.ConvertFreq(ts.freq).ToUpper();
                 sub1 = per1.sub.ToString("D2") + "01";
                 sub2 = per2.sub.ToString("D2") + "01";
             }
             else if (ts.freq == EFreq.D)
             {
-                freq = G.GetFreq(ts.freq).ToUpper();
+                freq = G.ConvertFreq(ts.freq).ToUpper();
                 sub1 = per1.sub.ToString("D2") + per1.subsub.ToString("D2");
                 sub2 = per2.sub.ToString("D2") + per2.subsub.ToString("D2");
             }
@@ -8555,7 +8556,7 @@ namespace Gekko
                         }
                         else
                         {
-                            yDatabank = (databank.GetIVariable(leftSideVariable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t);
+                            yDatabank = (databank.GetIVariable(leftSideVariable + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t);
                         }
 
                         foreach (string variableWithLag in p2)
@@ -8564,9 +8565,9 @@ namespace Gekko
                             int lag = -12345;
                             G.ExtractVariableAndLag(variableWithLag, out variable, out lag);
 
-                            double before = (databank.GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(lag));
+                            double before = (databank.GetIVariable(variable + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(lag));
                             double after = before + delta;
-                            (databank.GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).SetData(t.Add(lag), after);
+                            (databank.GetIVariable(variable + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).SetData(t.Add(lag), after);
                             double y1 = double.NaN;
                             try
                             {
@@ -8575,7 +8576,7 @@ namespace Gekko
                             finally
                             {
                                 //to make 100% sure it is always reset
-                                (databank.GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).SetData(t.Add(lag), before);
+                                (databank.GetIVariable(variable + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).SetData(t.Add(lag), before);
                             }
 
                             DecompHelper dh = new DecompHelper();
@@ -10810,7 +10811,7 @@ namespace Gekko
             else if (G.Equal(o.opt_method, "last")) emethod = ECollapseMethod.Last;
             else if (G.Equal(o.opt_method, "count")) emethod = ECollapseMethod.Count;
 
-            EFreq freq = G.GetFreq(o.opt_collapse);
+            EFreq freq = G.ConvertFreq(o.opt_collapse);
 
             bool isTranspose = false;
             if (G.Equal(o.opt_cols, "yes")) isTranspose = true;
@@ -10893,7 +10894,7 @@ namespace Gekko
 
             for (int i = i_data; i <= matrix.GetRowMaxNumber(); i++)
             {
-                string varnameWithFreq = G.Chop_AddFreq(nameList[i - i_data], G.GetFreq(freq));
+                string varnameWithFreq = G.Chop_AddFreq(nameList[i - i_data], G.ConvertFreq(freq));
                 Series ts = new Series(freq, varnameWithFreq);
                 Series counter = new Series(freq, null);  //will be discared afterwards but practical here
                 for (int j = j_data; j <= matrix.GetColMaxNumber(); j++)
@@ -12001,9 +12002,7 @@ namespace Gekko
                             }
                         }
 
-                        G.Write(gt.ToString() + " ");
-                        //if (Program.options.freq == EFreq.A) G.Write((gt.super) + " ");
-                        //else G.Write(gt.super + G.GetFreq(ts.freq) + gt.sub + " ");
+                        G.Write(gt.ToString() + " ");                        
 
                         double n1 = ts.GetDataSimple(gt);
                         double n0 = ts.GetDataSimple(gt.Add(-1));
@@ -12154,7 +12153,7 @@ namespace Gekko
                     {
                         if (useDatabank)
                         {
-                            string varnameWithFreq = token.s + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                            string varnameWithFreq = token.s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq);
                             if (Program.databanks.GetFirst().ContainsIVariable(varnameWithFreq))
                             {
                                 if (!knownVars.ContainsKey(token.s)) knownVars.Add(token.s, null);
@@ -12448,7 +12447,7 @@ namespace Gekko
                 if (iv_series != null)
                 {
                     //replaces the name, keeps freq. For instance, 
-                    iv_series.name = G.Chop_GetName(output.s2) + Globals.freqIndicator + G.GetFreq(iv_series.freq);
+                    iv_series.name = G.Chop_GetName(output.s2) + Globals.freqIndicator + G.ConvertFreq(iv_series.freq);
                 }
                 O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
             }
@@ -12708,7 +12707,7 @@ namespace Gekko
 
             string currentFirstBankName = Program.databanks.GetFirst().name;
             string currentRefBankName = Program.databanks.GetRef().name;
-            string currentFreq = G.GetFreq(Program.options.freq);
+            string currentFreq = G.ConvertFreq(Program.options.freq);
 
             string command = "COPY";
             string command2 = "copy";
@@ -13250,7 +13249,7 @@ namespace Gekko
                 string name3a = wildcardName;
                 if (wildcardFreq == null)
                 {
-                    if (!G.Chop_HasSigil(wildcardName)) name3a += Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                    if (!G.Chop_HasSigil(wildcardName)) name3a += Globals.freqIndicator + G.ConvertFreq(Program.options.freq);
                 }
                 else
                 {
@@ -13277,7 +13276,7 @@ namespace Gekko
                 G.Writeln2("Frequency '!*' not supported for ranges ('..')");
                 throw new GekkoException();
             }
-            if (wildcardFreq == null) wildcardFreq = G.GetFreq(Program.options.freq);
+            if (wildcardFreq == null) wildcardFreq = G.ConvertFreq(Program.options.freq);
             
             //For each matching databank
             List<string> varsMatched = new List<string>();
@@ -14354,7 +14353,7 @@ namespace Gekko
                 int c = 0;
                 foreach (string s in onlyDatabankNotModel)
                 {
-                    string ss = s + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                    string ss = s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq);
                     if (bank.ContainsIVariable(ss))
                     {
                         bank.RemoveIVariable(ss);
@@ -15535,7 +15534,7 @@ namespace Gekko
 
         private static void CreateXxVariableOrIssueError(Databank work, string var)
         {
-            if (!work.ContainsIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!work.ContainsIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (var.ToLower().StartsWith("xx", true, null))
                 {
@@ -15652,7 +15651,7 @@ namespace Gekko
 
                     foreach (ToFrom two in list)
                     {
-                        if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))  //.s2 is probably not used here
+                        if (G.Equal(G.ConvertFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))  //.s2 is probably not used here
                         {
                             //good
                             if (listFilteredForCurrentFreq == null) listFilteredForCurrentFreq = new List<ToFrom>();
@@ -16145,15 +16144,8 @@ namespace Gekko
                         //IVariable xx = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
 
                         IVariable xx = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
-
-                        //string varnameWithFreq = var.name;
+                                                
                         string varnameWithFreq = G.Chop_GetNameAndFreq(var.s2);
-                        //if (xx.Type() == EVariableType.Series)
-                        //{
-                        //    //string freq = var.freq;
-                        //    //if (freq == null) freq = G.GetFreq(Program.options.freq);
-                        //    varnameWithFreq = var.name + Globals.freqIndicator + var.freq;
-                        //}
 
                         if (databankWithFewerVariables.ContainsKey(varnameWithFreq))
                         {
@@ -16432,7 +16424,7 @@ namespace Gekko
                 bool ok = true;
                 foreach (string s in Program.model.modelGekko.endogenousOriginallyInModel.Keys)
                 {
-                    if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+                    if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
                     {
                         ok = false;
                         break;
@@ -18045,7 +18037,7 @@ namespace Gekko
         public static double Level(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18056,13 +18048,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t);  //#getvar
+            return (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t);  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulLevel(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18073,7 +18065,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18084,7 +18076,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            return (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t);  //#getvar
+            return (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t);  //#getvar
         }
         public static void RevertSmpl(GekkoSmpl2 smplRemember, GekkoSmpl smpl)
         {
@@ -18099,7 +18091,7 @@ namespace Gekko
         public static double Pch(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18110,13 +18102,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return ((db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t) / (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
+            return ((db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) / (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulPch(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18127,7 +18119,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18138,8 +18130,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double pch_base = ((Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t) / (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
-            double pch_work = ((Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t) / (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
+            double pch_base = ((Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) / (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
+            double pch_work = ((Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) / (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
             return pch_work - pch_base;
         }
 
@@ -18183,7 +18175,7 @@ namespace Gekko
         public static double Dif(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18194,13 +18186,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t) - (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1));  //#getvar
+            return (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) - (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1));  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulDif(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18211,7 +18203,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -18222,8 +18214,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double dif_base = (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)); //#getvar
-            double dif_work = (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)); //#getvar
+            double dif_base = (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)); //#getvar
+            double dif_work = (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)); //#getvar
             return dif_work - dif_base;
         }
 
@@ -18625,20 +18617,7 @@ namespace Gekko
                 G.ServiceMessage("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
             }
             return;
-        }
-
-        private static void GetFreq(string ss1, out string name1, out EFreq eFreq1)
-        {
-            List<string> s1 = new List<string>(ss1.Split('.'));            
-            name1 = s1[0];
-            string extension1 = "";
-            if (s1.Count == 2) extension1 = s1[1];
-            if (extension1 == "")
-            {
-                extension1 = G.GetFreq(Program.options.freq);
-            }
-            eFreq1 = G.GetFreq(extension1);
-        }
+        }        
 
         private static Databank GetDatabank(string b1)
         {
@@ -26970,7 +26949,7 @@ namespace Gekko
             foreach (string s in Program.model.modelGekko.varsAType.Keys)
             {
                 if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+                if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
                 {
                 }
                 else
@@ -26990,7 +26969,7 @@ namespace Gekko
 
             foreach (string s in varlist.Keys)
             {
-                if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+                if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
                 {
                 }
                 else
@@ -27155,7 +27134,7 @@ namespace Gekko
             {
                 foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
                 {
-                    double value = (work.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetDataSimple(t);
+                    double value = (work.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t);
                     if (G.isNumericalError(value))
                     {
                         varsWithMissingValues.Add(s);
@@ -27979,7 +27958,7 @@ namespace Gekko
 
         private static string MaybeRemoveFreq(string s1, bool removeCurrentFreqFromNames)
         {            
-            if (removeCurrentFreqFromNames) return G.Chop_RemoveFreq(s1, G.GetFreq(Program.options.freq));
+            if (removeCurrentFreqFromNames) return G.Chop_RemoveFreq(s1, G.ConvertFreq(Program.options.freq));
             else return s1;
         }
 
@@ -28201,7 +28180,7 @@ namespace Gekko
             Dictionary<string, string> precedents = eh.precedentsWithLagIndicator;
             string period = t.ToString();
 
-            Series tsls = Program.databanks.GetFirst().GetIVariable(lhs + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //#getvar
+            Series tsls = Program.databanks.GetFirst().GetIVariable(lhs + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series;  //#getvar
 
             if (tsls == null)
             {
@@ -28237,7 +28216,7 @@ namespace Gekko
                     var2 = variable;
                 }
                 G.Write(var2 + G.Blanks(14 - var2.Length));
-                Series ts = Program.databanks.GetFirst().GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;
+                Series ts = Program.databanks.GetFirst().GetIVariable(variable + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series;
 
                 if (variable == null)
                 {
@@ -28266,7 +28245,7 @@ namespace Gekko
 
         public static string AddFreqAtEndOfVariableName(string var, string freq)
         {
-            return AddFreqAtEndOfVariableName(var, G.GetFreq(freq));
+            return AddFreqAtEndOfVariableName(var, G.ConvertFreq(freq));
         }
 
         public static string AddFreqAtEndOfVariableName(string var, EFreq freq)

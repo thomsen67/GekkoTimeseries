@@ -971,7 +971,7 @@ namespace Gekko
                 }
                 varNamePointers[value.bNumber] = value.variable;
                 //TODO: should make a check here that all slots are filled in from b[min] to b[max]
-                Series ts = work.GetIVariable(value.variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //may be null
+                Series ts = work.GetIVariable(value.variable + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series;  //may be null
                 timeSeriesPointers[value.bNumber] = ts;
                 lagPointers[value.bNumber] = value.lag;
                 aNumberPointers[value.bNumber] = value.aNumber;
@@ -1681,7 +1681,7 @@ namespace Gekko
                 int index1 = -12345;
                 int index2 = -12345;
                 double[] x_beware_do_not_change = null;
-                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //Could have an A-array with Series...
+                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series;  //Could have an A-array with Series...
                 if (ts == null)
                 {
                     if (SolveCommon.IsDjz(var))
@@ -1757,7 +1757,7 @@ namespace Gekko
                         val = 0d;  //DJZ set to 0 --> will end up in b[]
                                    //J-factor or D or Z variable
                                    //see also #7235432894539
-                        Series tsNew = new Series(Program.options.freq, variable + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+                        Series tsNew = new Series(Program.options.freq, variable + Globals.freqIndicator + G.ConvertFreq(Program.options.freq));
                         work.AddIVariable(tsNew.name, tsNew);
                         timeSeriesPointers[i] = tsNew;
                         extraWritebackPointers[i] = 1;  //to make sure it gets written back from b[] to a[,] array
@@ -1866,14 +1866,14 @@ namespace Gekko
             {
                 string var = atd.varName;
                 int id = atd.aNumber;
-                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //Could have an A-array with Series...
+                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series;  //Could have an A-array with Series...
 
                 if (ts == null && SolveCommon.IsDjz(var))
                 {
                     //can be autocreated, this probably will never happen, since it is already created,
                     //see #7235432894539
-                    ts = new Series(Program.options.freq, var + Globals.freqIndicator + G.GetFreq(Program.options.freq));
-                    work.AddIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq), ts);
+                    ts = new Series(Program.options.freq, var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq));
+                    work.AddIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), ts);
                 }
 
                 //??? what if above is null??? << create it if djz?

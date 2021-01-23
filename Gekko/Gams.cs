@@ -1514,7 +1514,7 @@ namespace Gekko
                             //  ======================================
                             //
 
-                            string varNameWithFreq = varName + Globals.freqIndicator + G.GetFreq(freq);
+                            string varNameWithFreq = varName + Globals.freqIndicator + G.ConvertFreq(freq);
 
                             //if (varName.ToLower().Contains("d10"))
                             //{
@@ -1657,7 +1657,7 @@ namespace Gekko
                                         IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                         if (iv == null)
                                         {
-                                            ts2 = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(freq));
+                                            ts2 = new Series(ESeriesType.Normal, freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
                                             if (timeDimNr == -12345) ts2.type = ESeriesType.Timeless;
                                             ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
                                         }

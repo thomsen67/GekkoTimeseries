@@ -228,7 +228,7 @@ namespace Gekko
 
                 for (int i = 0; i < m; i++) //vars
                 {
-                    string nameWithFreq = G.Chop_AddFreq(name + "_dec" + (i + 1), G.GetFreq(lhs_series.freq));
+                    string nameWithFreq = G.Chop_AddFreq(name + "_dec" + (i + 1), G.ConvertFreq(lhs_series.freq));
                     Series z = new Series(lhs_series.freq, nameWithFreq);
                     for (int t = 0; t < n; t++) //time
                     {
@@ -239,7 +239,7 @@ namespace Gekko
 
                 if (true)
                 {
-                    string nameWithFreq = G.Chop_AddFreq(name + "_dec", G.GetFreq(lhs_series.freq));
+                    string nameWithFreq = G.Chop_AddFreq(name + "_dec", G.ConvertFreq(lhs_series.freq));
                     Series z = new Series(lhs_series.freq, nameWithFreq);
                     for (int t = 0; t < n; t++) //time
                     {
@@ -248,7 +248,7 @@ namespace Gekko
                     Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
                     if (poly > 0)
                     {
-                        string nameWithFreq2 = G.Chop_AddFreq(name + "_dec_trend", G.GetFreq(lhs_series.freq));
+                        string nameWithFreq2 = G.Chop_AddFreq(name + "_dec_trend", G.ConvertFreq(lhs_series.freq));
                         Series z2 = new Series(lhs_series.freq, nameWithFreq2);
                         for (int t = 0; t < n; t++) //time
                         {
@@ -256,7 +256,7 @@ namespace Gekko
                         }
                         Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq2, z2);
 
-                        string nameWithFreq3 = G.Chop_AddFreq(name + "_trend", G.GetFreq(lhs_series.freq));
+                        string nameWithFreq3 = G.Chop_AddFreq(name + "_trend", G.ConvertFreq(lhs_series.freq));
                         Series z3 = new Series(lhs_series.freq, nameWithFreq3);
                         for (int t = 0; t < n; t++) //time
                         {
@@ -286,7 +286,7 @@ namespace Gekko
                         for (int i = 0; i < m; i++)
                         {
                             {
-                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_low", G.GetFreq(freq));
+                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_low", G.ConvertFreq(freq));
                                 Series z = new Series(freq, nameWithFreq);
                                 if (type == "l")
                                     z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.datas[i].coeff_low);
@@ -296,7 +296,7 @@ namespace Gekko
                             }
 
                             {
-                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1), G.GetFreq(freq));
+                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1), G.ConvertFreq(freq));
                                 Series z = new Series(freq, nameWithFreq);
                                 if (type == "l")
                                     z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.datas[i].coeff);
@@ -306,7 +306,7 @@ namespace Gekko
                             }
 
                             {
-                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_high", G.GetFreq(freq));
+                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_high", G.ConvertFreq(freq));
                                 Series z = new Series(freq, nameWithFreq);
                                 if (type == "l")
                                     z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.datas[i].coeff_high);
@@ -317,7 +317,7 @@ namespace Gekko
                         }
 
                         {
-                            string nameWithFreq = G.Chop_AddFreq(name + "_chow" + "_" + type2, G.GetFreq(freq));
+                            string nameWithFreq = G.Chop_AddFreq(name + "_chow" + "_" + type2, G.ConvertFreq(freq));
                             Series z = new Series(freq, nameWithFreq);
                             if (type == "l")
                                 z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.data.coeff);

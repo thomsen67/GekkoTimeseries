@@ -46,7 +46,7 @@ namespace Gekko
                 int yy = O.ConvertToInt(iv1);
                 string ff = O.ConvertToString(iv2);
                 int ss = O.ConvertToInt(iv3);
-                GekkoTime gt = new GekkoTime(G.GetFreq(ff), yy, ss);
+                GekkoTime gt = new GekkoTime(G.ConvertFreq(ff), yy, ss);
                 return new ScalarDate(gt);
             }
             else
@@ -55,7 +55,7 @@ namespace Gekko
                 GekkoTime dd = O.ConvertToDate(iv1);
                 string ff = O.ConvertToString(iv2);
                 string startEnd2 = O.ConvertToString(iv3);
-                GekkoTime gt = Program.ConvertFreq(dd, G.GetFreq(ff), startEnd2);
+                GekkoTime gt = Program.ConvertFreq(dd, G.ConvertFreq(ff), startEnd2);
                 return new ScalarDate(gt);
             }
         }
@@ -269,11 +269,11 @@ namespace Gekko
             else if (ths.Type() == EVariableType.Date)
             {
                 GekkoTime gt = (ths as ScalarDate).date;
-                return new ScalarString(G.GetFreq(gt.freq));
+                return new ScalarString(G.ConvertFreq(gt.freq));
             }
             if (ths.Type() == EVariableType.Series)
             {
-                return new ScalarString(G.GetFreq((ths as Series).freq));
+                return new ScalarString(G.ConvertFreq((ths as Series).freq));
             }
             else
             {
@@ -576,7 +576,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            Series tsRotated = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.GetFreq(EFreq.U)));
+            Series tsRotated = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.ConvertFreq(EFreq.U)));
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
 
@@ -693,7 +693,7 @@ namespace Gekko
             {
                 foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
                 {
-                    if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
+                    if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.ConvertFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
                     {
                         //starts with endo_ or exo_ and is of annual type
                         fixes.Add(G.Chop_RemoveFreq(kvp.Key));
@@ -1117,7 +1117,7 @@ namespace Gekko
                     if (x[0].Type() == EVariableType.String)
                     {
                         //frequency
-                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        EFreq freq = G.ConvertFreq(O.ConvertToString(x[0]));
                         ts = new Series(freq, null);
                     }
                     else if (x[0].Type() == EVariableType.Val)
@@ -1139,7 +1139,7 @@ namespace Gekko
                     if (x[0].Type() == EVariableType.String)
                     {
                         //frequency
-                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        EFreq freq = G.ConvertFreq(O.ConvertToString(x[0]));
                         ts = new Series(freq, null);
                         ts.dimensions = O.ConvertToInt(x[1]);
                     }
@@ -1168,7 +1168,7 @@ namespace Gekko
                     if (x[0].Type() == EVariableType.String)
                     {
                         //frequency
-                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        EFreq freq = G.ConvertFreq(O.ConvertToString(x[0]));
                         ts = new Series(ESeriesType.Timeless, freq, null, double.NaN);
                     }
                     else if (x[0].Type() == EVariableType.Val)
@@ -1186,7 +1186,7 @@ namespace Gekko
                     if (x[0].Type() == EVariableType.String)
                     {
                         //frequency
-                        EFreq freq = G.GetFreq(O.ConvertToString(x[0]));
+                        EFreq freq = G.ConvertFreq(O.ConvertToString(x[0]));
                         double d = x[1].ConvertToVal();
                         ts = new Series(ESeriesType.Timeless, freq, null, d);
                     }
@@ -3793,7 +3793,7 @@ namespace Gekko
 
         public static IVariable currentfreq(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            return new ScalarString(G.GetFreq(Program.options.freq));
+            return new ScalarString(G.ConvertFreq(Program.options.freq));
         }
 
         public static IVariable currentperstart(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -4101,7 +4101,7 @@ namespace Gekko
             }
             else if (G.Equal(s2, "freq"))
             {
-                return new ScalarString(G.GetFreq(ts.freq));
+                return new ScalarString(G.ConvertFreq(ts.freq));
             }
             else
             {

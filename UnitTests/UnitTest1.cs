@@ -24526,12 +24526,12 @@ print(df2)
             string f = G.Chop_GetFreq(s);
 
             //hack: false used 4 places in GetVariable() and Contains()
-            double valWork = (First().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub));
+            double valWork = (First().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.ConvertFreq(f), year, sub));
             double valBase = double.NaN;
-            if (Ref().ContainsIVariable(s)) valBase = (Ref().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub));
-            double valWorkLag = (First().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub).Add(-1));
+            if (Ref().ContainsIVariable(s)) valBase = (Ref().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.ConvertFreq(f), year, sub));
+            double valWorkLag = (First().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.ConvertFreq(f), year, sub).Add(-1));
             double valBaseLag = double.NaN;
-            if (Ref().ContainsIVariable(s)) valBaseLag = (Ref().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub).Add(-1));
+            if (Ref().ContainsIVariable(s)) valBaseLag = (Ref().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.ConvertFreq(f), year, sub).Add(-1));
             //end hack
 
             UData u = new UData();

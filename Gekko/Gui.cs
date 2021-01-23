@@ -1532,7 +1532,7 @@ namespace Gekko
                     foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                     {
                         Series sub = kvp.Value as Series;
-                        string name = G.Chop_RemoveFreq(sub.GetName(), G.GetFreq(Program.options.freq));
+                        string name = G.Chop_RemoveFreq(sub.GetName(), G.ConvertFreq(Program.options.freq));
 
                         if (sub.meta.fix == EFixedType.Timeless)
                         {

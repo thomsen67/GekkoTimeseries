@@ -77,18 +77,10 @@ namespace Gekko
             return rv;
         }
 
-        //        public static bool IsDebugSession
-        //        {
-        //            get
-        //            {
-        //#if DEBUG
-        //                return true;
-        //#else
-        //            return false;
-        //#endif
-        //            }
-        //        }
-
+        /// <summary>
+        /// In a double[] array, replaces missing values with 0
+        /// </summary>
+        /// <param name="temp"></param>
         public static void ReplaceNaNWith0(double[] temp)
         {
             for (int i = 0; i < temp.Length; i++)
@@ -96,6 +88,11 @@ namespace Gekko
                 if (G.isNumericalError(temp[i])) temp[i] = 0d;
             }
         }
+
+        /// <summary>
+        ///  In a double[,] array, replaces missing values with 0
+        /// </summary>
+        /// <param name="temp"></param>
 
         public static void ReplaceNaNWith0(double[,] temp)
         {            
@@ -108,11 +105,19 @@ namespace Gekko
             }            
         }
 
+        /// <summary>
+        /// Helper method
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string ReplaceTurtle(string s)
         {
             return s.Replace("¤[0]", "").Replace("¤", "");
         }
-
+        
+        /// <summary>
+        /// Helper method
+        /// </summary>
         public static bool IsDebugSession
         {
             //Cannot get this to work...
@@ -133,6 +138,11 @@ namespace Gekko
             return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
+        /// <summary>
+        /// Parse a string into an integer
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         //NOTE: only deals with ints like 123, 007, 5. No minus, delimiters etc.!
         //Returns -12345 if s is not such an integer
         public static int IntParse(string s)
@@ -150,34 +160,24 @@ namespace Gekko
             return y;
         }
 
+        /// <summary>
+        /// Parse a string into a double
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
         public static bool TryParseIntoDouble(string s, out double d)
         {
             //NumberStyles.AllowDecimalPoint|NumberStyles.AllowExponent|NumberStyles.AllowLeadingSign
             return double.TryParse(s, NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d);
         }
 
-        public static string HandleInternalIdentifyer1(string s)
-        {
-            s = s.Replace(Globals.internalColumnIdentifyer, "");
-            s = s.Replace(Globals.internalSetIdentifyer, "#");
-            return s;
-        }
-
-        public static string GroupBy10(int i)
-        {
-            string s2;
-            int i1 = i / 10;
-            s2 = (i1 * 10) + Globals.ageHierarchyDivider + ((i1 + 1) * 10 - 1);
-            return s2;
-        }
-
-        public static string HandleInternalIdentifyer2(string s)
-        {
-            if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);
-            else s = Globals.internalColumnIdentifyer + s;
-            return s;
-        }
-
+        /// <summary>
+        /// Parse a string into a double
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="reportError"></param>
+        /// <returns></returns>
         public static double ParseIntoDouble(string s, bool reportError)
         {
             double d = double.NaN;
@@ -193,12 +193,60 @@ namespace Gekko
                 return double.NaN;
             }
         }
+
+        /// <summary>
+        /// Helper method
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string HandleInternalIdentifyer1(string s)
+        {
+            s = s.Replace(Globals.internalColumnIdentifyer, "");
+            s = s.Replace(Globals.internalSetIdentifyer, "#");
+            return s;
+        }
+
+        /// <summary>
+        /// For instance, 5 --> 0..9, 12 --> 10..19
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static string GroupBy10(int i)
+        {
+            string s2;
+            int i1 = i / 10;
+            s2 = (i1 * 10) + Globals.ageHierarchyDivider + ((i1 + 1) * 10 - 1);
+            return s2;
+        }
+
+        /// <summary>
+        /// Helper method for DECOMP
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string HandleInternalIdentifyer2(string s)
+        {
+            if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);
+            else s = Globals.internalColumnIdentifyer + s;
+            return s;
+        }
+                
+
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static double ParseIntoDouble(string s)
         {
             return G.ParseIntoDouble(s, false);
         }
 
-
+        /// <summary>
+        /// Converts bool true/false into string
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static string TrueFalse(bool x)
         {
             string s = "false";
@@ -211,7 +259,6 @@ namespace Gekko
         /// </summary>
         /// <param name="val">Input string</param>
         /// <returns>Output string</returns>
-
         public static string Add0Ifmissing(string val)
         {
             string val1 = "";
@@ -246,10 +293,9 @@ namespace Gekko
             int zzz = int.Parse(yyy);
             return zzz;
         }
-
-        //TODO: should be done as a struct
+                
         /// <summary>
-        /// Extracts "fY" and "-2" from "fY¤-2"
+        /// Extracts "fY" and "-2" from "fY¤-2". Not so much used in Gekko 3.0 anymore
         /// </summary>
         /// <param name="key">Input</param>
         /// <param name="variable">Variable name</param>
@@ -265,6 +311,11 @@ namespace Gekko
 
         //will include lag indicator (¤)
         //WHY not just always use FromBNumberToVarname2()??? Because of ENDO/EXO stuff??
+        /// <summary>
+        /// Helper function for models. Move to model part of code.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public static string FromBNumberToVarname(int i)
         {
             string culprit;
@@ -274,13 +325,23 @@ namespace Gekko
         }
 
         //will include lag indicator (¤)
+        /// <summary>
+        /// Helper function for models. Move to model part of code.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public static string FromBNumberToVarname2(int i)
         {
             string culprit = Program.model.modelGekko.varsBTypeInverted[i];
             return culprit;
         }
 
-        /// Converts "fY¤-2" into "fY(-2)"
+        // Converts "fY¤-2" into "fY(-2)"
+        /// <summary>
+        /// Helper not used much in Gekko 3.0
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <returns></returns>
         public static string FormatVariableAndLag(string varName)
         {
             string variable = null;
@@ -291,8 +352,13 @@ namespace Gekko
             return variable;
         }
 
-        /// Extracts "fY" and "-2" from "fY¤-2"
-        /// Extracts "fY" and "¤2000" from "fY¤¤2000"
+
+        /// <summary>
+        // Extracts "fY" and "-2" from "fY¤-2". Extracts "fY" and "¤2000" from "fY¤¤2000". Not used much in Gekko 3.0.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="variable"></param>
+        /// <param name="lag"></param>
         public static void ExtractVariableAndLag(string key, out string variable, out string lag)
         {
             //NOTE: NO parsing of the lag as integer here!
@@ -302,9 +368,15 @@ namespace Gekko
             lag = key.Substring(indx + 1, key.Length - (indx + 1));
         }
 
-        
+        /// <summary>
+        /// Convert a GekkoTime period into corresponding period for all frequencies. Used for instance when printing 
+        /// a quarterly series over a monthly time period. Important method.
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <returns></returns>
         public static AllFreqsHelper ConvertDateFreqsToAllFreqs(GekkoTime t1, GekkoTime t2)
-        {
+        {            
             //Also see #345632473
 
             //========================================================================================================
@@ -349,6 +421,14 @@ namespace Gekko
             return allFreqsHelper;
         }
 
+        /// <summary>
+        /// Pick out the "right" converted period from AllFreqsHelper. A bit of a waste of effort to do it like this, but usually not
+        /// part of speed-critical code.
+        /// </summary>
+        /// <param name="dates"></param>
+        /// <param name="freqHere"></param>
+        /// <param name="gt1"></param>
+        /// <param name="gt2"></param>
         public static void PickFromAllFreqs(AllFreqsHelper dates, EFreq freqHere, out GekkoTime gt1, out GekkoTime gt2)
         {
             if (freqHere == EFreq.A)
@@ -383,6 +463,14 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Add frequency to a varname, if it is missing (x --> x!q, if frequency is quarterly ("q")).
+        /// </summary>
+        /// <param name="varname"></param>
+        /// <param name="freq"></param>
+        /// <param name="type"></param>
+        /// <param name="isLeftSideVariable"></param>
+        /// <returns></returns>
         public static string AddFreq(string varname, string freq, EVariableType type, O.ELookupType isLeftSideVariable)
         {
             //freq is added for all no-sigil rhs
@@ -399,19 +487,19 @@ namespace Gekko
                 if (!varname.Contains(Globals.freqIndicator.ToString()))
                 {
                     if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
-                    else varnameWithFreq = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                    else varnameWithFreq = varname + Globals.freqIndicator + G.ConvertFreq(Program.options.freq);
                 }
             }
 
             return varnameWithFreq;
         }
 
-        public static string S(int i)
-        {
-            if (i <= 1) return "";
-            else return "s";
-        }
-
+        /// <summary>
+        /// Add frequency to a varname. Will replace AddFreq() method.
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <param name="freq"></param>
+        /// <returns></returns>
         public static string AddFreqToName(string varName, string freq)
         {
             //Only used internally, when dealing with databanks. Not relevant for
@@ -420,14 +508,29 @@ namespace Gekko
             else return G.Chop_AddFreq(varName, freq);
         }
 
-
-        public static EFreq GetFreq(string freq)
+        /// <summary>
+        /// Helper method for GAMS. Move to GAMS part.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static string S(int i)
         {
-            return GetFreq(freq, false);
+            if (i <= 1) return "";
+            else return "s";
+        }        
+
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static EFreq ConvertFreq(string freq)
+        {
+            return ConvertFreq(freq, false);
         }
 
 
-        public static EFreq GetFreq(string freq, bool nullIsCurrent)
+        public static EFreq ConvertFreq(string freq, bool nullIsCurrent)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -468,27 +571,6 @@ namespace Gekko
             return eFreq;
         }
 
-        // #09832752
-        //public static string RemoveFreqFromKey(string s)
-        //{
-        //    //DELETE SOON many places, keep in DISP etc.
-        //    //Use RemoveFreqFromName() instead
-
-        //    int i = s.IndexOf(Globals.freqIndicator);
-        //    if (i == 0)
-        //    {
-        //        G.Writeln2("*** ERROR: freq problem");
-        //        throw new GekkoException();
-        //    }
-        //    else if (i > 0)
-        //    {
-        //        return s.Substring(0, i);  //for instance, fy!q --> fy
-        //    }
-        //    return s;  //annual            
-        //}
-
-
-
         public static EFreq GetFreqFromName(string s)
         {
             string f = G.Chop_GetFreq(s);
@@ -499,7 +581,7 @@ namespace Gekko
             }
             else
             {
-                return G.GetFreq(f);
+                return G.ConvertFreq(f);
             }
         }
 
@@ -659,7 +741,7 @@ namespace Gekko
 
         public static string Chop_FreqAdd(string s1, EFreq freq)
         {
-            return Chop_AddFreq(s1, G.GetFreq(freq));
+            return Chop_AddFreq(s1, G.ConvertFreq(freq));
         }
 
         //See equivalent method in Functions.cs
@@ -673,7 +755,7 @@ namespace Gekko
 
         public static string Chop_FreqSet(string s1, EFreq freq)
         {
-            return Chop_SetFreq(s1, G.GetFreq(freq));
+            return Chop_SetFreq(s1, G.ConvertFreq(freq));
         }
 
         //See equivalent method in Functions.cs
@@ -707,7 +789,7 @@ namespace Gekko
 
         public static string Chop_FreqRemove(string s1, EFreq freq)
         {
-            return Chop_RemoveFreq(s1, G.GetFreq(freq));
+            return Chop_RemoveFreq(s1, G.ConvertFreq(freq));
         }
 
         //See equivalent method in Functions.cs
@@ -722,7 +804,7 @@ namespace Gekko
 
         public static string Chop_FreqReplace(string s1, EFreq freq2, EFreq freq3)
         {
-            return Chop_ReplaceFreq(s1, G.GetFreq(freq2), G.GetFreq(freq3));
+            return Chop_ReplaceFreq(s1, G.ConvertFreq(freq2), G.ConvertFreq(freq3));
         }
 
         //See equivalent method in Functions.cs
@@ -753,24 +835,7 @@ namespace Gekko
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================
-
-
-
-
-
-
-        //public static string AddCurrentFreqToName(string name)
-        //{
-        //    return AddFreqToName(name, Program.options.freq);
-        //}
-
-        //public static string AddFreqToName(string name, EFreq freq)
-        //{
-        //    //If freq is a, it transforms x into x!a
-        //    //But x!q will stay x!q.
-        //    return G.freqadd(name, freq);
-        //}
-
+                     
         public static ESeriesMissing GetMissing(string s)
         {
             if (G.Equal(s, "error")) return ESeriesMissing.Error;
@@ -786,7 +851,7 @@ namespace Gekko
 
         }
 
-        public static string GetFreq(EFreq eFreq)
+        public static string ConvertFreq(EFreq eFreq)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -1896,22 +1961,7 @@ namespace Gekko
             }
             return false;
         }
-
-        //public static bool IsScalarType(string type)
-        //{
-        //    if (G.Equal(type, "val")) return true;
-        //    if (G.Equal(type, "string")) return true;
-        //    if (G.Equal(type, "date")) return true;
-        //    return false;
-        //}
-
-        //public static bool IsCollectionType(string type)
-        //{
-        //    if (G.Equal(type, "list")) return true;
-        //    if (G.Equal(type, "matrix")) return true;
-        //    if (G.Equal(type, "map")) return true;
-        //    return false;
-        //}
+        
 
         //Use together with CheckIVariableName()
         //See also G.AddSigil()
@@ -2244,14 +2294,7 @@ namespace Gekko
                 G.Writeln2("String cannot be of zero length.");
                 throw new GekkoException();
             }
-
-            //if (oldValue.Equals(newValue, comparisonType))
-            //{
-            //This condition has no sense
-            //It will prevent method from replacesing: "Example", "ExAmPlE", "EXAMPLE" to "example"
-            //return str;
-            //}
-
+            
             // Prepare string builder for storing the processed string.
             // Note: StringBuilder has a better performance than String by 30-40%.
             StringBuilder resultStringBuilder = new StringBuilder(str.Length);
@@ -2694,7 +2737,7 @@ namespace Gekko
             string freq = null; string varname = null;
             O.ChopFreq(input, ref freq, ref varname);
             string freqPretty = null;
-            if (freq != null) freqPretty = " (" + G.GetFreqString(GetFreq(freq)) + ")";
+            if (freq != null) freqPretty = " (" + G.GetFreqString(ConvertFreq(freq)) + ")";
             if(useQuotes) return "'" + varname + "'" + freqPretty;
             else return varname + freqPretty;
         }

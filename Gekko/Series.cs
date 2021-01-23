@@ -194,7 +194,7 @@ namespace Gekko
         {
             if (onlyRemoveCurrentFreq)
             {
-                return G.Chop_RemoveFreq(this.GetName(), G.GetFreq(Program.options.freq));
+                return G.Chop_RemoveFreq(this.GetName(), G.ConvertFreq(Program.options.freq));
             }
             else
             {
@@ -1651,7 +1651,7 @@ namespace Gekko
 
         private static Series ArithmeticsArraySeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
         {
-            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x1_series.freq)), x1_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x1_series.freq)), x1_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -1665,7 +1665,7 @@ namespace Gekko
                 
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
                 
-                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(sub1.freq));
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
                     sub.SetData(t, a(sub1.GetData(smpl, t), x2_val));
@@ -1690,7 +1690,7 @@ namespace Gekko
 
         private static Series ArithmeticsArraySeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
-            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x1_series.freq)), x1_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x1_series.freq)), x1_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -1704,7 +1704,7 @@ namespace Gekko
 
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
 
-                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(sub1.freq));
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
                     sub.SetData(t, a(sub1.GetData(smpl, t), x2_series.GetData(smpl, t)));
@@ -1729,7 +1729,7 @@ namespace Gekko
 
         private static Series ArithmeticsSeriesArraySeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
-            Series temp = new Series(ESeriesType.ArraySuper, x2_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x2_series.freq)), x2_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x2_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x2_series.freq)), x2_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -1743,7 +1743,7 @@ namespace Gekko
 
                 Series sub1 = x2_series.dimensionsStorage.storage[mm1] as Series;
 
-                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(sub1.freq));
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
                     sub.SetData(t, a(x1_series.GetData(smpl, t), sub1.GetData(smpl, t)));
@@ -1779,7 +1779,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x1_series.freq)), x1_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.ConvertFreq(x1_series.freq)), x1_series.dimensions);
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
@@ -1811,7 +1811,7 @@ namespace Gekko
                 }
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
                 Series sub2 = x2_series.dimensionsStorage.storage[mm2] as Series;
-                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(sub1.freq));
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
                     sub.SetData(t, a(sub1.GetData(smpl, t), sub2.GetData(smpl, t)));
@@ -2266,7 +2266,7 @@ namespace Gekko
                 }
                                 
                 this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);                
-                string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq);
+                string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(this.freq);
 
                 if (iv == null)
                 {   

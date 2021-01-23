@@ -955,7 +955,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Incompatible freqs: " + G.GetFreq(this.freq) + " vs. " + G.GetFreq(gt2.freq));
+                    G.Writeln2("*** ERROR: Incompatible freqs: " + G.ConvertFreq(this.freq) + " vs. " + G.ConvertFreq(gt2.freq));
                     throw new GekkoException();
                 }
             }

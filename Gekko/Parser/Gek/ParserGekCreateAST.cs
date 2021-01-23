@@ -19,7 +19,7 @@ namespace Gekko.Parser.Gek
     /// </summary>
     public class ParserGekCreateAST
     {
-
+        
         public static ConvertHelper CreateAST(ParseHelper ph, P p)
         {
             //Q q = new Q();  //make a fresh container for method argument helpers
@@ -165,23 +165,9 @@ namespace Gekko.Parser.Gek
             ch2.code = s2.ToString().Replace("`", Globals.QT).Replace(Globals.smpl, "smpl");
 
             ch2.errors = errors;  //not used?
-
-            //if (Globals.uFunctionStorageCs.Count > 0)
-            //{
-            //    StringBuilder s3 = new StringBuilder();
-            //    foreach (string sCode in Globals.uFunctionStorageCs.Values)
-            //    {
-            //        s3.Append(sCode);
-            //    }
-            //    ch2.codeUFunctions = s3.ToString().Replace("`", Globals.QT);
-            //}
-
+            
             if (Globals.printAST)
-            {
-                //G.Writeln(ch2.codeUFunctions);
-                //G.Writeln("===============================");
-                //G.Writeln("===============================");
-                //G.Writeln("===============================");
+            {                
                 G.Writeln(ch2.code);
             }
 

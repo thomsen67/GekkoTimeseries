@@ -537,7 +537,7 @@ namespace Gekko
         public static EFreq XNameOrString2Freq(IVariable x)
         {
             string x_string = O.ConvertToString(x);
-            EFreq freq = G.GetFreq(x_string);
+            EFreq freq = G.ConvertFreq(x_string);
             return freq;
         }
 
@@ -994,7 +994,7 @@ namespace Gekko
                         }
 
                         string varNameWithoutFreq = endoOrExoPrefix + "_" + s;
-                        string varNameWithFreq = varNameWithoutFreq + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                        string varNameWithFreq = varNameWithoutFreq + Globals.freqIndicator + G.ConvertFreq(Program.options.freq);
 
                         GekkoTimes gts = global;
                         if (h.local != null) gts = h.local;
@@ -1911,7 +1911,7 @@ namespace Gekko
                                             //throw new GekkoException();
                                             //it is probably ok to create it here like this                                            
                                             //never mind...
-                                            rv = new Series(G.GetFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
+                                            rv = new Series(G.ConvertFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
                                             Program.databanks.GetFirst().AddIVariableWithOverwrite(rv);
                                         }
                                         else
@@ -2103,7 +2103,7 @@ namespace Gekko
             List<string> delete = new List<string>();
             foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
             {
-                if (kvp.Key.StartsWith(endoOrExoPrefix + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
+                if (kvp.Key.StartsWith(endoOrExoPrefix + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.ConvertFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
                 {
                     //starts with endo_ or exo_ and is of annual type
                     delete.Add(kvp.Key);
@@ -2590,7 +2590,7 @@ namespace Gekko
             }
             if (create)
             {
-                rv = new Series(G.GetFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
+                rv = new Series(G.ConvertFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
                 db.AddIVariableWithOverwrite(rv);
             }
             return rv;
@@ -2776,7 +2776,7 @@ namespace Gekko
 
         public static void PredictSetValue(string name, GekkoTime gt, double d)
         {
-            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.GetFreq(Program.options.freq), O.ECreatePossibilities.Can, false);
+            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), O.ECreatePossibilities.Can, false);
             Series ts = iv as Series;
             ts.SetData(gt, d);
         }
@@ -2784,7 +2784,7 @@ namespace Gekko
         public static double PredictGetValue(string name, GekkoTime gt)
         {
             //We do not allow searching of vars in databanks
-            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.GetFreq(Program.options.freq), O.ECreatePossibilities.NoneReturnNull, false);
+            IVariable iv = O.GetIVariableFromString(name + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), O.ECreatePossibilities.NoneReturnNull, false);
             if (iv == null)
             {
                 G.Writeln2("*** ERROR: PREDICT: Series '" + name + "' does not exist in first-position databank");
@@ -3243,21 +3243,29 @@ namespace Gekko
                 }
 
                 //We divide into three groups depending on LHS name:
-                //  A. Starts with '%'
-                //  B. Starts with '#'
-                //  C. No sigil (or isArraySubSeries == true)
+                //  A. LHS variable starts with '%'
+                //  B. LHS variable starts with '#'                
+                //  C. LHS variable has no sigil/symbol as first character (or isArraySubSeries == true)
 
-                //For each A, B, C, we also have the 7 possible types of the RHS, for instace ... = 2012q1 (date type)
+                //  For each A, B, C, we also have the 7 possible types of the RHS, for instace ... = 2012q1 (date type)
                 //  And for each of these 7 types, we may have a LHS type indicator, for instance DATE %d = ...  (should become date)
+                //  Note: on the RHS, a series may be normal series, timeless series, array-series.
+
+                //The following is hard to refactor, but the switches keeps it modularized.
 
                 if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
                 {
+                    // -----------------------------------------------------------------------------------
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // LHS variable starts with '%'
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // -----------------------------------------------------------------------------------
                     // Starts with '%'
 
                     //smpl.omitDynamicSeries = true;
@@ -3276,7 +3284,9 @@ namespace Gekko
                     {
                         case EVariableType.Series:
                             {
+                                //---------------------------------------------------------
                                 //%x = SERIES
+                                //---------------------------------------------------------
 
                                 Series rhsExpression_series = rhs as Series;
                                 switch (rhsExpression_series.type)
@@ -3430,12 +3440,17 @@ namespace Gekko
                 }
                 else if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolCollection)
                 {
+                    // ---------------------------------------------------------------------------------------
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // LHS variable starts with '#'
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // ---------------------------------------------------------------------------------------
                     // Starts with '#'
 
                     //smpl.omitDynamicSeries = true;
@@ -3679,12 +3694,17 @@ namespace Gekko
                 }
                 else
                 {
+                    // -------------------------------------------------------------------------------
                     // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
                     // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
                     // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
                     // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // LHS variable has no sigil/symbol as first character (or isArraySubSeries == true)
                     // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
                     // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // -------------------------------------------------------------------------------
                     //name is of series type (no sigils), or we have that isArraySubSeries == true (or both)
 
                     if (lhs == null && !isArraySubSeries && !varnameWithFreq.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
@@ -3754,7 +3774,7 @@ namespace Gekko
                         case EVariableType.Series:
                             {
                                 Series rhs_series_beware = rhs as Series;
-                                string freq_rhs = G.GetFreq(rhs_series_beware.freq);
+                                string freq_rhs = G.ConvertFreq(rhs_series_beware.freq);
                                 if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                                 {
                                     G.Writeln2("*** ERROR: Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
@@ -3810,7 +3830,7 @@ namespace Gekko
 
                                                 GekkoTime tt1 = GekkoTime.tNull;
                                                 GekkoTime tt2 = GekkoTime.tNull;
-                                                GekkoTime.ConvertFreqs(G.GetFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
+                                                GekkoTime.ConvertFreqs(G.ConvertFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
                                                                                                                                     //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
                                                                                                                                     //Now the smpl window runs from tt1 to tt2
                                                                                                                                     //We copy in from that window
@@ -4665,7 +4685,7 @@ namespace Gekko
             {
                 //create it
                 create = true;
-                lhs_series = new Series(ESeriesType.Normal, G.GetFreq(freq, true), varnameWithFreq);
+                lhs_series = new Series(ESeriesType.Normal, G.ConvertFreq(freq, true), varnameWithFreq);
             }
 
             return create;
@@ -7271,7 +7291,7 @@ namespace Gekko
                 }
                 foreach (string s in Program.model.modelGekko.varsAType.Keys)
                 {
-                    if (!Program.databanks.GetFirst().ContainsIVariable(s + "!" + G.GetFreq(Program.options.freq))) onlyModelNotDatabank.Add(s);
+                    if (!Program.databanks.GetFirst().ContainsIVariable(s + "!" + G.ConvertFreq(Program.options.freq))) onlyModelNotDatabank.Add(s);
                     //if (!Program.databanks.GetFirst().ContainsIVariable(s + "!" + "a")) onlyModelNotDatabank.Add(s);
                 }
 
@@ -8754,7 +8774,7 @@ namespace Gekko
                         for (int i = 0; i < names.Count; i++)
                         {
                             //This will add current freq (e.g. '!a') if it is not there
-                            names[i] = G.Chop_AddFreq(names[i], G.GetFreq(Program.options.freq));
+                            names[i] = G.Chop_AddFreq(names[i], G.ConvertFreq(Program.options.freq));
                         }
                     }
                     else if (G.Equal(opt_showfreq, "no"))

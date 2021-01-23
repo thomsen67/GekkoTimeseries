@@ -716,7 +716,7 @@ namespace Gekko
                 else if (temp is EFreq) // See if it is a freq.
                 {
                     EFreq value = (EFreq)temp;
-                    string d = G.GetFreq(value);
+                    string d = G.ConvertFreq(value);
                     line += name + " = " + d + ";";
                 }
                 else if (temp is ESeriesMissing)
