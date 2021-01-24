@@ -635,7 +635,7 @@ namespace Gekko
             //Also checks that freqs are the same
             if (t1.freq != t2.freq)
             {
-                G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqString(t1.freq) + " vs. " + G.GetFreqString(t2.freq));
+                G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqPretty(t1.freq) + " vs. " + G.GetFreqPretty(t2.freq));
                 throw new GekkoException();
             }
             EFreq efreq = t1.freq;

@@ -2690,17 +2690,30 @@ namespace Gekko
             return false;
         }
 
+        /// <summary>
+        /// Get location of gekko.exe
+        /// </summary>
+        /// <returns></returns>
         public static string GetProgramDir()
         {
             return System.IO.Path.GetDirectoryName(Application.ExecutablePath);
         }
+
+        /// <summary>
+        /// Get locatino of working folder
+        /// </summary>
+        /// <returns></returns>
         public static string GetWorkingFolder()
         {
             return System.IO.Directory.GetCurrentDirectory();
         }
 
-
-        //1.4.9 stuff
+        /// <summary>
+        /// Get Gekko version as string
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="patch"></param>
+        /// <returns></returns>
         public static string PrintVersion(string version, bool patch)
         {
             string start = "";
@@ -2746,8 +2759,7 @@ namespace Gekko
         /// If value is equal to <c>null</c>, than all occurrences of <paramref name="oldValue"/> will be removed from the <paramref name="str"/>.</param>
         /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
         /// <returns>A string that is equivalent to the current string except that all instances of <paramref name="oldValue"/> are replaced with <paramref name="newValue"/>. 
-        /// If <paramref name="oldValue"/> is not found in the current instance, the method returns the current instance unchanged.</returns>
-        
+        /// If <paramref name="oldValue"/> is not found in the current instance, the method returns the current instance unchanged.</returns>        
         public static string Replace(string str, string oldValue, string @newValue, StringComparison comparisonType, int maxtimes2)
         {
             int maxtimes = maxtimes2;
@@ -2832,6 +2844,11 @@ namespace Gekko
             return resultStringBuilder.ToString();
         }
 
+        /// <summary>
+        /// Helper method regarding the #(listfile x) syntax for lists
+        /// </summary>
+        /// <param name="varnameWithFreq"></param>
+        /// <returns></returns>
         public static string TransformListfileName(string varnameWithFreq)
         {
             if (!varnameWithFreq.Contains("___")) return varnameWithFreq;
@@ -2840,6 +2857,11 @@ namespace Gekko
             return listfileName;
         }
 
+        /// <summary>
+        /// Count lines in a string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static int CountLines(string str)
         {
             //Just counting lines, fast, no splitting etc.
@@ -2852,6 +2874,11 @@ namespace Gekko
             return count + 1;
         }
 
+        /// <summary>
+        /// Helper method for splitting csv lines
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         //This: 111,222,"33,44,55",666,"77,88","99"
         //returns this: 
         //  111  
@@ -2888,6 +2915,12 @@ namespace Gekko
             return result;
         }
 
+        /// <summary>
+        /// Method for printing out "service messages" in the Gekko GUI,
+        /// for instance when assigning z = x + y;
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="p"></param>
         public static void ServiceMessage(string s, P p)
         {            
             if (p == null)
@@ -2919,7 +2952,12 @@ namespace Gekko
             }
         }
 
-        //1.4.9 stuff
+        /// <summary>
+        /// Write info on Gekko version etc.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="silent"></param>
+        /// <returns></returns>
         public static StringBuilder WriteDirs(string type, bool silent)  //"small" or "large"
         {
             StringBuilder sb = new StringBuilder();
@@ -3042,6 +3080,10 @@ namespace Gekko
             return sb;
         }
 
+        /// <summary>
+        /// Helper for getting installed .NET versions
+        /// </summary>
+        /// <returns></returns>
         private static List<string> Get45PlusFromRegistry()
         {
             List<string> ss = new List<string>();
@@ -3062,6 +3104,11 @@ namespace Gekko
             return ss;
         }
 
+        /// <summary>
+        /// Helper for getting installed .NET versions
+        /// </summary>
+        /// <param name="releaseKey"></param>
+        /// <returns></returns>
         private static string CheckFor45PlusVersion(int releaseKey)
         {
             //see https://github.com/dotnet/docs/blob/master/docs/framework/migration-guide/how-to-determine-which-versions-are-installed.md
@@ -3090,6 +3137,10 @@ namespace Gekko
             return "No 4.5 or later version detected";
         }
 
+        /// <summary>
+        /// Helper for getting installed .NET versions
+        /// </summary>
+        /// <returns></returns>
         private static List<string> GetVersionFromRegistry()
         {
             List<string> ss = new List<string>();
@@ -3158,17 +3209,33 @@ namespace Gekko
             return ss;
         }
 
+        /// <summary>
+        /// Helper for PCIM databank reading
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static String oddX0000Hack(String val)
         {            
             String val1 = val.Replace('\x0000', '?');  //some odd hack regarding this odd character
             return val1;
         }
 
+        /// <summary>
+        /// Compare path names
+        /// </summary>
+        /// <param name="path1"></param>
+        /// <param name="path2"></param>
+        /// <returns></returns>
         public static bool IsSamePath(string path1, string path2)
         {
             return string.Compare(Path.GetFullPath(path1).TrimEnd('\\'), Path.GetFullPath(path2).TrimEnd('\\'), StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
+        /// <summary>
+        /// Helper method for TABLE
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static bool IsMissingVariableArtificialNumber(double val)
         {
             if (val > Globals.missingVariableArtificialNumberLow && val < Globals.missingVariableArtificialNumberHigh)
@@ -3212,29 +3279,48 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Pretty print name and frequency
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="useQuotes"></param>
+        /// <returns></returns>
         public static string GetNameAndFreqPretty(string input, bool useQuotes)
         {
             //returns '%s' or 'x' or 'x' (Annual)
             string freq = null; string varname = null;
             O.ChopFreq(input, ref freq, ref varname);
             string freqPretty = null;
-            if (freq != null) freqPretty = " (" + G.GetFreqString(ConvertFreq(freq)) + ")";
+            if (freq != null) freqPretty = " (" + G.GetFreqPretty(ConvertFreq(freq)) + ")";
             if(useQuotes) return "'" + varname + "'" + freqPretty;
             else return varname + freqPretty;
         }
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string GetNameAndFreqPretty(string input)
         {
             return GetNameAndFreqPretty(input, true);
         }
 
-        public static string GetFreqString()
+        /// <summary>
+        /// Get current frequency as pretty string
+        /// </summary>
+        /// <returns></returns>
+        public static string GetFreqPretty()
         {            
-            return GetFreqString(Program.options.freq);            
+            return GetFreqPretty(Program.options.freq);            
         }
                
-
-        public static string GetFreqString(EFreq input)
+        /// <summary>
+        /// Convert EFreq to pretty string
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string GetFreqPretty(EFreq input)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -3268,6 +3354,11 @@ namespace Gekko
             return f;
         }
 
+        /// <summary>
+        /// Check that t1 is less than or equal to t2
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
         public static void CheckLegalPeriod(GekkoTime t1, GekkoTime t2)
         {
             int n = GekkoTime.Observations(t1, t2);
@@ -3278,11 +3369,24 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Get type of variable as string
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string GetTypeString(IVariable input)
         {
             return input.Type().ToString().ToLower();
         }
 
+        /// <summary>
+        /// Replace string inside string, case insensitive
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="oldValue"></param>
+        /// <param name="newValue"></param>
+        /// <param name="onlyFirst"></param>
+        /// <returns></returns>
         static public string ReplaceString(string str, string oldValue, string newValue, bool onlyFirst)
         {            
             //Is always case-insensitive!
@@ -3305,6 +3409,11 @@ namespace Gekko
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Convert from GekkoTime to string, cf. FromStringToDate()
+        /// </summary>
+        /// <param name="gt"></param>
+        /// <returns></returns>
         public static string FromDateToString(GekkoTime gt)
         {
             //The reverse: see FromStringToDate()
@@ -3313,6 +3422,11 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// For a date like 2020m10d2 gets "m10d2".
+        /// </summary>
+        /// <param name="gt"></param>
+        /// <returns></returns>
         public static string GetSubPeriodString(GekkoTime gt)
         {
             //========================================================================================================
@@ -3341,23 +3455,12 @@ namespace Gekko
             return subend;
         }
 
-        public static bool IsDotIdent(string bank)
-        {
-            //generalizes IsIdent(), handles abc.de
-            string[] split = bank.Split('.');
-            if (split.Length == 1)
-            {
-                return IsIdent(split[0]);
-            }
-            else if (split.Length == 2)
-            {
-                if (split[0].Length > 0 && split[1].Length > 0 && IsIdent(split[0]) && IsIdent(split[1]))
-                    return true;
-                else return false;
-            }
-            else return false;
-        }        
-        
+        /// <summary>
+        /// Internal method. Before a .gcm file is parsed, some "glue" symbols are added to aid parsing. These are removed here.
+        /// Use to transform parser errors containing parts of the .gcm code.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string ReplaceGlueNew(string s)
         {
             //int length = s.Length;
@@ -3382,6 +3485,11 @@ namespace Gekko
             return s;
         }        
         
+        /// <summary>
+        /// Accepts names like a38, _xy, that is, "variable names".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool IsIdent(string s)
         {
             bool simple = true;
@@ -3409,12 +3517,24 @@ namespace Gekko
             return simple;
         }
 
+        /// <summary>
+        /// Cf. IsIdent()
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool IsIdentTranslate(string s)
         {
             if (s == null || s == "") return false;
             return IsIdent(s);
         }   
 
+        /// <summary>
+        /// Check if a string is an integer, with special options. 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="canHaveMinus"></param>
+        /// <param name="canBeZero"></param>
+        /// <returns></returns>
         public static bool IsInteger(string s, bool canHaveMinus, bool canBeZero)
         {
             //if canBeZero is false, the integer has to be <> 0 when evaluated
@@ -3446,17 +3566,32 @@ namespace Gekko
             return true;
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool IsInteger(string s)
         {
             return IsInteger(s, false, true);
         }
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool IsIntegerTranslate(string s)
         {
             if (s == null || s == "") return false;
             return IsInteger(s);
         }
 
+        /// <summary>
+        /// Check if variable is series or value of 1x1 matrix. Used for printing/plotting.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static bool IsValueType(IVariable x)
         {
             if (x.Type() == EVariableType.Series)
@@ -3474,6 +3609,13 @@ namespace Gekko
             else return false;
         }
 
+        /// <summary>
+        /// Converts a double into nearest int. Expects the input value to be very neaar to an integer, tolerance 0.000001 absolute.
+        /// Will handle negative values ok.
+        /// </summary>
+        /// <param name="rounded"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool ConvertToInt(out int rounded, double value)
         {            
             bool flag = true;
@@ -3486,6 +3628,11 @@ namespace Gekko
             return flag;
         }
 
+        /// <summary>
+        /// Converts a double into nearest int. Expects the input value to be very neaar to an integer, tolerance 0.000001 absolute.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static int ConvertToInt(double value)
         {
             //simpler method
@@ -3500,6 +3647,11 @@ namespace Gekko
             return rounded;
         }
 
+        /// <summary>
+        /// Calendar function.
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
         public static bool IsLeapYear(int year)
         {
             if (year < 1 || year > 9999)
@@ -3511,7 +3663,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Converts e.g. "fxo" to "fXo" is a model is loaded
+        /// Converts e.g. "fxo" to "fXo" is a model is loaded (using casing of model)
         /// </summary>
         /// <param name="var">Input string</param>
         /// <returns>Output string</returns>
@@ -3531,11 +3683,20 @@ namespace Gekko
             return var;
         }
 
+        /// <summary>
+        /// Whether a Gekko model is loaded with MODEL
+        /// </summary>
+        /// <returns></returns>
         public static bool HasModelGekko()
         {
             return Program.model != null && Program.model.modelGekko != null;
         }
 
+        /// <summary>
+        /// Prints list of strings to file
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="list"></param>
         public static void PrintListWithCommasToFile(StreamWriter file, List<string> list)
         {
             bool first = true;
@@ -3549,12 +3710,23 @@ namespace Gekko
             return;
         }        
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="insertLinks"></param>
         public static void PrintListWithCommas(List<string> list, bool insertLinks)
         {
             PrintListWithCommas(list, insertLinks, false);            
             return;
         }
 
+        /// <summary>
+        /// Print list of strings with commas, possibly with links
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="insertLinks"></param>
+        /// <param name="nocr"></param>
         public static void PrintListWithCommas(List<string> list, bool insertLinks, bool nocr)
         {
             int counter = 0;
@@ -3581,6 +3753,11 @@ namespace Gekko
             return;
         }
 
+        /// <summary>
+        /// Transform a list of strings to a comma-separated string
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static string GetListWithCommas(List<string> list) 
         {
             if (list == null) return null;
@@ -3594,6 +3771,11 @@ namespace Gekko
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static string GetListWithCommas(string[] list)
         {
             if (list == null) return null;
@@ -3602,20 +3784,22 @@ namespace Gekko
         
         /// <summary>
         /// For writing output to screen
-        /// </summary>
-        /// <param name="s"></param>
+        /// </summary>        
         public static void Write(string s)
         {
             WriteAbstract(s, null, false, Color.Empty, false, ETabs.Main);            
         }
 
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>        
         public static void Write(string s, ETabs tab)
         {
             WriteAbstract(s, null, false, Color.Empty, false, tab);
         }
 
         /// <summary>
-        /// For writing output to screen in a color
+        /// For writing output to screen
         /// </summary>
         /// <param name="s"></param>
         public static void Write(string s, Color color)
@@ -3623,6 +3807,9 @@ namespace Gekko
             WriteAbstract(s, null, false, color, false, ETabs.Main);
         }
 
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Write(string s, Color color, ETabs tab)
         {
             WriteAbstract(s, null, false, color, false, tab);
@@ -3630,32 +3817,38 @@ namespace Gekko
       
         /// <summary>
         /// For writing output to screen
-        /// </summary>
-        /// <param name="x"></param>
+        /// </summary>        
         public static void Write(int x)
         {
             WriteAbstract(x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Write(int x, ETabs tab)
         {
             WriteAbstract(x.ToString(), null, false, Color.Empty, false, tab);
         }
         /// <summary>
         /// For writing output to screen
-        /// </summary>
-        /// <param name="x"></param>
+        /// </summary>        
         public static void Write(double x)
         {
             WriteAbstract(x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Write(double x, ETabs tab)
         {
             WriteAbstract(x.ToString(), null, false, Color.Empty, false, tab);
         }
 
-
+        /// <summary>
+        /// Use GekkoAction class instead
+        /// </summary>
         public static string GetLinkAction(string s, GekkoAction a)
         {
             string s2 = Globals.linkActionStart + s + Globals.linkActionDelimiter + ++Globals.linkActionCounter + Globals.linkActionEnd;
@@ -3685,65 +3878,91 @@ namespace Gekko
             WriteAbstract(text, linktype, false, Color.Empty, true, tab);  //Color is not used anyway -- gets blue underlined
         }
 
-        //Provides extra blank line
+        /// <summary>
+        /// Printing, with extra blank line before
+        /// </summary>
         public static void Writeln2(string s)
         {
             Writeln();
             Writeln(s);
         }
 
-        //Provides extra blank line
+        /// <summary>
+        /// Printing, with extra blank line before
+        /// </summary>
         public static void Write2(string s)
         {
             Writeln();
             Write(s);
         }
 
-        //Provides extra blank line
+        /// <summary>
+        /// Printing, with extra blank line before
+        /// </summary>
         public static void Writeln2(string s, Color color)
         {
             Writeln();
             Writeln(s, color);
         }
 
-        //Easier to remember G.Writeln()
+
         /// <summary>
-        /// For writing output to screen (with line feed)
+        /// For writing output to screen
         /// </summary>
-        /// <param name="s"></param>
         public static void Writeln(string s)
         {
             WriteAbstract(s, null, true, Color.Empty, false, ETabs.Main);
         }
 
+
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Writeln(string s, ETabs tab)
         {
             WriteAbstract(s, null, true, Color.Empty, false, tab);
         }
+
+
         /// <summary>
-        /// For writing output to screen in a color
+        /// For writing output to screen
         /// </summary>
-        /// <param name="s"></param>
         public static void Writeln(string s, Color color)
         {
             WriteAbstract(s, null, true, color, false, ETabs.Main);
         }
 
+
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Writeln(string s, Color color, bool mustAlsoWriteToScreen)
         {
             WriteAbstractScroll(s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
         }
 
+
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Writeln(string s, Color color, ETabs tab)
         {
             WriteAbstract(s, null, true, color, false, tab);
         }
 
+
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void WriteAbstract(string s, string linktype, bool newline, Color color, bool link, ETabs tab)
         {            
             WriteAbstractScroll(s, linktype, null, newline, color, link, tab, false, false);
         }
 
+
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void WriteAbstractScroll(string s, string linktype, Action a, bool newline, Color color, bool link, ETabs tab, bool mustScrollToEnd, bool mustAlsoPrintToScreen)
         {
             if (Globals.applicationIsInProcessOfDying)
@@ -3787,11 +4006,22 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Used in DECOMP.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="word"></param>
+        /// <returns></returns>
         public static bool ContainsWord(string s, string word)
         {                       
             return Regex.Match(s, @"\b" + word + @"\b", RegexOptions.IgnoreCase).Success;
         }
 
+        /// <summary>
+        /// Used for JSON
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string RemoveComments(string input)
         {
             var blockComments = @"/\*(.*?)\*/";
@@ -3810,6 +4040,9 @@ namespace Gekko
             return noComments;
         }
 
+        /// <summary>
+        /// For developer use/debugging
+        /// </summary>        
         public static void WritelnGray(string s)
         {
             if (!Globals.runningOnTTComputer) return;
@@ -3817,6 +4050,9 @@ namespace Gekko
             WriteAbstract(s, null, true, Color.Gray, false, ETabs.Main);
         }
 
+        /// <summary>
+        /// For developer use/debugging
+        /// </summary>
         public static bool IsUnitTesting()  
         {
             if (Globals.excelDna) return true;            
@@ -3824,6 +4060,9 @@ namespace Gekko
             else return false;
         }
 
+        /// <summary>
+        /// This is the "real" method actually doing the printing
+        /// </summary>
         public static void WriteAbstract2(Object o)
         {            
             Program.WorkerThreadHelper2 wh = (Program.WorkerThreadHelper2)o;
@@ -3835,9 +4074,9 @@ namespace Gekko
             ETabs tab = wh.tab;
             bool mustScrollToEnd = wh.mustScrollToEnd;
 
-            if (s.Contains(Globals.linkActionStart))
+            if (s.Contains(Globals.linkActionStart)) // Use GekkoAction class instead
             {
-                LinkAction action = FindAction(s);
+                LinkAction action = FindAction(s); 
                 if (action != null)
                 {
                     Program.WorkerThreadHelper2 wh1 = wh.Clone();
@@ -3869,6 +4108,8 @@ namespace Gekko
                         {
                             if (s.Substring(j, Globals.linkActionEnd.Length) == Globals.linkActionEnd)
                             {
+                                // Use GekkoAction class instead
+
                                 int start = i + Globals.linkActionStart.Length;
                                 int end = j;
                                 string chop1 = s.Substring(0, start - Globals.linkActionStart.Length);
@@ -4067,12 +4308,17 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// Used for TABLE links
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static int ExtraLinkLength(string s)
         {
             int extra = 0;
             string sRest = s;
 
-            LinkAction action = FindAction(s);
+            LinkAction action = FindAction(s);  // Use GekkoAction class instead
             if (action != null)
             {
                 extra += Globals.linkActionStart.Length;
@@ -4086,6 +4332,11 @@ namespace Gekko
             return extra;
         }
 
+        /// <summary>
+        /// Use GekkoAction class instead
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static LinkAction FindAction(string s)
         {
             //Will only return the first link found
@@ -4114,6 +4365,12 @@ namespace Gekko
             return action;  //will be null
         }
 
+        /// <summary>
+        /// Helper method
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="textBox"></param>
+        /// <param name="newline"></param>
         private static void WriteAbstractClipHelper(string s, RichTextBoxEx textBox, bool newline)
         {
             string start = "*** ERROR: ";
@@ -4177,11 +4434,15 @@ namespace Gekko
         {
             WriteAbstract("", null, true, Color.Empty, false, ETabs.Main);
         }
-
+        
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Writeln(ETabs tab)
         {
             WriteAbstract("", null, true, Color.Empty, false, tab);
         }
+        
         /// <summary>
         /// For writing output to screen (with line feed)
         /// </summary>
@@ -4191,10 +4452,14 @@ namespace Gekko
             WriteAbstract(x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Writeln(int x, ETabs tab)
         {
             WriteAbstract(x.ToString(), null, true, Color.Empty, false, tab);
         }
+
         /// <summary>
         /// For writing output to screen (with line feed)
         /// </summary>
@@ -4204,11 +4469,17 @@ namespace Gekko
             WriteAbstract(x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static void Writeln(double x, ETabs tab)
         {
             WriteAbstract(x.ToString(), null, true, Color.Empty, false, tab);
         }
 
+        /// <summary>
+        /// For writing output to screen
+        /// </summary>
         public static bool FilenameIncludesPath(string filename)
         {
             return filename.Contains(":") || filename.Contains("\\");

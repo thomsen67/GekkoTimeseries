@@ -361,7 +361,7 @@ namespace Gekko
             }
             if (this.freq != start.freq)
             {
-                G.Writeln2("*** ERROR: Series is freq: " + G.GetFreqString(this.freq) + ", which is different from truncate freq: " + G.GetFreqString(start.freq));
+                G.Writeln2("*** ERROR: Series is freq: " + G.GetFreqPretty(this.freq) + ", which is different from truncate freq: " + G.GetFreqPretty(start.freq));
                 throw new GekkoException();
             }
             if (this.type == ESeriesType.Timeless) return;
@@ -577,7 +577,7 @@ namespace Gekko
 
         private void FreqError(GekkoTime t)
         {
-            G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqString(this.freq) + " versus " + G.GetFreqString(t.freq));
+            G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqPretty(this.freq) + " versus " + G.GetFreqPretty(t.freq));
             throw new GekkoException();
         }
 
@@ -1913,7 +1913,7 @@ namespace Gekko
             {
                 if (x1.freq != x2_series.freq)
                 {
-                    G.Writeln2("*** ERROR: Frequencies do not match: " + G.GetFreqString(x1.freq) + " vs " + G.GetFreqString(x2_series.freq));
+                    G.Writeln2("*** ERROR: Frequencies do not match: " + G.GetFreqPretty(x1.freq) + " vs " + G.GetFreqPretty(x2_series.freq));
                     throw new GekkoException();
                 }
             }
@@ -2184,7 +2184,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: You cannot index " + G.GetFreqString(this.freq) + " series with value " + i);
+                            G.Writeln2("*** ERROR: You cannot index " + G.GetFreqPretty(this.freq) + " series with value " + i);
                             throw new GekkoException();
                         }
                     }
@@ -2572,7 +2572,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqString(this.freq) + " SERIES with [" + i + "]");
+                        G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqPretty(this.freq) + " SERIES with [" + i + "]");
                         throw new GekkoException();
                     }
                 }

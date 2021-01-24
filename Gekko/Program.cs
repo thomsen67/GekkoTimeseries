@@ -5876,7 +5876,7 @@ namespace Gekko
             start = G.FromDateToString(Globals.globalPeriodStart);
             end = G.FromDateToString(Globals.globalPeriodEnd);
 
-            string f = G.GetFreqString();
+            string f = G.GetFreqPretty();
 
             string workingFolder = "";
             string banks = "";
@@ -10959,7 +10959,7 @@ namespace Gekko
             int vars = matrix.GetRowMaxNumber() - i_data + 1;
             int obs = matrix.GetColMaxNumber() - j_data + 1;
             G.Writeln("Imported " + vars + " timeseries from " + obs + " data points");
-            G.Writeln("The collapsed series (" + G.GetFreqString(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
+            G.Writeln("The collapsed series (" + G.GetFreqPretty(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
 
         private static void HandleRectangularFileFormatCellOffset(CellOffset o, bool isTranspose, out int i_data, out int j_data, out int i_names, out int j_names, out int i_dates, out int j_dates)
@@ -11505,7 +11505,7 @@ namespace Gekko
 
                 string freq = "[unknown frequency]";
 
-                freq = G.GetFreqString(ts.freq);
+                freq = G.GetFreqPretty(ts.freq);
 
                 bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
 
@@ -11887,7 +11887,7 @@ namespace Gekko
 
             if (eqsPrinted) G.Writeln("");
 
-            G.Writeln(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
+            G.Writeln(G.GetFreqPretty(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
 
             double dimCount2 = 1d;
             string dimCount = null;
@@ -14842,7 +14842,7 @@ namespace Gekko
             G.Writeln2("Global time set: " + G.FromDateToString(Globals.globalPeriodStart) + " to " + G.FromDateToString(Globals.globalPeriodEnd) + " (" + GekkoTime.Observations(Globals.globalPeriodStart, Globals.globalPeriodEnd) + " periods)");
             if (t1.freq != Program.options.freq || t2.freq != Program.options.freq)
             {
-                G.Writeln("+++ NOTE: The dates have been converted to " + G.GetFreqString(Program.options.freq) + " frequency");
+                G.Writeln("+++ NOTE: The dates have been converted to " + G.GetFreqPretty(Program.options.freq) + " frequency");
             }
             
         }        

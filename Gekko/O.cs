@@ -2345,7 +2345,7 @@ namespace Gekko
                     }
                     foreach (KeyValuePair<EFreq, long> kvp in count)
                     {
-                        s += kvp.Value + " (" + G.GetFreqString(kvp.Key) + "), ";
+                        s += kvp.Value + " (" + G.GetFreqPretty(kvp.Key) + "), ";
                     }
                     if (s != null)
                     {
@@ -3836,8 +3836,8 @@ namespace Gekko
                                                                                                                                     //We copy in from that window
                                                 if (lhs_series.freq != rhs_series_beware.freq)
                                                 {
-                                                    G.Writeln2("*** ERROR: Frequency mismatch. Left-hand series is " + G.GetFreqString(lhs_series.freq) + ",");
-                                                    G.Writeln("           whereas right-hand series is " + G.GetFreqString(lhs_series.freq), Color.Red);
+                                                    G.Writeln2("*** ERROR: Frequency mismatch. Left-hand series is " + G.GetFreqPretty(lhs_series.freq) + ",");
+                                                    G.Writeln("           whereas right-hand series is " + G.GetFreqPretty(lhs_series.freq), Color.Red);
                                                     throw new GekkoException();
                                                 }
 
@@ -5874,7 +5874,7 @@ namespace Gekko
             {
                 if (((Series)x).freq != ((Series)y).freq)
                 {
-                    G.Writeln2("*** ERROR: You cannot logically compare two timeseries with freqs " + G.GetFreqString(((Series)x).freq) + " and " + G.GetFreqString(((Series)y).freq));
+                    G.Writeln2("*** ERROR: You cannot logically compare two timeseries with freqs " + G.GetFreqPretty(((Series)x).freq) + " and " + G.GetFreqPretty(((Series)y).freq));
                     throw new GekkoException();
                 }
             }
