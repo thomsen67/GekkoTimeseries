@@ -1931,7 +1931,7 @@ namespace Gekko
             }
 
             string varName = cellText.Trim();  //the name may contain blanks like 'elveff '
-            varName = G.Chop_FreqAdd(varName, Program.options.freq);
+            varName = G.Chop_AddFreq(varName, Program.options.freq);
             variableCounter++;
             if (!databank.ContainsIVariable(varName))
             {
@@ -7642,7 +7642,7 @@ namespace Gekko
                     negative = true;
                 }
 
-                Series ts = O.GetIVariableFromString(G.Chop_FreqAdd(var2, EFreq.A), O.ECreatePossibilities.NoneReportError, true) as Series;
+                Series ts = O.GetIVariableFromString(G.Chop_AddFreq(var2, EFreq.A), O.ECreatePossibilities.NoneReportError, true) as Series;
 
                 if (ts == null)
                 {
@@ -17332,7 +17332,7 @@ namespace Gekko
             //Has an overload used for UPD statements etc.
             Series ts = null;
 
-            string varName2 = G.Chop_FreqAdd(varName, frequency);
+            string varName2 = G.Chop_AddFreq(varName, frequency);
 
             //string varName2 = Program.AddFreqAtEndOfVariableName(varName, frequency);
 
@@ -23799,7 +23799,7 @@ namespace Gekko
                                                 double y1_double = y1_series.GetData(smpl, t2);
                                                 double grad = (y1_double - y0_double) / eps;
                                                 int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                            
-                                                string name = G.Chop_FreqRemove(dp.s, per1.freq);
+                                                string name = G.Chop_RemoveFreq(dp.s, per1.freq);
 
                                                 if (lag != 0)
                                                 {

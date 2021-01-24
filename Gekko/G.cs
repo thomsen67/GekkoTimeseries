@@ -504,7 +504,7 @@ namespace Gekko
         {
             //Only used internally, when dealing with databanks. Not relevant for
             //outside use.
-            if (freq == null) return G.Chop_FreqAdd(varName, Program.options.freq);
+            if (freq == null) return G.Chop_AddFreq(varName, Program.options.freq);
             else return G.Chop_AddFreq(varName, freq);
         }
 
@@ -525,11 +525,16 @@ namespace Gekko
         /// <param name="freq"></param>
         /// <returns></returns>
         public static EFreq ConvertFreq(string freq)
-        {
+        {            
             return ConvertFreq(freq, false);
         }
 
-
+        /// <summary>
+        /// Convert from string to EFreq. Can optionally return current freq if string == null.
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <param name="nullIsCurrent"></param>
+        /// <returns></returns>
         public static EFreq ConvertFreq(string freq, bool nullIsCurrent)
         {
             //========================================================================================================
@@ -571,6 +576,11 @@ namespace Gekko
             return eFreq;
         }
 
+        /// <summary>
+        /// Get the freq part of a name (for instance q in x!q) and return it as EFreq.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static EFreq GetFreqFromName(string s)
         {
             string f = G.Chop_GetFreq(s);
@@ -583,26 +593,23 @@ namespace Gekko
             {
                 return G.ConvertFreq(f);
             }
-        }
+        }        
 
-        public static bool Chop_HasFreq(string s)
-        {
-            if (G.Chop_GetFreq(s) != null) return true;
-            return false;
-        }
-
-        public static bool Chop_HasIndex(string s)
-        {
-            if (G.Chop_GetIndex(s).Count > 0) return true;
-            return false;
-        }
-
+        /// <summary>
+        /// Test if variable type is null
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <returns></returns>
         public static bool IsGekkoNull(IVariable x1)
         {
             return x1.Type() == EVariableType.Null;
         }
 
-
+        /// <summary>
+        /// Helper method, return the number of fields in GekkoTime object. Technical use.
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <returns></returns>
         public static int FreqType(Series ts)
         {
             if (ts.freq == EFreq.A || ts.freq == EFreq.U) return 1;
@@ -620,42 +627,85 @@ namespace Gekko
         // ========================= functions to manipulate bankvarnames with indexes start =========================================
         // ===========================================================================================================================
 
+            
+        public static bool Chop_HasFreq(string bankvarname)
+        {
+            if (G.Chop_GetFreq(bankvarname) != null) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Whether or not a bankvarname has an index (like array-series x[a, b]).
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
+        public static bool Chop_HasIndex(string bankvarname)
+        {
+            if (G.Chop_GetIndex(bankvarname).Count > 0) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Get bank part of bankvarname. Returns blank if no bank.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_GetBank(string s1)
+        public static string Chop_GetBank(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
             string ss = "";
             if (bank != null) ss = bank;
             return ss;
         }
 
+        /// <summary>
+        /// Get name part of bankvarname. Freq is not included.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_GetName(string s1)
+        public static string Chop_GetName(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
             return name;
         }
 
+        /// <summary>
+        /// Get freq part of bankvarname.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_GetFreq(string s1)
+        public static string Chop_GetFreq(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
             if (freq == null) return "";
             else return freq;
         }
 
+        /// <summary>
+        /// Get name + freq from bankvarname.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_GetNameAndFreq(string s1)
+        public static string Chop_GetNameAndFreq(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
             if (freq == null) return name;
             else return name + Globals.freqIndicator + freq;
         }
 
+        /// <summary>
+        /// Get index part of bankvarname, for instance x!q[a, b] returns ["a", "b"]
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
         public static List<string> Chop_GetIndex(string s1)
         {
@@ -665,6 +715,14 @@ namespace Gekko
             else return new List<string>(index);
         }
 
+        /// <summary>
+        /// Produces a bankvarname from chops/chunks/parts.
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <param name="name"></param>
+        /// <param name="freq"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
         public static string Chop_GetFullName(string bank, string name, string freq, string[] index)
         {
@@ -672,6 +730,12 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Add bank to bankvarname, if not already there.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="bank"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
         public static string Chop_AddBank(string name, string bank)
         {
@@ -687,122 +751,199 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Set bank in bankvarname (will override existing bank)
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="bankname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_SetBank(string s1, string s2)
+        public static string Chop_SetBank(string bankvarname, string bankname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            return O.UnChop(s2, name, freq, index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            return O.UnChop(bankname, name, freq, index);
         }
 
+        /// <summary>
+        /// Remove bank from bankvarname.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_RemoveBank(string s1)
+        public static string Chop_RemoveBank(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
             return O.UnChop(null, name, freq, index);
         }
 
+        /// <summary>
+        /// Remove particular bank from bankvarname. Keep if different.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="bankname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_RemoveBank(string s1, string bankname)
+        public static string Chop_RemoveBank(string bankvarname, string bankname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
             string bankRemove = bankname;
             if (G.Equal(bankRemove, bank)) bank = null;
             return O.UnChop(bank, name, freq, index);
         }
 
+        /// <summary>
+        /// Replace bankname in bankvarname
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="bankname1"></param>
+        /// <param name="bankname2"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_ReplaceBank(string s1, string s2, string s3)
+        public static string Chop_ReplaceBank(string bankvarname, string bankname1, string bankname2)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (G.Equal(s2, bank)) bank = s3;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            if (G.Equal(bankname1, bank)) bank = bankname2;
             return O.UnChop(bank, name, freq, index);
         }
 
+        /// <summary>
+        /// Add freq to bankvarname, if not already there
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="freqname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_AddFreq(string varname, string freqname)
+        public static string Chop_AddFreq(string bankvarname, string freqname)
         {
             //only adds a freq if there is no freq already
             string bank, name, freq; string[] index;
-            O.Chop(varname, out bank, out name, out freq, out index);
-            if (G.Chop_HasSigil(name)) return varname;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return bankvarname;
             if (freq == null)
             {
                 return O.UnChop(bank, name, freqname, index);
             }
             else
             {
-                return varname;
+                return bankvarname;
             }
         }
 
-        public static string Chop_FreqAdd(string s1, EFreq freq)
+        /// <summary>
+        /// Variant
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static string Chop_AddFreq(string bankvarname, EFreq freq)
         {
-            return Chop_AddFreq(s1, G.ConvertFreq(freq));
+            return Chop_AddFreq(bankvarname, G.ConvertFreq(freq));
         }
 
+        /// <summary>
+        /// Set freq in bankvarname, will override.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="freqname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_SetFreq(string s1, string s2)
+        public static string Chop_SetFreq(string bankvarname, string freqname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (G.Chop_HasSigil(name)) return s1;
-            return O.UnChop(bank, name, s2, index);
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return bankvarname;
+            return O.UnChop(bank, name, freqname, index);
         }
 
-        public static string Chop_FreqSet(string s1, EFreq freq)
+        /// <summary>
+        /// Variant.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static string Chop_SetFreq(string bankvarname, EFreq freq)
         {
-            return Chop_SetFreq(s1, G.ConvertFreq(freq));
+            return Chop_SetFreq(bankvarname, G.ConvertFreq(freq));
         }
 
+        /// <summary>
+        /// Remove index part of varname, for instance x[a, b] --> x.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_RemoveIndex(string s1)
+        public static string Chop_RemoveIndex(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (G.Chop_HasSigil(name)) return s1;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return bankvarname;
             return O.UnChop(bank, name, freq, null);
         }
 
+        /// <summary>
+        /// Remove freq part of varnamne.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_RemoveFreq(string s1)
+        public static string Chop_RemoveFreq(string bankvarname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (G.Chop_HasSigil(name)) return s1;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return bankvarname;
             return O.UnChop(bank, name, null, index);
         }
 
+        /// <summary>
+        /// Remove freq part of name, if the freq part is equal to second argument.
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="freqname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_RemoveFreq(string s1, string s2)
+        public static string Chop_RemoveFreq(string bankvarname, string freqname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (G.Chop_HasSigil(name)) return s1;
-            string freqRemove = s2;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return bankvarname;
+            string freqRemove = freqname;
             if (G.Equal(freqRemove, freq)) freq = null;
             return O.UnChop(bank, name, freq, index);
         }
 
-        public static string Chop_FreqRemove(string s1, EFreq freq)
+        /// <summary>
+        /// Variant
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static string Chop_RemoveFreq(string bankvarname, EFreq freq)
         {
-            return Chop_RemoveFreq(s1, G.ConvertFreq(freq));
+            return Chop_RemoveFreq(bankvarname, G.ConvertFreq(freq));
         }
 
+        /// <summary>
+        /// Replace a certain freq with some other
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="freq1"></param>
+        /// <param name="freq2"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_ReplaceFreq(string s1, string s2, string s3)
+        public static string Chop_ReplaceFreq(string bankvarname, string freq1, string freq2)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (G.Chop_HasSigil(name)) return s1;
-            if (G.Equal(s2, freq)) freq = s3;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return bankvarname;
+            if (G.Equal(freq1, freq)) freq = freq2;
             return O.UnChop(bank, name, freq, index);
         }
 
-        public static string Chop_FreqReplace(string s1, EFreq freq2, EFreq freq3)
+        public static string Chop_ReplaceFreq(string s1, EFreq freq2, EFreq freq3)
         {
             return Chop_ReplaceFreq(s1, G.ConvertFreq(freq2), G.ConvertFreq(freq3));
         }

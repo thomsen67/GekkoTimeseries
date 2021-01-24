@@ -1644,8 +1644,8 @@ namespace Gekko
                                 G.Writeln2("*** ERROR: the elements of global:#alias must contain two strings");
                                 throw new GekkoException();
                             }
-                            string s1 = G.Chop_FreqAdd(O.ConvertToString(element_list[0]), Program.options.freq);
-                            string s2 = G.Chop_FreqAdd(O.ConvertToString(element_list[1]), Program.options.freq);
+                            string s1 = G.Chop_AddFreq(O.ConvertToString(element_list[0]), Program.options.freq);
+                            string s2 = G.Chop_AddFreq(O.ConvertToString(element_list[1]), Program.options.freq);
                             
                             if (alias3.ContainsKey(s1))
                             {

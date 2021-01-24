@@ -14682,7 +14682,7 @@ print(df2)
 
         private static void _AssertSeries(IBank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int subsub1, int year2, int sub2, int subsub2, double x, double delta)
         {
-            string s = G.Chop_FreqAdd(s2, Program.options.freq);
+            string s = G.Chop_AddFreq(s2, Program.options.freq);
 
             GekkoTime t1 = new GekkoTime(freq, year1, sub1, subsub1);
             GekkoTime t2 = new GekkoTime(freq, year2, sub2, subsub2);

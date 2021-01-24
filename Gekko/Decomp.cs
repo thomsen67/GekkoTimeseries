@@ -1235,7 +1235,7 @@ namespace Gekko
                                         //Function call end   --------------
 
                                         Series y1_series = y1 as Series;
-                                        string nameOriginal = G.Chop_FreqRemove(dp.s, tt1.freq);
+                                        string nameOriginal = G.Chop_RemoveFreq(dp.s, tt1.freq);
 
                                         if (true)  //this does not seem to cost any time...?
                                         {

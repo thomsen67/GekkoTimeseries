@@ -97,8 +97,8 @@ namespace Gekko
             Matrix name_stats = new Matrix(9, 1, double.NaN);
             Matrix name_covar = new Matrix(m, m, double.NaN);
             Matrix name_corr = new Matrix(m, m, double.NaN);
-            Series name_predict = new Series(o.t1.freq, G.Chop_FreqAdd(name + "_predict", lhs_series.freq));
-            Series name_residual = new Series(o.t1.freq, G.Chop_FreqAdd(name + "_residual", lhs_series.freq));
+            Series name_predict = new Series(o.t1.freq, G.Chop_AddFreq(name + "_predict", lhs_series.freq));
+            Series name_residual = new Series(o.t1.freq, G.Chop_AddFreq(name + "_residual", lhs_series.freq));
 
             double[] scaling = new double[x.GetLength(1)];
             for (int kk = 0; kk < x.GetLength(1); kk++)
