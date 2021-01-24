@@ -943,40 +943,90 @@ namespace Gekko
             return O.UnChop(bank, name, freq, index);
         }
 
+        /// <summary>
+        /// Variant
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="freq2"></param>
+        /// <param name="freq3"></param>
+        /// <returns></returns>
         public static string Chop_ReplaceFreq(string s1, EFreq freq2, EFreq freq3)
         {
             return Chop_ReplaceFreq(s1, G.ConvertFreq(freq2), G.ConvertFreq(freq3));
         }
 
+        /// <summary>
+        /// Set name part of bankvarname
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="newname"></param>
+        /// <returns></returns>
         //See equivalent method in Functions.cs
-        public static string Chop_SetName(string s1, string s2)
+        public static string Chop_SetName(string bankvarname, string newname)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            name = s2;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            name = newname;
             return O.UnChop(bank, name, freq, index);
         }
 
-        public static string Chop_SetNamePrefix(string s1, string s2)
+        /// <summary>
+        /// Insert a prefix in a name in a bankvarname
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="prefix"></param>
+        /// <returns></returns>
+        public static string Chop_SetNamePrefix(string bankvarname, string prefix)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            name = s2 + name;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            name = prefix + name;
             return O.UnChop(bank, name, freq, index);
         }
 
-        public static string Chop_SetNameSuffix(string s1, string s2)
+        /// <summary>
+        /// Insert a suffix in a name in a bankvarname
+        /// </summary>
+        /// <param name="bankvarname"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
+        public static string Chop_SetNameSuffix(string bankvarname, string suffix)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            name = name + s2;
+            O.Chop(bankvarname, out bank, out name, out freq, out index);
+            name = name + suffix;
             return O.UnChop(bank, name, freq, index);
         }
+
+        /// <summary>
+        /// True if varname starts with % or #.
+        /// </summary>
+        /// <param name="varname"></param>
+        /// <returns></returns>
+        public static bool Chop_HasSigil(string varname)
+        {
+            if (varname.StartsWith(Globals.symbolCollection + Globals.listfile)) return true;  //otherwise Chop_GetName gets it wrong below
+            string varname2 = Chop_GetName(varname);
+            if (varname2 == null || varname2.Length == 0)
+            {
+                G.Writeln2("*** ERROR: Variable name with zero length");
+                throw new GekkoException();
+            }
+            bool hasSigil = false;
+            if (varname2[0] == Globals.symbolScalar || varname2[0] == Globals.symbolCollection) hasSigil = true;
+            return hasSigil;
+        }
+
 
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes end ===========================================
         // ===========================================================================================================================
-                     
+
+        /// <summary>
+        /// Helper method for missings handling
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static ESeriesMissing GetMissing(string s)
         {
             if (G.Equal(s, "error")) return ESeriesMissing.Error;
@@ -992,6 +1042,11 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// Convert freq from EFreq to string
+        /// </summary>
+        /// <param name="eFreq"></param>
+        /// <returns></returns>
         public static string ConvertFreq(EFreq eFreq)
         {
             //========================================================================================================
@@ -1034,6 +1089,12 @@ namespace Gekko
             return ExtractOnlyVariableIgnoreLag(key, Globals.lagIndicator);
         }
 
+        /// <summary>
+        /// Ignore lag part in for instance x[-1]
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public static string ExtractOnlyVariableIgnoreLag(string key, string code)
         {
             if (key == null) return null;
@@ -1049,12 +1110,22 @@ namespace Gekko
             return variable;
         }
 
+        /// <summary>
+        /// True if between a..z or A..Z
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public static bool IsEnglishLetter(char c)
         {
             //Problem is that char.IsLetter accepts זרו and others
             return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
         }
 
+        /// <summary>
+        /// Remove single quotes from string: 'ab' --> ab.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string StripQuotes(string s)
         {
             if (s == null) return null;
@@ -1065,6 +1136,11 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Remove double quotes from string: "ab" --> ab
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string StripQuotes2(string s)
         {
             if (s == null) return null;
@@ -1075,7 +1151,13 @@ namespace Gekko
             return s;
         }
 
-        //Maybe allowTurtle should be removed
+        /// <summary>
+        /// Checks if a name is "simple", a38, f16, var2, _var3, x_y etc. Cannot start with digit.
+        /// Option to allow frequency.
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <param name="allowFreqIndicator"></param>
+        /// <returns></returns>
         public static bool IsSimpleToken(string varName, bool allowFreqIndicator)
         {
             //must be like a38, f16, var2, _var3, x_y etc. Cannot start with digit.
@@ -1093,7 +1175,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (!G.IsLetterOrDigitOrUnderscoreOrTilde(varName[jj]))
+                    if (!G.IsLetterOrDigitOrUnderscoreOrExclamation(varName[jj]))
                     {
                         return false;
                     }
@@ -1102,21 +1184,42 @@ namespace Gekko
             return true;
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <returns></returns>
         public static bool IsSimpleToken(string varName)
         {
             return IsSimpleToken(varName, false);  //no turtle allowed, maybe remove that
         }
 
+        /// <summary>
+        /// Appends blanks so width is met.
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string varFormat(string level1, int width)
         {
             return level1 + G.Blanks(width - level1.Length);
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <returns></returns>
         public static string varFormat(string level1)
         {
             return varFormat(level1, 12);
         }
 
+        /// <summary>
+        /// Get seconds elapsed since param1
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <returns></returns>
         public static string Seconds(DateTime t0)
         {
             double milliseconds = (DateTime.Now - t0).TotalMilliseconds;
@@ -1124,6 +1227,11 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Show elapsed milliseconds in a readable format
+        /// </summary>
+        /// <param name="milliseconds"></param>
+        /// <returns></returns>
         public static string SecondsFormat(double milliseconds)
         {
             double total = milliseconds / 1000d;
@@ -1144,6 +1252,12 @@ namespace Gekko
 
         //----------- used in prt statement start -----------------------------------
 
+        /// <summary>
+        /// Pretty prints a number with blanks appended so width is met.
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string levelFormat(double level1, int width)
         {
             string levelFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0," + width + ":0.0000}", level1);
@@ -1151,6 +1265,12 @@ namespace Gekko
             return G.Blanks(width - levelFormatted.Length) + levelFormatted;
         }
 
+        /// <summary>
+        /// Pretty prints a percentage with blanks appended so width is met.
+        /// </summary>
+        /// <param name="pch1"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string pchFormat(double pch1, int width)
         {
             string pchFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0," + width + ":0.00}", pch1);
@@ -1163,6 +1283,12 @@ namespace Gekko
             return G.Blanks(width - pchFormatted.Length) + pchFormatted;
         }
 
+        /// <summary>
+        /// Pretty prints a dlog with blanks appended so width is met.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string dlogFormat(double input, int width)
         {
             string dlogFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0," + width + ":0.0000}", input);
@@ -1175,6 +1301,12 @@ namespace Gekko
             return G.Blanks(width - dlogFormatted.Length) + dlogFormatted;
         }
 
+        /// <summary>
+        /// Preprends blanks to a string so width is met.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string StringFormat(string input, int width)
         {
             return G.Blanks(width - input.Length) + input;  //right-aligned
@@ -1183,27 +1315,13 @@ namespace Gekko
         //----------- used in prt statement end -----------------------------------
 
 
-        public static bool LooksLikeSimpleList(string s)
-        {
-            //Should looke like "#mylist2"
-            for (int i = 0; i < s.Length; i++)
-            {
-                char c = s[i];
-                if (i == 0 && c != '#') return false;
-                if (i == 1 && !(G.IsLetterOrUnderscore(c))) return false;
-                if (i >= 2 && !(G.IsLetterOrDigitOrUnderscore(c))) return false;
-            }
-            return true;
-        }
-
-        public static int CountCharsInString(string source, string cc)
-        {
-            int count = 0;
-            foreach (char c in source)
-                if (c == cc[0]) count++;
-            return count;
-        }
-
+        /// <summary>
+        /// Pretty print of double with decimals.
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <param name="decimals"></param>
+        /// <param name="missFunction"></param>
+        /// <returns></returns>
         public static string UpdprtFormat(double level1, int decimals, bool missFunction)
         {
             string z = new string('0', decimals);
@@ -1216,11 +1334,22 @@ namespace Gekko
             return levelFormatted;
         }
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <returns></returns>
         public static string levelFormatOld(double level1)
         {
             return levelFormatOld(level1, 14);
         }
 
+        /// <summary>
+        /// Pretty print a double so a width is met
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string levelFormatOld(double level1, int width)
         {
             int widthM1 = width - 1;
@@ -1229,17 +1358,34 @@ namespace Gekko
             return G.Blanks(width - levelFormatted.Length) + levelFormatted;
         }
 
+        /// <summary>
+        /// Pretty print an it so a width is met
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string IntFormat(int input, int width)
         {
             string formatted = input.ToString();
             return G.Blanks(width - formatted.Length) + formatted;
         }
 
+        /// <summary>
+        /// Variant
+        /// </summary>
+        /// <param name="pch1"></param>
+        /// <returns></returns>
         public static string pchFormatOld(double pch1)
         {
             return pchFormatOld(pch1, 8);
         }
 
+        /// <summary>
+        /// Pretty print a percentage so a width is met
+        /// </summary>
+        /// <param name="pch1"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string pchFormatOld(double pch1, int width)
         {
             int widthM1 = width - 1;
@@ -1249,6 +1395,12 @@ namespace Gekko
             return G.Blanks(width - pchFormatted.Length) + pchFormatted;
         }
 
+        /// <summary>
+        /// Left-adjust a string so width is met
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string dateFormat(string date, int width)
         {
             //this format is left-adjusted, so we get this:
@@ -1260,11 +1412,22 @@ namespace Gekko
             return date + G.Blanks(width - date.Length);
         }
 
+        /// <summary>
+        /// Pretty print dlog
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string dlogFormatOld(double input)
         {
             return dlogFormatOld(input, 8);
         }
 
+        /// <summary>
+        /// Pretty print dlog
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
         public static string dlogFormatOld(double input, int width)
         {
             int widthM1 = width - 1;
@@ -1274,6 +1437,14 @@ namespace Gekko
             return G.Blanks(width - dlogFormatted.Length) + dlogFormatted;
         }
 
+        /// <summary>
+        /// Number formatting
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="format"></param>
+        /// <param name="numberShouldShowAsN"></param>
+        /// <param name="isTable"></param>
+        /// <returns></returns>
         //Used for PRT, TABLE, etc.
         //See also #83490837432, these should be merged/fusioned
         public static string FormatNumber(double number, string format, bool numberShouldShowAsN, bool isTable)
@@ -1399,35 +1570,55 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Return this number of blanks.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public static string Blanks(int count)
         {
             if (count <= 0) return "";
             return "".PadLeft(count);
         }
 
-        //only for debugging purposes
-        public static string BlanksDebug(int count)
-        {
-            if (count < 0) return "";
-            string s = "";
-            for (int i = 0; i < count; i++)
-            {
-                s = s + "'";
-            }
-            return s;
-        }
-
+        /// <summary>
+        /// TSP helper method
+        /// </summary>
+        /// <param name="al"></param>
+        /// <param name="alType"></param>
+        /// <param name="i"></param>
+        /// <param name="relativePosition"></param>
+        /// <returns></returns>
         public static String TspUtilityFindToken(List<string> al, List<string> alType, int i, int relativePosition)
         {
             int ii = -12345;
             return TspUtilityFindWord(out ii, 0, al, alType, i, relativePosition);
         }
+
+        /// <summary>
+        /// TSP helper method
+        /// </summary>
+        /// <param name="al"></param>
+        /// <param name="alType"></param>
+        /// <param name="i"></param>
+        /// <param name="relativePosition"></param>
+        /// <returns></returns>
         public static String TspUtilityFindType(List<string> al, List<string> alType, int i, int relativePosition)
         {
             int ii = -12345;
             return TspUtilityFindWord(out ii, 1, al, alType, i, relativePosition);
         }
 
+        /// <summary>
+        /// TSP helper method.
+        /// </summary>
+        /// <param name="ii"></param>
+        /// <param name="type"></param>
+        /// <param name="al"></param>
+        /// <param name="alType"></param>
+        /// <param name="i"></param>
+        /// <param name="relativePosition"></param>
+        /// <returns></returns>
         public static String TspUtilityFindWord(out int ii, int type, List<string> al, List<string> alType, int i, int relativePosition)
         {
             if (relativePosition == 0)
@@ -1460,13 +1651,26 @@ namespace Gekko
             while (true);
         }
 
+        /// <summary>
+        /// TSP helper method
+        /// </summary>
+        /// <param name="al"></param>
+        /// <param name="alType"></param>
+        /// <param name="i"></param>
+        /// <param name="relativePosition"></param>
+        /// <returns></returns>
         public static int TspUtilitiesFindIndex(List<string> al, List<string> alType, int i, int relativePosition)
         {
             int ii = -12345;
             TspUtilityFindWord(out ii, 1, al, alType, i, relativePosition);
             return ii;
         }
-                
+
+        /// <summary>
+        /// Make an exact copy of a databank
+        /// </summary>
+        /// <param name="newDatabank"></param>
+        /// <param name="originalDatabank"></param>                
         public static void CloneDatabank(Databank newDatabank, Databank originalDatabank)
         {
             newDatabank.FileNameWithPath = originalDatabank.FileNameWithPath;
@@ -1483,6 +1687,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Only replace first occurrence
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="oldValue"></param>
+        /// <param name="newValue"></param>
+        /// <returns></returns>
         public static string ReplaceFirstOccurrence(string original, string oldValue, string newValue)
         {
             if (String.IsNullOrEmpty(original))
@@ -1529,6 +1740,13 @@ namespace Gekko
             return temp;
         }
 
+        /// <summary>
+        /// Create a double[,] array with a specific value
+        /// </summary>
+        /// <param name="size1"></param>
+        /// <param name="size2"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double[,] CreateArrayDouble(int size1, int size2, double value)
         {
             double[,] temp = new double[size1, size2];
@@ -1540,27 +1758,15 @@ namespace Gekko
                 }
             }
             return temp;
-        }
+        }        
 
-        //if there is a lag paranthesis starting at pos i
-        //   0 1 2 3
-        //   ( - 1 )
-        //   ( + 1 )                
-        //Also handles specific years
-        //   0  1   2
-        //   ( 2001 )
-        //And broken lags, including leads
-        //   1 2  3 4        
-        //   ( - .5 )        
-        //   ( + .5 )        
-        //Will not accept this:
-        //   ( .25 )
-        //   because lags/leads should have +/-, and specific
-        //   years cannot be broken.
-        //And the above with a plus as well (broken leads)
-        //also accepts [-1] (AREMOS)
-        // i is located at the first lag parenthesis in fy(-1)
-
+        /// <summary>
+        /// Near obsolete method.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="isVarName"></param>
+        /// <param name="isInverse"></param>
+        /// <returns></returns>
         public static string PrettifyTimeseriesHash(string s, bool isVarName, bool isInverse)
         {
             //This is most probably obsolete now: it transforms x___a into x[a]
@@ -1591,11 +1797,24 @@ namespace Gekko
             }
         }
         
+        /// <summary>
+        /// Helper method for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
+        /// </summary>
+        /// <param name="strA"></param>
+        /// <param name="strB"></param>
+        /// <returns></returns>
         public static int CompareNaturalIgnoreCase(string strA, string strB)
         {
             return CompareNatural(strA, strB, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase);
         }
-
+        /// <summary>
+        /// Helper method for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
+        /// </summary>
+        /// <param name="strA"></param>
+        /// <param name="strB"></param>
+        /// <param name="culture"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static int CompareNatural(string strA, string strB, CultureInfo culture, CompareOptions options)
         {
             CompareInfo cmp = culture.CompareInfo;
@@ -1706,7 +1925,9 @@ namespace Gekko
             return 0;
         }
 
-        
+        /// <summary>
+        /// Helper class for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
+        /// </summary>
         public class NaturalComparer : IComparer<string>, IComparer
         {
 
@@ -1948,6 +2169,9 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper class for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
+        /// </summary>
         public class NaturalComparerException : System.Exception
         {
 
@@ -1957,6 +2181,9 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper class for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
+        /// </summary>
         [System.Flags()]
         public enum NaturalComparerOptions
         {
@@ -1968,6 +2195,10 @@ namespace Gekko
             Default = None
         }
 
+        /// <summary>
+        /// Helper class for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         public class CustomComparer<T> : IComparer<T>
         {
             private Comparison<T> _comparison;
@@ -1983,6 +2214,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Removes empty lines in a list of strings
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static List<string> RemoveEmptyLines(List<string> s)
         {
             List<string> xx = new List<string>();
@@ -1994,6 +2230,11 @@ namespace Gekko
             return xx;
         }
 
+        /// <summary>
+        /// Transforms a list of strings into a string
+        /// </summary>
+        /// <param name="linesInput"></param>
+        /// <returns></returns>
         public static StringBuilder ExtractTextFromLines(List<string> linesInput)
         {
             StringBuilder sb = new StringBuilder();
@@ -2004,6 +2245,11 @@ namespace Gekko
             return sb;
         }
 
+        /// <summary>
+        /// Transform a string into a list of strings
+        /// </summary>
+        /// <param name="textInput"></param>
+        /// <returns></returns>
         public static List<string> ExtractLinesFromText(string textInput)
         {
             StringReader inputFileStringReader = new StringReader(textInput);
@@ -2023,12 +2269,21 @@ namespace Gekko
             return output;
         }
         
-
+        /// <summary>
+        /// Helper method for file access (writing)
+        /// </summary>
+        /// <param name="fs2"></param>
+        /// <returns></returns>
         public static StreamWriter GekkoStreamWriter(FileStream fs2)
         {
             return new StreamWriter(fs2, Encoding.GetEncoding(1252));
         }
 
+        /// <summary>
+        /// Normal letters + digigs + _
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public static bool IsLetterOrDigitOrUnderscore(char c)
         {
             if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_')
@@ -2036,6 +2291,10 @@ namespace Gekko
             else return false;
         }
 
+        /// <summary>        
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public static bool IsLetterOrDigit(char c)
         {
             if (G.IsEnglishLetter(c) || char.IsDigit(c))
@@ -2043,6 +2302,24 @@ namespace Gekko
             else return false;
         }
 
+        /// <summary>
+        /// letters, digits, _ or !
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static bool IsLetterOrDigitOrUnderscoreOrExclamation(char c)
+        {
+            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == Globals.freqIndicator)
+                return true;
+            else return false;
+        }
+
+        /// <summary>
+        /// Are two double numbers equal?
+        /// </summary>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
+        /// <returns></returns>
         public static bool Equals(double d1, double d2)  
         {
             // ---------------------------------------------
@@ -2080,18 +2357,21 @@ namespace Gekko
             return false;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
+        /// <returns></returns>
         public static bool IsBothNumericalError(double d1, double d2)
         {
             return G.isNumericalError(d1) && G.isNumericalError(d2);
         }
 
-        public static bool IsLetterOrDigitOrUnderscoreOrTilde(char c)
-        {
-            if (G.IsEnglishLetter(c) || char.IsDigit(c) || c == '_' || c == Globals.freqIndicator)
-                return true;
-            else return false;
-        }
-
+        /// <summary>
+        /// True if string starts with % or #.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool StartsWithSigil(string s)
         {
             if (s == null) return false;
@@ -2103,7 +2383,11 @@ namespace Gekko
             return false;
         }
         
-
+        /// <summary>
+        /// Helper method to check validity fo varname
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="sigilType"></param>
         //Use together with CheckIVariableName()
         //See also G.AddSigil()
         public static void CheckIVariableNameAndType(IVariable x, G.ESigilType sigilType)
@@ -2137,21 +2421,12 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-        public static bool Chop_HasSigil(string varname)
-        {
-            if (varname.StartsWith(Globals.symbolCollection + Globals.listfile)) return true;  //otherwise Chop_GetName gets it wrong below
-            string varname2 = Chop_GetName(varname);
-            if (varname2 == null || varname2.Length == 0)
-            {
-                G.Writeln2("*** ERROR: Variable name with zero length");
-                throw new GekkoException();
-            }
-            bool hasSigil = false;
-            if (varname2[0] == Globals.symbolScalar || varname2[0] == Globals.symbolCollection) hasSigil = true;
-            return hasSigil;
-        }
-
-
+        
+        /// <summary>
+        /// Check validity of varname
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         //Use together with CheckIVariableNameAndType()
         //See also G.AddSigil()
         public static ESigilType CheckIVariableName(string name)
@@ -2224,6 +2499,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Converts from string to EVariableType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static EVariableType GetVariableType(string type)
         {
             type = type.Trim();
@@ -2246,16 +2526,32 @@ namespace Gekko
             }
             return etype;
         }
+
+        /// <summary>
+        /// True if a string is null or "" or " " or "   ", etc.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static bool NullOrBlanks(string x)
         {
             return !(x != null && x.Trim() != "");
         }
 
+        /// <summary>
+        /// True if a string is null or "".
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static bool NullOrEmpty(string x)
         {
             return !(x != null && x != "");
         }
 
+        /// <summary>
+        /// True if a..z or A..Z or _.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public static bool IsLetterOrUnderscore(char c)
         {
             if (G.IsEnglishLetter(c) || c == '_')
@@ -2263,6 +2559,11 @@ namespace Gekko
             else return false;
         }
 
+        /// <summary>
+        /// Convert a GekkoTime to floating point. Used for PLOT.
+        /// </summary>
+        /// <param name="gt"></param>
+        /// <returns></returns>
         public static double FromDateToFloating(GekkoTime gt)
         {
             double d = double.NaN;
@@ -2281,11 +2582,21 @@ namespace Gekko
             return d;
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string HandleQuoteInQuote(string s)
         {
             return HandleQuoteInQuote(s, false);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="special"></param>
+        /// <returns></returns>
         public static string HandleQuoteInQuote(string s, bool special)
         {
             if (special) s = s.Replace("\"", "\\\"");  //inside js in html
@@ -2293,6 +2604,12 @@ namespace Gekko
             return s;
         }        
 
+        /// <summary>
+        /// How many days does a certain month contain
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
         public static int DaysInMonth(int y, int m)
         {
             if (y >= 1 && y <= 9999)
@@ -2303,17 +2620,26 @@ namespace Gekko
             {
                 return 30;  //does not make any sense anyway, but undated freq can have periods outside 1..9999
             }
-        }
-        
+        }        
 
+        /// <summary>
+        /// Helper method.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static string DateHelper3(string format, DateTime dt)
         {
             string s = dt.ToString(format.ToLower().Replace("m", "M"));            
             return s;
         }
 
-        
-
+        /// <summary>
+        /// Min function. Special handling of -12345 input.
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
         public static int GekkoMin(int i1, int i2) {
             //if both are missing, a missing is returned
             if (i1 == -12345) return i2;
@@ -2321,8 +2647,14 @@ namespace Gekko
             return Math.Min(i1, i2);
         }
 
+        /// <summary>
+        /// Max function. Special handling of -12345 input.
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
         public static int GekkoMax(int i1, int i2)
-        {
+        {            
             //if both are missing, a missing is returned
             //with positive inputs, this method is superflous, but we keep it for symmtery reasons (see GekkoMin())
             if (i1 == -12345) return i2;
@@ -2330,11 +2662,19 @@ namespace Gekko
             return Math.Max(i1, i2);
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
         public static void SetWorkingFolder()
         {
             SetWorkingFolder(true);
         }
 
+        /// <summary>
+        /// Try to switch to working folder.
+        /// </summary>
+        /// <param name="throwException"></param>
+        /// <returns></returns>
         public static bool SetWorkingFolder(bool throwException)
         {
             try
