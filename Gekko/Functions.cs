@@ -1950,6 +1950,14 @@ namespace Gekko
             x_series.meta.domains = ss;            
         }
 
+        /// <summary>
+        /// Gets the domain lists that each dimension must comply with (corresponding to GAMS domains)
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static List getdomains(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             Series x_series = x as Series;
@@ -1962,6 +1970,37 @@ namespace Gekko
             List<string> ss = new List<string>();
             for (int i = 0; i < x_series.meta.domains.Length; i++) ss.Add(x_series.meta.domains[i]);  //cloning for safety
             return new List(ss);
+        }
+
+        /// <summary>
+        /// If x[a, d] = 1, x[a, e] = 1, x[b, d] = 1, we get (('a', 'b'), ('d', 'e'))
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static List getelements(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            Series x_series = x as Series;
+            if (x_series == null || x_series.type != ESeriesType.ArraySuper)
+            {
+                G.Writeln2("*** ERROR: getelements(): Expected array-series");
+                throw new GekkoException();
+            }
+            
+            double dimCount2 = 1d;
+            string dimCount = null;
+            List<List<string>> elements = new List<List<string>>();
+            List<string> domains = new List<string>();                        
+            List<MapMultidimItem> keys = null;
+            GekkoDictionary<string, string>[] temp = null;            
+            keys = x_series.dimensionsStorage.storage.Keys.ToList();
+            keys.Sort(Program.CompareMapMultidimItems);
+            temp = new GekkoDictionary<string, string>[x_series.dimensions];
+            Program.DispHelperArraySeries2(x_series, keys, temp, ref dimCount2, ref dimCount, elements, domains);
+            List m = new List();
+            return m;
         }
 
         public static IVariable count(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable y)

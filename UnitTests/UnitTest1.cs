@@ -1114,6 +1114,14 @@ namespace UnitTests
             I("xx2 = series(2);");
             I("xx2['a', 'b'] = (1, 2, 3);");
             I("xx2['a', 'c'] = (11, 12, 13);");
+            I("#m = xx2.getelements();");
+            List m = Program.databanks.GetFirst().GetIVariable("#m") as List;
+            Assert.AreEqual(m.list.Count, 2);  //two dims
+            Assert.AreEqual((m.list[0].ConvertToList()[0]).ConvertToString(), "a");
+            Assert.AreEqual((m.list[1].ConvertToList()[0]).ConvertToString(), "b");
+            Assert.AreEqual((m.list[1].ConvertToList()[1]).ConvertToString(), "c");
+
+
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2002, 2d, sharedDelta);

@@ -11891,33 +11891,18 @@ namespace Gekko
 
             double dimCount2 = 1d;
             string dimCount = null;
+            List<List<string>> elements = new List<List<string>>();
+            List<string> domains = new List<string>();
+            DispHelperArraySeries2(ts, keys, temp, ref dimCount2, ref dimCount, elements, domains);
+
+            dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
             for (int i = 0; i < ts.dimensions; i++)
             {
-                string domain = null;
-                try
+                if (elements[i].Count > 0)
                 {
-                    domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
-                }
-                catch { };
-                if (domain == "*") domain = null;
-                if (domain != null) domain = domain + ", ";
-                temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                int ii = 0;
-                foreach (MapMultidimItem key in keys)
-                {
-                    if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
-                    ii++;
-                }
-                List<string> temp2 = temp[i].Keys.ToList();
-                temp2.Sort(G.CompareNaturalIgnoreCase);
-                dimCount2 = dimCount2 * temp[i].Count;
-                dimCount += temp2.Count + " * ";
-                if (temp[i].Count > 0)
-                {
-                    G.Writeln("Dimension " + (i + 1) + " (" + domain + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
+                    G.Writeln("Dimension " + (i + 1) + " (" + domains[i] + elements[i].Count + " elements): " + G.GetListWithCommas(elements[i]));
                 }
             }
-            dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
 
             if (keys == null || keys.Count == 0)
             {
@@ -11954,6 +11939,34 @@ namespace Gekko
                 }
 
 
+            }
+        }
+
+        public static void DispHelperArraySeries2(Series ts, List<MapMultidimItem> keys, GekkoDictionary<string, string>[] temp, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
+        {
+            for (int i = 0; i < ts.dimensions; i++)
+            {
+                string domain = null;
+                try
+                {
+                    domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
+                }
+                catch { };
+                if (domain == "*") domain = null;
+                if (domain != null) domain = domain + ", ";
+                temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                int ii = 0;
+                foreach (MapMultidimItem key in keys)
+                {
+                    if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
+                    ii++;
+                }
+                List<string> temp2 = temp[i].Keys.ToList();
+                temp2.Sort(G.CompareNaturalIgnoreCase);
+                dimCount2 = dimCount2 * temp[i].Count;
+                dimCount += temp2.Count + " * ";
+                domains.Add(domain);
+                elements.Add(temp2);
             }
         }
 
