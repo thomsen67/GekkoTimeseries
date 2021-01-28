@@ -1550,13 +1550,13 @@ namespace Gekko
 
                     o0.decompItems = new List<DecompItems>();                    
 
-                    o0.select.Add(O.ExplodeIvariablesSeq(false, new
+                    o0.select.Add(O.FlattenIVariablesSeq(false, new
                      List(new List<IVariable> { new ScalarString(var) })));
 
-                    o0.from.Add(O.ExplodeIvariablesSeq(false,
+                    o0.from.Add(O.FlattenIVariablesSeq(false,
                      new List(new List<IVariable> { new ScalarString(o.rv) })));
 
-                    o0.endo.Add(O.ExplodeIvariablesSeq(false, new List(new
+                    o0.endo.Add(O.FlattenIVariablesSeq(false, new List(new
                      List<IVariable> { new ScalarString(var) })));
 
                     o0.Exe();

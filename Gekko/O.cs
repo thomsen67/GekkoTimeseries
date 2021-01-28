@@ -629,14 +629,14 @@ namespace Gekko
             }                        
         }
 
-        public static List ExplodeIvariablesSeqFor(bool isNaked, IVariable iv)
+        public static List FlattenIVariablesSeqFor(bool isNaked, IVariable iv)
         {
-            List m = ExplodeIvariablesSeq(isNaked, iv);
+            List m = FlattenIVariablesSeq(isNaked, iv);
             m = Restrict2(m, true, false, true, true);  //no sigils
             return m;
         }
 
-        public static List ExplodeIvariablesSeq(bool isNaked, IVariable iv)
+        public static List FlattenIVariablesSeq(bool isNaked, IVariable iv)
         {
             List m = null;
             if (isNaked)
@@ -686,7 +686,7 @@ namespace Gekko
             }
             else
             {
-                m = new List(ExplodeIvariablesHelper(iv));
+                m = new List(FlattenIVariablesHelper(iv));
             }            
             
             if (isNaked)
@@ -804,13 +804,13 @@ namespace Gekko
             return new ScalarVal(-x.val);
         }
 
-        public static List ExplodeIvariables(IVariable iv)
+        public static List FlattenIVariables(IVariable iv)
         {
-            return new List(ExplodeIvariablesHelper(iv));
+            return new List(FlattenIVariablesHelper(iv));
         }
         
         //is recursive
-        private static List<IVariable> ExplodeIvariablesHelper(IVariable iv)
+        private static List<IVariable> FlattenIVariablesHelper(IVariable iv)
         {            
             List<IVariable> temp = new List<IVariable>();
             if (iv.Type() == EVariableType.List)
@@ -819,7 +819,7 @@ namespace Gekko
                 {
                     if (temp2 != null && temp2.Type() == EVariableType.List)
                     {
-                        List<IVariable> temp3 = ExplodeIvariablesHelper(temp2);
+                        List<IVariable> temp3 = FlattenIVariablesHelper(temp2);
                         temp.AddRange(temp3);
                     }
                     else
@@ -9210,10 +9210,10 @@ namespace Gekko
                 //.variable[0] will contain list(a, b).
                 //a[i1], a[i2], b[j1], b[j2], b[j3]
 
-                //Explode(): only lists at top-most level are preserved -- others are eliminated 
+                //Flatten(): only lists at top-most level are preserved -- others are eliminated 
                 //so for a prtElement, either the element is a non-List or a List (with only non-List items)
                 //the number of items should correspond with .labels2.
-                //After Explode() it could be:
+                //After Flatten() it could be:
                 //prtElement0 --> with labels2 = ('a', 'b', 'c')
                 //  arrayseries --> label 'a'
                 //    a[i1]
@@ -9231,7 +9231,7 @@ namespace Gekko
 
                 bool allSeries = AllSeries();
 
-                if (allSeries) Explode(); //unfolds any lists in the prtElements
+                if (allSeries) Flatten(); //unfolds any lists in the prtElements
 
                 List<string> labelOriginal = new List<string>();
 
@@ -9282,7 +9282,7 @@ namespace Gekko
                                     }
                                     catch { lbl = new List<string>(); }
 
-                                    ExplodeArraySeriesHelper(element.variable[bankNumber] as Series, check, lbl[0], element.labelRecordedPieces, firstVariableFoundInFirstOrRef, bankNumber, unfold, labels);
+                                    FlattenArraySeriesHelper(element.variable[bankNumber] as Series, check, lbl[0], element.labelRecordedPieces, firstVariableFoundInFirstOrRef, bankNumber, unfold, labels);
                                     element.variable[bankNumber] = unfold;
                                     if (firstVariableFoundInFirstOrRef == 1) element.labelGiven = labels;
                                 }
@@ -9313,7 +9313,7 @@ namespace Gekko
                                         {
                                             List unfold = new List();
                                             List<string> labels = new List<string>();
-                                            ExplodeArraySeriesHelper(subElement_series, check, labelsUnfolded[k], element.labelRecordedPieces, firstVariableFoundInFirstOrRef, bankNumber, unfold, labels);
+                                            FlattenArraySeriesHelper(subElement_series, check, labelsUnfolded[k], element.labelRecordedPieces, firstVariableFoundInFirstOrRef, bankNumber, unfold, labels);
                                             if (tempVariables == null) tempVariables = new List();
                                             tempVariables.list.AddRange(unfold.list);
                                             if (firstVariableFoundInFirstOrRef == 1)
@@ -9428,7 +9428,7 @@ namespace Gekko
                 return allSeries;
             }
 
-            private void Explode()
+            private void Flatten()
             {
                 foreach (O.Prt.Element element in this.prtElements)
                 {
@@ -9438,7 +9438,7 @@ namespace Gekko
                         {
                             if (element.variable[i].Type() == EVariableType.List)
                             {
-                                element.variable[i] = O.ExplodeIvariables(element.variable[i]);
+                                element.variable[i] = O.FlattenIVariables(element.variable[i]);
                                 //now, any sub-list inside this list is gone
                             }
                             
@@ -9448,7 +9448,7 @@ namespace Gekko
             }
 
 
-            private static void ExplodeArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
+            private static void FlattenArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
             {
 
                 List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();

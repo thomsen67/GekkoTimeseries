@@ -2249,7 +2249,7 @@ namespace Gekko
 
         private static IVariable HelperSum(GekkoTime t0, GekkoTime t3, IVariable[] items, bool avg)
         {
-            List m = O.ExplodeIvariables(new List(items));
+            List m = O.FlattenIVariables(new List(items));
             
             bool hasSeries = false;
             foreach (IVariable item in m.list)
@@ -3535,7 +3535,7 @@ namespace Gekko
         {
             if (x1.Type() == EVariableType.List)
             {                
-                return O.ExplodeIvariables(x1);
+                return O.FlattenIVariables(x1);
             }
             else
             {

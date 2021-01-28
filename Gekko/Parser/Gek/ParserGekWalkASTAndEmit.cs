@@ -3472,8 +3472,8 @@ namespace Gekko.Parser.Gek
                                 isFor = true;
                             }
 
-                            string code = "O.ExplodeIvariablesSeq(" + naked + ", new List(new List<IVariable> {";
-                            if (isFor) code = "O.ExplodeIvariablesSeqFor(" + naked + ", new List(new List<IVariable> {";
+                            string code = "O.FlattenIVariablesSeq(" + naked + ", new List(new List<IVariable> {";
+                            if (isFor) code = "O.FlattenIVariablesSeqFor(" + naked + ", new List(new List<IVariable> {";
 
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
@@ -3505,7 +3505,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFILENAMELIST":
                         {
-                            string code = "O.ExplodeIvariables(new List(new List<IVariable> {";
+                            string code = "O.FlattenIVariables(new List(new List<IVariable> {";
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;                                
