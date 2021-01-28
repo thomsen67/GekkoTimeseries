@@ -1504,7 +1504,7 @@ namespace Gekko
 
 
                 string dbName, varName, freq; string[] indexes; char firstChar;
-                if (x_string.StartsWith(Globals.symbolCollection + Globals.listfile))
+                if (Program.IsListfileArtificialName(x_string))
                 {
                     dbName = null; varName = x_string; freq = null; indexes = null; firstChar = varName[0];
                 }
@@ -1824,7 +1824,7 @@ namespace Gekko
                     {
                         //No explicit databank name is provided, or an all:x
 
-                        if (varname.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
+                        if (Program.IsListfileArtificialName(varname))
                         {
                             //special case: #(listfile m)
 
@@ -2509,8 +2509,6 @@ namespace Gekko
             G.Writeln("- True model file hash code    : " + Program.model.modelGekko.modelHashTrue);
         }
 
-
-
         private static List ReadListFile(string varname)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
@@ -2667,12 +2665,31 @@ namespace Gekko
         public static void AddIVariableWithOverwriteFromString(string fullname, IVariable iv)
         {
             string dbName, varName, freq; string[] indexes;
-            O.Chop(fullname, out dbName, out varName, out freq, out indexes);
+
+            if (Program.IsListfileArtificialName(fullname))
+            {
+                dbName = null;
+                varName = fullname;
+                freq = null;
+                indexes = null;
+            }
+            else
+            {
+                O.Chop(fullname, out dbName, out varName, out freq, out indexes);
+            }
             AddIVariableWithOverwriteFromString(dbName, varName, freq, indexes, iv);
         }
 
         public static void AddIVariableWithOverwriteFromString(string dbName, string varName, string freq, string[] indexes, IVariable iv)
         {
+            if (Program.IsListfileArtificialName(varName))
+            {
+                //quick handling of this special case, and return afterwards
+                //relevant for instance in INDEX * to #(listfile c:\tools\m.lst);
+                O.WriteListFile(varName, iv);
+                return;
+            }
+
             string nameWithFreq = G.AddFreqToName(varName, freq);
 
             Databank bank = null;
@@ -3096,6 +3113,9 @@ namespace Gekko
             }
 
             string s = iv.ConvertToString();
+
+            if (Program.IsListfileArtificialName(s)) return s;  //do not chew on an artificial "listfile___..." name, used for #(listfile m) kinds of IVariables
+
             if (!allowBank && s.Contains(Globals.symbolBankColon))
             {
                 G.Writeln2("*** ERROR: Bankname not accepted as part of name");
@@ -3215,7 +3235,9 @@ namespace Gekko
                 return;  //is just a probe on the type of the lhs, so we return without changing anything!
             }
 
-            if (ib != null && ib.BankType() == EBankType.Normal)
+            bool isListfile = Program.IsListfileArtificialName(varnameWithFreq);
+
+            if (!isListfile && ib != null && ib.BankType() == EBankType.Normal)
             {
                 //ib can be == null with an indexer on the lhs, like #m.#n.%s
                 Databank ib_databank = ib as Databank;
@@ -3226,10 +3248,9 @@ namespace Gekko
             if (rhs.Type() == EVariableType.List)
             {
                 List rhs_list = rhs as List;
-                
             }
-            
-            if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
+
+            if (isListfile)
             {
                 WriteListFile(varnameWithFreq, rhs);
             }
@@ -3416,7 +3437,7 @@ namespace Gekko
                                     G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
                                 }
                                 else
-                                {                                    
+                                {
                                     ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
                             }
@@ -3480,7 +3501,7 @@ namespace Gekko
 
                                             //if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                             if (lhsType == EVariableType.Matrix)
-                                                {
+                                            {
 
                                                 // array    smpl          destination
                                                 // source
@@ -3506,7 +3527,7 @@ namespace Gekko
                                                 double[,] destination = m.data;
 
                                                 int destinationStart = 0;
-                                                
+
                                                 Buffer.BlockCopy(source, 8 * i1, destination, 8 * destinationStart, 8 * (i2 - i1 + 1));
                                                 IVariable lhsNew = m;
 
@@ -3571,7 +3592,7 @@ namespace Gekko
 
                                             //if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                             if (lhsType == EVariableType.Matrix)
-                                                {
+                                            {
                                                 int n = smpl.Observations12();
                                                 double d = rhs_series.GetDataSequenceUnsafePointerAlterBEWARE()[0];
                                                 if (Series.MissingZero(rhs_series) && G.isNumericalError(d)) d = 0d;
@@ -3768,7 +3789,7 @@ namespace Gekko
                             }
                         }
                     }
-                        
+
                     switch (rhs.Type())
                     {
                         case EVariableType.Series:
@@ -3807,7 +3828,7 @@ namespace Gekko
                                                     G.Writeln("           Gekko version >= 3.1.7, this error may come out of the blue. In that case, see the", Color.Red);
                                                     G.Writeln("           'Backwards incompatibility, or how to ignore' section in the above link.", Color.Red);
                                                     G.Writeln();
-                                                    throw new GekkoException(); 
+                                                    throw new GekkoException();
                                                 }
                                             }
                                         }
@@ -3831,9 +3852,9 @@ namespace Gekko
                                                 GekkoTime tt1 = GekkoTime.tNull;
                                                 GekkoTime tt2 = GekkoTime.tNull;
                                                 GekkoTime.ConvertFreqs(G.ConvertFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
-                                                                                                                                    //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
-                                                                                                                                    //Now the smpl window runs from tt1 to tt2
-                                                                                                                                    //We copy in from that window
+                                                                                                                                        //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
+                                                                                                                                        //Now the smpl window runs from tt1 to tt2
+                                                                                                                                        //We copy in from that window
                                                 if (lhs_series.freq != rhs_series_beware.freq)
                                                 {
                                                     G.Writeln2("*** ERROR: Frequency mismatch. Left-hand series is " + G.GetFreqPretty(lhs_series.freq) + ",");
@@ -3854,7 +3875,7 @@ namespace Gekko
 
                                                 int index1, index2;
                                                 //may enlarge the array with NaNs first and last
-                                                double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);                                                                                                                                                
+                                                double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);
                                                 lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Series.MissingZero(rhs_series_beware));
                                             }
                                             else
@@ -3872,9 +3893,9 @@ namespace Gekko
                                             // x = Series Timeless
                                             //---------------------------------------------------------
                                             // stuff below also handles array-timeseries just fine  
-                                            
+
                                             if (create)
-                                            {                                                
+                                            {
                                                 lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too                                                
                                                 lhs_series.name = varnameWithFreq; ;
                                                 double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
@@ -3978,7 +3999,7 @@ namespace Gekko
                                     if (O.UseFlexFreq(smpl.t1, lhs_series.freq))
                                     {
                                         //different freqs, for instance x!q = 2 when global freq is !a                                        
-                                        foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);                                        
+                                        foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);
                                     }
                                     else
                                     {
@@ -3993,10 +4014,10 @@ namespace Gekko
 
                                 //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                 LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
-                                
+
                             }
                             break;
-                        
+
                         case EVariableType.Date:
                             {
                                 //---------------------------------------------------------
@@ -4013,7 +4034,7 @@ namespace Gekko
                                 // x = STRING
                                 //---------------------------------------------------------
                                 {
-                                    ReportTypeError(varnameWithFreq, rhs, lhsType, 1);                                    
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType, 1);
                                 }
                             }
                             break;
@@ -4062,7 +4083,7 @@ namespace Gekko
                                         if (O.UseFlexFreq(smpl.t1, lhs_series.freq))
                                         {
                                             //different freqs, for instance x!q = 2 when global freq is !a                                        
-                                            foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);                                            
+                                            foreach (GekkoTime t in smpl.Iterate12(lhs_series.freq)) lhs_series.SetData(t, d);
                                         }
                                         else
                                         {
@@ -4077,7 +4098,7 @@ namespace Gekko
                                     }
                                 }
                                 else
-                                {                                    
+                                {
                                     GekkoTime t1 = smpl.t1;
                                     GekkoTime t2 = smpl.t2;
                                     if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
@@ -4114,7 +4135,7 @@ namespace Gekko
                                         OperatorHelperSequence(smpl, lhs_series, rhsData, operatorType);
                                     }
                                 }
-                                
+
                                 LookupHelperLeftside_message(smpl, lhs_series.freq, varnameWithFreq);
 
                             }
@@ -4143,7 +4164,7 @@ namespace Gekko
                         GekkoTime t3 = smpl.t3; //why t3 and not t2? Never mind, t2 and t3 are equal most of the time
                         if (O.UseFlexFreq(t3, lhs_series.freq)) t3 = GekkoTime.ConvertFreqsLast(lhs_series.freq, t3);
 
-                        foreach (GekkoTime t in new GekkoTimeIterator(t3.Add(1), tLast)) 
+                        foreach (GekkoTime t in new GekkoTimeIterator(t3.Add(1), tLast))
                         {
                             //runs after the <...> period or globals period until data ends
                             //so the updates outside of sample.
@@ -4162,7 +4183,7 @@ namespace Gekko
 
             return;
 
-        }        
+        }
 
         private static void LookupHelperLeftside_message(GekkoSmpl smpl, EFreq lhs_series_freq, string varnameWithFreq)
         {

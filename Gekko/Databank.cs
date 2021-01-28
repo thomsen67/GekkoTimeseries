@@ -136,7 +136,7 @@ namespace Gekko
 
         public void AddIVariableWithOverwrite(string name, IVariable x)
         {
-            if (name != null && name.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
+            if (name != null && Program.IsListfileArtificialName(name))
             {
                 O.WriteListFile(name, x);
             }

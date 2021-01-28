@@ -232,7 +232,7 @@ namespace Gekko.Parser.Gek
                     //     ASTPLACEHOLDER
 
 
-                    name[0][0].Text = "listfile___" + name[0][0].Text;
+                    name[0][0].Text = Globals.listfile + "___" + name[0][0].Text;
                 }
                 else
                 {
@@ -271,7 +271,7 @@ namespace Gekko.Parser.Gek
                     ASTNode cname = new ASTNode("ASTCNAME", true);
                     ASTNode extraname = new ASTNode("ASTNAME", true);
                     extraname.Add(new ASTNode("ASTIDENT", true));
-                    extraname[0].Add(new ASTNode("listfile___"));
+                    extraname[0].Add(new ASTNode(Globals.listfile + "___"));
                     cname.Add(extraname);
                     cname.Add(name);
                     //name.Parent[0] = cname;

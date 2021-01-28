@@ -13199,7 +13199,11 @@ namespace Gekko
             return outputs;
         }
 
-        
+        public static bool IsListfileArtificialName(string varnameWithFreq)
+        {
+            if (varnameWithFreq == null) return false;
+            return varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___");
+        }
 
         private static List<string> GetListOfAllBanks()
         {

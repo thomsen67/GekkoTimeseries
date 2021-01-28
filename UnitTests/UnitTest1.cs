@@ -17694,7 +17694,7 @@ print(df2)
             string path = Path.GetTempPath() + "m.lst";
             I("#(listfile " + path + ") = a, b, c, d;");
             I("#(listfile " + path + ") = #(listfile " + path + ") + #(listfile " + path + ");");
-            I("%v = #(listfile" + path + ").length();");
+            I("%v = #(listfile " + path + ").length();");
             _AssertScalarVal(First(), "%v", 8);
 
             //test listfiles with filename in quotes
@@ -17714,6 +17714,8 @@ print(df2)
             I("#(listfile '" + path + "') = #(listfile '" + path + "') + #(listfile '" + path + "');");
             I("%v = #(listfile '" + path + "').length();");
             _AssertScalarVal(First(), "%v", 8);
+
+            I("INDEX * to #(listfile " + path + ");");  //just a test of syntax
 
             I("#(listfile {'n'}) = a, b, c;");
             I("#(listfile {'n'}) = #(listfile {'n'}) + #(listfile {'n'});");
