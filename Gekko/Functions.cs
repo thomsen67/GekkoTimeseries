@@ -1998,9 +1998,97 @@ namespace Gekko
             keys = x_series.dimensionsStorage.storage.Keys.ToList();
             keys.Sort(Program.CompareMapMultidimItems);
             temp = new GekkoDictionary<string, string>[x_series.dimensions];
-            Program.DispHelperArraySeries2(x_series, keys, temp, ref dimCount2, ref dimCount, elements, domains);
-            List m = new List();
-            return m;
+            Program.DispHelperArraySeries2(x_series, keys, ref dimCount2, ref dimCount, elements, domains);
+
+            List mm = new List();
+            for (int i = 0; i < x_series.dimensions; i++)
+            {
+                List m = new List();
+                foreach (string s in elements[i])
+                {
+                    m.list.Add(new ScalarString(s));
+                }
+                mm.Add(m);
+            }
+            return mm;
+        }
+
+        /// <summary>
+        /// Gets info on subseries inside an array-series:
+        /// - len/length: the number of subseries
+        /// - names: 'x[a, b]', x[a, c]'
+        /// - elements: ('a', 'b'), ('a', 'c')
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="x"></param>
+        /// <param name="option">len, length, names, elements</param>
+        /// <returns></returns>
+        public static IVariable subseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable option)
+        {
+            Series x_series = x as Series;
+            if (x_series == null || x_series.type != ESeriesType.ArraySuper)
+            {
+                G.Writeln2("*** ERROR: subseries(): Expected array-series");
+                throw new GekkoException();
+            }
+
+            ScalarString ss = option as ScalarString;
+            if (ss == null)
+            {
+                G.Writeln2("*** ERROR: subseries(): Expected string as option, argument 2");
+                throw new GekkoException();
+            }
+            string s = ss.ConvertToString();
+
+            double dimCount2 = 1d;
+            string dimCount = null;
+            List<List<string>> elements = new List<List<string>>();
+            List<string> domains = new List<string>();
+            List<MapMultidimItem> keys = null;
+            GekkoDictionary<string, string>[] temp = null;
+            keys = x_series.dimensionsStorage.storage.Keys.ToList();
+            keys.Sort(Program.CompareMapMultidimItems);
+
+            IVariable mm = null;
+
+            bool ok = false;
+            if (G.Equal(s, "len") || G.Equal(s, "length"))
+            {
+                ok = true;
+                mm = new ScalarVal(keys.Count);
+            }
+            else
+            {                
+
+                mm = new List();
+                foreach (MapMultidimItem mmi in keys)
+                {
+                    List m = new List();
+                    if (G.Equal(s, "elements"))
+                    {
+                        ok = true;
+                        foreach (string e in mmi.storage)
+                        {
+                            m.Add(new ScalarString(e));
+                        }
+                        (mm as List).Add(m);
+                    }
+                    else if (G.Equal(s, "names"))
+                    {
+                        ok = true;
+                        (mm as List).Add(new ScalarString(mmi.GetName()));
+                    }                    
+                }
+                if (!ok)
+                {
+                    G.Writeln2("*** ERROR: subseries(): Expected string as option to be 'length', 'names' or 'elements'");
+                    throw new GekkoException();
+                }
+            }
+            
+            return mm;
         }
 
         public static IVariable count(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable y)

@@ -5,32 +5,6 @@
  * cached models get tested a couple of placed (adam workshop and modelrandom). when starting unit testing,
  * all temp files are deleted (also cache mdl-files).
 
-Test_Assign()               Test of VAL, DATE, STRING
-Test_Collapse()             COLLAPSE
-Test_Databanks()            Test of tsd, tsdx (old and new)
-Test_Expressions()          SERIES y = @x(2010), stuff like that
-Test_ForwardLooking()       SIM of small models with leads
-Test_List()                 LIST commands
-Test_Open()                 OPEN command
-Test_Period()
-Test_PipeAndTell()
-Test_Print()
-Test_Res()
-Test_Time()
-Test_Timefilter()
-Test_TimeSeries()
-Test_UpdAndGenr()
-Test_Updx()
-
-Test_ADAMworkshop2011()     Test of a lot of exercises
-Test_EnsJJUST()             Test of ENDO/EXO
-Test_ModelJul05()           Test SIM of that model
-Test_ModelApr07()           Test SIM of that model
-Test_ModelApr08()           Test SIM of that model
-Test_ModelLille1()          Small model that had some problems at one point
-Test_ModelLille2()          Small model that had some problems at one point
-Test_ModelLille3()          Small model that had some problems at one point
-Test_ModelLille4()          Small model that had some problems at one point
 
 Integration_FM2010()
 Integration_FM2012()
@@ -1120,7 +1094,20 @@ namespace UnitTests
             Assert.AreEqual((m.list[0].ConvertToList()[0]).ConvertToString(), "a");
             Assert.AreEqual((m.list[1].ConvertToList()[0]).ConvertToString(), "b");
             Assert.AreEqual((m.list[1].ConvertToList()[1]).ConvertToString(), "c");
-
+            I("%v = xx2.subseries('length');");
+            _AssertScalarVal(First(), "%v", 2d);
+            I("#m = xx2.subseries('names');");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as List;
+            Assert.AreEqual(m.list.Count, 2);  //two dims
+            Assert.AreEqual(m.list[0].ConvertToString(), "xx2!a[a, b]");
+            Assert.AreEqual(m.list[1].ConvertToString(), "xx2!a[a, c]");
+            I("#m = xx2.subseries('elements');");  //('a', 'b'), ('a', 'c')
+            m = Program.databanks.GetFirst().GetIVariable("#m") as List;
+            Assert.AreEqual(m.list.Count, 2);  //two dims
+            Assert.AreEqual((m.list[0].ConvertToList()[0]).ConvertToString(), "a");
+            Assert.AreEqual((m.list[0].ConvertToList()[1]).ConvertToString(), "b");
+            Assert.AreEqual((m.list[1].ConvertToList()[0]).ConvertToString(), "a");
+            Assert.AreEqual((m.list[1].ConvertToList()[1]).ConvertToString(), "c");
 
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx2", new string[] { "a", "b" }, 2001, 1d, sharedDelta);
@@ -17702,6 +17689,31 @@ print(df2)
             I("#(listfile m) = #(listfile m) + #(listfile m);");
             I("%v = #(listfile m).length();");
             _AssertScalarVal(First(), "%v", 6);
+
+            //test listfiles with filename
+            string path = Path.GetTempPath() + "m.lst";
+            I("#(listfile " + path + ") = a, b, c, d;");
+            I("#(listfile " + path + ") = #(listfile " + path + ") + #(listfile " + path + ");");
+            I("%v = #(listfile" + path + ").length();");
+            _AssertScalarVal(First(), "%v", 8);
+
+            //test listfiles with filename in quotes
+            I("#(listfile '" + path + "') = a, b, c, d;");
+            I("#(listfile '" + path + "') = #(listfile '" + path + "') + #(listfile '" + path + "');");
+            I("%v = #(listfile '" + path + "').length();");
+            _AssertScalarVal(First(), "%v", 8);
+
+            //test listfiles with filename in curlies and quotes
+            I("#(listfile {'" + path + "'}) = a, b, c, d, e;");
+            I("#(listfile {'" + path + "'}) = #(listfile {'" + path + "'}) + #(listfile {'" + path + "'});");
+            I("%v = #(listfile {'" + path + "'}).length();");
+            _AssertScalarVal(First(), "%v", 10);
+
+            //test listfiles with filename in quotes            
+            I("#(listfile '" + path + "') = a, b, c, d;");
+            I("#(listfile '" + path + "') = #(listfile '" + path + "') + #(listfile '" + path + "');");
+            I("%v = #(listfile '" + path + "').length();");
+            _AssertScalarVal(First(), "%v", 8);
 
             I("#(listfile {'n'}) = a, b, c;");
             I("#(listfile {'n'}) = #(listfile {'n'}) + #(listfile {'n'});");

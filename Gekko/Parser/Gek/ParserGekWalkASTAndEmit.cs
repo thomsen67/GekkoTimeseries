@@ -5383,11 +5383,13 @@ namespace Gekko.Parser.Gek
 
         private static string ReportLabelHelper(ASTNode node)
         {
-            if(node.specialExpressionAndLabelInfo==null)
+            if (node.specialExpressionAndLabelInfo == null)
             {
                 return null;
             }
-            return node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3];
+            string label = node.specialExpressionAndLabelInfo[1];
+            label = label.Replace("\\", "\\\\");  //otherwise something like "#(listfile c:\tmp\m.lst)" will crash
+            return label + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3];
         }
 
         private static string GekkoSmplCommandHelper2(int smplCommandNumber)

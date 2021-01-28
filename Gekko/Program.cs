@@ -11574,7 +11574,7 @@ namespace Gekko
 
                 if (ts.dimensions > 0)
                 {
-                    DispHelperArraySeries(ts, keys, temp, eqsPrinted);
+                    DispHelperArraySeries(ts, keys, eqsPrinted);
                 }
                 else
                 {
@@ -11734,14 +11734,12 @@ namespace Gekko
                 }
             }            
 
-            List<MapMultidimItem> keys = null;
-            GekkoDictionary<string, string>[] temp = null;
+            List<MapMultidimItem> keys = null;            
 
             if (ts.type == ESeriesType.ArraySuper)
             {
                 keys = ts.dimensionsStorage.storage.Keys.ToList();
-                keys.Sort(CompareMapMultidimItems);
-                temp = new GekkoDictionary<string, string>[ts.dimensions];
+                keys.Sort(CompareMapMultidimItems);                
             }
 
             bool eqsPrinted = false;
@@ -11763,7 +11761,7 @@ namespace Gekko
 
             if (ts.dimensions > 0)
             {
-                DispHelperArraySeries(ts, keys, temp, eqsPrinted);
+                DispHelperArraySeries(ts, keys, eqsPrinted);
             }
             else
             {
@@ -11856,7 +11854,7 @@ namespace Gekko
             return eqsPrinted;
         }
 
-        private static void DispHelperArraySeries(Series ts, List<MapMultidimItem> keys, GekkoDictionary<string, string>[] temp, bool eqsPrinted)
+        private static void DispHelperArraySeries(Series ts, List<MapMultidimItem> keys, bool eqsPrinted)
         {
             // --------------
             // Array-series
@@ -11893,7 +11891,7 @@ namespace Gekko
             string dimCount = null;
             List<List<string>> elements = new List<List<string>>();
             List<string> domains = new List<string>();
-            DispHelperArraySeries2(ts, keys, temp, ref dimCount2, ref dimCount, elements, domains);
+            DispHelperArraySeries2(ts, keys, ref dimCount2, ref dimCount, elements, domains);
 
             dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
             for (int i = 0; i < ts.dimensions; i++)
@@ -11942,8 +11940,9 @@ namespace Gekko
             }
         }
 
-        public static void DispHelperArraySeries2(Series ts, List<MapMultidimItem> keys, GekkoDictionary<string, string>[] temp, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
+        public static void DispHelperArraySeries2(Series ts, List<MapMultidimItem> keys, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
         {
+            GekkoDictionary<string, string>[] temp = new GekkoDictionary<string, string>[ts.dimensions];
             for (int i = 0; i < ts.dimensions; i++)
             {
                 string domain = null;
