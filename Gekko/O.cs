@@ -4741,12 +4741,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-        }
-
-        public static void Print(GekkoSmpl smpl, IVariable x)
-        {
-            //Program.OPrint(smpl, x);
-        }
+        }        
 
         public static IVariable AddSpecial(GekkoSmpl smpl, IVariable x1, IVariable x2, bool minus)
         {
@@ -9278,7 +9273,7 @@ namespace Gekko
                                     List<string> lbl = new List<string>();
                                     try
                                     {
-                                        lbl = Program.OPrintLabels(element.labelGiven, element.labelRecordedPieces, 1, bankNumber);
+                                        lbl = Print.OPrintLabels(element.labelGiven, element.labelRecordedPieces, 1, bankNumber);
                                     }
                                     catch { lbl = new List<string>(); }
 
@@ -9295,7 +9290,7 @@ namespace Gekko
                                 {
                                     try
                                     {
-                                        labelsUnfolded = Program.OPrintLabels(element.labelGiven, element.labelRecordedPieces, n, bankNumber);
+                                        labelsUnfolded = Print.OPrintLabels(element.labelGiven, element.labelRecordedPieces, n, bankNumber);
                                     }
                                     catch { labelsUnfolded = new List<string>(); }
                                 }
@@ -9356,7 +9351,7 @@ namespace Gekko
                 // ----- Unfolding of array-series end ---------------------------------------------------------
                 // ---------------------------------------------------------------------------------------------
 
-                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !allSeries || Program.IsGmulprt(this, Program.GetPrintType(this)))
+                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !allSeries || Print.IsGmulprt(this, Print.GetPrintType(this)))
                 {
                     //Some of the vars are not series or val, so not possible to print them 
                     //meaningfully in one table. One or more of the vars may be array-series (non-indexed)
@@ -9369,7 +9364,7 @@ namespace Gekko
 
                         if (AllSeries())  //note that here, this.prtElements contains only 1 element (the current)!
                         {
-                            Program.OPrint(this, null, labelOriginal);
+                            Print.OPrint(this, null, labelOriginal);
                         }
                         else
                         {
@@ -9394,7 +9389,7 @@ namespace Gekko
                 else
                 {
                     //All vars are series or val (series may be x[#i] or x[%i]).
-                    Program.OPrint(this, null, labelOriginal);
+                    Print.OPrint(this, null, labelOriginal);                    
                 }
 
                 if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))

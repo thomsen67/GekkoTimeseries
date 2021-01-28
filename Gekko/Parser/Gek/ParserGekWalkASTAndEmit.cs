@@ -3632,8 +3632,7 @@ namespace Gekko.Parser.Gek
                             string type = tuple.Item2;
 
                             string lookupSettings = "new  LookupSettings()";
-                            if (isLeftSideVariable) lookupSettings = "new  LookupSettings(O.ELookupType.LeftHandSide)";                            
-                            bool isInsidePrintStatement = SearchUpwardsInTree5(node);
+                            if (isLeftSideVariable) lookupSettings = "new  LookupSettings(O.ELookupType.LeftHandSide)";                                                        
 
                             string ivTempVar = SearchUpwardsInTree4(node);
 
@@ -3788,28 +3787,8 @@ namespace Gekko.Parser.Gek
                                 node.Code.A(lookupCode);
                             }
                             break;
-                        }
+                        }                        
                         
-                        case "ASTPRINT":
-                        {
-
-                            string listName = "m" + ++Globals.counter;  //for ultra-safety
-                            string code = "List " + listName + " = null; try { " + listName + " = new List();" + G.NL;
-                            code += "for (" + Globals.smpl + "." + Globals.bankNumberiName + " = 0; " + Globals.smpl + "." + Globals.bankNumberiName + " < " + Globals.bankNumberiMax + "; " + Globals.smpl + "." + Globals.bankNumberiName + "++) {" + G.NL;
-                            //code += node[0].Code + ";" + G.NL;
-                            code += listName + ".Add(" + node[0].Code + ");" + G.NL;
-                            code += "}" + G.NL;  //end of for
-                            code += "}" + G.NL;  //end of try
-                            code += "finally" + G.NL;  //end of try
-                            code += "{" + G.NL;
-                            code += "" + Globals.smpl + "." + Globals.bankNumberiName + " = 0;" + G.NL;
-                            code += "}" + G.NL;
-                            node.Code.A(code);
-                            if (false) node.Code.LoopSmplCode("O.Print(" + Globals.smpl + ", " + listName + ")");
-                            node.Code.A("O.Print(" + Globals.smpl + ", " + listName + ");");
-
-                        }
-                        break;
                     case "ASTVARNAME":
                         {
                             bool s0 = false; if (node[0][0] != null) s0 = true;  //sigil % or #
@@ -5769,19 +5748,6 @@ namespace Gekko.Parser.Gek
                 tmp = tmp.Parent;
             }
             return rv;
-        }
-
-        private static bool SearchUpwardsInTree5(ASTNode node)
-        {
-            //finds out if the variable is inside a PRINT statement         
-            ASTNode tmp = node;
-            string rv = null;
-            while (tmp != null)
-            {
-                if (tmp.Text == "ASTPRINT") return true;
-                tmp = tmp.Parent;
-            }
-            return false;
         }
 
         private static bool SearchUpwardsInTree6(ASTNode node)
