@@ -2191,7 +2191,7 @@ namespace Gekko
                     else
                     {
                         //not a single-dimensional time index (or lag/lead)
-                        var temp = Program.GetListOfStringsFromListOfIvariables(indexes);
+                        var temp = Stringlist.GetListOfStringsFromListOfIvariables(indexes);
                         if (temp != null)
                         {
                             G.Writeln2("*** ERROR: Could not understand index " + this.name + "[" + G.GetListWithCommas(temp) + "]");
@@ -2223,7 +2223,7 @@ namespace Gekko
             }
             IVariable rv = null;
 
-            string[] keys = Program.GetListOfStringsFromListOfIvariables(indexes);
+            string[] keys = Stringlist.GetListOfStringsFromListOfIvariables(indexes);
 
             if (keys == null)
             {

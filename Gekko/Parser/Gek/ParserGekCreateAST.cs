@@ -62,7 +62,7 @@ namespace Gekko.Parser.Gek
                 temp.Add(e.Message);
                 //string textInput = ph.commandsText + "\r\n";
                 string input2 = textInput + "\r\n";
-                PrintLexerErrors(temp, Program.CreateListOfStringsFromString(input2), ph);
+                PrintLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
                 throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
             }
 
@@ -70,7 +70,7 @@ namespace Gekko.Parser.Gek
 
             if (parser3.GetErrors().Count > 0)
             {
-                PrintParserErrors(parser3.GetErrors(), Program.CreateListOfStringsFromString(textInput), ph);
+                PrintParserErrors(parser3.GetErrors(), Stringlist.CreateListOfStringsFromFile(textInput), ph);
                 throw new GekkoException();
             }
             t = (CommonTree)r3.Tree;

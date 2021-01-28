@@ -807,7 +807,7 @@ namespace Gekko
 
                     try
                     {
-                        ss = Program.GetListOfStringsFromList(x_list);
+                        ss = Stringlist.GetListOfStringsFromList(x_list);
                     }
                     catch
                     {
@@ -1995,7 +1995,7 @@ namespace Gekko
 
                             List l = iv as List;
 
-                            foreach (string s in Program.GetListOfStringsFromListOfIvariables(l.list.ToArray()))
+                            foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(l.list.ToArray()))
                             {
                                 if (gdx.gdxDataWriteStr(new string[] { s }, d) == 0)
                                 {

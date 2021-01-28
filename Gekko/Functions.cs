@@ -331,7 +331,7 @@ namespace Gekko
             string name = O.ConvertToString(ivname);
             string freq = O.ConvertToString(ivfreq);
             string[] index = null;
-            if (ivindex != null) index = Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(ivindex).ToArray());
+            if (ivindex != null) index = Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(ivindex).ToArray());
             string s = G.Chop_GetFullName(bank, name, freq, index);
             return new ScalarString(s);
         }
@@ -1946,7 +1946,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: setdomains(): Expected list of strings");
                 throw new GekkoException();
             }
-            string[] ss = Program.GetListOfStringsFromListOfIvariables(m_list.list.ToArray());
+            string[] ss = Stringlist.GetListOfStringsFromListOfIvariables(m_list.list.ToArray());
             x_series.meta.domains = ss;            
         }
 
@@ -3236,11 +3236,11 @@ namespace Gekko
                     if (ss[i] == "") continue;
                     ss2.Add(ss[i]);
                 }
-                m = O.CreateListFromStrings(ss2.ToArray());
+                m = Stringlist.CreateListFromStrings(ss2.ToArray());
             }
             else
             {
-                m = O.CreateListFromStrings(ss);
+                m = Stringlist.CreateListFromStrings(ss);
             }
             
             return m;
@@ -3507,7 +3507,7 @@ namespace Gekko
         public static IVariable sort(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2 = null)
         {
             List<IVariable> tmp = O.ConvertToList(x1);
-            List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables(tmp.ToArray()));
+            List<string> xx = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(tmp.ToArray()));
 
             string sort = null;
             if (x2 != null)
@@ -3546,7 +3546,7 @@ namespace Gekko
         public static IVariable unique(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             List<IVariable> tmp = O.ConvertToList(x1);
-            List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables(tmp.ToArray()));
+            List<string> xx = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(tmp.ToArray()));
             List m = new List();
             GekkoDictionary<string, string> dict = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in xx)
@@ -4255,8 +4255,8 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            List<string> lx1 = Program.GetListOfStringsFromList(x1);
-            List<string> lx2 = Program.GetListOfStringsFromList(x2);
+            List<string> lx1 = Stringlist.GetListOfStringsFromList(x1);
+            List<string> lx2 = Stringlist.GetListOfStringsFromList(x2);
             List<string> union = new List<string>();
             union.AddRange(lx1);
             GekkoDictionary<string, bool> result = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -4279,8 +4279,8 @@ namespace Gekko
         public static IVariable except(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis ikke i b.
-            List<string> lx1 = Program.GetListOfStringsFromList(x1);
-            List<string> lx2 = Program.GetListOfStringsFromList(x2);
+            List<string> lx1 = Stringlist.GetListOfStringsFromList(x1);
+            List<string> lx2 = Stringlist.GetListOfStringsFromList(x2);
             List<string> difference = new List<string>();
             GekkoDictionary<string, bool> temp = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in lx2)
@@ -4311,8 +4311,8 @@ namespace Gekko
             }
 
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis også i b.
-            List<string> lx1 = Program.GetListOfStringsFromList(x1);
-            List<string> lx2 = Program.GetListOfStringsFromList(x2);
+            List<string> lx1 = Stringlist.GetListOfStringsFromList(x1);
+            List<string> lx2 = Stringlist.GetListOfStringsFromList(x2);
             List<string> intersection = new List<string>();
             if (lx1.Count > lx2.Count)  //for speedup, we do the heaviest looping on the smaller list.
             {
@@ -4487,7 +4487,7 @@ namespace Gekko
             }
             else if (ths.Type() == EVariableType.List)
             {
-                List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables((ths as List).list.ToArray()));
+                List<string> xx = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables((ths as List).list.ToArray()));
                 List rv2 = new List();
                 foreach (string s in xx)
                 {
@@ -4515,7 +4515,7 @@ namespace Gekko
             }
             else if (ths.Type() == EVariableType.List)
             {
-                List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables((ths as List).list.ToArray()));
+                List<string> xx = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables((ths as List).list.ToArray()));
                 List rv2 = new List();
                 foreach (string s in xx)
                 {

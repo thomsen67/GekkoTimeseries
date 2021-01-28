@@ -850,14 +850,14 @@ namespace Gekko.Parser.Frm
                 endo.Sort(StringComparer.InvariantCulture);
                 all.Sort(StringComparer.InvariantCulture);
 
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(exod.ToArray())));
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(exoj.ToArray())));
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(exoz.ToArray())));
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(exodjz.ToArray())));
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(exo.ToArray())));
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(exotrue.ToArray())));
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(endo.ToArray())));
-                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(all.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exod", new List(Stringlist.GetListOfIVariablesFromListOfStrings(exod.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exoj", new List(Stringlist.GetListOfIVariablesFromListOfStrings(exoj.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exoz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(exoz.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exodjz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(exodjz.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(exo.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exotrue", new List(Stringlist.GetListOfIVariablesFromListOfStrings(exotrue.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "endo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(endo.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "all", new List(Stringlist.GetListOfIVariablesFromListOfStrings(all.ToArray())));
 
                 List<string> files = new List<string>();
                 files.Add("exod");
@@ -912,14 +912,14 @@ namespace Gekko.Parser.Frm
         {
             ModelListHelper modelListHelper = new ModelListHelper();
 
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "all")) modelListHelper.all = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "all"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "endo")) modelListHelper.endo = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "endo"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exo")) modelListHelper.exo = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exo"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exod")) modelListHelper.exod = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exod"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exodjz"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoj")) modelListHelper.exoj = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoj"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exotrue"));
-            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Program.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoz"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "all")) modelListHelper.all = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "all"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "endo")) modelListHelper.endo = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "endo"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exo")) modelListHelper.exo = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exo"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exod")) modelListHelper.exod = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exod"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exodjz"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoj")) modelListHelper.exoj = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoj"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exotrue"));
+            if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Stringlist.GetListOfStringsFromList(Program.databanks.GetGlobal().GetIVariable(Globals.symbolCollection + "exoz"));
 
             Program.model.modelGekko.modelInfo.modelListHelper = modelListHelper;
         }

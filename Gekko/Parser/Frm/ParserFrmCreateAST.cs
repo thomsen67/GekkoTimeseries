@@ -228,7 +228,7 @@ namespace Gekko.Parser.Frm
             wh.print = false;
             wh.printFile = false;
             wh.inputFile = textInput;
-            wh.inputFileLines = Program.CreateListOfStringsFromString(wh.inputFile);
+            wh.inputFileLines = Stringlist.CreateListOfStringsFromFile(wh.inputFile);
             return wh;
         }
 

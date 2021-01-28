@@ -1200,7 +1200,7 @@ namespace Gekko
                     string s2 = p.GetStackCommandFileText(p.GetDepth());
                     string s3 = "";
                     if (s2 != null) s3 = s2;
-                    Gekko.Parser.Frm.ParserFrmCreateAST.PrintModelParserErrors(Program.CreateListOfStringsFromString(e2.Message), Program.CreateListOfStringsFromString(s3), ph);
+                    Gekko.Parser.Frm.ParserFrmCreateAST.PrintModelParserErrors(Stringlist.CreateListOfStringsFromFile(e2.Message), Stringlist.CreateListOfStringsFromFile(s3), ph);
                 }
                 if (FindException(e2, "***") || FindException(e2, "+++"))
                 {
@@ -5680,7 +5680,7 @@ namespace Gekko
                     commandLinesFlat = HandleObeyFiles2(input);
                     if (skip != 0)
                     {
-                        List<string> ss = Program.CreateListOfStringsFromString(commandLinesFlat);
+                        List<string> ss = Stringlist.CreateListOfStringsFromFile(commandLinesFlat);
                         commandLinesFlat = "";
                         for (int ii = 0; ii < skip; ii++)
                         {
@@ -8023,26 +8023,7 @@ namespace Gekko
             originalFileName = split[0];
             string lineNumber2 = split[1];
             lineNumber = int.Parse(lineNumber2);  //1-based it seems
-        }
-
-        public static List<string> CreateListOfStringsFromString(string inputFile)
-        {
-            List<string> inputFileLines = new List<string>();
-            StringReader inputFileStringReader = new StringReader(inputFile);
-            while (true)
-            {
-                string aLine = inputFileStringReader.ReadLine();
-                if (aLine != null)
-                {
-                    inputFileLines.Add(aLine);
-                }
-                else
-                {
-                    break;
-                }
-            }
-            return inputFileLines;
-        }
+        }        
 
         public static void Decomp(O.Decomp1 o)
         {
@@ -8059,107 +8040,8 @@ namespace Gekko
             Decomp(decompOptions);
 
         }
-                
 
-        public static string[] GetListOfStringsFromListOfIvariables(IVariable[] indexes)
-        {
-            string[] keys = new string[indexes.Length];
-            int stringCount = 0;
-            int i = -1;
-            foreach (IVariable iv in indexes)
-            {
-                i++;
-                if (iv.Type() == EVariableType.String)
-                {
-                    //note: see same kind of code just below, //#98073245243875
-                    stringCount++;
-                    ScalarString ss = iv as ScalarString;
-                    keys[i] = ss.string2;
-                }
-                else if (iv.Type() == EVariableType.Val)  //will handle 007 in x[a, 007], will become x['a', '007']
-                {
-                    //note: see same kind of code just below, //#98073245243875
-                    int ii = O.ConvertToInt(iv, false);
-                    if (ii != int.MaxValue)
-                    {
-                        stringCount++;
-                        byte b = (iv as ScalarVal).numberOfLeadingZeroes;
-                        HandleLeadingZeroes(keys, i, b, ii);
-                    }
-                }
-                else if (iv.Type() == EVariableType.List)
-                {
-                    List iv_list = iv as List;
-                    if (iv_list.Count() == 1)
-                    {
-                        //Singleton list is allowed as a scalar
-                        IVariable singleton = iv_list.list[0];
-                        if (singleton.Type() == EVariableType.String)
-                        {
-                            //note: see same kind of code just above, //#98073245243875
-                            stringCount++;
-                            ScalarString ss = singleton as ScalarString;
-                            keys[i] = ss.string2;
-                        }
-                        else if (singleton.Type() == EVariableType.Val)  //will not handle 007 in x[a, 007], must be x[a, '007']
-                        {
-                            //note: see same kind of code just above, //#98073245243875
-                            int ii = O.ConvertToInt(singleton, false);
-                            if (ii != int.MaxValue)
-                            {
-                                stringCount++;
-                                keys[i] = ii.ToString();
-                                byte b = (singleton as ScalarVal).numberOfLeadingZeroes;
-                                HandleLeadingZeroes(keys, i, b, ii);
-
-                            }
-                        }
-                    }
-                }
-            }
-            if (indexes.Length != stringCount)
-            {
-                keys = null;  //signals a problem
-            }
-
-            return keys;
-        }
-
-        private static void HandleLeadingZeroes(string[] keys, int i, byte b, int ii)
-        {
-            string z = null;            
-            if (b > 0)
-            {
-                z = new string('0', b);
-            }
-            if (ii < 0)
-            {
-                //This should never happen: Gekko will not parse x[-0007] as a something that can
-                //be parsed into a string --> it will always be interpreted as a lag, because the
-                //first char after '[' is a '-'. So x[-...] or x[+...] are always lags or leads.
-                //This is to avoid x[5] being interpreted as x leaded 5 periods, rather than, say,
-                //five-year olds in the population.
-                keys[i] = "-" + z + (-ii).ToString(); //b = 3, ii = -7 --> "-0007"
-            }
-            else
-            {
-                keys[i] = z + ii.ToString(); //b = 3, ii = 7 --> "0007"
-            }
-        }
         
-        public static IVariable[] GetListOfIVariablesFromListOfStrings(string[] indexes)
-        {
-            IVariable[] keys = new IVariable[indexes.Length];
-            int stringCount = 0;
-            int i = -1;
-            foreach (string s in indexes)
-            {
-                i++;
-                keys[i] = new ScalarString(indexes[i]);
-            }
-            return keys;
-        }
-
         
 
         public static void Decomp(DecompOptions decompOptions)
@@ -9707,7 +9589,7 @@ namespace Gekko
 
                         int min = int.MaxValue;
                         int max = int.MinValue;
-                        List<string> list = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo"));
+                        List<string> list = Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo"));
                         int x = list.Count;
                         G.Writeln("Testing " + x + " endogenous vars");
                         for (int i = 0; i < x; i += n)
@@ -13485,7 +13367,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            List<string> list = Program.GetListOfStringsFromList(list2);
+            List<string> list = Stringlist.GetListOfStringsFromList(list2);
 
             //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
             //List<string> unfoldedList = UnfoldLists(list);
@@ -13516,7 +13398,7 @@ namespace Gekko
                     try
                     {
                         string m = type.Substring(2);
-                        List<string> a1 = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
+                        List<string> a1 = Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
                         bool showList = true;
                         if (a1.Count > 5000)
                         {
@@ -13577,7 +13459,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: List " + Globals.symbolCollection + m + " was not found");
                 throw new GekkoException();
             }
-            List<string> a1 = Program.GetListOfStringsFromList(iv);
+            List<string> a1 = Stringlist.GetListOfStringsFromList(iv);
 
             if (a1.Count == 0)
             {
@@ -13929,28 +13811,28 @@ namespace Gekko
                 if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + s)) Program.databanks.GetGlobal().RemoveIVariable(Globals.symbolCollection + s);
             }
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.all != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.all.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.all != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.all.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.endo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.endo.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.endo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.endo.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exo.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exo.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exod != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exod.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exod != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exod.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exodjz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exodjz.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exodjz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exodjz.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exoj != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoj.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exoj != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoj.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exotrue != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exotrue.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exotrue != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exotrue.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List());
 
-            if (Program.model.modelGekko.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoz.ToArray())));
+            if (Program.model.modelGekko.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Stringlist.GetListOfIVariablesFromListOfStrings(Program.model.modelGekko.modelInfo.modelListHelper.exoz.ToArray())));
             else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List());
                         
             Program.model.modelGekko.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
@@ -14430,21 +14312,21 @@ namespace Gekko
                 hasModel = true;
                 try
                 {
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exod", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exod", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exod.Add(s, "");
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoj", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoj", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exoj.Add(s, "");
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exoz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exoz.Add(s, "");
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exodjz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exodjz", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exodjz.Add(s, "");
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exo.Add(s, "");
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exotrue", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "exotrue", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         exotrue.Add(s, "");
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "endo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "endo", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         endo.Add(s, "");
-                    foreach (string s in Program.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "all", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
+                    foreach (string s in Stringlist.GetListOfStringsFromListOfIvariables(((List)O.GetIVariableFromString("global:" + Globals.symbolCollection + "all", O.ECreatePossibilities.NoneReturnNull)).list.ToArray()))
                         all.Add(s, "");
                 }
                 catch { };  //if error, we just ignore it, and the list will be empty.
@@ -15400,8 +15282,8 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            List<string> varsP = Program.GetListOfStringsFromList((List)list1);
-            List<string> varsX = Program.GetListOfStringsFromList((List)list2);
+            List<string> varsP = Stringlist.GetListOfStringsFromList((List)list1);
+            List<string> varsX = Stringlist.GetListOfStringsFromList((List)list2);
 
             if (varsP.Count == 0 || varsX.Count == 0)
             {
@@ -15521,33 +15403,7 @@ namespace Gekko
             return m;
         }
 
-        public static List<string> GetListOfStringsFromList(IVariable a)
-        {
-            if (a.Type() == EVariableType.String)
-            {
-                List<string> mm = new List<string>();
-                mm.Add(a.ConvertToString());
-                return mm;
-            }
-            else if (a.Type() == EVariableType.List)
-            {
-                List<IVariable> m = a.ConvertToList();
-                List<string> mm = new List<string>();
-                foreach (IVariable iv in m)
-                {
-                    string s = O.ConvertToString(iv);
-                    mm.Add(s);
-                }
-                return mm;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Input must be a string or list of strings");
-                throw new GekkoException();
-            }
-
-        }
-
+        
         private static void CreateXxVariableOrIssueError(Databank work, string var)
         {
             if (!work.ContainsIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
@@ -17995,7 +17851,7 @@ namespace Gekko
             commandLines.Add("Unknown file");
             if (fileText != null)
             {
-                commandLines = CreateListOfStringsFromString(fileText);
+                commandLines = Stringlist.CreateListOfStringsFromFile(fileText);
             }
             if (p.hasSeenStopCommand == 1)
             {                
@@ -30246,4 +30102,5 @@ namespace Gekko
         public Series ts;
         public bool hasColon = false;
     }
+    
 }

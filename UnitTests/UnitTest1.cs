@@ -12539,28 +12539,14 @@ namespace UnitTests
             _AssertSeries(First(), "gdp_true", 2005, 1325794d, sharedDelta);
 
         }
-
-        //private static List<string> GetListOfStrings(string s)
-        //{
-        //    return Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + s]);
-        //}
+        
 
         private static List<string> _GetListOfStrings(string s)
         {
             IVariable iv = Program.databanks.GetFirst().GetIVariable("#" + s);
             List list = iv as List;
-            return Program.GetListOfStringsFromList(list);
-        }
-
-        //private static void AssertHelperList(string s, List<string> ss)
-        //{
-        //    List<string> x = GetListOfStrings(s);
-        //    Assert.AreEqual(ss.Count, x.Count);
-        //    for (int i = 0; i < ss.Count; i++)
-        //    {
-        //        Assert.IsTrue(string.Compare(ss[i], x[i]) == 0);
-        //    }
-        //}
+            return Stringlist.GetListOfStringsFromList(list);
+        }       
 
         private static void _AssertHelperList(string s, List<string> ss)
         {

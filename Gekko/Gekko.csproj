@@ -400,6 +400,7 @@
     <Compile Include="SplitContainerFix.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Stringlist.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Translate.cs" />

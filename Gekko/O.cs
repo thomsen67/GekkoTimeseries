@@ -351,7 +351,7 @@ namespace Gekko
                 {
                     if (hasLargeModel)
                     {
-                        List<string> a1 = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
+                        List<string> a1 = Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
                         G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
                         G.Writeln();
                     }
@@ -964,7 +964,7 @@ namespace Gekko
 
             foreach (HandleEndoHelper h in helper)
             {
-                List<string> vars = Program.GetListOfStringsFromList(h.varname);  //emits error if not string or list
+                List<string> vars = Stringlist.GetListOfStringsFromList(h.varname);  //emits error if not string or list
 
                 foreach (string s in vars)
                 {
@@ -1531,7 +1531,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    rv = iv_series.FindArraySeries(smpl, Program.GetListOfIVariablesFromListOfStrings(indexes), false, false, settings);  //last arg. not used
+                    rv = iv_series.FindArraySeries(smpl, Stringlist.GetListOfIVariablesFromListOfStrings(indexes), false, false, settings);  //last arg. not used
                     
                 }
                 else
@@ -1545,7 +1545,7 @@ namespace Gekko
             {
                 //for instance PRT {('a', 'b')}. A controlled unfold like PRT {#m} will not get here.
                 List x_list = x as List;
-                string[] items = Program.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
+                string[] items = Stringlist.GetListOfStringsFromListOfIvariables(x_list.list.ToArray());
                 if (items == null)
                 {
                     G.Writeln2("*** ERROR: The list contains non-string elements");
@@ -3146,12 +3146,6 @@ namespace Gekko
             return s;
         }
 
-        public static List CreateListFromStrings(string[] input)
-        {
-            List m = new List(new List<string>(input));
-            return m;
-        }
-
         private static IVariable LookupHelperRightside2(Map map, string dbName, string varnameWithFreq)
         {
             IVariable rv;
@@ -3694,8 +3688,8 @@ namespace Gekko
                                 if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                 {
                                     Matrix m = rhs.DeepClone(null) as Matrix;
-                                    if (o.opt_colnames != null) m.colnames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
-                                    if (o.opt_rownames != null) m.rownames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
+                                    if (o.opt_colnames != null) m.colnames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_colnames).ToArray()));
+                                    if (o.opt_rownames != null) m.rownames = new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(O.ConvertToList(o.opt_rownames).ToArray()));
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
                                     G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                 }
@@ -4223,7 +4217,7 @@ namespace Gekko
             //see also #98037532985
 
             string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-            //List<string> temp = Program.GetListOfStringsFromList(rhs);
+            //List<string> temp = Stringlist.GetListOfStringsFromList(rhs);
             
             file = Program.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
@@ -5225,23 +5219,7 @@ namespace Gekko
             return m;                       
         }
 
-        public static List<string> GetListOfStringsFromIVariable(IVariable x)
-        {
-            if (x.Type() == EVariableType.String)
-            {
-                return new List<string>() { x.ConvertToString() };
-            }
-            else if (x.Type() == EVariableType.List)
-            {
-                return Program.GetListOfStringsFromList(x);
-            }
-            else
-            {
-                G.Writeln2("*** Expected string of list of strings");
-                throw new GekkoException();
-            }
-        }
-
+        
 
         private static IVariable MaybeStringify(IVariable x, bool dollarStringify)
         {
@@ -5318,7 +5296,7 @@ namespace Gekko
         public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
         {
             string bankName = O.ConvertToString(x);
-            List<string> items = Program.GetListOfStringsFromList(y);
+            List<string> items = Stringlist.GetListOfStringsFromList(y);
             List<string> newList = new List<string>();
             foreach (string s in items)
             {
@@ -8641,7 +8619,7 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Itershow(Program.GetListOfStringsFromList(this.names), this.t1, this.t2);
+                Program.Itershow(Stringlist.GetListOfStringsFromList(this.names), this.t1, this.t2);
             }
         }
 
@@ -8663,7 +8641,7 @@ namespace Gekko
             public void Exe()
             {
                 List<string> names2 = null;
-                if (this.names != null) names2 = Program.GetListOfStringsFromList(this.names);
+                if (this.names != null) names2 = Stringlist.GetListOfStringsFromList(this.names);
                 Program.Checkoff(names2, type);
             }
         }
@@ -9501,7 +9479,7 @@ namespace Gekko
                                 {
                                     try
                                     {
-                                        string[] ss = Program.GetListOfStringsFromListOfIvariables((set as List).list.ToArray());
+                                        string[] ss = Stringlist.GetListOfStringsFromListOfIvariables((set as List).list.ToArray());
                                         restrict[dimI].AddRange(ss);
                                     }
                                     catch

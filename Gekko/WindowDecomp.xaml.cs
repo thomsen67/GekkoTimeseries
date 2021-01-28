@@ -304,7 +304,7 @@ namespace Gekko
 
             if (Globals.isAgeHierarchy && name.EndsWith(Globals.ageHierarchyName))
             {
-                //List<string> list = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable("#" + Globals.ageName));
+                //List<string> list = Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable("#" + Globals.ageName));
                 SortedDictionary<string, List<string>> m1 = new SortedDictionary<string, List<string>>();
                 List<string> m2 = new List<string>();
                 GetHierarchyAggregateNames(list, m1, m2);
@@ -321,7 +321,7 @@ namespace Gekko
             }
             else
             {
-                //return Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(name));
+                //return Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(name));
                 return list;
             }
         }

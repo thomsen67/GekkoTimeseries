@@ -226,7 +226,7 @@ namespace Gekko
             string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
 
             List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError, true) as List;
-            List<string> vars = O.GetListOfStringsFromIVariable(ml);
+            List<string> vars = Stringlist.GetListOfStringsFromIVariable(ml);
 
             if (G.Equal(include_p_type, "yes"))
             {
