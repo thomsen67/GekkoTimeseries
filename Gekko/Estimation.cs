@@ -360,7 +360,7 @@ namespace Gekko
                 string s = null;
                 if (i + 1 < o.expressionsText.Count)
                 {
-                    s = Program.TruncateTextWithDots(25, G.ReplaceGlueNew(o.expressionsText[i + 1]));
+                    s = Program.TruncateTextWithDots(25, G.ReplaceGlueSymbols(o.expressionsText[i + 1]));
                 }
                 else
                 {
@@ -525,7 +525,7 @@ namespace Gekko
             }
 
             G.Writeln2(" " + Globals.ols1 + " " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")" + flat);
-            G.Writeln(" " + Globals.ols2 + "" + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
+            G.Writeln(" " + Globals.ols2 + "" + G.ReplaceGlueSymbols(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
 
 
@@ -571,7 +571,7 @@ namespace Gekko
                 {
                     string s = null;
                     s += "FRML _i ";
-                    s += G.ReplaceGlueNew(o.expressionsText[0]) + " = ";
+                    s += G.ReplaceGlueSymbols(o.expressionsText[0]) + " = ";
                     bool hasVariable = false;
                     for (int i = 0; i < m - poly - constant; i++)
                     {
@@ -581,7 +581,7 @@ namespace Gekko
                             if (name_param.data[i, 0] >= 0) s += " +";
                             else s += " ";
                         }
-                        string var = G.ReplaceGlueNew(o.expressionsText[i + 1]);
+                        string var = G.ReplaceGlueSymbols(o.expressionsText[i + 1]);
                         var = var.Replace(" ", "");
                         if (var.Contains("+") || var.Contains("-")) var = "(" + var + ")";
                         s += Program.NumberFormat(name_param.data[i, 0], "f" + Program.GetDigits(name_param.data[i, 0], 6)) + "*" + var;

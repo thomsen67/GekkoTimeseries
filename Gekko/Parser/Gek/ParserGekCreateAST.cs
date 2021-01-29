@@ -474,22 +474,15 @@ namespace Gekko.Parser.Gek
                 
                 if (flag)
                 {
-                    string[] ss = ast.Text.Split(Globals.parserExpressionSeparator);
-                    //for (int i = 0; i < ss.Length; i++)
-                    //{                        
-                    //    ss[i] = G.ReplaceGlueNew(ss[i]);                        
-                    //}
-                    cmdNode.Text = G.ReplaceGlueNew(ss[0]);
+                    string[] ss = ast.Text.Split(Globals.parserExpressionSeparator);                    
+                    cmdNode.Text = G.ReplaceGlueSymbols(ss[0]);
                     cmdNode.specialExpressionAndLabelInfo = ss;
                 }
             }
 
             if (cmdNode.Text != null)
             {
-                if (Globals.addGlue)
-                {
-                    cmdNode.Text = G.ReplaceGlueNew(cmdNode.Text);
-                }
+                cmdNode.Text = G.ReplaceGlueSymbols(cmdNode.Text);
             }
             cmdNode.Line = ast.Line;
             if (ast.Children == null)
@@ -594,7 +587,7 @@ namespace Gekko.Parser.Gek
                 if (ph.isOneLinerFromGui == true && lineNo != 1)
                 {
                     G.Writeln("*** ERROR: Parsing this line:");
-                    G.Writeln("    " + G.ReplaceGlueNew(inputFileLines[0]), Color.Blue);
+                    G.Writeln("    " + G.ReplaceGlueSymbols(inputFileLines[0]), Color.Blue);
                     G.Writeln("*** ERROR: " + errorMessage);
                 }
                 else
@@ -623,7 +616,7 @@ namespace Gekko.Parser.Gek
                     line = line + "  ";  //hack to avoid ending problems.....
                     string lineTemp = line;
 
-                    lineTemp = G.ReplaceGlueNew(lineTemp);
+                    lineTemp = G.ReplaceGlueSymbols(lineTemp);
 
                     string line0 = lineTemp.Substring(0, positionNo - 1);
                     string line1 = lineTemp.Substring(positionNo - 1, 1);
@@ -633,7 +626,7 @@ namespace Gekko.Parser.Gek
                     {
                         G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
                         string lineBefore = inputFileLines[lineNo - 1 - 1];
-                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
+                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
                     }
 
                     G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
@@ -649,8 +642,8 @@ namespace Gekko.Parser.Gek
 
                 if (ph.isModel == false && previousLineProbablyCulprit == false)
                 {
-                    WriteLinkToHelpFile2(G.ReplaceGlueNew(line));
-                    if (number == 1) ExtraErrorMessages(G.ReplaceGlueNew(line));
+                    WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                    if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
                 }
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
@@ -692,11 +685,8 @@ namespace Gekko.Parser.Gek
                 {
 
                 }
-
-                if (Globals.addGlue)
-                {
-                    errorMessage = G.ReplaceGlueNew(errorMessage);
-                }
+                
+                errorMessage = G.ReplaceGlueSymbols(errorMessage);                
 
                 if (true)
                 {
@@ -773,7 +763,7 @@ namespace Gekko.Parser.Gek
                     if (ph.isOneLinerFromGui == true && lineNo != 1)
                     {
                         G.Writeln("*** ERROR: Parsing this line:");
-                        G.Writeln("    " + G.ReplaceGlueNew(inputFileLines[0]), Color.Blue);
+                        G.Writeln("    " + G.ReplaceGlueSymbols(inputFileLines[0]), Color.Blue);
                         G.Writeln("*** ERROR: " + errorMessage);
                     }
                     else
@@ -816,7 +806,7 @@ namespace Gekko.Parser.Gek
                                 lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNo, 4) + "]:");
                             }
 
-                            lineTemp = G.ReplaceGlueNew(lineTemp);
+                            lineTemp = G.ReplaceGlueSymbols(lineTemp);
 
                             //try: not the end of the world if one of these fails
                             string line0 = "";
@@ -830,7 +820,7 @@ namespace Gekko.Parser.Gek
                             {
                                 G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
                                 string lineBefore = inputFileLines[lineNo - 1 - 1];
-                                G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
+                                G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
                             }
 
                             G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
@@ -848,8 +838,8 @@ namespace Gekko.Parser.Gek
 
                 if (ph.isModel == false)
                 {
-                    WriteLinkToHelpFile2(G.ReplaceGlueNew(line));
-                    if (number == 1) ExtraErrorMessages(G.ReplaceGlueNew(line));
+                    WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                    if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
                 }
             }
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
@@ -858,7 +848,7 @@ namespace Gekko.Parser.Gek
         
         private static void CheckForBadDouble(string lineTemp)
         {
-            string xx = G.ReplaceGlueNew(lineTemp.Trim());
+            string xx = G.ReplaceGlueSymbols(lineTemp.Trim());
             StringTokenizer2 tok = new StringTokenizer2(xx, false, true);
             tok.IgnoreWhiteSpace = false;
             tok.SymbolChars = new char[] { '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '*', '<', '>', ';', ',', ':', '-' };

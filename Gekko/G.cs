@@ -3502,7 +3502,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string ReplaceGlueNew(string s)
+        public static string ReplaceGlueSymbols(string s)
         {
             //int length = s.Length;
             //TODO:
@@ -3703,6 +3703,31 @@ namespace Gekko
             }
             catch (Exception e) { };
             return output;
+        }
+
+        public static void DeleteFolder(string s, string omitType)
+        {
+            if (!Directory.Exists(s)) return;
+            DeleteFolderHelper(new DirectoryInfo(s), omitType);
+        }
+
+        public static void DeleteFolder(string s)
+        {
+            DeleteFolder(s, null);
+        }
+
+        //Seems it does not delete the folders, but only their content
+        private static void DeleteFolderHelper(DirectoryInfo directoryInfo, string omitType)
+        {
+            foreach (FileInfo file in directoryInfo.GetFiles())
+            {
+                if (omitType != null && G.Equal("." + omitType, file.Extension)) continue;  //skip it
+                file.Delete();  //hmm probably best not to use WaitForFileDelete() here, exceptions are typically caught in a wrapper on this method, and not critical if it fails (used for cleanup)
+            }
+            foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
+            {
+                DeleteFolderHelper(subfolder, omitType);
+            }
         }
 
 

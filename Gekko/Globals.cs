@@ -711,8 +711,7 @@ namespace Gekko
         public static int endOfLinePositionWhenLastEnterPressed = -12345;
         public static int startOfLinePositionWhenLastEnterPressed = -12345;
         
-        public static bool debugTokens = false;  //tokens are printed 1 by 1, for debug purposes, show tokens, showtokens        
-        public static bool addGlue = true;        
+        public static bool debugTokens = false;  //tokens are printed 1 by 1, for debug purposes, show tokens, showtokens                
 
         public static bool printGrayLinesForDebugging = false;        
 

@@ -5606,7 +5606,7 @@ namespace Gekko
                 ss = commandLines[lineNumber - 1];
             }
             catch { }
-            string s = G.ReplaceGlueNew(ss) + "  --->   " + originalFileName + ", line " + lineNumber;
+            string s = G.ReplaceGlueSymbols(ss) + "  --->   " + originalFileName + ", line " + lineNumber;
             if (!Globals.bugfixMissing2.ContainsKey(s))
             {
                 Globals.bugfixMissing1.Add(s);

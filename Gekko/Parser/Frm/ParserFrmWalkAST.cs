@@ -633,7 +633,7 @@ namespace Gekko.Parser.Frm
                         if (recognized == false)
                         {
                             //Se also #09835742345
-                            G.Writeln2(G.ReplaceGlueNew(eh.equationText), Color.Red);
+                            G.Writeln2(G.ReplaceGlueSymbols(eh.equationText), Color.Red);
                             G.Writeln2("*** ERROR: Function '" + function + "' with " + arguments + " arguments");
                             G.Write("           cannot be recognized (see ", Color.Red);
                             G.WriteLink("functions", "help:" + "i_functions");

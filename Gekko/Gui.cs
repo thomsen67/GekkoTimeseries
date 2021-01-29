@@ -752,7 +752,7 @@ namespace Gekko
             try
             {
                 if (!Directory.Exists(path)) return;
-                Program.DeleteFolder(path, "mdl");
+                G.DeleteFolder(path, "mdl");
             }
             catch (Exception e)
             {
@@ -2404,6 +2404,13 @@ namespace Gekko
         {
         }
 
+        /// <summary>
+        /// Seems this can be used to convert a collection of .gtb file into a similar collection of .txt files with the actual
+        /// results of these tables --> for use without Gekko. This functionality is not used at the moment. Something a bit
+        /// similar can be found in EquationBrowser.cs for offline browsing.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
             StringBuilder s = new StringBuilder();
@@ -2459,7 +2466,7 @@ namespace Gekko
             DialogResult myDialogResult = MessageBox.Show(s.ToString(), "Convert PCIM tables", MessageBoxButtons.OKCancel);
             if (myDialogResult == DialogResult.OK)
             {
-                Program.ConvertTab2();
+                Program.ConvertPCIMTables();
             }
         }
 

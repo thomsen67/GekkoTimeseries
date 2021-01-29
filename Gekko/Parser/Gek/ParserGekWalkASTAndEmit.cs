@@ -3250,7 +3250,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     //may be overwritten with explicit source
                                     //maybe later on introduce a #calc list with such meta information
-                                    sb.A("o" + Num(node) + ".opt_source = @`<[code]>" + G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
+                                    sb.A("o" + Num(node) + ".opt_source = @`<[code]>" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
                                 }
 
                                 string type = HandleVar(node[3].Text);  //2 is options   
@@ -4283,11 +4283,11 @@ namespace Gekko.Parser.Gek
                             {
                                 if (node.specialExpressionAndLabelInfo[2] != "")
                                 {
-                                    givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[2]);
+                                    givenLabel = G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[2]);
                                     givenLabel = G.StripQuotes(givenLabel);
                                     givenLabel = Globals.labelCheatString + givenLabel;
                                 }
-                                else givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]);
+                                else givenLabel = G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1]);
                             }
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
 
@@ -4475,7 +4475,7 @@ namespace Gekko.Parser.Gek
                             bool isLoop = node.listLoopAnchor != null && node.listLoopAnchor.Count > 0;
                             isLoop = true;
 
-                            node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                            node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
 
                             string methodName = "Evalcode" + ++Globals.counter;
 
@@ -4522,7 +4522,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDECOMP":
                         {
                             node.Code.A("O.Decomp1 o" + Num(node) + " = new O.Decomp1();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                             GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
@@ -4581,7 +4581,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Decomp2 o" + Num(node) + " = new O.Decomp2();" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = @`" + node.Text + "`;" + G.NL);
-                            node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                             GetCodeFromAllChildren(node);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
@@ -5944,7 +5944,7 @@ namespace Gekko.Parser.Gek
             if (directOption)
             {
                 nodeCode += "o" + Num(node) + ".direct = true;" + G.NL;
-                nodeCode += "o" + Num(node) + ".rawfood = " + "@`" + G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]) + "`" + ";" + G.NL;
+                nodeCode += "o" + Num(node) + ".rawfood = " + "@`" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1]) + "`" + ";" + G.NL;
             }
             else
             {
@@ -6057,7 +6057,7 @@ namespace Gekko.Parser.Gek
             if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
             {
                 //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
-                nodeCode += "o" + numNode + ".meta = @`" + G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1]) + "`;" + G.NL;
+                nodeCode += "o" + numNode + ".meta = @`" + G.ReplaceGlueSymbols(node.Parent.specialExpressionAndLabelInfo[1]) + "`;" + G.NL;
             }
             nodeCode += "o" + numNode + ".Exe();" + G.NL;
             return nodeCode;

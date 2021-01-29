@@ -1046,7 +1046,7 @@ namespace Gekko.Parser.Frm
                 if (ph.isOneLinerFromGui == true && lineNo != 1)
                 {
                     G.Writeln("*** ERROR: Parsing this line:");
-                    G.Writeln("    " + G.ReplaceGlueNew(inputFileLines[0]), Color.Blue);
+                    G.Writeln("    " + G.ReplaceGlueSymbols(inputFileLines[0]), Color.Blue);
                     G.Writeln("*** ERROR: " + errorMessage);
                 }
                 else
@@ -1081,12 +1081,12 @@ namespace Gekko.Parser.Frm
                     {
                         G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
                         string lineBefore = inputFileLines[lineNo - 1 - 1];
-                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueNew(lineBefore), Color.Blue);
+                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
                     }
 
-                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueNew(line0), Color.Blue);
-                    G.Write(G.ReplaceGlueNew(line1), Color.Red);
-                    G.Writeln(G.ReplaceGlueNew(line2), Color.Blue);
+                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueSymbols(line0), Color.Blue);
+                    G.Write(G.ReplaceGlueSymbols(line1), Color.Red);
+                    G.Writeln(G.ReplaceGlueSymbols(line2), Color.Blue);
 
                     G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
                     G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);

@@ -191,7 +191,7 @@ namespace Gekko.Parser.Gek
                     {
                         if (lexer == true) G.Writeln("*** ERROR: Problem parsing/lexing command line:");
                         else G.Writeln("*** ERROR: Running user input line:");
-                        G.Writeln("              " + G.ReplaceGlueNew(problemLine), Color.Blue);
+                        G.Writeln("              " + G.ReplaceGlueSymbols(problemLine), Color.Blue);
                     }
                     else
                     {

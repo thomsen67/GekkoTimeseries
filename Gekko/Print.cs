@@ -242,7 +242,7 @@ namespace Gekko
                         if (lbl.Count != prtElementCounter)
                         {
                             Mismatch();
-                            string l = G.ReplaceGlueNew(RemoveSplitter(labelOriginal[k]).Split('|')[0]);
+                            string l = G.ReplaceGlueSymbols(RemoveSplitter(labelOriginal[k]).Split('|')[0]);
                             lbl = new List<string>();
                             for (int ii = 0; ii < prtElementCounter; ii++)
                             {
@@ -1689,7 +1689,7 @@ namespace Gekko
 
             if (labelRecordedPieces.Count == 0)
             {
-                lbl.Add(G.ReplaceGlueNew(w[0]));
+                lbl.Add(G.ReplaceGlueSymbols(w[0]));
                 return lbl;
             }
 
@@ -1830,7 +1830,7 @@ namespace Gekko
                         if (s5.Trim() != "") s6 = s5.Trim();  //just safety
                         u = u + s6;
                     }
-                    string result2 = G.ReplaceGlueNew(u);
+                    string result2 = G.ReplaceGlueSymbols(u);
                     //G.Writeln2("===> " + result2);
 
                     // ----------------------------------------------

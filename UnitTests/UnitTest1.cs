@@ -152,7 +152,7 @@ namespace UnitTests
             {
                 if (true)  //sometimes good to try setting temporary to false, to force running models on cached files.
                 {
-                    Program.DeleteFolder(Globals.localTempFilesLocation);
+                    G.DeleteFolder(Globals.localTempFilesLocation);
                 }
                 else
                 {
@@ -913,7 +913,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_OpenClose()
         {
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             I("RESET; TIME 2010 2012;");
@@ -3708,7 +3708,7 @@ namespace UnitTests
             //So you can use file=sub\xx.txt or file='sub\xx.txt' or file=%s, where %s is a string.
             //The test also tests PLOT.
             I("reset;");
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\analysis");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\analysis\graphs");
@@ -7585,7 +7585,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ArraySeries2()
         {
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
             I("RESET; MODE data; TIME 2000;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
@@ -9350,7 +9350,7 @@ namespace UnitTests
             {
                 for (int j = 0; j < 2; j++)
                 {
-                    Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                    G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                     string s = null;
                     string cols = null;
                     if (i == 1) s = "datetype = 'excel'";
@@ -9443,7 +9443,7 @@ namespace UnitTests
 
                                         counter++;
 
-                                        Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                                        G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                                         I("RESET; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
                                         string cols = null;
@@ -15239,7 +15239,7 @@ print(df2)
 
                 //Basic test first
 
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("RESET;");
                 //if (i == 0) I("OPTION databank logic = aremos;");
@@ -15274,7 +15274,7 @@ print(df2)
                 // test that data is written back
                 //---------------------------------
 
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
 
                 // ------------ open normal bank
@@ -17860,7 +17860,7 @@ print(df2)
 
             //==================== LIST operators etc. =======================================
 
-            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
@@ -19182,7 +19182,7 @@ print(df2)
             // Implicitly also testing TELL
             //
             string working = Globals.ttPath2 + @"\regres\temp";
-            Program.DeleteFolder(working);
+            G.DeleteFolder(working);
             Directory.CreateDirectory(working);
             I("OPTION folder working = '" + working + "';");
             // ------------------------
@@ -19352,7 +19352,7 @@ print(df2)
 
             for (int i = 0; i < 2; i++)
             {
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
@@ -19539,12 +19539,12 @@ print(df2)
                 if (i == 1) First().Trim();
                 DatabanksTestHelper4();
 
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
                 //CSV
                 //testing CSV read/write -------------------------------------------
 
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
@@ -19577,12 +19577,12 @@ print(df2)
 
                 I("OPTION freq a;");
                 DatabanksTestHelper();
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
                 //PRN
                 //testing PRN read/write -------------------------------------------
 
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
@@ -19615,7 +19615,7 @@ print(df2)
 
                 I("OPTION freq a;");
                 DatabanksTestHelper();
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
                 if (Globals.UNITTESTFOLLOWUP_important)
                 {
@@ -19627,7 +19627,7 @@ print(df2)
                     {
                         foreach (string type in types)
                         {
-                            Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                            G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                             I("RESET;");
                             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
@@ -19659,7 +19659,7 @@ print(df2)
 
                     // Testing READ and IMPORT with periods
 
-                    Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                    G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                     Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                     I("RESET;");
                     I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");                    
@@ -19772,7 +19772,7 @@ print(df2)
                     }// for IMPORT, READ
                 }
 
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
 
             }
         }
@@ -21246,7 +21246,7 @@ print(df2)
                 // testing annual
 
                 I("RESET;");
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 // ------ tsdx
                 if (bank == null)
@@ -21448,7 +21448,7 @@ print(df2)
                 // ---------- Testing on quarters
 
                 I("RESET;");
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 I("OPTION freq q;");
                 // ------ tsdx
@@ -21622,7 +21622,7 @@ print(df2)
                 // ---------- Testing on daily
 
                 I("RESET;");
-                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 I("OPTION freq d;");
                 // ------ gbk

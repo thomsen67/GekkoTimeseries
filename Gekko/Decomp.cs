@@ -2517,7 +2517,7 @@ namespace Gekko
                 if (Globals.printAST)
                 {
                     G.Writeln2("-------------- EVAL ---------------");
-                    G.Writeln2("EVAL " + G.ReplaceGlueNew(tmp));
+                    G.Writeln2("EVAL " + G.ReplaceGlueSymbols(tmp));
                     G.Writeln2("-----------------------------------");
                 }
 
