@@ -8718,7 +8718,13 @@ namespace Gekko
             }
         }
         
-        
+        /// <summary>
+        /// Internal helper method for SIM testing.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public static List<string> TestSim(List<string> list, int start, int end)
         {
             List<string> res = new List<string>();
@@ -8730,6 +8736,13 @@ namespace Gekko
             return res;
         }
 
+        /// <summary>
+        /// Helper for the "old" DECOMP method. Will become obsolete.
+        /// </summary>
+        /// <param name="decompOptions"></param>
+        /// <param name="transformationCodeAugmented"></param>
+        /// <param name="useLocalData"></param>
+        /// <returns></returns>
         public static Table DecompHelper2(DecompOptions decompOptions, string transformationCodeAugmented, bool useLocalData)
         {
             GekkoTime tStart = decompOptions.t1;
@@ -9262,6 +9275,18 @@ namespace Gekko
             return table;
         }
 
+        /// <summary>
+        /// Helper method for the "old" DECOMP. Will become obsolete.
+        /// </summary>
+        /// <param name="sum"></param>
+        /// <param name="truth"></param>
+        /// <param name="dataError"></param>
+        /// <param name="nonlinError"></param>
+        /// <param name="o"></param>
+        /// <param name="tableTemp"></param>
+        /// <param name="data"></param>
+        /// <param name="data_ALT"></param>
+        /// <param name="isRelative"></param>
         private static void DecompHelper3(ref double sum, ref double truth, ref double dataError, ref double nonlinError, int o, double[] tableTemp, List<DecompHelper> data, List<DecompHelper> data_ALT, bool isRelative)
         {
             sum = 0d;
@@ -9292,6 +9317,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper method for the "old" DECOMP. Will become obsolete.
+        /// </summary>
+        /// <param name="leftSideVariable"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
         private static List<string> GetAllVariablesForDecompose(string leftSideVariable, List<string> p2)
         {
             List<string> allVariables = new List<string>();
@@ -9330,6 +9361,13 @@ namespace Gekko
             return allVariables;
         }
 
+        /// <summary>
+        /// Helper method for the "old" DECOMP. Will become obsolete.
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <param name="isExpression"></param>
+        /// <param name="eh"></param>
+        /// <param name="cr"></param>
         private static void CreateDecompDll(string varName, bool isExpression, EquationHelper eh, out CompilerResults cr)
         {
             string code = "";
@@ -9375,6 +9413,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for the PREDICT command, compiling some dynamic C# code.
+        /// </summary>
+        /// <param name="code"></param>
         public static void CreatePredictActions(string code)
         {
             StringBuilder s2 = new StringBuilder();
@@ -9410,19 +9452,14 @@ namespace Gekko
             Object[] args = new Object[0];
             cr.CompiledAssembly.GetType("Gekko.TranslatedCode").InvokeMember("PredictActions", BindingFlags.InvokeMethod, null, null, args);            
         }
-        
 
-        public static List<int> GetLeftsideBNumbers()
-        {
-            //Gets equation numbers in simultaneous gauss-seidel block
-            //Note that this method takes a little time: do not put inside loop!
-            List<int> allSimul = new List<int>();
-            allSimul.AddRange(Program.model.modelGekko.m2.simulRecursive);
-            allSimul.AddRange(Program.model.modelGekko.m2.simulFeedback);
-            allSimul.Sort();
-            return allSimul;
-        }
-
+        /// <summary>
+        /// Helper for internal test of SIM command.
+        /// </summary>
+        /// <param name="cr"></param>
+        /// <param name="list"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
         private static void CreateTestSimDll(out CompilerResults cr, List<string> list, int start, int end)
         {
             //This is a method only used for debugging purposes
@@ -9500,6 +9537,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for "old" DECOMP command. Will be obsolete.
+        /// </summary>
+        /// <param name="cr"></param>
+        /// <param name="t"></param>
+        /// <param name="db"></param>
+        /// <returns></returns>
         private static double RunDecompEquation(CompilerResults cr, GekkoTime t, Databank db)
         {
             Object[] args2 = new Object[3];
@@ -9511,6 +9555,12 @@ namespace Gekko
             return val0;
         }
 
+        /// <summary>
+        /// For Gekko model files (.frm), takes care of normal equations (FRML), variable list, and runbefore$ or runafter$ code.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="modelCommentsHelper"></param>
+        /// <returns></returns>
         public static List<string> HandleModelFiles(List<string> input, ModelCommentsHelper modelCommentsHelper)
         {
             List<string> output = new List<string>();
