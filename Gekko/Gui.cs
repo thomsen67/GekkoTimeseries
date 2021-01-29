@@ -1044,47 +1044,7 @@ namespace Gekko
             //gui.textBox2.Focus();
         }
 
-        private void pIZToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            String dataFile = "";
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-
-            openFileDialog1.InitialDirectory = Globals.userSettings.TspUtilityPath;
-            openFileDialog1.Filter = "All files (*.*)|*.*";
-            openFileDialog1.FilterIndex = 1;
-
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    if ((openFileDialog1.OpenFile()) != null)
-                    {
-                        dataFile = openFileDialog1.FileName;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
-                }
-            }
-
-            if (dataFile == null) return;
-
-            using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\" + dataFile, Program.GekkoFileReadOrWrite.Read))
-            using (StreamReader sr = new StreamReader(fs))
-            {
-                String input = sr.ReadToEnd();
-                String output = Program.EncryptDecrypt(input);
-                using (FileStream fs2 = Program.WaitForFileStream(dataFile + "1", Program.GekkoFileReadOrWrite.Read))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs2))
-                {
-                    sw.Write(output);
-                    sw.Flush();
-                    sw.Close();
-                }
-            }
-        }
-
+        
         private void radioButton1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)

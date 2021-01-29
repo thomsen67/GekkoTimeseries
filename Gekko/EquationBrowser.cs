@@ -1170,7 +1170,7 @@ namespace Gekko
                     {
                         //simple name
                         string name = th[nameStart].s;
-                        string s3 = Program.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
+                        string s3 = StringTokenizer2.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
                         BrowserAddItem(datagen, name.Trim(), s3.Trim());
                     }
                     else
@@ -1218,7 +1218,7 @@ namespace Gekko
                             {
                                 //probably nothing to add, complicated name but no scalars found, for instance fy[2000] = ...
                                 string name = th[nameStart].s;
-                                string s3 = Program.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
+                                string s3 = StringTokenizer2.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
                                 BrowserAddItem(datagen, name.Trim(), s3.Trim());
                             }
                             else if (scalarsOnLhsInSerStatement.Count == 1 && xx[0].Value != null)

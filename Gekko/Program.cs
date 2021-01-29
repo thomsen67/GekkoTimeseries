@@ -1163,6 +1163,12 @@ namespace Gekko
         public static int guiBrowseHelpNumber = 0;
         public static List<string> guiBrowseHelpHistory = new List<string>();
 
+        /// <summary>
+        /// Random number
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
         public static int RandomInt(int min, int max)
         {
             lock (Globals.randomSyncLock)
@@ -1171,6 +1177,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <returns></returns>
         public static int RandomInt()
         {
             lock (Globals.randomSyncLock)
@@ -1179,6 +1189,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Random number
+        /// </summary>
+        /// <returns></returns>
         public static double RandomDouble()
         {
             lock (Globals.randomSyncLock)
@@ -1187,6 +1201,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for threads and exceptions
+        /// </summary>
+        /// <param name="e2"></param>
+        /// <param name="p"></param>
         public static void PrintExceptionAndFinishThread(Exception e2, P p)
         {
             if (!Globals.threadIsInProcessOfAborting && !(p.hasSeenStopCommand > 0))  //STOP should not show errors
@@ -1300,12 +1319,20 @@ namespace Gekko
             Gui.gui.ThreadFinished();  //removes the job from the stack of jobs, otherwise we will wait for this halted job forever. Could use thread stop instead??
         }
 
+        /// <summary>
+        /// An error that is printed if a user tries to change data in a protected (read-only) databank
+        /// </summary>
+        /// <param name="s"></param>
         public static void ProtectError(string s)
         {
             G.Writeln2("*** ERROR: " + s);
             throw new GekkoException();
         }
 
+        /// <summary>
+        /// Helper for exceptions
+        /// </summary>
+        /// <param name="p"></param>
         public static void GekkoExceptionCleanup(P p)
         {
             //This method is also called when exceptions arise in unit testing (FAIL() method)
@@ -1327,6 +1354,10 @@ namespace Gekko
             }
         }                
 
+        /// <summary>
+        /// Helper for the PIPE command
+        /// </summary>
+        /// <param name="i"></param>
         public static void StopPipeAndMute(int i)
         {
             if (i == 1)
@@ -1348,6 +1379,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for exceptions printing
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool FindException(Exception ex, string s)
         {
             if (ex == null) return false;
@@ -1362,7 +1399,11 @@ namespace Gekko
             return false;
         }
 
-
+        /// <summary>
+        /// Helper regarding stack trace, to see how commands/functions/procedures call each other
+        /// </summary>
+        /// <param name="e2"></param>
+        /// <returns></returns>
         public static string GetStackTraceWithOffset(Exception e2)
         {
             StackTrace st = new System.Diagnostics.StackTrace(e2);
@@ -1376,25 +1417,11 @@ namespace Gekko
             }
             return stackTrace;
         }
-
-        public static void SetGlobalTimePeriodAbstract(bool direct, GekkoTime t1, GekkoTime t2)
-        {
-            if (direct)
-            {
-                Globals.globalPeriodStart = t1;
-                Globals.globalPeriodEnd = t2;                
-            }
-        }
-
-        public static void SetGlobalTimePeriodAbstractNew(bool direct, GekkoTime t1, GekkoTime t2)
-        {
-            if (direct)
-            {
-                Globals.globalPeriodStart = t1;
-                Globals.globalPeriodEnd = t2;
-            }
-        }
-
+                
+        /// <summary>
+        /// Helper method (hook) for Gekcel
+        /// </summary>
+        /// <param name="s"></param>
         //ok that it is not referenced to, is used in Gekcel
         public static void PrepareExcelDna(string s)
         {
@@ -1403,24 +1430,6 @@ namespace Gekko
             Globals.excelDnaPath = s;
         }        
         
-        static int skipSpaces(string c, int ii)
-        {
-            int i;
-            //skip spaces (tab is included counted)
-            for (i = ii; i < c.Length; i++)
-            {
-                if (c[i] == ' ' || c[i] == '\t')     //'\t' is tab
-                {
-                    //do nothing
-                }
-                else return i;
-            }
-            return -12345;
-        }
-
-        
-        
-        
         /// <summary>
         /// s must be of form "var¤-1", multiple Globals.lagIndicator not allowed.
         /// if "var¤-1¤-1", .s1 is ok but .s2 not.
@@ -1428,7 +1437,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        static TwoStrings getVariableAndLag(String s)
+        static TwoStrings GetVariableAndLag(String s)
         {
             String var = "";
             String lag = "";
@@ -1447,7 +1456,12 @@ namespace Gekko
             return ts;
         }
 
-
+        /// <summary>
+        /// Reads .csv or .prn format into a TableLight "matrix" of cells.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static TableLight ReadCsvPrn(EDataFormat type, string file)
         {
             //everything is stored as strings, no parsing into values... (probably because it is not that simple, comma vs. dot, NaN, etc.)
@@ -1542,7 +1556,21 @@ namespace Gekko
             return matrix;
         }
 
-        public static void GetTimeseriesFromWorkbookMatrix(CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo, string dateformat, string datetype)
+        /// <summary>
+        /// This methods uses a TableLight "matrix" of cells, and imports data from it (typically timeseries). The TableLight is obtained either
+        /// from a Microsoft Office component (interop, PIA, demaiding Excel to be installed), or from the EPPlus component (that reads any
+        /// xlsx file). The data is read as if the rows are names and the cols are dates, and if a transposed sheet is read, the row/cells
+        /// of the TableLight matrix are first transposed in the TableLight object itself. There is a lot of functionality related to date
+        /// formats, especially if the dates are Excel dates.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <param name="oRead"></param>
+        /// <param name="databank"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="dateformat"></param>
+        /// <param name="datetype"></param>
+        public static void GetTimeseriesFromWorkbookMatrix(TableLight data, CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, ReadInfo readInfo, string dateformat, string datetype)
         {
 
             //We could 'taste' the file, but how to distinguish A and U for instance?
@@ -1553,11 +1581,11 @@ namespace Gekko
             int colOffset = 0;
             string sheetName = null; //not implemented yet: takes first sheet it finds.
 
-            bool transpose = ShouldTranspose(oRead, matrix2, rowOffset, colOffset);
-            TableLight matrix = matrix2;
+            bool transpose = ShouldTranspose(oRead, data, rowOffset, colOffset);
+            TableLight matrix = data;
             if (transpose)
             {
-                matrix = matrix2.Transpose();
+                matrix = data.Transpose();
             }
 
             bool isFirst = false;
@@ -1792,13 +1820,9 @@ namespace Gekko
 
                 Series ts = null;
 
-                for (int col = j_data; col <= matrixMaxCol; col++)
-                //for (int col = 1 + colOffset; col <= matrixMaxCol; col++)
+                for (int col = j_data; col <= matrixMaxCol; col++)                
                 {
-                    //if (row - rowOffset == 1 && col - colOffset == 1)
-
                     
-
                     CellLight cell = matrix.Get(row, col);
 
 
@@ -1816,7 +1840,7 @@ namespace Gekko
                             //VARIABLE NAME
                             //-----------------------
 
-                            ts = GetTimeseriesFromWorkbookMatrixHelper(databank, freqHere, transpose, ref variableCounter, row, col, matrix, j_names);
+                            ts = GetTimeseriesFromWorkbookMatrixHelper(matrix, databank, freqHere, transpose, ref variableCounter, row, col, j_names);
                         }
 
                         if (true)
@@ -1898,17 +1922,26 @@ namespace Gekko
             {
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
-            }
-            //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-            //currentBank.yearStart = readInfo.startPerResultingBank;
-            //currentBank.yearEnd = readInfo.endPerResultingBank;
+            }            
         }
 
-        private static Series GetTimeseriesFromWorkbookMatrixHelper(Databank databank, EFreq freqHere, bool transpose, ref int variableCounter, int row, int col, TableLight matrix, int j_cellnames)
+        /// <summary>
+        /// Helper method for GetTimeseriesFromWorkbookMatrix() that reads one timeseries from a TableLight.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="databank"></param>
+        /// <param name="freqHere"></param>
+        /// <param name="transpose"></param>
+        /// <param name="variableCounter"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="j_cellnames"></param>
+        /// <returns></returns>
+        private static Series GetTimeseriesFromWorkbookMatrixHelper(TableLight data, Databank databank, EFreq freqHere, bool transpose, ref int variableCounter, int row, int col, int j_cellnames)
         {
             Series ts;
 
-            CellLight cell = matrix.Get(row, j_cellnames);
+            CellLight cell = data.Get(row, j_cellnames);
 
             string cellText = null;
 
@@ -1947,18 +1980,32 @@ namespace Gekko
             return ts;
         }
 
+        /// <summary>
+        /// Helper method
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
         private static bool IsGekkoDateFormat(string format)
         {
             return format == null || G.Equal(format, "gekko");
         }
-
         
-
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         private static bool IsNonAvailableText(string text)
         {
             return IsNonAvailableText(text, true);
         }
 
+        /// <summary>
+        /// For Excel cells, checks it these have "missing values"
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="alsoMAndNa"></param>
+        /// <returns></returns>
         private static bool IsNonAvailableText(string text, bool alsoMAndNa)
         {
             //the last ones are the Danish codes
@@ -1972,6 +2019,14 @@ namespace Gekko
             return isNonAvailableText;
         }
 
+        /// <summary>
+        /// Whether the data should be transposed
+        /// </summary>
+        /// <param name="oRead"></param>
+        /// <param name="matrix2"></param>
+        /// <param name="rowOffset"></param>
+        /// <param name="colOffset"></param>
+        /// <returns></returns>
         private static bool ShouldTranspose(ReadOpenMulbkHelper oRead, TableLight matrix2, int rowOffset, int colOffset)
         {
             bool transpose = false;
@@ -1989,6 +2044,14 @@ namespace Gekko
             return transpose;
         }
 
+        /// <summary>
+        /// Special handling for .prn files
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="rowOffset"></param>
+        /// <param name="colOffset"></param>
+        /// <param name="matrix"></param>
+        /// <returns></returns>
         private static bool HandlePrnFirstElement(CellLight cell, int rowOffset, int colOffset, TableLight matrix)
         {
             bool transpose = false;
@@ -2008,6 +2071,13 @@ namespace Gekko
             return transpose;
         }
 
+        /// <summary>
+        /// Helper for Excel coordinates
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="transpose"></param>
+        /// <returns></returns>
         private static string GetExcelCell(int row, int col, bool transpose)
         {
             string coord = null;
@@ -2021,9 +2091,19 @@ namespace Gekko
             }
             return coord;
         }
-
-        
-
+                
+        /// <summary>
+        /// This is the main entry method for both READ/IMPORT and OPEN. A lot of the internals of READ versus OPEN is the same. Note that the READ and
+        /// IMPORT commands are really 99% identical, it is mostly a name difference. The method will transfer data from an external file into a 
+        /// Gekko databank. To do this, all data is first read into the databankTemp, and subsequently it may be merged in differnt ways, if it is 
+        /// a READ/IMPORT command.
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="wipeDatabankBeforeInsertingData"></param>
+        /// <param name="oRead"></param>
+        /// <param name="open"></param>
+        /// <param name="readInfos"></param>
+        /// <param name="create"></param>
         public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create)
         {
             //open = true if called with OPEN command                      
@@ -2633,6 +2713,20 @@ namespace Gekko
             return;
         }
 
+        /// <summary>
+        /// Used in OpenOrRead() to get a databankTemp. This is where the actual reading of the external databank file takes place.
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="oRead"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="file"></param>
+        /// <param name="originalFilePath"></param>
+        /// <param name="dateformat"></param>
+        /// <param name="datetype"></param>
+        /// <param name="tsdxFile"></param>
+        /// <param name="tempTsdxPath"></param>
+        /// <param name="NaNCounter"></param>
+        /// <returns></returns>
         public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //note: file is altered below, not sure why
@@ -2684,7 +2778,10 @@ namespace Gekko
             return databankTemp;
         }
 
-
+        /// <summary>
+        /// Helper for OPEN command
+        /// </summary>
+        /// <param name="oRead"></param>
         private static void CheckOpenSyntax(ReadOpenMulbkHelper oRead)
         {
             int counter = 0;
@@ -2720,6 +2817,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Check if something has changed in a databank since it was read. Relevant for CLOSE (after an OPEN), to see if something needs
+        /// to be written back to the file.
+        /// </summary>
+        /// <param name="removed"></param>
+        /// <returns></returns>
         public static bool IsDatabankDirty(Databank removed)
         {
             bool isDirty = false;
@@ -2741,6 +2844,11 @@ namespace Gekko
             return isDirty;
         }
 
+        /// <summary>
+        /// Technical helper method for reading databanks with array-series.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="merge"></param>
         public static void HandleCleanAndParentForTimeseries(Databank db, bool merge)
         {
             db.isDirty = false;
@@ -2762,6 +2870,17 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Read a two-dimensional data file containg "cells" of data. Supports .csv, .prn, and xls(x). The timeseries data is read into a Gekko databank.
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="oRead"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="file"></param>
+        /// <param name="databank"></param>
+        /// <param name="originalFilePath"></param>
+        /// <param name="dateformat"></param>
+        /// <param name="datetype"></param>
         private static void ReadSheet(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string dateformat, string datetype)
         {
             //TODO:
@@ -2794,9 +2913,14 @@ namespace Gekko
                     matrix = ReadExcelWorkbook(file, oRead.sheet);
                 }
             }
-            GetTimeseriesFromWorkbookMatrix(offset, oRead, databank, matrix, readInfo, dateformat, datetype);
+            GetTimeseriesFromWorkbookMatrix(matrix, offset, oRead, databank, readInfo, dateformat, datetype);
         }
 
+        /// <summary>
+        /// Helper for Excel coordinate names.
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
         public static int ExcelColumnNameToNumber(string columnName)
         {
             if (string.IsNullOrEmpty(columnName)) throw new GekkoException();
@@ -2818,6 +2942,11 @@ namespace Gekko
             None
         }
 
+        /// <summary>
+        /// This is a method for SHEET&lt;import&gt;, where data can be extracted more precisely from individual cells. The file format may
+        /// be .csv, .prn, or xls(x), and you may import into a series, matrix, list or map.
+        /// </summary>
+        /// <param name="o"></param>
         public static void SheetImport(O.SheetImport o)
         {
             List<string> listItems = null;
@@ -2864,12 +2993,7 @@ namespace Gekko
             if (G.Equal(o.opt_xls, "yes")) fileType = EDataFormat.Xls;
             else if (G.Equal(o.opt_xlsx, "yes")) fileType = EDataFormat.Xlsx;
             else if (G.Equal(o.opt_csv, "yes")) fileType = EDataFormat.Csv;
-            else if (G.Equal(o.opt_prn, "yes")) fileType = EDataFormat.Prn;
-            //else
-            //{
-            //    G.Writeln2("*** ERROR: SHEET<import> must be used with file type xlsx, xls, csv or prn");
-            //    throw new GekkoException();
-            //}
+            else if (G.Equal(o.opt_prn, "yes")) fileType = EDataFormat.Prn;            
 
             TableLight inputTable = null;
             if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
@@ -3043,6 +3167,14 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Special rules to get a cell value (from a TableLight cell) transformed into a C# double.
+        /// </summary>
+        /// <param name="transpose"></param>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="cell"></param>
+        /// <returns></returns>
         public static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, CellLight cell)
         {
             double v = double.NaN;
@@ -3071,6 +3203,18 @@ namespace Gekko
         }
 
 
+        /// <summary>
+        /// Read a .gbk Gekko databank file into a Gekko databank (in memory). The .gbk file is unzipped, and the xml metadata file inside is
+        /// read, too (DatabankInfo.xml). After that, the unzipped protobuffer file is transformed into an in-memory databank. To to this,
+        /// the protobuf-net is used.
+        /// </summary>
+        /// <param name="oRead"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="file"></param>
+        /// <param name="databank"></param>
+        /// <param name="originalFilePath"></param>
+        /// <param name="tsdxFile"></param>
+        /// <param name="tempTsdxPath"></param>
         public static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
             
@@ -3285,15 +3429,20 @@ namespace Gekko
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
             }
-
-            //if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
-
-            //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-            //currentBank.yearStart = readInfo.startPerResultingBank;
-            //currentBank.yearEnd = readInfo.endPerResultingBank;
-
         }
 
+        /// <summary>
+        /// Read the older .gbk databank format corresponding to Gekko 2.x.x.
+        /// </summary>
+        /// <param name="oRead"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="file"></param>
+        /// <param name="databank"></param>
+        /// <param name="originalFilePath"></param>
+        /// <param name="tsdxFile"></param>
+        /// <param name="tempTsdxPath"></param>
+        /// <param name="databankVersion"></param>
+        /// <returns></returns>
         private static Databank ReadGbk_1_1(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, string databankVersion)
         {
             Databank deserializedDatabank;
@@ -3328,7 +3477,6 @@ namespace Gekko
                         ss2[i - 1] = ss[i];
                     }
                     //string ghostName = ss[0];
-
 
                     string ghostName = ss[0] + Globals.freqIndicator + G.ConvertFreq(ts1.freqEnum);
                     Series tsGhost = deserializedDatabank.GetIVariable(ghostName) as Series;
@@ -3399,6 +3547,14 @@ namespace Gekko
             return deserializedDatabank;
         }
 
+        /// <summary>
+        /// Small helper method.
+        /// </summary>
+        /// <param name="dates"></param>
+        /// <param name="databank"></param>
+        /// <param name="name"></param>
+        /// <param name="tsProtobuf"></param>
+        /// <param name="wipeExistingOut"></param>
         private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, Databank databank, string name, Series tsProtobuf, bool wipeExistingOut)
         {
             if (wipeExistingOut)
@@ -3409,6 +3565,14 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Small helper method.
+        /// </summary>
+        /// <param name="dates"></param>
+        /// <param name="gmap"></param>
+        /// <param name="gmapItem"></param>
+        /// <param name="tsProtobuf"></param>
+        /// <param name="shouldOverwriteLaterOn"></param>
         private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, Series tsProtobuf, bool shouldOverwriteLaterOn)
         {
             if (shouldOverwriteLaterOn)
@@ -3419,6 +3583,18 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// When reading a timeseries from a databank, this timeseries has a date "window" (observations over which it is defined). In addition,
+        /// if the timeseries already exists in the memory databank, the existing timeseries also has a window. To make matters even worse, there
+        /// may be a time indication in the command, for instance IMPORT&lt;2000 2020&gt;. This method handles the logic of these three 
+        /// overlapping date "windows".
+        /// </summary>
+        /// <param name="dates"></param>
+        /// <param name="tsExisting"></param>
+        /// <param name="tsSource"></param>
+        /// <param name="maxYearInProtobufFile"></param>
+        /// <param name="minYearInProtobufFile"></param>
+        /// <param name="shouldOverwriteLaterOn"></param>
         public static void MergeTwoTimeseriesWithDateWindow(AllFreqsHelper dates, Series tsExisting, Series tsSource, ref int maxYearInProtobufFile, ref int minYearInProtobufFile, ref bool shouldOverwriteLaterOn)
         {
             if (tsSource.type == ESeriesType.Timeless || (tsExisting != null && tsExisting.type == ESeriesType.Timeless))
@@ -3528,6 +3704,12 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// Get a timeries from a databank, may return null.
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private static Series GetTsExisting(Databank databank, string name)
         {
             IVariable ivExisting = databank.GetIVariable(name);
@@ -3546,6 +3728,15 @@ namespace Gekko
             return tsExisting;
         }
 
+        /// <summary>
+        /// Read a .tsd file with timeseries data into a Gekko memory databank.
+        /// </summary>
+        /// <param name="oRead"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="file"></param>
+        /// <param name="databank"></param>
+        /// <param name="originalFilePath"></param>
+        /// <param name="NaNCounter"></param>
         private static void ReadTsd(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
         {
             bool isTsdx = false;
@@ -3556,9 +3747,16 @@ namespace Gekko
             readInfo.nanCounter = NaNCounter;
             readInfo.startPerResultingBank = readInfo.startPerInFile;
             readInfo.endPerResultingBank = readInfo.endPerInFile;
-
         }
 
+        /// <summary>
+        /// Helper method for MergeTwoTimeseriesWithDateWindow(). These date window are particularly tricky if the date windows have different
+        /// frequencies (for instance IMPORT&lt;2000q2 2020q3&gt; on an annual timeseries).
+        /// </summary>
+        /// <param name="dates"></param>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <returns></returns>
         public static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(AllFreqsHelper dates, GekkoTime first, GekkoTime last)
         {
             //offset is the distance from first to dates.t1. If dates.t1 < first, offset will be 0.
@@ -3614,6 +3812,15 @@ namespace Gekko
             return new Tuple<GekkoTime, GekkoTime, int>(firstRv, lastRv, offset);
         }
 
+        /// <summary>
+        /// Read all "records" (timeseries) from a .tsd file. A .tsd file may contain mixed frequencies.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="merge"></param>
+        /// <param name="isTsdx"></param>
+        /// <param name="databank"></param>
+        /// <param name="NaNCounter"></param>
+        /// <param name="readInfo"></param>
         public static void ReadAllTsdRecords(string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
         {
             int smallWarnings = 0;
@@ -3894,6 +4101,14 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Read the Gekko-specific "flat" databank format. For instance, a line could be: x1 2001 2004 10 m -20 30.0, meaning that x1 is the
+        /// series name, 2001-2004 are the dates, and 10, m, -20, 30.0 are the data (m is missing). The format resembles Gekko series assignment
+        /// statements, but is much faster to parser and read. Often used when such data lines are produced from other software packages.
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="fileLocal"></param>
         public static void ReadFlat(Databank databank, ReadInfo readInfo, string fileLocal)
         {
             
@@ -4029,6 +4244,12 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// Reads AREMOS "dump" files.
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="fileLocal"></param>
         public static void ReadAremos(Databank databank, ReadInfo readInfo, string fileLocal)
         {
 
@@ -4369,6 +4590,13 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// Helper method for the ReadPx() method
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="oRead"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="fileLocal"></param>
         public static void ReadPxHelper(Databank databank, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string fileLocal)
         {
             //merge and date truncation:
@@ -4395,6 +4623,12 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// Read the PCIM data file format
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="readInfo"></param>
+        /// <param name="fileLocal"></param>
         public static void ReadPCIM(Databank databank, ReadInfo readInfo, string fileLocal)
         {
 
@@ -4572,7 +4806,9 @@ namespace Gekko
             }
         }
 
-
+        /// <summary>
+        /// Read the .px data file format (used by Statistics Denmark and others)
+        /// </summary>
         public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {            
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
@@ -5120,6 +5356,12 @@ namespace Gekko
             
         }        
 
+        /// <summary>
+        /// Helper method for ReadPx() method.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="codesCombi"></param>
+        /// <returns></returns>
         private static string GetArrayName(string tableName, string codesCombi)
         {
             string name3 = null;
@@ -5139,6 +5381,22 @@ namespace Gekko
             return name3;
         }
 
+        /// <summary>
+        /// Helper method for ReadPx() method. The elements of each dimension are combined, in order to construct array-series names.
+        /// The method is recursive.
+        /// </summary>
+        /// <param name="isArray"></param>
+        /// <param name="table"></param>
+        /// <param name="codesHeader"></param>
+        /// <param name="codes"></param>
+        /// <param name="codesCombi"></param>
+        /// <param name="values"></param>
+        /// <param name="valuesCombi"></param>
+        /// <param name="depth"></param>
+        /// <param name="sCodes"></param>
+        /// <param name="sValues"></param>
+        /// <param name="hyphenFound"></param>
+        /// <param name="underscoreFound"></param>
         private static void WalkPxCombinations(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound, ref bool underscoreFound)
         {
             //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
@@ -5196,12 +5454,24 @@ namespace Gekko
             }
         }
         
-        
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="format2"></param>
+        /// <returns></returns>
         public static string NumberFormat(double d, string format2)
         {
             return NumberFormat(d, format2, null);
         }
 
+        /// <summary>
+        /// Format a double into a particular number format. Used in the Gekko format() function.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="format2"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public static string NumberFormat(double d, string format2, string culture)
         {
             string format = null;
@@ -5232,6 +5502,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// /// Format a string into a particular string format. Used in the Gekko format() function.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="format2"></param>
+        /// <returns></returns>
         public static string StringFormat(string s, string format2)
         {
             string format = null;            
@@ -5250,6 +5526,11 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Fixes glitch regarding .tsd and PCIM data file formats.
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <returns></returns>
         public static bool IsNonsenseVariableName(string varName)
         {
             bool nonsense = false;
@@ -5260,7 +5541,16 @@ namespace Gekko
             return nonsense;
         }
 
-
+        /// <summary>
+        /// Used in WriteTsd() to write the .tsd data file format.
+        /// </summary>
+        /// <param name="per1"></param>
+        /// <param name="per2"></param>
+        /// <param name="res"></param>
+        /// <param name="ts"></param>
+        /// <param name="name"></param>
+        /// <param name="isCaps"></param>
+        /// <param name="isTsdx"></param>
         private static void WriteTsdRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, bool isCaps, bool isTsdx)
         {
             int index1 = -12345;
@@ -5417,6 +5707,15 @@ namespace Gekko
             res.WriteLine();
         }
 
+        /// <summary>
+        /// Write the Gekko-specific "flat" data file format.
+        /// </summary>
+        /// <param name="per1"></param>
+        /// <param name="per2"></param>
+        /// <param name="res"></param>
+        /// <param name="ts"></param>
+        /// <param name="name"></param>
+        /// <param name="sb"></param>
         private static void WriteFlatRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, StringBuilder sb)
         {
             sb.Clear();
@@ -5431,6 +5730,15 @@ namespace Gekko
             res.WriteLine(sb);
         }
 
+        /// <summary>
+        /// Helper for writing a TSP data file.
+        /// </summary>
+        /// <param name="per1"></param>
+        /// <param name="per2"></param>
+        /// <param name="res"></param>
+        /// <param name="ts"></param>
+        /// <param name="name"></param>
+        /// <param name="isCaps"></param>
         private static void WriteTspRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, bool isCaps)
         {
             int index1 = -12345;
@@ -5488,6 +5796,15 @@ namespace Gekko
             res.WriteLine();
         }
 
+        /// <summary>
+        /// Helper for writing a TSP data file.
+        /// </summary>
+        /// <param name="yr1"></param>
+        /// <param name="yr2"></param>
+        /// <param name="res"></param>
+        /// <param name="varNumber"></param>
+        /// <param name="data"></param>
+        /// <param name="var2"></param>
         public static void WriteTsdRecord2(int yr1, int yr2, StreamWriter res, int varNumber, double[] data, String var2)
         {
             //TODO: quarters
@@ -5550,51 +5867,12 @@ namespace Gekko
             if (count2 % 5 != 0) res.WriteLine();
 
         }
-
-
-        public static int key = 129;
-
-        public static string EncryptDecrypt(string textToEncrypt)
-        {
-            StringBuilder inSb = new StringBuilder(textToEncrypt);
-            StringBuilder outSb = new StringBuilder(textToEncrypt.Length);
-            char c;
-            for (int i = 0; i < textToEncrypt.Length; i++)
-            {
-                c = inSb[i];
-                if (i > 17)
-                {
-                    c = (char)(c ^ key);
-                }
-                outSb.Append(c);
-            }
-            StringBuilder outSb1 = new StringBuilder(outSb.ToString());
-            for (int i = 0; i < Math.Abs(outSb.Length / 2d); i++)
-            {
-                if (i % 3 == 0 && i > 17)
-                {
-                    outSb1[i] = outSb[outSb.Length - i - 1];
-                    outSb1[outSb.Length - i - 1] = outSb[i];
-                }
-            }
-            return outSb1.ToString();
-        }
-
-        public static void DeleteTemporaryCsFilesFromLastTime()
-        {
-            //delete temporary .cs files from last time
-            string path = Globals.localTempFilesLocation;
-            if (Directory.Exists(path))
-            {
-                string[] fileList = Directory.GetFiles(path, "*.cs");
-                foreach (string file in fileList)
-                {
-                    FileInfo imgInfo = new FileInfo(file);
-                    imgInfo.Delete();
-                }
-            }
-        }
-
+        
+        /// <summary>
+        /// In a Gekko model, finds the equation (EquationHelper) that corresponds to a LHS variable name.
+        /// </summary>
+        /// <param name="lhsName"></param>
+        /// <returns></returns>
         public static EquationHelper FindEquationByMeansOfVariableName(string lhsName)
         {
             
@@ -5612,43 +5890,49 @@ namespace Gekko
             EquationHelper found = Program.model.modelGekko.equations[number];  //should alway find something
             return found;
         }
-
-        
-
+             
+        /// <summary>
+        /// Helper for printing out ordering information on a Gekko model.
+        /// </summary>
+        /// <param name="al"></param>
+        /// <param name="res"></param>
         public static void PrintEquationLeftHandSideNames(List<int> al, StreamWriter res)
         {
             foreach (int i in al)
             {
                 int tmp = Program.model.modelGekko.m2.fromEqNumberToBNumber[i];
                 string var = Program.model.modelGekko.varsBTypeInverted[tmp];
-                TwoStrings ts = getVariableAndLag(var);
+                TwoStrings ts = GetVariableAndLag(var);
                 string var2 = G.GetUpperLowerCase(ts.s1);
                 res.WriteLine("  " + var2);
             }
-        }
+        }                
 
-        
-
+        /// <summary>
+        /// For dynamic C# code, it is detected whether Gekko is 32- or 64-bit, and appropriate compiler settings
+        /// are set.
+        /// </summary>
+        /// <returns></returns>
         public static string GetCompilerOptions()
         {
             if (Environment.Is64BitProcess) return Globals.compilerOptions64;
             else return Globals.compilerOptions32;
-        }
-
+        }        
         
-        
-        
-        
-        
+        /// <summary>
+        /// This is the main entry into running Gekko commands, called for instance from the Gekko GUI window.
+        /// These commands are parsed, compiled and executed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="fileName"></param>
+        /// <param name="isLibrary"></param>
+        /// <param name="skip"></param>
+        /// <param name="p"></param>
         public static void EmitCodeFromANTLR(string text, string fileName, bool isLibrary, int skip, P p)
         {
             //#98073245298345
             //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
             
-            ////So we wipe out the uFunctions, to have a clean desk.
-            ////We do not wipe it if it is a library, since it has already been wiped just before (LIBRARY must be the first command).
-            //if (!isLibrary) Globals.uFunctionStorageCs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
             int max = 1;
             if (G.Equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)
 
@@ -5777,6 +6061,14 @@ namespace Gekko
             //if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
         }
 
+        /// <summary>
+        /// Precedents means which variables (often timeseries) are part of a given expression. This can be "recorded" when issuing
+        /// a given expression or statement, for instance the GetIVariable() method can report back that a certain variable has been
+        /// used in the expression. Such variables are then stored in Globals.precedents (a Dictionary with string keys).
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <param name="iv"></param>
+        /// <param name="db"></param>
         public static void PrecedentsHelper(string variableName, IVariable iv, Databank db)
         {
             if (Globals.precedents != null && iv != null)
@@ -5789,18 +6081,6 @@ namespace Gekko
             }
         }        
 
-        
-        public static string GetTextFromLeftBlanksTokens(List<TokenHelper> a, int a1, int a2)
-        {
-            string s2 = null;
-            for (int i = a1; i <= a2; i++)
-            {
-                s2 += G.Blanks(a[i].leftblanks) + a[i].s;
-            }
-
-            return s2;
-        }
-                
             
 
         public static List<string> MatchRange(string s1, string s2, List<IVariable> input, string endsWith)
@@ -10089,7 +10369,7 @@ namespace Gekko
         {
             //The method looks for two idents like "a1 b2 " or "a1 b2>". Any spaces before, in middle or after are ok.
             //A '=' right after the second token is ok too.
-            int j = skipSpaces(lineNewVersion, start);
+            int j = G.SkipSpaces(lineNewVersion, start);
             if (j == -12345) return false;
             if (!G.IsLetterOrUnderscore(lineNewVersion[j])) return false;
             int blank = -12345;
@@ -10105,7 +10385,7 @@ namespace Gekko
                     return false;
                 }
             }
-            j = skipSpaces(lineNewVersion, blank);
+            j = G.SkipSpaces(lineNewVersion, blank);
             if (j == -12345) return false;
             if (!G.IsLetterOrUnderscore(lineNewVersion[j])) return false;
             for (int k = j + 1; k < lineNewVersion.Length; k++)
@@ -17347,14 +17627,10 @@ namespace Gekko
             w2.FileNameWithPath = null;
             b2.FileNameWithPath = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
-            //Program.scalars.Clear();
-            //Program.lists.Clear();
-            //Program.macros.Clear();
+            
             Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace
                                                           //Globals.prtCsSnippets.Clear();  //just to save ram  --> can induce bugs
                                                           //Globals.prtCsSnippetsHeaders.Clear(); //just to save ram --> can induce bugs
-
-            //Globals.uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);  //resetting user functions
 
             //User functions: more can be added if necessary, or users can use LIST or DICT.
             InitUfunctionsAndArithmeticsAndMore();

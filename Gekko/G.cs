@@ -2663,6 +2663,28 @@ namespace Gekko
         }
 
         /// <summary>
+        /// In a string, skip to next non-space (tabs counted as spaces)
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="ii"></param>
+        /// <returns></returns>
+        public static int SkipSpaces(string c, int ii)
+        {
+            int i;
+            //skip spaces (tab is included counted)
+            for (i = ii; i < c.Length; i++)
+            {
+                if (c[i] == ' ' || c[i] == '\t')     //'\t' is tab
+                {
+                    //do nothing
+                }
+                else return i;
+            }
+            return -12345;
+        }
+
+
+        /// <summary>
         /// Overload.
         /// </summary>
         public static void SetWorkingFolder()

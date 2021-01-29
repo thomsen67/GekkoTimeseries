@@ -550,6 +550,17 @@ namespace Gekko
         {
             return G.Equal(GetS(line, i), ss) != null;
         }
+        
+        public static string GetTextFromLeftBlanksTokens(List<TokenHelper> a, int a1, int a2)
+        {
+            string s2 = null;
+            for (int i = a1; i <= a2; i++)
+            {
+                s2 += G.Blanks(a[i].leftblanks) + a[i].s;
+            }
+
+            return s2;
+        }
 
         public static Tuple<int, int> FindOptionFieldInSeriesAssignment(List<TokenHelper> line)
         {

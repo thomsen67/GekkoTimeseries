@@ -25,6 +25,9 @@ using ProtoBuf;
 
 namespace Gekko
 {
+    /// <summary>
+    /// This class is under construction...
+    /// </summary>
     [ProtoContract]
     public class GekkoDataFrame : IVariable
     {
