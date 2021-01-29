@@ -5961,7 +5961,7 @@ namespace Gekko
                         p.hasBeenCmdFile = true;
                     }
                     string input = GetTextFromFileWithWait(fileName);
-                    commandLinesFlat = HandleObeyFiles2(input);
+                    commandLinesFlat = HandleGekkoCommands(input);
                     if (skip != 0)
                     {
                         List<string> ss = Stringlist.CreateListOfStringsFromFile(commandLinesFlat);
@@ -5983,13 +5983,13 @@ namespace Gekko
                     //oneliner from GUI
                     if (text.Contains("\n"))
                     {
-                        commandLinesFlat = HandleObeyFiles2(text);  //is handled exactly as if it was a file
+                        commandLinesFlat = HandleGekkoCommands(text);  //is handled exactly as if it was a file
                         ph.isOneLinerFromGui = false;  //is a more-liner........
                     }
                     else
                     {
-                        string text0 = HandleOneLiners(text);
-                        commandLinesFlat = HandleObeyFiles2(text0);
+                        string text0 = HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(text);
+                        commandLinesFlat = HandleGekkoCommands(text0);
                         ph.isOneLinerFromGui = true;
                         p.isOneLinerFromGui = true;
                     }
@@ -9613,12 +9613,18 @@ namespace Gekko
             return output;
         }
 
+        /// <summary>
+        /// "Parent" method for another method of the same name.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="modelCommentsHelper"></param>
+        /// <returns></returns>
         public static string HandleModelFiles(string input, ModelCommentsHelper modelCommentsHelper)
         {
             //As a side-effect, Program.model.modelGekko.varlist is filled with stuff after VARLIST$
             List<string> lines = G.ExtractLinesFromText(input);
             List<string> linesNew = HandleModelFiles(lines, modelCommentsHelper);  //after this, there is no varlist stuff in linesNew
-            GetModelHashAndXml(linesNew, modelCommentsHelper); //does some rough removing of comments, empty lines etc.
+            GetModelHashAndInfo(linesNew, modelCommentsHelper); //does some rough removing of comments, empty lines etc.
             Globals.modelFileLines = linesNew;
             StringBuilder sb = new StringBuilder();
             foreach (string line in linesNew)
@@ -9629,8 +9635,14 @@ namespace Gekko
             return s2;
         }
 
-
-        private static void GetModelHashAndXml(List<string> linesNew, ModelCommentsHelper modelCommentsHelper)
+        /// <summary>
+        /// Get info fields from a model, and compute "true" hash of the model equations. This hash is both for signing of the model (cf. 
+        /// the SIGN command), and for internal use when storing dynamic C# code corresponding to a model in a local cache (so that it
+        /// can avoid parsing next time it is read with MODEL command).
+        /// </summary>
+        /// <param name="linesNew"></param>
+        /// <param name="modelCommentsHelper"></param>
+        private static void GetModelHashAndInfo(List<string> linesNew, ModelCommentsHelper modelCommentsHelper)
         {
             StringBuilder sb = new StringBuilder();
             StringBuilder comment = new StringBuilder();
@@ -9655,13 +9667,13 @@ namespace Gekko
                         }
                         if (nestedCommentCounter == 1)
                         {
-                            ExtractComment(comment, s2, modelCommentsHelper);
+                            GetModelHashAndInfoHelper(comment, s2, modelCommentsHelper);
                             continue;  //inside comment
                         }
                     }
                     if (s2.StartsWith("()") || s2.StartsWith("//"))
                     {
-                        ExtractComment(comment, s2, modelCommentsHelper);
+                        GetModelHashAndInfoHelper(comment, s2, modelCommentsHelper);
                         if (!s2.Contains("###"))
                         {
                             continue;  //we ignore a normal comment. But if the comment contains '###'
@@ -9723,9 +9735,14 @@ namespace Gekko
 
             return;
         }
-        
 
-        private static void ExtractComment(StringBuilder sb, string s2, ModelCommentsHelper modelCommentsHelper)
+        /// <summary>
+        /// Helper method.
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="s2"></param>
+        /// <param name="modelCommentsHelper"></param>
+        private static void GetModelHashAndInfoHelper(StringBuilder sb, string s2, ModelCommentsHelper modelCommentsHelper)
         {
             string s3 = s2.Trim();
             if (s3.StartsWith("/*")) s3 = s3.Substring(2);
@@ -9770,12 +9787,12 @@ namespace Gekko
             sb.AppendLine(s3);
         }
 
-        public static string HandleObeyFiles2(string input)
+        public static string HandleGekkoCommands(string input)
         {
             List<string> lines = G.ExtractLinesFromText(input);
 
             List<string> linesNew = null;
-            linesNew = HandleObeyFilesNew(lines);
+            linesNew = HandleGekkoCommandsGlueSymbols(lines);
 
             Globals.cmdFileLines = linesNew;  //used if there is a lexer error
             StringBuilder sb = new StringBuilder();
@@ -9787,6 +9804,12 @@ namespace Gekko
             return s2;
         }
 
+        /// <summary>
+        /// The Gekko percentile() function, generalized medians.
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="excelPercentile"></param>
+        /// <returns></returns>
         public static double Percentile(double[] sequence, double excelPercentile)
         {
             //handles NaN values, return Excel-style Percentile
@@ -9839,136 +9862,76 @@ namespace Gekko
         }        
 
         //What is this, a test?
-        public static TwoInts f(int x) { return new TwoInts(); }        
+        public static TwoInts f(int x) { return new TwoInts(); }
 
-        public static string HandleOneLiners(string text)
+        /// <summary>
+        /// These are internal developer "commands" that can be issued from the Gekko command window (GUI). But only on the developer
+        /// computer. Stuff like rungenr1, rungenr2, etc. Some of it is obsolete. On a non-developer pc, this method does exactly
+        /// nothing. All this is to avoid using ANTLR, which would be tedious.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(string text)
         {
-            if (Globals.runningOnTTComputer)
+            string sub = text.Trim();
+            if (sub.EndsWith(";")) sub = sub.Substring(0, sub.Length - 1);
+            sub = sub.Trim();
+
+            if (sub.StartsWith("I(\""))
             {
-                string s2 = text.Trim();
-                if (s2.EndsWith(";")) s2 = s2.Substring(0, s2.Length - 1);
-                s2 = s2.Trim();
+                int i = sub.IndexOf("\")");
+                string text2 = sub.Substring(3, i - 3);  //handle comments!!!
+                return text2;
+            }
 
-                if (s2.StartsWith("I(\""))
-                {
-                    int i = s2.IndexOf("\")");
-                    text = s2.Substring(3, i - 3);
-                }
-
-                if (s2.StartsWith("bvar"))
-                {
-                    string[] bv = s2.Split(' ');
-                    string xxxx = bv[1];
-                    xxxx = xxxx.Replace(";", "");
-                    int xx = int.Parse(xxxx);
-                    string xxx = Program.model.modelGekko.varsBTypeInverted[xx];
-                    G.Writeln("b[" + xx + "] = " + xxx);
-                    return "";
-                }
-                if (s2.Length == 8)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "rungenr1"))
+            switch (sub.ToLower())
+            {
+                case "--rungenr1":
                     {
                         //typing "rungenr1" will put cs code in Genr.cs
                         G.Writeln2("Put code in Genr.cs. Now you should compile...");
                         Program.Rungenr(1);
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                    else if (G.Equal(sub, "rungenr2"))
+                    break;
+                case "--rungenr2":
                     {
                         //typing "rungenr2" will run stuff in Genr.cs for debugging
                         G.Writeln2("Running Genr.cs for debugging:");
                         Program.Rungenr(2);
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-                
-
-                if (s2.Length == 7)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "timings"))
+                    break;
+                case "--timings":
                     {
                         Globals.showTimings = !Globals.showTimings;
                         G.Writeln("TIMINGS = " + Globals.showTimings);
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == 7)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "packsim"))
+                    break;
+                case "--packsim":
                     {
                         Globals.alwaysEnablcPackForSimulation = true;
                         G.Writeln("alwaysEnablcPackForSimulation = " + Globals.alwaysEnablcPackForSimulation);
                     }
-                }
-
-                if (s2.Length == 6)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "aremos"))
+                    break;
+                case "--aremos":
                     {
                         //typing "aremos" on the prompt opens the dialog for creating a wa.bat file.
                         //not intended for "normal" Gekko users.
                         makeBatFileForAremos();
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }                
-                               
-
-
-                if (s2.Length == 5)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "flush"))
+                    break;
+                case "--flush":
                     {
                         Flush();  //removes cached models
-                        return "";
                     }
-                }
-
-                if (s2.Length == 3)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "sub"))
-                    {
-                        if (Globals.decompSubstitute == true) Globals.decompSubstitute = false;
-                        else Globals.decompSubstitute = true;
-                        return "";
-                    }
-                }
-
-                if (s2.Length == 11)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "randommodel"))
-                    {
-                        Randommodel();
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }                
-
-                if (s2.Length == 6)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "deploy"))
+                    break;
+                case "--deploy":
                     {
                         //Deploy
                         G.Writeln2("Use 'deploy' from Total Commander prompt");
                         G.Writeln(@"Also see c:\Thomas\Gekko\GekkoCS\Deploy\!seher");
-                        return "";   //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == 7)
-                {
-
-                    string sub = s2;
-
-                    if (G.Equal(sub, "testsim"))
+                    break;
+                case "--testsim":
                     {
                         int n = 1000;
                         double[] abs = new double[3000];  //years
@@ -10037,14 +10000,10 @@ namespace Gekko
                             G.Writeln("abs " + y + " " + absVar[y] + " " + abs[y] + "     left " + absVs[y] + " right " + absHs[y]);
                         }
 
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
 
-                if (s2.Length == 3)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "lex"))
+                    }
+                    break;
+                case "--lex":
                     {
                         //show raw tokens
                         //only for debugging
@@ -10059,95 +10018,39 @@ namespace Gekko
                         {
                             G.Writeln("Lexing undone...");
                         }
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                
-
-                if (s2.Length == 3)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "ast"))
+                    break;
+                case "--ast":
                     {
                         //typing "ast" on the prompt means AST tree is printed out on screen
                         //only for debugging
                         //not intended for "normal" Gekko users.
                         Globals.printAST = true;
                         G.Writeln("AST tree will be printed...");
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == "testram".Length)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "testram"))
+                    break;
+                case "--testram":
                     {
                         Program.TestRam(false);
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == "testram2".Length)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "testram2"))
-                    {
-                        Program.TestRam(true);
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }                
-
-                if (s2.Length == 7)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "timings"))
-                    {
-                        Globals.showTimings = true;
-                        G.Writeln("Timings shown...");
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }                
-                
-                if (s2.Length == 5)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "proto"))
-                    {
-                        if (Globals.databanksAsProtobuffers == true) Globals.databanksAsProtobuffers = false;
-                        else Globals.databanksAsProtobuffers = true;
-                        G.Writeln("Protobuf using is set to: " + Globals.databanksAsProtobuffers);
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
-
-                if (s2.Length == 4)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "gray"))
+                    break;
+                case "--gray":
                     {
                         if (Globals.printGrayLinesForDebugging == true) Globals.printGrayLinesForDebugging = false;
                         else Globals.printGrayLinesForDebugging = true;
                         G.Writeln("Gray printing (debug) is set to: " + Globals.printGrayLinesForDebugging);
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.StartsWith("prune "))
-                {
-                    string[] ss2 = s2.Split(' ');
-                    double prune = G.ParseIntoDouble(ss2[1].Trim());
-                    Globals.pruneDecomp = prune;
-                    G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
-                    G.Writeln();
-                    return "";
-                }
-
-                
-                if (s2.Length == "killexcel".Length)
-                {
-                    if (G.Equal(s2, "killexcel"))
+                    break;
+                case "--prune":
+                    {
+                        string[] ss2 = sub.Split(' ');
+                        double prune = G.ParseIntoDouble(ss2[1].Trim());
+                        Globals.pruneDecomp = prune;
+                        G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
+                        G.Writeln();
+                    }
+                    break;
+                case "--killexcel":
                     {
                         DialogResult result = MessageBox.Show("Delete all processes with 'excel' in their names? CLOSE EXCEL SHEETS BEFOREHAND!!", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
                         if (result == DialogResult.Yes)
@@ -10168,14 +10071,9 @@ namespace Gekko
                             G.Writeln("Killed " + counter + " Excel processes");
                         }
                         else G.Writeln2("Cancelled");
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == 6)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "locked"))
+                    break;
+                case "--locked":
                     {
                         //typing "locked" on the prompt searches for locked files (sharing violation)
                         //in working folder and sub-dirs
@@ -10192,11 +10090,17 @@ namespace Gekko
                             G.Writeln("Found " + Globals.lockedCounter + " locked files");
                             G.Writeln();
                         }
-                        return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
+                    break;
+                default:
+                    {
+                        //this is the common case: just return the text string untouched.
+                        return text;
+                    }
+                    break;
             }
-            return text;
+
+            return "";  //return a blank line, so that Gekko does not try to parse and run the line
         }
 
 
@@ -10519,7 +10423,7 @@ namespace Gekko
             return true;
         }
 
-        private static List<string> HandleObeyFilesNew(List<string> inputFileLines)
+        private static List<string> HandleGekkoCommandsGlueSymbols(List<string> inputFileLines)
         {
             List<string> inputFileLines2 = new List<string>();
             int lineCounter = 0;

@@ -197,7 +197,7 @@ namespace Gekko.Parser.Frm
                             //    eqs.Add(sorted.Values[i]);
                             //}
 
-                            List<int> allSimul = Program.GetLeftsideBNumbers();
+                            List<int> allSimul = GetLeftsideBNumbers();
                             foreach (int i in allSimul)
                             {
                                 eqs.Add(Program.model.modelGekko.equations[i]);
@@ -570,6 +570,17 @@ namespace Gekko.Parser.Frm
                     G.Writeln("Compiling lasted " + duration);
                 }
             }
+        }
+
+        private static List<int> GetLeftsideBNumbers()
+        {
+            //Gets equation numbers in simultaneous gauss-seidel block
+            //Note that this method takes a little time: do not put inside loop!
+            List<int> allSimul = new List<int>();
+            allSimul.AddRange(Program.model.modelGekko.m2.simulRecursive);
+            allSimul.AddRange(Program.model.modelGekko.m2.simulFeedback);
+            allSimul.Sort();
+            return allSimul;
         }
 
         private static void EmitEpilogue(string failsafe, StringBuilder codeCommon)
