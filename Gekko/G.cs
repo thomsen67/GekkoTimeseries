@@ -2663,6 +2663,25 @@ namespace Gekko
         }
 
         /// <summary>
+        /// An other "interface" to the substring method, with start end end position, instead of using length.
+        /// The positions are inclusive.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="position1"></param>
+        /// <param name="position2"></param>
+        /// <returns></returns>
+        public static string Substring(string s, int position1, int position2)
+        {
+            string x = null;
+            try
+            {
+                x = s.Substring(position1 - 1, position2 - position1 + 1);
+            }
+            catch (Exception e) { };
+            return x;
+        }
+
+        /// <summary>
         /// In a string, skip to next non-space (tabs counted as spaces)
         /// </summary>
         /// <param name="c"></param>
@@ -3668,6 +3687,24 @@ namespace Gekko
             }
             return rounded;
         }
+
+        /// <summary>
+        /// Converts a string into an integer. Returns int.MaxValue if fail.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static int ConvertToInt(string input)
+        {
+            int output = int.MaxValue;
+            if (input == null) return output;
+            try
+            {
+                output = int.Parse(input);
+            }
+            catch (Exception e) { };
+            return output;
+        }
+
 
         /// <summary>
         /// Calendar function.

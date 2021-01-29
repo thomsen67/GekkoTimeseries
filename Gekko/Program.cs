@@ -6080,41 +6080,11 @@ namespace Gekko
                 }
             }
         }        
-
-            
-
-        public static List<string> MatchRange(string s1, string s2, List<IVariable> input, string endsWith)
-        {
-            List<string> temp = new List<string>();
-            if (endsWith == null)
-            {
-                foreach (IVariable iv in input)
-                {
-                    string s = O.ConvertToString(iv);
-                    if (string.Compare(s, s1, true) >= 0 && string.Compare(s, s2, true) <= 0)
-                    {
-                        temp.Add(s);
-                    }
-                }
-            }
-            else
-            {
-                foreach (IVariable iv in input)
-                {
-                    string s = O.ConvertToString(iv);
-                    if (!s.EndsWith(endsWith)) continue;
-                    string ss = s.Substring(0, s.Length - endsWith.Length);
-                    if (string.Compare(ss, s1, true) >= 0 && string.Compare(ss, s2, true) <= 0)
-                    {
-                        temp.Add(ss);
-                    }
-                }
-            }
-            temp.Sort(StringComparer.OrdinalIgnoreCase);
-            return temp;
-        }
         
-
+        /// <summary>
+        /// Used for playing a sound after long-running jobs.
+        /// </summary>
+        /// <param name="p"></param>
         public static void MaybePlaySound(P p)
         {
             if (Program.options.interface_sound == false) return;
@@ -6128,12 +6098,19 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Used for playing a sound after long-running jobs.
+        /// </summary>
         public static void PlaySound()
         {
             System.Media.SoundPlayer simpleSound = new System.Media.SoundPlayer(Application.StartupPath + "\\images\\" + Program.options.interface_sound_type + ".wav");
             simpleSound.Play();
         }
 
+        /// <summary>
+        /// Update the GUI status field with current time period, working folder, etc.
+        /// </summary>
+        /// <param name="s"></param>
         public static void ShowPeriodInStatusField(string s)
         {
             if (G.IsUnitTesting()) return;
@@ -6252,6 +6229,11 @@ namespace Gekko
             CrossThreadStuff.CutButtonEnabled(i > 0);
         }
 
+        /// <summary>
+        /// Small helper method.
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <returns></returns>
         private static string GetDatabankFileNameWithPath(Databank bank)
         {
             string fileName = "[no bank filename]";
@@ -6262,7 +6244,13 @@ namespace Gekko
             return fileName;
         }
 
-        
+        /// <summary>
+        /// Error message.
+        /// </summary>
+        /// <param name="lineNumber"></param>
+        /// <param name="problemLine"></param>
+        /// <param name="text"></param>
+        /// <param name="fileName"></param>
         public static void WriteErrorMessage(int lineNumber, string problemLine, string text, string fileName)
         {
             if (Globals.threadIsInProcessOfAborting) return;
@@ -6270,6 +6258,11 @@ namespace Gekko
             G.Writeln("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + G.ReplaceGlueNew(problemLine), Color.Blue, true);
         }
 
+        /// <summary>
+        /// Small helper method.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private static string GetOriginalTableFileName(string fileName)
         {
             string s2 = "";
@@ -6282,29 +6275,42 @@ namespace Gekko
                 //G.Writeln("*** ERROR: The original table filename: " + s2);
             }
             return s2;
-        }
-                
-
+        }                
         
-        
-        
+        /// <summary>
+        /// Helper for databank unswapping (not used at the moment)
+        /// </summary>
+        /// <param name="print"></param>
         public static void Unswap(bool print)
         {
             Databanks.Unswap();
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
         public static void Unswap()
         {
             Unswap(true);
         }
 
-        
+        /// <summary>
+        /// Helper for R interface.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         private static string GetRhomeWin32NT(StringBuilder logger)
         {
             RegistryKey rCoreKey = GetRCoreRegistryKeyWin32(logger);
             return GetRInstallPathFromRCoreKegKey(rCoreKey, logger);
         }
 
+        /// <summary>
+        /// Helper for R interface.
+        /// </summary>
+        /// <param name="rCoreKey"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         private static string RecurseFirstSubkey(RegistryKey rCoreKey, StringBuilder logger)
         {
             string[] subKeyNames = rCoreKey.GetSubKeyNames();
@@ -6322,6 +6328,9 @@ namespace Gekko
             }
         }
         
+        /// <summary>
+        /// Obtain Gekko version number.
+        /// </summary>
         public static void GetVersionAndGekkoExeLocationFromAssembly()
         {
             try
@@ -6338,7 +6347,10 @@ namespace Gekko
             catch (Exception e) { };
         }
 
-
+        /// <summary>
+        /// Internal helper method to show info on Gekko (bitness, JIT-ness, etc.)
+        /// </summary>
+        /// <returns></returns>
         public static string IsJit()
         {
             var HasDebuggableAttribute = false;
@@ -6406,6 +6418,10 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Internal helper method to test RAM allocation. Can be called with "testram" from GUI.
+        /// </summary>
+        /// <param name="read"></param>
         public static void TestRam(bool read)
         {
 
@@ -6491,6 +6507,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Internal helper method.
+        /// </summary>
+        /// <returns></returns>
         //keep it even if not referenced
         public static List<string> DumpBin()
         {
@@ -6499,6 +6519,10 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Info on bitness of Gekko.
+        /// </summary>
+        /// <returns></returns>
         public static string Get64Bitness()
         {
             string s = null;
@@ -6509,11 +6533,22 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// R helper method.
+        /// </summary>
+        /// <param name="rCoreKey"></param>
+        /// <returns></returns>
         private static string GetRCurrentVersionStringFromRegistry(RegistryKey rCoreKey)
         {
             return rCoreKey.GetValue("Current Version") as string;
         }
 
+        /// <summary>
+        /// R helper method.
+        /// </summary>
+        /// <param name="rCoreKey"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         private static string GetRInstallPathFromRCoreKegKey(RegistryKey rCoreKey, StringBuilder logger)
         {
             string installPath = null;
@@ -6561,12 +6596,20 @@ namespace Gekko
             return installPath;
         }
 
+        /// <summary>
+        /// R helper method.
+        /// </summary>
         private static void CheckPlatformWin32()
         {
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
                 throw new NotSupportedException("This method is supported only on the Win32NT platform");
         }
 
+        /// <summary>
+        /// R helper method.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         private static RegistryKey GetRCoreRegistryKeyWin32(StringBuilder logger)
         {
             CheckPlatformWin32();
@@ -6591,6 +6634,14 @@ namespace Gekko
             return r;
         }
 
+        /// <summary>
+        /// Write a Gekko matrix to a string suitable for R or Python.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="m"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string MatrixFromGekkoToROrPython<T>(string name, T[,] m, int type)
         {
             //See also MatrixFromROrPythonToGekko()
@@ -6641,6 +6692,12 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Used for R_RUN and PYTHON_RUN.
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="target"></param>
+        /// <param name="type"></param>
         public static void ROrPythonExport(List names, string target, int type)
         {
             //type 0 = R, type 1 = Python
@@ -6730,6 +6787,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Handling R_RUN command.
+        /// </summary>
+        /// <param name="o"></param>
         public static void RunR(Gekko.O.R_run o)
         {           
 
@@ -6852,6 +6913,11 @@ namespace Gekko
             MatrixFromROrPythonToGekko(lines, 0);            
         }
 
+        /// <summary>
+        /// Getting a matrix from R or Python back into Gekko.
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <param name="type"></param>
         private static void MatrixFromROrPythonToGekko(List<string> lines, int type)
         {
             //See also MatrixFromGekkoToROrPython()
@@ -6914,6 +6980,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Handle PYTHON_RUN.
+        /// </summary>
+        /// <param name="o"></param>
         public static void RunPython(Gekko.O.Python_run o)
         {
             string pythonFileName = Globals.localTempFilesLocation + "\\tempPyFile.py";
@@ -7067,6 +7137,10 @@ namespace Gekko
             MatrixFromROrPythonToGekko(lines, 1);                        
         }
 
+        /// <summary>
+        /// Helper for Python interface.
+        /// </summary>
+        /// <returns></returns>
         public static string GetPythonPath()
         {
             //https://gis.stackexchange.com/questions/44411/how-can-i-programmatically-get-the-path-of-python-exe-used-by-arcmap
@@ -7085,16 +7159,24 @@ namespace Gekko
             return null;
         }
 
-        
+        /// <summary>
+        /// See PrecedentsHelper().
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="varnameWithFreq"></param>
         public static void AddToPrecedents(Databank db, string varnameWithFreq)
-        {
-            
+        {            
             string two = db.name + ":" + varnameWithFreq;
             if (!Globals.precedents.ContainsKey(two))
             {
                 Globals.precedents.Add(two, 0);
             }
         }
+
+        /// <summary>
+        /// Method for the X12A command, seasonal correction. An external .exe file is called.
+        /// </summary>
+        /// <param name="o"></param>
         public static void X12a(Gekko.O.X12a o)
         {
             List<string> listItems = O.Restrict(o.names, true, false, true, false);
@@ -7121,11 +7203,7 @@ namespace Gekko
 
                 Series ts = O.ConvertToSeries(iv) as Series;
                 tss.Add(ts);  //for later use
-
-                //GetTimeSeriesFromStringWildcard() implicitly calls GetInfoFromStringWildcard() which we will call again later.
-                //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(o.listItems[i], o.opt_bank);
-                //foreach (Series ts in tss)
-                //{
+                
                 counter++;
                 string data = null;
                 foreach (GekkoTime t in new GekkoTimeIterator(o.t1, o.t2))
@@ -7285,6 +7363,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for X12A command, see X12a() method.
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <returns></returns>
         private static string GetFreqNumbers(EFreq freq)
         {
             string per = "";
@@ -7313,6 +7396,11 @@ namespace Gekko
             return per;
         }
 
+        /// <summary>
+        /// Print a Gekko matrix. Used in PRT command.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="label"></param>
         public static void ShowMatrix(Matrix a, string label)
         {
             if (a.data.GetLength(0) < 1 || a.data.GetLength(1) < 1)
@@ -7399,8 +7487,11 @@ namespace Gekko
             CrossThreadStuff.CopyButtonEnabled(true);
         }
 
-
-
+        /// <summary>
+        /// Helper function to see if compiler option is set for 32-bit Gekko (more RAM access)
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static bool IsLargeAware(string file)
         {
             using (var fs = File.OpenRead(file))
@@ -7410,7 +7501,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Checks if the stream is a MZ header and if it is large address aware
+        /// Helper function to see if compiler option is set for 32-bit Gekko (more RAM access). Checks if the stream is a MZ header and if it is large address aware. 
         /// </summary>
         /// <param name="stream">Stream to check, make sure its at the start of the MZ header</param>
         /// <exception cref=""></exception>
@@ -7435,6 +7526,13 @@ namespace Gekko
             return (br.ReadInt16() & IMAGE_FILE_LARGE_ADDRESS_AWARE) == IMAGE_FILE_LARGE_ADDRESS_AWARE;
         }        
 
+        /// <summary>
+        /// Method to handle Gekko flowcharts. These are defunct in Gekko 3.x at the moment, but may be revived. Cf. the GekkoFlowChart
+        /// project.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="code"></param>
+        /// <param name="period"></param>
         public static void FlowChart(string s, string code, GekkoTime period)
         {
             Dictionary<string, int> counter = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -7470,6 +7568,11 @@ namespace Gekko
             w.Show();
         }
 
+        /// <summary>
+        /// Helper for flowcharts.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string FlowInsertLabel(string s)
         {
             string rv = "";
@@ -7480,6 +7583,15 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Get label, source, unit, etc. for a timeseries.
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <param name="printName"></param>
+        /// <param name="printData"></param>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <returns></returns>
         public static List<string> GetVariableExplanationNEW(string variableName, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd)
         {
             List<string> rv = new List<string>();
@@ -7579,6 +7691,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Helper method.
+        /// </summary>
+        /// <param name="variableNameWithOrWithoutLag"></param>
+        /// <returns></returns>
         public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag)
         {
             string ss = "";
@@ -7587,6 +7704,20 @@ namespace Gekko
             return ss2;
         }
 
+        /// <summary>
+        /// Decomp engine for Gekko flowcharts (these are defunct in Gekko 3.x).
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="year"></param>
+        /// <param name="maxDepth"></param>
+        /// <param name="prune"></param>
+        /// <param name="factor"></param>
+        /// <param name="depth"></param>
+        /// <param name="counter"></param>
+        /// <param name="sw"></param>
+        /// <param name="sw2"></param>
+        /// <param name="d"></param>
+        /// <param name="code"></param>
         public static void DecompForFlowChart(string s, GekkoTime year, int maxDepth, double prune, double factor, int depth, Dictionary<string, int> counter, List<GekkoFlowChart.FlowArrow> sw, List<GekkoFlowChart.FlowNode> sw2, Dictionary<string, int> d, string code)
         {
             if (!Program.model.modelGekko.m2.endogenous.ContainsKey(s))
@@ -7659,6 +7790,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Some unit tests.
+        /// </summary>
+        /// <returns></returns>
         public static bool TestKP2010Model()
         {
             Dictionary<string, CompareHelper> skip = new Dictionary<string, CompareHelper>(StringComparer.OrdinalIgnoreCase);
@@ -7765,20 +7900,11 @@ namespace Gekko
             return true;
         }
 
-        public static void Randommodelcheck()
-        {
-            Series ts = Program.databanks.GetFirst().GetIVariable("sum" + "!a") as Series;
-            foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime((Program.options.freq), 2002, 1), new GekkoTime((Program.options.freq), 2100, 1)))
-            {
-                if (Math.Abs(ts.GetDataSimple(t)) > 3 * 1.0e-4)  //hmmm seems error can be a little > 0.0001
-                {
-                    G.Writeln2("*** ERROR: Problem with this model -- try PRT sum");
-                    throw new GekkoException();
-                }
-            }
-            G.Writeln("Check ok");
-        }
-
+        /// <summary>
+        /// Internal helper method that can create/produce a large number of linear models, where the parameters and variables
+        /// are determined randomly. See \Gekko\regres\Models\Random\, where such models reside. It is used to check solvers,
+        /// among other things that prologue, simulrecursive, epilogue etc. work as intended.
+        /// </summary>
         public static void Randommodel()
         {
 
@@ -7787,8 +7913,6 @@ namespace Gekko
             double factor = 2d; if (gaussMode) factor = factor / 2d;
             int nn = 50;
             Random r = new Random(11111);  //11111 used for regressions, with nn = 1000 and factor = 1d;
-
-
 
             for (int ii = 0; ii < nn; ii++)
             {
@@ -7902,6 +8026,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper method for Laspeyres chain index method, cf. Laspeyres() method.
+        /// </summary>
+        /// <param name="tStart0"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="varsX"></param>
+        /// <returns></returns>
         private static double[,] PutTimeseriesIntoArrayPossiblyNegative(GekkoTime tStart0, GekkoTime tEnd, List<string> varsX)
         {
             int obs = GekkoTime.Observations(tStart0, tEnd);
@@ -7952,13 +8083,13 @@ namespace Gekko
             return aX;
         }
 
-        //dynamic methods
-               
-
+        /// <summary>
+        /// Matrix inversion
+        /// </summary>
+        /// <param name="lu"></param>
+        /// <param name="indx"></param>
         private static void LUDecompose(ref double[,] lu, ref int[] indx)
         {
-            
-
             //Running a 1000x1000 dense matrix with code below takes about 2800 ms
             //Compare this with the 1200 ms described here: http://mathnetnumerics.codeplex.com/discussions/360326
             //See also the 1800 ms here: http://www.meta-numerics.net/Pages/Performance.aspx
@@ -8050,13 +8181,16 @@ namespace Gekko
                     }
                 }
             }
-
-            
-
         }
-
         
-        private static void Solve(ref double[] b, ref double[] x, int[] indx, double[,] lu)
+        /// <summary>
+        /// Helper for InvertMatrixLu().
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="x"></param>
+        /// <param name="indx"></param>
+        /// <param name="lu"></param>
+        private static void InvertMatrixSolve(ref double[] b, ref double[] x, int[] indx, double[,] lu)
         {
             if (b.Length != lu.GetLength(0) || x.Length != lu.GetLength(0))
                 throw new Exception("vector dimension problem");
@@ -8084,9 +8218,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Replace some characters to use for xml format.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string SpecialXmlChars(string text)
         {
-
             text = text.Replace("&", "&amp;");
             text = text.Replace("<", "&lt;");
             text = text.Replace(">", "&gt;");
@@ -8095,12 +8233,17 @@ namespace Gekko
             text = text.Replace("'", "&#39;");
             return text;
         }
-
-        
-        
-        public static string PrintTableHelper(Gekko.Table tab, bool printDateEtc, string printType)
+                       
+        /// <summary>
+        /// Print a Gekko table object, either as simple text, or as a html page.
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="printDateEtc"></param>
+        /// <param name="printType"></param>
+        /// <returns></returns>
+        public static string PrintTableHelper(Table table, bool printDateEtc, string printType)
         {
-            Globals.lastPrtOrMulprtTable = tab;
+            Globals.lastPrtOrMulprtTable = table;
             CrossThreadStuff.CopyButtonEnabled(true);
             //This method does NOT alter the table as a side-effect (because of ObjectCopier.Clone).
             bool printRawCode = false;
@@ -8116,7 +8259,7 @@ namespace Gekko
                 printType = "html";  //overrides txt, so "TABLE s1" or calling from menu will -> html table
             }
 
-            List<string> ss = tab.Print(printType);
+            List<string> ss = table.Print(printType);
 
             string fullFileNameAndPath = Globals.localTempFilesLocation + "\\" + "table.html";
 
@@ -8272,31 +8415,13 @@ namespace Gekko
 
             return printType;
         }
-
-        public static string Substring(string line, int p1, int p2)
-        {
-            string x = null;
-            try
-            {
-                x = line.Substring(p1 - 1, p2 - p1 + 1);
-            }
-            catch (Exception e) { };
-            return x;
-        }
-
-        public static int ToInt(string input)
-        {
-            int output = int.MaxValue;
-            if (input == null) return output;
-            try
-            {
-                output = int.Parse(input);
-            }
-            catch (Exception e) { };
-            return output;
-        }
         
-        
+        /// <summary>
+        /// Splits result from parser on '¤' so that filename and linenumber are extracted
+        /// </summary>
+        /// <param name="originalFileName"></param>
+        /// <param name="lineNumber"></param>
+        /// <param name="s"></param>
         public static void SplitCommandBeingExecuted(out string originalFileName, out int lineNumber, string s)
         {
             string[] split = s.Split('¤');
@@ -8305,10 +8430,12 @@ namespace Gekko
             lineNumber = int.Parse(lineNumber2);  //1-based it seems
         }        
 
+        /// <summary>
+        /// The "old" DECOMP method. Will be obsolete.
+        /// </summary>
+        /// <param name="o"></param>
         public static void Decomp(O.Decomp1 o)
         {
-            
-
             DecompOptions decompOptions = new DecompOptions();                        
             decompOptions.t1 = o.t1;
             decompOptions.t2 = o.t2;
@@ -8318,12 +8445,12 @@ namespace Gekko
             decompOptions.prtOptionLower = o.opt_prtcode.ToLower();
             decompOptions.name = o.name;
             Decomp(decompOptions);
+        }        
 
-        }
-
-        
-        
-
+        /// <summary>
+        /// The "old" DECOMP method, will be obsolete.
+        /// </summary>
+        /// <param name="decompOptions"></param>
         public static void Decomp(DecompOptions decompOptions)
         {
             Thread thread = new Thread(new ParameterizedThreadStart(DecompThreadFunction));
@@ -8345,8 +8472,11 @@ namespace Gekko
                 }
             }
         }
-
-
+        
+        /// <summary>
+        /// Thread for "old" DECOMP, will be obsolete.
+        /// </summary>
+        /// <param name="o"></param>
         // Thread for decomp window
         public static void DecompThreadFunction(Object o)
         {
@@ -8358,17 +8488,7 @@ namespace Gekko
             {
                 w = new Window1(decompOptions);
                 Globals.windowsDecomp.Add(w);
-            }
-
-            //if (decompOptions.expressionOld == null && decompOptions.variable != null)
-            //{
-            //    decompOptions.expressionOld = decompOptions.variable;
-            //}
-
-            //if (decompOptions.name == null && decompOptions.variable != null)
-            //{
-            //    decompOptions.name = decompOptions.variable;
-            //}
+            }            
 
             string name = null;
             if (decompOptions.name != null)
@@ -8463,6 +8583,11 @@ namespace Gekko
             }
         }
         
+        /// <summary>
+        /// Helper method for "old" DECOMP. Will be obsolete.
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
         public static EquationHelper DecompEval(string variable)
         {
             EquationHelper found = Program.FindEquationByMeansOfVariableName(variable);
@@ -8567,9 +8692,15 @@ namespace Gekko
 
             return found;
         }
-
         
     
+        /// <summary>
+        /// Helper method for "old" DECOMP. Will become obsolete.
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="simple"></param>
+        /// <returns></returns>
         public static string EquationLhsRhs(string lhs, string rhs, bool simple)
         {
             //This method is just so that we keep the two ways of decomposing together,
@@ -8578,37 +8709,16 @@ namespace Gekko
             //if (simple) return "-(" + lhs + ") + " + rhs;
             //else return "O.Add(" + Globals.smpl + ", O.Negate(" + Globals.smpl + ", " + lhs + "), " + rhs + ")";
             if (simple)
-                //return lhs + " - (" + rhs + " + " + Globals.decompExpressionName + ")";
+            {
                 return lhs + " - (" + rhs + ")";
+            }
             else
-                //return "O.Add(" + Globals.smpl + ", " + lhs + ", O.Negate(" + Globals.smpl + ", O.Add(" + Globals.smpl + ", " + rhs + ", " + Globals.decompExpressionName + ")))";
+            {
                 return "O.Add(" + Globals.smpl + ", " + lhs + ", O.Negate(" + Globals.smpl + ", (" + rhs + ")))";
+            }
         }
-
         
         
-        public static O.Prt PrtSnippet(string s, string s2)
-        {
-            CompilerResults cr;
-            CreatePrtSnippetDll(out cr, s, s2);
-            //O.Prt o = new O.Prt();
-            //Object[] args = new Object[1];
-            //args[0] = o;
-            O.Prt o = null;
-            try
-            {
-                Object ret = null;
-                ret = cr.CompiledAssembly.GetType("Gekko.PrtSnippet").InvokeMember("Snippet", BindingFlags.InvokeMethod, null, null, null);
-                o = (O.Prt)ret;
-                return o;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("ERROR: Some databanks or timeseries may be unavailable.\nPlease close the PLOT window and consult the error\nmessage in the Gekko output window.");
-            }
-            return o;
-        }
-
         public static List<string> TestSim(List<string> list, int start, int end)
         {
             List<string> res = new List<string>();
@@ -9300,41 +9410,7 @@ namespace Gekko
             Object[] args = new Object[0];
             cr.CompiledAssembly.GetType("Gekko.TranslatedCode").InvokeMember("PredictActions", BindingFlags.InvokeMethod, null, null, args);            
         }
-
-
-        private static void CreatePrtSnippetDll(out CompilerResults cr, string s, string s3)
-        {
-            StringBuilder s2 = new StringBuilder();
-            s2.AppendLine("using System;");
-            s2.AppendLine("using System.Collections.Generic;");
-            s2.AppendLine("using System.Text;");
-            s2.AppendLine("namespace Gekko");
-            s2.AppendLine("{");
-            s2.AppendLine("    public class PrtSnippet");
-            s2.AppendLine("    {");
-            s2.AppendLine(s3);
-            s2.AppendLine("public static O.Prt Snippet()");
-            s2.AppendLine("{");
-            s2.AppendLine(Globals.gekkoSmplInit);
-            s2.AppendLine(s);
-            s2.AppendLine("}");  //method
-            s2.AppendLine("}");  //class
-            s2.AppendLine("}");  //namespace
-            s2.Replace("`", Globals.QT);
-            CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Program.GetCompilerOptions();
-            compilerParams.GenerateInMemory = false;
-            compilerParams.IncludeDebugInformation = false;
-            compilerParams.ReferencedAssemblies.Add("system.dll");
-            compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-            compilerParams.GenerateExecutable = false;
-            cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2.ToString());
-            if (cr.Errors.HasErrors)
-            {
-                throw new GekkoException();
-            }
-        }
+        
 
         public static List<int> GetLeftsideBNumbers()
         {
@@ -9823,18 +9899,7 @@ namespace Gekko
                         Randommodel();
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.Length == 16)
-                {
-                    string sub = s2;
-                    if (G.Equal(sub, "randommodelcheck"))
-                    {
-                        Randommodelcheck();
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                }
-
+                }                
 
                 if (s2.Length == 6)
                 {
@@ -21672,7 +21737,7 @@ namespace Gekko
             }
 
             double[] x = new double[residuals.Length];
-            Solve(ref b, ref x, indx, lu);
+            InvertMatrixSolve(ref b, ref x, indx, lu);
 
             for (int i = 0; i < x.Length; i++)
             {
