@@ -352,6 +352,7 @@ namespace Gekko
         public static readonly ScalarString scalarStringYes = new ScalarString("yes");
         public static readonly ScalarString scalarStringNo = new ScalarString("no");
         
+
         public static bool fastGauss = true;  //Beware: RES command should switch the option off
                 
         public static double[] scaleNewtonValues = new double[0];

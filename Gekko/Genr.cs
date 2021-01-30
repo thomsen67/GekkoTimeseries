@@ -33,7 +33,7 @@ namespace Gekko
                         for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++) {
                             int bankNumber = bankNumbers[bankNumberI];
                             smpl.bankNumber = bankNumber;
-                            ope0.variable[bankNumber] = O.Lookup(smpl, null, (O.scalarStringHash).Concat(smpl, ((new ScalarString("listfile___"))).Concat(smpl, O.ReplaceSlash((new ScalarString("c")).Add(smpl, new ScalarString(":\\")).Add(smpl, (new ScalarString("tools"))).Add(smpl, new ScalarString("\\")).Add(smpl, (new ScalarString("m")))))), null, new LookupSettings(), EVariableType.Var, null);
+                            //ope0.variable[bankNumber] = O.Lookup(smpl, null, (Globals.scalarStringHash).Concat(smpl, ((new ScalarString("listfile___"))).Concat(smpl, O.ReplaceSlash((new ScalarString("c")).Add(smpl, new ScalarString(":\\")).Add(smpl, (new ScalarString("tools"))).Add(smpl, new ScalarString("\\")).Add(smpl, (new ScalarString("m")))))), null, new LookupSettings(), EVariableType.Var, null);
                             if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
                         }
                         smpl.bankNumber = 0;
