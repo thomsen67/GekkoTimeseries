@@ -48,7 +48,7 @@ namespace Gekko
                 List<string> al = new List<string>(5000);
                 List<string> alType = new List<string>(5000);
                 List<string> al1 = new List<string>(5000);  //contains output                        
-                Program.tokensFromFileToArrayList(dataFile, true, false, al, alType);
+                Program.TokensFromFileToArrayList(dataFile, true, false, al, alType);
                 double[] data = null;
                 String varName = "";
                 int start = -12345;
@@ -141,7 +141,7 @@ namespace Gekko
                 List<string> al = new List<string>(5000);
                 List<string> alType = new List<string>(5000);
                 List<string> al1 = new List<string>(5000);  //contains output                        
-                Program.tokensFromFileToArrayList(dataFile, true, false, al, alType);
+                Program.TokensFromFileToArrayList(dataFile, true, false, al, alType);
                 //double[] data = null;
                 string varName = "";
                 //int start = -12345;
@@ -276,7 +276,7 @@ namespace Gekko
             List<string> al = new List<string>(5000);
             List<string> alType = new List<string>(5000);
             List<string> al1 = new List<string>(5000);  //contains output                        
-            Program.tokensFromFileToArrayList(dataFile, true, false, al, alType);
+            Program.TokensFromFileToArrayList(dataFile, true, false, al, alType);
             List<string> aaName = new List<string>();
             List<string> aaValue = new List<string>();
 
@@ -444,7 +444,7 @@ namespace Gekko
             al = new List<string>(5000);
             alType = new List<string>(5000);
 
-            Program.tokensFromFileToArrayList(templateFile, false, false, al, alType);
+            Program.TokensFromFileToArrayList(templateFile, false, false, al, alType);
 
             //----------------------------------------------------
             //

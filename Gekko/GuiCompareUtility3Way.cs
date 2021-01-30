@@ -37,10 +37,7 @@ namespace Gekko
         }
 
         private void button1_Click(object sender, EventArgs e)
-        {
-            //if (this.radioButton1.Checked) Program.SamE1();
-            //else if (this.radioButton2.Checked) Program.SamE2();
-            //else if (this.radioButton3.Checked) Program.SamE3();
+        {            
             Program.CompareModelDatabankVarlist();
             this.Close();
         }

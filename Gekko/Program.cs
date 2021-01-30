@@ -1163,6 +1163,38 @@ namespace Gekko
         public static int guiBrowseHelpNumber = 0;
         public static List<string> guiBrowseHelpHistory = new List<string>();
 
+        public enum eOfficeVersion
+        {
+            eOfficeVersion_Unrecognized, // error return value
+            eOfficeVersion_95,
+            eOfficeVersion_97,
+            eOfficeVersion_2000,
+            eOfficeVersion_XP,   // XP = 2002 + marketing
+            eOfficeVersion_2003,
+            eOfficeVersion_2007,
+            eOfficeVersion_2010,
+            eOfficeVersion_2013,
+            eOfficeVersion_2016,
+            eOfficeVersion_2019  //???
+        };
+
+        public enum GekkoFileReadOrWrite
+        {
+            Read,
+            Write,
+            WriteAppend
+        };
+
+        public enum eOfficeApp // in case you are looking for a particular app
+        {
+            eOfficeApp_Word,
+            eOfficeApp_Excel,
+            eOfficeApp_Outlook,
+            eOfficeApp_Access,
+            eOfficeApp_PowerPoint,
+        };
+
+
         /// <summary>
         /// Random number
         /// </summary>
@@ -3226,7 +3258,7 @@ namespace Gekko
 
             readInfo.databankVersion = "";
             //try to unzip it here
-            tempTsdxPath = GetTempTsdxFolderPath();
+            tempTsdxPath = GetTempGbkFolderPath();
             if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
             {
                 Directory.CreateDirectory(tempTsdxPath);
@@ -9926,7 +9958,7 @@ namespace Gekko
                     {
                         //typing "aremos" on the prompt opens the dialog for creating a wa.bat file.
                         //not intended for "normal" Gekko users.
-                        makeBatFileForAremos();
+                        MakeBatFileForAremos();
                     }
                     break;
                 case "--flush":
@@ -16442,7 +16474,7 @@ namespace Gekko
             string tsdxVersion = "1.2"; //Gekko 3.0
 
             //try to zip it to this local folder
-            tempTsdxPath = GetTempTsdxFolderPath();
+            tempTsdxPath = GetTempGbkFolderPath();
             if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
             {
                 Directory.CreateDirectory(tempTsdxPath);
@@ -24564,14 +24596,27 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Error message for read/write of Excel xls(X) file using interop
+        /// </summary>
         private static void ErrorMessageExcelInterop()
-        {
+        {            
             G.Writeln2("+++ NOTE: The Excel engine for import/export of Excel sheets is slow and unstable.");
             G.Writeln("          Consider setting OPTION sheet engine = internal, using a better in-built engine for this.");
             G.Writeln("          However, this only works for the newer .xlsx file format, not for .xls files.");
             G.Writeln();
         }
 
+        /// <summary>
+        /// Cleanup ram after WriteExcel_Interop().
+        /// </summary>
+        /// <param name="objBook"></param>
+        /// <param name="objBooks"></param>
+        /// <param name="objSheets"></param>
+        /// <param name="objSheet"></param>
+        /// <param name="range"></param>
+        /// <param name="newSheet"></param>
+        /// <param name="range0"></param>
         private static void ExcelCleanup(ref Excel.Workbook objBook, ref Excel.Workbooks objBooks, ref Excel.Sheets objSheets, ref Excel.Worksheet objSheet, ref Excel.Range range, ref Excel.Worksheet newSheet, ref Excel.Range range0)
         {
             objBook.Close(false, Missing.Value, Missing.Value);
@@ -24625,6 +24670,12 @@ namespace Gekko
             GC.WaitForPendingFinalizers();
         }
 
+        /// <summary>
+        /// Helper method for ReadExcel_Interop() and WriteExcel_Interop()
+        /// </summary>
+        /// <param name="objSheets"></param>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
         private static Excel.Worksheet ExcelSheetTryGetSheet(Excel.Sheets objSheets, string sheet)
         {
             Excel.Worksheet objSheet;
@@ -24641,6 +24692,12 @@ namespace Gekko
             return objSheet;
         }
 
+        /// <summary>
+        /// Helper method for ReadExcel_Interop() and WriteExcel_Interop()
+        /// </summary>
+        /// <param name="objSheets"></param>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
         private static bool ExcelSheetCheckMatch(Excel.Sheets objSheets, string sheet)
         {
             bool match = false;
@@ -24655,6 +24712,12 @@ namespace Gekko
             return match;
         }
 
+        /// <summary>
+        /// Helper method for Excel file writing
+        /// </summary>
+        /// <param name="oPrt"></param>
+        /// <param name="isRows"></param>
+        /// <param name="isCols"></param>
         private static void HandleRowsCols(O.Prt oPrt, out bool isRows, out bool isCols)
         {
             isRows = false;
@@ -24700,11 +24763,21 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Gets info on Excel, to show in GUI: Help --> About.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
         public static string GetExcelVersion(Program.eOfficeApp app)
         {
             return Program.GetExcelVersion2(Program.GetApplicationVersion(app));
         }
 
+        /// <summary>
+        /// Transpose a double[,] array.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static double[,] Transpose(double[,] x)
         {
             double[,] y = new double[x.GetLength(1), x.GetLength(0)];
@@ -24717,20 +24790,11 @@ namespace Gekko
             }
             return y;
         }
-
-        public static GekkoTime[,] Transpose(GekkoTime[,] x)
-        {
-            GekkoTime[,] y = new GekkoTime[x.GetLength(1), x.GetLength(0)];
-            for (int i = 0; i < x.GetLength(0); i++)
-            {
-                for (int j = 0; j < x.GetLength(1); j++)
-                {
-                    y[j, i] = x[i, j];
-                }
-            }
-            return y;
-        }
-
+        
+        /// <summary>
+        /// Helper method for the internal --rungenr1 and --rungenr2
+        /// </summary>
+        /// <param name="i"></param>
         public static void Rungenr(int i)
         {
             if (i == 1)
@@ -24757,166 +24821,13 @@ namespace Gekko
                 TranslatedCode xx = new TranslatedCode();
                 TranslatedCode.CodeLines(new P());
             }
-        }
-
-
-        public delegate object FastInvokeHandler(object _target, object[] _params);
+        }        
 
         /// <summary>
-        /// A class to invoke methods using System.Reflection.Emit.DynamicMethod (.NET 2.0).
+        /// Transpose int[,] array
         /// </summary>
-        public sealed class FastMethodInvoker
-        {
-            private FastMethodInvoker() { }
-
-            /// <summary>
-            /// Returns DynamicMethod.
-            /// </summary>
-            /// <param name="_methodInfo">MethodInfo.</param>
-            /// <returns>Delegate</returns>
-            public static FastInvokeHandler GetMethodInvoker(MethodInfo _methodInfo)
-            {
-                DynamicMethod dynamicMethod = new DynamicMethod(string.Empty, typeof(object), new Type[] { typeof(object), typeof(object[]) }, _methodInfo.DeclaringType.Module);
-                ILGenerator il = dynamicMethod.GetILGenerator();
-                ParameterInfo[] ps = _methodInfo.GetParameters();
-                Type[] paramTypes = new Type[ps.Length];
-                for (int ii = 0; ii < paramTypes.Length; ii++)
-                {
-                    if (ps[ii].ParameterType.IsByRef)
-                        paramTypes[ii] = ps[ii].ParameterType.GetElementType();
-                    else
-                        paramTypes[ii] = ps[ii].ParameterType;
-                }
-                LocalBuilder[] locals = new LocalBuilder[paramTypes.Length];
-
-                for (int ii = 0; ii < paramTypes.Length; ii++)
-                {
-                    locals[ii] = il.DeclareLocal(paramTypes[ii], true);
-                }
-
-                for (int ii = 0; ii < paramTypes.Length; ii++)
-                {
-                    il.Emit(OpCodes.Ldarg_1);
-                    EmitFastInt(il, ii);
-                    il.Emit(OpCodes.Ldelem_Ref);
-                    EmitCastToReference(il, paramTypes[ii]);
-                    il.Emit(OpCodes.Stloc, locals[ii]);
-                }
-                il.Emit(OpCodes.Ldarg_0);
-                for (int ii = 0; ii < paramTypes.Length; ii++)
-                {
-                    if (ps[ii].ParameterType.IsByRef)
-                        il.Emit(OpCodes.Ldloca_S, locals[ii]);
-                    else
-                        il.Emit(OpCodes.Ldloc, locals[ii]);
-                }
-                il.EmitCall(OpCodes.Callvirt, _methodInfo, null);
-                if (_methodInfo.ReturnType == typeof(void))
-                    il.Emit(OpCodes.Ldnull);
-                else
-                    EmitBoxIfNeeded(il, _methodInfo.ReturnType);
-
-                for (int ii = 0; ii < paramTypes.Length; ii++)
-                {
-                    if (ps[ii].ParameterType.IsByRef)
-                    {
-                        il.Emit(OpCodes.Ldarg_1);
-                        EmitFastInt(il, ii);
-                        il.Emit(OpCodes.Ldloc, locals[ii]);
-                        if (locals[ii].LocalType.IsValueType)
-                            il.Emit(OpCodes.Box, locals[ii].LocalType);
-                        il.Emit(OpCodes.Stelem_Ref);
-                    }
-                }
-
-                il.Emit(OpCodes.Ret);
-                FastInvokeHandler invoker = (FastInvokeHandler)dynamicMethod.CreateDelegate(typeof(FastInvokeHandler));
-                return invoker;
-            }
-
-            /// <summary>
-            /// Emits the cast to reference.
-            /// </summary>
-            /// <param name="il">The il.</param>
-            /// <param name="type">The type.</param>
-            private static void EmitCastToReference(ILGenerator il, System.Type type)
-            {
-                if (type.IsValueType)
-                {
-                    il.Emit(OpCodes.Unbox_Any, type);
-                }
-                else
-                {
-                    il.Emit(OpCodes.Castclass, type);
-                }
-            }
-
-            /// <summary>
-            /// Emits the box if needed.
-            /// </summary>
-            /// <param name="il">The il.</param>
-            /// <param name="type">The type.</param>
-            private static void EmitBoxIfNeeded(ILGenerator il, System.Type type)
-            {
-                if (type.IsValueType)
-                {
-                    il.Emit(OpCodes.Box, type);
-                }
-            }
-
-            /// <summary>
-            /// Emits the fast int.
-            /// </summary>
-            /// <param name="il">The il.</param>
-            /// <param name="value">The value.</param>
-            private static void EmitFastInt(ILGenerator il, int value)
-            {
-                switch (value)
-                {
-                    case -1:
-                        il.Emit(OpCodes.Ldc_I4_M1);
-                        return;
-                    case 0:
-                        il.Emit(OpCodes.Ldc_I4_0);
-                        return;
-                    case 1:
-                        il.Emit(OpCodes.Ldc_I4_1);
-                        return;
-                    case 2:
-                        il.Emit(OpCodes.Ldc_I4_2);
-                        return;
-                    case 3:
-                        il.Emit(OpCodes.Ldc_I4_3);
-                        return;
-                    case 4:
-                        il.Emit(OpCodes.Ldc_I4_4);
-                        return;
-                    case 5:
-                        il.Emit(OpCodes.Ldc_I4_5);
-                        return;
-                    case 6:
-                        il.Emit(OpCodes.Ldc_I4_6);
-                        return;
-                    case 7:
-                        il.Emit(OpCodes.Ldc_I4_7);
-                        return;
-                    case 8:
-                        il.Emit(OpCodes.Ldc_I4_8);
-                        return;
-                }
-
-                if (value > -129 && value < 128)
-                {
-                    il.Emit(OpCodes.Ldc_I4_S, (SByte)value);
-                }
-                else
-                {
-                    il.Emit(OpCodes.Ldc_I4, value);
-                }
-            }
-        }
-
-
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static int[,] Transpose(int[,] x)
         {
             int[,] y = new int[x.GetLength(1), x.GetLength(0)];
@@ -24930,6 +24841,11 @@ namespace Gekko
             return y;
         }
 
+        /// <summary>
+        /// Convert an int[,] array to a string[,] array (used in WriteExcel_Interop())
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static string[,] ConvertToString(int[,] x)
         {
             string[,] y = new string[x.GetLength(0), x.GetLength(1)];
@@ -24943,6 +24859,11 @@ namespace Gekko
             return y;
         }
 
+        /// <summary>
+        /// Transpose a string[,] array
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static string[,] Transpose(string[,] x)
         {
             string[,] y = new string[x.GetLength(1), x.GetLength(0)];
@@ -24956,37 +24877,11 @@ namespace Gekko
             return y;
         }
 
-        public static DateTime[,] Transpose(DateTime[,] x)
-        {
-            DateTime[,] y = new DateTime[x.GetLength(1), x.GetLength(0)];
-            for (int i = 0; i < x.GetLength(0); i++)
-            {
-                for (int j = 0; j < x.GetLength(1); j++)
-                {
-                    y[j, i] = x[i, j];
-                }
-            }
-            return y;
-        }
-
-        public static DateTime[,] Transform(GekkoTime[,] x)
-        {
-            DateTime[,] y = new DateTime[x.GetLength(0), x.GetLength(1)];
-            for (int i = 0; i < x.GetLength(0); i++)
-            {
-                for (int j = 0; j < x.GetLength(1); j++)
-                {
-                    //y[j, i] = x[i, j];
-                    y[i, j] = DateTime.Now;
-                }
-            }
-            return y;
-        }
-
-
-
-
-
+        /// <summary>
+        /// Helper method for GetExcelVersion()
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string GetExcelVersion2(eOfficeVersion input)
         {
             if (input == eOfficeVersion.eOfficeVersion_95) return "95";
@@ -25001,38 +24896,13 @@ namespace Gekko
             if (input == eOfficeVersion.eOfficeVersion_2019) return "2019?";
             if (input == eOfficeVersion.eOfficeVersion_Unrecognized) return "[Unrecognized version]";
             return "[Unrecognized version]";
-        }        
+        }
 
-        public enum eOfficeVersion
-        {
-            eOfficeVersion_Unrecognized, // error return value
-            eOfficeVersion_95,
-            eOfficeVersion_97,
-            eOfficeVersion_2000,
-            eOfficeVersion_XP,   // XP = 2002 + marketing
-            eOfficeVersion_2003,
-            eOfficeVersion_2007,
-            eOfficeVersion_2010,
-            eOfficeVersion_2013,
-            eOfficeVersion_2016,
-            eOfficeVersion_2019  //???
-        };
-
-        public enum GekkoFileReadOrWrite
-        {
-            Read,
-            Write,
-            WriteAppend
-        };
-
-        public enum eOfficeApp // in case you are looking for a particular app
-        {
-            eOfficeApp_Word,
-            eOfficeApp_Excel,
-            eOfficeApp_Outlook,
-            eOfficeApp_Access,
-            eOfficeApp_PowerPoint,
-        };
+        /// <summary>
+        /// Helper method for GetExcelVersion().
+        /// </summary>
+        /// <param name="appToCheck"></param>
+        /// <returns></returns>
         public static eOfficeVersion GetApplicationVersion(eOfficeApp appToCheck)
         {
             // some of this function is based on the code in the article at: http://support.microsoft.com/kb/q247985/
@@ -25068,23 +24938,14 @@ namespace Gekko
             int firstCharOfVersion = lastDot + 1; // + 1 to get rid of the dot at the front
             string versionString = progAndVersion.Substring(firstCharOfVersion, progAndVersion.Length - firstCharOfVersion);
 
-            return StringToVersion(versionString);
+            return GetApplicationVersionHelper(versionString);
         }
 
-        public static string GetApplicationAsString(eOfficeApp officeApp)
-        {
-            switch (officeApp)
-            {
-                case eOfficeApp.eOfficeApp_Word: { return "Word"; } break;
-                case eOfficeApp.eOfficeApp_Excel: { return "Excel"; } break;
-                case eOfficeApp.eOfficeApp_Outlook: { return "Outlook"; } break;
-                case eOfficeApp.eOfficeApp_Access: { return "Access"; } break;
-                case eOfficeApp.eOfficeApp_PowerPoint: { return "Powerpoint"; } break;
-                default: { /*ASSERT(false);*/
-                        return string.Empty; } break; // added another ???
-            }
-        }
-
+        /// <summary>
+        /// Helper method for GetApplicationVersion().
+        /// </summary>
+        /// <param name="officeApp"></param>
+        /// <returns></returns>
         public static string GetProgID(eOfficeApp officeApp)
         {
             // ProgIDs from http://support.microsoft.com/kb/240794/EN-US/
@@ -25099,7 +24960,12 @@ namespace Gekko
             }
         }
 
-        public static eOfficeVersion StringToVersion(string versionString)
+        /// <summary>
+        /// Helper method for GetApplicationVersion()
+        /// </summary>
+        /// <param name="versionString"></param>
+        /// <returns></returns>
+        public static eOfficeVersion GetApplicationVersionHelper(string versionString)
         {
             // mapping between the marketing version (e.g. 2003) and the behind-the-scenes version
             if ("7" == versionString)
@@ -25148,17 +25014,29 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Use method CalculateHistoricalVarianceForVariable() to calculate such variances for b-variables (endogenous)
+        /// </summary>
+        /// <param name="timeSeriesPointers"></param>
+        /// <param name="t0"></param>
         public static void CreateBVariance(Series[] timeSeriesPointers, GekkoTime t0)
         {
             foreach (int i in Program.model.modelGekko.endogenousBNumbersOriginalInModelList)
             {
-                Series ts = timeSeriesPointers[i];
-                //string variable = varNamePointers[i];
+                Series ts = timeSeriesPointers[i];                
                 double d = CalculateHistoricalVarianceForVariable(ts, t0);
                 Program.model.modelGekko.bVariance[i] = d;
             }
         }
 
+        /// <summary>
+        /// Used for convergence checks, looks at historical variance for endogenous variables, to see what a 
+        /// "large" deviation is supposed to mean. This is practical, especially for variables that fluctuate
+        /// around zero.
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <param name="year0"></param>
+        /// <returns></returns>
         public static double CalculateHistoricalVarianceForVariable(Series ts, GekkoTime year0)
         {
             //only abs calc is used
@@ -25192,7 +25070,15 @@ namespace Gekko
             return d;
         }
 
-        public static void tokensFromFileToArrayList(String dataFile, bool ignoreWhiteSpace, bool addWorkingFolder, List<string> al, List<string> alType)
+        /// <summary>
+        /// Used for TSP interface.
+        /// </summary>
+        /// <param name="dataFile"></param>
+        /// <param name="ignoreWhiteSpace"></param>
+        /// <param name="addWorkingFolder"></param>
+        /// <param name="al"></param>
+        /// <param name="alType"></param>
+        public static void TokensFromFileToArrayList(String dataFile, bool ignoreWhiteSpace, bool addWorkingFolder, List<string> al, List<string> alType)
         {
             //Only used in TSP utilities
 
@@ -25233,9 +25119,11 @@ namespace Gekko
                 al.Add(""); alType.Add("");
             }
         }
-
-
         
+        /// <summary>
+        /// Menu item Utilities --> Compare model/databank/varlist...  This will compare variable names in the three places,
+        /// identifying "missing" or superfluous variables. Used for maintenance.
+        /// </summary>
         public static void CompareModelDatabankVarlist()
         {
             if (!G.HasModelGekko())
@@ -25442,113 +25330,14 @@ namespace Gekko
                 compareFile.Flush();
             }
         }
-
-        public static void CompareModelDatabank()
-        {
-            //IS THIS OBSOLETE??
-
-            GekkoTime tStart = Globals.globalPeriodStart;
-            GekkoTime tEnd = Globals.globalPeriodEnd;
-
-            if (!G.HasModelGekko())
-            {
-                G.Writeln2("*** ERROR: No model seems to be loaded, cf. the MODEL statement.");
-                G.Writeln("*** ERROR: The comparison could not be performed.");
-                return;
-            }
-
-            List<string> bothModelAndDatabank = new List<string>();
-            List<string> onlyModelNotDatabank = new List<string>();
-            List<string> onlyDatabankNotModel = new List<string>();
-
-            foreach (string s in Program.databanks.GetFirst().storage.Keys)
-            {
-                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.model.modelGekko.varsAType.ContainsKey(s))
-                {
-                    bothModelAndDatabank.Add(s);
-                }
-                else
-                {
-                    onlyDatabankNotModel.Add(s);
-                }
-            }
-
-            foreach (string s in Program.model.modelGekko.varsAType.Keys)
-            {
-                if (Program.model.modelGekko.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.modelGekko.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.databanks.GetFirst().storage.ContainsKey(s))
-                {
-                }
-                else
-                {
-                    onlyModelNotDatabank.Add(s);
-                }
-            }
-
-            bothModelAndDatabank.Sort(StringComparer.InvariantCulture);
-            onlyModelNotDatabank.Sort(StringComparer.InvariantCulture);
-            onlyDatabankNotModel.Sort(StringComparer.InvariantCulture);
-
-            List<string> varsWithMissingValues = new List<string>();
-
-            Databank work = Program.databanks.GetFirst();
-            foreach (string s in bothModelAndDatabank)
-            {
-                foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
-                {
-                    double value = (work.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t);
-                    if (G.isNumericalError(value))
-                    {
-                        varsWithMissingValues.Add(s);
-                        break;
-                    }
-                }
-            }
-            varsWithMissingValues.Sort();  //probably not necessary, but oh well
-
-            string fullFileNameAndPath = CreateFullPathAndFileName("compare.txt");
-
-            using (FileStream fs = WaitForFileStream(fullFileNameAndPath, GekkoFileReadOrWrite.Write))
-            using (StreamWriter compareFile = G.GekkoStreamWriter(fs))
-            {
-                compareFile.WriteLine("When comparing, auto-generated DJZ-type exogenous variables are ignored.");
-                compareFile.WriteLine("Such variables appear in the model and sometimes in the databank");
-                compareFile.WriteLine("(for instance when writing a databank after a simulation).");
-                compareFile.WriteLine("So comparing these kinds of variables does not");
-                compareFile.WriteLine("make much sense and would just pollute the comparison.");
-                compareFile.WriteLine();
-                compareFile.WriteLine("----------------------------------------------------------");
-                compareFile.WriteLine("-------------- Compare model and databank ----------------");
-                compareFile.WriteLine("----------------------------------------------------------");
-                compareFile.WriteLine();
-                compareFile.WriteLine("Both model and databank:   " + G.IntFormat(bothModelAndDatabank.Count, 7) + " variables");
-                compareFile.WriteLine("In databank, not in model: " + G.IntFormat(onlyDatabankNotModel.Count, 7) + " variables");
-                compareFile.WriteLine("In model, not in databank: " + G.IntFormat(onlyModelNotDatabank.Count, 7) + " variables");
-                compareFile.WriteLine();
-                compareFile.WriteLine("Below, missing variables are listed");
-                compareFile.WriteLine();
-                compareFile.WriteLine("In model, not in databank:   " + G.IntFormat(onlyModelNotDatabank.Count, 7) + " variables");
-                compareFile.WriteLine("----------------------------------------------------------");
-                G.PrintListWithCommasToFile(compareFile, onlyModelNotDatabank);
-                compareFile.WriteLine();
-                compareFile.WriteLine();
-                compareFile.WriteLine("From the " + G.IntFormat(bothModelAndDatabank.Count, 7) + " variables in both model and databank,");
-                compareFile.WriteLine("there are missing values in " + varsWithMissingValues.Count + " of these, for the given period " + tStart.ToString() + " to " + tEnd.ToString() + ":");
-                compareFile.WriteLine("----------------------------------------------------------");
-                G.PrintListWithCommasToFile(compareFile, varsWithMissingValues);
-                compareFile.WriteLine();
-                compareFile.WriteLine();
-                compareFile.WriteLine("The following " + G.IntFormat(onlyDatabankNotModel.Count, 7) + " variables are in the databank, but not in the model:");
-                compareFile.WriteLine("----------------------------------------------------------");
-                G.PrintListWithCommasToFile(compareFile, onlyDatabankNotModel);
-                compareFile.WriteLine();
-                compareFile.WriteLine();
-
-                compareFile.Flush();
-            }
-        }
-
+        
+        /// <summary>
+        /// Check residuals. From Gekko GUI, use --> Utilities --> Check residuals...  Residual check checks if model 
+        /// equations are in agreement, especially important for identities.
+        /// </summary>
+        /// <param name="checkType"></param>
+        /// <param name="dlog"></param>
+        /// <param name="split"></param>
         private static void ResidualCheck(string checkType, bool dlog, bool split)
         {
             string outputPath = Globals.localTempFilesLocation + "\\" + "residualcheck";
@@ -25582,6 +25371,13 @@ namespace Gekko
             G.Writeln();
         }
 
+        /// <summary>
+        /// Helper method for ResidualCheck().
+        /// </summary>
+        /// <param name="checkType"></param>
+        /// <param name="dlog"></param>
+        /// <param name="block"></param>
+        /// <param name="path"></param>
         private static void ResidualCheckHelper(string checkType, bool dlog, string block, string path)
         {
             Databank work = Program.databanks.GetFirst();
@@ -25695,6 +25491,10 @@ namespace Gekko
             Sam(gt1, gt2, Program.databanks.GetRef(), Program.databanks.GetFirst(), type2, order, after_d_type, "_after_d", dlog, block, path, null, null, double.NaN, double.NaN);
         }
 
+        /// <summary>
+        /// Use for writing the [modelname]__info file.
+        /// </summary>
+        /// <returns></returns>
         public static string GetModelInfoPath()
         {
             //put in local files on user pc
@@ -25703,6 +25503,9 @@ namespace Gekko
             return path;
         }
 
+        /// <summary>
+        /// Simple methods for the creation of a temp folder
+        /// </summary>
         public static void CreateTempFilesFolder()
         {
             if (!Directory.Exists(Globals.localTempFilesLocation))
@@ -25711,6 +25514,9 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Method to copy gekko.chm file (help file) as a local copy, to avoid security problems regarding reading it.
+        /// </summary>
         public static void CreateLocalCopyHelpChm()
         {
             if (Program.options.interface_help_copylocal)
@@ -25744,6 +25550,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Temp folder, originally used to store a .tsd file that was later zipped into .tsdx or .gbk. Now also used for other stuff.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetTempTsdFilePath(string type)
         {
             string tempPath = null;
@@ -25763,7 +25574,11 @@ namespace Gekko
             return tempPath;
         }
 
-        public static string GetTempTsdxFolderPath()
+        /// <summary>
+        /// Helper for ReadGbk() and WriteGbk().
+        /// </summary>
+        /// <returns></returns>
+        public static string GetTempGbkFolderPath()
         {
             //put in local files on user pc
             //Random r = new Random();
@@ -25772,37 +25587,81 @@ namespace Gekko
             return path;
         }
 
+        /// <summary>
+        /// Databank compare helper (GUI method)
+        /// </summary>
         public static void Sam1()
         {
             Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "", false);
         }
+
+        /// <summary>
+        /// Databank compare helper (GUI method)
+        /// </summary>
         public static void Sam2()
         {
             Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "absolute", true);
         }
+
+        /// <summary>
+        /// Databank compare helper (GUI method)
+        /// </summary>
         public static void Sam3()
         {
             Sam(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.databanks.GetRef(), Program.databanks.GetFirst(), "relative", true);
         }
+
+        /// <summary>
+        /// Databank compare helper (GUI method)
+        /// </summary>
         public static void SamE1(bool dlog, bool split)
         {
             ResidualCheck("alphabetical", dlog, split);
         }
+
+        /// <summary>
+        /// Databank compare helper (GUI method)
+        /// </summary>
         public static void SamE2(bool dlog, bool split)
         {
             ResidualCheck("absolute", dlog, split);
         }
+
+        /// <summary>
+        /// Databank compare helper (GUI method)
+        /// </summary>
         public static void SamE3(bool dlog, bool split)
         {
             ResidualCheck("relative", dlog, split);
         }
 
+        /// <summary>
+        /// Databank compare helper (GUI method)
+        /// </summary>
         public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string type, bool order)
         {
             //Called in order to compare databanks, 5 last args inactive
             Sam(tStart, tEnd, base2, work, type, order, null, null, false, null, null, null, null, double.NaN, double.NaN);
         }
 
+        /// <summary>
+        /// Generic method for comparisons (comparing timeseries observations)
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="base2"></param>
+        /// <param name="work"></param>
+        /// <param name="compareType"></param>
+        /// <param name="order"></param>
+        /// <param name="variables"></param>
+        /// <param name="variablesType"></param>
+        /// <param name="dlog"></param>
+        /// <param name="block"></param>
+        /// <param name="path"></param>
+        /// <param name="fileName"></param>
+        /// <param name="dump"></param>
+        /// <param name="crit_abs"></param>
+        /// <param name="crit_rel"></param>
         public static void Sam(GekkoTime tStart, GekkoTime tEnd, Databank base2, Databank work, string compareType, bool order, List<string> variables, string variablesType, bool dlog, string block, string path, string fileName, string dump, double crit_abs, double crit_rel)
         {
             //TODO: could be more clearly coded, with 6 compareTypes (3 databank and 3 residuals), doing a 'variables == null' is not too pretty
@@ -25848,9 +25707,6 @@ namespace Gekko
             {
                 return;  //to avoid empty files, especially when dividing into blocks
             }
-
-            //List<string> both = variables;  //may be null            
-
             SortedList ordered = new SortedList();
 
             string samFileName = "";
@@ -25928,15 +25784,7 @@ namespace Gekko
 
                     IVariable iv = O.GetIVariableFromString(tsString, O.ECreatePossibilities.NoneReportError);  //no search
                     IVariable ivGrund = O.GetIVariableFromString(G.Chop_SetBank(tsString, Globals.Ref), O.ECreatePossibilities.NoneReportError);
-
-                    //string dbName, varName, freq; string[] indexes;
-                    //O.Chop(tsString, out dbName, out varName, out freq, out indexes);
-                    //if (G.Chop_HasSigil(varName)) continue;  //filter out non-series, like %s or #m
-                    //IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
-                    //IVariable ivGrund = O.GetIVariableFromString(Globals.Ref, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
-                                                            
-                    //string tsNameWithFreq = varName;
-                    //if (freq != null) tsNameWithFreq = Globals.freqIndicator + freq;
+                    
                     string tsNameWithFreq = tsString;                    
 
                     if (iv == null && ivGrund == null)
@@ -25972,9 +25820,7 @@ namespace Gekko
 
             bool dumpList = false;
 
-
-            int pcounter = 0;
-            //string fullPathAndFileName = CreateFullPathAndFileName(samFileName);
+            int pcounter = 0;            
             string fullPathAndFileName = path;
             using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter samFile = G.GekkoStreamWriter(fs))
@@ -26111,7 +25957,6 @@ namespace Gekko
                         continue;
                     }
 
-
                     double max1 = max * (1d + count / 12345678912d) + count / 12345678912d;
                     if (order)
                     {
@@ -26139,13 +25984,10 @@ namespace Gekko
                     }
                 }
 
-
                 //databank compare
                 samFile.WriteLine("Out of the " + both2.Count + " common series, there are differences regarding " + ordered.Count + " of them:");
                 if (ordered.Count == 0) samFile.WriteLine("[none]");
                 samFile.WriteLine();
-
-
 
                 int counter = 0;
                 foreach (DictionaryEntry de in ordered)
@@ -26195,7 +26037,6 @@ namespace Gekko
                     {
                         if (compareType == "relative")
                         {
-
                             samFile.WriteLine("         max = " + G.pchFormatOld(-number));
                         }
                         else
@@ -26265,6 +26106,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Pick out a freq from ConvertDateFreqsToAllFreqs(). Used to convert frequencies.
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="tsFreq"></param>
+        /// <returns></returns>
         public static Tuple<GekkoTime, GekkoTime> ConvertFreqs(GekkoTime tStart, GekkoTime tEnd, EFreq tsFreq)
         {
             //========================================================================================================
@@ -26302,6 +26150,13 @@ namespace Gekko
             return new Tuple<GekkoTime, GekkoTime>(tStart2, tEnd2);
         }
 
+        /// <summary>
+        /// Used to convert frequencies.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="tsFreq"></param>
+        /// <param name="startEnd"></param>
+        /// <returns></returns>
         public static GekkoTime ConvertFreq(GekkoTime t, EFreq tsFreq, string startEnd)
         {            
             if (G.Equal(startEnd, "start"))
@@ -26319,12 +26174,30 @@ namespace Gekko
             }            
         }
 
+        /// <summary>
+        /// Optionally remove freq from name if it is same as current freq (this is done for printing purposes).
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="removeCurrentFreqFromNames"></param>
+        /// <returns></returns>
         private static string MaybeRemoveFreq(string s1, bool removeCurrentFreqFromNames)
         {            
             if (removeCurrentFreqFromNames) return G.Chop_RemoveFreq(s1, G.ConvertFreq(Program.options.freq));
             else return s1;
         }
 
+        /// <summary>
+        /// Helper method for Sam() method.
+        /// </summary>
+        /// <param name="onlyWork2"></param>
+        /// <param name="onlyRef2"></param>
+        /// <param name="both2"></param>
+        /// <param name="differentTypeSeries2"></param>
+        /// <param name="items"></param>
+        /// <param name="tsNameWithFreq"></param>
+        /// <param name="ts"></param>
+        /// <param name="tsGrund"></param>
+        /// <param name="removeCurrentFreqFromNames"></param>
         private static void SamHandleTwoExistingSeries(List<string> onlyWork2, List<string> onlyRef2, List<string> both2, List<string> differentTypeSeries2, List<SamHelper> items, string tsNameWithFreq, Series ts, Series tsGrund, bool removeCurrentFreqFromNames)
         {
             if (ts.type != tsGrund.type)
@@ -26376,14 +26249,12 @@ namespace Gekko
                     both2.Add(MaybeRemoveFreq(tsNameWithFreq, removeCurrentFreqFromNames));
                     items.Add(new SamHelper() { series1 = ts, series2 = tsGrund });
                 }
-            }
-            //SamHelper sh = items[items.Count - 1];
-            //if(sh.series1==null || sh.series2==null)
-            //{
-
-            //}
+            }            
         }
 
+        /// <summary>
+        /// Used for PIPE&lt;stop&gt;
+        /// </summary>
         public static void ReleasePipe()
         {
             //In order to release any current piping to file, so it does not block other users
@@ -26396,6 +26267,9 @@ namespace Gekko
             Globals.pipe = false;
         }
 
+        /// <summary>
+        /// Used for PIPE&lt;stop&gt;
+        /// </summary>
         public static void ReleasePipe2()
         {
             //Release piping to file when doing stuff like "prt fy file=output.txt"
@@ -26408,6 +26282,11 @@ namespace Gekko
             Globals.pipe2 = false;
         }
 
+        /// <summary>
+        /// Used when writing list of options on screen.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string MaybeAddPointAndZero(string s)
         {
             bool isInt = true;
@@ -26419,28 +26298,24 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Used when printing a list of databanks, where the .gbk extension is not needed.
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <returns></returns>
         public static string GetDatabankFilename(Databank databank)
         {
             return System.IO.Path.GetFileName(databank.FileNameWithPath);
         }
-
-        private static List<Dictionary<string, string>> CreateSimplePrecedentsForPrtPplot(List<string> variables)
-        {
-            //just done to use PrtPplot(),
-            List<Dictionary<string, string>> ll3 = new List<Dictionary<string, string>>();
-            Dictionary<string, string> temp = new Dictionary<string, string>();
-            foreach (string v in variables)
-            {
-                Dictionary<string, string> temp2 = new Dictionary<string, string>();
-                temp2.Add(v, "");
-                ll3.Add(temp);
-            }
-            return ll3;
-        }
-
+        
+        /// <summary>
+        /// Used for TABLE command 
+        /// </summary>
+        /// <param name="inputFileName"></param>
+        /// <param name="menuTable"></param>
+        /// <returns></returns>
         public static string TableHelper(string inputFileName, bool menuTable)
-        {
-            //!! used in dynamic code
+        {            
             //This is called from "TABLE filename.tab" command, including calls from menus which
             //will issue such a command in a thread (is so, menuTable is true).
 
@@ -26472,6 +26347,9 @@ namespace Gekko
             return inputFileName;
         }
 
+        /// <summary>
+        /// Used for CLONE and READ commands. Makes ref databank an excact copy of first-pos dabank.
+        /// </summary>
         public static void MulbkClone()
         {
             Databank first = Program.databanks.GetFirst();
@@ -26482,6 +26360,10 @@ namespace Gekko
             secondary.FileNameWithPath = first.FileNameWithPath;
         }
 
+        /// <summary>
+        /// Helper method for SIM (model solver)
+        /// </summary>
+        /// <param name="endoNoLagPointers"></param>
         public static void CreateEndoNoLagBNumbers(int[] endoNoLagPointers)
         {
             Program.model.modelGekko.endogenousBNumbersOriginalInModelList = new List<int>();
@@ -26600,262 +26482,15 @@ namespace Gekko
             G.Writeln();
         }
         
-
-        public static string AddFreqAtEndOfVariableName(string var)  //used most of the time, uses global freq
-        {
-            return AddFreqAtEndOfVariableName(var, Program.options.freq);
-        }
-
-        public static string AddFreqAtEndOfVariableName(string var, string freq)
-        {
-            return AddFreqAtEndOfVariableName(var, G.ConvertFreq(freq));
-        }
-
-        public static string AddFreqAtEndOfVariableName(string var, EFreq freq)
-        {            
-            if (freq == EFreq.A) return var;
-            string var2 = var;
-            if (freq == EFreq.Q || freq == EFreq.M || freq == EFreq.U)
-            {
-                if (var2.EndsWith(Globals.freqIndicator + "q") || var2.EndsWith(Globals.freqIndicator + "m") || var2.EndsWith(Globals.freqIndicator + "u"))
-                {
-                    //this is just a safety measure, to be deleted sometime
-                    G.Writeln2("*** ERROR: strange behavior regarding freq indicator");
-                    throw new GekkoException();
-                }
-                else
-                {
-                    if (freq == EFreq.Q)
-                    {
-                        var2 = var + Globals.freqIndicator + "q";
-                    }
-                    else if (freq == EFreq.M)
-                    {
-                        var2 = var + Globals.freqIndicator + "m";
-                    }
-                    else if (freq == EFreq.U)
-                    {
-                        var2 = var + Globals.freqIndicator + "u";
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR #745387463");
-                        throw new GekkoException();
-                    }
-                    //for instance fy%q for fY in quarters
-                }
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Internal error #74389642");
-                throw new GekkoException();
-            }
-            //nothing done for "a" type
-            return var2;
-        }
-
-
-
-        public static FileStream CheckIfFileIsBeingUsed(string fileName)
-        {
-            FileStream fs = null;
-            try
-            {
-                //fs = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.None);
-                fs = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-            return fs;
-        }
-
-
-
-        public static string DoStuffWithDoubleUnderline(string text)
-        {
-            //In the long run, using RTF will be replaced by HTML. Double underlines and invisible text is just
-            //not funny to write documentation with.
-            //identifies double underline (code "\uldb").
-            char[] t = text.ToCharArray();
-            StringBuilder t2 = new StringBuilder();
-            int max = t.Length - 10;  //make room for [i + x]
-            for (int i = 0; i < max; i++)
-            {
-                if (t[i] == '\\' && t[i + 1] == 'u' && t[i + 2] == 'l' && t[i + 3] == 'd' && t[i + 4] == 'b' && t[i + 5] == '\\')
-                {
-                    t2.Append(t[i]);
-                    t2.Append(t[i + 1]);
-                    t2.Append(t[i + 2]);
-                    t2.Append(t[i + 3]);
-                    t2.Append(t[i + 4]);
-                    t2.Append(t[i + 5]);
-                    for (int j = i + 6; j < max; j++)
-                    {
-                        if (t[j] == ' ' && t[j + 1] != '\\')
-                        {
-                            t2.Append(t[j]);
-                            t2.Append(" SIMPLELINK0 ");
-                            //start of words
-                            for (int k = j + 1; k < max; k++)
-                            {
-                                if (t[k] == '}')
-                                {
-                                    t2.Append(" SIMPLELINK1 ");
-
-                                    if (true)
-                                    {
-                                        //find hidden text if any
-                                        bool flag2 = false;  //met opening bracket
-                                        bool flag3 = false;  //invisible code ("\v " or "\v\")
-                                        for (int k2 = k + 1; k2 < max; k2++)
-                                        {
-
-                                            if (t[k2] == '\\' && t[k2 + 1] == 'u' && t[k2 + 2] == 'l' && t[k2 + 3] == 'd' && t[k2 + 4] == 'b' && t[k2 + 5] == '\\')
-                                            {
-                                                //not allowed to pass another underline -- probably something wrong: break out.
-                                                t2.Append("<null>");
-                                                t2.Append(" SIMPLELINK2 ");
-                                                goto Flag2;
-                                            }
-
-                                            if (t[k2] == '\\' && t[k2 + 1] == 'v' && (t[k2 + 2] == '\\' || t[k2 + 2] == ' '))
-                                            {
-                                                flag3 = true;
-                                            }
-                                            if (t[k2] == '{')
-                                            {
-                                                flag2 = true;
-                                            }
-                                            if (t[k2] == '}')
-                                            {
-                                                if (flag2 && flag3)
-                                                {
-                                                    //backtrack to find a space to delimit the word
-                                                    for (int k3 = k2 - 1; k3 > k; k3--)
-                                                    {
-                                                        if (t[k3] == ' ')
-                                                        {
-                                                            string word = new string(t, k3 + 1, k2 - k3 - 1);
-                                                            t2.Append(word);
-                                                            t2.Append(" SIMPLELINK2 ");
-                                                            goto Flag2;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                Flag2: ;
-
-
-                                    t2.Append(t[k]);
-                                    i = k;
-
-                                    goto Flag1;
-                                }
-                                else
-                                {
-                                    t2.Append(t[k]);
-                                }
-                            }
-                        }
-                        else t2.Append(t[j]);
-                    }
-                }
-                else
-                {
-                    t2.Append(t[i]);
-                }
-            Flag1: ;
-            }
-            text = t2.ToString();
-            return text;
-        }
-
-        public static void makeBatFileForAremos()
+        /// <summary>
+        /// Used for AREMOS, but will soon be completely legacy.
+        /// </summary>
+        public static void MakeBatFileForAremos()
         {
             GuiDialogMakeBatfile xx = new GuiDialogMakeBatfile(true);
             xx.ShowDialog();
             xx.Close();
-        }
-
-        // ================================================
-        // CES stuff, perhaps make available in Function.cs
-        // ================================================
-        
-        // with theta
-
-        static double CES_XL(double yrel, double p1rel, double p2rel, double theta, double sigma)
-        {
-            double uc = CES_UC(p1rel, p2rel, theta, sigma);
-            return yrel * Math.Pow(uc / p1rel, sigma);
-        }
-
-        static double CES_XR(double yrel, double p1rel, double p2rel, double theta, double sigma)
-        {
-            double uc = CES_UC(p1rel, p2rel, theta, sigma);
-            return yrel * Math.Pow(uc / p2rel, sigma);
-        }
-
-        static double C(double ca, double p1, double p2, double p1a, double p2a, double theta, double sigma)
-        {
-            double c = ca * CES_UC(p1 / p1a, p2 / p2a, theta, sigma);
-            return c;
-        }
-
-        static double CES_UC(double p1rel, double p2rel, double theta, double sigma)
-        {
-            double c = Math.Pow(theta * Math.Pow(p1rel, 1 - sigma) + (1 - theta) * Math.Pow(p2rel, 1 - sigma), 1 / (1 - sigma));
-            return c;
-        }
-
-        static double Y(double x1, double x2, double ya, double x1a, double x2a, double theta, double sigma)
-        {
-            double rho = (sigma - 1) / sigma;
-            double y_cal = ya * Math.Pow((theta * Math.Pow(x1 / x1a, rho) + (1 - theta) * Math.Pow(x2 / x2a, rho)), 1 / rho);
-            return y_cal;
-        }
-        
-        // -------
-
-        // with delta
-
-        static double Y_orig(double x1, double x2, double kappa, double delta, double sigma)
-        {
-            double rho = (sigma - 1) / sigma;
-            double y = kappa * Math.Pow(delta * Math.Pow(x1, rho) + (1 - delta) * Math.Pow(x2, rho), 1 / rho);
-            return y;
-        }
-
-        static double X1_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
-        {
-            double x1 = y / kappa * Math.Pow((delta * kappa * AC_orig(p1, p2, kappa, delta, sigma)) / p1, sigma);
-            return x1;
-        }
-
-        static double X2_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
-        {
-            double x2 = y / kappa * Math.Pow(((1 - delta) * kappa * AC_orig(p1, p2, kappa, delta, sigma)) / p2, sigma);
-            return x2;
-        }
-
-        static double C_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
-        {
-            double c = y * AC_orig(p1, p2, kappa, delta, sigma);
-            return c;
-        }
-
-        static double AC_orig(double p1, double p2, double kappa, double delta, double sigma)
-        {
-            double ac = 1 / kappa * Math.Pow(Math.Pow(delta, sigma) * Math.Pow(p1, 1 - sigma) + Math.Pow(1 - delta, sigma) * Math.Pow(p2, 1 - sigma), 1 / (1 - sigma));
-            return ac;
-        }
-
-        // ================================================
-        // CES stuff end
-        // ================================================
+        }        
                           
         [ProtoContract]
         public class ReadInfo
@@ -27233,6 +26868,89 @@ namespace Gekko
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// These methods are not used at the moment, but just keep them here. May become
+    /// Gekko functions later on. The functions are thoroughly tested.
+    /// </summary>
+    public static class Ces
+    {
+        // ================================================
+        // CES stuff, perhaps make available in Function.cs
+        // ================================================
+
+        // with theta
+        
+        public static double CES_XL(double yrel, double p1rel, double p2rel, double theta, double sigma)
+        {
+            double uc = CES_UC(p1rel, p2rel, theta, sigma);
+            return yrel * Math.Pow(uc / p1rel, sigma);
+        }
+
+        public static double CES_XR(double yrel, double p1rel, double p2rel, double theta, double sigma)
+        {
+            double uc = CES_UC(p1rel, p2rel, theta, sigma);
+            return yrel * Math.Pow(uc / p2rel, sigma);
+        }
+
+        public static double C(double ca, double p1, double p2, double p1a, double p2a, double theta, double sigma)
+        {
+            double c = ca * CES_UC(p1 / p1a, p2 / p2a, theta, sigma);
+            return c;
+        }
+
+        public static double CES_UC(double p1rel, double p2rel, double theta, double sigma)
+        {
+            double c = Math.Pow(theta * Math.Pow(p1rel, 1 - sigma) + (1 - theta) * Math.Pow(p2rel, 1 - sigma), 1 / (1 - sigma));
+            return c;
+        }
+
+        public static double Y(double x1, double x2, double ya, double x1a, double x2a, double theta, double sigma)
+        {
+            double rho = (sigma - 1) / sigma;
+            double y_cal = ya * Math.Pow((theta * Math.Pow(x1 / x1a, rho) + (1 - theta) * Math.Pow(x2 / x2a, rho)), 1 / rho);
+            return y_cal;
+        }
+
+        // -------
+
+        // with delta
+
+        public static double Y_orig(double x1, double x2, double kappa, double delta, double sigma)
+        {
+            double rho = (sigma - 1) / sigma;
+            double y = kappa * Math.Pow(delta * Math.Pow(x1, rho) + (1 - delta) * Math.Pow(x2, rho), 1 / rho);
+            return y;
+        }
+
+        public static double X1_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double x1 = y / kappa * Math.Pow((delta * kappa * AC_orig(p1, p2, kappa, delta, sigma)) / p1, sigma);
+            return x1;
+        }
+
+        public static double X2_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double x2 = y / kappa * Math.Pow(((1 - delta) * kappa * AC_orig(p1, p2, kappa, delta, sigma)) / p2, sigma);
+            return x2;
+        }
+
+        public static double C_orig(double y, double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double c = y * AC_orig(p1, p2, kappa, delta, sigma);
+            return c;
+        }
+
+        public static double AC_orig(double p1, double p2, double kappa, double delta, double sigma)
+        {
+            double ac = 1 / kappa * Math.Pow(Math.Pow(delta, sigma) * Math.Pow(p1, 1 - sigma) + Math.Pow(1 - delta, sigma) * Math.Pow(p2, 1 - sigma), 1 / (1 - sigma));
+            return ac;
+        }
+
+        // ================================================
+        // CES stuff end
+        // ================================================
     }
 
     public class LocalGlobal

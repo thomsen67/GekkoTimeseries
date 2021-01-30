@@ -936,9 +936,65 @@ namespace Gekko
         }
         public bool ContainsVariable(bool freqAddToName, string variable)
         {
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
+            if (freqAddToName) variable = AddFreqAtEndOfVariableName(variable);
             return this.storage.ContainsKey(variable);
         }
+
+
+        public static string AddFreqAtEndOfVariableName(string var)  //used most of the time, uses global freq
+        {
+            return AddFreqAtEndOfVariableName(var, Program.options.freq);
+        }
+
+        public static string AddFreqAtEndOfVariableName(string var, string freq)
+        {
+            return AddFreqAtEndOfVariableName(var, G.ConvertFreq(freq));
+        }
+
+        public static string AddFreqAtEndOfVariableName(string var, EFreq freq)
+        {
+            if (freq == EFreq.A) return var;
+            string var2 = var;
+            if (freq == EFreq.Q || freq == EFreq.M || freq == EFreq.U)
+            {
+                if (var2.EndsWith(Globals.freqIndicator + "q") || var2.EndsWith(Globals.freqIndicator + "m") || var2.EndsWith(Globals.freqIndicator + "u"))
+                {
+                    //this is just a safety measure, to be deleted sometime
+                    G.Writeln2("*** ERROR: strange behavior regarding freq indicator");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    if (freq == EFreq.Q)
+                    {
+                        var2 = var + Globals.freqIndicator + "q";
+                    }
+                    else if (freq == EFreq.M)
+                    {
+                        var2 = var + Globals.freqIndicator + "m";
+                    }
+                    else if (freq == EFreq.U)
+                    {
+                        var2 = var + Globals.freqIndicator + "u";
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR #745387463");
+                        throw new GekkoException();
+                    }
+                    //for instance fy%q for fY in quarters
+                }
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Internal error #74389642");
+                throw new GekkoException();
+            }
+            //nothing done for "a" type
+            return var2;
+        }
+
+
 
         public void RemoveVariable(string variable)
         {
@@ -948,7 +1004,7 @@ namespace Gekko
         public void RemoveVariable(EFreq eFreq, string variable)
         {
             if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
-            variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);
+            variable = AddFreqAtEndOfVariableName(variable, eFreq);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
                 this.storage.Remove(variable);
@@ -960,7 +1016,7 @@ namespace Gekko
         public void RemoveVariable(bool freqAddToName, string variable)
         {
             if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
+            if (freqAddToName) variable = AddFreqAtEndOfVariableName(variable);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
                 this.storage.Remove(variable);
@@ -973,7 +1029,7 @@ namespace Gekko
         private void RemoveVariable(bool freqAddToName, string freq, string variable)
         {
             if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable, freq);
+            if (freqAddToName) variable = AddFreqAtEndOfVariableName(variable, freq);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
                 this.storage.Remove(variable);
@@ -1024,8 +1080,8 @@ namespace Gekko
                 G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
                 throw new GekkoException();
             }
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
-            else variable = Program.AddFreqAtEndOfVariableName(variable, frequency);
+            if (freqAddToName) variable = AddFreqAtEndOfVariableName(variable);
+            else variable = AddFreqAtEndOfVariableName(variable, frequency);
             this.storage.Add(variable, ts);
             ts.parentDatabank = this;
             this.isDirty = true;
@@ -1038,14 +1094,14 @@ namespace Gekko
 
         public TimeSeries_1_1 GetVariable(bool freqAddToName, string variable)
         {
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
+            if (freqAddToName) variable = AddFreqAtEndOfVariableName(variable);
             TimeSeries_1_1 x = null; this.storage.TryGetValue(variable, out x);
             return x;
         }
 
         public TimeSeries_1_1 GetVariable(EFreq eFreq, string variable)
         {
-            if (eFreq != EFreq.A) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
+            if (eFreq != EFreq.A) variable = AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
             TimeSeries_1_1 x = null; this.storage.TryGetValue(variable, out x);
             return x;
         }
@@ -1059,7 +1115,7 @@ namespace Gekko
             //This auto-creates timeseries for use when reading for example tsd or PCIM files
             //Has an overload used for UPD statements etc.
             TimeSeries_1_1 ts = null;
-            string varName2 = Program.AddFreqAtEndOfVariableName(varName, frequency);
+            string varName2 = Databank_1_1.AddFreqAtEndOfVariableName(varName, frequency);
 
             if (!databank.ContainsVariable(false, varName2))  //a little bit slack, but not much if databank is empty to start with
             {
