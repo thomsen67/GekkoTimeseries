@@ -10809,9 +10809,12 @@ namespace Gekko
 
             return inputFileLines2;
         }
-
-        //QWERTY
-
+        
+        /// <summary>
+        /// True if string contains '*' or '?'
+        /// </summary>
+        /// <param name="inside"></param>
+        /// <returns></returns>
         public static bool CheckIfLooksLikeWildcard2(string inside)
         {
             if (inside == null) return false;
@@ -10819,12 +10822,15 @@ namespace Gekko
             return false;
         }
 
+        /// <summary>
+        /// finds [a*b?] patterns, handled like {'a*b?'}. Problem is that [a*b] looks like a matrix definition, therefore this code.
+        /// </summary>
+        /// <param name="inside"></param>
+        /// <returns></returns>
         public static bool CheckIfLooksLikeWildcard(string inside)
-        {
-            //finds [a*b?] patterns, handled like {'a*b?'}
+        {            
             //note that [bank:a*b?] is also allowed
-            //note that [bank:a*b?!q] is also allowed
-            //problem is that [a*b] looks like a matrix definition, therefore this code.
+            //note that [bank:a*b?!q] is also allowed            
 
             if (inside == null) return false;
 
@@ -10916,9 +10922,16 @@ namespace Gekko
             return true;
         }
 
-       
-        
-
+        /// <summary>
+        /// Used in CollapsePoints(), see this method
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <param name="counter"></param>
+        /// <param name="data"></param>
+        /// <param name="gt"></param>
+        /// <param name="method"></param>
+        /// <param name="gt_min"></param>
+        /// <param name="gt_max"></param>
         private static void HandleCollapseData(Series ts, Series counter, double data, GekkoTime gt, ECollapseMethod method, ref GekkoTime gt_min, ref GekkoTime gt_max)
         {
             if (gt_min.IsNull()) gt_min = gt;
@@ -10965,6 +10978,12 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// Collapse Excel date "points" into Gekko timeseries of chosen frequency. These Excel dates are completely flexible,
+        /// may even contain hours, minutes, etc., and Gekko will "collapse" (aggregate) these. Gets the data from .xls(x) via
+        /// an intermediate/temporary TableLight table, just like more normal IMPORT&lt;xlsx&gt;.
+        /// </summary>
+        /// <param name="o"></param>
         public static void CollapsePoints(O.Read o)
         {
             if (o.readTo != null)
@@ -11157,6 +11176,17 @@ namespace Gekko
             G.Writeln("The collapsed series (" + G.GetFreqPretty(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
 
+        /// <summary>
+        /// Helper for GetTimeseriesFromWorkbookMatrix() and CollapsePoints()
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="isTranspose"></param>
+        /// <param name="i_data"></param>
+        /// <param name="j_data"></param>
+        /// <param name="i_names"></param>
+        /// <param name="j_names"></param>
+        /// <param name="i_dates"></param>
+        /// <param name="j_dates"></param>
         private static void HandleRectangularFileFormatCellOffset(CellOffset o, bool isTranspose, out int i_data, out int j_data, out int i_names, out int j_names, out int i_dates, out int j_dates)
         {
             if (o.cell == null)
@@ -11202,7 +11232,13 @@ namespace Gekko
             }
         }
         
-
+        /// <summary>
+        /// Convert from an Excel cell (for instance C2) to two integers, for instance row=2, col=3
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="rowOffset"></param>
+        /// <param name="colOffset"></param>
+        /// <param name="transpose"></param>
         public static void FromXls1Based(string s, out int rowOffset, out int colOffset, bool transpose)
         {
             int index = s.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
@@ -11220,6 +11256,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Gets a text file as a C# string. Handles UTF8/ANSI encodeing, too.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static string GetTextFromFileWithWait(string filename)
         {
             //Encoding encoding = Encoding.Default;
@@ -11271,35 +11312,13 @@ namespace Gekko
             //s = Regex.Replace(s, @"[^\u0000-\u001F]+", string.Empty);  //see http://stackoverflow.com/questions/123336/how-can-you-strip-non-ascii-characters-from-a-string-in-c, here we use 0-1F, that is: 0-31
 
             return s;
-        }
+        }             
 
-
-        
-
-        public static string GetSHA256Hash(string modelText)
-        {
-            System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
-            byte[] modelTextInBytes = encoding.GetBytes(modelText);
-            byte[] result;
-            using (SHA256 shaM = new SHA256Managed())
-            {
-                result = shaM.ComputeHash(modelTextInBytes);
-            }
-            string hashValue = Convert.ToBase64String(result);
-            return hashValue;
-        }
-
-        public static string GetSHA256HashFromStream(Stream stream)
-        {
-            byte[] result;
-            using (SHA256 shaM = new SHA256Managed())
-            {
-                result = shaM.ComputeHash(stream);
-            }
-            string hashValue = Convert.ToBase64String(result);
-            return hashValue;
-        }
-
+        /// <summary>
+        /// Obtains MD5 hash code from a string input. Some symbols are replaced, so MD5 here is not completely standard.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string GetMD5Hash(string input)
         {
             // step 1, calculate MD5 hash from input
@@ -11315,6 +11334,10 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// RUN command.
+        /// </summary>
+        /// <param name="o"></param>
         public static void Run(O.Run o)
         {
             bool cancel = false;
@@ -11326,9 +11349,11 @@ namespace Gekko
             if (cancel) return;
             RunHelper(o);
         }        
-
-        
-
+                
+        /// <summary>
+        /// Helper for Run(). Will search for .gcm (RUN) file in OPTION folder command|command1|command2.
+        /// </summary>
+        /// <param name="o"></param>
         public static void RunHelper(O.Run o)
         {
             string s = o.fileName;
@@ -11355,19 +11380,29 @@ namespace Gekko
             {
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
-            }
-            //G.Writeln("Finished adding file: " + s);
+            }            
         }
 
+        /// <summary>
+        /// See CreateFullPathAndFileNameFromFolder(). Will add working folder.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string CreateFullPathAndFileName(string s)
         {
             return CreateFullPathAndFileNameFromFolder(s, null);
         }        
 
-        public static string CreateFullPathAndFileNameFromFolder(string file, string path)
+        /// <summary>
+        /// Will add working folder for simple filename input.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="folder"></param>
+        /// <returns></returns>
+        public static string CreateFullPathAndFileNameFromFolder(string file, string folder)
         {            
             //This method can be called with path = null or path = "", in that case it reduces to
-            //only adding the working folder is file is without colon.
+            //only adding the working folder if file is without colon.
             //Path is given from options: "option folder bank = ..." for instance
             //String is user input.
             //RULES:
@@ -11388,14 +11423,14 @@ namespace Gekko
             //    +++              return working_folder + "" + file (i.e. working_folder + file)
             //    +++           end
             //
-            if (path == null) path = "";
+            if (folder == null) folder = "";
             if (file == null)
             {
                 G.Writeln2("*** ERROR: Expected a file name, but it is not defined");
                 throw new GekkoException();
             }
             file = file.Trim(); //Most probably not necessary, but better safe than sorry
-            path = path.Trim(); //Most probably not necessary, but better safe than sorry
+            folder = folder.Trim(); //Most probably not necessary, but better safe than sorry
             string fileName2 = "";
             if (file.Contains(":\\"))
             {
@@ -11403,13 +11438,13 @@ namespace Gekko
             }
             else
             {
-                if (path.Contains(":\\"))
+                if (folder.Contains(":\\"))
                 {
-                    fileName2 = path + "\\" + file;
+                    fileName2 = folder + "\\" + file;
                 }
                 else
                 {
-                    fileName2 = Program.options.folder_working + "\\" + path + "\\" + file;  //path may be = "", and workingFolder may end with "\\", and file may start with "\\" --> 4 successive "\\" to be reduced later on
+                    fileName2 = Program.options.folder_working + "\\" + folder + "\\" + file;  //path may be = "", and workingFolder may end with "\\", and file may start with "\\" --> 4 successive "\\" to be reduced later on
                 }
             }
 
@@ -11425,11 +11460,23 @@ namespace Gekko
             return rv;  //see https://stackoverflow.com/questions/970911/net-remove-dots-from-the-path
         }
         
+        /// <summary>
+        /// The DISP command.
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="list"></param>
+        /// <param name="o"></param>
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, O.Disp o)
         {
             Disp(tStart, tEnd, list, false, false, false, o);
         }
 
+        /// <summary>
+        /// Searches for text parts in the variable list (loaded with a model). For instance, DISP 'balance of payments'; will search all variable labels
+        /// and return those variables containing the string. Note: this is different from wildcards regarding variable names.
+        /// </summary>
+        /// <param name="s"></param>
         public static void DispSearch(string s)
         {
             Databank db = Program.databanks.GetFirst();
@@ -11537,6 +11584,13 @@ namespace Gekko
             return;
         }
 
+        /// <summary>
+        /// Helper method for the sorting of array-series indexes. For instance, x[b, c] should be shown before x[c, a].
+        /// Also uses G.CompareNatural() internally (showing x[a2] before x[a10]).
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static int CompareMapMultidimItems(MapMultidimItem left, MapMultidimItem right)
         {
             if (left.storage.Length != right.storage.Length)
@@ -11554,32 +11608,22 @@ namespace Gekko
             return 0;
         }
 
-        public static void UnfoldLists(IVariable iv, List<IVariable> m)
-        {
-            //Recursive list unfolding
-            List mm = iv as List;
-            if (mm != null)
-            {
-                foreach (IVariable iv2 in mm.list)
-                {
-                    UnfoldLists(iv2, m);                    
-                }
-            }
-            else m.Add(iv);
-        }
-
-
+        /// <summary>
+        /// The DISP command. Wildcards can be used, like DISP x*; Wildcards use Program.Search().
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="list"></param>
+        /// <param name="showDetailed"></param>
+        /// <param name="showAllPeriods"></param>
+        /// <param name="clickedLink"></param>
+        /// <param name="o"></param>
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showDetailed, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
             EVariableType type = EVariableType.Series;            
             int nonSeries = 0;
 
-            GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);
-            //if (o != null && G.Equal(o.opt_info, "yes"))
-            //{
-            //    Info(tStart, tEnd, list);
-            //    return;
-            //}
+            GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);            
 
             Globals.dispLastDispStart = tStart; //kept if user chooses to click a link -- in that case we want to use same time settings
             Globals.dispLastDispEnd = tEnd; //kept if user chooses to click a link
@@ -11600,14 +11644,11 @@ namespace Gekko
             }
             else
             {
-
-                names = Program.Search(o.iv, null, EVariableType.Var);
-                
+                names = Program.Search(o.iv, null, EVariableType.Var);                
                 foreach(string s in names)
                 {
                     m.Add(O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true));
                 }
-
             }
                         
             for (int i5 = 0;i5<m.Count;i5++)
@@ -11679,6 +11720,8 @@ namespace Gekko
             }
             
         }
+
+        //qwerty hertil
 
         private static void DispNonGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, string bank, string varnameWithoutFreq)
         {
