@@ -366,6 +366,7 @@
     <Compile Include="List.cs" />
     <Compile Include="ListViewDragDropManager.cs" />
     <Compile Include="LongProcess.cs" />
+    <Compile Include="Lookup.cs" />
     <Compile Include="LruCache.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="MapMultidim.cs" />
