@@ -175,7 +175,7 @@ namespace Gekko
                     string fileName = null;
                     try
                     {
-                        fileName = Program.CreateFullPathAndFileName(Program.AddExtension(o1.fileName2, "." + "px"));
+                        fileName = Program.CreateFullPathAndFileName(G.AddExtension(o1.fileName2, "." + "px"));
                         using (FileStream fs = Program.WaitForFileStream(fileName, Program.GekkoFileReadOrWrite.Write))
                         using (StreamWriter sw = G.GekkoStreamWriter(fs))
                         {

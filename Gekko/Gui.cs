@@ -2149,7 +2149,7 @@ namespace Gekko
             if (Program.options.menu_startfile != "")
             {
                 fileName = Program.options.menu_startfile;
-                fileName = Program.AddExtension(fileName, ".html");
+                fileName = G.AddExtension(fileName, ".html");
             }
             else
             {

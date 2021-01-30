@@ -1315,7 +1315,7 @@ namespace Gekko
 
             string prefix = Program.options.gams_time_prefix.Trim().ToLower();
             bool hasPrefix = prefix.Length > 0;
-            string file = Program.AddExtension(fileLocal, "." + "gdx");
+            string file = G.AddExtension(fileLocal, "." + "gdx");
             int offset = (int)Program.options.gams_time_offset;
             DateTime dt1 = DateTime.Now;
             int skippedSets = 0;

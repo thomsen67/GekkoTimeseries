@@ -3705,17 +3705,56 @@ namespace Gekko
             return output;
         }
 
+        /// <summary>
+        /// Delete an entire folder, with omit.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="omitType"></param>
         public static void DeleteFolder(string s, string omitType)
         {
             if (!Directory.Exists(s)) return;
             DeleteFolderHelper(new DirectoryInfo(s), omitType);
         }
 
+        /// <summary>
+        /// Delete an entire folder.
+        /// </summary>
+        /// <param name="s"></param>
         public static void DeleteFolder(string s)
         {
             DeleteFolder(s, null);
         }
 
+        /// <summary>
+        /// Adds an extension to a filename, if no extension already given. For instance AddExtension("demo", ".gcm") --> "demo.gcm".
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="endingIncludingDot"></param>
+        /// <returns></returns>
+        public static string AddExtension(string fileName, string endingIncludingDot)
+        {
+            if (Path.GetExtension(fileName) == "") fileName += endingIncludingDot;  //ignore case
+            return fileName;
+        }
+
+        /// <summary>
+        /// Split a string into two parts, splitting at a given position.
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        public static void SplitString(out string s1, out string s2, string s, int i)
+        {
+            s1 = s.Substring(0, i);
+            s2 = s.Substring(i, s.Length - i);
+        }
+
+        /// <summary>
+        /// Helper for deleting folders.
+        /// </summary>
+        /// <param name="directoryInfo"></param>
+        /// <param name="omitType"></param>
         //Seems it does not delete the folders, but only their content
         private static void DeleteFolderHelper(DirectoryInfo directoryInfo, string omitType)
         {

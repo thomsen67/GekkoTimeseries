@@ -2240,7 +2240,7 @@ namespace Gekko
                     isGbk = false;
                 }
 
-                string originalFileNameWithExtension =  AddExtension(originalFileName, "." + extension);  //just for error messages
+                string originalFileNameWithExtension =  G.AddExtension(originalFileName, "." + extension);  //just for error messages
 
 
                 // ---------------------------------------------------------------------------------
@@ -2985,7 +2985,7 @@ namespace Gekko
 
             //do copylocal
             string fileName = o.fileName;
-            fileName = AddExtension(fileName, ".xlsx");
+            fileName = G.AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
             //TableLight inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);            
                         
@@ -3445,6 +3445,16 @@ namespace Gekko
         /// <returns></returns>
         private static Databank ReadGbk_1_1(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, string databankVersion)
         {
+            /// <summary>
+            /// Only used for ReadGbk_1_1()
+            /// </summary>
+            /// <param name="s"></param>
+            /// <returns></returns>
+            string[] GetArrayTimeseriesName_1_1(string s)
+            {
+                return s.Split(new string[] { Globals.symbolTurtle }, StringSplitOptions.None);
+            }
+
             Databank deserializedDatabank;
             int nanCounter = 0;
             ReadInfo readInfo_oldbank = new ReadInfo();
@@ -3470,7 +3480,7 @@ namespace Gekko
                 if (name.Contains(Globals.symbolTurtle))
                 {
                     //array-timeseries
-                    string[] ss = GetArrayTimeseriesName(name);
+                    string[] ss = GetArrayTimeseriesName_1_1(name);
                     string[] ss2 = new string[ss.Length - 1];
                     for (int i = 1; i < ss.Length; i++)
                     {
@@ -11030,7 +11040,7 @@ namespace Gekko
             bool isTranspose = false;
             if (G.Equal(o.opt_cols, "yes")) isTranspose = true;
 
-            string fn = Program.CreateFullPathAndFileName(Program.AddExtension(o.fileName, "." + x));
+            string fn = Program.CreateFullPathAndFileName(G.AddExtension(o.fileName, "." + x));
 
             //string s = Program.GetTextFromFileWithWait(fileName_string);
 
@@ -11358,7 +11368,7 @@ namespace Gekko
         {
             string s = o.fileName;
             s = G.StripQuotes(s);            
-            s = Program.AddExtension(s, "." + Globals.extensionCommand);            
+            s = G.AddExtension(s, "." + Globals.extensionCommand);            
             
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_command);
@@ -11721,8 +11731,18 @@ namespace Gekko
             
         }
 
-        //qwerty hertil
-
+        
+        /// <summary>
+        /// DISP for Gekko equations
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="showDetailed"></param>
+        /// <param name="showAllPeriods"></param>
+        /// <param name="clickedLink"></param>
+        /// <param name="ts"></param>
+        /// <param name="bank"></param>
+        /// <param name="varnameWithoutFreq"></param>
         private static void DispNonGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, string bank, string varnameWithoutFreq)
         {
             //ADAM-style, normal timeseries
@@ -11780,9 +11800,6 @@ namespace Gekko
                     }
                 }
 
-                
-
-
                 List<string> expls = Program.GetVariableExplanationNEW(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull);
                 foreach (string expl in expls) G.Writeln(expl);
 
@@ -11821,11 +11838,14 @@ namespace Gekko
 
                 G.Writeln("==========================================================================================");
                 if (note != null) G.Writeln(note);
-
-
             }
         }
 
+        /// <summary>
+        /// DISP for Gekko equations
+        /// </summary>
+        /// <param name="showDetailed"></param>
+        /// <param name="varnameWithoutFreq"></param>
         private static void DispHelperShowNormalEquation(bool showDetailed, string varnameWithoutFreq)
         {
             List<string> d4 = new List<string>();
@@ -11916,6 +11936,19 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// DISP for GAMS equations.
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="showDetailed"></param>
+        /// <param name="showAllPeriods"></param>
+        /// <param name="clickedLink"></param>
+        /// <param name="gamsToGekko"></param>
+        /// <param name="ts"></param>
+        /// <param name="var"></param>
+        /// <param name="bank"></param>
+        /// <param name="varnameWithoutFreq"></param>
         private static void DispGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, bool gamsToGekko, Series ts, string var, string bank, string varnameWithoutFreq)
         {
             string note = null;
@@ -12011,12 +12044,27 @@ namespace Gekko
             if (note != null) G.Writeln(note);
         }
 
+        /// <summary>
+        /// Check whether a variable is part of a GAMS model
+        /// </summary>
+        /// <param name="var"></param>
+        /// <returns></returns>
         public static bool HasGamsEquation(string var)
         {
             if (var == null) return false;
             return Program.model.modelGams?.equationsByVarname != null && Program.model.modelGams.equationsByVarname.ContainsKey(var);
         }
 
+        /// <summary>
+        /// DISP for GAMS equations
+        /// </summary>
+        /// <param name="showDetailed"></param>
+        /// <param name="clickedLink"></param>
+        /// <param name="gamsToGekko"></param>
+        /// <param name="var"></param>
+        /// <param name="varnameWithoutFreq"></param>
+        /// <param name="eqsPrinted"></param>
+        /// <returns></returns>
         private static bool DispHelperShowGamsEquations(bool showDetailed, bool clickedLink, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted)
         {
             string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
@@ -12092,6 +12140,12 @@ namespace Gekko
             return eqsPrinted;
         }
 
+        /// <summary>
+        /// For DISP (both Gekko and GAMS equations), show info on array-series, dimensions, etc.
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <param name="keys"></param>
+        /// <param name="eqsPrinted"></param>
         private static void DispHelperArraySeries(Series ts, List<MapMultidimItem> keys, bool eqsPrinted)
         {
             // --------------
@@ -12178,6 +12232,15 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for DISP, and also used in Functions.getelements()
+        /// </summary>
+        /// <param name="ts"></param>
+        /// <param name="keys"></param>
+        /// <param name="dimCount2"></param>
+        /// <param name="dimCount"></param>
+        /// <param name="elements"></param>
+        /// <param name="domains"></param>
         public static void DispHelperArraySeries2(Series ts, List<MapMultidimItem> keys, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
         {
             GekkoDictionary<string, string>[] temp = new GekkoDictionary<string, string>[ts.dimensions];
@@ -12207,6 +12270,15 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// DISP of normal series, both used for Gekko- and GAMS equations.
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="showAllPeriods"></param>
+        /// <param name="ts"></param>
+        /// <param name="varnameWithoutFreq"></param>
+        /// <param name="isTimeless"></param>
         private static void DispHelperNormalSeries(GekkoTime tStart, GekkoTime tEnd, bool showAllPeriods, Series ts, string varnameWithoutFreq, bool isTimeless)
         {
             // --------------
@@ -12301,6 +12373,15 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// DISP: When a variable is part of a model (Gekko- og GAMS-), equations are printed. These are printed with links.
+        /// The links are rtf-links, not very performant. Will be better when a WebBrowser component is used for this window,
+        /// when porting to WPF:
+        /// </summary>
+        /// <param name="gamsToGekko"></param>
+        /// <param name="varnameWithoutFreq"></param>
+        /// <param name="eqs"></param>
+        /// <param name="showGamsEquation"></param>
         private static void PrintEquationWithLinks(bool gamsToGekko, string varnameWithoutFreq, List<ModelGamsEquation> eqs, bool showGamsEquation)
         {
             int widthRemember = Program.options.print_width;
@@ -12351,6 +12432,11 @@ namespace Gekko
             
         }
 
+        /// <summary>
+        /// The links are rtf-links, not very performant. Will be better when a WebBrowser component is used for this window,
+        /// when porting to WPF:
+        /// </summary>
+        /// <param name="rhs"></param>
         private static void PrintEquation(string rhs)
         {
             GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
@@ -12379,11 +12465,22 @@ namespace Gekko
             //G.Writeln(";");
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         private static GekkoDictionary<string, string> GetKnownVars(string input)
         {
             return GetKnownVars(input, false);
         }
 
+        /// <summary>
+        /// Used for GAMS equations.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="useDatabank"></param>
+        /// <returns></returns>
         private static GekkoDictionary<string, string> GetKnownVars(string input, bool useDatabank)
         {
             GekkoDictionary<string, string> knownVars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -12415,36 +12512,12 @@ namespace Gekko
             return knownVars;
         }
 
-
-        private static List<GekkoDictionary<string, string>> GetDimensions(List<string> names)
-        {
-            List<GekkoDictionary<string, string>> dimensions = new List<GekkoDictionary<string, string>>();
-            foreach (string s in names)
-            {
-                string[] ss = GetArrayTimeseriesName(s);
-                int dims = ss.Length - 1;
-                for (int i = dimensions.Count; i < dims; i++)
-                {
-                    dimensions.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-                }
-                for (int i = 0; i < dims; i++)
-                {
-                    string name = ss[i + 1];
-                    if (!dimensions[i].ContainsKey(name))
-                    {
-                        dimensions[i].Add(name, "");
-                    }
-                }
-            }
-
-            return dimensions;
-        }
-
-        private static string[] GetArrayTimeseriesName(string s)
-        {
-            return s.Split(new string[] { Globals.symbolTurtle }, StringSplitOptions.None);
-        }
-
+        /// <summary>
+        /// Used for DISP, identify words. But why not use a tokenizer?
+        /// </summary>
+        /// <param name="strSplit"></param>
+        /// <param name="arrDelimiters"></param>
+        /// <returns></returns>
         public static List<string> SplitStringAndKeepDelimiters(string strSplit, char[] arrDelimiters)
         {
             // Start of tokenizing
@@ -12492,6 +12565,11 @@ namespace Gekko
             return alWork;
         }
 
+        /// <summary>
+        /// For a timeseries, get label, source, units, etc.
+        /// </summary>
+        /// <param name="var"></param>
+        /// <returns></returns>
         public static List<string> GetVariableExplanation(string var)
         {
             List<string> explanation = new List<string>();
@@ -12506,13 +12584,24 @@ namespace Gekko
             return explanation;
         }
 
+        /// <summary>
+        /// Pretty print for DISP and brower.
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <param name="pch1"></param>
+        /// <param name="levelFormatted"></param>
+        /// <param name="pchFormatted"></param>
         public static void ConvertToPrintFormat(double level1, double pch1, out string levelFormatted, out string pchFormatted)
         {
             levelFormatted = G.levelFormatOld(level1);
             pchFormatted = G.pchFormatOld(pch1);
         }
 
-
+        /// <summary>
+        /// Used in print to decorate a variable with info on whether it is endogenous or exogenous.
+        /// </summary>
+        /// <param name="var"></param>
+        /// <returns></returns>
         public static EEndoOrExo VariableTypeEndoExo(string var)
         {
             EEndoOrExo type = EEndoOrExo.Unknown;
@@ -12531,10 +12620,13 @@ namespace Gekko
                 }
             }
             return type;
-        }
+        }        
         
-        
-
+        /// <summary>
+        /// FIND command (new decomp stuff).
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
         public static string Find(O.Find o)  //returns equation name
         {
 
@@ -12552,8 +12644,6 @@ namespace Gekko
             foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
             {
                 string eqName = kvp.Value[0].nameGams;  //has only 1
-
-                //List<List<string>> results = new List<List<string>>();
 
                 int counter = 0;
                 foreach (EquationVariablesGams eqVarsGams in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
@@ -12627,42 +12717,13 @@ namespace Gekko
             rv = eb._activeEquation;
             if (b != true) rv = null;  //only when OK is pressed (or Enter)
             eb.Close();
-
             return rv;
-
-        }
-        
-
-        private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
-        {
-            yield return firstElement;
-            if (secondSequence == null)
-            {
-                yield break;
-            }
-
-            foreach (var item in secondSequence)
-            {
-                yield return item;
-            }
         }
 
-        private static IEnumerable<T> AllExcept<T>(this IEnumerable<T> sequence, int indexToSkip)
-        {
-            if (sequence == null)
-            {
-                yield break;
-            }
-
-            var index = 0;
-
-            foreach (var item in sequence.Where(item => index++ != indexToSkip))
-            {
-                yield return item;
-            }
-        }               
-        
-
+        /// <summary>
+        /// RENAME command.
+        /// </summary>
+        /// <param name="o"></param>
         public static void Rename(O.Rename o)
         {
 
@@ -12701,10 +12762,13 @@ namespace Gekko
                 }
                 O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
             }
-
             G.Writeln2("Renamed " + outputs.Count + " variables");
         }
 
+        /// <summary>
+        /// COPY command. Uses Program.SearchFromTo() internally.
+        /// </summary>
+        /// <param name="o"></param>
         public static void Copy(O.Copy o)
         {
 
@@ -12801,6 +12865,15 @@ namespace Gekko
 
         }
 
+        /// <summary>
+        /// For READ/IMPORT, WRITE/EXPORT and COPY, handles the logic of "respecting" the given time period.
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="respect"></param>
+        /// <param name="all"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static GekkoSmplSimple HandleRespectPeriod(GekkoTime t1, GekkoTime t2, string respect, string all, string type)
         {
             //type = copy, read, import, write, export
@@ -12862,6 +12935,15 @@ namespace Gekko
             return truncate;
         }
 
+        /// <summary>
+        /// Helper method for name ranges like xa..xd
+        /// </summary>
+        /// <param name="bankname"></param>
+        /// <param name="freqname"></param>
+        /// <param name="s"></param>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <param name="m"></param>
         public static void AddIfInRange(string bankname, string freqname, string s, string s1, string s2, List<string> m)
         {
             if (string.Compare(s1, s, true) <= 0 && string.Compare(s, s2, true) <= 0)
@@ -12874,6 +12956,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Wrapper method for SearchFromTo() method.
+        /// </summary>
+        /// <param name="names1"></param>
+        /// <param name="frombank"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static List<string> Search(List names1, string frombank, EVariableType type)
         {
             List<string> names = new List<string>();
@@ -12893,6 +12982,19 @@ namespace Gekko
             return names;
         }
 
+        /// <summary>
+        /// This is the central hub regarding wildcards in commands like INDEX, COPY, RENAME, DELETE, WRITE/EXPORT, READ/IMPORT, 
+        /// and having a central hub assures the the wildcard logic is consistent. 
+        /// It deals with the logic of for instance INDEX x*; or COPY x*b TO y*; etc. Also deals with {'...'} wildcards, and handles
+        /// the logic if banknames are given, too. This is a quite complicated method.
+        /// </summary>
+        /// <param name="names0"></param>
+        /// <param name="names1"></param>
+        /// <param name="frombank"></param>
+        /// <param name="tobank"></param>
+        /// <param name="type"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static List<ToFrom> SearchFromTo(List names0, List names1, string frombank, string tobank, EWildcardSearchType type, SearchOptions options)
         {
             //names0 may contain ranges
@@ -13198,12 +13300,7 @@ namespace Gekko
                 for (int i = 0; i < lhsUnfolded.Count; i++)
                 {
                     outputs.Add(new ToFrom(lhsUnfolded[i], null, lhsUnfoldedExplicit[i]));
-                }
-                ////No matching with other variables
-                //foreach (string s in lhsUnfolded)
-                //{
-                //    outputs.Add(new ToFrom(s, null, false)); //has no destination
-                //}                
+                }                     
             }
             else
             {
@@ -13400,19 +13497,7 @@ namespace Gekko
                         {
                             G.Writeln2("*** ERROR: Internal error #08745765398475");
                             throw new GekkoException();
-                        }
-                        if (type == EWildcardSearchType.Write)
-                        {
-                            if (!G.Equal(G.Chop_GetBank(two.s2), currentFirstBankName))
-                            {
-                                //G.Writeln2("*** ERROR: Internal error #08745765398475");
-                                //throw new GekkoException();
-                            }
-                        }
-
-                        //G.Writeln(two.s1 + " --> " + two.s2);
-                        //counter++;
-                        //if (counter > 20) break;
+                        }                        
                     }
 
                 }  //end of foreach (TwoStrings two in outputs)
@@ -13437,12 +13522,21 @@ namespace Gekko
             return outputs;
         }
 
+        /// <summary>
+        /// Used to handle #(listfile m) kinds of "variables": this example gets the "name" #listfile___m.
+        /// </summary
+        /// <param name="varnameWithFreq"></param>
+        /// <returns></returns>
         public static bool IsListfileArtificialName(string varnameWithFreq)
         {
             if (varnameWithFreq == null) return false;
             return varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___");
         }
 
+        /// <summary>
+        /// Used in the central SearchFromTo() method.
+        /// </summary>
+        /// <returns></returns>
         private static List<string> GetListOfAllBanks()
         {
             //Sequence: local, first, ref, rest, global
@@ -13459,6 +13553,11 @@ namespace Gekko
             return temp;
         }
 
+        /// <summary>
+        /// Used in the central SearchFromTo() method.
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <returns></returns>
         private static string SubstituteFirstRefNames(string bank)
         {
             if (bank == null) return bank;
@@ -13467,6 +13566,13 @@ namespace Gekko
             return bank;
         }
 
+        /// <summary>
+        /// Used in the central SearchFromTo() method.
+        /// </summary>
+        /// <param name="bankname"></param>
+        /// <param name="wildcardName"></param>
+        /// <param name="wildcardFreq"></param>
+        /// <returns></returns>
         private static List<string> MatchInBank(string bankname, string wildcardName, string wildcardFreq)
         {
             if (wildcardName.Contains("."))
@@ -13523,6 +13629,14 @@ namespace Gekko
             return varsMatched;
         }
 
+        /// <summary>
+        /// Used in the central SearchFromTo() method.
+        /// </summary>
+        /// <param name="bankname"></param>
+        /// <param name="name1"></param>
+        /// <param name="name2"></param>
+        /// <param name="wildcardFreq"></param>
+        /// <returns></returns>
         private static List<string> RangeInBank(string bankname, string name1, string name2, string wildcardFreq)
         {
             if (wildcardFreq == "*")
@@ -13555,6 +13669,12 @@ namespace Gekko
             return varsMatched;
         }
 
+        /// <summary>
+        /// Wrapper for the central SearchFromTo() method.
+        /// </summary>
+        /// <param name="wild1"></param>
+        /// <param name="stringsThatCanBeMatched"></param>
+        /// <returns></returns>
         public static List<string> Search(string wild1, List<string> stringsThatCanBeMatched)
         {
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
@@ -13571,6 +13691,11 @@ namespace Gekko
             return inputs;
         }
 
+        /// <summary>
+        /// CHECKOFF command.
+        /// </summary>
+        /// <param name="vars2"></param>
+        /// <param name="type"></param>
         public static void Checkoff(List<string> vars2, string type)
         {
 
@@ -13610,12 +13735,19 @@ namespace Gekko
             return;
         }
 
+        /// <summary>
+        /// Helper method.
+        /// </summary>
         private static void CheckoffHelper()
         {
             G.Writeln("The following " + Globals.checkoff.Count + " variables are not checked for convergence in the Gauss algorithm:");
             G.PrintListWithCommas(Globals.checkoff, false);
         }
 
+        /// <summary>
+        /// ENDO command.
+        /// </summary>
+        /// <param name="vars2"></param>
         public static void Endo(List<string> vars2)
         {
             if (!G.HasModelGekko())
@@ -13651,6 +13783,9 @@ namespace Gekko
             return;
         }
 
+        /// <summary>
+        /// Print lists of endogenous and exogenous variables.
+        /// </summary>
         public static void PrintEndoExoLists()
         {
             G.Writeln();
@@ -13679,6 +13814,10 @@ namespace Gekko
             return;
         }
 
+        /// <summary>
+        /// EXO command.
+        /// </summary>
+        /// <param name="vars2"></param>
         public static void Exo(List<string> vars2)
         {
             //TODO: check that manipulated vars exist in model -- no: model may be re-read etc.
@@ -13710,11 +13849,14 @@ namespace Gekko
             }
             G.Writeln2("Endogenized " + vars.Count + " variables");
             return;
-        }
-
+        }        
         
-
-        
+        /// <summary>
+        /// Used for DISP&lt;info&gt;. Will show values of variables determining an equation LHS.
+        /// </summary>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="list2"></param>
         public static void Info(GekkoTime tStart, GekkoTime tEnd, List list2)
         {
             if (!G.HasModelGekko())
@@ -13724,9 +13866,7 @@ namespace Gekko
             }
 
             List<string> list = Stringlist.GetListOfStringsFromList(list2);
-
-            //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
-            //List<string> unfoldedList = UnfoldLists(list);
+            
             if (!(tStart.super == tEnd.super && tStart.sub == tEnd.sub))
             {
                 G.Writeln2("*** ERROR: DISP<info> must be called with identical start and end date");
@@ -13738,12 +13878,24 @@ namespace Gekko
             }
         }
 
-
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="leftSide"></param>
+        /// <param name="rightSide"></param>
         public static void List(string type, string leftSide, List<string> rightSide)
         {
             List(type, leftSide, rightSide, true);
         }
 
+        /// <summary>
+        /// Helper method for clickable links
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="leftSideInput"></param>
+        /// <param name="rightSide"></param>
+        /// <param name="hasHashSign"></param>
         public static void List(string type, string leftSideInput, List<string> rightSide, bool hasHashSign)
         {
             if (type.StartsWith("?"))
@@ -13795,6 +13947,10 @@ namespace Gekko
             return;
         }
 
+        /// <summary>
+        /// Helper method for printing out lists with LIST?, avoiding listing of all the models lists, if the model is large.
+        /// </summary>
+        /// <returns></returns>
         public static bool IsLargeModel()
         {
             bool hasLargeModel = false;
@@ -13806,6 +13962,10 @@ namespace Gekko
             return hasLargeModel;
         }
 
+        /// <summary>
+        /// Helper method for LIST?.
+        /// </summary>
+        /// <param name="m"></param>
         public static void WriteListItems(string m)
         {
             IVariable iv = null; Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m);
@@ -13831,6 +13991,9 @@ namespace Gekko
             }            
         }
 
+        /// <summary>
+        /// Show the model name at the top of the main Gekko GUI window.
+        /// </summary>
         public static void GuiSetModelName()
         {
             if (Globals.workerThread != null)
@@ -13852,6 +14015,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// MODEL command.
+        /// </summary>
+        /// <param name="o"></param>
         public static void Model(O.Model o)
         {
             bool isGms = G.Equal(o.opt_gms, "yes");
@@ -13876,9 +14043,8 @@ namespace Gekko
             if (cancel) return;
 
             DateTime dt0 = DateTime.Now;
-
-            //fileName = SubstituteAssignVarsInExpression(fileName);
-            fileName = AddExtension(fileName, "." + type);
+                        
+            fileName = G.AddExtension(fileName, "." + type);
 
             string fileNameSimple = fileName;
 
@@ -13907,6 +14073,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Read a Gekko model from .frm file.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="dt0"></param>
+        /// <param name="textInputRaw"></param>
         private static void ReadGekkoModel(string fileName, DateTime dt0, string textInputRaw)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
@@ -13983,6 +14155,11 @@ namespace Gekko
             Program.model.modelGekko.modelInfo.Print();
         }
 
+        /// <summary>
+        /// Load a cached model from an internal protobuf file.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="mdlFileNameAndPath"></param>
         private static void ParserFrmGetProtobuf(string fileName, string mdlFileNameAndPath)
         {
             try
@@ -14025,6 +14202,11 @@ namespace Gekko
             }
         }
         
+        /// <summary>
+        /// Helper for equation browser GUI window (FIND)
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string DecompGetNameFromContrib(string s)
         {
             string[] ss = s.Split('¤');
@@ -14034,6 +14216,11 @@ namespace Gekko
             return ss5;
         }
 
+        /// <summary>
+        /// Helper for eval function that transforms a statement (as a string) into a Func with the C# code.
+        /// </summary>
+        /// <param name="conditionals"></param>
+        /// <param name="statement"></param>
         public static void CallEval(string conditionals, string statement)
         {
             string c = null;
@@ -14042,14 +14229,16 @@ namespace Gekko
                 c = "$ (" + conditionals + ")";
             }
             string s = c + " = " + statement;
-            Program.RunCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
-            
+            Program.RunCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression             
         }
-
         
+        /// <summary>
+        /// Helper for GAMS models, finding out what is the "real" dependent LHS variable (left hand side).
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="lhs"></param>
         public static void GetLhsVariable(TokenHelper node, ref string lhs)
-        {            
-
+        {
             if (lhs != null) return;  //found the lhs
             
             if (node.HasNoChildren())
@@ -14115,11 +14304,13 @@ namespace Gekko
                     }
                 }                
             }
-
         }
 
-        
-
+        /// <summary>
+        /// Will detect x[#i][-1] + y = ...  . Used in GetLhsVariable().
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         private static bool IsLaggedOrLeaded(TokenHelper x)
         {
             bool lagLead = false;
@@ -14144,6 +14335,11 @@ namespace Gekko
             return lagLead;
         }
 
+        /// <summary>
+        /// Used in IsLaggedOrLeaded().
+        /// </summary>
+        /// <param name="next2"></param>
+        /// <returns></returns>
         private static bool IsLagOrLeadBracket(TokenHelper next2)
         {
             bool lagLead = false;
@@ -14159,6 +14355,9 @@ namespace Gekko
             return lagLead;
         }        
 
+        /// <summary>
+        /// Helper method when loading a model from a cached internal protobuf file (getting model lists back in).
+        /// </summary>
         private static void GetListsFromModelListHelper()
         {
             string[] lists = new string[] { "all", "endo", "exo", "exod", "exodjz", "exoj", "exotrue", "exoz" };
@@ -14194,12 +14393,10 @@ namespace Gekko
             Program.model.modelGekko.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 
-        public static string AddExtension(string fileName, string ending)
-        {
-            if (Path.GetExtension(fileName) == "") fileName += ending;  //ignore case
-            return fileName;
-        }
-
+        /// <summary>
+        /// PIPE command.
+        /// </summary>
+        /// <param name="o"></param>
         public static void Pipe(O.Pipe o)
         {
             //This is where we start when issuing a PIPE
@@ -14213,11 +14410,22 @@ namespace Gekko
             Pipe(o.fileName, temp);
         }
 
+        /// <summary>
+        /// PIPE command.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="args"></param>
         public static void Pipe(string fileName, List<string> args)
         {
             Pipe(fileName, args, false);
         }
 
+        /// <summary>
+        /// PIPE command.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="args"></param>
+        /// <param name="mute"></param>
         public static void Pipe(string fileName, List<string> args, bool mute)  //mute used for closeall
         {
             bool append = false;
@@ -14329,6 +14537,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// PIPE command. Also handles html piping.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="append"></param>
+        /// <param name="html"></param>
+        /// <param name="mute"></param>
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute)
         {
             if (!mute && !Globals.pipe) G.Writeln2("Directing output to file: '" + fileName + "'");
@@ -14378,6 +14593,13 @@ namespace Gekko
             }
         }                
 
+        /// <summary>
+        /// Pipe to html file.
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <param name="css"></param>
+        /// <param name="s"></param>
         private static void AddHtmlToExistingHtml(ref string s1, ref string s2, string css, string s)
         {
             int i = s.IndexOf("</body>", StringComparison.OrdinalIgnoreCase);
@@ -14386,7 +14608,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Could not find </body> tag in the html file.");
                 throw new GekkoException();
             }
-            ChopString(out s1, out s2, s, i);
+            G.SplitString(out s1, out s2, s, i);
             //new we have:
             //
             //s1 = <html> <body>
@@ -14407,7 +14629,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 string s1a, s1b;
-                ChopString(out s1a, out s1b, s1, k);
+                G.SplitString(out s1a, out s1b, s1, k);
                 s1 = s1a + css + s1b;
             }
             else
@@ -14415,17 +14637,15 @@ namespace Gekko
                 //inject css into existing <head>...</head> section
                 //multiple <style> sections are allowed in <head>
                 string s1a, s1b;
-                ChopString(out s1a, out s1b, s1, j);
+                G.SplitString(out s1a, out s1b, s1, j);
                 s1 = s1a + css + s1b;
             }
-        }
+        }                
 
-        private static void ChopString(out string s1, out string s2, string s, int i)
-        {
-            s1 = s.Substring(0, i);
-            s2 = s.Substring(i, s.Length - i);
-        }
-
+        /// <summary>
+        /// CSS code when piping or tabelling to htmll file. Used to make formatting look nice.
+        /// </summary>
+        /// <returns></returns>
         public static string GetHtmlHeaderCssStyles()
         {
             StringBuilder lines = new StringBuilder();
@@ -14448,41 +14668,40 @@ namespace Gekko
             lines.AppendLine("</style>");
             string s = lines.ToString();
             return s;
-        }
-
-                
-
-        // ===========================
-        // qwerty TO HERE
-        // ===========================
-
+        }                        
+        
+        /// <summary>
+        /// Get a databank file. Will look in OPTION folder bank|bank1|bank2. May use popup if READ *.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="cancel"></param>
+        /// <param name="extension"></param>
+        /// <returns></returns>
         private static string ReadHelper(string fileName, ref bool cancel, string extension)
         {
             string rv = null;
             if (fileName == "*")
             {
                 SelectFile(extension, ref fileName, ref cancel);
-                //string type = "open";
-                //if (!open)
-                //{
-                //    type = "read";
-                //    if (isBase) type = "mulbk";
-                //}
                 CrossThreadStuff.SetTextInput(fileName, null);
             }
             else
             {                
-                fileName = AddExtension(fileName, "." + extension);
+                fileName = G.AddExtension(fileName, "." + extension);
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                fileName = FindFile(fileName, folders);
-                
+                fileName = FindFile(fileName, folders);                
             }
             return fileName;
         }
 
+        /// <summary>
+        /// Only used when finding tables ... (?)
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private static string FileNotFoundErrorMessage(string fileName)
         {
             string s = "*** ERROR: Could not read file '" + fileName + "' -- the file does not seem to exist";
@@ -14496,11 +14715,24 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Overload.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="folders"></param>
+        /// <returns></returns>
         public static string FindFile(string fileName, List<string> folders)
         {
             return FindFile(fileName, folders, true);
         }
 
+        /// <summary>
+        /// Find a file, may indicate folders to look in, and may include working folder.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="folders"></param>
+        /// <param name="includeWorkingFolder"></param>
+        /// <returns></returns>
         public static string FindFile(string fileName, List<string> folders, bool includeWorkingFolder)
         {
             string fileNameTemp = null;
@@ -14531,6 +14763,12 @@ namespace Gekko
             return fileNameTemp;
         }
 
+        /// <summary>
+        /// Select from a list of files of a given type. Opens a GUI window.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="fileName"></param>
+        /// <param name="cancel"></param>
         public static void SelectFile(string type, ref string fileName, ref bool cancel)
         {
             string dataFile = "";
@@ -14565,22 +14803,16 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR while reading " + type + " file");
                     throw new GekkoException();
-                }
-                //string dir = Path.GetDirectoryName(dataFile);
-                //string tsdOutputFile = dir + Path.DirectorySeparatorChar + "output.tsd";
+                }                
                 fileName = dataFile;
             }
         }
-
-        public static void Res(O.Res o)
-        {
-            //ErrorIfDatabanksSwapped();
-            SolveCommon.Res(o.t1, o.t2);
-        }
-
+        
+        /// <summary>
+        /// Used for DELETE&lt;nonmodel&gt;
+        /// </summary>
         public static void Trimvars()
-        {
-            //ErrorIfDatabanksSwapped();
+        {            
             if (!G.HasModelGekko())
             {
                 G.Writeln2("*** ERROR: No model is defined for trimming, cf. MODEL command.");
@@ -14618,6 +14850,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// FINDMISSINGDATA command.
+        /// </summary>
+        /// <param name="o"></param>
         public static void FindMissingData(O.Findmissingdata o)
         {
             GekkoTime tStart = o.t1;
@@ -14626,10 +14862,6 @@ namespace Gekko
             List vars2 = O.Restrict2(o.names, false, false, false, false);   //only allows plain vars (idents)
             List<ToFrom> vars = null;
             if (vars2 != null) vars = SearchFromTo(vars2, null, null, null, EWildcardSearchType.Search, null);
-                        
-            //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
-
-            //vars = UnfoldLists(vars);
 
             bool replace = true;
             if (double.IsNaN(o.opt_replace)) replace = false;
@@ -14841,19 +15073,10 @@ namespace Gekko
                     if (listname == "missingdata_") listname = "missingdata";
 
                     if (true)
-                    {
-                        //if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + listname))
-                        //{
-                        //    Program.databanks.GetFirst().RemoveIVariable(Globals.symbolCollection + listname);
-                        //}
-
-                        //if (Program.scalars.ContainsKey(Globals.symbolCollection+ listname))
-                        //{
-                        //    Program.scalars.Remove(Globals.symbolCollection + listname);
-                        //}
+                    {                        
                         list.Sort();
                         Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + listname, new List(list));
-                        //Program.scalars.Add(Globals.symbolCollection + listname, new List(list));
+                        
                         if (list.Count > 0)
                         {
                             string v = "variables";
@@ -14874,9 +15097,12 @@ namespace Gekko
                 G.Writeln();
             }
         }        
-
-        
-
+               
+        /// <summary>
+        /// Helper for options that may be both yes, no or null.
+        /// </summary>
+        /// <param name="opt"></param>
+        /// <returns></returns>
         //See #98745239543
         public static YesNoNull GetYesNoNullLocalOption(string opt)
         {
@@ -14892,7 +15118,12 @@ namespace Gekko
             return rv;
         }
 
-
+        /// <summary>
+        /// ITERSHOW command.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
         public static void Itershow(List<string> vars, GekkoTime t1, GekkoTime t2)
         {
             if (!G.HasModelGekko())
@@ -14900,14 +15131,10 @@ namespace Gekko
                 G.Writeln2("*** ERROR: No model seems to be defined, see MODEL command.");
                 throw new GekkoException();
             }
-
-            //List<string> vars = UnfoldLists(varsInput);
-
+            
             bool hasContent = false;
-
-            //GekkoTime t1, t2; ConvertToGekkoTime(time, out t1, out t2);
-
-            Gekko.Table tab = new Gekko.Table();
+            
+            Table tab = new Table();
             int row = 1;
 
             List<string> problems = new List<string>();
@@ -15008,74 +15235,14 @@ namespace Gekko
                 G.Writeln("It seems there was no results stored regarding iterations: did you remember to set 'OPTION solve gauss dump = yes' before simulation?");
             }
         }
-
-        
-
-        public static double Lead(double[] b, int i)
-        {
-            //int x = Program.model.modelGekko.m2.fromBNumberToEqNumber[i];
-            //BTypeData data = null; model.varsBType.TryGetValue("y" + Globals.lagIndicator + "1", out data);
-            //Program.model.modelGekko.m2.from
-            //G.Writeln(x);
-
-            double v = double.NaN;
-
-            int type = 1;  //0 "exo" or "forward method none", 1 const, 2 growth
-
-            if (Program.model.modelGekko.simulateResults[8] == 0d)
-            {
-                v = b[i];
-            }
-            else if (Program.model.modelGekko.simulateResults[8] == 1d)  //#375204390457
-            {
-                if (Program.model.modelGekko.terminalHelper == null)
-                {
-                    //This will switch off the smart terminal stuff, and perforn NFT
-                    //just like in the old days.
-                    //That typically means a lot of more iterations for terminal CONST,
-                    //whereas terminal EXO is not affected.
-                    v = b[i];  //use the normal one
-                }
-                else
-                {
-                    int distance = (int)Program.model.modelGekko.simulateResults[7];
-                    int newI = -12345;
-
-                    if (Program.model.modelGekko.terminalHelper.Count > distance)
-                    {
-                        Program.model.modelGekko.terminalHelper[distance].TryGetValue(i, out newI);
-                    }
-
-                    if (newI != -12345)
-                    {
-                        //found pointing to a period outside sim period, so we use another b[i]
-                        v = b[newI];
-                        //G.Writeln("used b[" + newI + "] " + b[newI] + " instead of real lead b[" + i + "] " + b[i] + ", distance " + distance);
-                    }
-                    else
-                    {
-                        //just use the normal one
-                        v = b[i];
-                    }
-                }
-            }
-            else if (Program.model.modelGekko.simulateResults[8] == 2d)
-            {
-                G.Writeln2("*** ERROR: terminal 'growth' does not work at the moment");
-                throw new GekkoException();
-            }
-            else throw new GekkoException();
-            return v;
-        }
-
-        
-
-        
-        
-        
-
                 
-
+        /// <summary>
+        /// Print some links for SIM. TODO: use GekkoAction instead.
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <param name="s3"></param>
         public static void IterLink(StringBuilder output, string s1, string s2, string s3)
         {
             LinkContainer lc = new LinkContainer(output.ToString());
@@ -15083,8 +15250,11 @@ namespace Gekko
             G.Write(s1); G.WriteLink(s2, "outputtab:" + lc.counter); G.Write(s3);
         }
         
-        
-
+        /// <summary>
+        /// TIME command.
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
         public static void Time(GekkoTime t1, GekkoTime t2)
         {
             Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(t1, t2, Program.options.freq);
@@ -15097,10 +15267,13 @@ namespace Gekko
             if (t1.freq != Program.options.freq || t2.freq != Program.options.freq)
             {
                 G.Writeln("+++ NOTE: The dates have been converted to " + G.GetFreqPretty(Program.options.freq) + " frequency");
-            }
-            
+            }            
         }        
 
+        /// <summary>
+        /// TIMEFILTER command.
+        /// </summary>
+        /// <param name="o"></param>
         public static void TimeFilter(O.TimeFilter o)
         {
             GekkoTimeSpans gtss = new GekkoTimeSpans();
@@ -15196,6 +15369,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// If a TIMEFILTER is set for the period, true is returned.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static bool ShouldFilterPeriod(GekkoTime t)
         {
             if (!Program.options.timefilter) return false;
@@ -15214,9 +15392,8 @@ namespace Gekko
             return shouldFilter;
         }
 
-
         /// <summary>
-        /// Execute a <b style="color:black;background-color:#ff9999">shell</b> command
+        /// SYS command: execute from Windows shell
         /// </summary>
         /// <param name="_CommandLine">Command line parameters to pass</param>        
         public static void ExecuteShellCommand(string _CommandLine, bool mute)
@@ -15407,78 +15584,15 @@ namespace Gekko
             }
             if (!Globals.threadIsInProcessOfAborting && fail) throw new GekkoException();  //we throw it here, after cleanup is performed
         }
-
-        /// <summary>Use this function like string.Split but instead of a character to split on,
-        /// use a maximum line width size. This is similar to a Word Wrap where no words will be split.</summary>
-        /// Note if the a word is longer than the maxcharactes it will be trimmed from the start.
-        /// <param name="initial">The string to parse.</param>
-        /// <param name="MaxCharacters">The maximum size.</param>
-        /// <remarks>This function will remove some white space at the end of a line, but allow for a blank line.</remarks>
-        ///
-        /// <returns>An array of strings.</returns>
-        public static List<string> SplitOn(string initial, int MaxCharacters)
-        {
-            List<string> lines = new List<string>();
-            if (string.IsNullOrEmpty(initial) == false)
-            {
-                string targetGroup = "Line";
-                string theRegex = string.Format(@"(?<{0}>.{{1,{1}}})(?:\W|$)", targetGroup, MaxCharacters);
-
-                MatchCollection matches = Regex.Matches(initial, theRegex, RegexOptions.IgnoreCase
-                                                                          | RegexOptions.Multiline
-                                                                          | RegexOptions.ExplicitCapture
-                                                                          | RegexOptions.CultureInvariant
-                                                                          | RegexOptions.Compiled);
-                if (matches != null)
-                    if (matches.Count > 0)
-                        foreach (Match m in matches)
-                            lines.Add(m.Groups[targetGroup].Value);
-            }
-
-            return lines;
-        }
-
-        public static List<string> SplitOn2(string initial, int MaxCharactersFirstLine, int MaxCharacters)
-        {
-
-            List<string> lines = new List<string>();
-
-            if (string.IsNullOrEmpty(initial) == false)
-            {
-                string targetGroup = "Line";
-                string theRegex = string.Format(@"(?<{0}>.{{1,{1}}})(?:\W|$)", targetGroup, MaxCharacters);
-
-                MatchCollection matches = Regex.Matches(initial, theRegex, RegexOptions.IgnoreCase
-                                                                          | RegexOptions.Multiline
-                                                                          | RegexOptions.ExplicitCapture
-                                                                          | RegexOptions.CultureInvariant
-                                                                          | RegexOptions.Compiled);
-                if (matches != null)
-                    if (matches.Count > 0)
-                        foreach (Match m in matches)
-                            lines.Add(m.Groups[targetGroup].Value);
-            }
-
-            return lines;
-        }
-
-        public static void UndoSim()
-        {
-            //ErrorIfDatabanksSwapped();
-            if (Globals.undoBank == null)
-            {
-                G.Writeln2("*** ERROR: Undo databank does not exist");
-                throw new GekkoException();
-            }
-            else
-            {
-                Databank work = Program.databanks.GetFirst();
-                work.Clear();
-                G.CloneDatabank(work, Globals.undoBank);
-                G.Writeln("Old databank re-established");
-            }
-        }
-
+        
+        /// <summary>
+        /// Used for WRITE&lt;gcm&gt;, writing a data file that can be RUN in Gekko.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <param name="op"></param>
+        /// <param name="file"></param>
         public static void WriteGcm(List<ToFrom> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
         {
             if (op == null) op = "n";
@@ -15501,11 +15615,10 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Operator type '" + op + "' not recognized");
                 throw new GekkoException();
             }
-
-            //Databank work = Program.databanks.GetFirst();
+                        
             Databank base2 = Program.databanks.GetRef();
 
-            file = AddExtension(file, "." + Globals.extensionCommand);
+            file = G.AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
             if (File.Exists(pathAndFilename))
             {
@@ -15599,12 +15712,7 @@ namespace Gekko
             G.Writeln2("Exported " + vars.Count + " variables to file " + pathAndFilename);
         }
 
-        public static void Genr()
-        {
-            //ErrorIfDatabanksSwapped();
-        }
-
-
+        //qwerty
 
         public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
         {
@@ -15979,7 +16087,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    string file = AddExtension(fileName, "." + "gdx");
+                    string file = G.AddExtension(fileName, "." + "gdx");
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     if (Program.options.gams_fast)
                     {
@@ -16001,7 +16109,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    string file = AddExtension(fileName, "." + "arrow");
+                    string file = G.AddExtension(fileName, "." + "arrow");
                     string pathAndFilename = CreateFullPathAndFileName(file);
                     try
                     {
@@ -16318,7 +16426,7 @@ namespace Gekko
 
             DateTime t = DateTime.Now;
 
-            file = AddExtension(file, "." + extension);
+            file = G.AddExtension(file, "." + extension);
 
             string path = null;
             if (isUsingOptionFolderBank)
@@ -16477,7 +16585,7 @@ namespace Gekko
             
             DateTime t = DateTime.Now;
             
-            file = AddExtension(file, "." + extension);
+            file = G.AddExtension(file, "." + extension);
 
             string path = null;
             if (isUsingOptionFolderBank)
@@ -16522,7 +16630,7 @@ namespace Gekko
                         
             string extension = "flat";
             DateTime t = DateTime.Now;
-            file = AddExtension(file, "." + extension);
+            file = G.AddExtension(file, "." + extension);
 
             string path = null;
             if (isUsingOptionFolderBank)
@@ -17112,12 +17220,12 @@ namespace Gekko
             if (dateFormat == EdataFormat.Csv)
             {
                 G.Writeln2("Writing csv file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
-                filename = AddExtension(filename, ".csv");
+                filename = G.AddExtension(filename, ".csv");
             }
             else if (dateFormat == EdataFormat.Prn)
             {
                 G.Writeln2("Writing prn file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
-                filename = AddExtension(filename, ".prn");
+                filename = G.AddExtension(filename, ".prn");
             }
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
@@ -17408,7 +17516,7 @@ namespace Gekko
             //Databank first = Program.databanks.GetFirst();
 
             G.Writeln2("Writing gnuplot file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
-            filename = AddExtension(filename, ".dat");
+            filename = G.AddExtension(filename, ".dat");
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
             int counter = 0;
@@ -17493,7 +17601,7 @@ namespace Gekko
         {
             //Databank work = Program.databanks.GetFirst();
             filename = filename;
-            filename = AddExtension(filename, ".tsp");
+            filename = G.AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
@@ -23399,7 +23507,7 @@ namespace Gekko
 
                 if (fileNameWithPath != null)
                 {
-                    fileNameWithPath = AddExtension(CreateFullPathAndFileName(fileNameWithPath), ".xlsx");
+                    fileNameWithPath = G.AddExtension(CreateFullPathAndFileName(fileNameWithPath), ".xlsx");
                 }
                 fileNameWithPathOriginal = fileNameWithPath;
                 
@@ -26280,7 +26388,7 @@ namespace Gekko
             //will issue such a command in a thread (is so, menuTable is true).
 
             //inputFileName = Program.SubstituteAssignVarsInExpression(inputFileName);
-            inputFileName = Program.AddExtension(inputFileName, "." + Globals.extensionTable);
+            inputFileName = G.AddExtension(inputFileName, "." + Globals.extensionTable);
 
             List<string> folders = new List<string>();
 

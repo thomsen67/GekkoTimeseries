@@ -1712,7 +1712,7 @@ namespace Gekko.Parser.Frm
 
                     if (lag >= 1)
                     {
-                        wh2.rightHandSideCsCode.shortVersion.Append("Gekko.Program.Lead(b, " + data.bNumber + ")");
+                        wh2.rightHandSideCsCode.shortVersion.Append("O.Lead(b, " + data.bNumber + ")");
                     }
                     else
                     {

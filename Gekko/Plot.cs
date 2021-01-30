@@ -30,7 +30,7 @@ namespace Gekko
                 if (extension.StartsWith(".")) extension = extension.Substring(1);
                 if (extension == "")
                 {
-                    o.opt_filename = Program.AddExtension(o.opt_filename, ".emf");
+                    o.opt_filename = G.AddExtension(o.opt_filename, ".emf");
                     extension = "emf";
                 }
                 if (!G.Equal(extension, "emf") && !G.Equal(extension, "png") && !G.Equal(extension, "svg") && !G.Equal(extension, "pdf"))
@@ -88,7 +88,7 @@ namespace Gekko
                 if (Program.options.plot_using != "")
                 {
                     string fileName = Program.options.plot_using;
-                    fileName = Program.AddExtension(fileName, ".gpt");
+                    fileName = G.AddExtension(fileName, ".gpt");
                     fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
                     doc1 = new XmlDocument();
                     string xmlText = Program.GetTextFromFileWithWait(fileName);
@@ -117,7 +117,7 @@ namespace Gekko
                     }
                     if (cancel) return;
 
-                    fileName = Program.AddExtension(fileName, ".gpt");
+                    fileName = G.AddExtension(fileName, ".gpt");
                     fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
                     doc2 = new XmlDocument();
                     string xmlText = Program.GetTextFromFileWithWait(fileName);

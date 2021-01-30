@@ -34,7 +34,6 @@ namespace Gekko
         public WindowEquationBrowser()
         {            
             InitializeComponent();
-            //qwerty
             this.windowEquationBrowserListView.SelectedIndex = 0;
             this.windowEquationBrowserListView.Focus();            
         }

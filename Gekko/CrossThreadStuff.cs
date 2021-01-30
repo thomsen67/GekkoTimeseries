@@ -686,7 +686,7 @@ namespace Gekko
                 else if (Gui.gui.tabControl1.SelectedIndex == 2)  //menu
                 {
                     bool isStart = false;
-                    string s = Program.AddExtension(Program.options.menu_startfile, ".html");
+                    string s = G.AddExtension(Program.options.menu_startfile, ".html");
                     if (Gui.gui.webBrowser.Url != null && (Gui.gui.webBrowser.Url.AbsoluteUri.Contains("/" + s) || Gui.gui.webBrowser.Url.AbsoluteUri.Contains("\\" + s)))
                     {
                         //ends with "/menu.html" or "\menu.html" (the latter will probably not occur, so just for safety)

@@ -1176,6 +1176,65 @@ namespace Gekko
             }         
         }
 
+        public static double Lead(double[] b, int i)
+        {
+            //int x = Program.model.modelGekko.m2.fromBNumberToEqNumber[i];
+            //BTypeData data = null; model.varsBType.TryGetValue("y" + Globals.lagIndicator + "1", out data);
+            //Program.model.modelGekko.m2.from
+            //G.Writeln(x);
+
+            double v = double.NaN;
+
+            int type = 1;  //0 "exo" or "forward method none", 1 const, 2 growth
+
+            if (Program.model.modelGekko.simulateResults[8] == 0d)
+            {
+                v = b[i];
+            }
+            else if (Program.model.modelGekko.simulateResults[8] == 1d)  //#375204390457
+            {
+                if (Program.model.modelGekko.terminalHelper == null)
+                {
+                    //This will switch off the smart terminal stuff, and perforn NFT
+                    //just like in the old days.
+                    //That typically means a lot of more iterations for terminal CONST,
+                    //whereas terminal EXO is not affected.
+                    v = b[i];  //use the normal one
+                }
+                else
+                {
+                    int distance = (int)Program.model.modelGekko.simulateResults[7];
+                    int newI = -12345;
+
+                    if (Program.model.modelGekko.terminalHelper.Count > distance)
+                    {
+                        Program.model.modelGekko.terminalHelper[distance].TryGetValue(i, out newI);
+                    }
+
+                    if (newI != -12345)
+                    {
+                        //found pointing to a period outside sim period, so we use another b[i]
+                        v = b[newI];
+                        //G.Writeln("used b[" + newI + "] " + b[newI] + " instead of real lead b[" + i + "] " + b[i] + ", distance " + distance);
+                    }
+                    else
+                    {
+                        //just use the normal one
+                        v = b[i];
+                    }
+                }
+            }
+            else if (Program.model.modelGekko.simulateResults[8] == 2d)
+            {
+                G.Writeln2("*** ERROR: terminal 'growth' does not work at the moment");
+                throw new GekkoException();
+            }
+            else throw new GekkoException();
+            return v;
+        }
+
+
+
         public static void IterateStart(bool isYear, ELoopType loopType, ref IVariable x, IVariable start)
         {
             if (x == null)
@@ -2512,7 +2571,7 @@ namespace Gekko
         private static List ReadListFile(string varname)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-            fileName = Program.AddExtension(fileName, "." + "lst");
+            fileName = G.AddExtension(fileName, "." + "lst");
             List<string> folders = new List<string>();
             string fileNameTemp = Program.FindFile(fileName, folders);
             if (fileNameTemp == null)
@@ -4219,7 +4278,7 @@ namespace Gekko
             string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             //List<string> temp = Stringlist.GetListOfStringsFromList(rhs);
             
-            file = Program.AddExtension(file, "." + "lst");
+            file = G.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
 
             List rhs_list = rhs as List;
@@ -5055,8 +5114,7 @@ namespace Gekko
             List<IVariable> temp = new List<IVariable>();
             temp.Add(r);
             List m = new List(temp);
-            List<string> mm = Program.Search(m, null, EVariableType.Var);
-            
+            List<string> mm = Program.Search(m, null, EVariableType.Var);            
             return new List(mm);
         }       
 
@@ -9824,17 +9882,6 @@ namespace Gekko
             }
         }
 
-        public class Res
-        {
-            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
-            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set                        
-            public void Exe()
-            {
-                G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Res(this);
-            }
-        }
-
         public class Model
         {
             public string fileName = null;
@@ -9961,7 +10008,7 @@ namespace Gekko
                     Program.SelectFile(Globals.extensionCommand, ref this.fileName, ref cancel);                    
                 }
                 if (cancel) return;
-                string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, "." + Globals.extensionCommand));
+                string zfilename = Program.CreateFullPathAndFileName(G.AddExtension(this.fileName, "." + Globals.extensionCommand));
                 System.Diagnostics.Process.Start("notepad.exe", zfilename);
             }
         }
@@ -9978,7 +10025,7 @@ namespace Gekko
                     Program.SelectFile(Globals.extensionPlot, ref this.fileName, ref cancel);
                 }
                 if (cancel) return;
-                string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, "." + Globals.extensionPlot));
+                string zfilename = Program.CreateFullPathAndFileName(G.AddExtension(this.fileName, "." + Globals.extensionPlot));
                 
                 Process p = new Process();
                 p.StartInfo.FileName = Application.StartupPath + "\\XmlNotepad\\XmlNotepad.exe";
@@ -10217,7 +10264,7 @@ namespace Gekko
                 }
                 string extension = ".gcm";
                 if (G.Equal(opt_aremos, "yes")) extension = ".cmd";
-                string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, extension));
+                string zfilename = Program.CreateFullPathAndFileName(G.AddExtension(this.fileName, extension));
                 string xx = Program.GetTextFromFileWithWait(zfilename);
                 List<string> xxx = G.ExtractLinesFromText(xx);                
                 if (zfilename.ToLower().EndsWith(".cmd") || zfilename.ToLower().EndsWith("." + Globals.extensionCommand)) 

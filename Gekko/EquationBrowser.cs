@@ -258,7 +258,7 @@ namespace Gekko
                 List<EquationHelper> yt = Program.model.modelGekko.equationsReverted;
                 //here we could use .lhsvariable and .precedentsWithLagIndicator to
                 //obtain variables for p-type equations.
-                return;  //qwerty
+                return;
             }
 
             if (Globals.browserLimit)
