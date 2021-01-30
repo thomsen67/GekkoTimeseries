@@ -24061,7 +24061,7 @@ namespace Gekko
         /// </summary>
         /// <param name="eo"></param>
         /// <param name="oPrt"></param>
-        /// <param name="isMulprt"></param>
+        /// <param name="isMulprt"></param> 
         /// <returns></returns>
         private static ExcelDataForClip WriteExcel_Interop(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
