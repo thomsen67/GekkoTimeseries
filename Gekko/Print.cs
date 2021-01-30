@@ -467,7 +467,7 @@ namespace Gekko
                 else
                 {
                     ExcelOptions eo = Program.PrepareDataForExcel(tab2);
-                    Program.CreateExcelWorkbook2(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
+                    Program.WriteExcel(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
                 }
                 return;
             }

@@ -1570,7 +1570,7 @@ namespace Gekko
         /// <param name="readInfo"></param>
         /// <param name="dateformat"></param>
         /// <param name="datetype"></param>
-        public static void GetTimeseriesFromWorkbookMatrix(TableLight data, CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, ReadInfo readInfo, string dateformat, string datetype)
+        public static void ExtractTimeseriesFromTableLight(TableLight data, CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, ReadInfo readInfo, string dateformat, string datetype)
         {
 
             //We could 'taste' the file, but how to distinguish A and U for instance?
@@ -2739,7 +2739,7 @@ namespace Gekko
             }
             else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
             {
-                ReadSheet(offset, oRead, readInfo, file, databankTemp, originalFilePath, dateformat, datetype);
+                Read2DCells_csv_prn_xlsx(offset, oRead, readInfo, file, databankTemp, originalFilePath, dateformat, datetype);
             }
             else if (oRead.Type == EDataFormat.Tsd)
             {
@@ -2881,7 +2881,7 @@ namespace Gekko
         /// <param name="originalFilePath"></param>
         /// <param name="dateformat"></param>
         /// <param name="datetype"></param>
-        private static void ReadSheet(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string dateformat, string datetype)
+        private static void Read2DCells_csv_prn_xlsx(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string dateformat, string datetype)
         {
             //TODO:
             //For speedup:
@@ -2910,10 +2910,10 @@ namespace Gekko
                 }
                 else
                 {
-                    matrix = ReadExcelWorkbook(file, oRead.sheet);
+                    matrix = ReadExcel(file, oRead.sheet);
                 }
             }
-            GetTimeseriesFromWorkbookMatrix(matrix, offset, oRead, databank, readInfo, dateformat, datetype);
+            ExtractTimeseriesFromTableLight(matrix, offset, oRead, databank, readInfo, dateformat, datetype);
         }
 
         /// <summary>
@@ -3002,7 +3002,7 @@ namespace Gekko
             }
             else if (fileType == EDataFormat.Xls || fileType == EDataFormat.Xlsx)
             {
-                inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);
+                inputTable = ReadExcel(fileName, o.opt_sheet);
             }            
 
             bool transpose = false;  //corresponding to row-wise reading
@@ -11045,7 +11045,7 @@ namespace Gekko
             //string s = Program.GetTextFromFileWithWait(fileName_string);
 
             TableLight matrix = null;
-            matrix = Program.ReadExcelWorkbook(fn, o.opt_sheet);
+            matrix = Program.ReadExcel(fn, o.opt_sheet);
             G.Writeln2("Read " + matrix.GetRowMaxNumber() + "x" + matrix.GetColMaxNumber() + " matrix from file");
             if (isTranspose) matrix = matrix.Transpose();
 
@@ -15711,13 +15711,19 @@ namespace Gekko
             }
             G.Writeln2("Exported " + vars.Count + " variables to file " + pathAndFilename);
         }
-
-        //qwerty
-
+        
+        /// <summary>
+        /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes.
+        /// </summary>
+        /// <param name="function"></param>
+        /// <param name="list1"></param>
+        /// <param name="list2"></param>
+        /// <param name="indexYear"></param>
+        /// <param name="tStart"></param>
+        /// <param name="tEnd"></param>
+        /// <returns></returns>
         public static IVariable Laspeyres(string function, IVariable list1, IVariable list2, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd)
-        {
-            //ErrorIfDatabanksSwapped();
-
+        {            
             if (!(Program.options.freq == EFreq.A))
             {
                 G.Writeln();
@@ -15828,19 +15834,7 @@ namespace Gekko
 
             Series p = new Series(EFreq.A, "p!a");  //all this should be deleted, but the code will run like this...
             Series q = new Series(EFreq.A, "q!a");
-
-            //List<string> vars = new List<string>();
-            //vars.Add(var1);
-            //vars.Add(var2);
-
-            //foreach (string var in vars)
-            //{
-            //    CreateXxVariableOrIssueError(work, var);
-            //}
-
-            //Series p = work.GetVariable(var1);
-            //Series x = work.GetVariable(var2);
-
+            
             double priceInIndexYear = xx[0, indexYearI] / xx[4, indexYearI];
             counter = -1;
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
@@ -15865,28 +15859,13 @@ namespace Gekko
             m.AddIVariable(p.GetName(), p);
             m.AddIVariable(q.GetName(), q);
             return m;
-        }
-
+        }        
         
-        private static void CreateXxVariableOrIssueError(Databank work, string var)
-        {
-            if (!work.ContainsIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
-            {
-                if (var.ToLower().StartsWith("xx", true, null))
-                {
-                    //only vars beginning with "xx"
-                    Series tsNew = new Series(Program.options.freq, var);
-                    work.AddIVariable(tsNew.name, tsNew);
-                }
-                else
-                {
-                    IssueCreateWarning(var);
-                }
-            }
-        }
-
-        
-        
+        /// <summary>
+        /// WRITE/EXPORT command.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
         public static int Write(O.Write o)
         {
             //TODO: introduce frombank
@@ -16165,6 +16144,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for WRITE/EXPORT
+        /// </summary>
+        /// <param name="variablesType"></param>
         private static void ErrorIfMatrix(EVariablesForWrite variablesType)
         {
             if (variablesType == EVariablesForWrite.OneNonSeries)
@@ -16174,6 +16157,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper for WRITE/EXPORT
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
         private static EWriteType GetWriteType(O.Write o)
         {
             EWriteType writeType = EWriteType.Gbk;
@@ -16194,6 +16182,10 @@ namespace Gekko
             return writeType;
         }
 
+        /// <summary>
+        /// Export from R
+        /// </summary>
+        /// <param name="o"></param>
         private static void ExportR(O.Write o)
         {
             //Special treatment, for the time being
@@ -16237,6 +16229,10 @@ namespace Gekko
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
+        /// <summary>
+        /// Export from Python.
+        /// </summary>
+        /// <param name="o"></param>
         private static void ExportPython(O.Write o)
         {
             //Special treatment, for the time being
@@ -16280,6 +16276,10 @@ namespace Gekko
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
+        /// <summary>
+        /// Error message for WRITE/EXPORT if there are 0 variables.
+        /// </summary>
+        /// <param name="listFilteredForCurrentFreq"></param>
         private static void CheckSomethingToWrite(List<ToFrom> listFilteredForCurrentFreq)
         {
             if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
@@ -16381,7 +16381,7 @@ namespace Gekko
 
             eo.fileName = fileName;
 
-            Program.CreateExcelWorkbook2(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat, datetype);
+            Program.WriteExcel(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat, datetype);
         }
 
         public static void ArrayTimeseriesTip(string name)
@@ -23095,15 +23095,21 @@ namespace Gekko
             return columnName;
         }        
 
-        public static TableLight ReadExcelWorkbook(string file, string sheetName)
+        /// <summary>
+        /// Read an Excel xls(x) file, using either EPPlus component or Office interop. Returns a TableLight table for further processing.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="sheetName"></param>
+        /// <returns></returns>
+        public static TableLight ReadExcel(string file, string sheetName)
         {
             if (Program.options.sheet_engine == "internal")
             {
-                return ReadExcelWorkbookEPPlus(file, sheetName);
+                return ReadExcel_EPPlus(file, sheetName);
             }
             else
             {
-                return ReadExcelWorkbookPIA(file, sheetName);
+                return ReadExcel_Interop(file, sheetName);
             }
         }
 
@@ -23118,7 +23124,14 @@ namespace Gekko
             }
         }
 
-        public static TableLight ReadExcelWorkbookEPPlus(string file, string sheetName)
+        /// <summary>
+        /// Read an Excel xlsx file, using the recommended EPPlus component that does not depend upon Excel or Office. 
+        /// Is read into a TableLight table for further processing. The code here will slowly become legacy
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="sheetName"></param>
+        /// <returns></returns>
+        public static TableLight ReadExcel_EPPlus(string file, string sheetName)
         {
             TableLight matrix = new TableLight();
             
@@ -23245,6 +23258,9 @@ namespace Gekko
             return matrix;
         }
 
+        /// <summary>
+        /// Helper method for ReadExcel_EPPlus()
+        /// </summary>
         private static void WriteExcelError()
         {
             G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2.");
@@ -23254,7 +23270,13 @@ namespace Gekko
             G.Writeln("          try to see if 'engine = excel' solves them (requires Excel).");
         }
 
-        private static TableLight ReadExcelWorkbookPIA(string file, string sheetName)
+        /// <summary>
+        /// Read an Excel xls(x) file via interop/PIA. Not really recommended, slow and a bit buggy, but read the old xls format.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="sheetName"></param>
+        /// <returns></returns>
+        private static TableLight ReadExcel_Interop(string file, string sheetName)
         {
             int threadID = (int)AppDomain.GetCurrentThreadId();  //should be ok, just not for "fibre" threads (on SQL server)... never mind
             if (!File.Exists(file))
@@ -23446,11 +23468,21 @@ namespace Gekko
             return matrix;
         }                
 
-        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
+        /// <summary>
+        /// Write to Excel xls(x) file, using either EPPlus component (recommended) or interop/PIA
+        /// </summary>
+        /// <param name="eo"></param>
+        /// <param name="oPrt"></param>
+        /// <param name="isMulprt"></param>
+        /// <param name="isMatrix"></param>
+        /// <param name="dateformat"></param>
+        /// <param name="datetype"></param>
+        /// <returns></returns>
+        public static ExcelDataForClip WriteExcel(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
         {
             if (G.Equal(Program.options.sheet_engine, "internal"))
             {
-                return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt, isMatrix, dateformat, datetype);
+                return WriteExcel_EPPlus(eo, oPrt, isMulprt, isMatrix, dateformat, datetype);
             }
             else
             {
@@ -23459,22 +23491,31 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Matrix export only supported for OPTION sheet engine = internal");
                     throw new GekkoException();
                 }
-                return CreateExcelWorkbookPIA(eo, oPrt, isMulprt);
+                return WriteExcel_Interop(eo, oPrt, isMulprt);
             }
         }
 
-
-        //This basically transfers for instance the double[,] array eo.excelData to Excel via Epplus.
+        /// <summary>
+        /// This basically transfers for instance the double[,] array eo.excelData (the data part of the transfer) to Excel via Epplus.
+        /// </summary>
+        /// <param name="eo"></param>
+        /// <param name="oPrt"></param>
+        /// <param name="isMulprt"></param>
+        /// <param name="isMatrix"></param>
+        /// <param name="dateformat"></param>
+        /// <param name="datetype"></param>
+        /// <returns></returns>        
         //Just before this method, regarding SHEET, eo.excelData has been made from a Table containing
         //the SHEET output.
-        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
+        private static ExcelDataForClip WriteExcel_EPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
         {
-
             //
             // NOTE: IsClipOrDna() is always false, these are not done here
             //       clip stuff and dna could be removed here
             //
 
+            // There are these combinations
+            // ----------------------------------------------------------------------------------
             //1. append-     filename-     sheet-            show fakefilename sheet='Data'
             //2. append-     filename-     sheet+            show fakefilename sheet=sheetname
             //3. append-     filename+     sheet-            store filename sheet='Data'                        ...as above just silent
@@ -23935,6 +23976,11 @@ namespace Gekko
             return null;
         }
 
+        /// <summary>
+        /// Optional time stamp for writing to Excel
+        /// </summary>
+        /// <param name="isMulprt"></param>
+        /// <returns></returns>
         private static string GetStamp(bool isMulprt)
         {
             StampTypes type = StampTypes.Normal;
@@ -23950,6 +23996,12 @@ namespace Gekko
             return ss;
         }        
 
+        /// <summary>
+        /// Helper method for dealing with Gekko dateformat options (may include "first" or "last").
+        /// </summary>
+        /// <param name="dateformat"></param>
+        /// <param name="isFirst"></param>
+        /// <returns></returns>
         private static string SplitDateFormatInTwo(string dateformat, ref bool isFirst)
         {
             string format = null;
@@ -23972,7 +24024,12 @@ namespace Gekko
             return format;
         }
 
-
+        /// <summary>
+        /// Helper method for WriteExcel_EPPlus(). Has to transform a 2D array into a jagged array, for some odd reason.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="twoDimensionalArray"></param>
+        /// <returns></returns>
         public static object[][] ToJaggedArray<T>(T[,] twoDimensionalArray)
         {
             int rowsFirstIndex = twoDimensionalArray.GetLowerBound(0);
@@ -23983,36 +24040,36 @@ namespace Gekko
             int columnsLastIndex = twoDimensionalArray.GetUpperBound(1);
             int numberOfColumns = columnsLastIndex + 1;
 
-
             object[][] jaggedArray = new object[numberOfRows][];
-            //List<object[]> xx = new List<object[]>(numberOfRows);
             object[][] xx = new object[numberOfRows][];
 
             for (int i = rowsFirstIndex; i <= rowsLastIndex; i++)
             {
-                //jaggedArray[i] = (object[])new T[numberOfColumns];
-
                 xx[i] = new object[numberOfColumns];
 
-
                 for (int j = columnsFirstIndex; j <= columnsLastIndex; j++)
-                {
-                    //jaggedArray[i][j] = twoDimensionalArray[i, j];
+                {                    
                     xx[i][j] = twoDimensionalArray[i, j];
                 }
             }
             return xx;
         }
 
-
-
-        private static ExcelDataForClip CreateExcelWorkbookPIA(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
+        /// <summary>
+        /// Write to Excel xls(x) file using interop/PIA. Note really recommended, better and faster to use WriteExcel_EPPlus().
+        /// The code here will slowly become legacy
+        /// </summary>
+        /// <param name="eo"></param>
+        /// <param name="oPrt"></param>
+        /// <param name="isMulprt"></param>
+        /// <returns></returns>
+        private static ExcelDataForClip WriteExcel_Interop(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
         {
             Excel.Workbook objBook = null;
 
             //TODO: #89073253245
             //this method transposes the input-table itself, which is a bit stupid since the table
-            //is easy to transpose when it is constructed (with option rows/cols)
+            //is easy to transpose when it is constructed (with option rows/cols)            
 
             string stampText = null;
             //TODO: think about extensions. If no extension given, it seems append=yes does not work properly.
