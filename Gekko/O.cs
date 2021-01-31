@@ -5444,6 +5444,12 @@ namespace Gekko
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END
 
+        /// <summary>
+        /// Convert a Gekko matrix into a timeseries.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
         public static Series CreateTimeSeriesFromMatrix(GekkoSmpl smpl, Matrix m)
         {
             if (m.data.GetLength(1) != 1)
@@ -5469,16 +5475,13 @@ namespace Gekko
                 temp[i] = m.data[i, 0];
             }
             return tsl;
-        }
+        }        
         
-
-        // =================================== end comparisons ==================================        
-
-        public static string SubstituteScalarsAndLists(string label, bool reportError)
-        {
-            return label;
-        }
-        
+        /// <summary>
+        /// Helper for avgt() and sumt() functions.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static GekkoTime GetDate(GekkoTime x)
         {
             //used for avgt() or sumt() without period indication
@@ -5491,36 +5494,72 @@ namespace Gekko
         // ------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public static GekkoTime ConvertToDate(IVariable x, GetDateChoices c)
         {
             return x.ConvertToDate(c);
         }
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static GekkoTime ConvertToDate(IVariable x)
         {
             return ConvertToDate(x, GetDateChoices.Strict);
         }
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static string ConvertToString(IVariable a)
         {
             return a.ConvertToString();
         }
 
+        /// <summary>
+        /// Convert from string.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string ConvertToString(string s)
         {
             return s;
         }
+
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="iv"></param>
+        /// <returns></returns>
         public static IVariable AlternativeConvertToString(IVariable iv)
         {
             return iv;
         }
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static List<IVariable> ConvertToList(IVariable a)
         {
             return a.ConvertToList();
         }
 
-
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static Matrix ConvertToMatrix(IVariable a)
         {
             //O.GetListFromCache(
@@ -5534,7 +5573,13 @@ namespace Gekko
         }
 
         // -------------- series converters start ---------------
-                
+
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static Series ConvertToSeriesMaybeConstant(GekkoSmpl smpl, IVariable x)
         {
             if (x.Type() == EVariableType.Series)
@@ -5556,6 +5601,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         //how relates to ConvertToTimeSeries()??
         public static IVariable ConvertToSeries(IVariable x)
         {
@@ -5567,6 +5617,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         //how relates to ConvertToSeries()??
         public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
         {
@@ -5645,6 +5701,11 @@ namespace Gekko
 
         // -------------- series converters end ---------------
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static IVariable ConvertToMap(IVariable x)
         {
             if (x.Type() == EVariableType.Map) return x;
@@ -5655,11 +5716,22 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static double ConvertToVal(GekkoTime t, IVariable a)
         {
             return a.GetVal(t);
         }
 
+        /// <summary>
+        /// Convert from IVariable.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static double ConvertToVal(IVariable a)
         {
             return a.ConvertToVal();
@@ -5670,6 +5742,12 @@ namespace Gekko
         // ------------------------ converters end --------------------------------------
         // ------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Error message.
+        /// </summary>
+        /// <param name="x_series"></param>
+        /// <param name="s"></param>
         private static void AssignmentError(Series x_series, string s)
         {
             if (x_series == null)
@@ -5682,9 +5760,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: You can only use " + s + " operator on a normal series type");
                 throw new GekkoException();
             }
-        }
-
-               
+        }               
         
         public static double[,] MultiplyMatrixScalar(double[,] a, double b, int m, int k)
         {
