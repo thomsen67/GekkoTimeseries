@@ -6539,7 +6539,7 @@ namespace Gekko
                     bool open = false;
                     if (isTo)
                     {
-                        //is in reality an OPEN                    
+                        //is in reality an OPEN                     
                         open = true;
                         hlp.Merge = false;  //but mixing <merge> and TO give error above anyway                
                         hlp.editable = false;  //superfluous but for safety
