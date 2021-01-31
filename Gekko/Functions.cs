@@ -1853,7 +1853,7 @@ namespace Gekko
                 }
 
                 Matrix rv = new Matrix();
-                rv.data = O.AddMatrixMatrix(mean.data, Program.MultiplyMatrices(tmp, randoms), n, 1);
+                rv.data = Program.AddMatrixMatrix(mean.data, Program.MultiplyMatrices(tmp, randoms), n, 1);
 
                 return rv;
 

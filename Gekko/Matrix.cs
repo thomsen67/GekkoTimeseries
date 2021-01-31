@@ -399,7 +399,7 @@ namespace Gekko
                             G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                             throw new GekkoException();
                         }
-                        double[,] c = O.AddMatrixMatrix(a, b, m, k);
+                        double[,] c = Program.AddMatrixMatrix(a, b, m, k);
                         Matrix z = new Matrix();
                         z.data = c;
                         return z;
@@ -434,7 +434,7 @@ namespace Gekko
                     G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                     throw new GekkoException();
                 }
-                double[,] c = O.SubtractMatrixMatrix(a, b, m, k);
+                double[,] c = Program.SubtractMatrixMatrix(a, b, m, k);
                 Matrix z = new Matrix();
                 z.data = c;
                 return z;
@@ -463,7 +463,7 @@ namespace Gekko
                 if (p == 1 && n == 1)
                 {
                     //Special case, #a * #onebyone
-                    double[,] c = O.MultiplyMatrixScalar(a, b[0, 0], m, k);
+                    double[,] c = Program.MultiplyMatrixScalar(a, b[0, 0], m, k);
                     Matrix z = new Matrix();
                     z.data = c;
                     return z;
@@ -471,7 +471,7 @@ namespace Gekko
                 else if (m == 1 && k == 1)
                 {
                     //Special case,  #onebyone * #a
-                    double[,] c = O.MultiplyMatrixScalar(b, a[0, 0], p, n);
+                    double[,] c = Program.MultiplyMatrixScalar(b, a[0, 0], p, n);
                     Matrix z = new Matrix();
                     z.data = c;
                     return z;
@@ -509,7 +509,7 @@ namespace Gekko
                 double b = O.ConvertToVal(x);  //#875324397
                 int m = a.GetLength(0);
                 int k = a.GetLength(1);
-                double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
+                double[,] c = Program.MultiplyMatrixScalar(a, b, m, k);
                 Matrix z = new Matrix();
                 z.data = c;
                 return z;
@@ -545,7 +545,7 @@ namespace Gekko
                         if (p == 1 && n == 1)
                         {
                             //Special case
-                            double[,] c = O.MultiplyMatrixScalar(a, 1d / b[0, 0], m, k);
+                            double[,] c = Program.MultiplyMatrixScalar(a, 1d / b[0, 0], m, k);
                             Matrix z = new Matrix();
                             z.data = c;
                             return z;
@@ -562,7 +562,7 @@ namespace Gekko
                         double b = O.ConvertToVal(x);  //#875324397
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
-                        double[,] c = O.MultiplyMatrixScalar(a, 1d / b, m, k);
+                        double[,] c = Program.MultiplyMatrixScalar(a, 1d / b, m, k);
                         Matrix z = new Matrix();
                         z.data = c;
                         return z;

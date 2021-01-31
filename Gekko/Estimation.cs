@@ -1016,15 +1016,15 @@ namespace Gekko
             if (r.GetLength(0) == 0)
             {
                 //covar = sigma^2 * inv(X'X)
-                ols.usedCovar = O.MultiplyMatrixScalar(ixtx, ols.see * ols.see, ixtx.GetLength(0), ixtx.GetLength(1));
+                ols.usedCovar = Program.MultiplyMatrixScalar(ixtx, ols.see * ols.see, ixtx.GetLength(0), ixtx.GetLength(1));
             }
             else
             {
                 //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )                
                 double[,] inside = Program.InvertMatrix(Program.MultiplyMatrices(Program.MultiplyMatrices(r, ixtx), Program.Transpose(r)), !calledFromRecursive);  //inv fails with an error, silent
                 double[,] temp1 = Program.MultiplyMatrices(Program.MultiplyMatrices(Program.MultiplyMatrices(Program.MultiplyMatrices(ixtx, Program.Transpose(r)), inside), r), ixtx);
-                double[,] temp2 = O.SubtractMatrixMatrix(ixtx, temp1, ixtx.GetLength(0), ixtx.GetLength(1));
-                ols.usedCovar = O.MultiplyMatrixScalar(temp2, ols.see * ols.see, temp2.GetLength(0), temp2.GetLength(1));
+                double[,] temp2 = Program.SubtractMatrixMatrix(ixtx, temp1, ixtx.GetLength(0), ixtx.GetLength(1));
+                ols.usedCovar = Program.MultiplyMatrixScalar(temp2, ols.see * ols.see, temp2.GetLength(0), temp2.GetLength(1));
             }
 
             //usedCovar = rep.covpar; --> this yields the same (without restrictions), also in the case without constant

@@ -269,7 +269,7 @@ namespace Gekko
                         double b = O.ConvertToVal(this);
                         int m = a.GetLength(0);
                         int k = a.GetLength(1);
-                        double[,] c = O.MultiplyMatrixScalar(a, b, m, k);
+                        double[,] c = Program.MultiplyMatrixScalar(a, b, m, k);
                         Matrix z = new Matrix();
                         z.data = c;
                         return z;

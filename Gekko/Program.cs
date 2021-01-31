@@ -21682,9 +21682,6 @@ namespace Gekko
             }
             return;
         }                
-
-        
-
         
 
         public static void Function(double[] arg, ref double func, object obj)
@@ -21717,8 +21714,6 @@ namespace Gekko
             }
             return matrix;
         }
-
-
 
         public static bool InvertMatrix(IElementalAccessVector residuals, IElementalAccessVector dx)
         {
@@ -22699,9 +22694,47 @@ namespace Gekko
                 G.Writeln();
             }
         }
-                
 
-        
+
+        public static double[,] MultiplyMatrixScalar(double[,] a, double b, int m, int k)
+        {
+            double[,] c = new double[m, k];
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < k; j++)
+                {
+                    c[i, j] = a[i, j] * b;
+                }
+            }
+            return c;
+        }
+
+        public static double[,] AddMatrixMatrix(double[,] a, double[,] b, int m, int k)
+        {
+            double[,] c = new double[m, k];
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < k; j++)
+                {
+                    c[i, j] = a[i, j] + b[i, j];
+                }
+            }
+            return c;
+        }
+
+
+        public static double[,] SubtractMatrixMatrix(double[,] a, double[,] b, int m, int k)  //a - b
+        {
+            double[,] c = new double[m, k];
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < k; j++)
+                {
+                    c[i, j] = a[i, j] - b[i, j];
+                }
+            }
+            return c;
+        }
 
         public static double[,] MultiplyMatrices(double[,] x, double[,] y)
         {

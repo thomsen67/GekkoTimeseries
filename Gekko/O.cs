@@ -5760,39 +5760,23 @@ namespace Gekko
                 G.Writeln2("*** ERROR: You can only use " + s + " operator on a normal series type");
                 throw new GekkoException();
             }
-        }               
-        
-        public static double[,] MultiplyMatrixScalar(double[,] a, double b, int m, int k)
-        {
-            double[,] c = new double[m, k];
-            for (int i = 0; i < m; i++)
-            {
-                for (int j = 0; j < k; j++)
-                {
-                    c[i, j] = a[i, j] * b;
-                }
-            }
-            return c;
         }
 
-        public static double[,] AddMatrixMatrix(double[,] a, double[,] b, int m, int k)
-        {
-            double[,] c = new double[m, k];
-            for (int i = 0; i < m; i++)
-            {
-                for (int j = 0; j < k; j++)
-                {
-                    c[i, j] = a[i, j] + b[i, j];
-                }
-            }
-            return c;
-        }
-
+        /// <summary>
+        /// Get a matrix row.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static IVariable[] MatrixRow(params IVariable[] list)
         {
             return list;
         }
 
+        /// <summary>
+        /// Get a matrix col. This is not so simple for nested lists.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static IVariable MatrixCol(params IVariable[][] list)
         {
             int[,] dimsR = null;
@@ -5909,21 +5893,11 @@ namespace Gekko
             mat.data = m;
             return mat;
         }
-
         
-        public static double[,] SubtractMatrixMatrix(double[,] a, double[,] b, int m, int k)  //a - b
-        {
-            double[,] c = new double[m, k];
-            for (int i = 0; i < m; i++)
-            {
-                for (int j = 0; j < k; j++)
-                {
-                    c[i, j] = a[i, j] - b[i, j];
-                }
-            }
-            return c;
-        }
-
+        /// <summary>
+        /// Returns number of subperiods for current freq. Does not work for D freq.
+        /// </summary>
+        /// <returns></returns>
         public static int CurrentSubperiods()
         {
             int lag = 1;
@@ -5931,69 +5905,24 @@ namespace Gekko
             else if (Program.options.freq == EFreq.M) lag = Globals.freqMSubperiods;
             return lag;
         }
-
-        public static IVariable HandleSummations(string type, double[] storage)
-        {
-            //i1 and i2 are often not used
-            double data = double.NaN;
-            switch (type)
-            {
-                case "sum":  //this is the GAMS-like sum function, for instance sum(#i, x[#i]). It does not exist in an avg() version.
-                case "movavg":
-                case "movsum":
-                case "avgt":
-                case "sumt":
-                    {
-                        double sum = 0d;
-                        for (int i = 0; i < storage.Length; i++)
-                        {
-                            sum += storage[i];
-                        }
-                        if (type == "movavg" || type == "avgt") data = sum / (double)storage.Length;
-                        else data = sum;
-                    }
-                    break;
-                case "pch":
-                case "pchy":
-                    {
-                        data = (storage[storage.Length - 1] / storage[0] - 1d) * 100d;
-                    }
-                    break;
-                case "dlog":
-                case "dlogy":
-                    {
-                        data = Math.Log(storage[storage.Length - 1] / storage[0]);
-                    }
-                    break;
-                case "dif":
-                case "diff":
-                case "dify":
-                case "diffy":
-                    {
-                        data = storage[storage.Length - 1] - storage[0];
-                    }
-                    break;
-                case "lag":
-                    {
-                        data = storage[0];
-                    }
-                    break;
-                default:
-                    {
-                        G.Writeln2("*** ERROR: Function " + type + " not recognized as a lag function");
-                        throw new GekkoException();
-                    }
-                    break;
-
-            }
-            return new ScalarVal(data);
-        }
-
+        
+        /// <summary>
+        /// Is this used?
+        /// </summary>
+        /// <param name="l"></param>
+        /// <returns></returns>
         public static List<string> GetList(List<string> l)
         {
             return l;
         }        
 
+        /// <summary>
+        /// Is this used?
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="a"></param>
+        /// <param name="bankNumber"></param>
+        /// <returns></returns>
         public static double GetVal(GekkoSmpl smpl, IVariable a, int bankNumber)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         {
             return a.GetValOLD(smpl);
@@ -6006,11 +5935,23 @@ namespace Gekko
         // position 0: return value type is wrong, for instance "return 123" in a "function string f(...)"
         // position i > 0: function argument, for instance f(123) in a "function string f(string x)"
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_void(IVariable x, int position)
         {
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_series(IVariable x, int position)
         {
             if (x.Type() != EVariableType.Series)
@@ -6033,6 +5974,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_val(IVariable x, int position)
         {
             if (x.Type() != EVariableType.Val)
@@ -6050,6 +5997,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_string(IVariable x, int position)
         {
             if (x.Type() != EVariableType.String)
@@ -6067,6 +6020,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_name(IVariable x, int position)
         {
             if (x == null)
@@ -6090,6 +6049,13 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="ga"></param>
+        /// <param name="smpl"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_date(GekkoArg ga, GekkoSmpl smpl, int position)
         {
             if (ga == null)
@@ -6115,6 +6081,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_date(IVariable x, int position)
         {
             if (x.Type() != EVariableType.Date)
@@ -6133,6 +6105,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_list(IVariable x, int position)
         {
             if (x.Type() != EVariableType.List)
@@ -6154,6 +6132,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_matrix(IVariable x, int position)
         {            
             if (x.Type() != EVariableType.Matrix)
@@ -6175,6 +6159,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type error message.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static string TypeErrorString(int position, string type)
         {
             string rv = null;
@@ -6209,6 +6199,12 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_map(IVariable x, int position)
         {
             if (x.Type() != EVariableType.Map)
@@ -6230,6 +6226,12 @@ namespace Gekko
             return x;
         }
 
+        /// <summary>
+        /// Type checks for assignments, function return values, or function arguments.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public static IVariable TypeCheck_var(IVariable x, int position)
         {
             //not possible???
@@ -6239,6 +6241,10 @@ namespace Gekko
 
         // -------------------- type checks end ----------------------------
 
+        /// <summary>
+        /// STOP command.
+        /// </summary>
+        /// <param name="p"></param>
         public static void Stop(P p)
         {
             Globals.threadIsInProcessOfAborting = true;
@@ -6246,6 +6252,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        /// <summary>
+        /// Helper.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="p"></param>
         public static void StopHelper(GekkoSmpl smpl, P p)
         {
             //Globals.threadIsInProcessOfAborting = true;
@@ -6253,11 +6264,22 @@ namespace Gekko
             O.FunctionLookupNew2(Globals.stopHelper)(smpl, p, false, null, null);
         }
 
+        /// <summary>
+        /// Conversion.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static int ConvertToInt(IVariable a)
         {
             return ConvertToInt(a, true);
         }
 
+        /// <summary>
+        /// Conversion.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="reportError"></param>
+        /// <returns></returns>
         public static int ConvertToInt(IVariable a, bool reportError)
         {
             bool problem = false;
@@ -6290,6 +6312,8 @@ namespace Gekko
         //Common methods end
         //Common methods end
         //Common methods end
+
+        // ---> The following is a lot of classes, each corresponding to a Gekko command.
 
         public class Read
         {
