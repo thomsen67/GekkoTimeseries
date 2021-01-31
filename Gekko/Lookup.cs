@@ -1792,6 +1792,37 @@ namespace Gekko
             }
         }
 
+        private static bool CreateSeriesIfNotExisting(string varnameWithFreq, string freq, ref Series lhs_series)
+        {
+            bool create = false;
+            if (lhs_series != null && (lhs_series.type == ESeriesType.Normal || lhs_series.type == ESeriesType.Timeless))
+            {
+                //do nothing, use it
+            }
+            else
+            {
+                //create it
+                create = true;
+                lhs_series = new Series(ESeriesType.Normal, G.ConvertFreq(freq, true), varnameWithFreq);
+            }
+
+            return create;
+        }
+
+        private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type)
+        {
+            ReportTypeError(varnameWithFreq, rhs, type, 0);
+        }
+
+        private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type, int extra)
+        {
+            G.Writeln2("*** ERROR: " + type.ToString().ToUpper() + " " + varnameWithFreq + " has a " + rhs.Type().ToString().ToUpper() + " on right-hand side");
+            if (extra == 1)
+            {
+                G.Writeln(Globals.stringConversionNote);
+            }
+            throw new GekkoException();
+        }
 
         private static bool IsAllSpecialDatabank(string dbName)
         {

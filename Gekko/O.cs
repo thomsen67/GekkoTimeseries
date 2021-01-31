@@ -3578,42 +3578,6 @@ namespace Gekko
             return;
         }
 
-        // =====================================================================
-        //                   Operator helper end
-        // =====================================================================
-
-        public static void Helper_Convert03(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t0, out GekkoTime t3)
-        {
-            //1 of 3
-            //This method is special compared to Helper_Convert12. The thing is that Helper_Convert03 handles the lag problem,
-            //and we have to deal with flexible freqs here.
-            //This is just to keep the fleible freq stuff assembled in one place
-            //Flexible freq stuff is for instance x!a <2001q2 2003q3> = 1, 2, 3;
-            //If there are problems with flexible freqs, these methods can be used for tracking
-            //See also O.FlexFreq() and Helper_Convert12()
-            GekkoTime.Convert03(smpl, desiredFreq, out t0, out t3);
-        }
-
-        public static void Helper_Convert12(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t1, out GekkoTime t2)
-        {
-            //2 of 3
-            //This is just to keep the fleible freq stuff assembled in one place
-            //Flexible freq stuff is for instance x!a <2001q2 2003q3> = 1, 2, 3;
-            //If there are problems with flexible freqs, these methods can be used for tracking
-            //See also O.FlexFreq() and Helper_Convert03()
-            GekkoTime.Convert12(smpl, desiredFreq, out t1, out t2);
-        }
-
-        public static bool UseFlexFreq(GekkoTime gt, EFreq freq)
-        {
-            //3 of 3
-            //This is just to keep the fleible freq stuff assembled in one place
-            //See also Helper_Convert12() and Helper_Convert03()
-            return gt.freq != freq;
-        }
-
-        
-
         private static ESeriesUpdTypes GetOperatorType(Assignment options)
         {
             if (options == null) return ESeriesUpdTypes.none;  //will this ever happen?
@@ -3659,80 +3623,109 @@ namespace Gekko
             return operatorType;
         }
 
+
+        // =====================================================================
+        //                   Operator helper end
+        // =====================================================================
+
+        // ==========================================================================================
+        // ======================== flex freq start =================================================
+        // ==========================================================================================
+
+        /// <summary>
+        /// Deals with flexible frequencies, for instance what to do with x!a &lt;2001q2 2003q3&gt; = 1, 2, 3;
+        /// If there are problems with flexible freqs, these methods can be used for tracking. 
+        /// See also O.FlexFreq() and O.Helper_Convert12(). [1 of 3].
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="desiredFreq"></param>
+        /// <param name="t0"></param>
+        /// <param name="t3"></param>
+        public static void Helper_Convert03(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t0, out GekkoTime t3)
+        {
+            //1 of 3
+            //This method is special compared to Helper_Convert12. The thing is that Helper_Convert03 handles the lag problem,
+            //and we have to deal with flexible freqs here.
+            //This is just to keep the fleible freq stuff assembled in one place
+            //Flexible freq stuff is for instance x!a <2001q2 2003q3> = 1, 2, 3;
+            //If there are problems with flexible freqs, these methods can be used for tracking
+            //See also O.UseFlexFreq() and Helper_Convert12()
+            GekkoTime.Convert03(smpl, desiredFreq, out t0, out t3);
+        }
+
+        /// <summary>
+        /// /// Deals with flexible frequencies, for instance what to do with x!a &lt;2001q2 2003q3&gt; = 1, 2, 3;
+        /// If there are problems with flexible freqs, these methods can be used for tracking. 
+        /// See also O.UseFlexFreq() and O.Helper_Convert03(). [2 of 3].
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="desiredFreq"></param>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        public static void Helper_Convert12(GekkoSmpl smpl, EFreq desiredFreq, out GekkoTime t1, out GekkoTime t2)
+        {
+            //2 of 3
+            //This is just to keep the fleible freq stuff assembled in one place
+            //Flexible freq stuff is for instance x!a <2001q2 2003q3> = 1, 2, 3;
+            //If there are problems with flexible freqs, these methods can be used for tracking
+            //See also O.FlexFreq() and Helper_Convert03()
+            GekkoTime.Convert12(smpl, desiredFreq, out t1, out t2);
+        }
+
+        /// <summary>
+        /// /// Deals with flexible frequencies, for instance what to do with x!a &lt;2001q2 2003q3&gt; = 1, 2, 3;
+        /// If there are problems with flexible freqs, these methods can be used for tracking. 
+        /// See also O.Helper_Convert03() and O.Helper_Convert12(). [3 of 3].
+        /// </summary>
+        /// <param name="gt"></param>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static bool UseFlexFreq(GekkoTime gt, EFreq freq)
+        {
+            //3 of 3
+            //This is just to keep the fleible freq stuff assembled in one place
+            //See also Helper_Convert12() and Helper_Convert03()
+            return gt.freq != freq;
+        }
+
+        // ==========================================================================================
+        // ======================== flex freq end ===================================================
+        // ==========================================================================================
+
+        /// <summary>
+        /// Helper regarding GekkoSmpl object
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="i"></param>
         public static void AdjustT0(GekkoSmpl smpl, int i)
         {
             smpl.t0 = smpl.t0.Add(i);            
         }
 
-        private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type)
-        {
-            ReportTypeError(varnameWithFreq, rhs, type, 0);
-        }
-
-        private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type, int extra)
-        {
-            G.Writeln2("*** ERROR: " + type.ToString().ToUpper() + " " + varnameWithFreq + " has a " + rhs.Type().ToString().ToUpper() + " on right-hand side");
-            if (extra == 1)
-            {
-                G.Writeln(Globals.stringConversionNote);
-            }
-            throw new GekkoException();
-        }
-
-        private static bool CreateSeriesIfNotExisting(string varnameWithFreq, string freq, ref Series lhs_series)
-        {
-            bool create = false;
-            if (lhs_series != null && (lhs_series.type == ESeriesType.Normal || lhs_series.type == ESeriesType.Timeless))
-            {
-                //do nothing, use it
-            }
-            else
-            {
-                //create it
-                create = true;
-                lhs_series = new Series(ESeriesType.Normal, G.ConvertFreq(freq, true), varnameWithFreq);
-            }
-
-            return create;
-        }
-
+        /// <summary>
+        /// Put in an IVariable with overwrite if it is already there.
+        /// </summary>
+        /// <param name="ib"></param>
+        /// <param name="varnameWithFreq"></param>
+        /// <param name="removeFirstBeforeAdding"></param>
+        /// <param name="lhsNew"></param>
         private static void AddIvariableWithOverwrite(IBank ib, string varnameWithFreq, bool removeFirstBeforeAdding, IVariable lhsNew)
         {
             if (removeFirstBeforeAdding) ib.RemoveIVariable(varnameWithFreq);
             ib.AddIVariable(varnameWithFreq, lhsNew);
         }
 
-        private static void LookupTypeCheck(IVariable rhs, string varName)
-        {
-            if (varName[0] == Globals.symbolScalar)
-            {
-                //VAL, STRING, DATE                        
-                if (rhs.Type() != EVariableType.Val && rhs.Type() != EVariableType.String && rhs.Type() != EVariableType.Date)
-                {
-                    G.Writeln2("*** ERROR: A %-variable cannot be of type " + rhs.Type().ToString().ToUpper());
-                    throw new GekkoException();
-                }
-            }
-            else if (varName[0] == Globals.symbolCollection)
-            {
-                //LIST, DICT, MATRIX                        
-                if (rhs.Type() != EVariableType.Matrix && rhs.Type() != EVariableType.List && rhs.Type() != EVariableType.Map)
-                {
-                    G.Writeln2("*** ERROR: A #-variable cannot be of type " + rhs.Type().ToString().ToUpper());
-                    throw new GekkoException();
-                }
-            }
-            else
-            {
-                if (rhs.Type() != EVariableType.Series && rhs.Type() != EVariableType.Val)
-                {
-                    //TODO: rhs as MATRIX (vector) should be possible if sample fits.
-                    G.Writeln2("*** ERROR: Could not convert right-hand side (" + rhs.Type().ToString() + ") to SERIES");
-                    throw new GekkoException();
-                }
-            }
-        }        
-
+        /// <summary>
+        /// For array-series this method makes it possible to write for instance
+        /// x[#a+1] or x[#a-1], where #a could be an age (integer, stored as a string).
+        /// In GAMS, this can also be done, but in GAMS there is no interpretation and conversion, 
+        /// it just take the previous or next element from the set.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="minus"></param>
+        /// <returns></returns>
         public static IVariable AddSpecial(GekkoSmpl smpl, IVariable x1, IVariable x2, bool minus)
         {
             bool specialAdd = false;
@@ -3774,10 +3767,14 @@ namespace Gekko
             {
                 return Add(smpl, x1, x2);
             }
-
         }
 
-
+        /// <summary>
+        /// How does this relate to the G.Chop...() methods?
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="name"></param>
+        /// <param name="rest"></param>
         public static void ChopIndexer(string s, out string name, out string rest)
         {
             name = s.Trim();
@@ -3790,6 +3787,12 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// How does this relate to the G.Chop...() methods?
+        /// </summary>
+        /// <param name="input2"></param>
+        /// <param name="freq"></param>
+        /// <param name="varName"></param>
         public static void ChopFreq(string input2, ref string freq, ref string varName)
         {
             if (input2 == null) return;
@@ -3814,52 +3817,14 @@ namespace Gekko
             return;
         }
 
-        //See also Chop()
-        public static string UnChop(string bank, string name, string freq, string[] index)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                G.Writeln2("*** ERROR: Name cannot be null");
-                throw new GekkoException();
-            }
-            string s = name.Trim();
-            if (bank != null) s = bank.Trim() + Globals.symbolBankColon + s;
-            if (freq != null) s = s + Globals.freqIndicator + freq;
-            if (index != null && index.Length > 0)
-            {
-                s += "[";
-                s += G.GetListWithCommas(index);
-                s += "]";
-            }
-            return s;
-        }
-
-        public static void AdjustSmplForDecomp(GekkoSmpl smpl, int i)
-        {           
-            
-            int add2a = O.MaxLag();
-            int add2b = O.MaxLead();
-
-            //add2a = 0; //seems ok, but check with large lag/lead to see if really ok!   <---- HMM why should this work??
-            //add2b = 0; //seems ok, but check with large lag/lead to see if really ok!
-
-            if (i == 0)
-            {
-                smpl.t0 = smpl.t0.Add(-add2a + Globals.decompPerLag);
-                smpl.t1 = smpl.t1.Add(-add2a + Globals.decompPerLag);
-                smpl.t2 = smpl.t2.Add(add2b);
-                smpl.t3 = smpl.t3.Add(add2b);
-            }
-            else
-            {
-                smpl.t0 = smpl.t0.Add(add2a - Globals.decompPerLag);
-                smpl.t1 = smpl.t1.Add(add2a - Globals.decompPerLag);
-                smpl.t2 = smpl.t2.Add(-add2b);
-                smpl.t3 = smpl.t3.Add(-add2b);
-            }
-        }
-
-
+        /// <summary>
+        /// /// How does this relate to the G.Chop...() methods?
+        /// </summary>
+        /// <param name="input2"></param>
+        /// <param name="dbName"></param>
+        /// <param name="varName"></param>
+        /// <param name="freq"></param>
+        /// <param name="indexes"></param>
         //See also UnChop()
         public static void Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes)
         {
@@ -3901,11 +3866,75 @@ namespace Gekko
             {
                 dbName = ss[0]; varName = ss[1].Trim();
             }
-            
+
             freq = null;
             O.ChopFreq(varName, ref freq, ref varName);
         }
 
+        /// <summary>
+        /// How does this relate to the G.Chop...() methods?
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <param name="name"></param>
+        /// <param name="freq"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        //See also Chop()
+        public static string UnChop(string bank, string name, string freq, string[] index)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                G.Writeln2("*** ERROR: Name cannot be null");
+                throw new GekkoException();
+            }
+            string s = name.Trim();
+            if (bank != null) s = bank.Trim() + Globals.symbolBankColon + s;
+            if (freq != null) s = s + Globals.freqIndicator + freq;
+            if (index != null && index.Length > 0)
+            {
+                s += "[";
+                s += G.GetListWithCommas(index);
+                s += "]";
+            }
+            return s;
+        }
+
+        /// <summary>
+        /// Helper for DECOMP command.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="i"></param>
+        public static void AdjustSmplForDecomp(GekkoSmpl smpl, int i)
+        {           
+            
+            int add2a = O.MaxLag();
+            int add2b = O.MaxLead();
+
+            //add2a = 0; //seems ok, but check with large lag/lead to see if really ok!   <---- HMM why should this work??
+            //add2b = 0; //seems ok, but check with large lag/lead to see if really ok!
+
+            if (i == 0)
+            {
+                smpl.t0 = smpl.t0.Add(-add2a + Globals.decompPerLag);
+                smpl.t1 = smpl.t1.Add(-add2a + Globals.decompPerLag);
+                smpl.t2 = smpl.t2.Add(add2b);
+                smpl.t3 = smpl.t3.Add(add2b);
+            }
+            else
+            {
+                smpl.t0 = smpl.t0.Add(add2a - Globals.decompPerLag);
+                smpl.t1 = smpl.t1.Add(add2a - Globals.decompPerLag);
+                smpl.t2 = smpl.t2.Add(-add2b);
+                smpl.t3 = smpl.t3.Add(-add2b);
+            }
+        }
+
+        /// <summary>
+        /// Handle indexers like x[...]
+        /// </summary>
+        /// <param name="depth"></param>
+        /// <param name="y"></param>
+        /// <param name="x"></param>
         public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)
         {
             if (depth >= x.Length)
@@ -3921,6 +3950,15 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// /// Handle indexers like x[...]
+        /// </summary>
+        /// <param name="logical"></param>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="options"></param>
+        /// <param name="indexes"></param>
         public static void DollarIndexerSetData(IVariable logical, GekkoSmpl smpl, IVariable x, IVariable y, O.Assignment options, params IVariable[] indexes)
         {
             //Only encountered on the LHS
@@ -3953,17 +3991,34 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Error message.
+        /// </summary>
         private static void DollarLHSError()
         {
             G.Writeln2("*** ERROR: $-conditional on left-hand side only supports value or series type");
             throw new GekkoException();
         }
 
+        /// <summary>
+        /// Handle indexers like x[...]
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="options"></param>
+        /// <param name="indexes"></param>
         public static void IndexerSetData(GekkoSmpl smpl, IVariable x, IVariable y, O.Assignment options, params IVariable[] indexes)
         {
             x.IndexerSetData(smpl, y, options, indexes);
         }
 
+        /// <summary>
+        /// Create a GekkoSmpl2 object, to fix the lag problem.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public static GekkoSmpl2 Smpl(GekkoSmpl smpl, int i)
         {
             GekkoSmpl2 smplRemember = null;
@@ -3974,6 +4029,12 @@ namespace Gekko
             return smplRemember;
         }
 
+        /// <summary>
+        /// Create a GekkoSmpl2 object, to fix the lag problem.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public static GekkoSmpl2 Smpl(GekkoSmpl smpl, IVariable i)
         {
             GekkoSmpl2 smplRemember = null;
@@ -3984,6 +4045,13 @@ namespace Gekko
             return smplRemember;
         }
 
+        /// <summary>
+        /// Handle indexers like x[...]
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="indexerType"></param>
+        /// <param name="indexes"></param>
+        /// <returns></returns>
         //See Indexer() below
         public static GekkoSmpl2 Indexer2(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
@@ -4024,6 +4092,15 @@ namespace Gekko
             return smplRemember;
         }
 
+        /// <summary>
+        /// Handle indexers like x[...]
+        /// </summary>
+        /// <param name="smplRemember"></param>
+        /// <param name="smpl"></param>
+        /// <param name="indexerType"></param>
+        /// <param name="x"></param>
+        /// <param name="indexes"></param>
+        /// <returns></returns>
         //See Indexer2() above. The first argument should be Indexer2(smpl, indexes)
         public static IVariable Indexer(GekkoSmpl2 smplRemember, GekkoSmpl smpl, O.EIndexerType indexerType, IVariable x, params IVariable[] indexes)
         {
@@ -4039,6 +4116,12 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Handle ranges like a..b
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <returns></returns>
         public static IVariable RangeGeneral(IVariable x1, IVariable x2)
         {
             Range r = new Range(x1, x2);
@@ -4049,31 +4132,38 @@ namespace Gekko
             return new List(mm);
         }       
 
+        /// <summary>
+        /// Helper method for labels in PRT, but is it used??
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static IVariable ReportLabel(GekkoSmpl smpl, IVariable x, string s)
         {
             smpl.labelRecordedPieces.Add(new RecordedPieces(s, x));
             return x;
         }
 
+        /// <summary>
+        /// Helper method for labels in PRT, but is it used??
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <returns></returns>
         public static List<List<LabelHelperIVariable>> AddLabelHelper2(GekkoSmpl smpl)
         {
-            List<List<LabelHelperIVariable>> rv = null;
-            //if(smpl.labelHelper2!=null && smpl.labelHelper2.Count>0)
-            //{
-            //    rv = smpl.labelHelper2;
-            //}
-            //else
-            //{
-            //    rv = new List<List<LabelHelperIVariable>>();
-            //    //rv.Add(smpl.labelHelper);
-            //}
+            List<List<LabelHelperIVariable>> rv = null;            
             rv = new List<List<LabelHelperIVariable>>();
             return rv;
         }
 
+        /// <summary>
+        /// Handles string in quotes.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static IVariable HandleString(ScalarString x)
-        {
-            //if (!x.string2.Contains("~") & !x.string2.Contains("\""))
+        {            
             if (!x.string2.Contains("~"))
             {
                 //fast, covers most cases
@@ -4087,6 +4177,11 @@ namespace Gekko
             return new ScalarString(s);  //costs a bit of time, but only if the string contains ~ or ".
         }        
 
+        /// <summary>
+        /// List elements logic for naked lists.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private static List GetRawListElements(string fileName)
         {
             //see also #98037532985
@@ -4201,42 +4296,13 @@ namespace Gekko
                 }
             }
             return m;                       
-        }
+        }                
 
-        
-
-        private static IVariable MaybeStringify(IVariable x, bool dollarStringify)
-        {
-            IVariable rv = null;
-            if (dollarStringify)
-            {
-                if (x.Type() == EVariableType.String)
-                {
-                    ScalarString ss = (ScalarString)x;
-                    ScalarString ss2 = new ScalarString(ss.string2, false);
-                    rv = ss2;
-                }
-                else if (x.Type() == EVariableType.List)
-                {
-                    List ml = (List)x;
-                    List ml2 = new List(ml.list);
-                    ml2.isNameList = false;
-                    rv = ml2;
-                }
-            }
-            else rv = x;
-            return rv;
-        }
-
-        public static List<string> AddBankToListItems(List<string> input, string bank)
-        {
-            for (int i = 0; i < input.Count; i++)
-            {
-                input[i] = bank + ":" + input[i];
-            }
-            return input;
-        }
-
+        /// <summary>
+        /// Helper method for FOR lists (parallel loops)
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static int ForListMax(List<List<IVariable>> x)
         {
             int n = -1;
@@ -4262,6 +4328,11 @@ namespace Gekko
             return n;
         }
 
+        /// <summary>
+        /// Conversion.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static List GetList(IVariable a)
         {
             if (a == null)
@@ -4277,24 +4348,21 @@ namespace Gekko
             return (List)a;
         }        
 
-        public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
-        {
-            string bankName = O.ConvertToString(x);
-            List<string> items = Stringlist.GetListOfStringsFromList(y);
-            List<string> newList = new List<string>();
-            foreach (string s in items)
-            {
-                newList.Add(bankName + ":" + s);
-            }
-            return new List(newList);
-        }
-
+        
         // ========================================================================================
         // ========================================================================================
         // ============== Logical operations start ================================================
         // ========================================================================================
         // ========================================================================================
 
+        /// <summary>
+        /// Helper for logical AND
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="and"></param>
+        /// <returns></returns>
         private static IVariable Helper_LogicalAndOr(GekkoSmpl smpl, IVariable x1, IVariable x2, bool and)
         {
             //same logic in Equals(), StrictlyLargerThan() etc.
@@ -4346,16 +4414,36 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Logical AND.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <returns></returns>
         public static IVariable LogicalAnd(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             return Helper_LogicalAndOr(smpl, x1, x2, true);
         }
 
+        /// <summary>
+        /// Logial OR.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <returns></returns>
         public static IVariable LogicalOr(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             return Helper_LogicalAndOr(smpl, x1, x2, false);
         }
 
+        /// <summary>
+        /// Logical NOT.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x1"></param>
+        /// <returns></returns>
         public static IVariable LogicalNot(GekkoSmpl smpl, IVariable x1)
         {
             IVariable rv = Globals.scalarVal0;
@@ -4390,6 +4478,13 @@ namespace Gekko
         // =========================================================================
         // =========================================================================
         
+        /// <summary>
+        /// Handle $-conditionals in expressions and assignments. [1 of 3].
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="logical"></param>
+        /// <returns></returns>
         public static IVariable Conditional1Of3(GekkoSmpl smpl, IVariable x, IVariable logical)
         {
             //Code located here to keep all conditional code in one place 
@@ -4472,6 +4567,12 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Handle $-conditionals in expressions and assignments. [2 of 3].
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="tmp"></param>
+        /// <returns></returns>
         public static double Conditional2Of3(GekkoSmpl smpl, IVariable tmp)
         {
             //Code located here to keep all conditional code in one place 
@@ -4506,6 +4607,12 @@ namespace Gekko
             return v;
         }
 
+        /// <summary>
+        /// Handle $-conditionals in expressions and assignments. [3 of 3].
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="vName"></param>
+        /// <returns></returns>
         public static string Conditional3Of3(string code, string vName)
         {
             //Code located here to keep all conditional code in one place 
@@ -4519,17 +4626,33 @@ namespace Gekko
         // =========================================================================
         // =========================================================================
 
+        /// <summary>
+        /// Helper method is old IF logic should be activated.
+        /// </summary>
+        /// <param name="b"></param>
         public static void UseOldIf(bool b)
         {
             Globals.if_old_helper = b;
         }
 
+        /// <summary>
+        /// If d != 0, returns true, else returns false.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
         public static bool IsTrue(double d)
         {
             if (d != 0d) return true;
             else return false;
         }
 
+        /// <summary>
+        /// Logic regarding IF (... == ...), for instance IF (x == y);.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static IVariable Equals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //same logic in LogicalOr() and LogicalAnd()
@@ -4584,6 +4707,10 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Helper method to detect and report where IF (x == y) type problems occur.
+        /// </summary>
+        /// <param name="p"></param>
         private static void MissingProblem(P p)
         {
             //G.Writeln2("+++ WARNING: missing problem " + p.lastFileSentToANTLR + " ");
@@ -4601,10 +4728,15 @@ namespace Gekko
                 Globals.bugfixMissing1.Add(s);
                 Globals.bugfixMissing2.Add(s, null);
             }
-
-            //throw new GekkoException();
         }
 
+        /// <summary>
+        /// Handles IF (... &lt;&gt; ...)
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
@@ -4660,6 +4792,13 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Handles IF( %x1 &lt; %x2 );
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static IVariable StrictlySmallerThan(GekkoSmpl smpl, IVariable x, IVariable y)
         {            
             //hmm, comparing two 1x1 matrices will fail
@@ -4695,6 +4834,13 @@ namespace Gekko
             return rv;                        
         }
 
+        /// <summary>
+        /// Handles IF( %x1 &lt;= %x2 );
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static IVariable SmallerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
@@ -4730,6 +4876,13 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Handles IF( %x1 &gt;= %x2 );
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static IVariable LargerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
@@ -4765,6 +4918,13 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Handles IF( %x1 &gt; %x2 );
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static IVariable StrictlyLargerThan(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
@@ -4800,11 +4960,24 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Helper for $ #i IN #i0 kind of syntax.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static IVariable In(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             return Functions.contains(smpl, null, null, y, x);
         }
 
+        /// <summary>
+        /// Evaluate some logical IF statement.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static bool IsTrue(GekkoSmpl smpl, IVariable x)
         {
             if (x.Type() == EVariableType.Val || O.IsTimelessSeries(x))
@@ -4848,6 +5021,11 @@ namespace Gekko
         // ========================================================================================
         // ========================================================================================
 
+        /// <summary>
+        /// Check that the frequencies are the same.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         private static void CheckFreq(IVariable x, IVariable y)
         {
             EFreq freq = EFreq.A;
@@ -4863,6 +5041,11 @@ namespace Gekko
             }
         }        
 
+        /// <summary>
+        /// Helper regarding user-defined functions.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="name"></param>
         public static void PrepareUfunction(int number, string name)
         {
             //If the user has defined a procedure MYPROC, and Gekko later implements a MYPROC command,
@@ -4961,6 +5144,11 @@ namespace Gekko
         // USER FUNCTION STUFF START
         // USER FUNCTION STUFF START
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="n"></param>
         private static void FunctionErrorMessage(string name, int n)
         {
             if (name.StartsWith(Globals.procedure))
@@ -4983,7 +5171,11 @@ namespace Gekko
             }
         }
 
-
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string LastText(string s)
         {
             if (s.Contains(Globals.procedure)) s = "PROCEDURE " + s.Replace(Globals.procedure, "");
@@ -4991,6 +5183,11 @@ namespace Gekko
             return s;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, IVariable> FunctionLookupNew0(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5004,7 +5201,11 @@ namespace Gekko
             return rv;
         }
 
-
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, IVariable> FunctionLookupNew1(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5018,6 +5219,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> FunctionLookupNew2(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5031,6 +5237,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5044,6 +5255,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew4(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5057,6 +5273,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew5(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5070,6 +5291,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew6(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5083,6 +5309,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew7(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5096,6 +5327,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew8(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5109,6 +5345,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew9(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5122,6 +5363,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew10(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5135,6 +5381,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew11(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5148,6 +5399,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew12(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5161,6 +5417,11 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew13(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -5173,8 +5434,7 @@ namespace Gekko
             }
             return rv;
         }
-
-
+        
 
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END
