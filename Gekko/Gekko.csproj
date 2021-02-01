@@ -402,6 +402,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Stringlist.cs" />
+    <Compile Include="StringTokenizer.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="Translate.cs" />
@@ -461,7 +462,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="StringTokenizer2.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TspUtilities.cs" />
     <Compile Include="GuiTspUtilities.cs">

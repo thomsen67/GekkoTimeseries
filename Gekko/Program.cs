@@ -4383,7 +4383,7 @@ namespace Gekko
             int year2 = int.MinValue;
 
             string txt = Program.GetTextFromFileWithWait(fileLocal);
-            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanksSkipNewlines(txt, 10, null, null, null, null);
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanksSkipNewlines(txt, 10, null, null, null, null);
                          
             int nSeries = 0;
             int nList = 0;
@@ -12448,7 +12448,7 @@ namespace Gekko
         private static void PrintEquation(string rhs)
         {
             GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
-            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(rhs);  //slack, tokenizing two times
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(rhs);  //slack, tokenizing two times
             for (int i = 0; i < tokens.storage.Count; i++)
             {
                 TokenHelper token = tokens[i];
@@ -12492,7 +12492,7 @@ namespace Gekko
         private static GekkoDictionary<string, string> GetKnownVars(string input, bool useDatabank)
         {
             GekkoDictionary<string, string> knownVars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(input);
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(input);
             foreach (TokenHelper token in tokens.storage)
             {
                 if (token.type == ETokenType.Word)
@@ -23049,7 +23049,7 @@ namespace Gekko
                 restOfLine.Replace(';', ' ');  // ';' can be used as delimiter instead of space
                 restOfLine.Trim();  //now restOfLine is "i=1,2,3,4,5 j=wb,wm,wt" or "i=1,2,3,4,5;j=wb,wm,wt"
 
-                StringTokenizer2 tok = new StringTokenizer2(restOfLine, false, true);
+                StringTokenizer tok = new StringTokenizer(restOfLine, false, true);
                 tok.IgnoreWhiteSpace = true;
                 tok.SymbolChars = new char[] { '=', ';', ',' };
                 Token token;
@@ -25110,7 +25110,7 @@ namespace Gekko
             all = GetTextFromFileWithWait(fileName);
 
             all2 = G.oddX0000Hack(all);
-            StringTokenizer2 tok = new StringTokenizer2(all2, false, true);
+            StringTokenizer tok = new StringTokenizer(all2, false, true);
             tok.IgnoreWhiteSpace = ignoreWhiteSpace;
             tok.SymbolChars = new char[] { '?', '(', ')', '=', '+', '-', '*', '/', '$' };
             Token token;

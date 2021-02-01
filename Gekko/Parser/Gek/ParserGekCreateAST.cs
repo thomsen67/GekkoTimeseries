@@ -849,7 +849,7 @@ namespace Gekko.Parser.Gek
         private static void CheckForBadDouble(string lineTemp)
         {
             string xx = G.ReplaceGlueSymbols(lineTemp.Trim());
-            StringTokenizer2 tok = new StringTokenizer2(xx, false, true);
+            StringTokenizer tok = new StringTokenizer(xx, false, true);
             tok.IgnoreWhiteSpace = false;
             tok.SymbolChars = new char[] { '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '*', '<', '>', ';', ',', ':', '-' };
             Token token;

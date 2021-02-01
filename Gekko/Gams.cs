@@ -131,7 +131,7 @@ namespace Gekko
             var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
             var tags4 = new List<string>() { "*" };
 
-            TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
+            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 

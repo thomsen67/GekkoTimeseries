@@ -24,7 +24,7 @@ namespace Gekko
             string txt = input;            
             var tags2 = new List<string>() { "!" };
 
-            TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, null, tags2, null, null);
+            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, null, tags2, null, null);
             
             int counter = 0;
 
@@ -1163,7 +1163,7 @@ namespace Gekko
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
 
-            TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
+            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
 
             int counter = 0;
 
@@ -1287,7 +1287,7 @@ namespace Gekko
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
 
-            TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
+            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
 
             int counter = 0;
 
@@ -1339,7 +1339,7 @@ namespace Gekko
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
 
-            TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
+            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
 
             int counter = 0;
 

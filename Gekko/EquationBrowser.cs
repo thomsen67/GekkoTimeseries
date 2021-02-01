@@ -332,9 +332,9 @@ namespace Gekko
                         var tags2 = new List<string>() { "//" };
                         string depLine = lines[listI + 1].Trim();
                         depLine = depLine.Replace(Globals.ols2, "").Trim();
-                        List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
+                        List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
 
-                        //List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
+                        //List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
                         string varLine = null;
                         for (int i2 = 0; i2 < a.Count; i2++)
                         {
@@ -1068,7 +1068,7 @@ namespace Gekko
             int fat = 3;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
-            List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(genr, fat, tags1, tags2, null, null).storage;
+            List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(genr, fat, tags1, tags2, null, null).storage;
             //List<TokenHelper> a = Program.GetTokensWithLeftBlanks(genr, fat, true);
 
             List<List<TokenHelper>> statements = new List<List<TokenHelper>>();
@@ -1119,7 +1119,7 @@ namespace Gekko
                     continue;
                 }
 
-                Tuple<int, int> opt = StringTokenizer2.FindOptionFieldInSeriesAssignment(th);
+                Tuple<int, int> opt = StringTokenizer.FindOptionFieldInSeriesAssignment(th);
                 int hasSeriesKeyword = 0;
                 if (G.Equal(th[0].s, "ser") || G.Equal(th[0].s, "series")) hasSeriesKeyword = 1;
                 string temp = null;
@@ -1130,7 +1130,7 @@ namespace Gekko
                     //no option field, "x = 1" OR "ser x = 1"
                     //if we start at hasSeriesKeyword, it is: "x = 1"
                     nameStart = hasSeriesKeyword;
-                    nameEnd = StringTokenizer2.FindS(th, nameStart + 1, "=");
+                    nameEnd = StringTokenizer.FindS(th, nameStart + 1, "=");
                     if (nameEnd != -12345) nameEnd--;
                 }
                 else
@@ -1141,14 +1141,14 @@ namespace Gekko
                     {
                         //option field before variable, for instance <...> x =  OR series <...> x = 
                         nameStart = opt.Item2 + 1;
-                        nameEnd = StringTokenizer2.FindS(th, nameStart + 1, "=");
+                        nameEnd = StringTokenizer.FindS(th, nameStart + 1, "=");
                         if (nameEnd != -12345) nameEnd--;
                     }
                     else
                     {
                         //option field after variable, for instance x <...> = OR series x <...> = 
                         nameStart = hasSeriesKeyword;
-                        nameEnd = StringTokenizer2.FindS(th, nameStart + 1, "<");
+                        nameEnd = StringTokenizer.FindS(th, nameStart + 1, "<");
                         if (nameEnd != -12345) nameEnd--;
                     }
                 }
@@ -1170,7 +1170,7 @@ namespace Gekko
                     {
                         //simple name
                         string name = th[nameStart].s;
-                        string s3 = StringTokenizer2.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
+                        string s3 = StringTokenizer.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
                         BrowserAddItem(datagen, name.Trim(), s3.Trim());
                     }
                     else
@@ -1218,7 +1218,7 @@ namespace Gekko
                             {
                                 //probably nothing to add, complicated name but no scalars found, for instance fy[2000] = ...
                                 string name = th[nameStart].s;
-                                string s3 = StringTokenizer2.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
+                                string s3 = StringTokenizer.GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
                                 BrowserAddItem(datagen, name.Trim(), s3.Trim());
                             }
                             else if (scalarsOnLhsInSerStatement.Count == 1 && xx[0].Value != null)
@@ -1359,7 +1359,7 @@ namespace Gekko
             try
             {
                 int fat = 20;
-                List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(equationText, fat, null, null, null, null).storage;
+                List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(equationText, fat, null, null, null, null).storage;
                 //List<TokenHelper> a = GetTokensWithLeftBlanks(equationText, 20, false);
 
                 int counter = -1;
