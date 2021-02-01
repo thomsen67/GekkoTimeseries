@@ -2555,12 +2555,12 @@ namespace Gekko
                                         if (tsExisting.dimensions == tsProtobuf.dimensions)
                                         {
                                             //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
-                                            MapMultidim gmapExisting = tsExisting.dimensionsStorage;
-                                            MapMultidim gmapProtobuf = tsProtobuf.dimensionsStorage;
+                                            Multidim gmapExisting = tsExisting.dimensionsStorage;
+                                            Multidim gmapProtobuf = tsProtobuf.dimensionsStorage;
 
-                                            foreach (KeyValuePair<MapMultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
+                                            foreach (KeyValuePair<MultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
                                             {
-                                                MapMultidimItem nameDimProtobuf = kvpGmap.Key;
+                                                MultidimItem nameDimProtobuf = kvpGmap.Key;
                                                 Series tsDimProtobuf = kvp.Value as Series;  //must be timeseries, no need to check that the type is so
 
                                                 IVariable ivDimExisting = null; gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
@@ -3549,7 +3549,7 @@ namespace Gekko
                         }
                     }
 
-                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(ss2, tsGhost), tsSub);
+                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(ss2, tsGhost), tsSub);
 
                 }
                 else
@@ -3615,7 +3615,7 @@ namespace Gekko
         /// <param name="gmapItem"></param>
         /// <param name="tsProtobuf"></param>
         /// <param name="shouldOverwriteLaterOn"></param>
-        private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, MapMultidim gmap, MapMultidimItem gmapItem, Series tsProtobuf, bool shouldOverwriteLaterOn)
+        private static void MergeTwoTimeseriesWithDateWindowHelper(AllFreqsHelper dates, Multidim gmap, MultidimItem gmapItem, Series tsProtobuf, bool shouldOverwriteLaterOn)
         {
             if (shouldOverwriteLaterOn)
             {
@@ -5288,7 +5288,7 @@ namespace Gekko
                         split2[i] = split[2 * i + 2];
                     }
 
-                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(split2, tsGhost), ts);
+                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(split2, tsGhost), ts);
                 }
             }
 
@@ -11625,31 +11625,7 @@ namespace Gekko
 
             return;
         }
-
-        /// <summary>
-        /// Helper method for the sorting of array-series indexes. For instance, x[b, c] should be shown before x[c, a].
-        /// Also uses G.CompareNatural() internally (showing x[a2] before x[a10]).
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <returns></returns>
-        public static int CompareMapMultidimItems(MapMultidimItem left, MapMultidimItem right)
-        {
-            if (left.storage.Length != right.storage.Length)
-            {
-                G.Writeln2("*** ERROR: #9843298473");
-                throw new GekkoException();
-            }
-            for (int i = 0; i < left.storage.Length; i++)
-            {
-                string sleft = left.storage[i];
-                string sright = right.storage[i];
-                int ii = G.CompareNatural(sleft, sright, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase);
-                if (ii != 0) return ii;
-            }
-            return 0;
-        }
-
+        
         /// <summary>
         /// The DISP command. Wildcards can be used, like DISP x*; Wildcards use Program.Search().
         /// </summary>
@@ -11836,12 +11812,12 @@ namespace Gekko
                 foreach (string expl in expls) G.Writeln(expl);
 
                 bool eqsPrinted = false;
-                List<MapMultidimItem> keys = null;
+                List<MultidimItem> keys = null;
                 GekkoDictionary<string, string>[] temp = null;
                 if (ts.type == ESeriesType.ArraySuper)
                 {
                     keys = ts.dimensionsStorage.storage.Keys.ToList();
-                    keys.Sort(CompareMapMultidimItems);
+                    keys.Sort(Multidim.CompareMultidimItems);
                     temp = new GekkoDictionary<string, string>[ts.dimensions];
                 }                
 
@@ -12037,12 +12013,12 @@ namespace Gekko
                 }
             }            
 
-            List<MapMultidimItem> keys = null;            
+            List<MultidimItem> keys = null;            
 
             if (ts.type == ESeriesType.ArraySuper)
             {
                 keys = ts.dimensionsStorage.storage.Keys.ToList();
-                keys.Sort(CompareMapMultidimItems);                
+                keys.Sort(Multidim.CompareMultidimItems);                
             }
 
             bool eqsPrinted = false;
@@ -12178,7 +12154,7 @@ namespace Gekko
         /// <param name="ts"></param>
         /// <param name="keys"></param>
         /// <param name="eqsPrinted"></param>
-        private static void DispHelperArraySeries(Series ts, List<MapMultidimItem> keys, bool eqsPrinted)
+        private static void DispHelperArraySeries(Series ts, List<MultidimItem> keys, bool eqsPrinted)
         {
             // --------------
             // Array-series
@@ -12232,7 +12208,7 @@ namespace Gekko
             }
             else
             {
-                MapMultidimItem mm = keys[0];
+                MultidimItem mm = keys[0];
                 string first = keys[0].ToString();
                 string last = keys[keys.Count - 1].ToString();
 
@@ -12243,7 +12219,7 @@ namespace Gekko
                 }
 
                 int countFix = 0;
-                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
                     Series sub = kvp.Value as Series;
                     if (sub.meta.fix == EFixedType.Timeless || sub.meta.fix == EFixedType.Normal) countFix++;
@@ -12273,7 +12249,7 @@ namespace Gekko
         /// <param name="dimCount"></param>
         /// <param name="elements"></param>
         /// <param name="domains"></param>
-        public static void DispHelperArraySeries2(Series ts, List<MapMultidimItem> keys, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
+        public static void DispHelperArraySeries2(Series ts, List<MultidimItem> keys, ref double dimCount2, ref string dimCount, List<List<string>> elements, List<string> domains)
         {
             GekkoDictionary<string, string>[] temp = new GekkoDictionary<string, string>[ts.dimensions];
             for (int i = 0; i < ts.dimensions; i++)
@@ -12288,7 +12264,7 @@ namespace Gekko
                 if (domain != null) domain = domain + ", ";
                 temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 int ii = 0;
-                foreach (MapMultidimItem key in keys)
+                foreach (MultidimItem key in keys)
                 {
                     if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
                     ii++;
@@ -15017,7 +14993,7 @@ namespace Gekko
 
                 if (ts.type == ESeriesType.ArraySuper)
                 {
-                    foreach (KeyValuePair<MapMultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
+                    foreach (KeyValuePair<MultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
                     {
                         Series sub = kvpsub.Value as Series;
                         l.Add(sub);
@@ -26249,7 +26225,7 @@ namespace Gekko
                     }
                     else
                     {
-                        foreach (KeyValuePair<MapMultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
+                        foreach (KeyValuePair<MultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
                         {
                             if (tsGrund.dimensionsStorage.storage.ContainsKey(kvpsub.Key))
                             {
@@ -26264,7 +26240,7 @@ namespace Gekko
                             }
                         }
 
-                        foreach (KeyValuePair<MapMultidimItem, IVariable> kvpsub in tsGrund.dimensionsStorage.storage)
+                        foreach (KeyValuePair<MultidimItem, IVariable> kvpsub in tsGrund.dimensionsStorage.storage)
                         {
                             if (ts.dimensionsStorage.storage.ContainsKey(kvpsub.Key))
                             {

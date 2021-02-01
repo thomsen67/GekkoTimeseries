@@ -1653,7 +1653,7 @@ namespace Gekko
                                     //create it
                                     if (isMultiDim)
                                     {
-                                        MapMultidimItem mmi = new MapMultidimItem(dims.ToArray(), ts);
+                                        MultidimItem mmi = new MultidimItem(dims.ToArray(), ts);
                                         IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                                         if (iv == null)
                                         {
@@ -1966,7 +1966,7 @@ namespace Gekko
 
                             if (ts.type == ESeriesType.ArraySuper)
                             {
-                                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                                foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                                 {
                                     string[] ss = kvp.Key.storage;
                                     WriteGdxHelper2(t1, t2, hasPrefix, gdx, kvp.Value as Series, ss, gdxValues);
@@ -2189,7 +2189,7 @@ namespace Gekko
 
             if (ts.type == ESeriesType.ArraySuper)
             {
-                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                 {
                     string[] ss = kvp.Key.storage;
                     WriteGdxHelperSlow2(t1, t2, usePrefix, gvar, kvp.Value as Series, ss);

@@ -1489,7 +1489,7 @@ namespace Gekko
                     List<string> lines = new List<string>();
 
 
-                    foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                    foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                     {
                         Series sub = kvp.Value as Series;
                         string name = G.Chop_RemoveFreq(sub.GetName(), G.ConvertFreq(Program.options.freq));

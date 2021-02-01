@@ -24,6 +24,7 @@ using System.Text;
 using ProtoBuf;
 using System.Drawing;
 using System.Linq;
+using System.Globalization;
 
 namespace Gekko
 {
@@ -122,7 +123,7 @@ namespace Gekko
         //[ProtoMember(7)]
         //private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
         [ProtoMember(8)]
-        public MapMultidim dimensionsStorage = null;  //only active if it is an array-timeseries
+        public Multidim dimensionsStorage = null;  //only active if it is an array-timeseries
 
         [ProtoMember(9)]
         //dimensions = gdxdimensions + (type == Timeless) - 1
@@ -134,7 +135,7 @@ namespace Gekko
         //BEWARE: Be careful when using .dataOffsetLag! #772439872435
         private int dataOffsetLag = 0;  //Added in protobuf for ultra-safety, should not be necessary. Only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
 
-        public MapMultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
+        public MultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
         public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
 
         private Series()
@@ -245,7 +246,7 @@ namespace Gekko
                 this.name = variableName;
                 this.meta = new SeriesMetaInformation();
                 this.dimensions = dimensions;
-                this.dimensionsStorage = new MapMultidim();
+                this.dimensionsStorage = new Multidim();
                 this.data = null; //for safety this is killed off                
             }
             else
@@ -434,7 +435,7 @@ namespace Gekko
         {
             int tDim = 0;
             if (hasTimeDimension) tDim = 1;
-            this.dimensionsStorage = new MapMultidim();
+            this.dimensionsStorage = new Multidim();
             this.dimensions = dimensionsIncludingTimeDimension - tDim;
             this.type = ESeriesType.ArraySuper;
             //if (!hasTimeDimension) this.type = ESeriesType.Timeless;
@@ -1655,13 +1656,13 @@ namespace Gekko
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
-            List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();            
+            List<MultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();            
 
-            keys1.Sort(Program.CompareMapMultidimItems);            
+            keys1.Sort(Multidim.CompareMultidimItems);            
 
             for (int i = 0; i < keys1.Count; i++)
             {
-                MapMultidimItem mm1 = keys1[i];                
+                MultidimItem mm1 = keys1[i];                
                 
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
                 
@@ -1694,13 +1695,13 @@ namespace Gekko
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
-            List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
+            List<MultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
 
-            keys1.Sort(Program.CompareMapMultidimItems);
+            keys1.Sort(Multidim.CompareMultidimItems);
 
             for (int i = 0; i < keys1.Count; i++)
             {
-                MapMultidimItem mm1 = keys1[i];
+                MultidimItem mm1 = keys1[i];
 
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
 
@@ -1733,13 +1734,13 @@ namespace Gekko
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
-            List<MapMultidimItem> keys1 = x2_series.dimensionsStorage.storage.Keys.ToList();
+            List<MultidimItem> keys1 = x2_series.dimensionsStorage.storage.Keys.ToList();
 
-            keys1.Sort(Program.CompareMapMultidimItems);
+            keys1.Sort(Multidim.CompareMultidimItems);
 
             for (int i = 0; i < keys1.Count; i++)
             {
-                MapMultidimItem mm1 = keys1[i];
+                MultidimItem mm1 = keys1[i];
 
                 Series sub1 = x2_series.dimensionsStorage.storage[mm1] as Series;
 
@@ -1783,11 +1784,11 @@ namespace Gekko
             temp.meta = new SeriesMetaInformation();
             temp.data = new SeriesDataInformation();
 
-            List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
-            List<MapMultidimItem> keys2 = x2_series.dimensionsStorage.storage.Keys.ToList();
+            List<MultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
+            List<MultidimItem> keys2 = x2_series.dimensionsStorage.storage.Keys.ToList();
 
-            keys1.Sort(Program.CompareMapMultidimItems);
-            keys2.Sort(Program.CompareMapMultidimItems);
+            keys1.Sort(Multidim.CompareMultidimItems);
+            keys2.Sort(Multidim.CompareMultidimItems);
 
             List m0 = new List(); //subseries first
             List m1 = new List(); //subseries ref
@@ -1802,8 +1803,8 @@ namespace Gekko
 
             for (int i = 0; i < keys1.Count; i++)
             {
-                MapMultidimItem mm1 = keys1[i];
-                MapMultidimItem mm2 = keys2[i];
+                MultidimItem mm1 = keys1[i];
+                MultidimItem mm2 = keys2[i];
                 if (!mm1.Equals(mm2))
                 {
                     G.Writeln2("*** ERROR: Non-corresponding elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
@@ -2265,7 +2266,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
                                 
-                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);                
+                this.dimensionsStorage.TryGetValue(new MultidimItem(keys), out iv);                
                 string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(this.freq);
 
                 if (iv == null)
@@ -2286,21 +2287,21 @@ namespace Gekko
                             else if (Program.options.series_array_print_missing == ESeriesMissing.M)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
+                                ((Series)rv).mmi = new MultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(double.NaN);
                                 ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.M;
                             }
                             else if (Program.options.series_array_print_missing == ESeriesMissing.Zero)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
+                                ((Series)rv).mmi = new MultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(0d);
                                 ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Zero;
                             }
                             else if (Program.options.series_array_print_missing == ESeriesMissing.Skip)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
+                                ((Series)rv).mmi = new MultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(0d);  //must be 0 for .isNotFound to work
                                 ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Skip;
                             }
@@ -2319,7 +2320,7 @@ namespace Gekko
                             else if (settings?.create == O.ECreatePossibilities.Can || settings?.create == O.ECreatePossibilities.Must)
                             {
                                 Series ts = new Series(ESeriesType.Normal, this.freq, name2);
-                                this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), ts);
+                                this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), ts);
                                 rv = ts;
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
@@ -2329,13 +2330,13 @@ namespace Gekko
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.M)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
+                                ((Series)rv).mmi = new MultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(double.NaN);
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.Zero)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
+                                ((Series)rv).mmi = new MultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(0d);
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
@@ -2372,7 +2373,7 @@ namespace Gekko
                         {
                             rv = new Series(ESeriesType.Normal, this.freq, name2);
                         }                        
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), rv);
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), rv);
                     }
                 }
                 else
@@ -2381,7 +2382,7 @@ namespace Gekko
                     {
                         //creates a brand new                        
                         Series ts = new Series(ESeriesType.Normal, this.freq, name2);
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), ts);
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), ts);
                         rv = ts;
                     }
                     else
@@ -2657,10 +2658,10 @@ namespace Gekko
             {
                 //Clone the array-subseries
                 tsCopy.dimensions = this.dimensions;
-                tsCopy.dimensionsStorage = new MapMultidim();
-                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                tsCopy.dimensionsStorage = new Multidim();
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
-                    MapMultidimItem item = kvp.Key.Clone();
+                    MultidimItem item = kvp.Key.Clone();
                     item.parent = tsCopy;  //must be re-pointed
                     Series subseries = kvp.Value.DeepClone(truncate) as Series;
                     subseries.mmi = item; //the sub-ser
@@ -2709,7 +2710,7 @@ namespace Gekko
         {             
             if (this.type == ESeriesType.ArraySuper)
             {                
-                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
                     //Globals.mem++;
                     kvp.Value.DeepTrim();
@@ -2726,7 +2727,7 @@ namespace Gekko
             if (this.type == ESeriesType.ArraySuper)
             {
                 //#parentpointer
-                foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
+                foreach (KeyValuePair<MultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
                     Series subSeries = kvp.Value as Series;
                     if (subSeries != null)
@@ -2738,7 +2739,7 @@ namespace Gekko
             }
         }
 
-        private static void ConnectArraysSeriesWithSubSeries(Series arraySeries, Series subSeries, MapMultidimItem mmi)
+        private static void ConnectArraysSeriesWithSubSeries(Series arraySeries, Series subSeries, MultidimItem mmi)
         {
             mmi.parent = arraySeries;  //The mmi item points to the array-series
             subSeries.mmi = mmi; //the sub-series points to the mmi, this way we can get from the sub-series all the way up to the array-series.                        
@@ -2830,6 +2831,146 @@ namespace Gekko
             return this.isDirty;
         }
         
-    }    
+    }
 
+    [ProtoContract]
+    public class Multidim
+    {
+        [ProtoMember(1)]
+        public Dictionary<MultidimItem, IVariable> storage = new Dictionary<MultidimItem, IVariable>();
+
+        public Multidim()
+        {
+            //only for protobuf use
+        }
+
+        public bool TryGetValue(MultidimItem gmi, out IVariable iv)
+        {
+            return this.storage.TryGetValue(gmi, out iv);
+        }
+
+        public void AddIVariableWithOverwrite(MultidimItem mmi, IVariable iv)
+        {
+            if (iv.Type() == EVariableType.Series && ((Series)iv).type == ESeriesType.Light)
+            {
+                throw new GekkoException(); //this check can be removed at some point
+            }
+            if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
+            this.storage.Add(mmi, iv);
+            Series ts = iv as Series;  //always so
+            if (ts != null) ts.mmi = mmi;  //so that the sub-series points to the mmi object, which in turn points to the array-series
+        }
+
+        public void RemoveIVariable(MultidimItem mmi)
+        {
+            if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
+            else
+            {
+                G.Writeln2("*** ERROR: Could not remove variable");
+                throw new GekkoException();
+            }
+        }
+
+        /// <summary>
+        /// Helper method for the sorting of array-series indexes. For instance, x[b, c] should be shown before x[c, a].
+        /// Also uses G.CompareNatural() internally (showing x[a2] before x[a10]).
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static int CompareMultidimItems(MultidimItem left, MultidimItem right)
+        {
+            if (left.storage.Length != right.storage.Length)
+            {
+                G.Writeln2("*** ERROR: #9843298473");
+                throw new GekkoException();
+            }
+            for (int i = 0; i < left.storage.Length; i++)
+            {
+                string sleft = left.storage[i];
+                string sright = right.storage[i];
+                int ii = G.CompareNatural(sleft, sright, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase);
+                if (ii != 0) return ii;
+            }
+            return 0;
+        }
+    }
+
+    [ProtoContract]
+    public class MultidimItem
+    {
+        [ProtoMember(1)]
+        public string[] storage = null;
+
+        public Series parent = null;  //do not store in protobuf
+
+        private MultidimItem()
+        {
+            //only because protobuf needs it, not for outside use
+        }
+
+        //Only used for lookup purposes, is going to be discarded afterwards
+        public MultidimItem(string[] s)
+        {
+            this.storage = s;
+        }
+
+        //Used for permanent storage, so the mmi must point to its parent
+        public MultidimItem(string[] s, Series parent)
+        {
+            this.storage = s;
+            this.parent = parent;
+        }
+
+        public override string ToString()
+        {
+            string first = null;
+            foreach (string s in this.storage)
+            {
+                first += s + ", ";
+            }
+            first = first.Substring(0, first.Length - ", ".Length);
+            return first;
+        }
+
+        public string GetName()
+        {
+            return this.parent.name + "[" + this.ToString() + "]";
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            for (int i = 0; i < storage.Length; i++)
+            {
+                hash = hash * 31 + storage[i].ToLower().GetHashCode();  //the 17 and 31 is a trick (primes) to get the hashcodes as distinct as possible. We need ToLower() so that 'aB' and 'Ab' are equal
+            }
+            return hash;
+        }
+
+        public override bool Equals(object obj)
+        {
+            //This will run fastest if the strings are interned (cf. string.Intern). But it seems they are so when getting deflated
+            //from protobuf file anyway.
+            //Hmmm maybe not so important, since the strings will have mixed cases. Maybe in principle we should store all of them as
+            //lower-case..... ??
+
+            if (obj == null || obj.GetType() != typeof(MultidimItem)) return false;
+            MultidimItem other = (MultidimItem)obj;
+            if (this.storage.Length != other.storage.Length) return false;
+            for (int i = 0; i < this.storage.Length; i++)
+            {
+                if (!G.Equal(this.storage[i], other.storage[i])) return false;
+            }
+            return true;
+        }
+
+        public MultidimItem Clone()
+        {
+            string[] ss = new string[this.storage.Length];
+            Array.Copy(this.storage, ss, this.storage.Length);
+            MultidimItem mmi = new MultidimItem(ss, this.parent);
+            return mmi;
+        }
+    }
 }

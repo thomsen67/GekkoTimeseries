@@ -1153,7 +1153,7 @@ namespace Gekko
                                     databank.AddIVariable(ts.name, ts);
                                 }
 
-                                MapMultidimItem mmi = new MapMultidimItem(ss2.ToArray(), ts);
+                                MultidimItem mmi = new MultidimItem(ss2.ToArray(), ts);
                                 IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
                                 if (iv == null)
                                 {
@@ -2599,7 +2599,7 @@ namespace Gekko
                 {
                     //array-series
 
-                    MapMultidimItem mmi = new MapMultidimItem(indexes);
+                    MultidimItem mmi = new MultidimItem(indexes);
 
                     //now we know that the series exists
 
@@ -2987,7 +2987,7 @@ namespace Gekko
                 {
                     //array-series
 
-                    MapMultidimItem mmi = new MapMultidimItem(indexes);
+                    MultidimItem mmi = new MultidimItem(indexes);
 
                     //now we know that the series exists
 
@@ -8594,9 +8594,9 @@ namespace Gekko
                 foreach (O.Prt.Element element in this.prtElements)
                 {
                     labelOriginal.Add(element.labelGiven[0]);
-                    List<List<MapMultidimItem>> check = new List<List<MapMultidimItem>>();
-                    check.Add(new List<MapMultidimItem>());
-                    check.Add(new List<MapMultidimItem>());
+                    List<List<MultidimItem>> check = new List<List<MultidimItem>>();
+                    check.Add(new List<MultidimItem>());
+                    check.Add(new List<MultidimItem>());
 
                     int firstVariableFoundInFirstOrRef = 0; //for each comma in PRT, counter is 1 when the first non-null variable is found (often in first, but could be in ref)
 
@@ -8792,10 +8792,10 @@ namespace Gekko
             }
 
 
-            private static void FlattenArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
+            private static void FlattenArraySeriesHelper(Series tsFirst, List<List<MultidimItem>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
             {
 
-                List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+                List<MultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
 
                 string[] domains = tsFirst.meta.domains;
 
@@ -8842,10 +8842,10 @@ namespace Gekko
                     G.Writeln2("Array-series " + G.GetNameAndFreqPretty(tsFirst.name) + " has no elements");
                     throw new GekkoException();
                 }
-                keys.Sort(Program.CompareMapMultidimItems);
+                keys.Sort(Multidim.CompareMultidimItems);
 
                 //List mm0 = new List();
-                foreach (MapMultidimItem key in keys)
+                foreach (MultidimItem key in keys)
                 {
                     if (restrict != null)
                     {

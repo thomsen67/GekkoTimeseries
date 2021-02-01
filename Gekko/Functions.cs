@@ -580,12 +580,12 @@ namespace Gekko
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
 
-            foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+            foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
             {
                 //foreach array-subseries, for instance x[#age] over the ages 18-100
                 //must be converted into y[#t] where #t is for instance 1950-2100, and the timeperiod is undated 18-100
 
-                MapMultidimItem map = kvp.Key;
+                MultidimItem map = kvp.Key;
                 string s = map.storage[iDim - 1];
                 int a = G.IntParse(s);
                 if (a == -12345)
@@ -609,7 +609,7 @@ namespace Gekko
 
                 foreach (GekkoTime t in new GekkoTimeIterator(tsSub.GetRealDataPeriodFirst(), tsSub.GetRealDataPeriodLast()))
                 {
-                    MapMultidimItem mapRotated = map.Clone();
+                    MultidimItem mapRotated = map.Clone();
                     map.parent = tsRotated;
                     mapRotated.storage[iDim - 1] = t.ToString();
 
@@ -1123,7 +1123,7 @@ namespace Gekko
                     else if (x[0].Type() == EVariableType.Val)
                     {
                         ts = new Series(Program.options.freq, null);
-                        ts.dimensionsStorage = new MapMultidim();
+                        ts.dimensionsStorage = new Multidim();
                         ts.dimensions = O.ConvertToInt(x[0]);
                         ts.type = ESeriesType.ArraySuper;
                         ts.meta = new SeriesMetaInformation();
@@ -1993,10 +1993,10 @@ namespace Gekko
             string dimCount = null;
             List<List<string>> elements = new List<List<string>>();
             List<string> domains = new List<string>();                        
-            List<MapMultidimItem> keys = null;
+            List<MultidimItem> keys = null;
             GekkoDictionary<string, string>[] temp = null;            
             keys = x_series.dimensionsStorage.storage.Keys.ToList();
-            keys.Sort(Program.CompareMapMultidimItems);
+            keys.Sort(Multidim.CompareMultidimItems);
             temp = new GekkoDictionary<string, string>[x_series.dimensions];
             Program.DispHelperArraySeries2(x_series, keys, ref dimCount2, ref dimCount, elements, domains);
 
@@ -2046,10 +2046,10 @@ namespace Gekko
             string dimCount = null;
             List<List<string>> elements = new List<List<string>>();
             List<string> domains = new List<string>();
-            List<MapMultidimItem> keys = null;
+            List<MultidimItem> keys = null;
             GekkoDictionary<string, string>[] temp = null;
             keys = x_series.dimensionsStorage.storage.Keys.ToList();
-            keys.Sort(Program.CompareMapMultidimItems);
+            keys.Sort(Multidim.CompareMultidimItems);
 
             IVariable mm = null;
 
@@ -2063,7 +2063,7 @@ namespace Gekko
             {                
 
                 mm = new List();
-                foreach (MapMultidimItem mmi in keys)
+                foreach (MultidimItem mmi in keys)
                 {
                     List m = new List();
                     if (G.Equal(s, "elements"))

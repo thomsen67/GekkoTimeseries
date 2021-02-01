@@ -1325,7 +1325,7 @@ namespace UnitTests
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2002, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2003, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2004, 300d, sharedDelta);
-            IVariable temp3 = null; (First().GetIVariable("x3!a") as Series).dimensionsStorage.TryGetValue(new MapMultidimItem(new string[] { "a" }), out temp3);
+            IVariable temp3 = null; (First().GetIVariable("x3!a") as Series).dimensionsStorage.TryGetValue(new MultidimItem(new string[] { "a" }), out temp3);
             Assert.IsTrue((temp3 as Series).type == ESeriesType.Timeless);
 
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2000, double.NaN, sharedDelta);
@@ -1333,7 +1333,7 @@ namespace UnitTests
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2002, 400d, sharedDelta);
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2003, 400d, sharedDelta);
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2004, double.NaN, sharedDelta);
-            IVariable temp4 = null; (First().GetIVariable("x4!a") as Series).dimensionsStorage.TryGetValue(new MapMultidimItem(new string[] { "b" }), out temp4);
+            IVariable temp4 = null; (First().GetIVariable("x4!a") as Series).dimensionsStorage.TryGetValue(new MultidimItem(new string[] { "b" }), out temp4);
             Assert.IsTrue((temp4 as Series).type == ESeriesType.Normal);
 
             _AssertSeries(First(), "x5!a", 2000, double.NaN, sharedDelta);  //Because it was found a a normal series to begin with
@@ -14677,7 +14677,7 @@ print(df2)
                 Series tsGhost = db.GetIVariable(s) as Series;
                 if (tsGhost.type != ESeriesType.ArraySuper) throw new GekkoException();
                 if (tsGhost.dimensions == 0) throw new GekkoException();
-                IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MapMultidimItem(indexes), out iv);
+                IVariable iv = null; tsGhost.dimensionsStorage.TryGetValue(new MultidimItem(indexes), out iv);
                 ts = iv as Series;
             }
             else
