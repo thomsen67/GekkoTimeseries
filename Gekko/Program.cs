@@ -3415,7 +3415,7 @@ namespace Gekko
 
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {
-                            iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
+                            iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MultiDim.parent
                         }
                         readInfo.variables = deserializedDatabank.storage.Count;
                         G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
