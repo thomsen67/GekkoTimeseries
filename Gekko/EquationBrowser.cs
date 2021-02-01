@@ -333,8 +333,7 @@ namespace Gekko
                         string depLine = lines[listI + 1].Trim();
                         depLine = depLine.Replace(Globals.ols2, "").Trim();
                         List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
-
-                        //List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
+                        
                         string varLine = null;
                         for (int i2 = 0; i2 < a.Count; i2++)
                         {
