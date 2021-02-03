@@ -10,7 +10,7 @@ using System.Collections;
 
 namespace Gekko.Parser.Gek
 {
-    public class ParserGekCommon
+    public class ParserGekCommon 
     {
 
     }
