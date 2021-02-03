@@ -773,7 +773,7 @@ namespace Gekko
                 ScalarDate t2 = new ScalarDate(o.t2);
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt1", new ScalarDate(o.t1));
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt2", new ScalarDate(o.t2));
-                Program.RunCommandCalledFromGUI(before, o.p);
+                Program.RunGekkoCommands(before, "", 0, o.p);
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt1");
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }
@@ -786,7 +786,7 @@ namespace Gekko
             {
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt1", new ScalarDate(o.t1));
                 Program.databanks.GetLocal().AddIVariableWithOverwrite(Globals.symbolScalar + "__simt2", new ScalarDate(o.t2));
-                Program.RunCommandCalledFromGUI(after, o.p);
+                Program.RunGekkoCommands(after, "", 0, o.p);
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt1");
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }

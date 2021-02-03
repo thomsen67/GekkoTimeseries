@@ -20,6 +20,56 @@ using System.Text;
 
 namespace Gekko
 {
+    public enum ETokenType
+    {
+        Unknown,
+        Word,
+        Number,
+        QuotedString,
+        Comment,
+        WhiteSpace,
+        Symbol,
+        EOL,
+        EOF,
+        Null  //used to signal out of range
+    }
+
+    public class Token
+    {
+        int line;
+        int column;
+        string value;
+        ETokenType kind;
+
+        public Token(ETokenType kind, string value, int line, int column)
+        {
+            this.kind = kind;
+            this.value = value;
+            this.line = line;
+            this.column = column;
+        }
+
+        public int Column
+        {
+            get { return this.column; }
+        }
+
+        public ETokenType Kind
+        {
+            get { return this.kind; }
+        }
+
+        public int Line
+        {
+            get { return this.line; }
+        }
+
+        public string Value
+        {
+            get { return this.value; }
+        }
+    }
+
     public class TokenList
     {
         //This is basically just a very simple list

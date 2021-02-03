@@ -212,7 +212,7 @@ namespace Gekko
                 File.Copy(fileNameIndex, fileNameIndex2, true);
             }
 
-            Program.RunCommandCalledFromGUI(settings_commands, new P());
+            Program.RunGekkoCommands(settings_commands, "", 0, new P());
 
             int gap = 20;
 
@@ -680,13 +680,13 @@ namespace Gekko
                 if (ts2 == null)
                 {
                     //only plot the series from Work
-                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
-                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", "", 0, new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", "", 0, new P());
                 }
                 else
                 {
-                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
-                    Program.RunCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", "", 0, new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", "", 0, new P());
                 }
 
                 sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");

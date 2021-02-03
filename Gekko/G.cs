@@ -113,19 +113,7 @@ namespace Gekko
         public static string ReplaceTurtle(string s)
         {
             return s.Replace("¤[0]", "").Replace("¤", "");
-        }
-        
-        /// <summary>
-        /// Helper method
-        /// </summary>
-        public static bool IsDebugSession
-        {
-            //Cannot get this to work...
-            get
-            {
-                return false;
-            }
-        }
+        }        
 
         /// <summary>
         /// Search for string inside string (case-insensitive)

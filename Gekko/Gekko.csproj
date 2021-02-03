@@ -331,7 +331,6 @@
     <Compile Include="Decomp.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Gams.cs" />
-    <Compile Include="GekkoError.cs" />
     <Compile Include="GekkoNull.cs" />
     <Compile Include="GekkoTime.cs" />
     <Compile Include="GuiDialogMakeShortcut.cs">
@@ -365,7 +364,6 @@
     <Compile Include="IVariable.cs" />
     <Compile Include="List.cs" />
     <Compile Include="ListViewDragDropManager.cs" />
-    <Compile Include="LongProcess.cs" />
     <Compile Include="Lookup.cs" />
     <Compile Include="LruCache.cs" />
     <Compile Include="Map.cs" />
@@ -462,7 +460,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="Token.cs" />
     <Compile Include="TspUtilities.cs" />
     <Compile Include="GuiTspUtilities.cs">
       <SubType>Form</SubType>

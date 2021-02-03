@@ -24586,7 +24586,7 @@ print(df2)
         private static void I(string s)
         {
             Globals.lastPrtOrMulprtTable = null;
-            Program.RunCommandCalledFromGUI(s, new P());
+            Program.RunGekkoCommands(s, "", 0, new P());
         }
 
         private static void CheckFullDatabank(double deltaAbs, double deltaRel, int t1, int t2)

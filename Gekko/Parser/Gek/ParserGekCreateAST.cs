@@ -15,12 +15,12 @@ using System.Reflection.Emit;
 namespace Gekko.Parser.Gek
 {
     /// <summary>
-    /// This class is used to create an AST from a .get (script) file. There is a similar class for model files.
+    /// This class is used to parse commands and create an ASTtree, and walk it.There is a similar class for model files.
     /// </summary>
     public class ParserGekCreateAST
     {
         
-        public static ConvertHelper CreateAST(ParseHelper ph, P p)
+        public static ConvertHelper ParseAndCallWalkAndEmit(ParseHelper ph, P p)
         {
             //Q q = new Q();  //make a fresh container for method argument helpers
             //p.SetQ(q);

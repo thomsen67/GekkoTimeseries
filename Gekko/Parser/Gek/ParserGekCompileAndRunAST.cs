@@ -222,7 +222,7 @@ namespace Gekko.Parser.Gek
                 }
             }
             Program.WriteCallStack(false, p);  //will only be performed once
-            if(!G.IsDebugSession)throw e;
+            throw e;
         }
 
         private static void HandleCompileErrors(P p, CompilerResults cr)

@@ -41,7 +41,7 @@ using System.Timers;
 namespace Gekko
 {
 
-    public delegate void SetTextDelegate(System.Windows.Forms.Control ctrl, string text);
+    public delegate void SetTextDelegate(System.Windows.Forms.Control ctrl, string text);    
 
     public partial class Gui : Form
     {
@@ -218,13 +218,10 @@ namespace Gekko
         ///
         [STAThread]
         public static void Main(string[] args)
-        {
-            if (!G.IsDebugSession)
-            {
-                //Code to handle unexpected crashes, for instance after hibernation
-                AppDomain currentDomain = AppDomain.CurrentDomain;
-                currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
-            }
+        {            
+            //Code to handle unexpected crashes, for instance after hibernation
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);            
             
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
@@ -1675,7 +1672,7 @@ namespace Gekko
                 CrossThreadStuff.Blink();
         }
 
-        public void StartThread(string s, bool newUserInput)
+        public void StartThread(string gekkoCommands, bool newUserInput)
         {
             toolStripStatusLabel3.Image = yellow;
             toolStripButton3.Enabled = true;
@@ -1683,9 +1680,7 @@ namespace Gekko
 
             Globals.bugfixMissing1 = new List<string>();
             Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            //System.Threading.Timer timer = new System.Threading.Timer(new TimerCallback(xx), null, 0, 1000);
-
+            
             //Blinking icon when running a command
             //Not active/blinking when Gekko is idle
             Globals.guiTimerCounter = 0;
@@ -1707,7 +1702,7 @@ namespace Gekko
 
             if (newUserInput)
             {
-                Globals.tasks.Enqueue(s);
+                Globals.tasks.Enqueue(gekkoCommands);
                 if (Globals.tasks.Count > 1)  //if 0 just run it normally
                 {
                     return;  //The job is dealt with in ThreadFinished()
@@ -1728,7 +1723,7 @@ namespace Gekko
             gui.threadEventStopThread.Reset();
             gui.threadEventThreadStopped.Reset();
             // create worker thread instance
-            gui.threadInput = s;
+            gui.threadInput = gekkoCommands;
             gui.threadWorkerThread = new Thread(new ThreadStart(this.WorkerThreadFunction), 10000000);  //with 1.7 MB (1700000) we can a sum of about 120 variables. Augmenting to 10 MB (10000000) --> around 700 variables in the sum (if it is a simple sum). That ought to be enough and 10x the default of 1 MB. The problem is all due to recursion when walking the AST.
             gui.threadWorkerThread.SetApartmentState(ApartmentState.STA);
             gui.threadWorkerThread.CurrentCulture = CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
@@ -1761,34 +1756,23 @@ namespace Gekko
             LongProcess longProcess;
             longProcess = new LongProcess(threadEventStopThread, threadEventThreadStopped, this);
 
-
+            string commandLine = longProcess.gekkoGui.threadInput;
+            
+            try
             {
-                string commandLine = longProcess.gekkoGui.threadInput;
-                
-                if (G.IsDebugSession)
+                longProcess.Run(p);
+            }
+            catch (Exception e2)
+            {
+                Program.PrintExceptionAndFinishThread(e2, p);
+                if (!Globals.applicationIsInProcessOfAborting)
                 {
-                    longProcess.Run(p);
+                    Globals.guiTimer.Stop();  //otherwise it will blink on
+                    Gui.gui.toolStripStatusLabel3a.Text = " ";
+                    toolStripStatusLabel3.Image = red;
+                    toolStripButton3.Enabled = false;
                 }
-                else
-                {
-                    try
-                    {
-                        longProcess.Run(p);
-                    }
-                    catch (Exception e2)
-                    {
-                        Program.PrintExceptionAndFinishThread(e2, p);
-                        if (!Globals.applicationIsInProcessOfAborting)
-                        {
-                            Globals.guiTimer.Stop();  //otherwise it will blink on
-                            Gui.gui.toolStripStatusLabel3a.Text = " ";
-                            toolStripStatusLabel3.Image = red;
-                            toolStripButton3.Enabled = false;
-                        }
-                        Program.GekkoExceptionCleanup(p);
-                        if (G.IsDebugSession) throw;
-                    }
-                }
+                Program.GekkoExceptionCleanup(p);
             }
         }
 

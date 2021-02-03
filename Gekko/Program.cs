@@ -131,6 +131,52 @@ namespace Gekko
         Ols
     }
 
+    /// <summary>
+	/// Class emulates long process which runs in worker thread
+	/// and makes synchronous user UI operations.
+	/// </summary>
+	public class LongProcess
+    {
+        // Main thread sets this event to stop worker thread:
+        ManualResetEvent eventStop2;
+        // Worker thread sets this event when it is stopped:
+        ManualResetEvent eventStopped2;
+        // Reference to main form used to make syncronous user interface calls:
+        public Gui gekkoGui;
+
+        public LongProcess(ManualResetEvent eventStop, ManualResetEvent eventStopped, Gui form)
+        {
+            eventStop2 = eventStop;
+            eventStopped2 = eventStopped;
+            gekkoGui = form;
+            Globals.workerThread = this;
+        }
+
+        // Function runs in worker thread and emulates long process.
+        public void Run(P p)
+        {
+            Program.RunGekkoCommands(gekkoGui.threadInput, "", 0, p);
+
+            // check if thread is cancelled (do this inside loops in e.g. "sim" etc.)
+            if (eventStop2.WaitOne(0, true))
+            {
+                // clean-up operations may be placed here
+                // ...
+                // inform main thread that this thread stopped
+                eventStopped2.Set();
+                return;
+            }
+
+            // Make asynchronous call to main form
+            // to inform it that thread finished
+            //if (!Globals.applicationIsInProcessOfAborting)
+            {
+                gekkoGui.Invoke(gekkoGui.threadDelegateThreadFinished, null);
+            }
+        }
+    }
+
+
     public class ExcelDnaData
     {
         public object[,] cells = null; //when transferring from Gekko databank to current sheet
@@ -198,6 +244,26 @@ namespace Gekko
             this.data = new OLSRekurData(n);
         }        
     }
+
+    
+    public class GekkoError
+    {
+        public int t1Problem = 0; //always 0 or positive
+        public int t2Problem = 0; //always 0 or positive
+
+        public GekkoError(int t1Problem, int t2Problem)
+        {
+            G.WritelnGray("*** ERROR: TooSmallTooLarge: " + t1Problem + " " + t2Problem);
+            G.Writeln2("*** ERROR: Unfortunately, you ran into a lag problem in Gekko 3.0.");
+            G.Writeln("    This typically arises in expressions like x1[-1] + x2, where timeseries with lags are");
+            G.Writeln("    involved. You may try to use an intermediate variable which will often provide a work-around");
+            G.Writeln("    for the problem, for instance defining y = x1[-1] + x2, and then use y instead of the ");
+            G.Writeln("    expression. For more on this problem, see this page: https://t-t.dk/gekko/the-lag-problem");
+            throw new GekkoException();
+            this.t1Problem = t1Problem;
+            this.t2Problem = t2Problem;
+        }
+    }    
 
     public class OLSRekurData
     {
@@ -5959,22 +6025,24 @@ namespace Gekko
         {
             if (Environment.Is64BitProcess) return Globals.compilerOptions64;
             else return Globals.compilerOptions32;
-        }        
-        
+        }
+
         /// <summary>
         /// This is the main entry into running Gekko commands, called for instance from the Gekko GUI window.
         /// These commands are parsed, compiled and executed.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="fileName"></param>
-        /// <param name="isLibrary"></param>
-        /// <param name="skip"></param>
+        /// <param name="skip">Only for internal use</param>
         /// <param name="p"></param>
-        public static void EmitCodeFromANTLR(string text, string fileName, bool isLibrary, int skip, P p)
+        /// 
+        public static void RunGekkoCommands(string text, string fileName, int skip, P p)
         {
             //#98073245298345
             //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
-            
+
+            if (Globals.excelDna) Globals.excelDnaOutput = new StringBuilder();  //clears, and records everything from now on for use in Excel window            
+
             int max = 1;
             if (G.Equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)
 
@@ -6016,7 +6084,7 @@ namespace Gekko
                                 break;
                             }
                             commandLinesFlat += ss[ii] + G.NL;
-                        }                                                
+                        }
                     }
                     ph.isOneLinerFromGui = false;
                 }
@@ -6045,9 +6113,7 @@ namespace Gekko
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                     p.lastFileSentToANTLR = fileName;
                     p.SetLastFileSentToANTLR(fileName);
-                                        
-                    ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, p);
-                    
+                    ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                 }
                 catch (Exception e)
@@ -6082,25 +6148,17 @@ namespace Gekko
                 ch.commandsText = commandLinesFlat;
                 if (fileName == "") Globals.commandMemory.storage.AppendLine(text); //is syntax-ok, but may run-time fail
 
-                if (isLibrary)
+                try
                 {
-                    //skip it, there will be no code, since code outside functions is not allowed in gcm files storing user functions (called with LIBRARY)
+                    Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                 }
-                else
+                catch (Exception e)
                 {
-                    try
-                    {
-                        Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
-                    }
-                    catch (Exception e)
-                    {
-                        if (!G.IsDebugSession) throw;
-                    }
+                    throw;
                 }
 
                 break;  //if we get to here, everything is ok so break the file-trying loop
-            }
-            //if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
+            }            
         }
 
         /// <summary>
@@ -11416,7 +11474,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             
-            Program.EmitCodeFromANTLR("", fileName2, false, (int)o.opt_skip, o.p);
+            Program.RunGekkoCommands("", fileName2, (int)o.opt_skip, o.p);
 
             if (G.Equal(s, Globals.autoExecCmdFileName))
             {
@@ -14237,7 +14295,7 @@ namespace Gekko
                 c = "$ (" + conditionals + ")";
             }
             string s = c + " = " + statement;
-            Program.RunCommandCalledFromGUI("VAR_KDUSJFLQO2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression             
+            Program.RunGekkoCommands("VAR_KDUSJFLQO2 deleteme " + s, "", 0, new P()); //produces Func<> Globals.expression with the expression             
         }
         
         /// <summary>
@@ -18562,16 +18620,7 @@ namespace Gekko
         // --------------------------------------------------------------------------------------
         // ----------------- used for tables end ------------------------------------------------
         // --------------------------------------------------------------------------------------
-
-        public static void RunCommandCalledFromGUI(string s, P p)
-        {
-            if (Globals.excelDna)
-            {
-                Globals.excelDnaOutput = new StringBuilder();  //clears, and records everything from now on for use in Excel window
-            }
-            Program.EmitCodeFromANTLR(s, "", false, 0, p);            
-        }
-
+        
         public static void Create(List varsInput, bool questionMark, O.Create o)
         {
             //ErrorIfDatabanksSwapped();

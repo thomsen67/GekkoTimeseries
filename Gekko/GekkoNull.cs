@@ -12,23 +12,7 @@ namespace Gekko
         // ----------------------------------------------------
         // --------------object functions start----------------
         // ----------------------------------------------------
-
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------
-
+        
         public double GetValOLD(GekkoSmpl t)
         {
             G.Writeln2("*** ERROR: Invalid operation on null/empty value");

@@ -402,7 +402,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
-                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", "", 0, new P());
                     };
                     tab.Set(i + 2, 6, G.GetLinkAction("Left", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -415,7 +415,7 @@ namespace Gekko
 
                     Action a = () =>
                     {
-                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", "", 0, new P());
                     };
                     tab.Set(i + 2, 7, G.GetLinkAction("Slide", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -427,7 +427,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
-                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", "", 0, new P());
                     };
                     tab.Set(i + 2, 8, G.GetLinkAction("Right", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -447,7 +447,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
+                    Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", "", 0, new P());
                 };
                 line += "  " + G.GetLinkAction("Fit", new GekkoAction(EGekkoActionTypes.Ols, name, a));
 
@@ -467,7 +467,7 @@ namespace Gekko
                             string label = o.expressionsText[i + 1];
                             s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
                         }
-                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
+                        Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", "", 0, new P());
                     }
                     else
                     {
@@ -478,7 +478,7 @@ namespace Gekko
                             s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
                         }
                         s += ", " + name + "_dec_trend 'trend'";
-                        Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
+                        Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", "", 0, new P());
                     }
                 };
                 line += "  " + G.GetLinkAction("Dec", new GekkoAction(EGekkoActionTypes.Ols, name, a));
@@ -492,7 +492,7 @@ namespace Gekko
                 // ---------                
                 Action a = () =>
                 {
-                    Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_left 'Chow-test (left)' <type=boxes>;", new P());
+                    Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_left 'Chow-test (left)' <type=boxes>;", "", 0, new P());
                 };
                 tab.Set(m + 2, 6, G.GetLinkAction("Chow", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                 // ---------
@@ -502,7 +502,7 @@ namespace Gekko
                 // ---------                
                 Action a = () =>
                 {
-                    Program.RunCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_right 'Chow-test (right)' <type=boxes>;", new P());
+                    Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_right 'Chow-test (right)' <type=boxes>;", "", 0, new P());
                 };
                 tab.Set(m + 2, 8, G.GetLinkAction("Chow", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                 // ---------
