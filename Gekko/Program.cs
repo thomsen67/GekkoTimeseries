@@ -1180,24 +1180,12 @@ namespace Gekko
         public int w;
         public int s;
         public int sForA;
-
     }
-
-
+    
+    
     /// <summary>
-    /// Simple helper class
+    /// A large class containing a "mixed bag" of all sorts of code.
     /// </summary>
-    public class MacroHelper
-    {
-        public string s;
-    }
-
-    public interface DB
-    {
-
-    }
-    
-    
     public static class Program
     {
         /// <summary>
@@ -1205,6 +1193,9 @@ namespace Gekko
         /// </summary>
         public static Options options = new Options();
 
+        /// <summary>
+        /// Helper for name aliases
+        /// </summary>
         public static GekkoDictionary<string, string> alias = null;
 
         /// <summary>
@@ -1217,16 +1208,36 @@ namespace Gekko
         /// Contains names of the open databanks. Not case-sensitive. The name of any bank points to a
         /// storage with variable names. Which again points to a double[] array with data for each period.
         /// </summary>
-        public static Databanks databanks = new Databanks();        
-        public static Dictionary<string, Table> tables = new Dictionary<string, Table>(StringComparer.OrdinalIgnoreCase);
-        public static CompiledGenrStatements compiledGenrStatements = new CompiledGenrStatements();
+        public static Databanks databanks = new Databanks();     
+        
+        /// <summary>
+        /// Storage of Gekko tables.
+        /// </summary>
+        public static Dictionary<string, Table> tables = new Dictionary<string, Table>(StringComparer.OrdinalIgnoreCase);        
 
-        //varlist stuff
+        /// <summary>
+        /// The Gekko variable list for models.
+        /// </summary>
         public static List<Item> unfoldedVariableList = null;  //the unfolded variable list
+
+        /// <summary>
+        /// Helper for the GUI browser (DISP command)
+        /// </summary>
         public static int guiBrowseNumber = 0;
+        
+        /// <summary>
+        /// Helper for the GUI browser (DISP command)
+        /// </summary>
         public static List<string> guiBrowseHistory = new List<string>();
 
+        /// <summary>
+        /// Helper for the GUI browser (DISP command)
+        /// </summary>
         public static int guiBrowseHelpNumber = 0;
+
+        /// <summary>
+        /// Helper for the GUI browser (DISP command)
+        /// </summary>
         public static List<string> guiBrowseHelpHistory = new List<string>();
 
         public enum eOfficeVersion
@@ -26757,17 +26768,7 @@ namespace Gekko
             public List<int> col = new List<int>();
             public int line = -1;
             public string file = "";
-        }
-
-        public class CompiledGenrStatements
-        {
-            //best to keep this stuff in one place, for safety
-            public Dictionary<string, int> list = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            public Assembly assembly = null;
-            public string inputCode = null;
-            public string generatedCsCode = null;
-            public int checkNumberOfLines = -12345;
-        }
+        }        
 
         public class PrintHelper
         {
@@ -27392,7 +27393,7 @@ namespace Gekko
         }
     }
 
-        public class P
+    public class P
     {
         public bool hasWrittenRunTimeErrorOnce = false;  //bit hacky
         public EHasShownErrorHandling hasShownErrorHandling = EHasShownErrorHandling.False;
