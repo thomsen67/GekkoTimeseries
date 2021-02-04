@@ -20,14 +20,7 @@ namespace Gekko.Parser.Gek
         public bool IsNull() {
             if (this.storage == null) return true;
             return false;
-        }
-
-        //public void SetNull()
-        //{
-        //    this.storage = null;
-        //}
-
-            
+        }   
 
         public override string ToString()
         {
@@ -92,9 +85,7 @@ namespace Gekko.Parser.Gek
             if (this.storage == null) this.storage = new StringBuilder();            
             this.storage.Insert(0, s);
         }
-
-
-
+        
         public void Replace(string s1, string s2)
         {
             this.storage.Replace(s1, s2);
@@ -107,8 +98,6 @@ namespace Gekko.Parser.Gek
             this.A(Globals.endGekkoSmplIteratorCode);
             this.Replace(Globals.gekkoSmplIteratorName, (++Globals.counter).ToString());
         }
-
-
     }
 
     
@@ -120,11 +109,7 @@ namespace Gekko.Parser.Gek
     }
 
     public class ParserGekWalkASTAndEmit
-    {
-
-        public static readonly GekkoTime tNULL = new GekkoTime(EFreq.A, -12345, 1);
-
-
+    {   
 
         public enum ELastCommand
         {
@@ -498,10 +483,6 @@ namespace Gekko.Parser.Gek
             if (node.Parent != null)
             {
                 string s = null;
-                //if (node.Text == "ASTTUPLEITEM")
-                //{
-                //    s = "_tuple_" + node.Number;  //a (VAL x, GENR y) = ... tuple is kind of like two separate commands.
-                //}
                 node.commandLinesCounter = node.Parent.commandLinesCounter + s;  //default, may be overridden if new command is encountered.               
             }
 
@@ -520,21 +501,8 @@ namespace Gekko.Parser.Gek
                 w.commandLinesCounter++;  //becomes 0 first time here (starts at -1)
                 node.commandLinesCounter = w.commandLinesCounter.ToString(); //used for the O(node)-method, so that o0, o1, o2 numbers do not suddenly change after for instance a FOR.
                 w.expressionCounter = -1;  //for labels in PRT elements
-
             }
-
-            //#9874352093573
-            if (node.Text == "ASTPRTELEMENT" || node.Text == "ASTOLSELEMENT" || node.Text == "ASTTABLESETVALUESELEMENT")
-            {
-                //??? Is this used at all?
-
-                //This local cache is only used for commands that do implicit timeseries looping with expressions
-                //For instance PRT fX%i (PRT fXnz would end in global cache), where we do not have to 
-                //  find fx%i for each period in the time loop (the reference fx%i is always fixed over that loop
-                //  which is internal/implicit inside the GENR statement).
-                ClearLocalStatementCache(w);
-            }
-
+            
             if (relativeDepth == 1)
             {
                 //see at #2384328423
@@ -1403,7 +1371,7 @@ namespace Gekko.Parser.Gek
 
                             
 
-                            if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
+                            if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree5(node.Parent))
                             {
                                 bool xxx = ReportHelperIsSum(internalName, internalFunction); //a controlled #x, bounded by sum
 
@@ -1620,7 +1588,7 @@ namespace Gekko.Parser.Gek
 
                             bool xxx = ReportHelperIsSum(internalName, internalFunction); //a controlled #x, bounded by sum
 
-                            if (((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent)) && (!xxx))
+                            if (((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree5(node.Parent)) && (!xxx))
                             {
                                 //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
                                 //node.Code.A("O.ListContains(" + node[0].Code + "," + Globals.reportInterior1 + indexes + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2 + ")");
@@ -2378,7 +2346,7 @@ namespace Gekko.Parser.Gek
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
                                     //after a sum(#m, ....) function, the labelCounter must be set to 0, if this sum() function is not inside another sum() function
-                                    bool b = SearchUpwardsInTree7(node.Parent);
+                                    bool b = SearchUpwardsInTree6(node.Parent);
                                     if (!b)
                                     {
                                         sb1.AppendLine(Globals.labelCounter + " = 0;");
@@ -2393,8 +2361,8 @@ namespace Gekko.Parser.Gek
 
                                 //node.Code.A(funcName + "()");
 
-                                if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
-                                w.wh.localFuncs.AppendLine(s2_changes.ToString());
+                                if (w.wh.localFuncsCode == null) w.wh.localFuncsCode = new GekkoStringBuilder();
+                                w.wh.localFuncsCode.AppendLine(s2_changes.ToString());
 
                                 node.Code.A(funcName + "(" + parentListLoopVars2 + ")"); //functionname may be for instance temp27(smpl)
 
@@ -2767,7 +2735,7 @@ namespace Gekko.Parser.Gek
 
                             //LIGHTFIXME, isRhs
 
-                            bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
+                            bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree5(node.Parent));
                             if (node[1].Text == "ASTDOT")
                                 reportInterior = false;  //never for #x.??? type indexing
                             
@@ -3382,7 +3350,7 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 string localFuncCode = "";
-                                if (w.wh.localFuncs != null) localFuncCode = w.wh.localFuncs.ToString();
+                                if (w.wh.localFuncsCode != null) localFuncCode = w.wh.localFuncsCode.ToString();
 
                                 // HACK HACK HACK
                                 // HACK HACK HACK
@@ -3398,8 +3366,8 @@ namespace Gekko.Parser.Gek
                                     localFuncCode = sb.ToString() + G.NL + localFuncCode;
                                 }
 
-                                w.wh.localFuncs = new GekkoStringBuilder();
-                                w.wh.localFuncs.Append(localFuncCode);
+                                w.wh.localFuncsCode = new GekkoStringBuilder();
+                                w.wh.localFuncsCode.Append(localFuncCode);
                             }
 
                         }
@@ -3424,9 +3392,9 @@ namespace Gekko.Parser.Gek
                             string funcName = "MapDef_" + node.mapTempVarName;
                             string s2 = "Map " + node.mapTempVarName + " = new Map();" + G.NL;
                             foreach (ASTNode child in node.ChildrenIterator()) s2 += child.Code.ToString();
-                            if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
+                            if (w.wh.localFuncsCode == null) w.wh.localFuncsCode = new GekkoStringBuilder();
                             string smplLocal, s2_changes; ReplaceSmpl(s2, out smplLocal, out s2_changes);
-                            w.wh.localFuncs.AppendLine("Func<GekkoSmpl, Map> " + funcName + " = (" + smplLocal + ") => {" + G.NL + s2_changes + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "};" + G.NL);
+                            w.wh.localFuncsCode.AppendLine("Func<GekkoSmpl, Map> " + funcName + " = (" + smplLocal + ") => {" + G.NL + s2_changes + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "};" + G.NL);
                             node.Code.A(funcName + "(" + Globals.smpl + ")");
                         }
                         break;
@@ -4346,7 +4314,6 @@ namespace Gekko.Parser.Gek
                             node.Code.A("for(int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++) {" + G.NL);
                             node.Code.A("int bankNumber = bankNumbers[bankNumberI];" + G.NL);
                             node.Code.A("" + Globals.smpl + ".bankNumber = bankNumber;" + G.NL);
-                            node.Code.A(EmitLocalCacheForTimeLooping(w));
 
                             //node.Code.A("smpl" 
                             node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
@@ -5015,20 +4982,18 @@ namespace Gekko.Parser.Gek
                     if (Globals.special.ContainsKey(node.Text))
                     {                                           
                         //do nothing
-                        string putInBefore = G.NL + "p.SetText(@`¤" + line + "`);" + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        string putInBefore = G.NL + "p.SetText(@`¤" + line + "`);" + G.NL + w.wh?.localFuncsCode?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }
                     else
                     {
                         //#2384328423                        
-                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localFuncsCode?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }
-                    
 
-                    //HACK #438543: a hack on this hack...! To avoid it is getting printed > 1 time for the same statement
-                    w.wh.localInsideLoopVariables = null;
-                    w.wh.localFuncs = null;
+                    //HACK #438543: a hack on this hack...! To avoid it is getting printed > 1 time for the same statement                    
+                    w.wh.localFuncsCode = null;
                 }
             }
 
@@ -5244,14 +5209,14 @@ namespace Gekko.Parser.Gek
         private static void StashIntoLocalFuncs(W w, string c, string s0, bool isLoop)
         {
             string smplLocal, s0_changes; ReplaceSmpl(s0, out smplLocal, out s0_changes);
-            if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
+            if (w.wh.localFuncsCode == null) w.wh.localFuncsCode = new GekkoStringBuilder();
             if (!isLoop)
             {
-                w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smplLocal + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
+                w.wh.localFuncsCode.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smplLocal + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
             }
             else
             {
-                w.wh.localFuncs.Append(s0);
+                w.wh.localFuncsCode.Append(s0);
             }
 
         }
@@ -5629,8 +5594,6 @@ namespace Gekko.Parser.Gek
         }
 
         
-
-
         private static string GetSimpleHashName(ASTNode node)
         {
             string rv = null;
@@ -5688,7 +5651,6 @@ namespace Gekko.Parser.Gek
             }
             return rv;
         }
-
         
         private static string SearchUpwardsInTree3(ASTNode node, string varName)
         {
@@ -5750,7 +5712,7 @@ namespace Gekko.Parser.Gek
             return rv;
         }
 
-        private static bool SearchUpwardsInTree6(ASTNode node)
+        private static bool SearchUpwardsInTree5(ASTNode node)
         {
             //finds out if node is inside [] or {}
             ASTNode tmp = node;
@@ -5763,7 +5725,7 @@ namespace Gekko.Parser.Gek
             return false;
         }
                 
-        private static bool SearchUpwardsInTree7(ASTNode node)
+        private static bool SearchUpwardsInTree6(ASTNode node)
         {
             //finds out if node is inside sum() function of type sum(#x, ...)
             ASTNode tmp = node;
@@ -5785,7 +5747,7 @@ namespace Gekko.Parser.Gek
             return false;
         }
 
-        private static ASTNode SearchUpwardsInTree7a(ASTNode node)
+        private static ASTNode SearchUpwardsInTree7(ASTNode node)
         {
             //finds highest sum() function of type sum(#x, ...)
             ASTNode tmp = node;
@@ -5845,77 +5807,12 @@ namespace Gekko.Parser.Gek
             StringBuilder destination = null;            
             destination = w.headerCs;
             return destination;
-        }
+        }        
         
-        private static void ClearLocalStatementCache(W w)
-        {
-            w.wh.localStatementCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }                       
-
         private static string Num(ASTNode node)
         {
             return "" + node.commandLinesCounter;
-        }        
-
-        private static string EmitLocalCacheForTimeLooping(W wh2)
-        {
-            string s = null;
-            StringBuilder sb = null;
-            if (wh2.wh != null && wh2.wh.localStatementCache != null && wh2.wh.localStatementCache.Count > 0)
-            {
-                sb = new StringBuilder();
-                foreach (KeyValuePair<string, string> kvp in wh2.wh.localStatementCache)
-                {
-                    sb.AppendLine("IVariable " + kvp.Value + " = " + kvp.Key + ";");
-                }
-                return s + sb.ToString();
-            }
-            return s;
-        }        
-
-        //This method converts a simple scalar like '%s' into a reference to 'scalar117' (global IVariable), via the method O.GetScalarFromCache()
-        private static string CacheRefScalarCs(out string scalarNameInGlobalCache, string scalarSimpleIdent, GekkoDictionary<string, string> scalarCache, StringBuilder headerCs, EScalarRefType type, string rhsCs, bool isName, bool transformationAllowed, bool stringify)
-        {
-            string scalarCs = null;
-            scalarNameInGlobalCache = null; scalarCache.TryGetValue(scalarSimpleIdent, out scalarNameInGlobalCache);
-            if (scalarNameInGlobalCache == null)
-            {
-                //this scalar name has not been encountered before
-                scalarNameInGlobalCache = "scalar" + ++Globals.counter;
-                scalarCache.Add(scalarSimpleIdent, scalarNameInGlobalCache);
-                headerCs.AppendLine("public static IVariable " + scalarNameInGlobalCache + " = null;");                
-            }            
-            //using the scalar name (for instance scalar117) found or created in the global cache
-            if (type == EScalarRefType.OnRightHandSide)
-            {
-                string b = "false";
-                if (transformationAllowed) b = "true";
-                string s = "false";
-                if (stringify) s = "true";
-                scalarCs = "O.GetScalarFromCache(ref " + scalarNameInGlobalCache + ", `" + scalarSimpleIdent + "`, " + b + ", " + s + ")";
-            }
-            else if (type == EScalarRefType.Val)
-            {
-                scalarCs = "O.SetValFromCache(ref " + scalarNameInGlobalCache + ", `" + scalarSimpleIdent + "`, " + rhsCs + ");" + G.NL;
-            }
-            else if (type == EScalarRefType.Date)
-            {
-                scalarCs = "O.SetDateFromCache(ref " + scalarNameInGlobalCache + ", `" + scalarSimpleIdent + "`, " + rhsCs + ");" + G.NL;
-            }
-            else if (type == EScalarRefType.String)
-            {
-                string x = "false";
-                if (isName) x = "true";
-                scalarCs = "O.SetStringFromCache(ref " + scalarNameInGlobalCache + ", `" + scalarSimpleIdent + "`, " + rhsCs + ", " + x + ");" + G.NL;
-            }
-            else if (type == EScalarRefType.Matrix)
-            {
-                //see also SetMatrixData(), should that be used??
-                scalarCs = "O.SetMatrixFromCache(ref " + scalarNameInGlobalCache + ", `" + scalarSimpleIdent + "`, " + rhsCs + ");" + G.NL;
-            }
-            else throw new GekkoException();    
-            return scalarCs;
-        }        
+        }
         
         private static void GetCodeFromAllChildren(ASTNode node)
         {
@@ -5964,20 +5861,6 @@ namespace Gekko.Parser.Gek
             }
             return minus;
         }
-
-        private static string ExtractInnerString(string s)
-        {
-            string s2 = s;
-            if (s.StartsWith("new ScalarString(`") && s.EndsWith("`)"))
-            {
-                s2 = s.Substring(18, s.Length - 18 - 2);
-            }
-            else if (s.StartsWith("(new ScalarString(`") && s.EndsWith("`))"))
-            {
-                s2 = s.Substring(19, s.Length - 19 - 3);
-            }
-            return s2;
-        }
         
         private static string AddOperator(string type, string s, string parentType, ASTNode node)
         {
@@ -5996,7 +5879,10 @@ namespace Gekko.Parser.Gek
         public int expressionCounter = -1;
         public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.                        
     }
-    
+
+    /// <summary>
+    /// Created for each new command (except IF, FOR, etc -- hmm is this true now?)
+    /// </summary>
     public class WalkHelper
     {
         public enum seriesType
@@ -6006,21 +5892,14 @@ namespace Gekko.Parser.Gek
             SeriesRhs
         }
 
-        //created for each new command (except IF, FOR, etc -- hmm is this true now?)
-
-        public GekkoStringBuilder localFuncs = null;
-        public string localInsideLoopVariables = null;  //probably obsolete now
-
-        public GekkoDictionary<string, string> localStatementCache = null;        
+        /// <summary>
+        /// This is for GAMS-like sum functions, contains C# code, used in Gekko 3.0.
+        /// </summary>
+        public GekkoStringBuilder localFuncsCode = null;
+                  
         public seriesType seriesHelper = seriesType.None;
 
-        public GekkoDictionary<string, string> seriesHelperListNames = null;
-        public GekkoDictionary<string, string> sumHelperListNames = null;
-
         public string currentCommand = null;
-        public bool isGotoOrTarget = false;
-             
+        public bool isGotoOrTarget = false;             
     }
-
-    
 }
