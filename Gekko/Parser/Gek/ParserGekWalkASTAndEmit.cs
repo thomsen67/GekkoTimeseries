@@ -5838,247 +5838,19 @@ namespace Gekko.Parser.Gek
                 tmp = tmp.Parent;
             }
             return false;
-        }
-
-        private static void ResetUFunctionHelpers(W w)
-        {
-            w.uFunctionsHelper = null;  //do not remove this line: important!      
-            w.uListCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            w.uScalarCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            w.uTsCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
+        }        
 
         private static StringBuilder GetHeaderCs(W w)
         {
-            StringBuilder destination = null;
-            if (w.uFunctionsHelper != null) destination = w.uFunctionsHelper.headerCs;
-            else destination = w.headerCs;
+            StringBuilder destination = null;            
+            destination = w.headerCs;
             return destination;
         }
-                
-
-        private static void AstListHelper(ASTNode node, W w, string simpleIdent, bool stringify)
-        {
-
-            node.Code.CA(""); //clearing
-
-            string nameCode = null;
-            string listName = simpleIdent;
-
-            //trying both left-side of SERIES indexer and sum function
-            string found = null; if (w.wh.seriesHelperListNames != null) w.wh.seriesHelperListNames.TryGetValue(listName, out found);
-            if(found == null) if (w.wh.sumHelperListNames != null) w.wh.sumHelperListNames.TryGetValue(listName, out found);
-
-            if (found != null)  //not found
-            {
-                nameCode = GetLoopNameCs(node, listName);
-                node.Code.A(nameCode);
-            }
-            else
-            {                
-                string stringifyString = "false"; if (stringify) stringifyString = "true";
-                GekkoDictionary<string, string> listCache = GetListCache(w);
-                string s = null; listCache.TryGetValue(simpleIdent, out s);
-                if (s == null)
-                {
-                    //has not been seen before
-                    string listWithNumber = "list" + ++Globals.counter;
-                    listCache.Add(simpleIdent, listWithNumber);
-                    GetHeaderCs(w).AppendLine("public static IVariable " + listWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
-                    node.Code.A("O.GetScalarFromCache(ref " + listWithNumber + ", `" + Globals.symbolCollection + simpleIdent + "`, false, " + stringifyString + ")");
-                }
-                else
-                {
-                    node.Code.A("O.GetScalarFromCache(ref " + s + ", `" + Globals.symbolCollection + simpleIdent + "`, false, " + stringifyString + ")");
-                }
-            }
-        }
-
-        private static GekkoDictionary<string, string> GetListCache(W w)
-        {
-            GekkoDictionary<string, string> listCache = null;
-            if (w.uFunctionsHelper != null) listCache = w.listCache;
-            else listCache = w.uListCache;
-            return listCache;
-        }
-
-        private static GekkoDictionary<string, string> GetScalarCache(W w)
-        {
-            GekkoDictionary<string, string> scalarCache = null;
-            if (w.uFunctionsHelper != null) scalarCache = w.scalarCache;
-            else scalarCache = w.uScalarCache;
-            return scalarCache;
-        }
-
-        private static GekkoDictionary<string, string> GetTsCache(W w)
-        {
-            GekkoDictionary<string, string> tsCache = null;
-            if (w.uFunctionsHelper != null) tsCache = w.tsCache;
-            else tsCache = w.uTsCache;
-            return tsCache;
-        }
-
+        
         private static void ClearLocalStatementCache(W w)
         {
             w.wh.localStatementCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        private static string HandleList(ASTNode node, string childCode)
-        {
-            string nodeCode = null;
-            nodeCode += "O.List o" + Num(node) + " = new O.List();" + G.NL;
-            nodeCode = HandleListFile(node, nodeCode);
-            nodeCode += "o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-            nodeCode += "o" + Num(node) + ".p = p;" + G.NL;
-
-            //Quite an ugly hack. Problem is that with "LIST<direct>xx = 0, 1, 2" Gekko will try to convert 0 into a list and will
-            //throw an exception before O.List.Exe() is even called. So with <direct> we need to suppress the O.GetList()-code that 
-            //puts stuff inside the elements.
-            bool directOption = false;
-            string extraCode = null;
-            for (int i = 2; i < node.ChildrenCount(); i++)
-            {
-                if (node[i].Text == "ASTDIRECT") directOption = true;
-                extraCode += node[i].Code;
-            }
-            if (directOption)
-            {
-                nodeCode += "o" + Num(node) + ".direct = true;" + G.NL;
-                nodeCode += "o" + Num(node) + ".rawfood = " + "@`" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1]) + "`" + ";" + G.NL;
-            }
-            else
-            {
-                nodeCode += childCode;
-            }
-            nodeCode += extraCode;
-
-            nodeCode += "o" + Num(node) + ".Exe();" + G.NL;
-            return nodeCode;
-        }
-
-        private static string HandleListFile(ASTNode node, string nodeCode)
-        {
-            if (node[0].Text == "ASTLISTFILE")
-            {
-                nodeCode += "o" + Num(node) + ".listFile = O.ConvertToString(" + node[0].Code + ");" + G.NL;
-            }
-            else
-            {
-                nodeCode += "o" + Num(node) + ".name = O.ConvertToString(" + node[0].Code + ");" + G.NL;
-            }
-
-            return nodeCode;
-        }
-
-        private static string HandleString(ASTNode node, string childCode, bool isName)
-        {
-            string x = "false";
-            if (isName) x = "true";
-
-            string nodeCode = "O.SetStringData(" + node[0].Code + ", " + childCode + ", " + x + ");" + G.NL;
-            return nodeCode;
-        }
-
-        private static string HandleDate(ASTNode node, string childCode)
-        {
-            string nodeCode = "O.SetDateData(" + node[0].Code + ", " + childCode + ");" + G.NL;
-            return nodeCode;
-        }
-
-        private static string HandleVal(ASTNode node, string childCode, W w)
-        {
-            string nodeCodeTemp = null;            
-            ASTNode node0 = node[0];
-            if (node[0].Text == "?")
-            {
-                nodeCodeTemp = "O.Val.Q(" + Globals.QT + node[1].Text + Globals.QT + ");" + G.NL;
-            }
-            else
-            {
-                if (node0.nameSimpleIdent != null)
-                {
-                    //It is a simple ident code, such as VAL x = ...                                
-                    string tempDoubleCs = "tempDouble" + ++Globals.counter;
-                    nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(" + Globals.smpl + ");" + G.NL;
-                    string notUsed = null;
-                    string leftSideCs = CacheRefScalarCs(out notUsed, node0.nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, tempDoubleCs, false, true, false);
-                    nodeCodeTemp += leftSideCs + G.NL;
-                }
-                else
-                {
-                    //fancy name like VAL x|%y = ... --> this will be slow!                                
-                    nodeCodeTemp += "O.SetValData(" + Globals.smpl + ", " + node0.Code + ", " + childCode + ");" + G.NL;
-                }
-            }
-            return nodeCodeTemp;
-        }
-
-        private static string HandleGenr(ASTNode node, string numNode, string childCodePeriod, string childCodeLhsName, string childCodeRhs, W w, string lhsFunction)
-        {
-            string nodeCode = null;
-            nodeCode += "O.Genr o" + numNode + " = new O.Genr();" + G.NL;
-            nodeCode += EmitLocalCacheForTimeLooping(w);
-            nodeCode += childCodePeriod + G.NL;  //dates
-            nodeCode += "o" + numNode + ".lhs = null;" + G.NL;
-            nodeCode += "o" + numNode + ".p = p;" + G.NL;
-            nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
-            nodeCode += GekkoTimeIteratorStartCode(w, node);
-            nodeCode += "  double data = O.ConvertToVal(" + childCodeRhs + ", t);" + G.NL;  //uuu
-            nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
-            //nodeCode += "  double dataLag = O.ConvertToVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
-            if (lhsFunction == null)
-            {
-                nodeCode += "o" + numNode + ".lhs.SetData(t, data);" + G.NL;
-            }
-            else if (G.Equal(lhsFunction, "log"))
-            {
-                nodeCode += "o" + numNode + ".lhs.SetData(t, Math.Exp(data));" + G.NL;
-            }
-            else if (G.Equal(lhsFunction, "dlog"))
-            {
-                nodeCode += "o" + numNode + ".lhs.SetData(t, o" + numNode + ".lhs.GetData(t.Add(-1)) * Math.Exp(data));" + G.NL;
-            }
-            else if (G.Equal(lhsFunction, "pch"))
-            {
-                nodeCode += "o" + numNode + ".lhs.SetData(t, o" + numNode + ".lhs.GetData(t.Add(-1)) * (data/100d + 1));" + G.NL;
-            }
-            else if (G.Equal(lhsFunction, "dif") || G.Equal(lhsFunction, "diff"))
-            {
-                nodeCode += "o" + numNode + ".lhs.SetData(t, o" + numNode + ".lhs.GetData(t.Add(-1)) + data);" + G.NL;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Left-hand side function '" + lhsFunction + "' is not recognized");
-                G.Writeln("           Legal functions are log, dlog, pch, dif or diff");
-                throw new GekkoException();
-            }
-            nodeCode += GekkoTimeIteratorEndCode();
-
-            if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
-            {
-                //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
-                nodeCode += "o" + numNode + ".meta = @`" + G.ReplaceGlueSymbols(node.Parent.specialExpressionAndLabelInfo[1]) + "`;" + G.NL;
-            }
-            nodeCode += "o" + numNode + ".Exe();" + G.NL;
-            return nodeCode;
-        }
-
-        private static string GekkoTimeIteratorEndCode()
-        {
-            return Globals.endGekkoTimeIteratorCode;            
-        }
-
-        //private static string GekkoListIteratorEndCode()
-        //{
-        //    return Globals.endGekkoListIteratorCode;
-        //}
-
-        private static string GekkoTimeIteratorStartCode(W w, ASTNode node)
-        {            
-            string nodeCode = Globals.startGekkoTimeIteratorCode;
-            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode;                      
-            return nodeCode;
-        }        
+        }                       
 
         private static string Num(ASTNode node)
         {
@@ -6144,23 +5916,7 @@ namespace Gekko.Parser.Gek
             else throw new GekkoException();    
             return scalarCs;
         }        
-
-        private static string FindFunctionArguments(ASTNode node, W wh2, string simpleIdent)
-        {            
-            if (wh2.uFunctionsHelper != null)
-            {
-                foreach (FunctionArgumentsHelperElements fah in wh2.uFunctionsHelper.storage)
-                {
-                    if (G.Equal(fah.parameterName, simpleIdent))
-                    {
-                        //this list is a function argument, use that                        
-                        return fah.parameterCode;
-                    }
-                }
-            }
-            return null;
-        }        
-
+        
         private static void GetCodeFromAllChildren(ASTNode node)
         {
             if (node == null)
@@ -6189,21 +5945,8 @@ namespace Gekko.Parser.Gek
             {
                 receiver.A(child.Code + G.NL);
             }
-        }
+        }        
         
-        private static void GetChoice(ASTNode node, W wh2, string simpleHash, bool isSimple, out string fa, out int choice)
-        {
-            fa = null;
-            choice = 3;  //1, 2, 3
-            if (isSimple)
-            {
-                fa = FindFunctionArguments(node, wh2, simpleHash);
-                if (fa != null) choice = 1;
-                else choice = 2;
-            }
-            if (choice == 2) choice = 3;
-        }
-
         private static string HandleNegate(ASTNode node)
         {
             //This is for speedup purposes, to avoid a Negate() function on primitives taking up time.
@@ -6242,55 +5985,18 @@ namespace Gekko.Parser.Gek
             if (parentType == "ASTPRTELEMENTOPTIONFIELD") o = "ope" + Num(node) + ".operators";
             return o + ".Add(new OptString(`" + type + "`, O.ConvertToString(" + s + ")));" + G.NL;
         }        
-
-        
     }
 
     public class W
     {         
         //W is created when running a .cmd/.gcm file
-        public WalkHelper wh = null;  //is created when encountering a Gekko command (like SERIES, PRT, etc.)        
-        public Dictionary<int, List<string>> prtItems;
-        public Dictionary<int, List<string>> prtLabels;
+        public WalkHelper wh = null;  //is created when encountering a Gekko command (like SERIES, PRT, etc.)                
         public string fileNameContainingParsedCode = null;
         public int commandLinesCounter = -1;
         public int expressionCounter = -1;
-
-        public GekkoDictionary<string, string> scalarCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, string> listCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, string> tsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.
-        public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear Series pointers
-        public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
-        public StringBuilder headerExpressions = new StringBuilder();
-
-        //public GekkoDictionary<string, bool> functionUserDefined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, bool> tupleClasses = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-
-        public StringBuilder uHeaderCs = new StringBuilder(); //stuff to be put at the very start.        
-        public FunctionArgumentsHelper uFunctionsHelper = null; //important that it starts out as null here
-        public GekkoDictionary<string, string> uScalarCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, string> uListCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, string> uTsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);        
+        public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.                        
     }
-
-    public class FunctionArgumentsHelperElements
-    {
-        public string parameterName;
-        public string type;
-        public string parameterCode;
-        public int tupleCount = 1;
-        public string tupleNameCode;
-    }
-
-    public class FunctionArgumentsHelper
-    {
-        public List<string> lhsTypes = new List<string>();
-        public string functionName;
-        public List<FunctionArgumentsHelperElements> storage = new List<FunctionArgumentsHelperElements>();
-        public StringBuilder headerCs = new StringBuilder();
-    }
-
+    
     public class WalkHelper
     {
         public enum seriesType
@@ -6316,43 +6022,5 @@ namespace Gekko.Parser.Gek
              
     }
 
-    public class OPrt : O_OLD
-    {
-        private string fileName = null;
-        private EDataFormat type = EDataFormat.None;  //type of data(bank)
-        private bool merge = false;  //merge or not.
-        private string as2 = null; //for OPEN AS.
-        private string orientation = null;  //rows or cols
-
-        public string FileName
-        {
-            get { return fileName; }
-            set { FailIfImmutable(); fileName = value; }
-        }
-
-        public EDataFormat Type
-        {
-            get { return type; }
-            set { FailIfImmutable(); type = value; }
-        }
-
-        public bool Merge
-        {
-            get { return merge; }
-            set { FailIfImmutable(); merge = value; }
-        }
-
-        public string As
-        {
-            get { return as2; }
-            set { FailIfImmutable(); as2 = value; }
-        }
-
-        public string Orientation
-        {
-            get { return orientation; }
-            set { FailIfImmutable(); orientation = value; } 
-        }
-
-    }
+    
 }

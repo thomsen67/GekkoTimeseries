@@ -149,8 +149,6 @@ namespace Gekko.Parser.Gek
             s2.AppendLine(csMethods2);  //definitions of CC1(), CC2(), etc. -- may be empty
 
             s2.AppendLine(csCode2);
-            
-            s2.Append(wh2.headerExpressions);  //definitions of GekkoExpression1(), ...
 
             s2.AppendLine("public static void CodeLines(P p)");
             s2.AppendLine("{");

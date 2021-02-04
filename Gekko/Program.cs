@@ -27278,7 +27278,7 @@ namespace Gekko
         Ref //READ<ref>, CLEAR<ref>, etc.
     }
 
-    public class ReadOpenMulbkHelper: O_OLD
+    public class ReadOpenMulbkHelper
     {
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
@@ -27300,98 +27300,35 @@ namespace Gekko
         public string FileName
         {
             get { return fileName; }
-            set { FailIfImmutable(); fileName = value; }
+            set { fileName = value; }
         }
 
         public EDataFormat Type
         {
             get { return type; }
-            set { FailIfImmutable(); type = value; }
+            set { type = value; }
         }
 
         public bool Merge
         {
             get { return merge; }
-            set { FailIfImmutable(); merge = value; }
+            set { merge = value; }
         }
 
         public string As
         {
             get { return as2; }
-            set { FailIfImmutable(); as2 = value; }
+            set { as2 = value; }
         }
 
         public string Orientation
         {
             get { return orientation; }
-            set { FailIfImmutable(); orientation = value; }
+            set { orientation = value; }
         }
 
     }
-
-    public class O_OLD //arguments to methods
-    {
-        private int id = -12345;
-        private bool immutable = false;
-
-        public void SetId(Q q)  //This method should only be used in .Add() in Q class and not elsewhere!!
-        {
-            FailIfImmutable();  //for safety, so we are sure the .id is only set once
-            this.id = q.Count();
-        }
-
-        public int GetId()
-        {
-            return this.id;
-        }
-
-        public bool IsReadOnly
-        {
-            get { return immutable; }
-        }
-
-        public virtual void MakeReadOnly()
-        {
-            immutable = true;
-        }
-
-        protected virtual void FailIfImmutable()
-        {
-            if (immutable)
-            {
-                G.Writeln2("*** ERROR: Internal error #46374843");
-                throw new GekkoException();
-            }
-        }
-
-    }
-
-    public class Q  //essentially just a container to store method objects
-    {
-        private List<O_OLD> storage = new List<O_OLD>();
-
-        public O_OLD this[int i]
-        {
-            get
-            {
-                //O o = q[117]
-                return storage[i];
-            }
-            //set --> not allowed
-        }
-
-        public void Add(O_OLD o)
-        {
-            o.SetId(this); //This method should only be used in .Add() in Q class and not elsewhere!! Will set id to storage.Count (ok since item has not been added yet)
-            o.MakeReadOnly();  //So the field do not get altered when the object is used later on. The object might be used many time, for instance the statement is inside a loop.
-            storage.Add(o);
-        }
-
-        public int Count()
-        {
-            return this.storage.Count;
-        }
-    }
+    
 
     public class P
     {
