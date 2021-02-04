@@ -166,7 +166,10 @@ namespace Gekko
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
 
-        public static Dictionary<int, Func<GraphHelper, string>> printCs = new Dictionary<int, Func<GraphHelper, string>>();
+        /// <summary>
+        /// BEWARE: This is used in dynamic C# code, no rename please! Or change the dynamic code...
+        /// </summary>
+        public static Dictionary<int, Func<GraphHelper, string>> printStorageAsFunc = new Dictionary<int, Func<GraphHelper, string>>();
 
         public static Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>> ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>> ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>>();

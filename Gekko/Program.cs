@@ -17896,7 +17896,7 @@ namespace Gekko
             //User functions: more can be added if necessary, or users can use LIST or DICT.
             InitUfunctionsAndArithmeticsAndMore();
 
-            Globals.printCs = new Dictionary<int, Func<GraphHelper, string>>();
+            Globals.printStorageAsFunc = new Dictionary<int, Func<GraphHelper, string>>();
 
             Program.model = new Model();
             Program.unfoldedVariableList = null;

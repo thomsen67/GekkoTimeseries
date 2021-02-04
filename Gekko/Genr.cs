@@ -40,7 +40,7 @@ namespace Gekko
                         o0.prtElements.Add(ope0);
                     }
 
-                    o0.printCsCounter = Globals.printCs.Count - 1;
+                    o0.printStorageAsFuncCounter = Globals.printStorageAsFunc.Count - 1;
                     o0.Exe();
                 }
                 finally {
@@ -48,7 +48,7 @@ namespace Gekko
                 }
                 return o0.emfName;
             };
-            Globals.printCs.Add(Globals.printCs.Count, print0);
+            Globals.printStorageAsFunc.Add(Globals.printStorageAsFunc.Count, print0);
             print0(new GraphHelper());
 
             //[[commandEnd]]0

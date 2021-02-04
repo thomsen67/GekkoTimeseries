@@ -8445,7 +8445,7 @@ namespace Gekko
             public List<OptString> operators = new List<OptString>();
             public string emfName = null;  //name of produced emf file if PLOT
                         
-            public int printCsCounter = -12345;
+            public int printStorageAsFuncCounter = -12345;
 
             public string guiGraphOperator = null;  //clicking in the PLOT window
                   

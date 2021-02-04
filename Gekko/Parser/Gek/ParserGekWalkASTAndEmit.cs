@@ -2679,7 +2679,7 @@ namespace Gekko.Parser.Gek
 
                                 //node.Code.A(LocalCode4(Num(node)));
                                                                 
-                                node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
+                                node.Code.A("o" + Num(node) + ".printStorageAsFuncCounter = Globals.printStorageAsFunc.Count - 1;" + G.NL);
                                                                 
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
@@ -2689,7 +2689,7 @@ namespace Gekko.Parser.Gek
 
                                 node.Code.A("};" + G.NL);  //end Action
                                 
-                                node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
+                                node.Code.A("Globals.printStorageAsFunc.Add(Globals.printStorageAsFunc.Count, print" + Num(node) + "); " + G.NL);
 
                                 node.Code.A("print" + Num(node) + "(new GraphHelper());" + G.NL); //end Action
 

@@ -364,7 +364,7 @@ namespace Gekko
             if (isDlog || isLog) gh.isLogTransform = true;
             gh.isRefreshing = true;
 
-            string emfName = Globals.printCs[this.graphOptions.printCsCounter](gh);
+            string emfName = Globals.printStorageAsFunc[this.graphOptions.printStorageAsFuncCounter](gh);
                                
             this.graphOptions.emfName = emfName;
             Invalidate();
@@ -572,7 +572,7 @@ namespace Gekko
         
         public bool windowIsShown = false;
         public long counter = -12345;
-        public int printCsCounter = -12345;
+        public int printStorageAsFuncCounter = -12345;
         
         public GraphOptions()
         {

@@ -868,7 +868,7 @@ namespace Gekko
                 graphOptions.graphVars = null;
                 graphOptions.graphVarsNames = labelsNonBroken;
                 graphOptions.title = null;
-                graphOptions.printCsCounter = o.printCsCounter;
+                graphOptions.printStorageAsFuncCounter = o.printStorageAsFuncCounter;
 
                 //G.Writeln("Calling gnuplot2");
 
