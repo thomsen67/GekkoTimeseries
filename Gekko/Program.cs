@@ -16530,7 +16530,7 @@ namespace Gekko
             }
             //pathAndFilename = tempTsdxPath + "\\" + "databank" + ".tsd";
 
-            CreateDatabankXmlInfo(tempTsdxPath, tsdxVersion, isCloseCommand);
+            CreateDatabankXmlInfo(databank, tempTsdxPath, tsdxVersion, isCloseCommand);
 
             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
             
@@ -16807,8 +16807,9 @@ namespace Gekko
             }
         }
 
-        private static void CreateDatabankXmlInfo(string tempTsdxPath, string tsdxVersion, bool isCloseCommand)
+        private static void CreateDatabankXmlInfo(Databank databank, string tempTsdxPath, string tsdxVersion, bool isCloseCommand)
         {
+
             // Create the xml document containe
             XmlDocument doc = new XmlDocument();// Create the XML Declaration, and append it to XML document
             XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", null, null);
@@ -16821,7 +16822,7 @@ namespace Gekko
             doc.AppendChild(root);
 
             XmlElement comment = doc.CreateElement("Info1");  //HDG
-            comment.InnerText = Program.databanks.GetFirst().info1;
+            comment.InnerText = databank.info1;
             root.AppendChild(comment);
 
             XmlElement date = doc.CreateElement("Date");
@@ -16837,7 +16838,7 @@ namespace Gekko
                 bool ok = true;
                 foreach (string s in Program.model.modelGekko.endogenousOriginallyInModel.Keys)
                 {
-                    if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
+                    if (!databank.ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
                     {
                         ok = false;
                         break;

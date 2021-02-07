@@ -2033,6 +2033,7 @@ namespace Gekko
         {
             if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be HDG 'text'; fixing it here
             Program.databanks.GetFirst().info1 = text;
+            Program.databanks.GetFirst().isDirty = true;
             G.Writeln2("Databank heading for '" + Program.databanks.GetFirst().name + "' databank set to: '" + text + "'");
         }
 
