@@ -3490,11 +3490,14 @@ namespace Gekko
 
                         deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
 
+                        TwoInts yearMinMax = new TwoInts(); yearMinMax.int1 = int.MaxValue; yearMinMax.int2 = int.MinValue;
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {
-                            iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MultiDim.parent
+                            iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
                         }
                         readInfo.variables = deserializedDatabank.storage.Count;
+                        readInfo.startPerInFile = yearMinMax.int1;
+                        readInfo.endPerInFile = yearMinMax.int2;
                         G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
                     }
                     catch (Exception e)
@@ -3508,10 +3511,7 @@ namespace Gekko
 
                 }  //end of using
 
-            }
-
-            int maxYearInProtobufFile = int.MinValue;
-            int minYearInProtobufFile = int.MaxValue;
+            }            
 
             if (true)
             {
@@ -3530,11 +3530,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
                     throw new GekkoException();
                 }
-                if (!(databankVersion == "1.0" || databankVersion == "1.1"))
-                {
-                    readInfo.startPerInFile = minYearInProtobufFile;
-                    readInfo.endPerInFile = maxYearInProtobufFile;
-                }
+                
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
             }
@@ -3665,6 +3661,24 @@ namespace Gekko
 
             return deserializedDatabank;
         }
+
+        /// <summary>
+        /// Small helper method to help finding first and last year of a timeseries. Used when for instance reading/opening
+        /// a .gbk databank, so the period of the databank can be shown.
+        /// </summary>
+        /// <param name="ts">The series to find min-max for</param>
+        /// <param name="yearMinMax">Helper object to store the years</param>
+        public static void GetYearMinMax(Series ts, TwoInts yearMinMax)
+        {
+            //We do not use GetRealPeriodFirst() etc. -- only for showing dates when reading a bank, does not
+            //need to be 100% correct.
+            if (ts.type != ESeriesType.Timeless)
+            {
+                yearMinMax.int1 = Math.Min(yearMinMax.int1, ts.GetPeriodFirst().super);
+                yearMinMax.int2 = Math.Max(yearMinMax.int2, ts.GetPeriodLast().super);
+            }
+        }
+
 
         /// <summary>
         /// Small helper method.

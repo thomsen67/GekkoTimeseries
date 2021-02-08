@@ -2722,7 +2722,7 @@ namespace Gekko
             }            
         }
 
-        public void DeepCleanup()
+        public void DeepCleanup(TwoInts yearMinMax)
         {
             if (this.type == ESeriesType.ArraySuper)
             {
@@ -2734,11 +2734,16 @@ namespace Gekko
                     {
                         //best to keep these pointers out of protobuf                        
                         ConnectArraysSeriesWithSubSeries(this, subSeries, kvp.Key);
+                        Program.GetYearMinMax(subSeries, yearMinMax);
                     }
                 }
             }
+            else
+            {
+                Program.GetYearMinMax(this, yearMinMax);
+            }
         }
-
+        
         private static void ConnectArraysSeriesWithSubSeries(Series arraySeries, Series subSeries, MultidimItem mmi)
         {
             mmi.parent = arraySeries;  //The mmi item points to the array-series

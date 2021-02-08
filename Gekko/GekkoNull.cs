@@ -138,7 +138,7 @@ namespace Gekko
             return;
         }
 
-        public void DeepCleanup()
+        public void DeepCleanup(TwoInts yearMinMax)
         {
             return;
         }

@@ -102,7 +102,7 @@ namespace Gekko
 
         void DeepTrim();
 
-        void DeepCleanup();
+        void DeepCleanup(TwoInts yearsMinMax);
 
         void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims);
     }

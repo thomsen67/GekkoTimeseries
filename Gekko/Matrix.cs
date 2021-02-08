@@ -801,7 +801,7 @@ namespace Gekko
             //do nothing, nothing to trim
         }
 
-        public void DeepCleanup()
+        public void DeepCleanup(TwoInts yearMinMax)
         {
             //do nothing
         }

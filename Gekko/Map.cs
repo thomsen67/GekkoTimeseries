@@ -263,14 +263,14 @@ namespace Gekko
             }            
         }
 
-        public void DeepCleanup()
+        public void DeepCleanup(TwoInts yearMinMax)
         {
             if (this.storage == null) this.storage = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
                 if (!Object.ReferenceEquals(this, kvp.Value)) //if it contains itself
                 {
-                    kvp.Value.DeepCleanup();
+                    kvp.Value.DeepCleanup(yearMinMax);
                 }
             }
         }

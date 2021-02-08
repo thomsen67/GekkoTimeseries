@@ -469,14 +469,14 @@ namespace Gekko
             }         
         }
 
-        public void DeepCleanup()
+        public void DeepCleanup(TwoInts yearMinMax)
         {
             if (this.list == null) this.list = new List<IVariable>();
             foreach (IVariable iv in this.list)
             {
                 if (!Object.ReferenceEquals(this, iv))  //avoid problems if the list contains itself
                 {
-                    iv.DeepCleanup();
+                    iv.DeepCleanup(yearMinMax);
                 }
             }
         }

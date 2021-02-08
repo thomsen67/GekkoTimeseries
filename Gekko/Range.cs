@@ -128,7 +128,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public void DeepCleanup()
+        public void DeepCleanup(TwoInts yearMinMax)
         {
             //do nothing
         }
