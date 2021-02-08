@@ -7837,8 +7837,7 @@ namespace Gekko
         public class Disp
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
-            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            //public List<string> listItems = null;
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
             public List iv = null;
             public string searchName = null;
             public string opt_info = null;
@@ -8077,12 +8076,13 @@ namespace Gekko
                 if (this.type == "ASTPLACEHOLDER") this.type = null;
                 EVariableType type = EVariableType.Var;
                 if (this.type != null) type = G.GetVariableType(this.type);
-                
+
+                //See also #87582903573828
                 List<string> names = Program.Search(this.names1, opt_bank, type);
 
                 if (isCountCommand)
                 {
-                    G.Writeln2("Found " + names.Count + " matching items");
+                    PrintFound(type, names);
                 }
                 else
                 {
@@ -8162,13 +8162,24 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("Found " + names.Count + " matching items");
+                        PrintFound(type, names);
                     }
                 }
             }
 
-            
+            private void PrintFound(EVariableType type, List<string> names)
+            {
+                G.Writeln2("Found " + names.Count + " matching items");
 
+                if (names.Count == 0)
+                {
+                    //See also #87582903573828
+                    SearchHelper1 helper = Program.SearchAllBanksAllFreqs(this.names1, this.opt_bank, type);
+                    if (helper.allBanks.count > 0) G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + helper.allBanks.count + " matches");
+                    if (helper.allFreqs.count > 0) G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + helper.allFreqs.count + " matches");
+                    if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count) G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + helper.allBanksAndFreqs.count + " matches");
+                }
+            }
         }
 
 
@@ -8323,6 +8334,9 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Delete this? COUNT command uses O.Index.
+        /// </summary>
         public class Count
         {
             //Is this just an INDEX<mute>?

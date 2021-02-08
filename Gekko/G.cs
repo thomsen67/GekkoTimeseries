@@ -662,7 +662,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get freq part of bankvarname.
+        /// Get freq part of bankvarname. Returns blank if no freq.
         /// </summary>
         /// <param name="bankvarname"></param>
         /// <returns></returns>

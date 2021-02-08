@@ -11720,8 +11720,7 @@ namespace Gekko
         /// <param name="clickedLink"></param>
         /// <param name="o"></param>
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showDetailed, bool showAllPeriods, bool clickedLink, O.Disp o)
-        {
-            EVariableType type = EVariableType.Series;            
+        {            
             int nonSeries = 0;
 
             GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);            
@@ -11745,6 +11744,7 @@ namespace Gekko
             }
             else
             {
+                //See also #87582903573829
                 names = Program.Search(o.iv, null, EVariableType.Var);                
                 foreach(string s in names)
                 {
@@ -11762,8 +11762,6 @@ namespace Gekko
 
                 //one listitem could be obk:fx*, fy, #m, obk:#m, @fy
                 
-                //IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
-
                 Series ts = x as Series;
 
                 if (ts == null)
@@ -11806,6 +11804,12 @@ namespace Gekko
             if (seriesCounter + nonSeries == 0)
             {
                 G.Writeln2("Did not find any variable(s) to display");
+
+                //See also #87582903573829
+                SearchHelper1 helper = Program.SearchAllBanksAllFreqs(o.iv, null, EVariableType.Var);
+                if (helper.allBanks.count > 0) G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + helper.allBanks.count + " matches");
+                if (helper.allFreqs.count > 0) G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + helper.allFreqs.count + " matches");
+                if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count) G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + helper.allBanksAndFreqs.count + " matches");
             }
             else if (seriesCounter == 0 && nonSeries > 0)
             {
@@ -13074,7 +13078,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// This is the central hub regarding wildcards in commands like INDEX, COPY, RENAME, DELETE, WRITE/EXPORT, READ/IMPORT, 
+        /// This is the central hub regarding wildcards in commands like INDEX, DISP, COPY, RENAME, DELETE, WRITE/EXPORT, READ/IMPORT, 
         /// and having a central hub assures the the wildcard logic is consistent. 
         /// It deals with the logic of for instance INDEX x*; or COPY x*b TO y*; etc. Also deals with {'...'} wildcards, and handles
         /// the logic if banknames are given, too. This is a quite complicated method.
@@ -13611,6 +13615,63 @@ namespace Gekko
             }
 
             return outputs;
+        }
+
+        /// <summary>
+        /// A helper method for Search(), and also implicit SearchFromTo(). For instance, an INDEX *; may 
+        /// return 0 hits, because the timeseries are in other databanks, or in other frecuencies. So what this
+        /// method does is to look at INDEX *:*; and INDEX *!*; and INDEX *:*!*; to see if there are other hits.
+        /// If so, these can be reported. This is helpful for users who do not understand that '*' wildcard only
+        /// matches series in first-position databank with current frequency.    
+        /// </summary>
+        /// <param name="names1"></param>
+        /// <param name="opt_bank"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static SearchHelper1 SearchAllBanksAllFreqs(List names1, string opt_bank, EVariableType type)
+        {
+            SearchHelper1 helper = new SearchHelper1();
+            foreach (IVariable iv in names1.list)
+            {
+                try
+                {
+                    string s = O.ConvertToString(iv);
+                    string bank = G.Chop_GetBank(s);
+                    string freq = G.Chop_GetFreq(s);
+                    bool sigil = G.Chop_HasSigil(s);
+
+                    if (bank == "")
+                    {
+                        string newName = G.Chop_AddBank(s, "*");
+                        List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
+                        helper.allBanks.name = newName;
+                        helper.allBanks.nameOriginal = s;
+                        helper.allBanks.count = extraNames.Count;
+                    }
+
+                    if (freq == "")
+                    {
+                        string newName = G.Chop_AddFreq(s, "*");
+                        List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
+                        helper.allFreqs.name = newName;
+                        helper.allFreqs.nameOriginal = s;
+                        helper.allFreqs.count = extraNames.Count;
+                    }
+
+                    if (bank == "" && freq == "")
+                    {
+                        string newName = G.Chop_AddFreq(s, "*");
+                        newName = G.Chop_AddBank(newName, "*");
+                        List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
+                        helper.allBanksAndFreqs.name = newName;
+                        helper.allBanksAndFreqs.nameOriginal = s;
+                        helper.allBanksAndFreqs.count = extraNames.Count;
+                    }
+                }
+                catch { };  //if it fails, we live with that
+            }
+
+            return helper;
         }
 
         /// <summary>
@@ -28321,6 +28382,20 @@ namespace Gekko
         public Databank databank;
         public Series ts;
         public bool hasColon = false;
+    }
+
+    public class SearchHelper1
+    {
+        public SearchHelper2 allBanks = new SearchHelper2();
+        public SearchHelper2 allFreqs = new SearchHelper2();
+        public SearchHelper2 allBanksAndFreqs = new SearchHelper2();
+    }
+
+    public class SearchHelper2
+    {
+        public string name = null;
+        public string nameOriginal = null;
+        public int count = 0;
     }
     
 }

@@ -7295,6 +7295,56 @@ namespace UnitTests
             I("index <showbank=all showfreq=all> {'*:%*'}, {'*:#*'}, {'*:*!*'} to #mylist;");  //default
             _AssertHelperList("mylist", new List<string>() { "Work:%n", "Ref:%n", "Work:#mylist", "Work:x1!a", "Work:x1!q", "Work:x2!a", "Work:x2!q", "Ref:x1!a", "Ref:x1!q", "Ref:x2!a", "Ref:x2!q" });
 
+            // testing of extra info provided if a search returns 0 items
+            // needs better testing of sigils # and %
+            // all in all, this whole databank "view" needs to be constructed from the
+            // ground up.
+
+            I("reset;");
+            I("xa1!q = 100;");
+            I("xa2!q = 200;");
+            I("%x = 200;");
+            I("#m = [2];");
+            I("open <edit> deleteme; clear deleteme;");
+            I("xa1 = 1;");
+            I("xa2 = 2;");
+            I("xa1!q = 10;");
+            I("xa2!q = 20;");
+            I("%x = 100;");
+            I("#m = [1];");
+            I("close *;");
+            I("open deleteme;");
+            Globals.unitTestScreenOutput.Clear();
+            I("index *;");
+            string s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains("Found 0 matching items"));
+            Assert.IsTrue(s.Contains("*:* instead of * --> 2 matches"));
+            Assert.IsTrue(s.Contains("*!* instead of * --> 2 matches"));
+            Assert.IsTrue(s.Contains("*:*!* instead of * --> 6 matches"));
+            // ----------------------------------------------------------------------------
+            I("delete xa1!q;");
+            I("delete xa2!q;");
+            Globals.unitTestScreenOutput.Clear();
+            I("index *!q;");
+            s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains("Found 0 matching items"));
+            Assert.IsTrue(s.Contains("Note: *:*!q instead of *!q --> 2 matches"));
+            // ----------------------------------------------------------------------------            
+            Globals.unitTestScreenOutput.Clear();
+            I("index *!*;");
+            s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains("Found 0 matching items"));
+            Assert.IsTrue(s.Contains("Note: *:*!* instead of *!* --> 4 matches"));
+            // ----------------------------------------------------------------------------            
+            Globals.unitTestScreenOutput.Clear();
+            I("index work:*;");
+            s = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(s.Contains("Found 0 matching items"));
+            Assert.IsFalse(s.Contains("Note: "));  //does not find other freqs in Work
+
+
+
+
         }
 
 
