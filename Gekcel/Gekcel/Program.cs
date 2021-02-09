@@ -13,6 +13,8 @@ using ExcelDna.IntelliSense;
 using ExcelDna.ComInterop;
 using Extensibility;
 
+//About 64-bit, maybe see this: https://colinlegg.wordpress.com/2016/09/07/my-first-c-net-udf-using-excel-dna-and-visual-studio/
+
 //TODO: prt should work. Maybe wipe cells before sheet/prt? Optional. Starting cell?
 //      sheet does not work with <cols>, transposed, fix
 //      cls should wipe, and be careful
@@ -177,7 +179,7 @@ namespace Gekcel
         [ExcelFunction(Name = "Gekko_Put", Description = "Transfers data from sheet cells to a Gekko databank (baseOfArray can be index = 0 or 1)")]
         public static double Gekko_Put(object[,] cells, int baseOfArrayZeroOrOne)
         {
-            Program.PrepareExcelDnaOld(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
 
             TableLight matrix = new TableLight();  //1-based
 
@@ -358,12 +360,7 @@ End Sub
             targetExcelFile.Save();  //saves file            
 
             //app.Quit();
-        }                
-
-        private static void SetWorkingFolderIfNullOrEmpty()
-        {
-            if (string.IsNullOrEmpty(Program.options.folder_working)) Program.options.folder_working = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
-        }
+        }                        
 
         public static string Run(string commands)
         {
@@ -375,25 +372,9 @@ End Sub
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
-                Program.InitUfunctionsAndArithmeticsAndMore();
-
-                Program.PrepareExcelDnaOld(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
-                SetWorkingFolderIfNullOrEmpty();
-                Program.databanks.storage.Clear();
-                Program.databanks.storage.Add(new Databank("Work"));
-                Program.databanks.storage.Add(new Databank("Ref"));
-
-                Program.databanks.local.Clear();
-                Program.databanks.global.Clear();
-                Program.databanks.localGlobal = new LocalGlobal();
-                Globals.commandMemory = new CommandMemory();
-                Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
-                Program.InitUfunctionsAndArithmeticsAndMore();
-                Program.model = new Gekko.Model();
-
-                Program.GetStartingPeriod();
-                Globals.lastPrtOrMulprtTable = null;
+                Program.PrepareExcelDna2(ExcelDnaUtil.XllPath);
             }
+
             counter++;
             Globals.lastPrtOrMulprtTable = null;
 
@@ -404,7 +385,7 @@ End Sub
 
             try
             {
-                Program.RunCommandCalledFromGUI(commands, new P());
+                Program.RunGekkoCommands(commands, "", 0, new P());
             }
             catch (Exception e)
             {

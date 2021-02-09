@@ -1528,7 +1528,8 @@ namespace Gekko
         }
                 
         /// <summary>
-        /// Helper method (hook) for Gekcel
+        /// Helper method (hook) for Gekcel. BEWARE: Do not change name or signature without changing in 
+        /// Gekcel solution, too!!
         /// </summary>
         /// <param name="s"></param>
         //ok that it is not referenced to, is used in Gekcel
@@ -1537,7 +1538,39 @@ namespace Gekko
             Globals.excelDna = true;
             Globals.excelDna2 = false;
             Globals.excelDnaPath = s;
-        }        
+        }
+
+        /// <summary>
+        /// Helper method (hook) for Gekcel. BEWARE: Do not change name or signature without changing in 
+        /// Gekcel solution, too!!
+        /// </summary>
+        /// <param name="s"></param>
+        //ok that it is not referenced to, is used in Gekcel
+        public static void PrepareExcelDna2(string path)
+        {
+            void SetWorkingFolderIfNullOrEmpty()
+            {
+                if (string.IsNullOrEmpty(Program.options.folder_working)) Program.options.folder_working = Path.GetDirectoryName(path);
+            }
+
+            Program.InitUfunctionsAndArithmeticsAndMore();
+
+            Program.PrepareExcelDna(Path.GetDirectoryName(path)); //necessary for it to run ANTLR etc.          
+            SetWorkingFolderIfNullOrEmpty();
+            Program.databanks.storage.Clear();
+            Program.databanks.storage.Add(new Databank("Work"));
+            Program.databanks.storage.Add(new Databank("Ref"));
+
+            Program.databanks.local.Clear();
+            Program.databanks.global.Clear();
+            Program.databanks.localGlobal = new LocalGlobal();
+            Globals.commandMemory = new CommandMemory();
+            Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
+            Program.InitUfunctionsAndArithmeticsAndMore();
+            Program.model = new Gekko.Model();
+
+            Program.GetStartingPeriod();
+        }
         
         /// <summary>
         /// s must be of form "var¤-1", multiple Globals.lagIndicator not allowed.
@@ -6054,10 +6087,11 @@ namespace Gekko
 
         /// <summary>
         /// This is the main entry into running Gekko commands, called for instance from the Gekko GUI window.
-        /// These commands are parsed, compiled and executed.
+        /// These commands are parsed, compiled and executed. BEWARE: Do not change name or signature without changing in 
+        /// Gekcel solution, too!!
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="fileName"></param>
+        /// <param name="text">Set this "" not null if missing</param>
+        /// <param name="fileName">Set this "" not null if missing</param>
         /// <param name="skip">Only for internal use</param>
         /// <param name="p"></param>
         /// 
@@ -13640,28 +13674,28 @@ namespace Gekko
                     string freq = G.Chop_GetFreq(s);
                     bool sigil = G.Chop_HasSigil(s);
 
-                    if (bank == "")
+                    if (true)
                     {
-                        string newName = G.Chop_AddBank(s, "*");
+                        string newName = G.Chop_SetBank(s, "*");
                         List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
                         helper.allBanks.name = newName;
                         helper.allBanks.nameOriginal = s;
                         helper.allBanks.count = extraNames.Count;
                     }
 
-                    if (freq == "")
+                    if (true)
                     {
-                        string newName = G.Chop_AddFreq(s, "*");
+                        string newName = G.Chop_SetFreq(s, "*");
                         List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
                         helper.allFreqs.name = newName;
                         helper.allFreqs.nameOriginal = s;
                         helper.allFreqs.count = extraNames.Count;
                     }
 
-                    if (bank == "" && freq == "")
+                    if (true)
                     {
-                        string newName = G.Chop_AddFreq(s, "*");
-                        newName = G.Chop_AddBank(newName, "*");
+                        string newName = G.Chop_SetFreq(s, "*");
+                        newName = G.Chop_SetBank(newName, "*");
                         List<string> extraNames = Program.Search(new List(new List<string>() { newName }), opt_bank, type);
                         helper.allBanksAndFreqs.name = newName;
                         helper.allBanksAndFreqs.nameOriginal = s;

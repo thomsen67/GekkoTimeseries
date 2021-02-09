@@ -1,23 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
-using System.Reflection;
-using System.Diagnostics;
-
 
 namespace Deploy
 {
@@ -25,19 +12,17 @@ namespace Deploy
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
-        //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
-        //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll";
-        //For some reason, the full 7z files need to be present in the folder, whereas for the Gekko installation, this
-        //is not necessary. A mystery ... so we had to install z-zip to make it work. Never mind.
-        //public static string zip = @"c:\Program Files\7-Zip\7z.dll";
+    {        
         public static string tools = @"c:\tools\tmp\Gekko_files";
+        public bool installerIs64Bit = false;
+        public static string ifile = @"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\InstallerForGekko.vdproj";
 
         public MainWindow()
         {
             InitializeComponent();
             this.Top = 10;
             this.Left = 10;
+            InstallerBitness(ifile);
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -46,18 +31,28 @@ namespace Deploy
             MessageBox.Show("Copied Gekko.chm");
         }
 
+        private string bit32Or64()
+        {
+            if (installerIs64Bit) return "64";
+            else return "32";
+        }
+
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                FileInfo fi = new FileInfo(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi");
+                string file = null;
+                if (installerIs64Bit) file = @"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release\InstallerForGekko.msi";
+                else file = @"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi";
+
+                FileInfo fi = new FileInfo(file);
                 double min = (DateTime.Now - fi.LastWriteTime).TotalMinutes;
                 if (min > 15)
                 {
                     MessageBox.Show("ERROR: the .msi file seems too old (> 15 minutes)");
                     return;
                 }
-                System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi");                
+                System.Diagnostics.Process.Start(file);                
             }
             catch
             {
@@ -68,9 +63,18 @@ namespace Deploy
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             try
-            {                
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", tools + @"\InstallerForGekko.msi", true);
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", tools + @"\Setup.exe", true);
+            {
+                if (installerIs64Bit)
+                {
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", tools + @"\" + bit32Or64() + @"\InstallerForGekko.msi", true);
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", tools + @"\" + bit32Or64() + @"\Setup.exe", true);
+                }
+                else
+                {
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release\InstallerForGekko.msi", tools + @"\" + bit32Or64() + @"\InstallerForGekko.msi", true);
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release\Setup.exe", tools + @"\" + bit32Or64() + @"\Setup.exe", true);
+                }
+                    
                 MessageBox.Show(@"Copying 2 files ok");
             }
             catch
@@ -129,16 +133,33 @@ namespace Deploy
         {
             try
             {
-                string dir = @"c:\Program Files (x86)\Gekko\";
-                string zip = tools + @"\Gekko.zip";
+                string dir = null;
+                if (installerIs64Bit)
+                {
+                    dir = @"c:\Program Files\Gekko\";
+                }
+                else
+                {
+                    dir = @"c:\Program Files (x86)\Gekko\";                    
+                }
+
+                FileInfo fi = new FileInfo(dir + "gekko.exe");
+                double min = (DateTime.Now - fi.LastWriteTime).TotalMinutes;
+                if (min > 15)
+                {
+                    MessageBox.Show("ERROR: the gekko.exe file seems too old (> 15 minutes) for zipping Gekko" + bit32Or64() + ".zip");
+                    return;
+                }
+
+                string zip = tools + @"\" + bit32Or64() + @"\Gekko.zip";
                 File.Delete(zip);
                 ZipFile.CreateFromDirectory(dir, zip);
             }
             catch
             {
-                MessageBox.Show("Zipping of Gekko.zip failed");
+                MessageBox.Show("Zipping of Gekko" + bit32Or64() + ".zip failed");
             }
-            MessageBox.Show("Finished zipping of Gekko.zip");
+            MessageBox.Show("Finished zipping of Gekko" + bit32Or64() + ".zip");
         }
 
         private void button5_Click(object sender, RoutedEventArgs e)
@@ -151,11 +172,11 @@ namespace Deploy
                 return;
             }
 
-            File.Delete(tools + @"\sha.txt"); //for safety
+            File.Delete(tools + @"\"+ bit32Or64() + @"\sha.txt"); //for safety
 
-            string sha1 = ComputeSha1(tools + @"\InstallerForGekko.msi");
-            string sha2 = ComputeSha1(tools + @"\Setup.exe");
-            string sha3 = ComputeSha1(tools + @"\Gekko.zip");
+            string sha1 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\InstallerForGekko.msi");
+            string sha2 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\Setup.exe");
+            string sha3 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\Gekko.zip");
 
             if (sha1 == null || sha2 == null || sha3 == null)
             {
@@ -166,16 +187,12 @@ namespace Deploy
             string txt = null;
             txt += "<strong>Gekko " + version + " </strong>" + "\r\n";
             txt += "<ul>" + "\r\n";
-            txt += "  <li>" + sha1 + "    " + "InstallerForGekko.msi" + "</li>" + "\r\n";
-            txt += "  <li>" + sha2 + "    " + "Setup.exe" + "</li>" + "\r\n";
-            txt += "  <li>" + sha3 + "    " + "Gekko.zip" + "</li>" + "\r\n";
+            txt += "  <li>" + sha1 + "    " + "InstallerForGekko.msi ("+ bit32Or64() + ")" + "</li>" + "\r\n";
+            txt += "  <li>" + sha2 + "    " + "Setup.exe ("+ bit32Or64() + ")" + "</li>" + "\r\n";
+            txt += "  <li>" + sha3 + "    " + "Gekko.zip ("+ bit32Or64() + ")" + "</li>" + "\r\n";
             txt += "</ul>" + "\r\n";
 
-            System.IO.File.WriteAllText(tools + @"\sha.txt", txt);
-
-            this.textBoxSha1.Text = sha1 + " = " + "InstallerForGekko.msi" + "\n";
-            this.textBoxSha1.Text += sha2 + " = " + "Setup.exe" + "\n";
-            this.textBoxSha1.Text += sha3 + " = " + "Gekko.zip";
+            System.IO.File.WriteAllText(tools + @"\"+ bit32Or64() + @"\sha.txt", txt);            
 
             MessageBox.Show(@"SHA ok, copied to " + tools);
 
@@ -363,7 +380,9 @@ namespace Deploy
             {
                 dir.Delete(true);
             }
-            MessageBox.Show("Folder " + tools + " is now wiped (empty)");
+            MessageBox.Show("Folder " + tools + " is now wiped (empty)");            
+            Directory.CreateDirectory(tools + @"\" + @"32");
+            Directory.CreateDirectory(tools + @"\" + @"64");
         }
 
         public static class ZipHelper
@@ -564,6 +583,99 @@ namespace Deploy
             }
 
             MessageBox.Show("Checked " + list.storage.Count + " exe/dll file signatures, there were " + errors + " errors" + "\n" + sb.ToString());
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            
+            string text = File.ReadAllText(ifile);
+            if (text.Contains("\"TargetPlatform\" = \"3:0\""))
+            {
+                MessageBoxResult m = MessageBox.Show("Installer bitness is 32-bit. Would you like to CHANGE to 64-bit?", "", MessageBoxButton.YesNoCancel);
+                if (m == MessageBoxResult.Yes)
+                {
+                    text = text.Replace("\"TargetPlatform\" = \"3:0\"", "\"TargetPlatform\" = \"3:1\"");
+                    text = text.Replace("\"DefaultLocation\" = \"8:[ProgramFilesFolder]\\\\[ProductName]\"", "\"DefaultLocation\" = \"8:[ProgramFiles64Folder]\\\\[ProductName]\"");
+                    File.WriteAllText(ifile, text);
+                    MessageBox.Show("Installer bitness set to 64-bit");
+                }
+                else
+                {
+                    MessageBox.Show("Installer bitness kept at 32-bit");
+                }
+            }
+            else if (text.Contains("\"TargetPlatform\" = \"3:1\""))
+            {
+                MessageBoxResult m = MessageBox.Show("Installer bitness is 64-bit. Would you like to CHANGE to 32-bit?", "", MessageBoxButton.YesNoCancel);
+                if (m == MessageBoxResult.Yes)
+                {
+                    text = text.Replace("\"TargetPlatform\" = \"3:1\"", "\"TargetPlatform\" = \"3:0\"");
+                    text = text.Replace("\"DefaultLocation\" = \"8:[ProgramFiles64Folder]\\\\[ProductName]\"", "\"DefaultLocation\" = \"8:[ProgramFilesFolder]\\\\[ProductName]\"");
+                    File.WriteAllText(ifile, text);
+                    MessageBox.Show("Installer bitness set to 32-bit");
+                }
+                else
+                {
+                    MessageBox.Show("Installer bitness kept at 64-bit");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Installer does not seem to be either 32-bit or 64-bit -- strange, aborting...");
+            }
+
+            InstallerBitness(ifile);
+        }
+
+        private void InstallerBitness(string file)
+        {
+            string text2 = File.ReadAllText(file);
+            if (text2.Contains("\"TargetPlatform\" = \"3:0\"")) installerIs64Bit = false;
+            else if (text2.Contains("\"TargetPlatform\" = \"3:1\"")) installerIs64Bit = true;
+            else
+            {
+                MessageBox.Show("Installer does not seem to be either 32-bit or 64-bit -- strange, aborting...");
+            }
+            if (installerIs64Bit) label_Bitness.Content = "Installer: 64-bit";
+            else label_Bitness.Content = "Installer: 32-bit";
+
+            if (installerIs64Bit)
+            {
+                if (!text2.Contains("\"DefaultLocation\" = \"8:[Program64FilesFolder]\\\\[ProductName]\""))
+                {
+                    MessageBox.Show("*** ERROR: for 64-bit: expected vdproj file to contain [Program64FilesFolder]");
+                    return;
+                }
+            }
+            else
+            {
+                if (!text2.Contains("\"DefaultLocation\" = \"8:[ProgramFilesFolder]\\\\[ProductName]\""))
+                {
+                    MessageBox.Show("*** ERROR: for 32-bit: expected vdproj file to contain [ProgramFilesFolder]");
+                    return;
+                }
+            }
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            string s = "Set Gekko Debug|x86 (that is, debug 32-bit) and compile" + "\n";
+            s += "Now we copy gekko.exe, gekko.pdb and ANTLR.dll from /?to /Diverse/ExternalDllFiles";
+            s += "Maybe get all these files from Gekko32.zip, so we are sure all is good (but keep Gekcel_orig.xlsm)";
+            s += "only 32-bit, about 64-bit see: https://colinlegg.wordpress.com/2016/09/07/my-first-c-net-udf-using-excel-dna-and-visual-studio/";
+        
+            MessageBox.Show(s);
+            s = "If there are problems injecting VBA, see Gekcel/Program.cs for trust stuff" + "\n";
+            s += "1. Double-click Gekcel.xll" + "\n";
+            s += "2. If there is a security warning, click 'activate'" + "\n";
+            s += "3. Now there should be a 'Gekko' tab on the ribbon. Click this tab and click the 'Setup' button'" + "\n";
+            s += "   You should get a message that the Gekko environment is set up." + "\n";
+            s += "4. Run the macro 'Demo' " + "\n";
+            MessageBox.Show(s);
+            s = "Now package files in Gekcel32.zip, see what files were in last time" + "\n";
+
+            MessageBox.Show(s);
+
         }
     }
 

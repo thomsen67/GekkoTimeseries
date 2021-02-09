@@ -7340,11 +7340,8 @@ namespace UnitTests
             I("index work:*;");
             s = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(s.Contains("Found 0 matching items"));
-            Assert.IsFalse(s.Contains("Note: "));  //does not find other freqs in Work
-
-
-
-
+            Assert.IsTrue(s.Contains("Note: *:* instead of work:* --> 2 matches"));
+            Assert.IsTrue(s.Contains("Note: *:*!* instead of work:* --> 4 matches"));
         }
 
 
