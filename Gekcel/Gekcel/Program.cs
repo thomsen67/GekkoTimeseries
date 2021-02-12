@@ -179,7 +179,7 @@ namespace Gekcel
         [ExcelFunction(Name = "Gekko_Put", Description = "Transfers data from sheet cells to a Gekko databank (baseOfArray can be index = 0 or 1)")]
         public static double Gekko_Put(object[,] cells, int baseOfArrayZeroOrOne)
         {
-            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc.          
+            Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc. MUST use GetDirectoryName()          
 
             TableLight matrix = new TableLight();  //1-based
 
@@ -372,7 +372,7 @@ End Sub
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
-                Program.PrepareExcelDna2(ExcelDnaUtil.XllPath);
+                Program.PrepareExcelDna2(Path.GetDirectoryName(ExcelDnaUtil.XllPath));  //MUST use GetDirectoryName()
             }
 
             counter++;

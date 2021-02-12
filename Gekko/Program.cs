@@ -1526,37 +1526,39 @@ namespace Gekko
             }
             return stackTrace;
         }
-                
+
         /// <summary>
         /// Helper method (hook) for Gekcel. BEWARE: Do not change name or signature without changing in 
         /// Gekcel solution, too!!
         /// </summary>
-        /// <param name="s"></param>
+        /// <param name="path">Note: must be real path, not a path+filename</param></param>
         //ok that it is not referenced to, is used in Gekcel
-        public static void PrepareExcelDna(string s)
+        public static void PrepareExcelDna(string path)
         {
+            //MessageBox.Show("PrepareExcelDna() called with: " + path);
+
             Globals.excelDna = true;
-            Globals.excelDna2 = false;
-            Globals.excelDnaPath = s;
+            Globals.excelDnaPath = path;
         }
 
         /// <summary>
         /// Helper method (hook) for Gekcel. BEWARE: Do not change name or signature without changing in 
         /// Gekcel solution, too!!
         /// </summary>
-        /// <param name="s"></param>
+        /// <param name="path">Note: must be real path, not a path+filename</param>
         //ok that it is not referenced to, is used in Gekcel
         public static void PrepareExcelDna2(string path)
         {
-            void SetWorkingFolderIfNullOrEmpty()
-            {
-                if (string.IsNullOrEmpty(Program.options.folder_working)) Program.options.folder_working = Path.GetDirectoryName(path);
-            }
+            //MessageBox.Show("PrepareExcelDna2() called with: " + path);
 
-            Program.InitUfunctionsAndArithmeticsAndMore();
+            InitUfunctionsAndArithmeticsAndMore();
 
-            Program.PrepareExcelDna(Path.GetDirectoryName(path)); //necessary for it to run ANTLR etc.          
-            SetWorkingFolderIfNullOrEmpty();
+            PrepareExcelDna(path); //necessary for it to run ANTLR etc.          
+
+            if (string.IsNullOrEmpty(Program.options.folder_working)) Program.options.folder_working = path;
+
+            Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
+
             Program.databanks.storage.Clear();
             Program.databanks.storage.Add(new Databank("Work"));
             Program.databanks.storage.Add(new Databank("Ref"));
@@ -2513,7 +2515,7 @@ namespace Gekko
 
                 if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
-                    if (copyLocal && !Globals.excelDna2)
+                    if (copyLocal && !Globals.excelDna)
                     {
                         DateTime t0 = DateTime.Now;
                         localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
@@ -2761,7 +2763,7 @@ namespace Gekko
                 }
 
                 //Cleanup of local files
-                if (copyLocal && !Globals.excelDna2)
+                if (copyLocal && !Globals.excelDna)
                 {
                     if (true)
                     {

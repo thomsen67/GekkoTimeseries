@@ -65,7 +65,6 @@ namespace Gekko
         public static List<string> unitTestsPromtingHelper = null;
 
         public static bool excelDna = false;  //true for use with ExcelDna solution
-        public static bool excelDna2 = false;
         public static StringBuilder excelDnaOutput = null;
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
         public static ExcelDnaData excelDnaData = null;

@@ -66,13 +66,13 @@ namespace Deploy
             {
                 if (installerIs64Bit)
                 {
-                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", tools + @"\" + bit32Or64() + @"\InstallerForGekko.msi", true);
-                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", tools + @"\" + bit32Or64() + @"\Setup.exe", true);
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release\InstallerForGekko.msi", tools + @"\" + bit32Or64() + @"\InstallerForGekko.msi", true);
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release\Setup.exe", tools + @"\" + bit32Or64() + @"\Setup.exe", true);
                 }
                 else
                 {
-                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release\InstallerForGekko.msi", tools + @"\" + bit32Or64() + @"\InstallerForGekko.msi", true);
-                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release\Setup.exe", tools + @"\" + bit32Or64() + @"\Setup.exe", true);
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", tools + @"\" + bit32Or64() + @"\InstallerForGekko.msi", true);
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", tools + @"\" + bit32Or64() + @"\Setup.exe", true);
                 }
                     
                 MessageBox.Show(@"Copying 2 files ok");
@@ -177,8 +177,9 @@ namespace Deploy
             string sha1 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\InstallerForGekko.msi");
             string sha2 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\Setup.exe");
             string sha3 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\Gekko.zip");
+            string sha4 = ComputeSha1(tools + @"\" + "Gekcel" + @"\Gekcel.zip");
 
-            if (sha1 == null || sha2 == null || sha3 == null)
+            if (sha1 == null || sha2 == null || sha3 == null || sha4 == null)
             {
                 MessageBox.Show("Problem with SHA1, not computed, aborting...");
                 return;
@@ -187,9 +188,10 @@ namespace Deploy
             string txt = null;
             txt += "<strong>Gekko " + version + " </strong>" + "\r\n";
             txt += "<ul>" + "\r\n";
-            txt += "  <li>" + sha1 + "    " + "InstallerForGekko.msi ("+ bit32Or64() + ")" + "</li>" + "\r\n";
-            txt += "  <li>" + sha2 + "    " + "Setup.exe ("+ bit32Or64() + ")" + "</li>" + "\r\n";
-            txt += "  <li>" + sha3 + "    " + "Gekko.zip ("+ bit32Or64() + ")" + "</li>" + "\r\n";
+            txt += "  <li>" + sha1 + "    " + "InstallerForGekko.msi ("+ bit32Or64() + "-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha2 + "    " + "Setup.exe ("+ bit32Or64() + "-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha3 + "    " + "Gekko.zip ("+ bit32Or64() + "-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha4 + "    " + "Gekcel.zip (32-bit)" + "</li>" + "\r\n";
             txt += "</ul>" + "\r\n";
 
             System.IO.File.WriteAllText(tools + @"\"+ bit32Or64() + @"\sha.txt", txt);            
@@ -641,9 +643,9 @@ namespace Deploy
 
             if (installerIs64Bit)
             {
-                if (!text2.Contains("\"DefaultLocation\" = \"8:[Program64FilesFolder]\\\\[ProductName]\""))
+                if (!text2.Contains("\"DefaultLocation\" = \"8:[ProgramFiles64Folder]\\\\[ProductName]\""))
                 {
-                    MessageBox.Show("*** ERROR: for 64-bit: expected vdproj file to contain [Program64FilesFolder]");
+                    MessageBox.Show("*** ERROR: for 64-bit: expected vdproj file to contain [ProgramFiles64Folder]");
                     return;
                 }
             }
