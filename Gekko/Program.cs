@@ -11907,27 +11907,35 @@ namespace Gekko
                 G.Write(type3);
                 string stamp = null;
                 if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
-                if (ts.freq == EFreq.A || ts.freq == EFreq.U)
+
+                if (ts.type == ESeriesType.ArraySuper)
                 {
-                    if (noData || first.super == -12345 || last.super == -12345)
-                    {
-                        G.Writeln(freq + ", no data period");
-                    }
-                    else
-                    {
-                        //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                        G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
-                    }
+                    //do not print any data period here, this is calculated for the sub-series in code further down.
                 }
                 else
                 {
-                    if (noData || first.super == -12345 || last.super == -12345)
+                    if (ts.freq == EFreq.A || ts.freq == EFreq.U)
                     {
-                        G.Writeln(freq + ", no data period");
+                        if (noData || first.super == -12345 || last.super == -12345)
+                        {
+                            G.Writeln(freq + ", no data period");
+                        }
+                        else
+                        {
+                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                            G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
+                        }
                     }
                     else
                     {
-                        G.Writeln(freq + " data from " + first.ToString() + " to " + last.ToString() + stamp);
+                        if (noData || first.super == -12345 || last.super == -12345)
+                        {
+                            G.Writeln(freq + ", no data period");
+                        }
+                        else
+                        {
+                            G.Writeln(freq + " data from " + first.ToString() + " to " + last.ToString() + stamp);
+                        }
                     }
                 }
 
