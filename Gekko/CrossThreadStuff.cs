@@ -52,7 +52,7 @@ namespace Gekko
         delegate void SetTextInputCallback(string text, string type2);
         public static void SetTextInput(string text, string type2)
         {
-            if (Gui.gui.textBox2.InvokeRequired)
+            if (Gui.gui.textBoxMainTabLower.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new SetTextInputCallback(SetTextInput), new object[] { text, type2 });
@@ -61,7 +61,7 @@ namespace Gekko
             {
                 // It's on the same thread, no need for Invoke
 
-                RichTextBox textBox = Gui.gui.textBox2;
+                RichTextBox textBox = Gui.gui.textBoxMainTabLower;
                 string path = "";
                 string f1 = Path.GetFileNameWithoutExtension(text);
                 string p0 = Program.options.folder_working.TrimEnd('\\');
@@ -119,17 +119,16 @@ namespace Gekko
             {
                 return;
             }
-            if (Gui.gui.textBoxTab3.InvokeRequired)
+            if (Gui.gui.textBoxMainTabUpper.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new ZoomCallback(Zoom), new object[] { });
             }
             else
             {
-                Gui.gui.textBox1.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                Gui.gui.textBox2.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                Gui.gui.textBoxTab2.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                Gui.gui.textBoxTab3.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                Gui.gui.textBoxMainTabUpper.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                Gui.gui.textBoxMainTabLower.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                Gui.gui.textBoxOutputTab.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));                
             }
         }
 
@@ -137,16 +136,16 @@ namespace Gekko
         delegate void SetReadOnlyCallback(bool b);
         public static void SetReadOnly(bool b)
         {
-            if (Gui.gui.textBox1.InvokeRequired)
+            if (Gui.gui.textBoxMainTabUpper.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new SetReadOnlyCallback(SetReadOnly), new object[] { b });
             }
             else
             {
-                Gui.gui.textBox2.ReadOnly = b;
-                if (b) Gui.gui.textBox2.BackColor = Color.LightGray;
-                else Gui.gui.textBox2.BackColor = Color.White;                
+                Gui.gui.textBoxMainTabLower.ReadOnly = b;
+                if (b) Gui.gui.textBoxMainTabLower.BackColor = Color.LightGray;
+                else Gui.gui.textBoxMainTabLower.BackColor = Color.White;                
             }
         }
 
@@ -164,22 +163,17 @@ namespace Gekko
             {
                 if (G.Equal(text, "main"))
                 {
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage1;
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMain;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Main);
                 }
                 if (G.Equal(text, "output"))
                 {
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Output);
-                }
-                if (G.Equal(text, "help"))
-                {
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage3;
-                    if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Help);
-                }
+                }                
                 if (G.Equal(text, "menu"))
                 {
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage4;
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMenu;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Menu);
                 }
             }
@@ -193,7 +187,7 @@ namespace Gekko
             {
                 return;
             }
-            if (Gui.gui.textBox2.InvokeRequired)
+            if (Gui.gui.textBoxMainTabLower.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new ModeCallback(Mode), new object[] { });
@@ -221,7 +215,7 @@ namespace Gekko
                     double r = 253; double g = 245; double b = 176; double alpha = 0.00d;                    
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
-                else Gui.gui.textBox2.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
+                else Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
                 
             }
         }
@@ -236,7 +230,7 @@ namespace Gekko
                 //just ignore it: do not clear the stuff                
                 return;
             }
-            if (Gui.gui.textBoxTab3.InvokeRequired)
+            if (Gui.gui.textBoxMainTabUpper.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new ClsCallback(Cls), new object[] { text });
@@ -245,8 +239,8 @@ namespace Gekko
             {
                 if (text == "" || text == "main")
                 {
-                    Gui.gui.textBox1.Clear();
-                    Gui.gui.textBox1.AppendText(Globals.blankUsedAsPadding);  //to simulate a previous carriage return with 1 character indent
+                    Gui.gui.textBoxMainTabUpper.Clear();
+                    Gui.gui.textBoxMainTabUpper.AppendText(Globals.blankUsedAsPadding);  //to simulate a previous carriage return with 1 character indent
                     {
                         //To save memory, these links can no longer be clicked.
                         Globals.linkContainerCounter = 0L;
@@ -260,14 +254,9 @@ namespace Gekko
                 }
                 else if (text == "output")
                 {
-                    Gui.gui.textBoxTab2.Clear();
-                    Gui.gui.textBoxTab2.AppendText(Globals.blankUsedAsPadding);
-                }
-                else if (text == "help")
-                {
-                    Gui.gui.textBoxTab3.Clear();
-                    Gui.gui.textBoxTab3.AppendText(Globals.blankUsedAsPadding);
-                }
+                    Gui.gui.textBoxOutputTab.Clear();
+                    Gui.gui.textBoxOutputTab.AppendText(Globals.blankUsedAsPadding);
+                }                
             }
         }
 
@@ -342,7 +331,7 @@ namespace Gekko
                 }
                 else
                 {
-                    Gui.gui.textBox2.SelectedText = Globals.windowIntellisense.lastSelected;
+                    Gui.gui.textBoxMainTabLower.SelectedText = Globals.windowIntellisense.lastSelected;
                 }
                 Globals.windowIntellisense.IsOpen = false;
             }

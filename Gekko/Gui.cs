@@ -72,9 +72,8 @@ namespace Gekko
         //public Image gray = null;
         public Image target = null;
 
-        public RichTextBoxEx textBox1 = new RichTextBoxEx();
-        public RichTextBoxEx textBoxTab2 = new RichTextBoxEx();
-        public RichTextBoxEx textBoxTab3 = new RichTextBoxEx();
+        public RichTextBoxEx textBoxMainTabUpper = new RichTextBoxEx();
+        public RichTextBoxEx textBoxOutputTab = new RichTextBoxEx();        
 
         // worker thread
         Thread threadWorkerThread;
@@ -108,73 +107,70 @@ namespace Gekko
 
         public Gui()
         {            
-            this.textBox1 = new RichTextBoxEx();
-            //this.settings1 = new Settings();
-            this.splitContainer1 = new SplitContainerFix();
+            this.textBoxMainTabUpper = new RichTextBoxEx();
+            
+            this.splitContainerMainTab = new SplitContainerFix();
 
             InitializeComponent();
 
-            this.textBox2.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxMainTabLower.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
             //
             // textBox1
-            //
-            this.textBox1.AutoWordSelection = true;
-            this.textBox1.BackColor = System.Drawing.SystemColors.Window;
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.ContextMenuStrip = this.contextMenuStrip1;
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.WordWrap = false;
-            this.textBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(641, 276);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.TabStop = false;
-            this.textBox1.Text = "";
-            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyDown);
-            this.textBox1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);
-            this.splitContainer1.Panel1.Controls.Add(this.textBox1);
+            //            
+            this.textBoxMainTabUpper.AutoWordSelection = true;
+            this.textBoxMainTabUpper.BackColor = System.Drawing.SystemColors.Window;
+            this.textBoxMainTabUpper.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxMainTabUpper.ContextMenuStrip = this.contextMenuStrip1;
+            this.textBoxMainTabUpper.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxMainTabUpper.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxMainTabUpper.Location = new System.Drawing.Point(0, 0);
+            this.textBoxMainTabUpper.Name = "textBox1";
+            this.textBoxMainTabUpper.ReadOnly = true;
+            this.textBoxMainTabUpper.WordWrap = false;
+            this.textBoxMainTabUpper.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Both;
+            this.textBoxMainTabUpper.Size = new System.Drawing.Size(641, 276);
+            this.textBoxMainTabUpper.TabIndex = 0;
+            this.textBoxMainTabUpper.TabStop = false;
+            this.textBoxMainTabUpper.Text = "";
+            this.textBoxMainTabUpper.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyDown);
+            this.textBoxMainTabUpper.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);
+
+            Panel panelMainTabUpper = new Panel();
+            panelMainTabUpper.BackColor= System.Drawing.SystemColors.Window;
+            panelMainTabUpper.Dock = DockStyle.Fill;
+            panelMainTabUpper.Padding = new Padding(Globals.mainTabPaddingLeft, Globals.mainTabPaddingVertical, 0, Globals.mainTabPaddingVertical);
+            panelMainTabUpper.Controls.Add(this.textBoxMainTabUpper);
+            this.splitContainerMainTab.Panel1.Controls.Add(panelMainTabUpper);
 
             //
-            // textBoxTab2
+            // output window
             //
-            this.textBoxTab2.AutoWordSelection = true;
-            this.textBoxTab2.BackColor = System.Drawing.SystemColors.Window;
-            this.textBoxTab2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxTab2.ContextMenuStrip = this.contextMenuStrip1;
-            this.textBoxTab2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxTab2.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxTab2.Location = new System.Drawing.Point(0, 0);
-            this.textBoxTab2.Name = "textBoxTab2";
-            this.textBoxTab2.ReadOnly = true;
-            this.textBoxTab2.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.textBoxTab2.Size = new System.Drawing.Size(641, 358);
-            this.textBoxTab2.TabIndex = 0;
-            this.textBoxTab2.TabStop = false;
-            this.textBoxTab2.Text = "";
-            this.tabPage2.Controls.Add(this.textBoxTab2);
+            this.textBoxOutputTab.AutoWordSelection = true;
+            this.textBoxOutputTab.BackColor = System.Drawing.SystemColors.Window;
+            this.textBoxOutputTab.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxOutputTab.ContextMenuStrip = this.contextMenuStrip1;
+            this.textBoxOutputTab.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxOutputTab.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxOutputTab.Location = new System.Drawing.Point(0, 0);
+            this.textBoxOutputTab.Name = "textBoxTab2";
+            this.textBoxOutputTab.ReadOnly = true;
+            this.textBoxOutputTab.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.textBoxOutputTab.Size = new System.Drawing.Size(641, 358);
+            this.textBoxOutputTab.TabIndex = 0;
+            this.textBoxOutputTab.TabStop = false;
+            this.textBoxOutputTab.Text = "";
 
-            //
-            // textBoxTab3
-            //
-            this.textBoxTab3.AutoWordSelection = true;
-            this.textBoxTab3.BackColor = System.Drawing.SystemColors.Window;
-            this.textBoxTab3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxTab3.ContextMenuStrip = this.contextMenuStrip1;
-            this.textBoxTab3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxTab3.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxTab3.Location = new System.Drawing.Point(0, 0);
-            this.textBoxTab3.Name = "textBoxTab3";
-            this.textBoxTab3.ReadOnly = true;
-            this.textBoxTab3.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.textBoxTab3.Size = new System.Drawing.Size(641, 358);
-            this.textBoxTab3.TabIndex = 0;
-            this.textBoxTab3.TabStop = false;
-            this.textBoxTab3.Text = "";
-            this.tabPage3.Controls.Add(this.textBoxTab3);
+            //this.tabPageOutput.Controls.Add(this.textBoxOutputTab);
+
+            Panel panelOutputTab = new Panel();
+            panelOutputTab.BackColor = System.Drawing.SystemColors.Window;
+            panelOutputTab.Dock = DockStyle.Fill;
+            panelOutputTab.Padding = new Padding(Globals.mainTabPaddingLeft, Globals.mainTabPaddingVertical, 0, Globals.mainTabPaddingVertical);
+            panelOutputTab.Controls.Add(this.textBoxOutputTab);            
+            this.tabPageOutput.Controls.Add(panelOutputTab);
+
+
 
             // initialize delegates
             threadDelegateAddString = new DelegateAddString(this.AddString);
@@ -196,9 +192,8 @@ namespace Gekko
             red = Image.FromFile(Application.StartupPath + "\\images\\red.png");
             target = Image.FromFile(Application.StartupPath + "\\images\\target.png");
 
-            this.textBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBox1_LinkClicked);
-            this.textBoxTab2.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxTab2_LinkClicked);
-            this.textBoxTab3.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxTab3_LinkClicked);
+            this.textBoxMainTabUpper.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBox1_LinkClicked);
+            this.textBoxOutputTab.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxTab2_LinkClicked);
 
             //if (Globals.isBetaVersion) this.splitContainer1.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
 
@@ -440,22 +435,15 @@ namespace Gekko
             gui = new Gui();
             if (track) MessageBox.Show("9");
 
-            gui.textBox1.AppendText(Globals.blankUsedAsPadding); //to simulate a previous carriage return with 1 character indent
-            gui.textBoxTab2.Text = "";
-            gui.textBoxTab2.AppendText(" This window is used to show output from the main window, when \n");
-            gui.textBoxTab2.AppendText(" this output is large in volume, or the details may not be of \n");
-            gui.textBoxTab2.AppendText(" crucial interest to the user. When relevant, this kind of extra \n");
-            gui.textBoxTab2.AppendText(" output will be accessible via a clickable link in the main window. \n");
-            gui.textBoxTab2.AppendText(" \n");
-            gui.textBoxTab2.AppendText(Globals.blankUsedAsPadding); //to simulate a previous carriage return with 1 character indent
-
-            gui.textBoxTab3.Text = "";
-            gui.textBoxTab3.AppendText(" This window is used to provide easy access to the help system, \n");
-            gui.textBoxTab3.AppendText(" specifically help concerning specific commands and their syntax. \n");
-            gui.textBoxTab3.AppendText(" You may write 'help' in the main window to activate the help \n");
-            gui.textBoxTab3.AppendText(" system here.");
-            gui.textBoxTab3.AppendText(" \n");
-            gui.textBoxTab3.AppendText(Globals.blankUsedAsPadding); //to simulate a previous carriage return with 1 character indent
+            gui.textBoxMainTabUpper.AppendText(Globals.blankUsedAsPadding); //to simulate a previous carriage return with 1 character indent
+            gui.textBoxOutputTab.Text = "";
+            gui.textBoxOutputTab.AppendText("This window is used to show output from the main window, when \n");
+            gui.textBoxOutputTab.AppendText("this output is large in volume, or the details may not be of \n");
+            gui.textBoxOutputTab.AppendText("crucial interest to the user. When relevant, this kind of extra \n");
+            gui.textBoxOutputTab.AppendText("output will be accessible via a clickable link in the main window. \n");
+            gui.textBoxOutputTab.AppendText("\n");
+            gui.textBoxOutputTab.AppendText(Globals.blankUsedAsPadding); //to simulate a previous carriage return with 1 character indent
+            
             if (track) MessageBox.Show("10");
 
             bool cleanup = false;
@@ -837,7 +825,7 @@ namespace Gekko
             int mainWindowHeightOLD = gui.Size.Height;
             int mainWindowTopDistanceOLD = gui.Top;
             int mainWindowLeftDistanceOLD = gui.Left;
-            int mainWindowSplitterDistanceOLD = gui.splitContainer1.SplitterDistance;
+            int mainWindowSplitterDistanceOLD = gui.splitContainerMainTab.SplitterDistance;
 
             try
             {
@@ -849,13 +837,13 @@ namespace Gekko
                 {
                     //Does not work. Splitter drops to bottom when closing/opening several times,
                     //even when splitter is not touched.
-                    gui.splitContainer1.SplitterDistance = us.MainWindowSplitterDistance;
+                    gui.splitContainerMainTab.SplitterDistance = us.MainWindowSplitterDistance;
                 }
                 else
                 {
                     //need to fix splitter to something fixed!
                     //height is 358 always, but it gets ok even if we change the height of Gekko
-                    gui.splitContainer1.SplitterDistance = (gui.splitContainer1.Height * 65) / 100;
+                    gui.splitContainerMainTab.SplitterDistance = (gui.splitContainerMainTab.Height * 65) / 100;
                 }
             }
             catch
@@ -863,7 +851,7 @@ namespace Gekko
                 //setting the defaults instead, they should work
                 gui.Size = new Size(mainWindowWidthOLD, mainWindowHeightOLD);
                 gui.Location = new Point(mainWindowLeftDistanceOLD, mainWindowTopDistanceOLD);
-                gui.splitContainer1.SplitterDistance = mainWindowSplitterDistanceOLD;
+                gui.splitContainerMainTab.SplitterDistance = mainWindowSplitterDistanceOLD;
             }
             //window stuff end---------------------------
 
@@ -872,7 +860,7 @@ namespace Gekko
             {
                 gui.Size = new Size(700, 550);
                 gui.Location = new Point(100, 50);
-                gui.splitContainer1.SplitterDistance = 276;
+                gui.splitContainerMainTab.SplitterDistance = 276;
             }
 
             try
@@ -988,7 +976,7 @@ namespace Gekko
                 us.MainWindowHeight = gui.Size.Height;
                 us.MainWindowTopDistance = gui.Top;
                 us.MainWindowLeftDistance = gui.Left;
-                us.MainWindowSplitterDistance = gui.splitContainer1.SplitterDistance;
+                us.MainWindowSplitterDistance = gui.splitContainerMainTab.SplitterDistance;
             }
             //Save user settings in xml file
             us.WorkingFolder = Program.options.folder_working;
@@ -1136,8 +1124,8 @@ namespace Gekko
         {
             //In order to move the focus to the command input textbox
             //Otherwise the focus is set on the results text box (above)
-            gui.textBox2.Focus();
-            gui.textBox2.Select();
+            gui.textBoxMainTabLower.Focus();
+            gui.textBoxMainTabLower.Select();
         }
 
         private void Gekko_KeyDown(object sender, KeyEventArgs e)
@@ -1149,11 +1137,7 @@ namespace Gekko
             else if (e.Control && e.KeyCode == Keys.O)
             {
                 CrossThreadStuff.SetTab("output", true);
-            }
-            else if (e.Control && e.KeyCode == Keys.H)
-            {
-                CrossThreadStuff.SetTab("help", true);
-            }
+            }            
             else if (e.Control && e.KeyCode == Keys.U)
             {
                 CrossThreadStuff.SetTab("menu", true);
@@ -1274,11 +1258,7 @@ namespace Gekko
         private void textBoxTab2_LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
         {
             LinkClicked(e, ETabs.Output);
-        }
-        private void textBoxTab3_LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
-        {
-            LinkClicked(e, ETabs.Help);
-        }
+        }        
 
         private static void LinkClicked(System.Windows.Forms.LinkClickedEventArgs e, ETabs tab)
         {
@@ -1311,9 +1291,8 @@ namespace Gekko
                 if (type == "tab")
                 {
                     //for instance input0 = "output#tab:output"
-                    if (input == "main") Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage1;
-                    else if (input == "output") Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
-                    else if (input == "help") Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage3;
+                    if (input == "main") Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMain;
+                    else if (input == "output") Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     else if (input.Contains("output"))  //for instance "output12b"
                     {
                         string input2 = input.Substring(6);
@@ -1326,7 +1305,7 @@ namespace Gekko
                             if (letter == "a") liste = ec.simInitEndoMissingValue;
                             else if (letter == "b") liste = ec.simNonExistingVariable;
                             else if (letter == "c") liste = ec.simMissingValueExoOrLaggedEndo;
-                            Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                            Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                             O.Cls("output");
                             foreach (string s in liste)
                             {
@@ -1412,7 +1391,7 @@ namespace Gekko
                 }
                 else if (type == "outputtab")
                 {
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     O.Cls("output");
                     string s = Globals.linkContainer[long.Parse(input)].s;
                     List<string> ss = G.ExtractLinesFromText(s);
@@ -1472,7 +1451,7 @@ namespace Gekko
                 }
                 else if (type == "dispfix")
                 {
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     O.Cls("output");
                     Series ts = O.GetIVariableFromString(input, O.ECreatePossibilities.NoneReportError, false) as Series;
                     if (!(ts.type == ESeriesType.ArraySuper))
@@ -1529,7 +1508,7 @@ namespace Gekko
             }
             catch
             {
-                Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage1;
+                Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMain;
                 G.Writeln2("*** ERROR: problem with link");
                 //consume this error: otherwise the whole GUI will close (for instance if a DISP-variable does not exist)
             }
@@ -1556,7 +1535,7 @@ namespace Gekko
                 {
                     //do nothing
                 }
-                gui.textBox2.Focus();
+                gui.textBoxMainTabLower.Focus();
             }
             //else if (Gui.gui.tabControl1.SelectedIndex == 2)
             //{
@@ -1592,7 +1571,7 @@ namespace Gekko
                     temp.Add(var);
                     Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }
-                gui.textBox2.Focus();
+                gui.textBoxMainTabLower.Focus();
             }
             //else if (Gui.gui.tabControl1.SelectedIndex == 2)
             //{
@@ -1617,7 +1596,7 @@ namespace Gekko
 
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
-            gui.textBox2.Focus();
+            gui.textBoxMainTabLower.Focus();
         }
 
         private void comparecheckDatabanksToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2028,45 +2007,7 @@ namespace Gekko
                     }
                     Program.guiBrowseNumber++;
                 }
-            }
-            else if (type == ETabs.Help)
-            {
-                //this can be deleted
-                if (var != null)
-                {
-                    if (Program.guiBrowseHelpNumber > Program.guiBrowseHelpHistory.Count - 1)
-                    {
-                        Program.guiBrowseHelpHistory.Add(var);
-                    }
-                    else
-                    {
-                        if (G.Equal(var, Program.guiBrowseHelpHistory[Program.guiBrowseHelpNumber]))
-                        {
-                        }
-                        else
-                        {
-                            int dif = Program.guiBrowseHelpHistory.Count - Program.guiBrowseHelpNumber;
-                            for (int i2 = 0; i2 < dif; i2++)
-                            {
-                                Program.guiBrowseHelpHistory.RemoveAt(Program.guiBrowseHelpHistory.Count - 1);
-                            }
-                            Program.guiBrowseHelpHistory.Add(var);
-                        }
-                    }
-                    Program.guiBrowseHelpNumber++;
-                }
-                Program.WorkerThreadHelper1 wh = new Program.WorkerThreadHelper1();
-                if (Program.guiBrowseHelpNumber >= 2) wh.leftArrow = "true";
-                else wh.leftArrow = "false";
-                if (Program.guiBrowseHelpNumber < Program.guiBrowseHelpHistory.Count) wh.rightArrow = "true";
-                else wh.rightArrow = "false";
-
-                Gui gui = Gui.gui;
-                if (gui != null && gui.IsHandleCreated)  //Invoke can not be called if there is no handle created
-                {
-                    gui.Invoke(gui.threadDelegateSetTitle, wh);
-                }
-            }
+            }            
             else if (type == ETabs.Output)
             {
             }
@@ -3016,5 +2957,5 @@ namespace Gekko
             G.Writeln2("option interface edit style = rstudio2");
             CrossThreadStuff.SetChecked();
         }
-    }
+    }    
 }

@@ -25,9 +25,9 @@ namespace Gekko
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Gui));
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new Gekko.SplitContainerFix();
-            this.textBox2 = new System.Windows.Forms.RichTextBox();
+            this.tabPageMain = new System.Windows.Forms.TabPage();
+            this.splitContainerMainTab = new Gekko.SplitContainerFix();
+            this.textBoxMainTabLower = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,10 +38,9 @@ namespace Gekko
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();            
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabPageOutput = new System.Windows.Forms.TabPage();
+            this.tabPageMenu = new System.Windows.Forms.TabPage();
             this.webBrowser = new System.Windows.Forms.WebBrowser();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
             this.textBoxTooltip = new System.Windows.Forms.TextBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
@@ -139,12 +138,12 @@ namespace Gekko
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
+            this.tabPageMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerMainTab)).BeginInit();
+            this.splitContainerMainTab.Panel2.SuspendLayout();
+            this.splitContainerMainTab.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
-            this.tabPage4.SuspendLayout();
+            this.tabPageMenu.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -153,9 +152,9 @@ namespace Gekko
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Controls.Add(this.tabPageMain);   //main
+            this.tabControl1.Controls.Add(this.tabPageOutput); //output
+            this.tabControl1.Controls.Add(this.tabPageMenu);   //menu
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.HotTrack = true;
             this.tabControl1.Location = new System.Drawing.Point(0, 49);
@@ -170,63 +169,71 @@ namespace Gekko
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.splitContainer1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(0);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(641, 358);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Main";
-            this.tabPage1.ToolTipText = "Main window for running Gekko (Ctrl+M)";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabPageMain.Controls.Add(this.splitContainerMainTab);
+            this.tabPageMain.Location = new System.Drawing.Point(4, 22);
+            this.tabPageMain.Margin = new System.Windows.Forms.Padding(0);
+            this.tabPageMain.Name = "tabPage1";
+            this.tabPageMain.Size = new System.Drawing.Size(641, 358);
+            this.tabPageMain.TabIndex = 0;
+            this.tabPageMain.Text = "Main";
+            this.tabPageMain.ToolTipText = "Main window for running Gekko (Ctrl+M)";
+            this.tabPageMain.UseVisualStyleBackColor = true;
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(0);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.splitContainerMainTab.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainerMainTab.Location = new System.Drawing.Point(0, 0);
+            this.splitContainerMainTab.Margin = new System.Windows.Forms.Padding(0);
+            this.splitContainerMainTab.Name = "splitContainer1";
+            this.splitContainerMainTab.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.BackColor = System.Drawing.Color.Transparent;
-            this.splitContainer1.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
+            this.splitContainerMainTab.Panel1.BackColor = System.Drawing.Color.Transparent;
+            this.splitContainerMainTab.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.textBox2);
-            this.splitContainer1.Size = new System.Drawing.Size(641, 358);
-            this.splitContainer1.SplitterDistance = 275;
-            this.splitContainer1.SplitterWidth = 6;
-            this.splitContainer1.TabIndex = 6;
-            this.splitContainer1.TabStop = false;
+
+            Panel panelMainTabLower = new Panel();
+            panelMainTabLower.BackColor = System.Drawing.SystemColors.Window;
+            panelMainTabLower.Dock = DockStyle.Fill;
+            panelMainTabLower.Padding = new Padding(Globals.mainTabPaddingLeft, Globals.mainTabPaddingVertical, 0, Globals.mainTabPaddingVertical);            
+            panelMainTabLower.Controls.Add(this.textBoxMainTabLower);
+            this.splitContainerMainTab.Panel2.Controls.Add(panelMainTabLower);
+
+            this.splitContainerMainTab.Size = new System.Drawing.Size(641, 358);
+            this.splitContainerMainTab.SplitterDistance = 275;
+            this.splitContainerMainTab.SplitterWidth = 6;
+            this.splitContainerMainTab.TabIndex = 6;
+            this.splitContainerMainTab.TabStop = false;
+            this.splitContainerMainTab.BackColor = Color.LightGray;
             // 
             // textBox2
             // 
-            this.textBox2.AcceptsTab = true;
-            this.textBox2.AllowDrop = true;
-            this.textBox2.AutoWordSelection = true;
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.ContextMenuStrip = this.contextMenuStrip1;
-            this.textBox2.DetectUrls = false;
-            this.textBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox2.Location = new System.Drawing.Point(0, 0);
+            this.textBoxMainTabLower.AcceptsTab = true;
+            this.textBoxMainTabLower.AllowDrop = true;
+            this.textBoxMainTabLower.AutoWordSelection = true;
+            this.textBoxMainTabLower.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxMainTabLower.ContextMenuStrip = this.contextMenuStrip1;
+            this.textBoxMainTabLower.DetectUrls = false;
+            this.textBoxMainTabLower.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxMainTabLower.Location = new System.Drawing.Point(0, 0);            
+            this.textBoxMainTabLower.Name = "textBox2";
+            this.textBoxMainTabLower.Size = new System.Drawing.Size(641, 77);
+            this.textBoxMainTabLower.TabIndex = 0;
+            this.textBoxMainTabLower.Text = "";
+            this.textBoxMainTabLower.WordWrap = false;
+            this.textBoxMainTabLower.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            this.textBoxMainTabLower.VisibleChanged += new System.EventHandler(this.textBox2_VisibleChanged);
+            this.textBoxMainTabLower.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyDown);
+            this.textBoxMainTabLower.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox2_KeyPress);
+            this.textBoxMainTabLower.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);
             
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(641, 77);
-            this.textBox2.TabIndex = 0;
-            this.textBox2.Text = "";
-            this.textBox2.WordWrap = false;
-            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
-            this.textBox2.VisibleChanged += new System.EventHandler(this.textBox2_VisibleChanged);
-            this.textBox2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyDown);
-            this.textBox2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox2_KeyPress);
-            this.textBox2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);
             // 
             // contextMenuStrip1
             // 
-            
+
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem,
             this.redoToolStripMenuItem,
@@ -300,27 +307,27 @@ namespace Gekko
             // 
             // tabPage2
             // 
-            this.tabPage2.BackColor = System.Drawing.Color.Transparent;
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(0);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(641, 358);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Output";
-            this.tabPage2.ToolTipText = "Output of bulky stuff like long lists etc. (Ctrl+O)";
-            this.tabPage2.Click += new System.EventHandler(this.tabPage2_Click);
+            this.tabPageOutput.BackColor = System.Drawing.Color.Transparent;
+            this.tabPageOutput.Location = new System.Drawing.Point(4, 22);
+            this.tabPageOutput.Margin = new System.Windows.Forms.Padding(0);
+            this.tabPageOutput.Name = "tabPage2";
+            this.tabPageOutput.Size = new System.Drawing.Size(641, 358);
+            this.tabPageOutput.TabIndex = 1;
+            this.tabPageOutput.Text = "Output";
+            this.tabPageOutput.ToolTipText = "Output of bulky stuff like long lists etc. (Ctrl+O)";
+            this.tabPageOutput.Click += new System.EventHandler(this.tabPage2_Click);
             // 
             // tabPage4
             // 
-            this.tabPage4.Controls.Add(this.webBrowser);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPageMenu.Controls.Add(this.webBrowser);
+            this.tabPageMenu.Location = new System.Drawing.Point(4, 22);
             
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(641, 358);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Menu";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.tabPageMenu.Name = "tabPage4";
+            this.tabPageMenu.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageMenu.Size = new System.Drawing.Size(641, 358);
+            this.tabPageMenu.TabIndex = 3;
+            this.tabPageMenu.Text = "Menu";
+            this.tabPageMenu.UseVisualStyleBackColor = true;
             // 
             // webBrowser
             // 
@@ -333,17 +340,7 @@ namespace Gekko
             this.webBrowser.TabIndex = 0;
             this.webBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser_DocumentCompleted);
             this.webBrowser.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser_Navigating);
-            // 
-            // tabPage3
-            // 
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Margin = new System.Windows.Forms.Padding(0);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(641, 358);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Help";
-            this.tabPage3.ToolTipText = "Gekko help system (Ctrl+H)";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            
             // 
             // textBoxTooltip
             // 
@@ -1195,12 +1192,12 @@ namespace Gekko
             this.Shown += new System.EventHandler(this.Gui_Shown);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Gekko_KeyDown);
             this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
+            this.tabPageMain.ResumeLayout(false);
+            this.splitContainerMainTab.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerMainTab)).EndInit();
+            this.splitContainerMainTab.ResumeLayout(false);
             this.contextMenuStrip1.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
+            this.tabPageMenu.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -1216,7 +1213,7 @@ namespace Gekko
         #endregion
 
         public TabControl tabControl1;
-        public System.Windows.Forms.RichTextBox textBox2;                
+        public System.Windows.Forms.RichTextBox textBoxMainTabLower;                
 
         //private System.Windows.Forms.TreeView treeViewItems;
         private System.Windows.Forms.TextBox textBoxTooltip;
@@ -1233,7 +1230,7 @@ namespace Gekko
 
         //private RichTextBox textBox2;
         //private AutoComplete textBox2;
-        private SplitContainerFix splitContainer1;
+        private SplitContainerFix splitContainerMainTab;
 
         private ToolStripMenuItem setWorkingDirToolStripMenuItem;
         private ToolStripMenuItem makebatFileToolStripMenuItem;
@@ -1318,8 +1315,8 @@ namespace Gekko
                     //char is typically a letter (first letter of a command). So for most purposes it works ok.
                     //Ctrl+C etc. in the upper window work ok.
                     string s = ("" + (char)e.KeyValue).ToLower();
-                    this.textBox2.SelectedText = s;
-                    this.textBox2.Focus();
+                    this.textBoxMainTabLower.SelectedText = s;
+                    this.textBoxMainTabLower.Focus();
                 }
             }
         }
@@ -1352,7 +1349,7 @@ namespace Gekko
                 //                
                 if (Globals.windowIntellisense != null && Globals.windowIntellisense.IsOpen && Globals.windowIntellisense.listBox1.SelectedItem != null)
                 {
-                    textBox2.SelectedText = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
+                    textBoxMainTabLower.SelectedText = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
                     Globals.windowIntellisense.IsOpen = false;
                     e.Handled = true;
                 }
@@ -1404,7 +1401,7 @@ namespace Gekko
                 //
                 // Ctrl+V
                 //
-                textBox2.Paste(DataFormats.GetFormat(DataFormats.Text));  //to avoid formatting, colors etc., when pasting from e.g. Word examples, mails etc.
+                textBoxMainTabLower.Paste(DataFormats.GetFormat(DataFormats.Text));  //to avoid formatting, colors etc., when pasting from e.g. Word examples, mails etc.
                 e.Handled = true;
             }
             else if (e.Control && e.KeyCode == Keys.C)
@@ -1412,9 +1409,9 @@ namespace Gekko
                 //
                 // Ctrl+C
                 //
-                if (this.textBox2.SelectedText != null)
+                if (this.textBoxMainTabLower.SelectedText != null)
                 {
-                    Clipboard.SetText(this.textBox2.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
+                    Clipboard.SetText(this.textBoxMainTabLower.SelectedText);     //to avoid formatting, colors etc. when pasting to Word, in a mail
                 }
                 e.Handled = true;
             }
@@ -1507,9 +1504,9 @@ namespace Gekko
             string insertText = "\n";
             try
             {
-                int selectionIndex = textBox2.SelectionStart;
-                int j = textBox2.Text.IndexOf('\n', selectionIndex + 0);
-                if (j >= 0 && j + 0 < textBox2.Text.Length) textBox2.SelectionStart = j + 1;
+                int selectionIndex = textBoxMainTabLower.SelectionStart;
+                int j = textBoxMainTabLower.Text.IndexOf('\n', selectionIndex + 0);
+                if (j >= 0 && j + 0 < textBoxMainTabLower.Text.Length) textBoxMainTabLower.SelectionStart = j + 1;
             }
             catch { };  //no need to fail on this
         }
@@ -1529,7 +1526,7 @@ namespace Gekko
 
             string s2 = null;
 
-            string selected = textBox2.SelectedText;
+            string selected = textBoxMainTabLower.SelectedText;
 
             int line2;
             int firstChar;
@@ -1551,14 +1548,14 @@ namespace Gekko
                 //Strange: needed after the textbox is rtf type.......
 
                 //TODO: can give error with multi-line input (line>size)
-                if (textBox2.Lines.Length > line2)  //must be so, otherwise we get error
+                if (textBoxMainTabLower.Lines.Length > line2)  //must be so, otherwise we get error
                 {
-                    s2 = textBox2.Lines[line2];
+                    s2 = textBoxMainTabLower.Lines[line2];
                     if (Globals.startOfLinePositionWhenLastEnterPressed != -12345) Globals.endOfLinePositionWhenLastEnterPressed = Globals.startOfLinePositionWhenLastEnterPressed + s2.Length;
                     bool isAtLastColumn = false;
                     if (s2.Length == column2) isAtLastColumn = true;
                     bool isAtLastRow = false;
-                    if (line2 + 1 == textBox2.Lines.Length) isAtLastRow = true;
+                    if (line2 + 1 == textBoxMainTabLower.Lines.Length) isAtLastRow = true;
                     if (!isAtLastColumn)
                     {
                         //in the middle of a line --> never no new line
@@ -1569,7 +1566,7 @@ namespace Gekko
                         //at the end of the non-last line -> no new line, but maybe semicolon
                         if (s2.Trim() != "" && !s2.Trim().EndsWith(";"))
                         {
-                            textBox2.SelectedText = ";";
+                            textBoxMainTabLower.SelectedText = ";";
                             s2 = s2 + ";";
                         }
                         e.Handled = true;
@@ -1579,7 +1576,7 @@ namespace Gekko
                         //at the end of the last line -> new line and semicolon
                         if (s2.Trim() != "" && !s2.Trim().EndsWith(";"))
                         {
-                            textBox2.SelectedText = ";";
+                            textBoxMainTabLower.SelectedText = ";";
                             s2 = s2 + ";";
                         }
                     }
@@ -1631,7 +1628,7 @@ namespace Gekko
             string s2 = null;
             try
             {
-                s2 = textBox2.Lines[line2].Substring(0, column2);
+                s2 = textBoxMainTabLower.Lines[line2].Substring(0, column2);
             }
             catch
             {
@@ -1709,8 +1706,8 @@ namespace Gekko
                 }
 
                 // Find the position of the caret
-                Point point = this.textBox2.GetPositionFromCharIndex(textBox2.SelectionStart);
-                Point pp = this.textBox2.PointToScreen(point);                
+                Point point = this.textBoxMainTabLower.GetPositionFromCharIndex(textBoxMainTabLower.SelectionStart);
+                Point pp = this.textBoxMainTabLower.PointToScreen(point);                
                 double xx = double.NaN;
                 double yy = double.NaN;
                 int ixx = 0;
@@ -1727,9 +1724,9 @@ namespace Gekko
 
         private void TextInputHelper(out int line2, out int firstChar, out int column2)
         {
-            line2 = textBox2.GetLineFromCharIndex(textBox2.GetFirstCharIndexOfCurrentLine());
-            firstChar = textBox2.GetFirstCharIndexFromLine(line2);
-            column2 = textBox2.SelectionStart - firstChar;
+            line2 = textBoxMainTabLower.GetLineFromCharIndex(textBoxMainTabLower.GetFirstCharIndexOfCurrentLine());
+            firstChar = textBoxMainTabLower.GetFirstCharIndexFromLine(line2);
+            column2 = textBoxMainTabLower.SelectionStart - firstChar;
         }
 
         private void richTextBox1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -1741,16 +1738,15 @@ namespace Gekko
         private void textBoxTooltip_Enter(object sender, System.EventArgs e)
         {
             // Stop the fake tooltip's text being selected
-            this.textBox2.Focus();
+            this.textBoxMainTabLower.Focus();
         }
         
         public ToolStripButton toolStripButton2;
         private ToolStripMenuItem comparecheckDatabanksToolStripMenuItem;
         private ToolStripMenuItem comparecheckEquationsToolStripMenuItem;
         private ToolStripMenuItem compareModeldatabankvarlistToolStripMenuItem;
-        public TabPage tabPage1;
-        public TabPage tabPage2;
-        public TabPage tabPage3;
+        public TabPage tabPageMain;
+        public TabPage tabPageOutput;        
         private ContextMenuStrip contextMenuStrip1;
         private ToolStripMenuItem undoToolStripMenuItem;
         private ToolStripMenuItem redoToolStripMenuItem;
@@ -1788,7 +1784,7 @@ namespace Gekko
         private ToolStripMenuItem tSPUtilitiesToolStripMenuItem;
         private ToolStripMenuItem tSPImportEqsToolStripMenuItem;
         private ToolStripMenuItem tSPImportDataToolStripMenuItem1;
-        public TabPage tabPage4;
+        public TabPage tabPageMenu;
         public WebBrowser webBrowser;
         //private ElementHost elementHost1;
         //private Menu menu1;

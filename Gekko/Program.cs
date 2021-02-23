@@ -790,8 +790,7 @@ namespace Gekko
     public enum ETabs
     {
         Main,
-        Output,
-        Help,
+        Output,        
         Menu
     }
 
@@ -1228,17 +1227,7 @@ namespace Gekko
         /// <summary>
         /// Helper for the GUI browser (DISP command)
         /// </summary>
-        public static List<string> guiBrowseHistory = new List<string>();
-
-        /// <summary>
-        /// Helper for the GUI browser (DISP command)
-        /// </summary>
-        public static int guiBrowseHelpNumber = 0;
-
-        /// <summary>
-        /// Helper for the GUI browser (DISP command)
-        /// </summary>
-        public static List<string> guiBrowseHelpHistory = new List<string>();
+        public static List<string> guiBrowseHistory = new List<string>();        
 
         public enum eOfficeVersion
         {
@@ -14114,7 +14103,7 @@ namespace Gekko
                         }
                         if (showList)
                         {
-                            Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                            Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                             O.Cls("output");
                             //run in thread ideally
                             foreach (string s in a1)

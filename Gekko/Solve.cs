@@ -758,7 +758,7 @@ namespace Gekko
                 return;
             }
 
-            if (!G.IsUnitTesting()) Gekko.Gui.gui.textBox1.SuspendLayout();
+            if (!G.IsUnitTesting()) Gekko.Gui.gui.textBoxMainTabUpper.SuspendLayout();
             SimOptions so = new SimOptions();
             so.method = Program.options.solve_method;
             if (G.Equal(o.opt_fix, "yes")) so.isFix = true;
@@ -791,7 +791,7 @@ namespace Gekko
                 Program.databanks.GetLocal().RemoveIVariable(Globals.symbolScalar + "__simt2");
             }
 
-            if (!G.IsUnitTesting()) Gekko.Gui.gui.textBox1.ResumeLayout();
+            if (!G.IsUnitTesting()) Gekko.Gui.gui.textBoxMainTabUpper.ResumeLayout();
         }
 
         public static void SimFast(GekkoTime tStart, GekkoTime tEnd, SimOptions so)

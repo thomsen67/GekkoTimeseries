@@ -4365,9 +4365,8 @@ namespace Gekko
                 }
                 else
                 {
-                    if (tab == ETabs.Main) textBox = Gui.gui.textBox1;
-                    else if (tab == ETabs.Output) textBox = Gui.gui.textBoxTab2;
-                    else if (tab == ETabs.Help) textBox = Gui.gui.textBoxTab3;
+                    if (tab == ETabs.Main) textBox = Gui.gui.textBoxMainTabUpper;
+                    else if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
                     else throw new GekkoException();
 
                     int start = textBox.TextLength;
