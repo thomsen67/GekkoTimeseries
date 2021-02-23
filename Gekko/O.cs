@@ -168,6 +168,28 @@ namespace Gekko
         }
 
         /// <summary>
+        /// /// Simple math overload
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <returns></returns>
+        public static double Min(double x1, double x2)
+        {
+            return Math.Min(x1, x2);
+        }
+
+        /// <summary>
+        /// /// Simple math overload
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <returns></returns>
+        public static double Max(double x1, double x2)
+        {
+            return Math.Max(x1, x2);
+        }
+
+        /// <summary>
         /// Simple math overload
         /// </summary>
         /// <param name="x"></param>
@@ -2009,6 +2031,15 @@ namespace Gekko
             if (Globals.runningOnTTComputer && text == "arrow")
             {
                 Arrow.Run();
+            }
+
+            if(Globals.runningOnTTComputer)
+            {
+                List<string> error = new List<string>();
+                error.Add("Cell z1. Could not interpret this date: 1234");
+                error.Add("It is supposed to be an Excel date, counting days since January 1, 1900. But Gekko cannot" + "It is supposed to be an Excel date, counting days since January 1, 1900.But Gekko cannot");
+                error.Add("convert it to a value.");
+                G.Error(error);
             }
 
             if (nocr) G.Write(text);

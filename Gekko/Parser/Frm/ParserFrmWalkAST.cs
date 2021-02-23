@@ -286,6 +286,30 @@ namespace Gekko.Parser.Frm
                             wh2.rightHandSideCsCode.Append("Abs(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
+                        else if (G.Equal(function, "min"))
+                        {
+                            if (arguments != 2)
+                            {
+                                G.Writeln2("*** ERROR: Expected min() function with 2 arguments");
+                                throw new GekkoException();
+                            }
+                            recognized = true;
+                            wh2.rightHandSideCsCode.Append("O.Min(", EEmitType.computerReadable);
+                            wh2.rightHandSideCsCode.Append("Min(", EEmitType.humanReadable);
+                            numberOfRightParentheses++;
+                        }
+                        else if (G.Equal(function, "max"))
+                        {
+                            if (arguments != 2)
+                            {
+                                G.Writeln2("*** ERROR: Expected max() function with 2 arguments");
+                                throw new GekkoException();
+                            }
+                            recognized = true;
+                            wh2.rightHandSideCsCode.Append("O.Max(", EEmitType.computerReadable);
+                            wh2.rightHandSideCsCode.Append("Max(", EEmitType.humanReadable);
+                            numberOfRightParentheses++;
+                        }
                         else if (G.Equal(function, "dlog") || G.Equal(function, "dlogy"))
                         {
                             int lag = 1;

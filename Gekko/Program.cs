@@ -1820,7 +1820,7 @@ namespace Gekko
                         gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, cell.dateTime);
                     }
                     else
-                    {
+                    {                        
                         G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + cell.text + "'");
                         G.Writeln("           It is supposed to be an Excel date, counting days since January 1, 1900. But Gekko cannot", Color.Red);
                         G.Writeln("           convert it to a value.", Color.Red);

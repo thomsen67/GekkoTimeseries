@@ -4476,6 +4476,26 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Error message (with exception thrown).
+        /// </summary>
+        /// <param name="ss">Error lines</param>
+        public static void Error(List<string> ss)
+        {
+
+            string stars = "*** ERROR: ";
+            bool first = true;
+            foreach (string s in ss)
+            {
+                string start = null;
+                if (first) start = stars;
+                else start = G.Blanks(stars.Length);
+                G.Writeln(start + s, Color.Red);
+                first = false;
+            }
+            throw new GekkoException();
+        }
+
+        /// <summary>
         /// Helper method
         /// </summary>
         /// <param name="s"></param>

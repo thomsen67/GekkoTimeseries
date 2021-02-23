@@ -1332,6 +1332,7 @@ namespace Gekko
 
             if (hasDate)
             {
+                //date comparisions
                 GekkoTime gt = GekkoTime.tNull;
                 foreach (IVariable item in items)
                 {
