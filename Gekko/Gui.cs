@@ -1957,6 +1957,33 @@ namespace Gekko
                     }
                 }
             }
+
+            if(Globals.isAutoExec)
+            {
+                //This bool probably is not 100% safe, because at start up, there are actually 3 threads started:
+                //  1. a dummy worker thread
+                //  2. possible ini file
+                //  3. possible gekko.exe parameters
+                //Regardign 2 and 3, these wait for each another, but it seems 1 could run and finish, before
+                //2 and 3 are run, meaning that after 1, the traffic light would be green for a short period of
+                //time. But this is unlikely, because the parser is slow to start up. So in all likeliness,
+                //isAutoExec will only be true when both 1, 2 and 3 are finished. But worst case, the history
+                //links will just show up too soon in the output window. So worst case is not catastrophical.
+
+                //G.Writeln2("Restore commands from last session?  Raw   History   More    (23-02-2021 11:55)");
+
+                Action a = () =>
+                {
+                    string s = Program.GetTextFromFileWithWait(System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoCommandHistory.gcm");
+                    MessageBox.Show(s);
+                };
+                
+                G.Writeln("Restore from " + G.GetLinkAction("Raw", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " file");                
+
+                Globals.isAutoExec = false;  //must be last
+            }
+
+            
         }
 
         public void GuiBrowseArrowsStuff(string var, bool link, ETabs type)
@@ -2848,6 +2875,21 @@ namespace Gekko
 
         private void commandHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            List<string> ss2 = GetCleanedCommandMemory();
+            WindowMessageBox w = new WindowMessageBox();
+            w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
+            w.textBox1.FontSize = 11;
+            w.Title = "Command history since last clearing of workspace";
+            w.textBox1.Text = G.ExtractTextFromLines(ss2).ToString();
+            w.ShowDialog();
+        }
+
+        /// <summary>
+        /// Removes artificial call of gekko.ini from this memory.
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetCleanedCommandMemory()
+        {
             List<string> ss = G.ExtractLinesFromText(Globals.commandMemory.storage.ToString());
             List<string> ss2 = new List<string>();
             foreach (string s in ss)
@@ -2856,12 +2898,7 @@ namespace Gekko
                 if (s == Globals.iniFileSecretName) continue;
                 ss2.Add(s);
             }
-            WindowMessageBox w = new WindowMessageBox();
-            w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
-            w.textBox1.FontSize = 11;
-            w.Title = "Command history since last clearing of workspace";
-            w.textBox1.Text = G.ExtractTextFromLines(ss2).ToString();
-            w.ShowDialog();
+            return ss2;
         }
 
         private void clearCommandHistoryToolStripMenuItem_Click(object sender, EventArgs e)

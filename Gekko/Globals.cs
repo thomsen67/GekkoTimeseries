@@ -781,6 +781,8 @@ namespace Gekko
 
         public static string iniFileSecretName = "[[RunGekkoIniFile]]";
 
+        public static bool isAutoExec = true;
+
         public static WindowIntellisense windowIntellisense = null;
 
         public static Table lastPrtOrMulprtTable = null; 

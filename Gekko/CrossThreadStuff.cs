@@ -46,7 +46,21 @@ namespace Gekko
                 // It's on the same thread, no need for Invoke
                 Decomp.DecompGetFuncExpressionsAndRecalc(o);
             }
-        }        
+        }
+
+        delegate string GetInputWindowTextCallback();
+        public static string GetInputWindowText()
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                return Gui.gui.Invoke(new GetInputWindowTextCallback(GetInputWindowText), new object[] { }) as string;
+            }
+            else
+            {
+                return Gui.gui.textBoxMainTabLower.Text;
+            }
+        }
 
         //weird delegate pattern, but it works!
         delegate void SetTextInputCallback(string text, string type2);

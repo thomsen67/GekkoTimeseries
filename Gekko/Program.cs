@@ -6196,7 +6196,11 @@ namespace Gekko
                 }
 
                 ch.commandsText = commandLinesFlat;
-                if (fileName == "") Globals.commandMemory.storage.AppendLine(text); //is syntax-ok, but may run-time fail
+                if (fileName == "")
+                {
+                    //either a one-liner, else a marked block, issued with [Enter].
+                    Globals.commandMemory.storage.AppendLine(text); //is syntax-ok, but may still run-time fail                   
+                }
 
                 try
                 {
@@ -6206,9 +6210,48 @@ namespace Gekko
                 {
                     throw;
                 }
+                finally
+                {
+                    RecordHistoryAndSaveToFiles();
+                }
 
                 break;  //if we get to here, everything is ok so break the file-trying loop
             }            
+        }
+
+        private static void RecordHistoryAndSaveToFiles()
+        {
+            //after the command is done -- even if an error occurs
+            //by recording these files after the command, * in "read *" or "model *" will have been
+            //replaced with real filenames.
+
+            try
+            {
+                string file1 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoCommandHistory.gcm";
+                StreamWriter sw1 = new StreamWriter(file1);
+                string s1 = Globals.commandMemory.storage.ToString();
+                sw1.Write(s1);
+                sw1.Flush();
+                sw1.Close();
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
+
+            try
+            {
+                string file2 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoInputWindow.gcm";
+                StreamWriter sw2 = new StreamWriter(file2);
+                string s2 = CrossThreadStuff.GetInputWindowText();
+                sw2.Write(s2);
+                sw2.Flush();
+                sw2.Close();
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
         }
 
         /// <summary>
@@ -17998,9 +18041,7 @@ namespace Gekko
             b2.FileNameWithPath = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
             
-            Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace
-                                                          //Globals.prtCsSnippets.Clear();  //just to save ram  --> can induce bugs
-                                                          //Globals.prtCsSnippetsHeaders.Clear(); //just to save ram --> can induce bugs
+            Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace                                                         
 
             //User functions: more can be added if necessary, or users can use LIST or DICT.
             InitUfunctionsAndArithmeticsAndMore();

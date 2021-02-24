@@ -1534,8 +1534,7 @@ namespace Gekko
             TextInputHelper(out line2, out firstChar, out column2);
             Globals.startOfLinePositionWhenLastEnterPressed = firstChar;
             Globals.commandMemory.lengthWhenLastEnterPressed = Globals.commandMemory.storage.ToString().Length;
-
-
+            
             if (selected != "")
             {
                 s2 = selected;
