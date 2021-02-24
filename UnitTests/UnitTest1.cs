@@ -13773,6 +13773,65 @@ print(df2)
         [TestMethod]
         public void _Test_FunctionsInBuilt()
         {
+            //min()
+            I("RESET; time 2001 2003;");
+            I("%x = min(2, 3);");
+            _AssertScalarVal(First(), "%x", 2d);
+            I("%x = min(2, 3, 1);");
+            _AssertScalarVal(First(), "%x", 1d);
+            I("%x = min(2001q2, 2001q3);");
+            _AssertScalarDate(First(), "%x", EFreq.Q, 2001, 2);
+            I("%x = min(2001q2, 2001q3, 2001q1);");
+            _AssertScalarDate(First(), "%x", EFreq.Q, 2001, 1);
+            I("x1 = 2, 3, 1;");
+            I("x2 = 3, -1, 2;");
+            I("y = min(x1, 2.5);");
+            _AssertSeries(First(), "y!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 2.5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 1d, sharedDelta);            
+            I("y = min(2.5, x1);");
+            _AssertSeries(First(), "y!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 2.5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 1d, sharedDelta);
+            I("y = min(x1, x2);");
+            _AssertSeries(First(), "y!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, -1d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 1d, sharedDelta);
+            I("y = min(2.6, x1, 2.5);");
+            _AssertSeries(First(), "y!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 2.5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 1d, sharedDelta);
+
+            //max()
+            I("RESET; time 2001 2003;");
+            I("%x = max(2, 3);");
+            _AssertScalarVal(First(), "%x", 3d);
+            I("%x = max(2, 3, 1);");
+            _AssertScalarVal(First(), "%x", 3d);
+            I("%x = max(2001q2, 2001q3);");
+            _AssertScalarDate(First(), "%x", EFreq.Q, 2001, 3);
+            I("%x = max(2001q2, 2001q3, 2001q1);");
+            _AssertScalarDate(First(), "%x", EFreq.Q, 2001, 3);
+            I("x1 = 2, 3, 1;");
+            I("x2 = 3, -1, 2;");
+            I("y = max(x1, 2.5);");
+            _AssertSeries(First(), "y!a", 2001, 2.5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 3d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 2.5d, sharedDelta);
+            I("y = max(2.5, x1);");
+            _AssertSeries(First(), "y!a", 2001, 2.5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 3d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 2.5d, sharedDelta);
+            I("y = max(x1, x2);");
+            _AssertSeries(First(), "y!a", 2001, 3d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 3d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 2d, sharedDelta);
+            I("y = max(2.6, x1, 2.5);");
+            _AssertSeries(First(), "y!a", 2001, 2.6d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, 3d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, 2.6d, sharedDelta);
+            
+            
             Databank work = First();
             //simplest possible
             I("RESET;");

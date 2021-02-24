@@ -1553,7 +1553,7 @@ namespace Gekko
             }
         }
 
-        private static Series ArithmeticsSeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
+        public static Series ArithmeticsSeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() and GetStartEndPeriod() which are safe
@@ -1857,7 +1857,7 @@ namespace Gekko
             if (windowNew2.StrictlyLargerThan(window2)) window2 = windowNew2;
         }
 
-        private void PrepareInput(GekkoSmpl smpl, IVariable input, out Series x1, out Series x2_series, out double x2_val)
+        public void PrepareInput(GekkoSmpl smpl, IVariable input, out Series x1, out Series x2_series, out double x2_val)
         {
             x1 = this;
             IVariable x2 = input;  //unknown type

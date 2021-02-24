@@ -1315,11 +1315,58 @@ namespace Gekko
             return m;
         }
 
+        /// <summary>
+        /// Helper method to deal with two-argument function, where arguments may be scalar or series or even 1x1 matrix.
+        /// The function must be given normal and "swapped", for instance (x1, x2) => x1 - x2, followed by (x1, x2) => x2 - x1.
+        /// For symmetrical functions swapping yields the same, but must still be stated.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        /// <param name="iv1">x1</param>
+        /// <param name="iv2">x2</param>
+        /// <param name="a">Normal function, like (x1, x2) => x1 - x2</param>
+        /// <param name="aSwapped">Swapped function, like (x1, x2) => x2 - x1</param>
+        /// <returns></returns>
+        public static IVariable Helper_GeneralFunction(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2, Func<double, double, double> a, Func<double, double, double> aSwapped)
+        {
+            if (iv1.Type() == EVariableType.Series)
+            {
+                //series, series
+                //series, val
+                Series iv1_series = iv1 as Series;
+                Series x1_series, x2_series; double x2_val;
+                iv1_series.PrepareInput(smpl, iv2, out x1_series, out x2_series, out x2_val);
+                Series rv_series = null;
+                if (x2_series != null) rv_series = Series.ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
+                else rv_series = Series.ArithmeticsSeriesVal(smpl, x1_series, x2_val, aSwapped);
+                return rv_series;
+            }
+            else if ((iv1.Type() == EVariableType.Val || (iv1.Type() == EVariableType.Matrix && ((Matrix)iv1).data.Length == 1)) && iv2.Type() == EVariableType.Series)
+            {
+                //val, series
+                double x1_val = iv1.ConvertToVal();
+                Series x2_series = (Series)iv2;
+                Series rv_series = Series.ArithmeticsSeriesVal(smpl, x2_series, x1_val, aSwapped);  //Note: swapped!
+                return rv_series;
+            }
+            else
+            {
+                //val, val
+                double x1_val = iv1.ConvertToVal();
+                double x2_val = iv2.ConvertToVal();
+                double d = a(x1_val, x2_val);
+                return new ScalarVal(d);
+            }
+        }
+
         public static IVariable min(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
         {
-            //Right now we only implement it for vals, so _t1 and _t2 are not used.
-            //Later on, perhaps for dates, series etc.
-            //See also max()
+            if (items.Length < 2)
+            {
+                G.Writeln2("*** ERROR: Expected 2 or more arguments");
+                throw new GekkoException();
+            }
 
             bool hasDate = false;
             foreach (IVariable item in items)
@@ -1347,20 +1394,23 @@ namespace Gekko
             }
             else
             {
-
-                double min = double.MaxValue;
-                foreach (IVariable item in items)
+                IVariable total = items[0];
+                for (int i = 1; i < items.Length; i++)
                 {
-                    min = Math.Min(min, item.ConvertToVal());
+                    //accumulate
+                    total = Helper_GeneralFunction(smpl, _t1, _t2, total, items[i], (x1, x2) => Math.Min(x1, x2), (x1, x2) => Math.Min(x2, x1));
                 }
-                return new ScalarVal(min);
-            }
+                return total;
+            }            
         }
 
         public static IVariable max(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
         {
-            //Right now we only implement it for vals, so _t1 and _t2 are not used.
-            //See also min()
+            if (items.Length < 2)
+            {
+                G.Writeln2("*** ERROR: Expected 2 or more arguments");
+                throw new GekkoException();
+            }
 
             bool hasDate = false;
             foreach (IVariable item in items)
@@ -1373,6 +1423,7 @@ namespace Gekko
 
             if (hasDate)
             {
+                //date comparisions
                 GekkoTime gt = GekkoTime.tNull;
                 foreach (IVariable item in items)
                 {
@@ -1387,12 +1438,13 @@ namespace Gekko
             }
             else
             {
-                double max = double.MinValue;
-                foreach (IVariable item in items)
+                IVariable total = items[0];
+                for (int i = 1; i < items.Length; i++)
                 {
-                    max = Math.Max(max, item.ConvertToVal());
+                    //accumulate
+                    total = Helper_GeneralFunction(smpl, _t1, _t2, total, items[i], (x1, x2) => Math.Max(x1, x2), (x1, x2) => Math.Max(x2, x1));
                 }
-                return new ScalarVal(max);
+                return total;
             }
         }
 
