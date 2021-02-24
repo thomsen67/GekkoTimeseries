@@ -408,8 +408,8 @@ namespace Gekko
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
                 
         public static string blankUsedAsPadding = "";  //to be able to remove that stuff sometime when I understand padding in richtextbox!
-        public static int mainTabPaddingLeft = 6;
-        public static int mainTabPaddingVertical = 6;
+        public static int guiTextPaddingLeft = 6;
+        public static int guiTextPaddingVertical = 6;
 
         //global time settings
         public static GekkoTime globalPeriodStart = GekkoTime.tNull;

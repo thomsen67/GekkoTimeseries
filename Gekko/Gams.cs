@@ -2277,8 +2277,14 @@ namespace Gekko
         private static void GdxErrorMessage()
         {
             G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder',");
-            G.Writeln("           for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. Note that you must");
-            G.Writeln("           use a 32-bit version of GAMS with Gekko (which is 32-bit).");
+            G.Writeln("           for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. In general, the");
+            G.Writeln("           GAMS component is pretty good at auto-detecting the location of GAMS on the pc,");
+            G.Writeln("           including finding a 32-bit GAMS if 32-bit Gekko is used, and a 64-bit GAMS if 64-bit");
+            G.Writeln("           Gekko is used. It is probably not possible to use a 32-bit GAMS from a 64-bit Gekko,");
+            G.Writeln("           but the inverse may be possible. In general, consider the bitness of both GAMS and");
+            G.Writeln("           Gekko. Newer GAMS versions are 64-bit only, and in general, using Gekko 64-bit is");
+            G.Writeln("           advised, too.");
+            G.Writeln("           Bitness info: " + Program.Get64Bitness());            
         }
 
         private static void GetGAMSWorkspace(ref string gamsDir, ref GAMSWorkspace ws)

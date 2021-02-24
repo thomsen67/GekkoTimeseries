@@ -198,7 +198,7 @@ namespace Gekko
             Panel panelMainTabLower = new Panel();
             panelMainTabLower.BackColor = System.Drawing.SystemColors.Window;
             panelMainTabLower.Dock = DockStyle.Fill;
-            panelMainTabLower.Padding = new Padding(Globals.mainTabPaddingLeft, Globals.mainTabPaddingVertical, 0, Globals.mainTabPaddingVertical);            
+            panelMainTabLower.Padding = new Padding(Globals.guiTextPaddingLeft - 2, Globals.guiTextPaddingVertical, 0, Globals.guiTextPaddingVertical);  //-2 aligns better with upper part, not sure why
             panelMainTabLower.Controls.Add(this.textBoxMainTabLower);
             this.splitContainerMainTab.Panel2.Controls.Add(panelMainTabLower);
 

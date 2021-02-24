@@ -6676,10 +6676,10 @@ namespace Gekko
         public static string Get64Bitness()
         {
             string s = null;
-            if (Environment.Is64BitProcess) s = "64-bit process on ";
-            else s = "32-bit process on ";
-            if (Environment.Is64BitOperatingSystem) s += "64-bit operating system";
-            else s += "32-bit operating system";
+            if (Environment.Is64BitProcess) s = "64-bit Gekko process on ";
+            else s = "32-bit Gekko process on ";
+            if (Environment.Is64BitOperatingSystem) s += "64-bit Windows system";
+            else s += "32-bit Windows system";
             return s;
         }
 

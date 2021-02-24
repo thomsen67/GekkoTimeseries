@@ -139,7 +139,7 @@ namespace Gekko
             Panel panelMainTabUpper = new Panel();
             panelMainTabUpper.BackColor= System.Drawing.SystemColors.Window;
             panelMainTabUpper.Dock = DockStyle.Fill;
-            panelMainTabUpper.Padding = new Padding(Globals.mainTabPaddingLeft, Globals.mainTabPaddingVertical, 0, Globals.mainTabPaddingVertical);
+            panelMainTabUpper.Padding = new Padding(Globals.guiTextPaddingLeft, Globals.guiTextPaddingVertical, 0, Globals.guiTextPaddingVertical);
             panelMainTabUpper.Controls.Add(this.textBoxMainTabUpper);
             this.splitContainerMainTab.Panel1.Controls.Add(panelMainTabUpper);
 
@@ -166,7 +166,7 @@ namespace Gekko
             Panel panelOutputTab = new Panel();
             panelOutputTab.BackColor = System.Drawing.SystemColors.Window;
             panelOutputTab.Dock = DockStyle.Fill;
-            panelOutputTab.Padding = new Padding(Globals.mainTabPaddingLeft, Globals.mainTabPaddingVertical, 0, Globals.mainTabPaddingVertical);
+            panelOutputTab.Padding = new Padding(Globals.guiTextPaddingLeft, Globals.guiTextPaddingVertical, 0, Globals.guiTextPaddingVertical);
             panelOutputTab.Controls.Add(this.textBoxOutputTab);            
             this.tabPageOutput.Controls.Add(panelOutputTab);
 
