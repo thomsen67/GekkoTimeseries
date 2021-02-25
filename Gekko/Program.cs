@@ -6212,7 +6212,7 @@ namespace Gekko
                 }
                 finally
                 {
-                    RecordHistoryAndSaveToFiles();
+                    if (!Globals.isAutoExec) RecordHistoryAndSaveToFiles();  //not done at the very startup
                 }
 
                 break;  //if we get to here, everything is ok so break the file-trying loop
@@ -8462,7 +8462,7 @@ namespace Gekko
             List<string> lines = Program.GetDatabankInfo(type);
             if (Program.options.table_stamp)
             {
-                string printed = "Table printed: " + Program.GetDateTimeStamp();
+                string printed = "Table printed: " + Program.GetDateTimePretty(DateTime.Now);
                 lines.Add(printed);
             }
 
@@ -16977,7 +16977,7 @@ namespace Gekko
             root.AppendChild(comment);
 
             XmlElement date = doc.CreateElement("Date");
-            string now = GetDateTimeStamp();
+            string now = GetDateTimePretty(DateTime.Now);
             date.InnerText = now;
             root.AppendChild(date);
 
@@ -17045,10 +17045,16 @@ namespace Gekko
             }
         }
 
-        public static string GetDateTimeStamp()
+        public static string GetDateTimePretty(DateTime date1)
         {
-            DateTime date1 = DateTime.Now;
-            string now = date1.ToString("G", CultureInfo.CreateSpecificCulture("da-DK"));
+            return GetDateTimePretty(date1, false);
+        }
+
+        public static string GetDateTimePretty(DateTime date1, bool shortTime)
+        {
+            string code = "G";
+            if (shortTime) code = "g";  //no seconds
+            string now = date1.ToString(code, CultureInfo.CreateSpecificCulture("da-DK"));
             return now;
         }
 
@@ -18040,8 +18046,41 @@ namespace Gekko
             w2.FileNameWithPath = null;
             b2.FileNameWithPath = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
-            
+
+            string resetRestartFirstLine = null;
+            string lastCommand = null;
+            try
+            {
+                lastCommand = Globals.commandMemory.storage.ToString().Substring(Globals.commandMemory.lengthWhenLastEnterPressed).Trim();
+            }
+            catch
+            {
+                //not the end of the world if it fails
+            }            
+
             Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace                                                         
+
+            try
+            {
+                if (lastCommand != null)
+                {
+                    //this will catch stuff like "restart", "restart;", "restart ;", "restart;time 2020;", etc. (also for "reset").
+                    TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(lastCommand);
+                    string firstLower = null;
+                    if (tokens.storage.Count > 0 && tokens.storage[0].type == ETokenType.Word) firstLower = tokens.storage[0].s.ToLower();
+
+                    if (firstLower == "reset" || firstLower == "restart")
+                    {
+                        //We insert a reset/restart as if it had been entered by hand.
+                        Globals.commandMemory.storage.AppendLine(lastCommand);
+                        Globals.commandMemory.lengthWhenLastEnterPressed = Globals.commandMemory.storage.ToString().Length;
+                    }
+                }
+            }
+            catch
+            {
+                //not the end of the world if it fails
+            }
 
             //User functions: more can be added if necessary, or users can use LIST or DICT.
             InitUfunctionsAndArithmeticsAndMore();
@@ -24238,7 +24277,7 @@ namespace Gekko
             if (isMulprt) type = StampTypes.Multiplier; //we drop .Base for now...
 
             List<string> lines = GetDatabankInfo(type);
-            string ss = GetDateTimeStamp() + ". ";
+            string ss = GetDateTimePretty(DateTime.Now) + ". ";
             foreach (string s in lines)
             {
                 ss = ss + s + ". ";
@@ -24505,7 +24544,7 @@ namespace Gekko
                         if (isMulprt) type = StampTypes.Multiplier; //we drop .Base for now...
 
                         List<string> lines = GetDatabankInfo(type);
-                        string ss = GetDateTimeStamp() + ". ";
+                        string ss = GetDateTimePretty(DateTime.Now) + ". ";
                         foreach (string s in lines)
                         {
                             ss = ss + s + ". ";

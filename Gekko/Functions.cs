@@ -3988,7 +3988,7 @@ namespace Gekko
 
         public static IVariable currentdatetime(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            return new ScalarString(Program.GetDateTimeStamp());
+            return new ScalarString(Program.GetDateTimePretty(DateTime.Now));
         }
 
         public static IVariable currenttime(GekkoSmpl smpl, IVariable _t1, IVariable _t2)

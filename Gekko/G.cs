@@ -49,7 +49,8 @@ namespace Gekko
             None  //can be series            
         }
 
-        public static string NL = "\r\n";
+        public static string NL = "\r\n";  //official Windows, cf. https://stackoverflow.com/questions/3986093/in-c-whats-the-difference-between-n-and-r-n
+        public static char NL2 = '\n';     //best for counting number of newlines, since Windows accepts both \r\n and \n as newline. Mac uses \r, hmm, never mind.
 
         /// <summary>
         /// Compares two strings, ignoring case (so "aBc" == "Abc").
@@ -95,14 +96,14 @@ namespace Gekko
         /// <param name="temp"></param>
 
         public static void ReplaceNaNWith0(double[,] temp)
-        {            
+        {
             for (int i = 0; i < temp.GetLength(0); i++)
             {
                 for (int j = 0; j < temp.GetLength(1); j++)
                 {
                     if (G.isNumericalError(temp[i, j])) temp[i, j] = 0d;
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace Gekko
         public static string ReplaceTurtle(string s)
         {
             return s.Replace("¤[0]", "").Replace("¤", "");
-        }        
+        }
 
         /// <summary>
         /// Search for string inside string (case-insensitive)
@@ -218,7 +219,7 @@ namespace Gekko
             else s = Globals.internalColumnIdentifyer + s;
             return s;
         }
-                
+
 
         /// <summary>
         /// Overload
@@ -281,7 +282,7 @@ namespace Gekko
             int zzz = int.Parse(yyy);
             return zzz;
         }
-                
+
         /// <summary>
         /// Extracts "fY" and "-2" from "fY¤-2". Not so much used in Gekko 3.0 anymore
         /// </summary>
@@ -364,13 +365,13 @@ namespace Gekko
         /// <param name="t2"></param>
         /// <returns></returns>
         public static AllFreqsHelper ConvertDateFreqsToAllFreqs(GekkoTime t1, GekkoTime t2)
-        {            
+        {
             //Also see #345632473
 
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            
+
             if (t1.IsNull()) return null;
 
             AllFreqsHelper allFreqsHelper = new Gekko.AllFreqsHelper();
@@ -505,7 +506,7 @@ namespace Gekko
         {
             if (i <= 1) return "";
             else return "s";
-        }        
+        }
 
         /// <summary>
         /// Overload
@@ -513,7 +514,7 @@ namespace Gekko
         /// <param name="freq"></param>
         /// <returns></returns>
         public static EFreq ConvertFreq(string freq)
-        {            
+        {
             return ConvertFreq(freq, false);
         }
 
@@ -581,7 +582,7 @@ namespace Gekko
             {
                 return G.ConvertFreq(f);
             }
-        }        
+        }
 
         /// <summary>
         /// Test if variable type is null
@@ -615,7 +616,7 @@ namespace Gekko
         // ========================= functions to manipulate bankvarnames with indexes start =========================================
         // ===========================================================================================================================
 
-            
+
         public static bool Chop_HasFreq(string bankvarname)
         {
             if (G.Chop_GetFreq(bankvarname) != null) return true;
@@ -1444,7 +1445,7 @@ namespace Gekko
 
             try
             {
-                
+
                 if (!format2.StartsWith("f") && !format2.StartsWith("s"))
                 {
                     G.Writeln("*** ERROR: Number format should start with 'f' or 's', e.g. 'f10.2': " + format);
@@ -1531,7 +1532,7 @@ namespace Gekko
                     else s = number.ToString("0", nfi);
                 }
                 else if (format2.StartsWith("s"))
-                {                    
+                {
                     s = number.ToString("0." + new string('0', decimals) + "e+00", nfi);
                 }
                 else
@@ -1746,7 +1747,7 @@ namespace Gekko
                 }
             }
             return temp;
-        }        
+        }
 
         /// <summary>
         /// Near obsolete method.
@@ -1784,7 +1785,7 @@ namespace Gekko
                 else return "'" + s.Replace(Globals.symbolTurtle, "', '") + "'";
             }
         }
-        
+
         /// <summary>
         /// Helper method for natural file listing sorting (a8, a9, a10, a11 instead of a10, a11, a8, a9)
         /// </summary>
@@ -2074,9 +2075,9 @@ namespace Gekko
                     int lastRoman = int.MaxValue;
                     int cptLastRoman = 0;
                     do
-                    {                        
-                        
-                        NextChar();                        
+                    {
+
+                        NextChar();
                         if (!char.IsLetter(mCurChar)) break;
                     }
                     while (true);
@@ -2136,7 +2137,7 @@ namespace Gekko
                 //identical 
                 return 0;
             }
-            
+
             public int RomanValue(string string1)
             {
                 mParser1.Init(string1);
@@ -2256,7 +2257,7 @@ namespace Gekko
             }
             return output;
         }
-        
+
         /// <summary>
         /// Helper method for file access (writing)
         /// </summary>
@@ -2308,7 +2309,7 @@ namespace Gekko
         /// <param name="d1"></param>
         /// <param name="d2"></param>
         /// <returns></returns>
-        public static bool Equals(double d1, double d2)  
+        public static bool Equals(double d1, double d2)
         {
             // ---------------------------------------------
             // #890345340857                        
@@ -2370,7 +2371,7 @@ namespace Gekko
             }
             return false;
         }
-        
+
         /// <summary>
         /// Helper method to check validity fo varname
         /// </summary>
@@ -2409,7 +2410,7 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-        
+
         /// <summary>
         /// Check validity of varname
         /// </summary>
@@ -2590,7 +2591,7 @@ namespace Gekko
             if (special) s = s.Replace("\"", "\\\"");  //inside js in html
             else s = s.Replace("\"", "\"\"");
             return s;
-        }        
+        }
 
         /// <summary>
         /// How many days does a certain month contain
@@ -2608,7 +2609,7 @@ namespace Gekko
             {
                 return 30;  //does not make any sense anyway, but undated freq can have periods outside 1..9999
             }
-        }        
+        }
 
         /// <summary>
         /// Helper method.
@@ -2618,7 +2619,7 @@ namespace Gekko
         /// <returns></returns>
         public static string DateHelper3(string format, DateTime dt)
         {
-            string s = dt.ToString(format.ToLower().Replace("m", "M"));            
+            string s = dt.ToString(format.ToLower().Replace("m", "M"));
             return s;
         }
 
@@ -2642,7 +2643,7 @@ namespace Gekko
         /// <param name="i2"></param>
         /// <returns></returns>
         public static int GekkoMax(int i1, int i2)
-        {            
+        {
             //if both are missing, a missing is returned
             //with positive inputs, this method is superflous, but we keep it for symmtery reasons (see GekkoMin())
             if (i1 == -12345) return i2;
@@ -2774,7 +2775,7 @@ namespace Gekko
             {
                 version = Globals.gekkoVersion;
             };  //fail silently                        
-                        
+
             return version;
         }
 
@@ -2816,7 +2817,7 @@ namespace Gekko
                 G.Writeln2("String cannot be of zero length.");
                 throw new GekkoException();
             }
-            
+
             // Prepare string builder for storing the processed string.
             // Note: StringBuilder has a better performance than String by 30-40%.
             StringBuilder resultStringBuilder = new StringBuilder(str.Length);
@@ -2832,7 +2833,7 @@ namespace Gekko
             int counter = 0;
 
             while ((foundAt = str.IndexOf(oldValue, startSearchFromIndex, comparisonType)) != valueNotFound)
-            {                
+            {
 
                 // Append all characters until the found replacement.
                 int @charsUntilReplacment = foundAt - startSearchFromIndex;
@@ -2869,7 +2870,7 @@ namespace Gekko
             // Append the last part to the result.
             int @charsUntilStringEnd = str.Length - startSearchFromIndex;
             resultStringBuilder.Append(str, startSearchFromIndex, @charsUntilStringEnd);
-            
+
             return resultStringBuilder.ToString();
         }
 
@@ -2887,21 +2888,31 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Count lines in a string
+        /// Count lines in a string. With precise=true, the line count is more precise but slower. Difference
+        /// between precise or not is normally within one line.
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="s"></param>
         /// <returns></returns>
-        public static int CountLines(string str)
+        public static int CountLines(string s, bool precise)
         {
             //Just counting lines, fast, no splitting etc.
-            if (str == null) return 0;
-            if (str == string.Empty) return 0;
-            int index = -1;
-            int count = 0;
-            while (-1 != (index = str.IndexOf(G.NL, index + 1)))
-                count++;
-            return count + 1;
-        }
+            if (s == null) return 0;
+            if (s == string.Empty) return 0;
+
+            if (precise)
+            {
+                var ss2 = G.ExtractLinesFromText(s);
+                return ss2.Count;
+            } else
+            {
+                //!!The below is imprecise sometimes
+                int index = -1;
+                int count = 0;
+                while (-1 != (index = s.IndexOf(G.NL2, index + 1)))
+                    count++;
+                return count + 1;
+            }
+        }    
 
         /// <summary>
         /// Helper method for splitting csv lines

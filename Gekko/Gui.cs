@@ -1972,18 +1972,61 @@ namespace Gekko
 
                 //G.Writeln2("Restore commands from last session?  Raw   History   More    (23-02-2021 11:55)");
 
-                Action a = () =>
-                {
-                    string s = Program.GetTextFromFileWithWait(System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoCommandHistory.gcm");
-                    MessageBox.Show(s);
-                };
+                string file1 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoInputWindow.gcm";
+                string file2 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoCommandHistory.gcm";
                 
-                G.Writeln("Restore from " + G.GetLinkAction("Raw", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " file");                
+                if (File.Exists(file1) && File.Exists(file2))
+                {
+                    List<string> ss1 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(file1), false);  //just to remove blank lines at top/bottom (not in middle), not to remove any [[RunGekkoIniFile]]
+                    string s1 = G.ExtractTextFromLines(ss1).ToString();
+                    Globals.sessionMemoryFile1 = s1;
+
+                    List<string> ss2 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(file2), true);
+                    string s2 = G.ExtractTextFromLines(ss2).ToString();
+                    Globals.sessionMemoryFile2 = s2;
+
+                    if (!string.IsNullOrWhiteSpace(Globals.sessionMemoryFile1) || !string.IsNullOrWhiteSpace(Globals.sessionMemoryFile2))
+                    {                        
+
+                        DateTime dt1 = (new DirectoryInfo(file1)).LastWriteTime;
+                        DateTime dt2 = (new DirectoryInfo(file2)).LastWriteTime;
+                        DateTime dt = (dt1 < dt2 ? dt1 : dt2);
+
+                        Action a1 = () =>
+                        {
+                        //Raw, lower part of gui window
+                        try
+                            {
+
+                                if (File.Exists(file1))
+                                {                                    
+                                    Gui.gui.textBoxMainTabLower.Text = Globals.sessionMemoryFile1;
+                                }
+                            }
+                            catch { }
+                        };
+
+                        Action a2 = () =>
+                        {
+                        //recorded history
+                        try
+                            {
+                                Gui.gui.textBoxMainTabLower.Text = Globals.sessionMemoryFile2;
+                            }
+                            catch { }
+                        };
+
+                        Action a3 = () =>
+                        {
+                            O.Help("restore_session");
+                        };
+
+                        G.Writeln2("Restore previous commands (" + Program.GetDateTimePretty(dt, true) + ")?  " + G.GetLinkAction("window (" + G.CountLines(Globals.sessionMemoryFile1, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "  " + G.GetLinkAction("history (" + G.CountLines(Globals.sessionMemoryFile2, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + "  " + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
+                    }
+                }
 
                 Globals.isAutoExec = false;  //must be last
-            }
-
-            
+            }            
         }
 
         public void GuiBrowseArrowsStuff(string var, bool link, ETabs type)
@@ -2875,7 +2918,7 @@ namespace Gekko
 
         private void commandHistoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            List<string> ss2 = GetCleanedCommandMemory();
+            List<string> ss2 = GetCleanedCommandMemory(Globals.commandMemory.storage.ToString(), true);
             WindowMessageBox w = new WindowMessageBox();
             w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
             w.textBox1.FontSize = 11;
@@ -2885,17 +2928,33 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Removes artificial call of gekko.ini from this memory.
+        /// Removes artificial call of gekko.ini from this memory. Will also remove blank lines at top or bottom (but not in middle, unless option is set).
         /// </summary>
         /// <returns></returns>
-        public static List<string> GetCleanedCommandMemory()
+        public static List<string> GetCleanedCommandMemory(string s2, bool removeBlanksInMiddle)
         {
-            List<string> ss = G.ExtractLinesFromText(Globals.commandMemory.storage.ToString());
-            List<string> ss2 = new List<string>();
-            foreach (string s in ss)
+            List<string> ss = G.ExtractLinesFromText(s2);
+
+            int c1 = 0;
+            for (int i = 0; i < ss.Count; i++)
             {
-                if (s.Trim() == "") continue;
+                if (ss[i].Trim() == "") c1++;
+                else break;
+            }
+
+            int c2 = 0;
+            for (int i = ss.Count - 1; i >= 0; i--)
+            {
+                if (ss[i].Trim() == "") c2++;
+                else break;
+            }
+
+            List<string> ss2 = new List<string>();
+            for (int i = c1; i < ss.Count - c2; i++)
+            {
+                string s = ss[i];                
                 if (s == Globals.iniFileSecretName) continue;
+                if (removeBlanksInMiddle && s.Trim() == "") continue;
                 ss2.Add(s);
             }
             return ss2;
