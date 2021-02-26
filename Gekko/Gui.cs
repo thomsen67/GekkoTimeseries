@@ -1967,40 +1967,40 @@ namespace Gekko
                 //Regardign 2 and 3, these wait for each another, but it seems 1 could run and finish, before
                 //2 and 3 are run, meaning that after 1, the traffic light would be green for a short period of
                 //time. But this is unlikely, because the parser is slow to start up. So in all likeliness,
-                //isAutoExec will only be true when both 1, 2 and 3 are finished. But worst case, the history
+                //isAutoExec will only be true when both 1, 2 and 3 are finished. But worst case, the historyGekkoInputWindow
                 //links will just show up too soon in the output window. So worst case is not catastrophical.
 
                 //G.Writeln2("Restore commands from last session?  Raw   History   More    (23-02-2021 11:55)");
 
-                string file1 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoInputWindow.gcm";
-                string file2 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoCommandHistory.gcm";
+                string fileSnapshot = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoSnapshot.gcm";
+                string fileHistory = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoHistory.gcm";
                 
-                if (File.Exists(file1) && File.Exists(file2))
+                if (File.Exists(fileSnapshot) && File.Exists(fileHistory))
                 {
-                    List<string> ss1 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(file1), false);  //just to remove blank lines at top/bottom (not in middle), not to remove any [[RunGekkoIniFile]]
+                    List<string> ss1 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(fileSnapshot), false);  //just to remove blank lines at top/bottom (not in middle), not to remove any [[RunGekkoIniFile]]
                     string s1 = G.ExtractTextFromLines(ss1).ToString();
-                    Globals.sessionMemoryFile1 = s1;
+                    Globals.sessionMemorySnapshot = s1;
 
-                    List<string> ss2 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(file2), true);
+                    List<string> ss2 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(fileHistory), true);
                     string s2 = G.ExtractTextFromLines(ss2).ToString();
-                    Globals.sessionMemoryFile2 = s2;
+                    Globals.sessionMemoryHistory = s2;
 
-                    if (!string.IsNullOrWhiteSpace(Globals.sessionMemoryFile1) || !string.IsNullOrWhiteSpace(Globals.sessionMemoryFile2))
+                    if (!string.IsNullOrWhiteSpace(Globals.sessionMemorySnapshot) || !string.IsNullOrWhiteSpace(Globals.sessionMemoryHistory))
                     {                        
 
-                        DateTime dt1 = (new DirectoryInfo(file1)).LastWriteTime;
-                        DateTime dt2 = (new DirectoryInfo(file2)).LastWriteTime;
+                        DateTime dt1 = (new DirectoryInfo(fileSnapshot)).LastWriteTime;
+                        DateTime dt2 = (new DirectoryInfo(fileHistory)).LastWriteTime;
                         DateTime dt = (dt1 < dt2 ? dt1 : dt2);
 
                         Action a1 = () =>
                         {
-                        //Raw, lower part of gui window
+                        //Snapshot, lower part of gui window
                         try
                             {
 
-                                if (File.Exists(file1))
-                                {                                    
-                                    Gui.gui.textBoxMainTabLower.Text = Globals.sessionMemoryFile1;
+                                if (File.Exists(fileSnapshot))
+                                {
+                                    Gui.gui.textBoxMainTabLower.Text = Globals.sessionMemorySnapshot;  //will not scroll to end, which is good. Cannot be undone with Ctrl+Z, but never mind.
                                 }
                             }
                             catch { }
@@ -2011,7 +2011,7 @@ namespace Gekko
                         //recorded history
                         try
                             {
-                                Gui.gui.textBoxMainTabLower.Text = Globals.sessionMemoryFile2;
+                                Gui.gui.textBoxMainTabLower.Text = Globals.sessionMemoryHistory;  //will not scroll to end, which is good. Cannot be undone with Ctrl+Z, but never mind.
                             }
                             catch { }
                         };
@@ -2021,7 +2021,7 @@ namespace Gekko
                             O.Help("restore_session");
                         };
 
-                        G.Writeln2("Restore previous commands (" + Program.GetDateTimePretty(dt, true) + ")?  " + G.GetLinkAction("window (" + G.CountLines(Globals.sessionMemoryFile1, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "  " + G.GetLinkAction("history (" + G.CountLines(Globals.sessionMemoryFile2, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + "  " + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
+                        G.Writeln2("Restore session (" + Program.GetDateTimePretty(dt, true) + ")?  " + G.GetLinkAction("snapshot (" + G.CountLines(Globals.sessionMemorySnapshot, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "  |  " + G.GetLinkAction("history (" + G.CountLines(Globals.sessionMemoryHistory, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + "  |  " + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
                     }
                 }
 

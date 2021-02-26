@@ -3043,7 +3043,7 @@ namespace Gekko
             {
                 sb.AppendLine(" User settings file (for window positions etc.): ");
                 sb.AppendLine("   " + Globals.userSettingsPath);
-                sb.AppendLine(" Temporary files (cached models, gnuplot data, etc.): ");
+                sb.AppendLine(" Temporary files (cached models, restore info, gnuplot data, etc.): ");
                 sb.AppendLine("   " + System.Windows.Forms.Application.LocalUserAppDataPath);
                 sb.AppendLine(" Excel version installed: Excel " + Program.GetExcelVersion(Program.eOfficeApp.eOfficeApp_Excel));                
 
@@ -4507,7 +4507,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper method
+        /// Helper method: the core part of G.Write() and G.Writeln().
         /// </summary>
         /// <param name="s"></param>
         /// <param name="textBox"></param>
@@ -4558,7 +4558,7 @@ namespace Gekko
                             {
                                 string s1 = s.Substring(0, c + 1);
                                 s = s.Substring(c + 1, s.Length - c - 1);
-                                textBox.AppendText(start2 + s1 + NL2);  //If newline=false, we impose a newline anyway
+                                textBox.AppendText(start2 + s1 + NL2);  //If newline=false, we impose a newline anyway                                
                                 Globals.guiMainLinePosition = 0;
                                 break;
                             }

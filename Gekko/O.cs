@@ -2033,7 +2033,7 @@ namespace Gekko
                 Arrow.Run();
             }
 
-            if(false && Globals.runningOnTTComputer)
+            if (Globals.runningOnTTComputer)
             {
                 List<string> error = new List<string>();
                 error.Add("Cell z1. Could not interpret this date: 1234");

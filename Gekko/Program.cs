@@ -6212,23 +6212,38 @@ namespace Gekko
                 }
                 finally
                 {
-                    if (!Globals.isAutoExec) RecordHistoryAndSaveToFiles();  //not done at the very startup
+                    if (!Globals.isAutoExec) RecordRestorInfo();  //not done at the very startup
                 }
 
                 break;  //if we get to here, everything is ok so break the file-trying loop
             }            
         }
 
-        private static void RecordHistoryAndSaveToFiles()
+        private static void RecordRestorInfo()
         {
             //after the command is done -- even if an error occurs
             //by recording these files after the command, * in "read *" or "model *" will have been
             //replaced with real filenames.
 
+
             try
             {
-                string file1 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoCommandHistory.gcm";
-                StreamWriter sw1 = new StreamWriter(file1);
+                string fileSnapshot = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoSnapshot.gcm";
+                StreamWriter sw2 = new StreamWriter(fileSnapshot);
+                string s2 = CrossThreadStuff.GetInputWindowText();
+                sw2.Write(s2);
+                sw2.Flush();
+                sw2.Close();
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
+
+            try
+            {
+                string fileHistory = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoHistory.gcm";
+                StreamWriter sw1 = new StreamWriter(fileHistory);
                 string s1 = Globals.commandMemory.storage.ToString();
                 sw1.Write(s1);
                 sw1.Flush();
@@ -6239,19 +6254,6 @@ namespace Gekko
                 //do nothing
             }
 
-            try
-            {
-                string file2 = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoInputWindow.gcm";
-                StreamWriter sw2 = new StreamWriter(file2);
-                string s2 = CrossThreadStuff.GetInputWindowText();
-                sw2.Write(s2);
-                sw2.Flush();
-                sw2.Close();
-            }
-            catch (Exception e)
-            {
-                //do nothing
-            }
         }
 
         /// <summary>

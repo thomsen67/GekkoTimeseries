@@ -782,8 +782,8 @@ namespace Gekko
         public static string iniFileSecretName = "[[RunGekkoIniFile]]";
 
         public static bool isAutoExec = true;
-        public static string sessionMemoryFile1 = null;
-        public static string sessionMemoryFile2 = null;
+        public static string sessionMemorySnapshot = null;
+        public static string sessionMemoryHistory = null;
 
         public static WindowIntellisense windowIntellisense = null;
 
