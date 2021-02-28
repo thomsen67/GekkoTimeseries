@@ -62,7 +62,15 @@ using System.IO.Compression;
 
 namespace Gekko
 {
-    
+
+    public enum EWritelnType
+    {
+        Normal,
+        Error,
+        Warning,
+        Note
+    }
+
     public enum EEquationType
     {
         D,
@@ -671,7 +679,7 @@ namespace Gekko
         Unknown
     }
 
-    public enum EWriteType
+    public enum EDatabankWriteType
     {
         Tsdx,
         Flat,
@@ -16100,7 +16108,7 @@ namespace Gekko
         {
             //TODO: introduce frombank
 
-            EWriteType writeType = GetWriteType(o);
+            EDatabankWriteType writeType = GetWriteType(o);
 
             List<ToFrom> list = null;
             if (o.list1 != null)
@@ -16116,7 +16124,7 @@ namespace Gekko
                 list = SearchFromTo(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write, null);
             }            
             
-            if (writeType == EWriteType.Tsdx)
+            if (writeType == EDatabankWriteType.Tsdx)
             {
                 G.Writeln2("*** ERROR: You cannot use <tsdx>. The extension name has changed to ." + Globals.extensionDatabank + ".");
                 G.Writeln("           If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file,", Color.Red);
@@ -16126,7 +16134,7 @@ namespace Gekko
             }
 
             bool isDefault = false;
-            if (writeType == EWriteType.Gbk)
+            if (writeType == EDatabankWriteType.Gbk)
             {
                 isDefault = true;
             }
@@ -16149,13 +16157,13 @@ namespace Gekko
                 
                 if (writeAllVariables) Program.options.interface_alias = false;  //is remembered above and reverted
 
-                if (writeType == EWriteType.R)
+                if (writeType == EDatabankWriteType.R)
                 {
                     //special treatment for the time being
                     ExportR(o);
                     return o.list1.Count();
                 }
-                else if (writeType == EWriteType.Python)
+                else if (writeType == EDatabankWriteType.Python)
                 {
                     //special treatment for the time being
                     ExportPython(o);
@@ -16348,11 +16356,11 @@ namespace Gekko
                     {
                         return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
                     }
-                    if (writeType == EWriteType.Tsd)
+                    if (writeType == EDatabankWriteType.Tsd)
                     {
                         return WriteTsd(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
                     }
-                    else if (writeType == EWriteType.Flat)
+                    else if (writeType == EDatabankWriteType.Flat)
                     {
                         return WriteFlat(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
                     }
@@ -16392,23 +16400,23 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
-        private static EWriteType GetWriteType(O.Write o)
+        private static EDatabankWriteType GetWriteType(O.Write o)
         {
-            EWriteType writeType = EWriteType.Gbk;
-            if (G.Equal(o.opt_csv, "yes")) writeType = EWriteType.Csv;
-            else if (G.Equal(o.opt_gdx, "yes")) writeType = EWriteType.Gdx;
-            else if (G.Equal(o.opt_gnuplot, "yes")) writeType = EWriteType.Gnuplot;
-            else if (G.Equal(o.opt_prn, "yes")) writeType = EWriteType.Prn;
-            else if (G.Equal(o.opt_r, "yes")) writeType = EWriteType.R;
-            else if (G.Equal(o.opt_gcm, "yes")) writeType = EWriteType.Gcm;
-            else if (G.Equal(o.opt_tsd, "yes")) writeType = EWriteType.Tsd;
-            else if (G.Equal(o.opt_tsdx, "yes")) writeType = EWriteType.Tsdx;
-            else if (G.Equal(o.opt_tsp, "yes")) writeType = EWriteType.Tsp;
-            else if (G.Equal(o.opt_xls, "yes")) writeType = EWriteType.Xls;
-            else if (G.Equal(o.opt_xlsx, "yes")) writeType = EWriteType.Xlsx;
-            else if (G.Equal(o.opt_flat, "yes")) writeType = EWriteType.Flat;
-            else if (G.Equal(o.opt_python, "yes")) writeType = EWriteType.Python;
-            else if (G.Equal(o.opt_arrow, "yes")) writeType = EWriteType.Arrow;
+            EDatabankWriteType writeType = EDatabankWriteType.Gbk;
+            if (G.Equal(o.opt_csv, "yes")) writeType = EDatabankWriteType.Csv;
+            else if (G.Equal(o.opt_gdx, "yes")) writeType = EDatabankWriteType.Gdx;
+            else if (G.Equal(o.opt_gnuplot, "yes")) writeType = EDatabankWriteType.Gnuplot;
+            else if (G.Equal(o.opt_prn, "yes")) writeType = EDatabankWriteType.Prn;
+            else if (G.Equal(o.opt_r, "yes")) writeType = EDatabankWriteType.R;
+            else if (G.Equal(o.opt_gcm, "yes")) writeType = EDatabankWriteType.Gcm;
+            else if (G.Equal(o.opt_tsd, "yes")) writeType = EDatabankWriteType.Tsd;
+            else if (G.Equal(o.opt_tsdx, "yes")) writeType = EDatabankWriteType.Tsdx;
+            else if (G.Equal(o.opt_tsp, "yes")) writeType = EDatabankWriteType.Tsp;
+            else if (G.Equal(o.opt_xls, "yes")) writeType = EDatabankWriteType.Xls;
+            else if (G.Equal(o.opt_xlsx, "yes")) writeType = EDatabankWriteType.Xlsx;
+            else if (G.Equal(o.opt_flat, "yes")) writeType = EDatabankWriteType.Flat;
+            else if (G.Equal(o.opt_python, "yes")) writeType = EDatabankWriteType.Python;
+            else if (G.Equal(o.opt_arrow, "yes")) writeType = EDatabankWriteType.Arrow;
             return writeType;
         }
 
@@ -26991,6 +26999,8 @@ namespace Gekko
             public ETabs tab;
             public bool mustScrollToEnd;
             public bool mustAlsoPrintToScreen = false;
+            public EWritelnType type = EWritelnType.Normal;
+            public bool parentOfAll = false;
 
             public WorkerThreadHelper2 Clone()
             {
@@ -27003,6 +27013,7 @@ namespace Gekko
                 wh.tab = this.tab;
                 wh.mustScrollToEnd = this.mustScrollToEnd;
                 wh.mustAlsoPrintToScreen = this.mustAlsoPrintToScreen;
+                wh.type = this.type;
                 return wh;
             }
         }

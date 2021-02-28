@@ -552,11 +552,9 @@ namespace Gekko
                     int count = 0;
                     foreach (string s in missingVariables)
                     {
-                        count++;
-                        string blank = "";
-                        if (count > 0) blank = Globals.blankUsedAsPadding;
+                        count++;                        
                         string count2 = count.ToString();
-                        ec.simNonExistingVariable.Add(blank + " " + G.Blanks(4 - count2.Length) + "#" + count + ": The variable " + s + " does not exist in Work databank");
+                        ec.simNonExistingVariable.Add(" " + G.Blanks(4 - count2.Length) + "#" + count + ": The variable " + s + " does not exist in Work databank");
                     }
                     ec.simNonExistingVariable.Add("");
                 }
@@ -578,10 +576,8 @@ namespace Gekko
                         string s2 = s.Replace("[0]", "");
                         //s2 = s2.Replace("[", "(");
                         //s2 = s2.Replace("]", ")");
-                        string count2 = count.ToString();
-                        string blank = "";
-                        if (count > 0) blank = Globals.blankUsedAsPadding;
-                        ec.simMissingValueExoOrLaggedEndo.Add(blank + " " + G.Blanks(4 - count2.Length) + "#" + count + ": Period " + tStart + ": variable " + s2 + " had a missing value in Work databank");
+                        string count2 = count.ToString();                        
+                        ec.simMissingValueExoOrLaggedEndo.Add(" " + G.Blanks(4 - count2.Length) + "#" + count + ": Period " + tStart + ": variable " + s2 + " had a missing value in Work databank");
                     }
                     ec.simMissingValueExoOrLaggedEndo.Add("");
                 }
@@ -1511,11 +1507,9 @@ namespace Gekko
                 int count = 0;
                 foreach (string s in ec.simInitEndoMissingValueHelper)
                 {
-                    count++;
-                    string blank = "";
-                    if (count > 0) blank = Globals.blankUsedAsPadding;
+                    count++;                    
                     string count2 = count.ToString();
-                    ec.simInitEndoMissingValue.Add(blank + " " + G.Blanks(4 - count2.Length) + "#" + count + ": " + s);
+                    ec.simInitEndoMissingValue.Add(" " + G.Blanks(4 - count2.Length) + "#" + count + ": " + s);
                 }
                 ec.simInitEndoMissingValue.Add("");
                 G.Write("+++ NOTE: "); G.WriteLink(ec.simInitEndoMissingValueHelper.Count.ToString(), "tab:output" + ec.counter + "a"); G.Writeln(" endogenous were given an arbitrary starting value (this is ok)");

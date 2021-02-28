@@ -3909,7 +3909,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(string s)
         {
-            WriteAbstract(s, null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWritelnType.Normal, s, null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3917,7 +3917,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(string s, ETabs tab)
         {
-            WriteAbstract(s, null, false, Color.Empty, false, tab);
+            WriteAbstract(EWritelnType.Normal, s, null, false, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -3926,7 +3926,7 @@ namespace Gekko
         /// <param name="s"></param>
         public static void Write(string s, Color color)
         {
-            WriteAbstract(s, null, false, color, false, ETabs.Main);
+            WriteAbstract(EWritelnType.Normal, s, null, false, color, false, ETabs.Main);
         }
 
         /// <summary>
@@ -3934,7 +3934,7 @@ namespace Gekko
         /// </summary>
         public static void Write(string s, Color color, ETabs tab)
         {
-            WriteAbstract(s, null, false, color, false, tab);
+            WriteAbstract(EWritelnType.Normal, s, null, false, color, false, tab);
         }
       
         /// <summary>
@@ -3942,7 +3942,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(int x)
         {
-            WriteAbstract(x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3950,14 +3950,14 @@ namespace Gekko
         /// </summary>
         public static void Write(int x, ETabs tab)
         {
-            WriteAbstract(x.ToString(), null, false, Color.Empty, false, tab);
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
         }
         /// <summary>
         /// For writing output to screen
         /// </summary>        
         public static void Write(double x)
         {
-            WriteAbstract(x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3965,7 +3965,7 @@ namespace Gekko
         /// </summary>
         public static void Write(double x, ETabs tab)
         {
-            WriteAbstract(x.ToString(), null, false, Color.Empty, false, tab);
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -3988,7 +3988,7 @@ namespace Gekko
             //for instance input0 = "fY", "disp:fY"
             //for instance input0 = "sim", "help:sim"            
             //see Gui.textBox1_LinkClicked
-            WriteAbstract(text, linktype, false, Color.Empty, true, ETabs.Main);  //Color is not used anyway -- gets blue underlined
+            WriteAbstract(EWritelnType.Normal, text, linktype, false, Color.Empty, true, ETabs.Main);  //Color is not used anyway -- gets blue underlined
         }
 
         public static void WriteLink(string text, string linktype, ETabs tab)
@@ -3997,7 +3997,7 @@ namespace Gekko
             //for instance input0 = "fY", "disp:fY"
             //for instance input0 = "sim", "help:sim"            
             //see Gui.textBox1_LinkClicked
-            WriteAbstract(text, linktype, false, Color.Empty, true, tab);  //Color is not used anyway -- gets blue underlined
+            WriteAbstract(EWritelnType.Normal, text, linktype, false, Color.Empty, true, tab);  //Color is not used anyway -- gets blue underlined
         }
 
         /// <summary>
@@ -4033,16 +4033,32 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s)
         {
-            WriteAbstract(s, null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWritelnType.Normal, s, null, true, Color.Empty, false, ETabs.Main);
         }
 
+        /// <summary>
+        /// For writing output to screen, with a type/indent like error/warning/note
+        /// </summary>
+        public static void Writeln(EWritelnType type, string s)
+        {
+            WriteAbstract(type, s, null, true, Color.Empty, false, ETabs.Main);
+        }
+
+        /// <summary>
+        /// For writing output to screen, with a type/indent like error/warning/note
+        /// </summary>
+        public static void Writeln2(EWritelnType type, string s)
+        {
+            G.Writeln();
+            WriteAbstract(type, s, null, true, Color.Empty, false, ETabs.Main);
+        }
 
         /// <summary>
         /// For writing output to screen
         /// </summary>
         public static void Writeln(string s, ETabs tab)
         {
-            WriteAbstract(s, null, true, Color.Empty, false, tab);
+            WriteAbstract(EWritelnType.Normal, s, null, true, Color.Empty, false, tab);
         }
 
 
@@ -4051,7 +4067,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color)
         {
-            WriteAbstract(s, null, true, color, false, ETabs.Main);
+            WriteAbstract(EWritelnType.Normal, s, null, true, color, false, ETabs.Main);
         }
 
 
@@ -4060,7 +4076,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color, bool mustAlsoWriteToScreen)
         {
-            WriteAbstractScroll(s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
+            WriteAbstractScroll(EWritelnType.Normal, s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
         }
 
 
@@ -4069,23 +4085,22 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color, ETabs tab)
         {
-            WriteAbstract(s, null, true, color, false, tab);
+            WriteAbstract(EWritelnType.Normal, s, null, true, color, false, tab);
         }
 
 
         /// <summary>
         /// For writing output to screen
         /// </summary>
-        public static void WriteAbstract(string s, string linktype, bool newline, Color color, bool link, ETabs tab)
+        public static void WriteAbstract(EWritelnType type, string s, string linktype, bool newline, Color color, bool link, ETabs tab)
         {            
-            WriteAbstractScroll(s, linktype, null, newline, color, link, tab, false, false);
+            WriteAbstractScroll(type, s, linktype, null, newline, color, link, tab, false, false);
         }
-
 
         /// <summary>
         /// For writing output to screen
         /// </summary>
-        public static void WriteAbstractScroll(string s, string linktype, Action a, bool newline, Color color, bool link, ETabs tab, bool mustScrollToEnd, bool mustAlsoPrintToScreen)
+        public static void WriteAbstractScroll(EWritelnType type, string s, string linktype, Action a, bool newline, Color color, bool link, ETabs tab, bool mustScrollToEnd, bool mustAlsoPrintToScreen)
         {
             if (Globals.applicationIsInProcessOfDying)
             {
@@ -4093,7 +4108,7 @@ namespace Gekko
                 return;
             }
             
-            Program.WorkerThreadHelper2 wh = new Program.WorkerThreadHelper2();
+            Program.WorkerThreadHelper2 helper = new Program.WorkerThreadHelper2();
             if (s == null)
             {
                 s = "";
@@ -4109,22 +4124,25 @@ namespace Gekko
                 color = Globals.warningColor;
                 Globals.numberOfWarnings++;
             }            
-            wh.color = color;
-            wh.s = s;
-            wh.linktype = linktype;
-            wh.newline = newline;
-            wh.link = link;
-            wh.tab = tab;
-            wh.mustScrollToEnd = mustScrollToEnd;
-            wh.mustAlsoPrintToScreen = mustAlsoPrintToScreen;
+            helper.color = color;
+            helper.s = s;
+            helper.linktype = linktype;
+            helper.newline = newline;
+            helper.link = link;
+            helper.tab = tab;
+            helper.mustScrollToEnd = mustScrollToEnd;
+            helper.mustAlsoPrintToScreen = mustAlsoPrintToScreen;
+            helper.type = type;
+            helper.parentOfAll = true;  //only true here, not when cloning!
+
             if (Globals.workerThread == null)
             {
                 //typically only just when program starts -- worker thread not yet created
-                WriteAbstract2(wh);
+                WriteAbstract2(helper);
             }
             else
             {
-                Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateAddString, new Object[] { wh });
+                Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateAddString, new Object[] { helper });
             }
         }
 
@@ -4169,7 +4187,7 @@ namespace Gekko
         {
             if (!Globals.runningOnTTComputer) return;
             if (!Globals.printGrayLinesForDebugging) return;
-            WriteAbstract(s, null, true, Color.Gray, false, ETabs.Main);
+            WriteAbstract(EWritelnType.Normal, s, null, true, Color.Gray, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4186,8 +4204,10 @@ namespace Gekko
         /// This is the "real" method actually doing the printing
         /// </summary>
         public static void WriteAbstract2(Object o)
-        {            
-            Program.WorkerThreadHelper2 wh = (Program.WorkerThreadHelper2)o;
+        {
+
+            Program.WorkerThreadHelper2 wh = (Program.WorkerThreadHelper2)o;            
+
             Color color = wh.color;
             string s = wh.s;            
             string linktype = wh.linktype;
@@ -4214,7 +4234,7 @@ namespace Gekko
                     wh2.s = action.ss2[0];
                     wh2.mustScrollToEnd = false;
                     WriteAbstract2(wh2);
-
+                    
                     Program.WorkerThreadHelper2 wh3 = wh.Clone();
                     wh3.s = action.chop3;
                     WriteAbstract2(wh3);
@@ -4293,7 +4313,7 @@ namespace Gekko
             bool isMuting = false;
 
             if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;
-
+            
             //Not piping to normal pipe file if there is a pipe to pipe2-file (eg. for "p fy file=output.txt")
             if (!Globals.pipe2 && Globals.pipe && Globals.pipeFileHelper.pipeFile != null)
             {
@@ -4383,6 +4403,7 @@ namespace Gekko
                     int start = textBox.TextLength;
                     if (newline)
                     {
+                        //has newline
                         if (link)
                         {
                             G.Writeln("*** ERROR: link with newline not supported");
@@ -4390,12 +4411,13 @@ namespace Gekko
                         }
                         else
                         {
-                            WriteAbstractClipHelper(s, textBox, true); //Globals.guiMainLinePosition is changed here                                     
+                            WriteAbstractHelper(wh.type, s, textBox, true); //Globals.guiMainLinePosition is changed here                                     
                             if (tab == ETabs.Main || mustScrollToEnd) Gui.gui.ScrollToEnd(textBox);
                         }
                     }
                     else
                     {
+                        //does not have newline
                         if (link)
                         {
                             //see Gui.textBox1_LinkClicked                        
@@ -4404,7 +4426,7 @@ namespace Gekko
                         }
                         else
                         {
-                            WriteAbstractClipHelper(s, textBox, false); //Globals.guiMainLinePosition is changed here                        
+                            WriteAbstractHelper(wh.type, s, textBox, false); //Globals.guiMainLinePosition is changed here                        
                         }
                     }
                     int end = textBox.TextLength;
@@ -4505,32 +4527,36 @@ namespace Gekko
             }
             throw new GekkoException();
         }
-
-        /// <summary>
-        /// Helper method: the core part of G.Write() and G.Writeln().
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="textBox"></param>
-        /// <param name="newline"></param>
-        private static void WriteAbstractClipHelper(string s, RichTextBoxEx textBox, bool newline)
+        
+        private static void WriteAbstractHelper(EWritelnType type, string s, RichTextBoxEx textBox, bool newline)
         {
-            string start = "*** ERROR: ";
-            start = "";
+            //not sure exactly how this code works in all details, but it has been battle-tested a lot,
+            //and is probably robust.
 
-            string NL2 = "\r\n" + Globals.blankUsedAsPadding;
+            //Should be redone properly for WPF, with tokenizer
+
+            string start = "";  //this is the blank-indent used on each line except the first.
+            if (type == EWritelnType.Error)
+            {
+
+                if( start = Globals.errorString;
+                else start=
+            }
+
             while (s != null)
             {
-                int col = Globals.guiMainLinePosition;
-                int indent2 = 0; if (col == 0) indent2 = start.Length;
-                string start2 = start; if (indent2 == 0) start2 = "";
-                int rest = Program.options.print_width - col - indent2;
+                int colPosition = Globals.guiMainLinePosition;                   //Often 0. Globals.guiMainLinePosition handles some inserts (like links) that there must be room for. But it also handles G.Write() without newline, so that this position is remembered (and no blank-indent is inserted)
+                int indent2 = 0; if (colPosition == 0) indent2 = start.Length;   //indent2 is 11 if start = "*** ERROR" and we are after a newline.
+                string start2 = start; if (indent2 == 0) start2 = "";            //hmm
+                int rest = Program.options.print_width - colPosition - indent2;
+                int restRemember = rest;
                 if (rest < 0) rest = 0;
 
-                if (s.Length <= rest)
+                if (s.Length <= rest)  //easy: we can fit what we are going to write inside the right margin
                 {
                     if (newline)
-                    {                        
-                        textBox.AppendText(start2 + s + NL2);
+                    {
+                        textBox.AppendText(start2 + s + G.NL);
                         Globals.guiMainLinePosition = 0;
                     }
                     else
@@ -4547,9 +4573,38 @@ namespace Gekko
                     {
                         if (c == 0)
                         {
-                            textBox.AppendText(start2 + s + NL2);  //has to write it, even if too long. If newline=false, we impose a newline anyway
+                            string extra = null;
+                            if (newline) extra = G.NL;
+
+                            //Now we are hacking!
+                            //We are pretty sure that this does not contain any links.
+                            //but it may be too long, like 400 chars rather than < 100.
+                            //it will happen pretty seldom, probably only when a link is right at
+                            //the right margin.
+                                                        
+                            while (true)
+                            {
+                                if (Program.options.print_width - start.Length - s.Length < 0)
+                                {                                    
+                                    string s1 = s.Substring(0, Program.options.print_width - start.Length);
+                                    s = G.Substring(s, Program.options.print_width - start.Length + 1, s.Length);                                                                        
+                                    s1 = s1.TrimStart();
+                                    textBox.AppendText(G.NL + start + s1);
+                                    Globals.guiMainLinePosition = start.Length + s1.Length;
+                                    continue;
+                                }
+                                else
+                                {
+                                    s = s.TrimStart();
+                                    textBox.AppendText(G.NL + start + s + extra);
+                                    Globals.guiMainLinePosition += s.Length;
+                                }
+                                break;
+                            }
+                            
+                            if (newline) Globals.guiMainLinePosition = 0;
+                            else Globals.guiMainLinePosition = start.Length + s.Length;
                             s = null;
-                            Globals.guiMainLinePosition = 0;
                             break;
                         }
                         if (s.Substring(c, 1) == " ")
@@ -4558,7 +4613,7 @@ namespace Gekko
                             {
                                 string s1 = s.Substring(0, c + 1);
                                 s = s.Substring(c + 1, s.Length - c - 1);
-                                textBox.AppendText(start2 + s1 + NL2);  //If newline=false, we impose a newline anyway                                
+                                textBox.AppendText(start2 + s1 + G.NL);  //If newline=false, we impose a newline anyway                                
                                 Globals.guiMainLinePosition = 0;
                                 break;
                             }
@@ -4573,7 +4628,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln()
         {
-            WriteAbstract("", null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWritelnType.Normal, "", null, true, Color.Empty, false, ETabs.Main);
         }
         
         /// <summary>
@@ -4581,7 +4636,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(ETabs tab)
         {
-            WriteAbstract("", null, true, Color.Empty, false, tab);
+            WriteAbstract(EWritelnType.Normal, "", null, true, Color.Empty, false, tab);
         }
         
         /// <summary>
@@ -4590,7 +4645,7 @@ namespace Gekko
         /// <param name="x"></param>
         public static void Writeln(int x)
         {
-            WriteAbstract(x.ToString(), null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4598,7 +4653,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(int x, ETabs tab)
         {
-            WriteAbstract(x.ToString(), null, true, Color.Empty, false, tab);
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -4607,7 +4662,7 @@ namespace Gekko
         /// <param name="x"></param>
         public static void Writeln(double x)
         {
-            WriteAbstract(x.ToString(), null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4615,7 +4670,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(double x, ETabs tab)
         {
-            WriteAbstract(x.ToString(), null, true, Color.Empty, false, tab);
+            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
         }
 
         /// <summary>

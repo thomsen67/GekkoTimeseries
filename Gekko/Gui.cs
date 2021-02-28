@@ -308,6 +308,18 @@ namespace Gekko
             
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
+
+            if (Globals.runningOnTTComputer)
+            {
+                Action a = () =>
+                {
+                    O.Help("i_dynamic_statements");
+                };
+                G.Writeln2(EWritelnType.Error, "aaaaaaa01 aaaaaaaa02 " + G.GetLinkAction("bbbbbbb01", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaa03 aaaaaaaaaa04 " + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaa05 aaaaaaaaaaaa06 " + G.GetLinkAction("bbbbbbb03", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa07 aaaaaaaaaaaaaa08 " + G.GetLinkAction("bbbbbbb04", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa09 aaaaaaaaaaaaaaaa10 " + G.GetLinkAction("bbbbbbb05", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaaaa11 aaaaaaaaaaaaaaaa12 " + G.GetLinkAction("bbbbbbb06", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa13 aaaaaaaaaaaaaa14 " + G.GetLinkAction("bbbbbbb07", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa15 aaaaaaa16 " + G.GetLinkAction("bbbbbbb08", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa17 aaaaaaa18 " + G.GetLinkAction("bbbbbbb09", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa19 aaaaaaa20 " + G.GetLinkAction("bbbbbbb10", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa21 aaaaaaa22 " + G.GetLinkAction("bbbbbbb11", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa23 aaaaaaa24 " + G.GetLinkAction("bbbbbbb12", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa25 aaaaaaa26 " + G.GetLinkAction("bbbbbbb13", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa27 aaaaaaa28 " + G.GetLinkAction("bbbbbbb14", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                G.Writeln();
+            }
+
+
             G.WriteDirs("small", false);
 
             if (Globals.gekkoVersion == "3.1.7" || Globals.gekkoVersion == "3.1.8" || Globals.gekkoVersion == "3.1.9" || Globals.gekkoVersion == "3.1.10")
@@ -434,15 +446,13 @@ namespace Gekko
             if (track) MessageBox.Show("8");
             gui = new Gui();
             if (track) MessageBox.Show("9");
-
-            gui.textBoxMainTabUpper.AppendText(Globals.blankUsedAsPadding); //to simulate a previous carriage return with 1 character indent
+                        
             gui.textBoxOutputTab.Text = "";
             gui.textBoxOutputTab.AppendText("This window is used to show output from the main window, when \n");
             gui.textBoxOutputTab.AppendText("this output is large in volume, or the details may not be of \n");
             gui.textBoxOutputTab.AppendText("crucial interest to the user. When relevant, this kind of extra \n");
             gui.textBoxOutputTab.AppendText("output will be accessible via a clickable link in the main window. \n");
-            gui.textBoxOutputTab.AppendText("\n");
-            gui.textBoxOutputTab.AppendText(Globals.blankUsedAsPadding); //to simulate a previous carriage return with 1 character indent
+            gui.textBoxOutputTab.AppendText("\n");            
             
             if (track) MessageBox.Show("10");
 

@@ -253,8 +253,7 @@ namespace Gekko
             {
                 if (text == "" || text == "main")
                 {
-                    Gui.gui.textBoxMainTabUpper.Clear();
-                    Gui.gui.textBoxMainTabUpper.AppendText(Globals.blankUsedAsPadding);  //to simulate a previous carriage return with 1 character indent
+                    Gui.gui.textBoxMainTabUpper.Clear();                    
                     {
                         //To save memory, these links can no longer be clicked.
                         Globals.linkContainerCounter = 0L;
@@ -268,8 +267,7 @@ namespace Gekko
                 }
                 else if (text == "output")
                 {
-                    Gui.gui.textBoxOutputTab.Clear();
-                    Gui.gui.textBoxOutputTab.AppendText(Globals.blankUsedAsPadding);
+                    Gui.gui.textBoxOutputTab.Clear();                    
                 }                
             }
         }

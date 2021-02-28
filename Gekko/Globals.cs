@@ -406,8 +406,7 @@ namespace Gekko
         public static PipeFileHelper pipeFileHelper2 = new PipeFileHelper();  //pipe 2 is for printing etc. when user choses "p fy file=myfile.txt"
 
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
-                
-        public static string blankUsedAsPadding = "";  //to be able to remove that stuff sometime when I understand padding in richtextbox!
+        
         public static int guiTextPaddingLeft = 6;
         public static int guiTextPaddingVertical = 6;
 
@@ -703,6 +702,8 @@ namespace Gekko
 
         public static int waitFileTotalTime = 600;  //600 s = 10 min
         public static int waitFileGap = 2;
+
+        public static string errorString = "*** ERROR: ";
 
         public static int guiMainLinePosition = 0;
 
