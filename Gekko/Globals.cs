@@ -704,6 +704,7 @@ namespace Gekko
         public static int waitFileGap = 2;
 
         public static string errorString = "*** ERROR: ";
+        public static string warningString = "+++ WARNING: ";
 
         public static int guiMainLinePosition = 0;
 

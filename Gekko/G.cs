@@ -4045,7 +4045,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// For writing output to screen, with a type/indent like error/warning/note
+        /// For writing output to screen, with a type/indent like error/warning/note.
         /// </summary>
         public static void Writeln2(EWritelnType type, string s)
         {
@@ -4061,6 +4061,42 @@ namespace Gekko
             WriteAbstract(EWritelnType.Normal, s, null, true, Color.Empty, false, tab);
         }
 
+
+        /// <summary>
+        /// For writing output to screen, with a type/indent like error/warning/note
+        /// </summary>
+        public static void Writeln(Writeln ss)
+        {
+            string s = WritelnHelperAssembleLines(ss.storage);
+            WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
+        }
+
+        /// <summary>
+        /// For writing output to screen, with a type/indent like error/warning/note
+        /// </summary>
+        public static void Writeln2(Writeln ss)
+        {
+            G.Writeln();
+            string s = WritelnHelperAssembleLines(ss.storage);
+            WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
+        }
+
+        private static string WritelnHelperAssembleLines(List<string> ss)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < ss.Count; i++)
+            {
+                string add = "";
+                bool remove = false;
+                if (i > 0)
+                {
+                    sb.Append(" ");
+                }
+                sb.Append(ss[i].Trim());
+            }
+            string s3 = sb.ToString();
+            return s3;
+        }        
 
         /// <summary>
         /// For writing output to screen
@@ -4113,17 +4149,16 @@ namespace Gekko
             {
                 s = "";
             }
-            if (s.Trim().StartsWith("*** ERROR"))
-            {
-                color = Color.Red;
-                Globals.numberOfErrors++;
-                //if (Globals.excelDna && Globals.excelDnaStorage == null) Globals.excelDnaStorage = new StringBuilder();  //loaded, records everything from now on
-            }
-            else if (s.Trim().StartsWith("+++ WARNING"))
-            {
-                color = Globals.warningColor;
-                Globals.numberOfWarnings++;
-            }            
+            //if (s.Trim().StartsWith("*** ERROR"))
+            //{
+            //    color = Color.Red;
+            //    Globals.numberOfErrors++;
+            //}
+            //else if (s.Trim().StartsWith("+++ WARNING"))
+            //{
+            //    color = Globals.warningColor;
+            //    Globals.numberOfWarnings++;
+            //}            
             helper.color = color;
             helper.s = s;
             helper.linktype = linktype;
@@ -4206,38 +4241,39 @@ namespace Gekko
         public static void WriteAbstract2(Object o)
         {
 
-            Program.WorkerThreadHelper2 wh = (Program.WorkerThreadHelper2)o;            
+            Program.WorkerThreadHelper2 helper = (Program.WorkerThreadHelper2)o;            
 
-            Color color = wh.color;
-            string s = wh.s;            
-            string linktype = wh.linktype;
-            bool newline = wh.newline;
-            bool link = wh.link;
-            ETabs tab = wh.tab;
-            bool mustScrollToEnd = wh.mustScrollToEnd;
+            Color color = helper.color;
+            string s = helper.s;            
+            string linktype = helper.linktype;
+            bool newline = helper.newline;
+            bool link = helper.link;
+            ETabs tab = helper.tab;
+            bool mustScrollToEnd = helper.mustScrollToEnd;
 
             if (s.Contains(Globals.linkActionStart)) // Use GekkoAction class instead
             {
                 LinkAction action = FindAction(s); 
                 if (action != null)
                 {
-                    Program.WorkerThreadHelper2 wh1 = wh.Clone();
-                    wh1.s = action.chop1;
-                    wh1.newline = false;
-                    wh1.mustScrollToEnd = false;
-                    WriteAbstract2(wh1);
+                    Program.WorkerThreadHelper2 helper1 = helper.Clone();
+                    helper1.s = action.chop1;
+                    helper1.newline = false;
+                    helper1.mustScrollToEnd = false;
+                    helper1.parentOfAll = helper.parentOfAll;  //first time the line is split regarding links
+                    WriteAbstract2(helper1);
 
-                    Program.WorkerThreadHelper2 wh2 = wh.Clone();
-                    wh2.newline = false;
-                    wh2.link = true;
-                    wh2.linktype = "action:" + action.ss2[1];
-                    wh2.s = action.ss2[0];
-                    wh2.mustScrollToEnd = false;
-                    WriteAbstract2(wh2);
+                    Program.WorkerThreadHelper2 helper2 = helper.Clone();
+                    helper2.newline = false;
+                    helper2.link = true;
+                    helper2.linktype = "action:" + action.ss2[1];
+                    helper2.s = action.ss2[0];
+                    helper2.mustScrollToEnd = false;
+                    WriteAbstract2(helper2);
                     
-                    Program.WorkerThreadHelper2 wh3 = wh.Clone();
-                    wh3.s = action.chop3;
-                    WriteAbstract2(wh3);
+                    Program.WorkerThreadHelper2 helper3 = helper.Clone();
+                    helper3.s = action.chop3;
+                    WriteAbstract2(helper3);
 
                     return;
                 }
@@ -4259,13 +4295,13 @@ namespace Gekko
                                 string chop3 = s.Substring(end + Globals.linkActionEnd.Length, s.Length - end - Globals.linkActionEnd.Length);
                                 string[] ss2 = chop2.Split(Globals.linkActionDelimiter);
 
-                                Program.WorkerThreadHelper2 wh1 = wh.Clone();
+                                Program.WorkerThreadHelper2 wh1 = helper.Clone();
                                 wh1.s = chop1;
                                 wh1.newline = false;
                                 wh1.mustScrollToEnd = false;
                                 WriteAbstract2(wh1);
 
-                                Program.WorkerThreadHelper2 wh2 = wh.Clone();
+                                Program.WorkerThreadHelper2 wh2 = helper.Clone();
                                 wh2.newline = false;
                                 wh2.link = true;
                                 wh2.linktype = "action:" + ss2[1];
@@ -4273,7 +4309,7 @@ namespace Gekko
                                 wh2.mustScrollToEnd = false;
                                 WriteAbstract2(wh2);
 
-                                Program.WorkerThreadHelper2 wh3 = wh.Clone();
+                                Program.WorkerThreadHelper2 wh3 = helper.Clone();
                                 wh3.s = chop3;
                                 WriteAbstract2(wh3);
 
@@ -4287,14 +4323,14 @@ namespace Gekko
 
             RichTextBoxEx textBox = null;            
 
-            bool mustAlsoPrintOnScreen = wh.mustAlsoPrintToScreen;            
+            bool mustAlsoPrintOnScreen = helper.mustAlsoPrintToScreen;            
             
-            if (s.Contains("*** ERROR"))
+            if (helper.type == EWritelnType.Error)
             {
                 mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping or muting
                 if (Globals.errorMemory == null) Globals.errorMemory = new StringBuilder();
             }
-            if (s.Contains("+++ WARNING")) mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping
+            else if (helper.type == EWritelnType.Warning) mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping
 
             if (Globals.errorMemory != null)
             {
@@ -4332,7 +4368,7 @@ namespace Gekko
                         }
                         catch (IOException)
                         {
-                            G.Writeln2("*** ERROR: I-o Problem with writing a line to pipe file");
+                            MessageBox.Show("*** ERROR: I-o Problem with writing a line to pipe file");
                             throw;
                         }
                         Globals.pipeFileHelper.pipeFile.Flush();  ////#80435243075235 flushing turned off here
@@ -4360,7 +4396,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln2("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper2.pipeFileFileWithPath);
+                    MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper2.pipeFileFileWithPath);
                     throw new GekkoException();
                 }
             }      
@@ -4406,12 +4442,12 @@ namespace Gekko
                         //has newline
                         if (link)
                         {
-                            G.Writeln("*** ERROR: link with newline not supported");
+                            MessageBox.Show("*** ERROR: link with newline not supported");
                             throw new GekkoException();
                         }
                         else
                         {
-                            WriteAbstractHelper(wh.type, s, textBox, true); //Globals.guiMainLinePosition is changed here                                     
+                            WriteAbstractHelper(helper.type, helper.parentOfAll, s, textBox, true); //Globals.guiMainLinePosition is changed here                                     
                             if (tab == ETabs.Main || mustScrollToEnd) Gui.gui.ScrollToEnd(textBox);
                         }
                     }
@@ -4426,29 +4462,28 @@ namespace Gekko
                         }
                         else
                         {
-                            WriteAbstractHelper(wh.type, s, textBox, false); //Globals.guiMainLinePosition is changed here                        
+                            WriteAbstractHelper(helper.type, helper.parentOfAll, s, textBox, false); //Globals.guiMainLinePosition is changed here                        
                         }
                     }
                     int end = textBox.TextLength;
 
                     if (link == false)
                     {
+                        //set color etc.
+
+                        if (helper.type == EWritelnType.Error) color = Color.Red;  //overrides any color given
+                        else if (helper.type == EWritelnType.Warning) color = Globals.warningColor;  //overrides any color given
+
                         textBox.Select(start, end - start);
                         {
-                            textBox.SelectionColor = color; //could set box.SelectionBackColor, box.SelectionFont too.
-                            if (color == Color.Red)  //hack, do an abstract method with bold (bold is ugly anyway...)
-                            {
-                                //Gekko.gui.textBox1.SelectionFont = new Font(Gekko.gui.textBox1.SelectionFont, FontStyle.Bold);
-                            }
+                            textBox.SelectionColor = color; //could set box.SelectionBackColor, box.SelectionFont too.                            
                         }
                         textBox.SelectionLength = 0; // clear     
                         textBox.SelectionStart = end;
                     }
-
-                    //textBox.SelectionFont = new Font(textBox.SelectionFont, FontStyle.Regular);  //clear
                 }
             }
-
+            if (helper.type == EWritelnType.Error) throw new GekkoException();  //so that we do not have to do this manually after printing an error.
         }
 
         /// <summary>
@@ -4506,29 +4541,17 @@ namespace Gekko
                 }
             }
             return action;  //will be null
-        }
-
-        /// <summary>
-        /// Error message (with exception thrown).
-        /// </summary>
-        /// <param name="ss">Error lines</param>
-        public static void Error(List<string> ss)
-        {
-
-            string stars = "*** ERROR: ";
-            bool first = true;
-            foreach (string s in ss)
-            {
-                string start = null;
-                if (first) start = stars;
-                else start = G.Blanks(stars.Length);
-                G.Writeln(start + s, Color.Red);
-                first = false;
-            }
-            throw new GekkoException();
-        }
+        }        
         
-        private static void WriteAbstractHelper(EWritelnType type, string s, RichTextBoxEx textBox, bool newline)
+        /// <summary>
+        /// Low-level part of printing on screen.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="parentOfAll"></param>
+        /// <param name="s"></param>
+        /// <param name="textBox"></param>
+        /// <param name="newline"></param>
+        private static void WriteAbstractHelper(EWritelnType type, bool parentOfAll, string s, RichTextBoxEx textBox, bool newline)
         {
             //not sure exactly how this code works in all details, but it has been battle-tested a lot,
             //and is probably robust.
@@ -4538,9 +4561,15 @@ namespace Gekko
             string start = "";  //this is the blank-indent used on each line except the first.
             if (type == EWritelnType.Error)
             {
-
-                if( start = Globals.errorString;
-                else start=
+                if (parentOfAll) start = Globals.errorString;
+                else start = G.Blanks(Globals.errorString.Length);
+                Globals.numberOfErrors++;
+            }
+            else if (type == EWritelnType.Warning)
+            {
+                if (parentOfAll) start = Globals.warningString;
+                else start = G.Blanks(Globals.warningString.Length);
+                Globals.numberOfWarnings++;
             }
 
             while (s != null)
@@ -4680,5 +4709,23 @@ namespace Gekko
         {
             return filename.Contains(":") || filename.Contains("\\");
         }
+    }
+
+    /// <summary>
+    /// A helper class for printing multiple lines. It basically just stores a List&lt;string&gt; inside.
+    /// </summary>
+    public class Writeln
+    {
+        public List<string> storage = new List<string>();
+        public EWritelnType type = EWritelnType.Normal;
+        public void A(string s)
+        {
+            this.storage.Add(s);
+        }
+
+        public Writeln(EWritelnType type)
+        {
+            this.type = type;
+        }        
     }
 }

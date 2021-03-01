@@ -309,14 +309,25 @@ namespace Gekko
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
 
-            if (Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 Action a = () =>
                 {
                     O.Help("i_dynamic_statements");
                 };
-                G.Writeln2(EWritelnType.Error, "aaaaaaa01 aaaaaaaa02 " + G.GetLinkAction("bbbbbbb01", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaa03 aaaaaaaaaa04 " + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaa05 aaaaaaaaaaaa06 " + G.GetLinkAction("bbbbbbb03", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa07 aaaaaaaaaaaaaa08 " + G.GetLinkAction("bbbbbbb04", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa09 aaaaaaaaaaaaaaaa10 " + G.GetLinkAction("bbbbbbb05", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaaaa11 aaaaaaaaaaaaaaaa12 " + G.GetLinkAction("bbbbbbb06", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa13 aaaaaaaaaaaaaa14 " + G.GetLinkAction("bbbbbbb07", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa15 aaaaaaa16 " + G.GetLinkAction("bbbbbbb08", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa17 aaaaaaa18 " + G.GetLinkAction("bbbbbbb09", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa19 aaaaaaa20 " + G.GetLinkAction("bbbbbbb10", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa21 aaaaaaa22 " + G.GetLinkAction("bbbbbbb11", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa23 aaaaaaa24 " + G.GetLinkAction("bbbbbbb12", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa25 aaaaaaa26 " + G.GetLinkAction("bbbbbbb13", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa27 aaaaaaa28 " + G.GetLinkAction("bbbbbbb14", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
-                G.Writeln();
+                Writeln w = new Writeln(EWritelnType.Error);
+                w.A("aaaaaaa01 aaaaaaaa02 " + G.GetLinkAction("bbbbbbb01", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                w.A("aaaaaaaaa03 aaaaaaaaaa04 " + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaa05 aaaaaaaaaaaa06");
+                w.A(G.GetLinkAction("bbbbbbb03", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa07 aaaaaaaaaaaaaa08 " + G.GetLinkAction("bbbbbbb04", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa09 aaaaaaaaaaaaaaaa10");
+                w.A(G.GetLinkAction("bbbbbbb05", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaaaa11 aaaaaaaaaaaaaaaa12 " + G.GetLinkAction("bbbbbbb06", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa13 aaaaaaaaaaaaaa14 ");
+                w.A(" " + G.GetLinkAction("bbbbbbb07", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa15 aaaaaaa16 " + G.GetLinkAction("bbbbbbb08", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa17 aaaaaaa18 ");
+                w.A(G.GetLinkAction("bbbbbbb09", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa19 aaaaaaa20 " + G.GetLinkAction("bbbbbbb10", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa21 aaaaaaa22 " + G.GetLinkAction("bbbbbbb11", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa23 aaaaaaa24 " + G.GetLinkAction("bbbbbbb12", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa25 aaaaaaa26 " + G.GetLinkAction("bbbbbbb13", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa27 aaaaaaa28 " + G.GetLinkAction("bbbbbbb14", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                G.Writeln2(w);                
+                
+                G.Writeln2(EWritelnType.Error, "This is a problem.");
+
+                G.Writeln2("hej");
+
             }
 
 
@@ -1287,7 +1298,7 @@ namespace Gekko
                     int pos = input0.IndexOf(Globals.linkSeparator1);
                     string input2 = input0.Substring(pos + 1);
                     string[] input3 = input2.Split(Globals.linkSeparator2);
-                    if (input3.Length != 2) throw new Exception("*** ERROR: strange error rgd. links");
+                    if (input3.Length != 2) G.Writeln2(EWritelnType.Error, "Strange error rgd. links");
                     type = input3[0];
                     input = input3[1];
                 }

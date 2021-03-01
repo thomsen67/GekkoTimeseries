@@ -2032,16 +2032,7 @@ namespace Gekko
             {
                 Arrow.Run();
             }
-
-            if (Globals.runningOnTTComputer)
-            {
-                List<string> error = new List<string>();
-                error.Add("Cell z1. Could not interpret this date: 1234");
-                error.Add("It is supposed to be an Excel date, counting days since January 1, 1900. But Gekko cannot" + "It is supposed to be an Excel date, counting days since January 1, 1900.But Gekko cannot");
-                error.Add("convert it to a value.");
-                G.Error(error);
-            }
-
+            
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }

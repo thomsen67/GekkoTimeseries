@@ -48,9 +48,8 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            G.Writeln2("*** ERROR: Could not convert the VAL " + this.val + " directly into STRING.");
-            G.Writeln("           You may try the string() conversion function.");            
-            throw new GekkoException();
+            G.Writeln2(EWritelnType.Error, "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion function.");
+            return null;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
