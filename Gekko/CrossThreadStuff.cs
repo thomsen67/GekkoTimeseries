@@ -126,6 +126,28 @@ namespace Gekko
         }
 
         //weird delegate pattern, but it works!
+        delegate void SetTextUpperCallback(string text, string hyperlink);
+        public static void SetTextUpper(string text, string hyperlink)
+        {
+            if (Gui.gui.textBoxMainTabLower.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new SetTextUpperCallback(SetTextUpper), new object[] { text, hyperlink });
+            }
+            else
+            {
+                // It's on the same thread, no need for Invoke
+                Gui.gui.textBoxMainTabUpper.Text = text;
+                int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
+                //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
+                Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + text + @"\v #" + hyperlink + @"\v0}";
+                Gui.gui.textBoxMainTabUpper.Select(position, text.Length + hyperlink.Length + 1);
+                Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
+                Gui.gui.textBoxMainTabUpper.Select(position + text.Length + hyperlink.Length + 1, 0);
+            }
+        }
+
+        //weird delegate pattern, but it works!
         delegate void ZoomCallback();
         public static void Zoom()
         {

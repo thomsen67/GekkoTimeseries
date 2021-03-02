@@ -2032,6 +2032,11 @@ namespace Gekko
             {
                 Arrow.Run();
             }
+
+            if (false)
+            {
+                CrossThreadStuff.SetTextUpper("HELLO", "action:1");
+            }
             
             if (nocr) G.Write(text);
             else G.Writeln(text);

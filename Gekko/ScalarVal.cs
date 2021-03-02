@@ -48,7 +48,18 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            G.Writeln2(EWritelnType.Error, "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion function.");
+            if (Globals.runningOnTTComputer)
+            {
+                Action a = () =>
+                {
+                    O.Help("i_dynamic_statements");
+                };
+                G.Writeln2(EWritelnType.Note, "Could not convert the VAL " + this.val + " directly into " + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "STRING. You may try the string() conversion functi" + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "on." + "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion function."+ "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion func" + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "tion." + "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conv" + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "ersion function." + "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion function."+ "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion function."+ "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion function."+ "Could not convert the VAL " + this.val + " directly into STRING. You may tr" + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "y the string() conversion function." + "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() c" + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "onversion func" + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + "tion.");
+            }
+            else
+            {
+                G.Writeln2(EWritelnType.Error, "Could not convert the VAL " + this.val + " directly into STRING. You may try the string() conversion function.");
+            }
             return null;
         }
 

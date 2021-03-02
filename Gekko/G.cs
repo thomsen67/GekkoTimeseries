@@ -4239,10 +4239,10 @@ namespace Gekko
         /// This is the "real" method actually doing the printing
         /// </summary>
         public static void WriteAbstract2(Object o)
-        {
+        {           
 
-            Program.WorkerThreadHelper2 helper = (Program.WorkerThreadHelper2)o;            
-
+            Program.WorkerThreadHelper2 helper = (Program.WorkerThreadHelper2)o;
+            
             Color color = helper.color;
             string s = helper.s;            
             string linktype = helper.linktype;
