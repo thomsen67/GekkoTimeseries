@@ -2033,11 +2033,96 @@ namespace Gekko
                 Arrow.Run();
             }
 
-            if (false)
+            if (true)
             {
-                CrossThreadStuff.SetTextUpper("HELLO", "action:1");
+                void Writeln3(Writeln x)
+                {
+                    string s = G.WritelnHelperAssembleLines(x.storage);
+
+                    int i1 = 0;
+                    List<TwoInts> links = new List<TwoInts>();
+                    while (true)
+                    {
+                        i1 = s.IndexOf(Globals.linkActionStart, i1);  //linkActionDelimiter
+                        if (i1 == -1) break;
+                        int i2 = s.IndexOf(Globals.linkActionEnd, i1 + 1);
+                        if (i2 == -1) break;  //strange
+                        links.Add(new TwoInts() { int1 = i1, int2 = i2 });
+                        i1 = i2 + 1;
+                    }
+                                        
+                    for (int i = 0; i < links.Count; i++)
+                    {
+                        // ........ {a{ ..link1.... }a} ........... {a{ ...link2.... }a} ..........
+
+                        int lastC = 0;
+                        if (i > 0) lastC = links[i - 1].int2 + Globals.linkActionEnd.Length;
+                        string normalText = G.Substring(s, lastC, links[i].int1 - 1);
+                        if (true)
+                        {
+                            Gui.gui.textBoxMainTabUpper.AppendText(normalText);
+                        }
+                        string[] ss = G.Substring(s, links[i].int1 + Globals.linkActionStart.Length, links[i].int2 - 1).Split(Globals.linkActionDelimiter);  //delimiter must be there
+                        string linkText = ss[0];
+                        string linkLink = ss[1];
+                        if (true)
+                        {
+                            int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
+                            //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
+                            Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + text + @"\v #" + linkLink + @"\v0}";
+                            Gui.gui.textBoxMainTabUpper.Select(position, text.Length + linkLink.Length + 1);
+                            Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
+                            Gui.gui.textBoxMainTabUpper.Select(position + text.Length + linkLink.Length + 1, 0);
+                        }
+                        if (i == links.Count - 1)
+                        {
+                            //get the last bit
+                            string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
+                            if (true)
+                            {
+                                Gui.gui.textBoxMainTabUpper.AppendText(normalText2);
+                            }
+                        }
+                    }
+                }
+
+                //if (hyperlink == null)
+                //{
+                //    Gui.gui.textBoxMainTabUpper.AppendText(text);
+                //}
+                //else
+                //{
+                //    int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
+                //    //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
+                //    Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + text + @"\v #" + hyperlink + @"\v0}";
+                //    Gui.gui.textBoxMainTabUpper.Select(position, text.Length + hyperlink.Length + 1);
+                //    Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
+                //    Gui.gui.textBoxMainTabUpper.Select(position + text.Length + hyperlink.Length + 1, 0);
+                //}
+
+
+                CrossThreadStuff.SetTextUpper("txt1 ", null);
+                CrossThreadStuff.SetTextUpper("txt2", "action:1");
+                CrossThreadStuff.SetTextUpper(" txt3", null);
+
+                Action a = () =>
+                {
+                    O.Help("i_dynamic_statements");
+                };
+                Writeln w = new Writeln(EWritelnType.Error);
+                //w.A("aaaaaaa01 aaaaaaaa02 " + G.GetLinkAction("bbbbbbb01", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+                //w.A("aaaaaaaaa03 aaaaaaaaaa04 " + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaa05 aaaaaaaaaaaa06");
+                //w.A(G.GetLinkAction("bbbbbbb03", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa07 aaaaaaaaaaaaaa08 " + G.GetLinkAction("bbbbbbb04", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa09 aaaaaaaaaaaaaaaa10");
+                //w.A(G.GetLinkAction("bbbbbbb05", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaaaa11 aaaaaaaaaaaaaaaa12 " + G.GetLinkAction("bbbbbbb06", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa13 aaaaaaaaaaaaaa14 ");
+                //w.A(" " + G.GetLinkAction("bbbbbbb07", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa15 aaaaaaa16 " + G.GetLinkAction("bbbbbbb08", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa17 aaaaaaa18 ");
+                //w.A(G.GetLinkAction("bbbbbbb09", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa19 aaaaaaa20 " + G.GetLinkAction("bbbbbbb10", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa21 aaaaaaa22 " + G.GetLinkAction("bbbbbbb11", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa23 aaaaaaa24 " + G.GetLinkAction("bbbbbbb12", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa25 aaaaaaa26 " + G.GetLinkAction("bbbbbbb13", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa27 aaaaaaa28 " + G.GetLinkAction("bbbbbbb14", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
+
+                w.A("abc " + G.GetLinkAction("def", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " ghi");
+
+                Writeln3(w);
+
             }
-            
+
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }

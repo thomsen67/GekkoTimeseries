@@ -669,6 +669,8 @@ namespace Gekko
         public const string linkActionEnd = "}a}";
         public const char linkActionDelimiter = '¤';
 
+        public static bool newPrint = true;
+
         //Perhaps merge all this stuff in LinkContainer
         public static long linkContainerCounter = 0L;
         public static Dictionary<long, Program.LinkContainer> linkContainer = new Dictionary<long, Program.LinkContainer>();

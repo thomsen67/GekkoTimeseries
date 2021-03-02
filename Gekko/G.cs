@@ -2652,7 +2652,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// An other "interface" to the substring method, with start end end position, instead of using length.
+        /// Another "interface" to the substring method, with start end end position, instead of using length. Indexes are 0-based.
         /// The positions are inclusive.
         /// </summary>
         /// <param name="s"></param>
@@ -2664,7 +2664,7 @@ namespace Gekko
             string x = null;
             try
             {
-                x = s.Substring(position1 - 1, position2 - position1 + 1);
+                x = s.Substring(position1, position2 - position1 + 1);
             }
             catch (Exception e) { };
             return x;
@@ -4081,7 +4081,7 @@ namespace Gekko
             WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
         }
 
-        private static string WritelnHelperAssembleLines(List<string> ss)
+        public static string WritelnHelperAssembleLines(List<string> ss)
         {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < ss.Count; i++)
@@ -4616,7 +4616,7 @@ namespace Gekko
                                 if (Program.options.print_width - start.Length - s.Length < 0)
                                 {                                    
                                     string s1 = s.Substring(0, Program.options.print_width - start.Length);
-                                    s = G.Substring(s, Program.options.print_width - start.Length + 1, s.Length);                                                                        
+                                    s = G.Substring(s, Program.options.print_width - start.Length + 1 - 1, s.Length - 1);
                                     s1 = s1.TrimStart();
                                     textBox.AppendText(G.NL + start + s1);
                                     Globals.guiMainLinePosition = start.Length + s1.Length;

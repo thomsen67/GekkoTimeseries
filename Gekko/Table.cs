@@ -2349,7 +2349,7 @@ namespace Gekko
                     //char[] c = line.ToCharArray();
                     if (line.StartsWith("01"))
                     {
-                        int ii = G.ConvertToInt(G.Substring(line, 3, 5));
+                        int ii = G.ConvertToInt(G.Substring(line, 3 - 1, 5 - 1));
                         if (ii == int.MaxValue || ii < 1)
                         {
                             TableConvertError(u, file, counter, line, "Number of variable fields < 1...??");
@@ -2362,12 +2362,12 @@ namespace Gekko
                     }
                     else if (line.StartsWith("02"))
                     {
-                        int w = G.ConvertToInt(G.Substring(line, 3, 4));
+                        int w = G.ConvertToInt(G.Substring(line, 3 - 1, 4 - 1));
                         if (w == int.MaxValue || w < 1)
                         {
                             TableConvertError(u, file, counter, line, "Width problem....");
                         }
-                        string code = G.Substring(line, 5, 5).ToLower();
+                        string code = G.Substring(line, 5 - 1, 5 - 1).ToLower();
                         if (code == "i")
                         {
                         }
@@ -2379,7 +2379,7 @@ namespace Gekko
                             TableConvertError(u, file, counter, line, "Number format is not 'i' or 'f'...");
                         }
                         int decimals = int.MaxValue;
-                        if (line.Length > 5) decimals = G.ConvertToInt(G.Substring(line, 6, 6));
+                        if (line.Length > 5) decimals = G.ConvertToInt(G.Substring(line, 6 - 1, 6 - 1));
                         if (decimals == int.MaxValue)
                         {
                             if (code == "i")
@@ -2528,7 +2528,7 @@ namespace Gekko
                     }
                     else if (line.StartsWith("11"))
                     {
-                        string s = G.Substring(line, 3, 3);
+                        string s = G.Substring(line, 3 - 1, 3 - 1);
                         if (s == null)
                         {
                             TableConvertError(u, file, counter, line, "Problem with delimiter character");

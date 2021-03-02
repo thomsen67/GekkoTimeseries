@@ -137,13 +137,20 @@ namespace Gekko
             else
             {
                 // It's on the same thread, no need for Invoke
-                Gui.gui.textBoxMainTabUpper.Text = text;
-                int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
-                //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
-                Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + text + @"\v #" + hyperlink + @"\v0}";
-                Gui.gui.textBoxMainTabUpper.Select(position, text.Length + hyperlink.Length + 1);
-                Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
-                Gui.gui.textBoxMainTabUpper.Select(position + text.Length + hyperlink.Length + 1, 0);
+                //Gui.gui.textBoxMainTabUpper.Text = text;
+                if (hyperlink == null)
+                {
+                    Gui.gui.textBoxMainTabUpper.AppendText(text);
+                }
+                else
+                {
+                    int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
+                    //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
+                    Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + text + @"\v #" + hyperlink + @"\v0}";
+                    Gui.gui.textBoxMainTabUpper.Select(position, text.Length + hyperlink.Length + 1);
+                    Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
+                    Gui.gui.textBoxMainTabUpper.Select(position + text.Length + hyperlink.Length + 1, 0);
+                }
             }
         }
 
