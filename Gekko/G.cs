@@ -4493,6 +4493,7 @@ namespace Gekko
         /// <returns></returns>
         public static int ExtraLinkLength(string s)
         {
+            //see also #jkahfdasify7 
             int extra = 0;
             string sRest = s;
 
@@ -4511,7 +4512,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Use GekkoAction class instead
+        /// Used for GekkoAction links
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
