@@ -4740,8 +4740,8 @@ namespace Gekko
             string margin = G.Blanks(marginFirst.Length);
             bool ln2 = true;
 
-            string s = G.WritelnHelperAssembleLines(w.storageMain);
-            WritelnHelper(s, marginFirst, color, isPiping, hasNewline, margin, ln2);
+            string s1 = G.WritelnHelperAssembleLines(w.storageMain);
+            WritelnHelper(s1, marginFirst, color, isPiping, hasNewline, margin, ln2);
 
             string s2 = G.WritelnHelperAssembleLines(w.storageMore);
             WritelnHelper(s2, marginFirst, Color.Empty, isPiping, hasNewline, margin, ln2);
@@ -4750,7 +4750,8 @@ namespace Gekko
 
         private static void WritelnHelper(string s, string marginFirst, Color color, bool isPiping, bool hasNewline, string margin, bool ln2)
         {
-            
+            if (s.Trim() == "") return;
+
             int i1 = 0;
             List<TwoInts> links = new List<TwoInts>();
             while (true)
