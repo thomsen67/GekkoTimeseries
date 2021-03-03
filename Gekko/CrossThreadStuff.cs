@@ -126,148 +126,21 @@ namespace Gekko
         }
 
         //weird delegate pattern, but it works!
-        delegate void SetTextUpperCallback(Writeln x);
-        public static void SetTextUpper(Writeln x)
+        delegate void SetTextUpperCallback(GWriteln x);
+        public static void Writeln(GWriteln x)
         {
             if (Gui.gui.textBoxMainTabLower.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new SetTextUpperCallback(SetTextUpper), new object[] { x });
+                Gui.gui.Invoke(new SetTextUpperCallback(Writeln), new object[] { x });
             }
             else
             {
                 // It's on the same thread, no need for Invoke                
-
-                bool isPiping = false;
-                bool hasNewline = true;                
-                string marginFirst = "EE ";
-                string margin = G.Blanks(marginFirst.Length);
-                bool ln2 = true;
-
-                string s = G.WritelnHelperAssembleLines(x.storage);
-                int i1 = 0;
-                List<TwoInts> links = new List<TwoInts>();
-                while (true)
-                {
-                    i1 = s.IndexOf(Globals.linkActionStart, i1);  //linkActionDelimiter
-                    if (i1 == -1) break;
-                    int i2 = s.IndexOf(Globals.linkActionEnd, i1 + 1);
-                    if (i2 == -1) break;  //strange
-                    links.Add(new TwoInts() { int1 = i1, int2 = i2 });
-                    i1 = i2 + 1;
-                }
-                                
-                int colCounter = 0;
-                int colMax = Program.options.print_width;
-                if (isPiping) colMax = Program.options.print_filewidth;
-
-                if (ln2)
-                {
-                    Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine + marginFirst);
-                    colCounter = margin.Length;
-                }
-
-                for (int i = 0; i < links.Count; i++)
-                {
-                    // ........ {a{ ..link1.... }a} ........... {a{ ...link2.... }a} ..........
-
-                    int lastC = 0;
-                    if (i > 0) lastC = links[i - 1].int2 + Globals.linkActionEnd.Length;
-                    string normalText = G.Substring(s, lastC, links[i].int1 - 1);
-                    if (true)
-                    {
-                        colCounter = WrapText(normalText, margin, colCounter, colMax);
-                    }
-                    string[] ss = G.Substring(s, links[i].int1 + Globals.linkActionStart.Length, links[i].int2 - 1).Split(Globals.linkActionDelimiter);  //delimiter must be there
-                    string linkText = ss[0];
-                    string linkLink = "action:" + ss[1];
-                    if (true)
-                    {
-                        if (colCounter + linkText.Length > colMax)
-                        {
-                            //insert a line break no matter what the character before is. Link cannot be broken/wrapped
-                            Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine + margin);
-                            colCounter = margin.Length;
-                        }
-
-                        int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
-                        //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
-                        Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + linkText + @"\v #" + linkLink + @"\v0}";
-                        Gui.gui.textBoxMainTabUpper.Select(position, linkText.Length + linkLink.Length + 1);
-                        Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
-                        Gui.gui.textBoxMainTabUpper.Select(position + linkText.Length + linkLink.Length + 1, 0);
-                        colCounter += linkText.Length;
-                    }
-                    if (i == links.Count - 1)
-                    {
-                        //get the last bit
-                        string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
-                        if (true)
-                        {
-                            colCounter = WrapText(normalText2, margin, colCounter, colMax);
-                        }
-                    }
-                }
-                if (hasNewline) Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine);
-            }            
-        }
-
-        private static int WrapText(string text, string margin, int colCounter, int colMax)
-        {            
-            if (colCounter + text.Length > colMax)
-            {
-                //          |mmmmm..............................|
-                //          |mmmmm..................this is a really long line
-                //
-                // becomes
-                //          |mmmmm..............................|
-                //          |mmmmm..................this is a
-                //          |mmmmmreally long line
-                //
-                // where . are some chars, and m is left-margin (blanks).
-                // so when right margin is exceeded, we find a suitable blank to break on (after it)
-                                
-                for (int ii = text.Length - 1; ii >= 0; ii--)
-                {
-                    if (text[ii] == ' ')
-                    {
-                        if (colCounter + ii <= colMax)
-                        {
-                            //in the example, the blank is the blank between "a" and "really", which is inside the right margin
-                            string s1 = G.Substring(text, 0, ii);
-                            string s2 = G.Substring(text, ii + 1, text.Length - 1);
-                            Gui.gui.textBoxMainTabUpper.AppendText(s1 + Environment.NewLine + margin + s2);
-                            colCounter = margin.Length + s2.Length;
-                            return colCounter;
-                        }
-                    }
-                }
-
-                //wrapping did not succeed (maybe there are no blanks). Then we just have to break.
-                //          |mmmmm..............................|
-                //          |mmmmm..................thisisareallylongline
-                //
-                // becomes
-                //          |mmmmm..............................|
-                //          |mmmmm..................
-                //          |mmmmmthisisareallylongline
-                //
-                // if the word is extremely long, it will break the right margin in any case.
-
-                Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine + margin + text);
-                colCounter = margin.Length + text.Length;
-
+                G.Writeln(x);
             }
-            else
-            {
-                //easy, there is room for the text
-                Gui.gui.textBoxMainTabUpper.AppendText(text);
-                colCounter += text.Length;
-            }
-
-            return colCounter;
         }
-
+        
         //weird delegate pattern, but it works!
         delegate void ZoomCallback();
         public static void Zoom()

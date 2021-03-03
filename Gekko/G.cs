@@ -4062,22 +4062,22 @@ namespace Gekko
         }
 
 
-        /// <summary>
-        /// For writing output to screen, with a type/indent like error/warning/note
-        /// </summary>
-        public static void Writeln(Writeln ss)
-        {
-            string s = WritelnHelperAssembleLines(ss.storage);
-            WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
-        }
+        ///// <summary>
+        ///// For writing output to screen, with a type/indent like error/warning/note
+        ///// </summary>
+        //public static void Writeln(GWriteln ss)
+        //{
+        //    string s = WritelnHelperAssembleLines(ss.storageMain);
+        //    WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
+        //}
 
         /// <summary>
         /// For writing output to screen, with a type/indent like error/warning/note
         /// </summary>
-        public static void Writeln2(Writeln ss)
+        public static void Writeln2(GWriteln ss)
         {
             G.Writeln();
-            string s = WritelnHelperAssembleLines(ss.storage);
+            string s = WritelnHelperAssembleLines(ss.storageMain);
             WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
         }
 
@@ -4710,23 +4710,207 @@ namespace Gekko
         {
             return filename.Contains(":") || filename.Contains("\\");
         }
+
+        /// <summary>
+        /// The new way of printing text on screen. Will eventually replace all
+        /// of the G.Write() and G.Writeln() methods.
+        /// </summary>
+        /// <param name="w"></param>
+        public static void Writeln(GWriteln w)
+        {
+            string marginFirst = "";
+            Color color = Color.Empty;
+            if (w.type == EWritelnType.Error)
+            {
+                marginFirst = "*** ERROR: ";
+                color = Color.Red;
+            }
+            else if (w.type == EWritelnType.Warning)
+            {
+                marginFirst = "+++ WARNING: ";
+                color = Globals.warningColor;
+            }
+            else if (w.type == EWritelnType.Note)
+            {
+                marginFirst = "+++ NOTE: ";
+            }
+
+            bool isPiping = false;
+            bool hasNewline = true;
+            string margin = G.Blanks(marginFirst.Length);
+            bool ln2 = true;
+
+            string s = G.WritelnHelperAssembleLines(w.storageMain);
+            WritelnHelper(s, marginFirst, color, isPiping, hasNewline, margin, ln2);
+
+            string s2 = G.WritelnHelperAssembleLines(w.storageMore);
+            WritelnHelper(s2, marginFirst, Color.Empty, isPiping, hasNewline, margin, ln2);
+
+        }
+
+        private static void WritelnHelper(string s, string marginFirst, Color color, bool isPiping, bool hasNewline, string margin, bool ln2)
+        {
+            
+            int i1 = 0;
+            List<TwoInts> links = new List<TwoInts>();
+            while (true)
+            {
+                i1 = s.IndexOf(Globals.linkActionStart, i1);  //linkActionDelimiter
+                if (i1 == -1) break;
+                int i2 = s.IndexOf(Globals.linkActionEnd, i1 + 1);
+                if (i2 == -1) break;  //strange
+                links.Add(new TwoInts() { int1 = i1, int2 = i2 });
+                i1 = i2 + 1;
+            }
+
+            int textLengthStart = Gui.gui.textBoxMainTabUpper.TextLength;
+            int colCounter = 0;
+            int colMax = Program.options.print_width;
+            if (isPiping) colMax = Program.options.print_filewidth;
+
+            if (ln2)
+            {
+                Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine + marginFirst);
+                colCounter = margin.Length;
+            }
+
+            for (int i = 0; i < links.Count; i++)
+            {
+                // ........ {a{ ..link1.... }a} ........... {a{ ...link2.... }a} ..........
+
+                int lastC = 0;
+                if (i > 0) lastC = links[i - 1].int2 + Globals.linkActionEnd.Length;
+                string normalText = G.Substring(s, lastC, links[i].int1 - 1);
+                if (true)
+                {
+                    colCounter = WrapText(normalText, margin, colCounter, colMax, color);
+                }
+                string[] ss = G.Substring(s, links[i].int1 + Globals.linkActionStart.Length, links[i].int2 - 1).Split(Globals.linkActionDelimiter);  //delimiter must be there
+                string linkText = ss[0];
+                string linkLink = "action:" + ss[1];
+                if (true)
+                {
+                    if (colCounter + linkText.Length > colMax)
+                    {
+                        //insert a line break no matter what the character before is. Link cannot be broken/wrapped
+                        Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine + margin);
+                        colCounter = margin.Length;
+                    }
+
+                    int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
+                    //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
+                    Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + linkText + @"\v #" + linkLink + @"\v0}";
+                    Gui.gui.textBoxMainTabUpper.Select(position, linkText.Length + linkLink.Length + 1);
+                    Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
+                    Gui.gui.textBoxMainTabUpper.Select(position + linkText.Length + linkLink.Length + 1, 0);
+                    colCounter += linkText.Length;
+                }
+                if (i == links.Count - 1)
+                {
+                    //get the last bit
+                    string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
+                    if (true)
+                    {
+                        colCounter = WrapText(normalText2, margin, colCounter, colMax, color);
+                    }
+                }
+            }
+            if (hasNewline) Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine);
+            if (color != Color.Empty)
+            {
+                Gui.gui.textBoxMainTabUpper.Select(textLengthStart, Gui.gui.textBoxMainTabUpper.TextLength);
+                Gui.gui.textBoxMainTabUpper.SelectionColor = color;
+            }
+        }
+
+        private static int WrapText(string text, string margin, int colCounter, int colMax, Color color)
+        {
+            while (true)
+            {
+                if (colCounter + text.Length > colMax)
+                {
+                    //          |mmmmm..............................|
+                    //          |mmmmm..................this is a really long line
+                    //
+                    // becomes
+                    //          |mmmmm..............................|
+                    //          |mmmmm..................this is a
+                    //          |mmmmmreally long line
+                    //
+                    // where . are some chars, and m is left-margin (blanks).
+                    // so when right margin is exceeded, we find a suitable blank to break on (after it)
+
+                    //find best wrap, even if it wraps outside of the margin
+
+                    int bestWrapI = -12345;
+                    for (int ii = 0; ii < text.Length; ii++)
+                    {
+                        if (text[ii] == ' ')
+                        {
+                            if (colCounter + ii > colMax)
+                            {
+                                if (bestWrapI != -12345) break;  //we found a wrap inside margin, else carry on
+                            }
+                            bestWrapI = ii;
+                        }
+                    }
+
+                    if (bestWrapI == -12345)
+                    {
+                        //no wrap found: long line without any blanks. Just wrap at 0
+                        bestWrapI = 0;
+                    }
+
+                    string s1 = G.Substring(text, 0, bestWrapI);
+                    text = G.Substring(text, bestWrapI + 1, text.Length - 1);
+                    Gui.gui.textBoxMainTabUpper.AppendText(s1 + Environment.NewLine + margin);
+                    //AppendText(Gui.gui.textBoxMainTabUpper, s1 + Environment.NewLine + margin, color);
+                    colCounter = margin.Length;
+                }
+                else
+                {
+                    //easy, there is room for the text                    
+                    Gui.gui.textBoxMainTabUpper.AppendText(text);
+                    //AppendText(Gui.gui.textBoxMainTabUpper, text + Environment.NewLine + margin, color);
+                    colCounter += text.Length;
+                    break;  //the end
+                }
+            }
+
+            return colCounter;
+        }
+
     }
 
     /// <summary>
     /// A helper class for printing multiple lines. It basically just stores a List&lt;string&gt; inside.
     /// </summary>
-    public class Writeln
+    public class GWriteln
     {
-        public List<string> storage = new List<string>();
-        public EWritelnType type = EWritelnType.Normal;
-        public void A(string s)
-        {
-            this.storage.Add(s);
-        }
+        //Note: links to documentation are easy, for instance "Read more in help system {a{here¤htm:series}a}."
 
-        public Writeln(EWritelnType type)
+        public List<string> storageMain = new List<string>(); //shown in main error text       
+        public List<string> storageMore = new List<string>(); //link regarding more information
+        public EWritelnType type = EWritelnType.Normal;
+
+        public GWriteln(EWritelnType type)
         {
             this.type = type;
+        }
+
+        public void Add(string s)
+        {
+            this.storageMain.Add(s);
+        }
+
+        public void More(string s)
+        {
+            this.storageMore.Add(s);
         }        
+        
+        public void Exe()
+        {
+            CrossThreadStuff.Writeln(this);
+        }
     }
 }
