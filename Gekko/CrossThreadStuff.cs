@@ -126,18 +126,18 @@ namespace Gekko
         }
 
         //weird delegate pattern, but it works!
-        delegate void SetTextUpperCallback(GWriteln x);
-        public static void Writeln(GWriteln x)
+        delegate void SetTextUpperCallback(Wrap x);
+        public static void Wrap(Wrap wrap)
         {
             if (Gui.gui.textBoxMainTabLower.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new SetTextUpperCallback(Writeln), new object[] { x });
+                Gui.gui.Invoke(new SetTextUpperCallback(Wrap), new object[] { wrap });
             }
             else
             {
                 // It's on the same thread, no need for Invoke                
-                G.Writeln(x);
+                G.Wrap(wrap);
             }
         }
         

@@ -14294,9 +14294,13 @@ namespace Gekko
             Globals.modelFileName = Path.GetFileName(Globals.modelPathAndFileName);
 
             if (!File.Exists(fileName))
-            {
-                G.Writeln2("*** ERROR: Could not find file '" + fileNameSimple + "'.");
-                throw new GekkoException();
+            {                
+                Wrap w = new Wrap(EWritelnType.Error);
+                w.Add("Could not find model file '" + fileNameSimple + "'");
+                w.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                w.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                w.More("You may use 'model *;' to look for model files in the current working folder.");
+                w.Exe();
             }
 
             string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$

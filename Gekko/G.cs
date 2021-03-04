@@ -4074,7 +4074,7 @@ namespace Gekko
         /// <summary>
         /// For writing output to screen, with a type/indent like error/warning/note
         /// </summary>
-        public static void Writeln2(GWriteln ss)
+        public static void Writeln2(Wrap ss)
         {
             G.Writeln();
             string s = WritelnHelperAssembleLines(ss.storageMain);
@@ -4716,8 +4716,11 @@ namespace Gekko
         /// of the G.Write() and G.Writeln() methods.
         /// </summary>
         /// <param name="w"></param>
-        public static void Writeln(GWriteln w)
+        /// #klsdjsdklgj9
+        public static void Wrap(Wrap w)
         {
+            //When we get here, we are typically at a line that has just breaked.            
+
             string marginFirst = "";
             Color color = Color.Empty;
             if (w.type == EWritelnType.Error)
@@ -4736,19 +4739,33 @@ namespace Gekko
             }
 
             bool isPiping = false;
-            bool hasNewline = true;
             string margin = G.Blanks(marginFirst.Length);
-            bool ln2 = true;
 
+            //-------------------------------
+            //The short message in main tab
+            //-------------------------------
             string s1 = G.WritelnHelperAssembleLines(w.storageMain);
-            WritelnHelper(s1, marginFirst, color, isPiping, hasNewline, margin, ln2);
+            WrapHelper(s1, marginFirst, margin, isPiping, color, true, ETabs.Main);
 
-            string s2 = G.WritelnHelperAssembleLines(w.storageMore);
-            WritelnHelper(s2, marginFirst, Color.Empty, isPiping, hasNewline, margin, ln2);
+            Action a = () =>
+            {
+                //-------------------------------
+                //The long explanation in output tab
+                //-------------------------------
+                Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
+                O.Cls("output");
+                string s3 = G.WritelnHelperAssembleLines(w.storageMore);
+                WrapHelper(s3, "", "", false, Color.Empty, false, ETabs.Output);
+            };
+
+            //---------------------------------------------------------------
+            //The link in the main tab to the explanation in the output tab
+            //---------------------------------------------------------------
+            WrapHelper("Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", margin, margin, isPiping, Color.Empty, false, ETabs.Main);
 
         }
 
-        private static void WritelnHelper(string s, string marginFirst, Color color, bool isPiping, bool hasNewline, string margin, bool ln2)
+        private static void WrapHelper(string s, string marginFirst, string margin, bool isPiping, Color color, bool ln2, ETabs tab)
         {
             if (s.Trim() == "") return;
 
@@ -4765,15 +4782,21 @@ namespace Gekko
             }
 
             int textLengthStart = Gui.gui.textBoxMainTabUpper.TextLength;
-            int colCounter = 0;
+            int col = 0;
             int colMax = Program.options.print_width;
             if (isPiping) colMax = Program.options.print_filewidth;
 
+            RichTextBoxEx textBox = Gui.gui.textBoxMainTabUpper;
+            if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
+
             if (ln2)
             {
-                Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine + marginFirst);
-                colCounter = margin.Length;
+                Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine);
             }
+
+            textBox.AppendText(Environment.NewLine + marginFirst);
+
+            col = margin.Length;
 
             for (int i = 0; i < links.Count; i++)
             {
@@ -4784,27 +4807,27 @@ namespace Gekko
                 string normalText = G.Substring(s, lastC, links[i].int1 - 1);
                 if (true)
                 {
-                    colCounter = WrapText(normalText, margin, colCounter, colMax, color);
+                    col = WrapText(normalText, margin, col, colMax, color, tab);
                 }
                 string[] ss = G.Substring(s, links[i].int1 + Globals.linkActionStart.Length, links[i].int2 - 1).Split(Globals.linkActionDelimiter);  //delimiter must be there
                 string linkText = ss[0];
                 string linkLink = "action:" + ss[1];
                 if (true)
                 {
-                    if (colCounter + linkText.Length > colMax)
+                    if (col + linkText.Length > colMax)
                     {
                         //insert a line break no matter what the character before is. Link cannot be broken/wrapped
-                        Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine + margin);
-                        colCounter = margin.Length;
+                        textBox.AppendText(Environment.NewLine + margin);
+                        col = margin.Length;
                     }
 
                     int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
                     //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
-                    Gui.gui.textBoxMainTabUpper.SelectedRtf = @"{\rtf1\ansi " + linkText + @"\v #" + linkLink + @"\v0}";
-                    Gui.gui.textBoxMainTabUpper.Select(position, linkText.Length + linkLink.Length + 1);
-                    Gui.gui.textBoxMainTabUpper.SetSelectionLink(true);
-                    Gui.gui.textBoxMainTabUpper.Select(position + linkText.Length + linkLink.Length + 1, 0);
-                    colCounter += linkText.Length;
+                    textBox.SelectedRtf = @"{\rtf1\ansi " + linkText + @"\v #" + linkLink + @"\v0}";
+                    textBox.Select(position, linkText.Length + linkLink.Length + 1);
+                    textBox.SetSelectionLink(true);
+                    textBox.Select(position + linkText.Length + linkLink.Length + 1, 0);
+                    col += linkText.Length;
                 }
                 if (i == links.Count - 1)
                 {
@@ -4812,20 +4835,31 @@ namespace Gekko
                     string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
                     if (true)
                     {
-                        colCounter = WrapText(normalText2, margin, colCounter, colMax, color);
+                        col = WrapText(normalText2, margin, col, colMax, color, tab);
                     }
                 }
             }
-            if (hasNewline) Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine);
+
+            if (links.Count == 0)
+            {
+                WrapText(s, margin, col, colMax, color, tab);
+            }
+
+            //Always insert a newline now, we are not doing the equivalent to Write().
+            textBox.AppendText(Environment.NewLine);
+
             if (color != Color.Empty)
             {
-                Gui.gui.textBoxMainTabUpper.Select(textLengthStart, Gui.gui.textBoxMainTabUpper.TextLength);
-                Gui.gui.textBoxMainTabUpper.SelectionColor = color;
+                textBox.Select(textLengthStart, textBox.TextLength);
+                textBox.SelectionColor = color;
             }
         }
 
-        private static int WrapText(string text, string margin, int colCounter, int colMax, Color color)
+        private static int WrapText(string text, string margin, int colCounter, int colMax, Color color, ETabs tab)
         {
+            RichTextBoxEx textBox = Gui.gui.textBoxMainTabUpper;
+            if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
+
             while (true)
             {
                 if (colCounter + text.Length > colMax)
@@ -4864,15 +4898,13 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    Gui.gui.textBoxMainTabUpper.AppendText(s1 + Environment.NewLine + margin);
-                    //AppendText(Gui.gui.textBoxMainTabUpper, s1 + Environment.NewLine + margin, color);
+                    textBox.AppendText(s1 + Environment.NewLine + margin);
                     colCounter = margin.Length;
                 }
                 else
                 {
                     //easy, there is room for the text                    
-                    Gui.gui.textBoxMainTabUpper.AppendText(text);
-                    //AppendText(Gui.gui.textBoxMainTabUpper, text + Environment.NewLine + margin, color);
+                    textBox.AppendText(text);
                     colCounter += text.Length;
                     break;  //the end
                 }
@@ -4884,9 +4916,9 @@ namespace Gekko
     }
 
     /// <summary>
-    /// A helper class for printing multiple lines. It basically just stores a List&lt;string&gt; inside.
+    /// A helper class for printing multiple lines. It basically just stores List&lt;string&gt; inside.
     /// </summary>
-    public class GWriteln
+    public class Wrap
     {
         //Note: links to documentation are easy, for instance "Read more in help system {a{here¤htm:series}a}."
 
@@ -4894,7 +4926,7 @@ namespace Gekko
         public List<string> storageMore = new List<string>(); //link regarding more information
         public EWritelnType type = EWritelnType.Normal;
 
-        public GWriteln(EWritelnType type)
+        public Wrap(EWritelnType type)
         {
             this.type = type;
         }
@@ -4911,7 +4943,8 @@ namespace Gekko
         
         public void Exe()
         {
-            CrossThreadStuff.Writeln(this);
+            CrossThreadStuff.Wrap(this);  //calls G.Wrap(), see #klsdjsdklgj9
+            throw new GekkoException();
         }
     }
 }
