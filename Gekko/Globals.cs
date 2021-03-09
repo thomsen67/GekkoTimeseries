@@ -705,8 +705,6 @@ namespace Gekko
         public static int waitFileTotalTime = 600;  //600 s = 10 min
         public static int waitFileGap = 2;
 
-        public static string errorString = "*** ERROR: ";
-        public static string warningString = "+++ WARNING: ";
 
         public static int guiMainLinePosition = 0;
 
@@ -755,6 +753,10 @@ namespace Gekko
 
         public static int convertTabToTextCounter = 0;
         public static int convertTabToTextErrorCounter = 0;
+
+        public static string errorString = "*** ERROR: ";
+        public static string warningString = "+++ WARNING: ";
+        public static string noteString = "+++ NOTE: ";
 
         public static System.Drawing.Color warningColor = System.Drawing.Color.OrangeRed;
         public static System.Windows.Media.Color GrayExcelLine = System.Windows.Media.Color.FromArgb(255, 208, 215, 229); //as in Excel

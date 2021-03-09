@@ -4733,17 +4733,17 @@ namespace Gekko
             Color color = Color.Empty;
             if (w.type == EWritelnType.Error)
             {
-                marginFirst = "*** ERROR: ";
+                marginFirst = Globals.errorString;
                 color = Color.Red;
             }
             else if (w.type == EWritelnType.Warning)
             {
-                marginFirst = "+++ WARNING: ";
+                marginFirst = Globals.warningString;
                 color = Globals.warningColor;
             }
             else if (w.type == EWritelnType.Note)
             {
-                marginFirst = "+++ NOTE: ";
+                marginFirst = Globals.noteString;
             }
 
             bool isPiping = false;
@@ -4753,9 +4753,12 @@ namespace Gekko
             //The short message in main tab
             //-------------------------------
             List<string> ss1 = G.WritelnHelperAssembleLines(w.storageMain);
+
+            int ii = -1;
             foreach (string s1 in ss1)
             {
-                WrapHelper(s1, marginFirst, margin, isPiping, color, false, ETabs.Main);
+                ii++;                
+                WrapHelper(ii, s1, marginFirst, margin, isPiping, color, false, ETabs.Main);
             }
 
             Action a = () =>
@@ -4766,20 +4769,23 @@ namespace Gekko
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                 O.Cls("output");
                 List<string> ss3 = G.WritelnHelperAssembleLines(w.storageMore);
+
+                int ii2 = -1;
                 foreach (string s3 in ss3)
                 {
-                    WrapHelper(s3, "", "", false, Color.Empty, false, ETabs.Output);
+                    ii2++;
+                    WrapHelper(ii2, s3, "", "", false, Color.Empty, false, ETabs.Output);
                 }                
             };
 
             //---------------------------------------------------------------
             //The link in the main tab to the explanation in the output tab
             //---------------------------------------------------------------
-            WrapHelper("Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", margin, margin, isPiping, Color.Empty, false, ETabs.Main);
+            WrapHelper(0, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", margin, margin, isPiping, Color.Empty, false, ETabs.Main);
 
         }
 
-        private static void WrapHelper(string s, string marginFirst, string margin, bool isPiping, Color color, bool ln2, ETabs tab)
+        private static void WrapHelper(int counter, string s, string marginFirst, string margin, bool isPiping, Color color, bool ln2, ETabs tab)
         {
             if (s.Trim() == "") return;
 
@@ -4805,10 +4811,16 @@ namespace Gekko
 
             if (ln2)
             {
-                G.AppendText(Gui.gui.textBoxMainTabUpper, Environment.NewLine + "&");
+                G.AppendText(Gui.gui.textBoxMainTabUpper, Environment.NewLine);
             }
 
-            G.AppendText(textBox, Environment.NewLine + "%" + marginFirst);
+            string m = G.NL + marginFirst;            
+            if (counter > 0)
+            {
+                m = G.NL + margin;
+            }
+
+            G.AppendText(textBox, m);
 
             col = margin.Length;
 
@@ -4829,7 +4841,7 @@ namespace Gekko
                 if (col + linkText.Length > colMax)
                 {
                     //insert a line break no matter what the character before is. Link cannot be broken/wrapped                        
-                    G.AppendText(textBox, Environment.NewLine + "#" + margin);
+                    G.AppendText(textBox, Environment.NewLine + margin);
                     col = margin.Length;
                 }
                 
@@ -4853,7 +4865,7 @@ namespace Gekko
             }
 
             //Always insert a newline now, we are not doing the equivalent to Write().
-            G.AppendText(textBox, Environment.NewLine + "@");
+            G.AppendText(textBox, Environment.NewLine);
 
             if (color != Color.Empty)
             {
@@ -4937,7 +4949,7 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    G.AppendText(textBox, s1 + Environment.NewLine + "£" + margin);
+                    G.AppendText(textBox, s1 + Environment.NewLine + margin);
                     colCounter = margin.Length;
                 }
                 else
