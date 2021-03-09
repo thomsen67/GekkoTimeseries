@@ -4857,7 +4857,7 @@ namespace Gekko
                 if (col + linkText.Length > colMax)
                 {
                     //insert a line break no matter what the character before is. Link cannot be broken/wrapped                        
-                    G.AppendText(textBox, Environment.NewLine + margin);
+                    G.AppendText(textBox, G.NL + margin);
                     col = margin.Length;
                 }
 
@@ -4969,7 +4969,7 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    G.AppendText(textBox, s1 + Environment.NewLine + margin);
+                    G.AppendText(textBox, s1 + G.NL + margin);
                     colCounter = margin.Length;
                 }
                 else
