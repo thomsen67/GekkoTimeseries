@@ -4757,16 +4757,14 @@ namespace Gekko
             int ii = -1;
             foreach (string s1 in ss1)
             {
-                ii++;
-                int lines = 0;
+                ii++;                
                 string m = marginFirst;
                 if (ii > 0)
-                {
-                    lines = 1;
+                {                    
                     m = margin;
                     color = Color.Empty;
                 }
-                WrapHelper(lines, m, margin, s1, isPiping, color, ETabs.Main);
+                WrapHelper(1, 1, m, margin, s1, isPiping, color, ETabs.Main);
             }
 
             Action a = () =>
@@ -4787,18 +4785,28 @@ namespace Gekko
                     {
                         lines = 1;
                     }
-                    WrapHelper(lines, "", "", s3, false, Color.Empty, ETabs.Output);
+                    WrapHelper(lines, 1, "", "", s3, false, Color.Empty, ETabs.Output);
                 }                
             };
 
             //---------------------------------------------------------------
             //The link in the main tab to the explanation in the output tab
             //---------------------------------------------------------------
-            WrapHelper(1, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
-
+            WrapHelper(1, 2, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
         }
 
-        private static void WrapHelper(int ln2, string marginFirst, string margin, string s, bool isPiping, Color color, ETabs tab)
+        /// <summary>
+        /// Helper for Wrap(). Note: linesAtStart == 0 similar to G.Writeln(), and lines == 1 similar to G.Writeln2(). Note: linesAtEnd = 0 similar to G.Write().
+        /// </summary>
+        /// <param name="linesAtStart">blank lines</param>
+        /// /// <param name="linesAtEnd">blank lines</param>
+        /// <param name="marginFirst">For instance "*** ERROR: "</param>
+        /// <param name="margin">For instance "           ", blanks corresponding to "*** ERROR: "</param>
+        /// <param name="s">Text to show</param>
+        /// <param name="isPiping">Pipe to file?</param>
+        /// <param name="color">Text color (can be Color.Empty)</param>
+        /// <param name="tab">Which tab to print it?</param>
+        private static void WrapHelper(int linesAtStart, int linesAtEnd, string marginFirst, string margin, string s, bool isPiping, Color color, ETabs tab)
         {
             if (s.Trim() == "") return;
 
@@ -4823,7 +4831,7 @@ namespace Gekko
             if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
 
             string nl = "";
-            for (int i = 0; i < ln2; i++)
+            for (int i = 0; i < linesAtStart; i++)  
             {                
                 nl += G.NL;
             }            
@@ -4852,7 +4860,7 @@ namespace Gekko
                     G.AppendText(textBox, Environment.NewLine + margin);
                     col = margin.Length;
                 }
-                
+
                 AppendLink(textBox, linkText, linkLink);
                 col += linkText.Length;
 
@@ -4860,10 +4868,7 @@ namespace Gekko
                 {
                     //get the last bit
                     string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
-                    if (true)
-                    {
-                        col = WrapText(textBox, normalText2, margin, col, colMax, color);
-                    }
+                    col = WrapText(textBox, normalText2, margin, col, colMax, color);
                 }
             }
 
@@ -4873,7 +4878,14 @@ namespace Gekko
             }
 
             //Always insert a newline now, we are not doing the equivalent to Write().
-            G.AppendText(textBox, Environment.NewLine);
+            
+
+            string nl2 = "";
+            for (int i = 0; i < linesAtEnd; i++)
+            {
+                nl2 += G.NL;
+            }
+            if (nl2 != "") G.AppendText(textBox, nl2);
 
             if (color != Color.Empty)
             {
