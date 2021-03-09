@@ -4077,25 +4077,33 @@ namespace Gekko
         public static void Writeln2(Wrap ss)
         {
             G.Writeln();
-            string s = WritelnHelperAssembleLines(ss.storageMain);
-            WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
+            List<string> ss2 = WritelnHelperAssembleLines(ss.storageMain);
+            foreach (string s in ss2)
+            {
+                WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
+            }
         }
 
-        public static string WritelnHelperAssembleLines(List<string> ss)
+        public static List<string> WritelnHelperAssembleLines(List<List<string>> ss)
         {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < ss.Count; i++)
+            List<string> sbs = new List<string>();
+            foreach (List<string> xx in ss)
             {
-                string add = "";
-                bool remove = false;
-                if (i > 0)
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < xx.Count; i++)
                 {
-                    sb.Append(" ");
+                    string add = "";
+                    bool remove = false;
+                    if (i > 0)
+                    {
+                        sb.Append(" ");
+                    }
+                    sb.Append(xx[i].Trim());
                 }
-                sb.Append(ss[i].Trim());
+                string s3 = sb.ToString();
+                sbs.Add(s3);
             }
-            string s3 = sb.ToString();
-            return s3;
+            return sbs;
         }        
 
         /// <summary>
@@ -4744,8 +4752,11 @@ namespace Gekko
             //-------------------------------
             //The short message in main tab
             //-------------------------------
-            string s1 = G.WritelnHelperAssembleLines(w.storageMain);
-            WrapHelper(s1, marginFirst, margin, isPiping, color, true, ETabs.Main);
+            List<string> ss1 = G.WritelnHelperAssembleLines(w.storageMain);
+            foreach (string s1 in ss1)
+            {
+                WrapHelper(s1, marginFirst, margin, isPiping, color, true, ETabs.Main);
+            }
 
             Action a = () =>
             {
@@ -4754,8 +4765,11 @@ namespace Gekko
                 //-------------------------------
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                 O.Cls("output");
-                string s3 = G.WritelnHelperAssembleLines(w.storageMore);
-                WrapHelper(s3, "", "", false, Color.Empty, false, ETabs.Output);
+                List<string> ss3 = G.WritelnHelperAssembleLines(w.storageMore);
+                foreach (string s3 in ss3)
+                {
+                    WrapHelper(s3, "", "", false, Color.Empty, false, ETabs.Output);
+                }                
             };
 
             //---------------------------------------------------------------
@@ -4791,10 +4805,10 @@ namespace Gekko
 
             if (ln2)
             {
-                Gui.gui.textBoxMainTabUpper.AppendText(Environment.NewLine);
+                G.AppendText(Gui.gui.textBoxMainTabUpper, Environment.NewLine);
             }
 
-            textBox.AppendText(Environment.NewLine + marginFirst);
+            G.AppendText(textBox, Environment.NewLine + marginFirst);
 
             col = margin.Length;
 
@@ -4807,42 +4821,35 @@ namespace Gekko
                 string normalText = G.Substring(s, lastC, links[i].int1 - 1);
                 if (true)
                 {
-                    col = WrapText(normalText, margin, col, colMax, color, tab);
+                    col = WrapText(textBox, normalText, margin, col, colMax, color);
                 }
                 string[] ss = G.Substring(s, links[i].int1 + Globals.linkActionStart.Length, links[i].int2 - 1).Split(Globals.linkActionDelimiter);  //delimiter must be there
                 string linkText = ss[0];
                 string linkLink = "action:" + ss[1];
-                if (true)
+                if (col + linkText.Length > colMax)
                 {
-                    if (col + linkText.Length > colMax)
-                    {
-                        //insert a line break no matter what the character before is. Link cannot be broken/wrapped
-                        textBox.AppendText(Environment.NewLine + margin);
-                        col = margin.Length;
-                    }
-
-                    int position = Gui.gui.textBoxMainTabUpper.SelectionStart;
-                    //Gui.gui.textBoxMainTabUpper.SelectionStart = position;
-                    textBox.SelectedRtf = @"{\rtf1\ansi " + linkText + @"\v #" + linkLink + @"\v0}";
-                    textBox.Select(position, linkText.Length + linkLink.Length + 1);
-                    textBox.SetSelectionLink(true);
-                    textBox.Select(position + linkText.Length + linkLink.Length + 1, 0);
-                    col += linkText.Length;
+                    //insert a line break no matter what the character before is. Link cannot be broken/wrapped                        
+                    G.AppendText(textBox, Environment.NewLine + margin);
+                    col = margin.Length;
                 }
+                
+                AppendLink(textBox, linkText, linkLink);
+                col += linkText.Length;
+
                 if (i == links.Count - 1)
                 {
                     //get the last bit
                     string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
                     if (true)
                     {
-                        col = WrapText(normalText2, margin, col, colMax, color, tab);
+                        col = WrapText(textBox, normalText2, margin, col, colMax, color);
                     }
                 }
             }
 
             if (links.Count == 0)
             {
-                WrapText(s, margin, col, colMax, color, tab);
+                WrapText(textBox, s, margin, col, colMax, color);
             }
 
             //Always insert a newline now, we are not doing the equivalent to Write().
@@ -4855,11 +4862,31 @@ namespace Gekko
             }
         }
 
-        private static int WrapText(string text, string margin, int colCounter, int colMax, Color color, ETabs tab)
+        private static void AppendText(RichTextBox textBox, string s)
         {
-            RichTextBoxEx textBox = Gui.gui.textBoxMainTabUpper;
-            if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
+            AppendLink(textBox, s, null);  //no link
+        }
 
+        private static void AppendLink(RichTextBox textBox, string s, string link)
+        {
+            if (link == null)
+            {
+                textBox.AppendText(s);
+            }
+            else
+            {
+                RichTextBoxEx textBoxEx = textBox as RichTextBoxEx;
+                if (textBoxEx == null) MessageBox.Show("*** ERROR: Cannot use links in this RichTextBox");
+                int position = textBoxEx.SelectionStart;
+                textBoxEx.SelectedRtf = @"{\rtf1\ansi " + s + @"\v #" + link + @"\v0}";
+                textBoxEx.Select(position, s.Length + link.Length + 1);
+                textBoxEx.SetSelectionLink(true);
+                textBoxEx.Select(position + s.Length + link.Length + 1, 0);
+            }
+        }        
+
+        private static int WrapText(RichTextBoxEx textBox, string text, string margin, int colCounter, int colMax, Color color)
+        {
             while (true)
             {
                 if (colCounter + text.Length > colMax)
@@ -4898,18 +4925,17 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    textBox.AppendText(s1 + Environment.NewLine + margin);
+                    G.AppendText(textBox, s1 + Environment.NewLine + margin);
                     colCounter = margin.Length;
                 }
                 else
                 {
-                    //easy, there is room for the text                    
-                    textBox.AppendText(text);
+                    //easy, there is room for the text   
+                    G.AppendText(textBox, text);
                     colCounter += text.Length;
                     break;  //the end
                 }
             }
-
             return colCounter;
         }
 
@@ -4922,8 +4948,8 @@ namespace Gekko
     {
         //Note: links to documentation are easy, for instance "Read more in help system {a{here¤htm:series}a}."
 
-        public List<string> storageMain = new List<string>(); //shown in main error text       
-        public List<string> storageMore = new List<string>(); //link regarding more information
+        public List<List<string>> storageMain = new List<List<string>>(); //shown in main error text
+        public List<List<string>> storageMore = new List<List<string>>(); //link regarding more information
         public EWritelnType type = EWritelnType.Normal;
 
         public Wrap(EWritelnType type)
@@ -4931,16 +4957,33 @@ namespace Gekko
             this.type = type;
         }
 
-        public void Add(string s)
+        public void Add(int i, string s)
         {
-            this.storageMain.Add(s);
+            // has elements 0, 1, 2 (count = 3)
+            // i = 4
+            // has to add 2 elements. That is, i - count + 1.
+
+            for (int ii = 0; ii < i - this.storageMain.Count + 1; ii++)
+            {
+                this.storageMain.Add(new List<string>());
+            }
+            this.storageMain[i].Add(s);
         }
 
-        public void More(string s)
+        public void More(int i, string s)
         {
-            this.storageMore.Add(s);
-        }        
-        
+            // has elements 0, 1, 2 (count = 3)
+            // i = 4
+            // has to add 2 elements. That is, i - count + 1.
+
+            for (int ii = 0; ii < i - this.storageMore.Count + 1; ii++)
+            {
+                this.storageMore.Add(new List<string>());
+            }
+            this.storageMore[i].Add(s);
+        }
+
+
         public void Exe()
         {
             CrossThreadStuff.Wrap(this);  //calls G.Wrap(), see #klsdjsdklgj9
