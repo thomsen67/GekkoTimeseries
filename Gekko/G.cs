@@ -4757,8 +4757,16 @@ namespace Gekko
             int ii = -1;
             foreach (string s1 in ss1)
             {
-                ii++;                
-                WrapHelper(ii, s1, marginFirst, margin, isPiping, color, false, ETabs.Main);
+                ii++;
+                int lines = 0;
+                string m = marginFirst;
+                if (ii > 0)
+                {
+                    lines = 1;
+                    m = margin;
+                    color = Color.Empty;
+                }
+                WrapHelper(lines, m, margin, s1, isPiping, color, ETabs.Main);
             }
 
             Action a = () =>
@@ -4770,22 +4778,27 @@ namespace Gekko
                 O.Cls("output");
                 List<string> ss3 = G.WritelnHelperAssembleLines(w.storageMore);
 
+                int lines = 0;
                 int ii2 = -1;
                 foreach (string s3 in ss3)
                 {
                     ii2++;
-                    WrapHelper(ii2, s3, "", "", false, Color.Empty, false, ETabs.Output);
+                    if (ii2 > 0)
+                    {
+                        lines = 1;
+                    }
+                    WrapHelper(lines, "", "", s3, false, Color.Empty, ETabs.Output);
                 }                
             };
 
             //---------------------------------------------------------------
             //The link in the main tab to the explanation in the output tab
             //---------------------------------------------------------------
-            WrapHelper(0, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", margin, margin, isPiping, Color.Empty, false, ETabs.Main);
+            WrapHelper(1, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
 
         }
 
-        private static void WrapHelper(int counter, string s, string marginFirst, string margin, bool isPiping, Color color, bool ln2, ETabs tab)
+        private static void WrapHelper(int ln2, string marginFirst, string margin, string s, bool isPiping, Color color, ETabs tab)
         {
             if (s.Trim() == "") return;
 
@@ -4809,18 +4822,13 @@ namespace Gekko
             RichTextBoxEx textBox = Gui.gui.textBoxMainTabUpper;
             if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
 
-            if (ln2)
-            {
-                G.AppendText(Gui.gui.textBoxMainTabUpper, Environment.NewLine);
-            }
+            string nl = "";
+            for (int i = 0; i < ln2; i++)
+            {                
+                nl += G.NL;
+            }            
 
-            string m = G.NL + marginFirst;            
-            if (counter > 0)
-            {
-                m = G.NL + margin;
-            }
-
-            G.AppendText(textBox, m);
+            G.AppendText(textBox, nl + marginFirst);
 
             col = margin.Length;
 
