@@ -4755,7 +4755,7 @@ namespace Gekko
             List<string> ss1 = G.WritelnHelperAssembleLines(w.storageMain);
             foreach (string s1 in ss1)
             {
-                WrapHelper(s1, marginFirst, margin, isPiping, color, true, ETabs.Main);
+                WrapHelper(s1, marginFirst, margin, isPiping, color, false, ETabs.Main);
             }
 
             Action a = () =>
@@ -4805,10 +4805,10 @@ namespace Gekko
 
             if (ln2)
             {
-                G.AppendText(Gui.gui.textBoxMainTabUpper, Environment.NewLine);
+                G.AppendText(Gui.gui.textBoxMainTabUpper, Environment.NewLine + "&");
             }
 
-            G.AppendText(textBox, Environment.NewLine + marginFirst);
+            G.AppendText(textBox, Environment.NewLine + "%" + marginFirst);
 
             col = margin.Length;
 
@@ -4829,7 +4829,7 @@ namespace Gekko
                 if (col + linkText.Length > colMax)
                 {
                     //insert a line break no matter what the character before is. Link cannot be broken/wrapped                        
-                    G.AppendText(textBox, Environment.NewLine + margin);
+                    G.AppendText(textBox, Environment.NewLine + "#" + margin);
                     col = margin.Length;
                 }
                 
@@ -4853,7 +4853,7 @@ namespace Gekko
             }
 
             //Always insert a newline now, we are not doing the equivalent to Write().
-            textBox.AppendText(Environment.NewLine);
+            G.AppendText(textBox, Environment.NewLine + "@");
 
             if (color != Color.Empty)
             {
@@ -4862,11 +4862,23 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Helper method for adding text to the GUI
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <param name="s"></param>
         private static void AppendText(RichTextBox textBox, string s)
         {
             AppendLink(textBox, s, null);  //no link
         }
 
+        /// <summary>
+        /// Helper method for adding text to the GUI. The idea is that -- in the longer run -- all change to GUI text runs through
+        /// this method (at the moment, only Wrap text does this).
+        /// </summary>
+        /// <param name="textBox">The GUI text box</param>
+        /// <param name="s">String to show</param>
+        /// <param name="link">Link url, else null if no link</param>
         private static void AppendLink(RichTextBox textBox, string s, string link)
         {
             if (link == null)
@@ -4925,7 +4937,7 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    G.AppendText(textBox, s1 + Environment.NewLine + margin);
+                    G.AppendText(textBox, s1 + Environment.NewLine + "£" + margin);
                     colCounter = margin.Length;
                 }
                 else
