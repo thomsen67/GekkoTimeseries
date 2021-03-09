@@ -4994,39 +4994,40 @@ namespace Gekko
 
         public List<List<string>> storageMain = new List<List<string>>(); //shown in main error text
         public List<List<string>> storageMore = new List<List<string>>(); //link regarding more information
-        public EWritelnType type = EWritelnType.Normal;
+        public EWritelnType type = EWritelnType.Normal;        
 
         public Wrap(EWritelnType type)
         {
             this.type = type;
+            this.storageMain.Add(new List<string>());
+            this.storageMore.Add(new List<string>());
         }
 
-        public void Add(int i, string s)
+        public void Main(string s)
+        {
+            // has elements 0, 1, 2 (count = 3)
+            // i = 4
+            // has to add 2 elements. That is, i - count + 1.            
+            this.storageMain[this.storageMain.Count - 1].Add(s);
+        }
+
+        public void MainNextSection()
+        {            
+            this.storageMain.Add(new List<string>());
+        }
+
+        public void More(string s)
         {
             // has elements 0, 1, 2 (count = 3)
             // i = 4
             // has to add 2 elements. That is, i - count + 1.
-
-            for (int ii = 0; ii < i - this.storageMain.Count + 1; ii++)
-            {
-                this.storageMain.Add(new List<string>());
-            }
-            this.storageMain[i].Add(s);
+            this.storageMore[this.storageMore.Count - 1].Add(s);
         }
 
-        public void More(int i, string s)
-        {
-            // has elements 0, 1, 2 (count = 3)
-            // i = 4
-            // has to add 2 elements. That is, i - count + 1.
-
-            for (int ii = 0; ii < i - this.storageMore.Count + 1; ii++)
-            {
-                this.storageMore.Add(new List<string>());
-            }
-            this.storageMore[i].Add(s);
+        public void MoreNextSection()
+        {            
+            this.storageMore.Add(new List<string>());
         }
-
 
         public void Exe()
         {
