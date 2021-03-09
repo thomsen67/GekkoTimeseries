@@ -192,12 +192,9 @@ namespace Gekko
             red = Image.FromFile(Application.StartupPath + "\\images\\red.png");
             target = Image.FromFile(Application.StartupPath + "\\images\\target.png");
 
-            this.textBoxMainTabUpper.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBox1_LinkClicked);
-            this.textBoxOutputTab.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxTab2_LinkClicked);
-
-            //if (Globals.isBetaVersion) this.splitContainer1.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-
-            //this.KeyDown += new KeyEventHandler(Gekko_KeyDown);
+            this.textBoxMainTabUpper.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxMainTabUpper_LinkClicked);
+            this.textBoxOutputTab.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxOutputTab_LinkClicked);
+            
         }
 
         static void CrashHandler(object sender, UnhandledExceptionEventArgs args)
@@ -308,30 +305,7 @@ namespace Gekko
             
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
-
-            //if (false && Globals.runningOnTTComputer)
-            //{
-            //    Action a = () =>
-            //    {
-            //        O.Help("i_dynamic_statements");
-            //    };
-            //    Writeln w = new Writeln(EWritelnType.Error);
-            //    w.AddMain("aaaaaaa01 aaaaaaaa02 " + G.GetLinkAction("bbbbbbb01", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
-            //    w.AddMain("aaaaaaaaa03 aaaaaaaaaa04 " + G.GetLinkAction("bbbbbbb02", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaa05 aaaaaaaaaaaa06");
-            //    w.AddMain(G.GetLinkAction("bbbbbbb03", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa07 aaaaaaaaaaaaaa08 " + G.GetLinkAction("bbbbbbb04", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa09 aaaaaaaaaaaaaaaa10");
-            //    w.AddMain(G.GetLinkAction("bbbbbbb05", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaaaa11 aaaaaaaaaaaaaaaa12 " + G.GetLinkAction("bbbbbbb06", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaaaa13 aaaaaaaaaaaaaa14 ");
-            //    w.AddMain(" " + G.GetLinkAction("bbbbbbb07", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaaaaaaaa15 aaaaaaa16 " + G.GetLinkAction("bbbbbbb08", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa17 aaaaaaa18 ");
-            //    w.AddMain(G.GetLinkAction("bbbbbbb09", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa19 aaaaaaa20 " + G.GetLinkAction("bbbbbbb10", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa21 aaaaaaa22 " + G.GetLinkAction("bbbbbbb11", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa23 aaaaaaa24 " + G.GetLinkAction("bbbbbbb12", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa25 aaaaaaa26 " + G.GetLinkAction("bbbbbbb13", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " aaaaaaa27 aaaaaaa28 " + G.GetLinkAction("bbbbbbb14", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
-
-            //    G.Writeln2(w);                
-                
-            //    G.Writeln2(EWritelnType.Error, "This is a problem.");
-
-            //    G.Writeln2("hej");
-
-            //}
-
-
+            
             G.WriteDirs("small", false);
 
             if (Globals.gekkoVersion == "3.1.7" || Globals.gekkoVersion == "3.1.8" || Globals.gekkoVersion == "3.1.9" || Globals.gekkoVersion == "3.1.10")
@@ -1273,11 +1247,11 @@ namespace Gekko
             SendMessage(rtb.Handle, WM_VSCROLL, ptrWparam, ptrLparam);
         }
 
-        private void textBox1_LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
+        private void textBoxMainTabUpper_LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
         {
             LinkClicked(e, ETabs.Main);
         }
-        private void textBoxTab2_LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
+        private void textBoxOutputTab_LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
         {
             LinkClicked(e, ETabs.Output);
         }        
@@ -1518,9 +1492,17 @@ namespace Gekko
                 }
                 else if (type == "action")
                 {
-                    long n = long.Parse(input);
-                    GekkoAction a = Program.GetGekkoAction(n);
-                    a.action();
+                    if (input.Trim().ToLower().EndsWith(".htm"))
+                    {
+                        //a link inside a string with the form {a{intro.htm}a}, 
+                        O.Help(input);
+                    }
+                    else
+                    {
+                        long n = long.Parse(input);
+                        GekkoAction a = Program.GetGekkoAction(n);
+                        a.action();
+                    }
                 }
                 else
                 {

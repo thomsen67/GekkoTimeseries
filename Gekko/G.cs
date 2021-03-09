@@ -4792,7 +4792,14 @@ namespace Gekko
             //---------------------------------------------------------------
             //The link in the main tab to the explanation in the output tab
             //---------------------------------------------------------------
-            WrapHelper(1, 2, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
+
+            if (w.storageMore[0].Count > 0)
+            {
+                WrapHelper(1, 1, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
+            }
+
+            G.AppendText(Gui.gui.textBoxMainTabUpper, G.NL);  //we need this for some reason, else next part of error msg gets 1 line too close.
+
         }
 
         /// <summary>
@@ -4906,7 +4913,7 @@ namespace Gekko
 
         /// <summary>
         /// Helper method for adding text to the GUI. The idea is that -- in the longer run -- all change to GUI text runs through
-        /// this method (at the moment, only Wrap text does this).
+        /// this method (at the moment, only Wrap text does this). See also Gui.gui.LinkClicked().
         /// </summary>
         /// <param name="textBox">The GUI text box</param>
         /// <param name="s">String to show</param>
