@@ -14296,14 +14296,15 @@ namespace Gekko
             if (!File.Exists(fileName))
             {
                 //new Warning("Could not find model file '" + fileNameSimple + "'");
-                Error e = new Error();                
-                e.Main("Could not find model file '" + fileNameSimple + "'");
-                //w.MainNextSection(); // "aaa
-                e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                e.More("You may use 'model *;' to look for model files in the current working folder.");
-                //w.MoreNextSection();
-                e.Exe();
+                using (Error e = new Error())
+                {
+                    e.Main("Could not find model file '" + fileNameSimple + "'");
+                    //w.MainNextSection(); // "aaa
+                    e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                    e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                    e.More("You may use 'model *;' to look for model files in the current working folder.");
+                    //w.MoreNextSection();                      
+                }
             }
 
             string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$

@@ -736,10 +736,12 @@ namespace Gekko
 
             if (G.HasModelGekko() && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
             {
-                G.Writeln2("*** ERROR: The model was not compiled/loaded with the current frequency");
-                G.Writeln("    This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
-                G.Writeln("    the MODEL statement after your 'OPTION freq ... ' statement.");
-                throw new GekkoException();
+                using (Error e = new Error())
+                {
+                    e.Main("The model was not compiled/loaded with the current frequency.");
+                    e.Main("This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
+                    e.Main("the MODEL statement after your 'OPTION freq ... ' statement.");
+                }
             }
 
             if (G.Equal(o.opt_after, "yes"))

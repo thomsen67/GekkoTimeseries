@@ -4121,7 +4121,7 @@ namespace Gekko
             {
                 color = Globals.warningColor;
                 Globals.numberOfWarnings++;
-            }
+            }            
             helper.color = color;
             helper.s = s;
             helper.linktype = linktype;
@@ -4707,7 +4707,7 @@ namespace Gekko
             //-------------------------------
             //The short message in main tab
             //-------------------------------
-            List<string> ss1 = w.WritelnHelperAssembleLines("main");
+            List<string> ss1 = w.ConsolidateLines("main");
 
             int ii = -1;
             foreach (string s1 in ss1)
@@ -4729,7 +4729,7 @@ namespace Gekko
                 //-------------------------------
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                 O.Cls("output");
-                List<string> ss3 = w.WritelnHelperAssembleLines("more");
+                List<string> ss3 = w.ConsolidateLines("more");
 
                 int lines = 0;
                 int ii2 = -1;
@@ -4950,13 +4950,21 @@ namespace Gekko
     /// <summary>
     /// A helper class for printing multiple lines. It basically just stores List&lt;string&gt; inside.
     /// </summary>
-    public class Wrap
+    public class Wrap: IDisposable
     {
         //Note: links to documentation are easy, for instance "Read more in help system {a{here¤htm:series}a}."
 
         private List<List<string>> storageMain = new List<List<string>>(); //shown in main error text
         private List<List<string>> storageMore = new List<List<string>>(); //link regarding more information
         private EWrapType type = EWrapType.Normal;        
+
+        /// <summary>
+        /// After using(...) {...}, Exe() is run so that it gets printed.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Exe();
+        }
 
         public Wrap(EWrapType type)
         {
@@ -4965,6 +4973,10 @@ namespace Gekko
             this.storageMore.Add(new List<string>());
         }
 
+        /// <summary>
+        /// Add text to "main"
+        /// </summary>
+        /// <param name="s"></param>
         public void Main(string s)
         {
             // has elements 0, 1, 2 (count = 3)
@@ -4973,11 +4985,18 @@ namespace Gekko
             this.storageMain[this.storageMain.Count - 1].Add(s);
         }
 
+        /// <summary>
+        /// Add a section break to "main"
+        /// </summary>
         public void MainNextSection()
         {            
             this.storageMain.Add(new List<string>());
         }
 
+        /// <summary>
+        /// Add text to "more".
+        /// </summary>
+        /// <param name="s"></param>
         public void More(string s)
         {
             // has elements 0, 1, 2 (count = 3)
@@ -4986,22 +5005,37 @@ namespace Gekko
             this.storageMore[this.storageMore.Count - 1].Add(s);
         }
 
+        /// <summary>
+        /// Add a section break to "more"
+        /// </summary>
         public void MoreNextSection()
         {            
             this.storageMore.Add(new List<string>());
         }
 
+        /// <summary>
+        /// The type of object.
+        /// </summary>
+        /// <returns></returns>
         public EWrapType Type()
         {
             return this.type;
         }
 
+        /// <summary>
+        /// Actually "runs" the object, printing stuff on screen.
+        /// If the type is Error, a GekkoException will be thrown after printing.
+        /// </summary>
         public void Exe()
         {
             CrossThreadStuff.Wrap(this);  //calls G.Wrap(), see #klsdjsdklgj9
-            throw new GekkoException();
+            if (type == EWrapType.Error) throw new GekkoException();
         }
 
+        /// <summary>
+        /// Any more lines?
+        /// </summary>
+        /// <returns></returns>
         public bool HasMore()
         {
             return this.storageMore[0].Count > 0;
@@ -5012,7 +5046,7 @@ namespace Gekko
         /// </summary>
         /// <param name="ss"></param>
         /// <returns></returns>
-        public List<string> WritelnHelperAssembleLines(string type)
+        public List<string> ConsolidateLines(string type)
         {
             List<List<string>> ss = null;
             if (type == "main") ss = this.storageMain;
