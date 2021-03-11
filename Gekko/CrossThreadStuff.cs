@@ -137,7 +137,7 @@ namespace Gekko
             else
             {
                 // It's on the same thread, no need for Invoke                
-                G.Wrap(wrap);
+                wrap.Exe2();
             }
         }
         

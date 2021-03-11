@@ -17667,8 +17667,8 @@ namespace Gekko
 
             if (G.Equal(Program.options.interface_csv_delimiter, "comma") && G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
             {
-                G.Writeln2("+++ WARNING: Using comma both as decimal separator and field delimiter is not advised");
-            }
+                new Warning("Using comma both as decimal separator and field delimiter is not advised");
+            }            
 
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
