@@ -3909,7 +3909,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(string s)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Normal, s, null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3917,7 +3917,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(string s, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, false, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Normal, s, null, false, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -3926,7 +3926,7 @@ namespace Gekko
         /// <param name="s"></param>
         public static void Write(string s, Color color)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, false, color, false, ETabs.Main);
+            WriteAbstract(EWrapType.Normal, s, null, false, color, false, ETabs.Main);
         }
 
         /// <summary>
@@ -3934,7 +3934,7 @@ namespace Gekko
         /// </summary>
         public static void Write(string s, Color color, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, false, color, false, tab);
+            WriteAbstract(EWrapType.Normal, s, null, false, color, false, tab);
         }
       
         /// <summary>
@@ -3942,7 +3942,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(int x)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3950,14 +3950,14 @@ namespace Gekko
         /// </summary>
         public static void Write(int x, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
         }
         /// <summary>
         /// For writing output to screen
         /// </summary>        
         public static void Write(double x)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3965,7 +3965,7 @@ namespace Gekko
         /// </summary>
         public static void Write(double x, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -3988,7 +3988,7 @@ namespace Gekko
             //for instance input0 = "fY", "disp:fY"
             //for instance input0 = "sim", "help:sim"            
             //see Gui.textBox1_LinkClicked
-            WriteAbstract(EWritelnType.Normal, text, linktype, false, Color.Empty, true, ETabs.Main);  //Color is not used anyway -- gets blue underlined
+            WriteAbstract(EWrapType.Normal, text, linktype, false, Color.Empty, true, ETabs.Main);  //Color is not used anyway -- gets blue underlined
         }
 
         public static void WriteLink(string text, string linktype, ETabs tab)
@@ -3997,7 +3997,7 @@ namespace Gekko
             //for instance input0 = "fY", "disp:fY"
             //for instance input0 = "sim", "help:sim"            
             //see Gui.textBox1_LinkClicked
-            WriteAbstract(EWritelnType.Normal, text, linktype, false, Color.Empty, true, tab);  //Color is not used anyway -- gets blue underlined
+            WriteAbstract(EWrapType.Normal, text, linktype, false, Color.Empty, true, tab);  //Color is not used anyway -- gets blue underlined
         }
 
         /// <summary>
@@ -4033,13 +4033,13 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Normal, s, null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
         /// For writing output to screen, with a type/indent like error/warning/note
         /// </summary>
-        public static void Writeln(EWritelnType type, string s)
+        public static void Writeln(EWrapType type, string s)
         {
             WriteAbstract(type, s, null, true, Color.Empty, false, ETabs.Main);
         }
@@ -4047,7 +4047,7 @@ namespace Gekko
         /// <summary>
         /// For writing output to screen, with a type/indent like error/warning/note.
         /// </summary>
-        public static void Writeln2(EWritelnType type, string s)
+        public static void Writeln2(EWrapType type, string s)
         {
             G.Writeln();
             WriteAbstract(type, s, null, true, Color.Empty, false, ETabs.Main);
@@ -4058,52 +4058,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, true, Color.Empty, false, tab);
-        }
-
-
-        ///// <summary>
-        ///// For writing output to screen, with a type/indent like error/warning/note
-        ///// </summary>
-        //public static void Writeln(GWriteln ss)
-        //{
-        //    string s = WritelnHelperAssembleLines(ss.storageMain);
-        //    WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
-        //}
-
-        /// <summary>
-        /// For writing output to screen, with a type/indent like error/warning/note
-        /// </summary>
-        public static void Writeln2(Wrap ss)
-        {
-            G.Writeln();
-            List<string> ss2 = WritelnHelperAssembleLines(ss.storageMain);
-            foreach (string s in ss2)
-            {
-                WriteAbstract(ss.type, s, null, true, Color.Empty, false, ETabs.Main);
-            }
-        }
-
-        public static List<string> WritelnHelperAssembleLines(List<List<string>> ss)
-        {
-            List<string> sbs = new List<string>();
-            foreach (List<string> xx in ss)
-            {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < xx.Count; i++)
-                {
-                    string add = "";
-                    bool remove = false;
-                    if (i > 0)
-                    {
-                        sb.Append(" ");
-                    }
-                    sb.Append(xx[i].Trim());
-                }
-                string s3 = sb.ToString();
-                sbs.Add(s3);
-            }
-            return sbs;
+            WriteAbstract(EWrapType.Normal, s, null, true, Color.Empty, false, tab);
         }        
 
         /// <summary>
@@ -4111,7 +4066,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, true, color, false, ETabs.Main);
+            WriteAbstract(EWrapType.Normal, s, null, true, color, false, ETabs.Main);
         }
 
 
@@ -4120,7 +4075,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color, bool mustAlsoWriteToScreen)
         {
-            WriteAbstractScroll(EWritelnType.Normal, s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
+            WriteAbstractScroll(EWrapType.Normal, s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
         }
 
 
@@ -4129,14 +4084,14 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, s, null, true, color, false, tab);
+            WriteAbstract(EWrapType.Normal, s, null, true, color, false, tab);
         }
 
 
         /// <summary>
         /// For writing output to screen
         /// </summary>
-        public static void WriteAbstract(EWritelnType type, string s, string linktype, bool newline, Color color, bool link, ETabs tab)
+        public static void WriteAbstract(EWrapType type, string s, string linktype, bool newline, Color color, bool link, ETabs tab)
         {            
             WriteAbstractScroll(type, s, linktype, null, newline, color, link, tab, false, false);
         }
@@ -4144,7 +4099,7 @@ namespace Gekko
         /// <summary>
         /// For writing output to screen
         /// </summary>
-        public static void WriteAbstractScroll(EWritelnType type, string s, string linktype, Action a, bool newline, Color color, bool link, ETabs tab, bool mustScrollToEnd, bool mustAlsoPrintToScreen)
+        public static void WriteAbstractScroll(EWrapType type, string s, string linktype, Action a, bool newline, Color color, bool link, ETabs tab, bool mustScrollToEnd, bool mustAlsoPrintToScreen)
         {
             if (Globals.applicationIsInProcessOfDying)
             {
@@ -4157,16 +4112,16 @@ namespace Gekko
             {
                 s = "";
             }
-            //if (s.Trim().StartsWith("*** ERROR"))
-            //{
-            //    color = Color.Red;
-            //    Globals.numberOfErrors++;
-            //}
-            //else if (s.Trim().StartsWith("+++ WARNING"))
-            //{
-            //    color = Globals.warningColor;
-            //    Globals.numberOfWarnings++;
-            //}            
+            if (s.Trim().StartsWith("*** ERROR"))
+            {
+                color = Color.Red;
+                Globals.numberOfErrors++;
+            }
+            else if (s.Trim().StartsWith("+++ WARNING"))
+            {
+                color = Globals.warningColor;
+                Globals.numberOfWarnings++;
+            }
             helper.color = color;
             helper.s = s;
             helper.linktype = linktype;
@@ -4230,7 +4185,7 @@ namespace Gekko
         {
             if (!Globals.runningOnTTComputer) return;
             if (!Globals.printGrayLinesForDebugging) return;
-            WriteAbstract(EWritelnType.Normal, s, null, true, Color.Gray, false, ETabs.Main);
+            WriteAbstract(EWrapType.Normal, s, null, true, Color.Gray, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4333,12 +4288,12 @@ namespace Gekko
 
             bool mustAlsoPrintOnScreen = helper.mustAlsoPrintToScreen;            
             
-            if (helper.type == EWritelnType.Error)
+            if (helper.type == EWrapType.Error)
             {
                 mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping or muting
                 if (Globals.errorMemory == null) Globals.errorMemory = new StringBuilder();
             }
-            else if (helper.type == EWritelnType.Warning) mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping
+            else if (helper.type == EWrapType.Warning) mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping
 
             if (Globals.errorMemory != null)
             {
@@ -4479,8 +4434,8 @@ namespace Gekko
                     {
                         //set color etc.
 
-                        if (helper.type == EWritelnType.Error) color = Color.Red;  //overrides any color given
-                        else if (helper.type == EWritelnType.Warning) color = Globals.warningColor;  //overrides any color given
+                        if (helper.type == EWrapType.Error) color = Color.Red;  //overrides any color given
+                        else if (helper.type == EWrapType.Warning) color = Globals.warningColor;  //overrides any color given
 
                         textBox.Select(start, end - start);
                         {
@@ -4491,7 +4446,7 @@ namespace Gekko
                     }
                 }
             }
-            if (helper.type == EWritelnType.Error) throw new GekkoException();  //so that we do not have to do this manually after printing an error.
+            if (helper.type == EWrapType.Error) throw new GekkoException();  //so that we do not have to do this manually after printing an error.
         }
 
         /// <summary>
@@ -4560,7 +4515,7 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="textBox"></param>
         /// <param name="newline"></param>
-        private static void WriteAbstractHelper(EWritelnType type, bool parentOfAll, string s, RichTextBoxEx textBox, bool newline)
+        private static void WriteAbstractHelper(EWrapType type, bool parentOfAll, string s, RichTextBoxEx textBox, bool newline)
         {
             //not sure exactly how this code works in all details, but it has been battle-tested a lot,
             //and is probably robust.
@@ -4568,13 +4523,13 @@ namespace Gekko
             //Should be redone properly for WPF, with tokenizer
 
             string start = "";  //this is the blank-indent used on each line except the first.
-            if (type == EWritelnType.Error)
+            if (type == EWrapType.Error)
             {
                 if (parentOfAll) start = Globals.errorString;
                 else start = G.Blanks(Globals.errorString.Length);
                 Globals.numberOfErrors++;
             }
-            else if (type == EWritelnType.Warning)
+            else if (type == EWrapType.Warning)
             {
                 if (parentOfAll) start = Globals.warningString;
                 else start = G.Blanks(Globals.warningString.Length);
@@ -4666,7 +4621,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln()
         {
-            WriteAbstract(EWritelnType.Normal, "", null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Normal, "", null, true, Color.Empty, false, ETabs.Main);
         }
         
         /// <summary>
@@ -4674,7 +4629,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, "", null, true, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Normal, "", null, true, Color.Empty, false, tab);
         }
         
         /// <summary>
@@ -4683,7 +4638,7 @@ namespace Gekko
         /// <param name="x"></param>
         public static void Writeln(int x)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4691,7 +4646,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(int x, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -4700,7 +4655,7 @@ namespace Gekko
         /// <param name="x"></param>
         public static void Writeln(double x)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4708,7 +4663,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(double x, ETabs tab)
         {
-            WriteAbstract(EWritelnType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -4731,17 +4686,17 @@ namespace Gekko
 
             string marginFirst = "";
             Color color = Color.Empty;
-            if (w.type == EWritelnType.Error)
+            if (w.Type() == EWrapType.Error)
             {
                 marginFirst = Globals.errorString;
                 color = Color.Red;
             }
-            else if (w.type == EWritelnType.Warning)
+            else if (w.Type() == EWrapType.Warning)
             {
                 marginFirst = Globals.warningString;
                 color = Globals.warningColor;
             }
-            else if (w.type == EWritelnType.Note)
+            else if (w.Type() == EWrapType.Note)
             {
                 marginFirst = Globals.noteString;
             }
@@ -4752,7 +4707,7 @@ namespace Gekko
             //-------------------------------
             //The short message in main tab
             //-------------------------------
-            List<string> ss1 = G.WritelnHelperAssembleLines(w.storageMain);
+            List<string> ss1 = w.WritelnHelperAssembleLines("main");
 
             int ii = -1;
             foreach (string s1 in ss1)
@@ -4774,7 +4729,7 @@ namespace Gekko
                 //-------------------------------
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                 O.Cls("output");
-                List<string> ss3 = G.WritelnHelperAssembleLines(w.storageMore);
+                List<string> ss3 = w.WritelnHelperAssembleLines("more");
 
                 int lines = 0;
                 int ii2 = -1;
@@ -4793,14 +4748,14 @@ namespace Gekko
             //The link in the main tab to the explanation in the output tab
             //---------------------------------------------------------------
 
-            if (w.storageMore[0].Count > 0)
+            if (w.HasMore())
             {
                 WrapHelper(1, 1, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
             }
 
             G.AppendText(Gui.gui.textBoxMainTabUpper, G.NL);  //we need this for some reason, else next part of error msg gets 1 line too close.
 
-        }
+        }        
 
         /// <summary>
         /// Helper for Wrap(). Note: linesAtStart == 0 similar to G.Writeln(), and lines == 1 similar to G.Writeln2(). Note: linesAtEnd = 0 similar to G.Write().
@@ -4999,11 +4954,11 @@ namespace Gekko
     {
         //Note: links to documentation are easy, for instance "Read more in help system {a{here¤htm:series}a}."
 
-        public List<List<string>> storageMain = new List<List<string>>(); //shown in main error text
-        public List<List<string>> storageMore = new List<List<string>>(); //link regarding more information
-        public EWritelnType type = EWritelnType.Normal;        
+        private List<List<string>> storageMain = new List<List<string>>(); //shown in main error text
+        private List<List<string>> storageMore = new List<List<string>>(); //link regarding more information
+        private EWrapType type = EWrapType.Normal;        
 
-        public Wrap(EWritelnType type)
+        public Wrap(EWrapType type)
         {
             this.type = type;
             this.storageMain.Add(new List<string>());
@@ -5036,10 +4991,123 @@ namespace Gekko
             this.storageMore.Add(new List<string>());
         }
 
+        public EWrapType Type()
+        {
+            return this.type;
+        }
+
         public void Exe()
         {
             CrossThreadStuff.Wrap(this);  //calls G.Wrap(), see #klsdjsdklgj9
             throw new GekkoException();
+        }
+
+        public bool HasMore()
+        {
+            return this.storageMore[0].Count > 0;
+        }
+
+        /// <summary>
+        /// Helper method to consolidate List&lt;string&gt; lines in a section into one string. Handles blanks etc. too so that it is pretty.
+        /// </summary>
+        /// <param name="ss"></param>
+        /// <returns></returns>
+        public List<string> WritelnHelperAssembleLines(string type)
+        {
+            List<List<string>> ss = null;
+            if (type == "main") ss = this.storageMain;
+            else if (type == "more") ss = this.storageMore;
+            else throw new GekkoException();
+
+            List<string> sbs = new List<string>();
+            foreach (List<string> xx in ss)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < xx.Count; i++)
+                {
+                    string add = "";
+                    bool remove = false;
+                    if (i > 0)
+                    {
+                        sb.Append(" ");
+                    }
+                    sb.Append(xx[i].Trim());
+                }
+                string s3 = sb.ToString();
+                sbs.Add(s3);
+            }
+            return sbs;
+        }
+    }
+
+
+    /// <summary>
+    /// Inherits from Wrap class. For easier syntax when constructing.
+    /// </summary>
+    public class Error: Wrap
+    {
+        /// <summary>
+        /// Object of Wrap type
+        /// </summary>
+        public Error(): base(EWrapType.Error)
+        {            
+        }
+
+        /// <summary>
+        /// Do not assign to anything. Usage: new Error("Error in ...");
+        /// </summary>
+        /// <param name="s"></param>
+        public Error(string s) : base(EWrapType.Error)
+        {
+            this.Main(s);
+            this.Exe();
+        }
+
+    }
+
+    /// <summary>
+    /// Inherits from Wrap class. For easier syntax when constructing.
+    /// </summary>
+    public class Warning : Wrap
+    {
+        /// <summary>
+        /// Object of Wrap type
+        /// </summary>
+        public Warning() : base(EWrapType.Warning)
+        {
+        }
+
+        /// <summary>
+        /// Do not assign to anything. Usage: new Warning("Beware...");
+        /// </summary>
+        /// <param name="s"></param>
+        public Warning(string s) : base(EWrapType.Warning)
+        {
+            this.Main(s);
+            this.Exe();
+        }
+    }
+
+    /// <summary>
+    /// Inherits from Wrap class. For easier syntax when constructing.
+    /// </summary>
+    public class Note : Wrap
+    {
+        /// <summary>
+        /// Object of Wrap type
+        /// </summary>
+        public Note() : base(EWrapType.Note)
+        {
+        }
+
+        /// <summary>
+        /// Do not assign to anything. Usage: new Note("Beware...");
+        /// </summary>
+        /// <param name="s"></param>
+        public Note(string s) : base(EWrapType.Note)
+        {
+            this.Main(s);
+            this.Exe();
         }
     }
 }

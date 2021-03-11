@@ -1273,7 +1273,7 @@ namespace Gekko
                     int pos = input0.IndexOf(Globals.linkSeparator1);
                     string input2 = input0.Substring(pos + 1);
                     string[] input3 = input2.Split(Globals.linkSeparator2);
-                    if (input3.Length != 2) G.Writeln2(EWritelnType.Error, "Strange error rgd. links");
+                    if (input3.Length != 2) G.Writeln2(EWrapType.Error, "Strange error rgd. links");
                     type = input3[0];
                     input = input3[1];
                 }

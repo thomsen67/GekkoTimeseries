@@ -63,7 +63,7 @@ using System.IO.Compression;
 namespace Gekko
 {
 
-    public enum EWritelnType
+    public enum EWrapType
     {
         Normal,
         Error,
@@ -14294,27 +14294,16 @@ namespace Gekko
             Globals.modelFileName = Path.GetFileName(Globals.modelPathAndFileName);
 
             if (!File.Exists(fileName))
-            {                
-                Wrap w = new Wrap(EWritelnType.Error);
-                w.Main("Could not find model file '" + fileNameSimple + "'");
-                w.Main("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.MainNextSection();
-                w.Main("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.Main("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.MainNextSection();
-                w.Main("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.Main("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-
-                w.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                w.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                w.More("You may use 'model *;' to look for model files in the current working folder.");
-                w.MoreNextSection();
-                w.More("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.More("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.MoreNextSection();
-                w.More("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.More("aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa aaaaa ");
-                w.Exe();
+            {
+                //new Warning("Could not find model file '" + fileNameSimple + "'");
+                Error e = new Error();                
+                e.Main("Could not find model file '" + fileNameSimple + "'");
+                //w.MainNextSection(); // "aaa
+                e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                e.More("You may use 'model *;' to look for model files in the current working folder.");
+                //w.MoreNextSection();
+                e.Exe();
             }
 
             string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$
@@ -27017,7 +27006,7 @@ namespace Gekko
             public ETabs tab;
             public bool mustScrollToEnd;
             public bool mustAlsoPrintToScreen = false;
-            public EWritelnType type = EWritelnType.Normal;
+            public EWrapType type = EWrapType.Normal;
             public bool parentOfAll = false;
 
             public WorkerThreadHelper2 Clone()

@@ -730,9 +730,8 @@ namespace Gekko
         public static void Sim(O.Sim o)
         {
             if (!G.HasModelGekko())
-            {
-                G.Writeln2("*** ERROR: No model seems to be defined (see MODEL statement)");
-                throw new GekkoException();
+            {                
+                new Error("No model seems to be defined (cf. {a{MODEL¤model.htm}a} statement)");
             }
 
             if (G.HasModelGekko() && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
