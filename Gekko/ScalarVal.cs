@@ -113,14 +113,14 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
-            G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
+            new Error("Cannot use []-indexer on VAL");
             throw new GekkoException();
         }       
 
         public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
-            G.Writeln2("*** ERROR: You are trying to convert/use the value " + this.val + " as a STRING/NAME item in a list");
+            new Error("You are trying to convert/use the value " + this.val + " as a STRING/NAME item in a list");
             G.Writeln("           In LIST commands, you must for example use '5' instead of 5, and '01' instead of 01.");
             G.Writeln("           Alternatively, for lists with such elements, you can use the LIST<direct> option.");
             G.Writeln("           If you are using a VAL scalar %v, you may try to use string(%v) instead.");
@@ -169,12 +169,12 @@ namespace Gekko
                     }
                 case EVariableType.Matrix:
                     {
-                        G.Writeln2("*** ERROR: You cannot add a MATRIX and a SCALAR.");
+                        new Error("You cannot add a MATRIX and a SCALAR.");
                         throw new GekkoException();
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Variable conversion error.");
+                        new Error("Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -191,7 +191,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        G.Writeln2("*** ERROR: You cannot concatenate a SERIES and a SCALAR.");
+                        new Error("You cannot concatenate a SERIES and a SCALAR.");
                         throw new GekkoException();
                     }
                 case EVariableType.String:
@@ -200,12 +200,12 @@ namespace Gekko
                     }
                 case EVariableType.Matrix:
                     {
-                        G.Writeln2("*** ERROR: You cannot add a MATRIX and a SCALAR.");
+                        new Error("You cannot add a MATRIX and a SCALAR.");
                         throw new GekkoException();
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Variable conversion error.");
+                        new Error("Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -234,7 +234,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Variable conversion error.");
+                        new Error("Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -275,7 +275,7 @@ namespace Gekko
                     }                
                 default:
                     {
-                        G.Writeln2("*** ERROR: Variable conversion error.");
+                        new Error("Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -304,7 +304,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Variable conversion error.");
+                        new Error("Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -333,7 +333,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Variable conversion error.");
+                        new Error("Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -341,7 +341,7 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on a VAL");
+            new Error("You cannot use an indexer [] on a VAL");
             throw new GekkoException();
         }
 

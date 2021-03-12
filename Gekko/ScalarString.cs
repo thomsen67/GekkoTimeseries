@@ -126,17 +126,17 @@ namespace Gekko
                     int ival = O.ConvertToInt(index);
                     if (ival < 0)
                     {
-                        G.Writeln2("*** ERROR: Illegal string indexer [" + ival + "]: negative number not allowed");
+                        new Error("Illegal string indexer [" + ival + "]: negative number not allowed");
                         throw new GekkoException();
                     }
                     else if (ival == 0)
                     {
-                        G.Writeln2("*** ERROR: Illegal [0] string indexing. Use the length() function for string length.");
+                        new Error("Illegal [0] string indexing. Use the length() function for string length.");
                         throw new GekkoException();
                     }
                     else if (ival > this.string2.Length)
                     {
-                        G.Writeln2("*** ERROR: Illegal string indexer [" + ival + "]: larger than length of string (" + this.string2.Length + ")");
+                        new Error("Illegal string indexer [" + ival + "]: larger than length of string (" + this.string2.Length + ")");
                         throw new GekkoException();
                     }
 
@@ -156,7 +156,7 @@ namespace Gekko
 
                     if (ival1 > this.string2.Length || ival2 > this.string2.Length || ival2 < ival1 || ival1 < 1 || ival2 < 1)
                     {
-                        G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
+                        new Error("Invalid range, [" + ival1 + " .. " + ival2 + "]");
                         throw new GekkoException();
                     }
 
@@ -166,18 +166,18 @@ namespace Gekko
                 }
                 else if (index.Type() == EVariableType.String)
                 {
-                    G.Writeln2("*** ERROR: You cannot use %s1[%s2], where %s1 and %s2 are strings. Perhaps see the search() function.");
+                    new Error("You cannot use %s1[%s2], where %s1 and %s2 are strings. Perhaps see the search() function.");
                     throw new GekkoException();
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Type mismatch regarding []-index");
+                    new Error("Type mismatch regarding []-index");
                     throw new GekkoException();
                 }
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on string");
+                new Error("Cannot use " + indexes.Length + "-dimensional indexer on string");
                 throw new GekkoException();
             }
         }
@@ -185,7 +185,7 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: You cannot use minus on string");
+            new Error("You cannot use minus on string");
             throw new GekkoException();
         }
         
@@ -193,7 +193,7 @@ namespace Gekko
         {
 
             //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
-            G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this.string2 + "'");
+            new Error("You are trying to extract a numerical value from STRING '" + this.string2 + "'");
             G.Writeln("           A STRING s ('" + this.string2 + "') can refer to a timeseries name (" + this.string2 + "), but in");
             G.Writeln("           that case you must use {%s} instead of %s.");
             throw new GekkoException();
@@ -201,13 +201,13 @@ namespace Gekko
 
         public double GetVal(GekkoTime smpl)
         {
-            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
+            new Error("Cannot extract a val from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type ('" + this.string2 + "')");
+            new Error("Cannot extract a val from " + G.GetTypeString(this) + " type ('" + this.string2 + "')");
             double d = double.NaN; bool b = double.TryParse(this.string2, out d);
             if (this.isFromNakedList && b)
             {
@@ -230,7 +230,7 @@ namespace Gekko
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Could not convert the string '" + this.string2 + "' directly into a date.");
+            new Error("Could not convert the string '" + this.string2 + "' directly into a date.");
             G.Writeln("           You may try the date() conversion function.");
             GekkoTime gt = GekkoTime.FromStringToGekkoTime(this.string2);            
             if (this.isFromNakedList && !gt.IsNull())
@@ -260,13 +260,13 @@ namespace Gekko
                     }                    
                 case EVariableType.List:
                     {
-                        G.Writeln2("*** ERROR: Adding a list and scalar with %s + #x is no longer legal");
+                        new Error("Adding a list and scalar with %s + #x is no longer legal");
                         G.Writeln("           Please use #x.prefix(%s) instead.");
                         throw new GekkoException();
                     }                    
                 case EVariableType.Series:
                     {
-                        G.Writeln2("*** ERROR: You cannot add a string and a timeseries");
+                        new Error("You cannot add a string and a timeseries");
                         G.Writeln(Globals.stringConversionNote);
                         throw new GekkoException();
                     }                    
@@ -284,7 +284,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Type error regarding add.");                        
+                        new Error("Type error regarding add.");                        
                         throw new GekkoException();
                     }
             }
@@ -306,7 +306,7 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        G.Writeln2("*** ERROR: You cannot concatenate a string and a timeseries");
+                        new Error("You cannot concatenate a string and a timeseries");
                         throw new GekkoException();
                     }
                 case EVariableType.Val:
@@ -323,7 +323,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Type error regarding concatenate.");
+                        new Error("Type error regarding concatenate.");
                         throw new GekkoException();
                     }
             }
@@ -331,35 +331,35 @@ namespace Gekko
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: Subtracting from a string ('" + this.string2 + "') is not allowed");
+            new Error("Subtracting from a string ('" + this.string2 + "') is not allowed");
             G.Writeln(Globals.stringConversionNote);
             throw new GekkoException();
         }
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
         {            
-            G.Writeln2("*** ERROR: Multiplication involving a string ('" + this.string2 + "') is not allowed");
+            new Error("Multiplication involving a string ('" + this.string2 + "') is not allowed");
             G.Writeln(Globals.stringConversionNote);
             throw new GekkoException();
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: Division involving a string ('" + this.string2 + "') is not allowed");
+            new Error("Division involving a string ('" + this.string2 + "') is not allowed");
             G.Writeln(Globals.stringConversionNote);
             throw new GekkoException();
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: Exponentiation involving a string ('" + this.string2 + "') is not allowed");
+            new Error("Exponentiation involving a string ('" + this.string2 + "') is not allowed");
             G.Writeln(Globals.stringConversionNote);
             throw new GekkoException();
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: You cannot use an indexer [] on a STRING");
+            new Error("You cannot use an indexer [] on a STRING");
             throw new GekkoException();
         }
 

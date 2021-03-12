@@ -1452,7 +1452,7 @@ namespace Gekko
                     Series ts = O.GetIVariableFromString(input, O.ECreatePossibilities.NoneReportError, false) as Series;
                     if (!(ts.type == ESeriesType.ArraySuper))
                     {
-                        G.Writeln2("*** ERROR: strange error rgd. links");
+                        new Error("strange error rgd. links");
                         throw new GekkoException();
                     }
 
@@ -1506,7 +1506,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Unexpected error rgd. links");
+                    new Error("Unexpected error rgd. links");
                     throw new GekkoException();
                 }
             }
@@ -2180,7 +2180,7 @@ namespace Gekko
                             }
                             catch
                             {
-                                G.Writeln2("*** ERROR: Could not copy styles.css from Gekko program folder");
+                                new Error("Could not copy styles.css from Gekko program folder");
                                 throw new GekkoException();
                             }
                         }
@@ -2196,7 +2196,7 @@ namespace Gekko
                             }
                             catch
                             {
-                                G.Writeln2("*** ERROR: Could not copy styles.css from Gekko program folder");
+                                new Error("Could not copy styles.css from Gekko program folder");
                                 throw new GekkoException();
                             }
                         }

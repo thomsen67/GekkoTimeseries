@@ -61,9 +61,9 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            new Error("Could not convert the dateframe " + this.val + " directly into string.");
-            G.Writeln("           You may try the string() conversion function.");
-            throw new GekkoException();
+            new Error("Could not convert the dateframe " + this.val + " directly into string. You may try the string() conversion function.");
+            return null;
+            //throw new GekkoException();
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)

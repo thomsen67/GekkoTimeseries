@@ -416,7 +416,7 @@ namespace Gekko
                                         if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
                                         {
                                             new Error("DECOMP matrix invert problem");
-                                            throw new GekkoException();
+                                            //throw new GekkoException();
                                         }
                                         mEndo[row, col] = d;
                                     }
@@ -426,7 +426,7 @@ namespace Gekko
                                         if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
                                         {
                                             new Error("DECOMP matrix invert problem");
-                                            throw new GekkoException();
+                                            //throw new GekkoException();
                                         }
                                         mExo[row, col] = d;
                                     }
@@ -794,7 +794,7 @@ namespace Gekko
 
             if (nEqs != endo.Count)
             {
-                G.Writeln2("*** ERROR: The number of equations and endogenous variables do not match (" + nEqs + " vs " + endo.Count + ")");
+                new Error("The number of equations and endogenous variables do not match (" + nEqs + " vs " + endo.Count + ")");
                 G.Writeln2("Equations (unrolled over sets):");
                 for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
                 {
@@ -874,7 +874,7 @@ namespace Gekko
                     if (!G.HasModelGekko())
                     {
                         new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     if (true)
                     {
@@ -939,7 +939,7 @@ namespace Gekko
                     {
                         Globals.showDecompTable = false;
                         new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
             }
@@ -1125,7 +1125,7 @@ namespace Gekko
                 if (y0a == null)
                 {
                     new Error("DECOMP expects the expression to be of series type");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 Series y0_series = y0a_series;
                 if (y0a_series.type != ESeriesType.Light)
@@ -1151,7 +1151,7 @@ namespace Gekko
                     if (y0aRef == null)
                     {
                         new Error("DECOMP expects the expression to be of series type");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     y0Ref_series = y0aRef_series;
                     if (y0aRef_series.type != ESeriesType.Light)
@@ -1540,7 +1540,7 @@ namespace Gekko
                                     if (tsFirst == null)
                                     {
                                         new Error("Decomp #7093473984");
-                                        throw new GekkoException();
+                                        //throw new GekkoException();
                                     }
                                     dLevel = tsFirst.GetDataSimple(t2);
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
@@ -1553,7 +1553,7 @@ namespace Gekko
                                     if (tsRef == null)
                                     {
                                         new Error("Decomp #7093473985");
-                                        throw new GekkoException();
+                                        //throw new GekkoException();
                                     }
                                     dLevelRef = tsRef.GetDataSimple(t2);
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
@@ -1934,10 +1934,10 @@ namespace Gekko
             {
                 if (decompOptions2.link[parentI].varnames.Count != decompDatasSupremeClone.Count)
                 {
-                    new Error("The number of variables and equations do not match. For istance, in ");
-                    G.Writeln("           DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is,", System.Drawing.Color.Red);
-                    G.Writeln("           it must be defined over one or more sets with 2 elements in all).", System.Drawing.Color.Red);
-                    throw new GekkoException();
+                    new Error("The number of variables and equations do not match. For istance, in DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is, it must be defined over one or more sets with 2 elements in all).");
+
+
+                    //throw new GekkoException();
                 }
                 for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
                 {
@@ -2046,9 +2046,9 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Could not find variable " + name1 + " in non-linked equation number " + j);
-                        G.Writeln("           Beware of alignment: the names and equations must match.", System.Drawing.Color.Red);
-                        throw new GekkoException();
+                        new Error("Could not find variable " + name1 + " in non-linked equation number " + j + ".Beware of alignment: the names and equations must match.");
+
+                        //throw new GekkoException();
                     }
                 }
             }
@@ -2401,7 +2401,7 @@ namespace Gekko
                 string name = linkVariable;
                 if (linkVariable.EndsWith("¤[0]")) name = linkVariable.Substring(0, linkVariable.Length - "¤[0]".Length);
                 new Error("Could not find variable " + name + " in linked equation #" + i + " of " + (decompDatas.Count - 1));
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             return parentJ;
@@ -2429,7 +2429,7 @@ namespace Gekko
             if (found == null)
             {
                 new Error("DECOMP: Could not find variable '" + variable + "' as left-hand side in model");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             string[] ss = found.equationText.Split('=');
 
@@ -2440,7 +2440,7 @@ namespace Gekko
             if (!G.Equal(ss0[0], "frml"))
             {
                 new Error("Model equation '" + variable + "': Equation does not start with 'frml'");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             string lhs = null;
@@ -2497,7 +2497,7 @@ namespace Gekko
                 {
                     //should not happen
                     new Error("Problem with J-factors in equation " + found.lhs);
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 

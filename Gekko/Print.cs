@@ -63,7 +63,7 @@ namespace Gekko
                 {
                     if (xx0.list.Count != xx1.list.Count)
                     {
-                        G.Writeln2("*** ERROR: Lists with different number of items");
+                        new Error("Lists with different number of items");
                         throw new GekkoException();
                     }
                 }
@@ -329,7 +329,7 @@ namespace Gekko
             // ----------------------- start -------------------------------------------------
             if (freqs[0] && (freqs[1] || freqs[2] || freqs[3] || freqs[4]))
             {
-                G.Writeln2("*** ERROR: You cannot mix undated and other frequencies for PRT/PLOT");
+                new Error("You cannot mix undated and other frequencies for PRT/PLOT");
                 throw new GekkoException();
             }
 
@@ -374,7 +374,7 @@ namespace Gekko
                 {
                     if (!G.Equal(o.opt_nomax, "yes"))
                     {
-                        G.Writeln2("*** ERROR: PLOT had " + n + " elements, max is " + Program.options.plot_elements_max);
+                        new Error("PLOT had " + n + " elements, max is " + Program.options.plot_elements_max);
                         G.Writeln("           You can use PLOT<nomax> or set OPTION plot elements max = ... ;", Color.Red);
                         throw new GekkoException();
                     }
@@ -386,7 +386,7 @@ namespace Gekko
                 {
                     if (!G.Equal(o.opt_nomax, "yes"))
                     {
-                        G.Writeln2("*** ERROR: PRINT had " + n + " elements, max is " + Program.options.print_elements_max);
+                        new Error("PRINT had " + n + " elements, max is " + Program.options.print_elements_max);
                         G.Writeln("           You can use PRT<nomax> or set OPTION print elements max = ... ;", Color.Red);
                         throw new GekkoException();
                     }
@@ -517,7 +517,7 @@ namespace Gekko
 
             if (freqs[0] || freqs[1] || freqs[2])
             {
-                G.Writeln2("*** ERROR: You cannot mix Daily and Annual/Quarterly/Undated frequencies for PRT/PLOT");
+                new Error("You cannot mix Daily and Annual/Quarterly/Undated frequencies for PRT/PLOT");
                 throw new GekkoException();
             }
 
@@ -618,7 +618,7 @@ namespace Gekko
                     //sheet or non-pretty printing
                     if (isMonthlyFreq)
                     {
-                        G.Writeln2("*** ERROR: Cannot use D and M freq at the same time");
+                        new Error("Cannot use D and M freq at the same time");
                         throw new GekkoException();
                     }
                     i++;
@@ -1657,7 +1657,7 @@ namespace Gekko
             else if (G.Equal(operator2, "dp")) return 0d;
             else
             {
-                G.Writeln2("*** ERROR: Transformation error");
+                new Error("Transformation error");
                 throw new GekkoException();
             }
         }

@@ -299,7 +299,7 @@ namespace Gekko
                 //timeseries should have .freqEnum = EFreq.Q. This is basically what the above IF tests. It is for
                 //safety, and might be omitted at some point.
                 new Error("Freq mismatch");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.dataArray == null)
             {
@@ -339,7 +339,7 @@ namespace Gekko
             if (!this.isTimeless)
             {
                 new Error("Timeless variable error #100");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
 
@@ -371,7 +371,7 @@ namespace Gekko
             {
                 //See comment to GetData()
                 new Error("Freq mismatch");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.dataArray == null)
             {
@@ -446,7 +446,7 @@ namespace Gekko
                 //This check: better safe than sorry!
                 //See comment to GetData()
                 new Error("Freq mismatch");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.dataArray == null)
             {
@@ -489,7 +489,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless variable error #2");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return GetDataSequence(out index1, out index2, per1, per2, false);
         }
@@ -507,7 +507,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless variable error #3");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             //Program.ErrorIfDatabanksSwapped(this);
@@ -516,7 +516,7 @@ namespace Gekko
                 //This check: better safe than sorry!
                 //See comment to GetData()
                 new Error("Freq mismatch");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.dataArray == null)
             {
@@ -605,7 +605,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless variable error #4");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return GetPeriod(this.firstPeriodPositionInArray);
         }
@@ -621,7 +621,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless variable error #5");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return GetPeriod(this.lastPeriodPositionInArray);
         }
@@ -631,7 +631,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless variable error #6");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
             //returns tNull if all missing
@@ -654,7 +654,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless variable error #7");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
             //returns tNull if all missing
@@ -682,7 +682,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless variable error #7");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             //The inverse method is GetArrayIndex()
             //Should maybe be private method? But then how to unit-test?
@@ -801,7 +801,7 @@ namespace Gekko
             if (this.isTimeless)
             {
                 new Error("Timeless error #10");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             else
             {
@@ -824,7 +824,7 @@ namespace Gekko
                 if (indexes[i].Type() != EVariableType.String)
                 {
                     new Error("Expected [] indexer element #" + (i + 1) + " to be STRING");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 hash += ((ScalarString)indexes[i]).string2;
                 if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
@@ -961,7 +961,7 @@ namespace Gekko
                 {
                     //this is just a safety measure, to be deleted sometime
                     new Error("strange behavior regarding freq indicator");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else
                 {
@@ -988,7 +988,7 @@ namespace Gekko
             else
             {
                 new Error("Internal error #74389642");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             //nothing done for "a" type
             return var2;
@@ -1223,7 +1223,7 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date1 + "' as an int (start year)");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         try
                         {
@@ -1232,7 +1232,7 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         try
                         {
@@ -1241,7 +1241,7 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date2 + "' as an int (end year)");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         try
                         {
@@ -1250,7 +1250,7 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m
 
@@ -1344,7 +1344,7 @@ namespace Gekko
                                 {
                                     new Error("" + varName + ": could not parse '" + toParse + "' as a number");
                                     //sr.Close();
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                             }
 
@@ -1423,9 +1423,9 @@ namespace Gekko
 
             if (type == -12345)
             {
-                new Error("Could not find data storage file inside zipped databank file");
-                G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
-                throw new GekkoException();
+                new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);
+                
+                //throw new GekkoException();
             }
 
             if (type == 1)

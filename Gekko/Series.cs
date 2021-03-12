@@ -151,7 +151,7 @@ namespace Gekko
             this.freq = freq;
             if (type != ESeriesType.Normal && type != ESeriesType.Light)
             {
-                G.Writeln2("*** ERROR: Series constructor error");
+                new Error("Series constructor error");
                 throw new GekkoException();
             }
         }
@@ -181,7 +181,7 @@ namespace Gekko
             //also works for array-subseries
             if (this.name == null && Globals.runningOnTTComputer)
             {
-                G.Writeln2("*** ERROR: Parent db error");
+                new Error("Parent db error");
                 throw new GekkoException();
             }
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
@@ -217,7 +217,7 @@ namespace Gekko
                 int n = GekkoTime.Observations(t1, t2);
                 if (n < 1)
                 {
-                    G.Writeln2("*** ERROR: Attempt to create SERIES with " + n + " observation");
+                    new Error("Attempt to create SERIES with " + n + " observation");
                     throw new GekkoException();
                 }
                 this.data.SetDataarray_ONLY_INTERNAL_USE(new double[n]);  //we make the array as compact as possible --> faster
@@ -228,7 +228,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: SERIES constructor 1");
+                new Error("SERIES constructor 1");
                 throw new GekkoException();
             }
         }
@@ -251,7 +251,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: SERIES constructor 2");
+                new Error("SERIES constructor 2");
                 throw new GekkoException();
             }
         }
@@ -273,7 +273,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: SERIES constructor 4");
+                new Error("SERIES constructor 4");
                 throw new GekkoException();
             }
         }
@@ -295,7 +295,7 @@ namespace Gekko
 
             if (this.type != ESeriesType.Normal)
             {
-                G.Writeln2("*** ERROR: SERIES constructor 3");
+                new Error("SERIES constructor 3");
                 throw new GekkoException();
             }
 
@@ -309,7 +309,7 @@ namespace Gekko
             {
                 if (!this.name.Contains(Globals.freqIndicator))
                 {
-                    G.Writeln2("*** ERROR: Missing freq indicator, see G.AddFreqToName()");
+                    new Error("Missing freq indicator, see G.AddFreqToName()");
                     throw new GekkoException();
                 }
             }
@@ -357,12 +357,12 @@ namespace Gekko
 
             if (start.freq != end.freq)
             {
-                G.Writeln2("*** ERROR: Truncate start and end have different frequencies");
+                new Error("Truncate start and end have different frequencies");
                 throw new GekkoException();
             }
             if (this.freq != start.freq)
             {
-                G.Writeln2("*** ERROR: Series is freq: " + G.GetFreqPretty(this.freq) + ", which is different from truncate freq: " + G.GetFreqPretty(start.freq));
+                new Error("Series is freq: " + G.GetFreqPretty(this.freq) + ", which is different from truncate freq: " + G.GetFreqPretty(start.freq));
                 throw new GekkoException();
             }
             if (this.type == ESeriesType.Timeless) return;
@@ -510,7 +510,7 @@ namespace Gekko
                 //If no data has been added to the timeseries, NaN will always be returned.
                 if (this.type == ESeriesType.ArraySuper)
                 {
-                    G.Writeln2("*** ERROR: The variable '" + this.name + "' is an array-timeseries,");
+                    new Error("The variable '" + this.name + "' is an array-timeseries,");
                     G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
                     Program.ArrayTimeseriesTip(this.name);
                     throw new GekkoException();
@@ -578,13 +578,13 @@ namespace Gekko
 
         private void FreqError(GekkoTime t)
         {
-            G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqPretty(this.freq) + " versus " + G.GetFreqPretty(t.freq));
+            new Error("Frequency mismatch: " + G.GetFreqPretty(this.freq) + " versus " + G.GetFreqPretty(t.freq));
             throw new GekkoException();
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: Type error regarding concat and SERIES");
+            new Error("Type error regarding concat and SERIES");
             throw new GekkoException();
         }
 
@@ -592,7 +592,7 @@ namespace Gekko
         {
             if (this.type != ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #100");
+                new Error("Timeless variable error #100");
                 throw new GekkoException();
             }
             if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -608,7 +608,7 @@ namespace Gekko
         {
             if (this.type != ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #1009");
+                new Error("Timeless variable error #1009");
                 throw new GekkoException();
             }
             if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
@@ -875,7 +875,7 @@ namespace Gekko
             //will also set metadata regarding max-min periods       
             if (this.type == ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #2");
+                new Error("Timeless variable error #2");
                 throw new GekkoException();
             }
             return GetDataSequenceAbstract(out index1, out index2, per1, per2, true, false);
@@ -896,7 +896,7 @@ namespace Gekko
             //will also set metadata regarding max-min periods
             if (this.type == ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #2");
+                new Error("Timeless variable error #2");
                 throw new GekkoException();
             }
             this.SetDirty(true); //we have to mark dirty manually
@@ -924,7 +924,7 @@ namespace Gekko
                                  
             if (this.type == ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #3");
+                new Error("Timeless variable error #3");
                 throw new GekkoException();
             }
             if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -1002,7 +1002,7 @@ namespace Gekko
             //TODO: Implement for array-series
             if (this.type == ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #4");
+                new Error("Timeless variable error #4");
                 throw new GekkoException();
             }
             return GetPeriod(this.meta.firstPeriodPositionInArray);
@@ -1019,7 +1019,7 @@ namespace Gekko
             //TODO: Implement for array-series
             if (this.type == ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #5");
+                new Error("Timeless variable error #5");
                 throw new GekkoException();
             }
             return GetPeriod(this.meta.lastPeriodPositionInArray);
@@ -1096,7 +1096,7 @@ namespace Gekko
 
             if (this.type == ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #7");
+                new Error("Timeless variable error #7");
                 throw new GekkoException();
             }
             //The inverse method is GetArrayIndex()
@@ -1180,7 +1180,7 @@ namespace Gekko
 
             if (gt.freq != anchorPeriod.freq)
             {
-                G.Writeln2("*** ERROR: Frequency mismatch");
+                new Error("Frequency mismatch");
                 throw new GekkoException();
             }
             //this.anchorPeriod.sub is always 1 at the moment, and will always be 1 for Annual.
@@ -1306,7 +1306,7 @@ namespace Gekko
         {
             if (this.type == ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: Timeless error #10");
+                new Error("Timeless error #10");
                 throw new GekkoException();
             }
             else
@@ -1328,7 +1328,7 @@ namespace Gekko
             {
                 if (indexes[i].Type() != EVariableType.String)
                 {
-                    G.Writeln2("*** ERROR: Expected [] indexer element #" + (i + 1) + " to be STRING");
+                    new Error("Expected [] indexer element #" + (i + 1) + " to be STRING");
                     throw new GekkoException();
                 }
                 hash += ((ScalarString)indexes[i]).string2;
@@ -1405,7 +1405,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Internal error #4598243755");
+                new Error("Internal error #4598243755");
                 throw new GekkoException();
             }
 
@@ -1488,7 +1488,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Internal error #4598243756");
+                new Error("Internal error #4598243756");
                 throw new GekkoException();
             }
             return rv_series;
@@ -1776,7 +1776,7 @@ namespace Gekko
             //This is typically used for printing differences
             if (x1_series.dimensions != x2_series.dimensions)
             {
-                G.Writeln2("*** ERROR: The two array-series have different number of dimensions (" + x1_series.dimensions + " vs " + x2_series.dimensions + ")");
+                new Error("The two array-series have different number of dimensions (" + x1_series.dimensions + " vs " + x2_series.dimensions + ")");
                 throw new GekkoException();
             }
 
@@ -1797,7 +1797,7 @@ namespace Gekko
 
             if (keys1.Count != keys2.Count)
             {
-                G.Writeln2("*** ERROR: The two array-series have different number of elements (" + keys1.Count + " vs " + keys2.Count + ")");
+                new Error("The two array-series have different number of elements (" + keys1.Count + " vs " + keys2.Count + ")");
                 throw new GekkoException();
             }
 
@@ -1807,7 +1807,7 @@ namespace Gekko
                 MultidimItem mm2 = keys2[i];
                 if (!mm1.Equals(mm2))
                 {
-                    G.Writeln2("*** ERROR: Non-corresponding elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
+                    new Error("Non-corresponding elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
                     throw new GekkoException();
                 }
                 Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
@@ -1871,7 +1871,7 @@ namespace Gekko
                     List x2_list = x2 as List;
                     if (x2_list.Count() != smpl.Observations12())
                     {
-                        G.Writeln2("*** ERROR: List with " + x2_list.Count() + " elements, expected " + smpl.Observations12() + " elements corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
+                        new Error("List with " + x2_list.Count() + " elements, expected " + smpl.Observations12() + " elements corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
                         throw new GekkoException();
                     }
                     Series ts = new Series(ESeriesType.Light, smpl.t1.Add(-Globals.smplOffset), smpl.t2); //new series light
@@ -1891,7 +1891,7 @@ namespace Gekko
                     Matrix x2_matrix = x2 as Matrix;
                     if (x2_matrix.data.GetLength(0) != smpl.Observations12() || x2_matrix.data.GetLength(1) != 1)
                     {
-                        G.Writeln2("*** ERROR: " + x2_matrix.DimensionsAsString() + " elements, expected a " + smpl.Observations12() + " x 1 matrix corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
+                        new Error("" + x2_matrix.DimensionsAsString() + " elements, expected a " + smpl.Observations12() + " x 1 matrix corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
                         throw new GekkoException();
                     }
                     Series ts = new Series(ESeriesType.Light, smpl.t1.Add(-Globals.smplOffset), smpl.t2);  //new series light
@@ -1914,7 +1914,7 @@ namespace Gekko
             {
                 if (x1.freq != x2_series.freq)
                 {
-                    G.Writeln2("*** ERROR: Frequencies do not match: " + G.GetFreqPretty(x1.freq) + " vs " + G.GetFreqPretty(x2_series.freq));
+                    new Error("Frequencies do not match: " + G.GetFreqPretty(x1.freq) + " vs " + G.GetFreqPretty(x2_series.freq));
                     throw new GekkoException();
                 }
             }
@@ -2094,7 +2094,7 @@ namespace Gekko
                     //why not allow this, really? Would work for 1-dimensional array-series, x['a'] = x[a] = x.a
                     //or maybe just keep disallowing it, because it would be hard to add a new dimension with a lot of x.a without []-parentheses.
                     //also a bit hard to spot that it is an array-series.
-                    G.Writeln2("*** ERROR: Use of dot syntax not possible regarding array-series indexing.");
+                    new Error("Use of dot syntax not possible regarding array-series indexing.");
                     G.Writeln("           Using x.a instead of x['a'] or x[a] would make it harder to spot x as an array-series,", Color.Red);
                     G.Writeln("           adding a dimension would be cumbersome, and the confusion would probably not merit the", Color.Red);
                     G.Writeln("           advantages (that are only present regarding 1-dimensional array-series anyway)", Color.Red);
@@ -2102,7 +2102,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Direct lagging/leading of an arrayseries not yet possible");
+                    new Error("Direct lagging/leading of an arrayseries not yet possible");
                     throw new GekkoException();
                 }
             }
@@ -2185,7 +2185,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: You cannot index " + G.GetFreqPretty(this.freq) + " series with value " + i);
+                            new Error("You cannot index " + G.GetFreqPretty(this.freq) + " series with value " + i);
                             throw new GekkoException();
                         }
                     }
@@ -2195,11 +2195,11 @@ namespace Gekko
                         var temp = Stringlist.GetListOfStringsFromListOfIvariables(indexes);
                         if (temp != null)
                         {
-                            G.Writeln2("*** ERROR: Could not understand index " + this.name + "[" + G.GetListWithCommas(temp) + "]");
+                            new Error("Could not understand index " + this.name + "[" + G.GetListWithCommas(temp) + "]");
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: Could not understand index " + this.name + "[...]");
+                            new Error("Could not understand index " + this.name + "[...]");
                         }
                         throw new GekkoException();
                     }
@@ -2219,7 +2219,7 @@ namespace Gekko
         {
             if (indexes.Length == 0)
             {
-                G.Writeln2("*** ERROR: Indexer has 0 length");
+                new Error("Indexer has 0 length");
                 throw new GekkoException();
             }
             IVariable rv = null;
@@ -2234,7 +2234,7 @@ namespace Gekko
                 {
                     s += iv.Type().ToString() + ", ";
                 }
-                G.Writeln2("*** ERROR: Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
+                new Error("Series []-index with these argument types: " + s.Substring(0, s.Length - (", ").Length));
                 throw new GekkoException();
             }
 
@@ -2252,7 +2252,7 @@ namespace Gekko
                 if (this.dimensionsStorage == null)
                 {
                     string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
-                    G.Writeln2("*** ERROR: The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
+                    new Error("The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
                     G.Writeln("           Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
                     G.Writeln("           You may use '" + this.name + " = series(" + keys.Length + ");' to create it,", Color.Red);
                     G.Writeln("           perhaps with 'CREATE " + this.name + ";' first.", Color.Red);
@@ -2341,7 +2341,7 @@ namespace Gekko
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
                             {
-                                G.Writeln2("*** ERROR: Please use 'OPTION series array calc missing = zero' instead of 'skip'");
+                                new Error("Please use 'OPTION series array calc missing = zero' instead of 'skip'");
                                 throw new GekkoException();
                             }
                             else throw new GekkoException();
@@ -2359,7 +2359,7 @@ namespace Gekko
                         else
                         {
                             //#07549843254
-                            G.Writeln2("*** ERROR: Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + G.GetListWithCommas(keys) + "].");
+                            new Error("Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + G.GetListWithCommas(keys) + "].");
                             G.Writeln("           You may change the settings with the following option:", Color.Red);
                             G.Writeln("           OPTION databank create auto = yes;", Color.Red);
                             throw new GekkoException();
@@ -2392,7 +2392,7 @@ namespace Gekko
                     if (rv == null)
                     {
                         //should not be possible
-                        G.Writeln2("*** ERROR: Array-timeseries element is non-series.");
+                        new Error("Array-timeseries element is non-series.");
                         throw new GekkoException();
                     }
                 }
@@ -2418,7 +2418,7 @@ namespace Gekko
                 }
                 txt += "'" + ss + "', ";
             }
-            G.Writeln2("*** ERROR: The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
+            new Error("The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
             G.Writeln("           [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
             foreach (string warning in warnings)
             {
@@ -2504,26 +2504,26 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot convert a non-timeless SERIES to a VAL");
+                new Error("Cannot convert a non-timeless SERIES to a VAL");
                 throw new GekkoException();
             }
             return v;
         }
 
         public string ConvertToString()        {
-            G.Writeln2("*** ERROR: Cannot convert series to string (series name: '" + this.GetName() + "')");
+            new Error("Cannot convert series to string (series name: '" + this.GetName() + "')");
             throw new GekkoException();
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Cannot convert series to date (series name: '" + this.GetName() + "')");
+            new Error("Cannot convert series to date (series name: '" + this.GetName() + "')");
             throw new GekkoException();
         }
 
         public List<IVariable> ConvertToList()
         {
-            G.Writeln2("*** ERROR: Cannot convert series to list (series name: '" + this.GetName() + "')");
+            new Error("Cannot convert series to list (series name: '" + this.GetName() + "')");
             throw new GekkoException();
         }
 
@@ -2544,7 +2544,7 @@ namespace Gekko
                 if (ts == null)
                 {
                     //Probably not possible, sum() and unfold are on the RHS
-                    G.Writeln2("*** ERROR: indexer on LHS on a null object");
+                    new Error("indexer on LHS on a null object");
                     throw new GekkoException();
                 }
                 O.LookupHelperLeftside(smpl, ts, rhsExpression, EVariableType.Var, options);                
@@ -2556,7 +2556,7 @@ namespace Gekko
                     int i = O.ConvertToInt(indexes[0]);
                     if (this.freq != EFreq.U && IsLagOrLead(i))
                     {
-                        G.Writeln2("*** ERROR: You cannot use index in range -99..99 on a left-hand side series, unless it is of undated freq");
+                        new Error("You cannot use index in range -99..99 on a left-hand side series, unless it is of undated freq");
                         throw new GekkoException();
                     }
 
@@ -2573,7 +2573,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqPretty(this.freq) + " SERIES with [" + i + "]");
+                        new Error("You cannot []-index a " + G.GetFreqPretty(this.freq) + " SERIES with [" + i + "]");
                         throw new GekkoException();
                     }
                 }
@@ -2590,7 +2590,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: A normal series " + this.GetNameAndFreqPretty(true) + " on the left-hand side must be []-indexed with date or val");
+                    new Error("A normal series " + this.GetNameAndFreqPretty(true) + " on the left-hand side must be []-indexed with date or val");
                     throw new GekkoException();
                 }
             }
@@ -2600,7 +2600,7 @@ namespace Gekko
         {
             if (this.type == ESeriesType.Light)
             {
-                G.Writeln2("*** ERROR: Light series cannot be set dirty");
+                new Error("Light series cannot be set dirty");
                 throw new GekkoException();
             }
             else
@@ -2871,7 +2871,7 @@ namespace Gekko
             if (this.storage.ContainsKey(mmi)) this.storage.Remove(mmi);
             else
             {
-                G.Writeln2("*** ERROR: Could not remove variable");
+                new Error("Could not remove variable");
                 throw new GekkoException();
             }
         }
@@ -2887,7 +2887,7 @@ namespace Gekko
         {
             if (left.storage.Length != right.storage.Length)
             {
-                G.Writeln2("*** ERROR: #9843298473");
+                new Error("#9843298473");
                 throw new GekkoException();
             }
             for (int i = 0; i < left.storage.Length; i++)

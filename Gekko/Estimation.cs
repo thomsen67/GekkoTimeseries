@@ -74,7 +74,7 @@ namespace Gekko
             if (lhs_series == null)
             {
                 new Error("Left-hand side should be a SERIES");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             //bool useScale = false; //usually true
@@ -130,7 +130,7 @@ namespace Gekko
                 if (cols != m + 1)
                 {
                     new Error("The impose matrix has " + cols + " cols, expected " + (m + 1));
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 restrict_input = new double[rr.data.GetLength(0), rr.data.GetLength(1)];  //needs to be cloned, otherwise the IMPOSE matrix will be changed with scaling
@@ -165,7 +165,7 @@ namespace Gekko
                 string s = null;
                 if (constant == 1) s = "(including constant) ";
                 new Error("There are " + m + " params " + s + "and " + k + " restrictions with only " + n + " observations");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             OLSRekurInfo rekurInfo = new OLSRekurInfo();
@@ -613,7 +613,7 @@ namespace Gekko
                 catch
                 {
                     new Error("OLS<dump> failed: is the file '" + fileName + "' blocked?");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
         }
@@ -685,7 +685,7 @@ namespace Gekko
             if (d > trendparams.Count)
             {
                 new Error("" + s + "... parameter must be <= " + (trendparams.Count) + " (poly degree)");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -738,7 +738,7 @@ namespace Gekko
                     else
                     {
                         new Error("xflat: syntax error");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
             }
@@ -750,13 +750,13 @@ namespace Gekko
                 if (xtrend.Count > 1)
                 {
                     new Error("xtrend: only 1 element is allowed");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 polydf = G.ConvertToInt(Functions.HelperValConvertFromString(xtrend[0]));
                 if ((polydf < 0))
                 {
                     new Error("xtrend: polynomium cannot be negative");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -767,7 +767,7 @@ namespace Gekko
             if (df_start < 1)
             {
                 new Error("minimum degrees of freedom must be > 0");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             OLSRekurDatas rekur = new OLSRekurDatas(m, df_original - df_start + 1);  //if df_start == 1, this corresponds to index 0 in arrays

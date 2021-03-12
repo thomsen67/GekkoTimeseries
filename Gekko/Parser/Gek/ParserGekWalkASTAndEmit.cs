@@ -124,7 +124,7 @@ namespace Gekko.Parser.Gek
         {
             if (node.Text != "ASTIDENT")
             {
-                G.Writeln2("*** ERROR: #8937524309");
+                new Error("#8937524309");
                 throw new GekkoException();
             }
             return node[0].Text;
@@ -327,7 +327,7 @@ namespace Gekko.Parser.Gek
                                     tmp = node2.Parent;
                                     if (tmp.Text != "ASTASSIGNMENT")
                                     {
-                                        G.Writeln2("*** ERROR: Internal error #32468353233");  //see #32468353233
+                                        new Error("Internal error #32468353233");  //see #32468353233
                                         throw new GekkoException();
                                     }
                                 }
@@ -598,7 +598,7 @@ namespace Gekko.Parser.Gek
                             {
                                 if (node.listLoopAnchor.ContainsKey(s))
                                 {
-                                    G.Writeln2("*** ERROR: The list " + Globals.symbolCollection + s + " is used several times for multidimensional looping in sum() or unfold() function");
+                                    new Error("The list " + Globals.symbolCollection + s + " is used several times for multidimensional looping in sum() or unfold() function");
                                     throw new GekkoException();
                                 }
                                 node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, functionName));
@@ -1171,7 +1171,7 @@ namespace Gekko.Parser.Gek
 
                                     if (!node[ii][0][0].Code.ToString().StartsWith("O.Lookup("))
                                     {
-                                        G.Writeln2("*** ERROR: Internal error #09875209835");
+                                        new Error("Internal error #09875209835");
                                         throw new GekkoException();
                                     }
 
@@ -1193,7 +1193,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    G.Writeln2("*** ERROR: Expected a variable with or without []-indexes");
+                                    new Error("Expected a variable with or without []-indexes");
                                     throw new GekkoException();
                                 }
                                 node.Code.A(la + ".Add(" + helper + "" + ii + ");" + G.NL);
@@ -1687,7 +1687,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    G.Writeln2("*** ERROR: Internal error related to $ on left-hand side");
+                                    new Error("Internal error related to $ on left-hand side");
                                     throw new GekkoException();
                                 }                              
 
@@ -1730,7 +1730,7 @@ namespace Gekko.Parser.Gek
 
                                 if (node.ChildrenCount() > 0)
                                 {
-                                    G.Writeln2("*** ERROR: Return of variable, but not inside function definition");
+                                    new Error("Return of variable, but not inside function definition");
                                     throw new GekkoException();
                                 }
                                 node.Code.A("return;" + G.NL);
@@ -1743,7 +1743,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     if (node.ChildrenCount() > 0)
                                     {
-                                        G.Writeln2("*** ERROR: RETURN <variable> used, should be just RETURN with no variable");
+                                        new Error("RETURN <variable> used, should be just RETURN with no variable");
                                         throw new GekkoException();
                                     }
                                     node.Code.A("return null;" + G.NL);
@@ -1753,7 +1753,7 @@ namespace Gekko.Parser.Gek
                                     //#9807235423 return problem, should it be return true?? C1(), C2(), ...
                                     if (!G.Equal(type, "void"))
                                     {
-                                        G.Writeln2("*** ERROR: RETURN with no variable used, should be RETURN <variable>");
+                                        new Error("RETURN with no variable used, should be RETURN <variable>");
                                         throw new GekkoException();
                                     }
                                     node.Code.A("return;" + G.NL);  //probably the node[0].Code is always empty here (should be)
@@ -1828,7 +1828,7 @@ namespace Gekko.Parser.Gek
                                     GetCodes(node, i, out codeStart, out codeEnd2, out codeStep);
                                     if (loopType == O.ELoopType.ForTo)
                                     {
-                                        G.Writeln2("*** ERROR: You cannot use TO or STEP/BY in a parallel loop");
+                                        new Error("You cannot use TO or STEP/BY in a parallel loop");
                                         throw new GekkoException();
                                     }
                                     node.Code.A(listsname + ".Add(O.ConvertToList(" + codeStart + "))").End();
@@ -1885,7 +1885,7 @@ namespace Gekko.Parser.Gek
                                     }
                                     else
                                     {
-                                        G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                        new Error("Internal error related to BLOCK");
                                         throw new GekkoException();
                                     }
                                 }
@@ -1927,7 +1927,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    G.Writeln2("*** ERROR: Internal error related to BLOCK");
+                                    new Error("Internal error related to BLOCK");
                                     throw new GekkoException();
                                 }
                             }
@@ -2001,7 +2001,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (numberOfOptionalParameters > 0)
                                         {
-                                            G.Writeln2("*** ERROR: Required parameters cannot be stated after optional parameters");
+                                            new Error("Required parameters cannot be stated after optional parameters");
                                             throw new GekkoException();
                                         }
                                     }
@@ -2262,7 +2262,7 @@ namespace Gekko.Parser.Gek
                                 string listName = null;
                                 if (node.listLoopAnchor == null)
                                 {
-                                    G.Writeln2("*** ERROR: Internal error #98973422");
+                                    new Error("Internal error #98973422");
                                     throw new GekkoException();
                                 }
                                 //method def:
@@ -2919,7 +2919,7 @@ namespace Gekko.Parser.Gek
                                     string[] ss = s.Split(new string[] { Globals.objFunctionPlaceholder }, StringSplitOptions.None);
                                     if (ss.Length != 2)
                                     {
-                                        G.Writeln2("*** ERROR: Unexpected function error");
+                                        new Error("Unexpected function error");
                                         throw new GekkoException();
                                     }
 
@@ -3031,7 +3031,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         if (i > 250)
                                         {
-                                            G.Writeln2("*** ERROR: Did not expect so many trailing zeroes: " + node[0].Text);
+                                            new Error("Did not expect so many trailing zeroes: " + node[0].Text);
                                             throw new GekkoException();
                                         }
                                     }
@@ -3042,7 +3042,7 @@ namespace Gekko.Parser.Gek
                                         //if b == 0 here, all chars are '0'. So we just subtract 1 from length
                                         if (node[0].Text.Length > 250)
                                         {
-                                            G.Writeln2("*** ERROR: Did not expect so many trailing zeroes: " + node[0].Text);
+                                            new Error("Did not expect so many trailing zeroes: " + node[0].Text);
                                             throw new GekkoException();
                                         }
                                         b = (byte)(node[0].Text.Length - 1);
@@ -3227,7 +3227,7 @@ namespace Gekko.Parser.Gek
                                 string ivTempVar = SearchUpwardsInTree4(node[0]);
                                 if (ivTempVar == null)
                                 {
-                                    G.Writeln2("*** ERROR: Internal error #7698248427");
+                                    new Error("Internal error #7698248427");
                                     throw new GekkoException();
                                 }
                                 string convertTo = null;
@@ -3454,13 +3454,13 @@ namespace Gekko.Parser.Gek
                                 {
                                     if (child.AlternativeCode == null)
                                     {
-                                        G.Writeln2("*** ERROR: Name is expected. Use {...} to turn a string into a name.");
+                                        new Error("Name is expected. Use {...} to turn a string into a name.");
                                         throw new GekkoException();
                                     }
                                     name = child.AlternativeCode.ToString();
                                     if (name == null || name == "")
                                     {
-                                        G.Writeln2("*** ERROR: Name is expected. Use {...} to turn a string into a name.");
+                                        new Error("Name is expected. Use {...} to turn a string into a name.");
                                         throw new GekkoException();
                                     }
                                 }
@@ -5052,13 +5052,13 @@ namespace Gekko.Parser.Gek
 
             if (rv == null || rv[1] == null)
             {
-                G.Writeln2("*** ERROR: OPTION " + ss7 + " = ... does not exist");
+                new Error("OPTION " + ss7 + " = ... does not exist");
                 throw new GekkoException();
             }
 
             if (!isBlock && rv[0] == "series dyn")
             {
-                G.Writeln2("*** ERROR: You cannot use 'option series dyn ...', use 'block series dyn ...' instead.");
+                new Error("You cannot use 'option series dyn ...', use 'block series dyn ...' instead.");
                 throw new GekkoException();
             }
 
@@ -5198,7 +5198,7 @@ namespace Gekko.Parser.Gek
             if (node.functionDefAnchor == null) node.functionDefAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (node.functionDefAnchor.ContainsKey(s))
             {
-                G.Writeln2("*** ERROR: The variable name " + s + " is used several times in a FUNCTION definition");
+                new Error("The variable name " + s + " is used several times in a FUNCTION definition");
                 throw new GekkoException();
             }
             node.functionDefAnchor.Add(s, Globals.functionArgName + ++Globals.counter);
@@ -5244,7 +5244,7 @@ namespace Gekko.Parser.Gek
             {
                 if (G.Chop_HasSigil(s))
                 {
-                    G.Writeln2("*** ERROR: Did not expect '" + s[0] + "' on variable " + s + x);
+                    new Error("Did not expect '" + s[0] + "' on variable " + s + x);
                     throw new GekkoException();
                 }
             }
@@ -5252,7 +5252,7 @@ namespace Gekko.Parser.Gek
             {
                 if (s[0] != Globals.symbolScalar)
                 {
-                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolScalar + "' on variable " + s + x);
+                    new Error("Expected '" + Globals.symbolScalar + "' on variable " + s + x);
                     throw new GekkoException();
                 }
             }
@@ -5260,7 +5260,7 @@ namespace Gekko.Parser.Gek
             {
                 if (s[0] != Globals.symbolCollection)
                 {
-                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolCollection + "' on variable " + s + x);
+                    new Error("Expected '" + Globals.symbolCollection + "' on variable " + s + x);
                     throw new GekkoException();
                 }
             }
@@ -5469,7 +5469,7 @@ namespace Gekko.Parser.Gek
 
                 if (varname.StartsWith(Globals.symbolCollection.ToString()))
                 {
-                    G.Writeln2("*** ERROR: At present, only scalar variables (%) are allowed as FOR loop variablse");
+                    new Error("At present, only scalar variables (%) are allowed as FOR loop variablse");
                     throw new GekkoException();
                 }
                 

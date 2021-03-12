@@ -172,7 +172,7 @@ namespace Gekko
                 if (file.Contains("/") || file.Contains("\\"))
                 {
                     new Error("'" + file + "' should not contain '/' or '\\'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -207,7 +207,7 @@ namespace Gekko
                 if (!File.Exists(fileNameIndex))
                 {
                     new Error("'" + fileNameIndex + "' was not found");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 File.Copy(fileNameIndex, fileNameIndex2, true);
             }
@@ -1033,7 +1033,7 @@ namespace Gekko
                             else
                             {
                                 new Error("User abort");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                         }
                     }

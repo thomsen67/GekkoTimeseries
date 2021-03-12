@@ -362,7 +362,7 @@ namespace Gekko.Parser.Gek
             if (nGoal != mainCs.Count + methodsCs.Count - nExtra)
             {
                 //Sanity check that nothing is forgotten
-                G.Writeln2("*** ERROR: Technical issue with code-splitting, please use OPTION system code split = 0");
+                new Error("Technical issue with code-splitting, please use OPTION system code split = 0");
                 throw new GekkoException();
             }
 
@@ -534,7 +534,7 @@ namespace Gekko.Parser.Gek
                 }
                 catch (Exception e)
                 {
-                    G.Writeln2("*** ERROR: The parser stumbled unexpectedly with the message: " + s);
+                    new Error("The parser stumbled unexpectedly with the message: " + s);
                     throw new GekkoException();
                 }
                 int lineNo = lineNumber + 1;  //1-based
@@ -545,7 +545,7 @@ namespace Gekko.Parser.Gek
                 }
                 catch (Exception e)
                 {
-                    G.Writeln2("*** ERROR: The parser stumbled unexpectedly with the message: " + s);
+                    new Error("The parser stumbled unexpectedly with the message: " + s);
                     throw new GekkoException();
                 }
 

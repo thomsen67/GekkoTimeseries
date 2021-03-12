@@ -35,7 +35,7 @@ namespace Gekko
                 }
                 if (!G.Equal(extension, "emf") && !G.Equal(extension, "png") && !G.Equal(extension, "svg") && !G.Equal(extension, "pdf"))
                 {
-                    G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png, svg or pdf");
+                    new Error("In PLOT, expected file type is emf, png, svg or pdf");
                     throw new GekkoException();
                 }
                 extension = extension.ToLower().Trim();  //gnuplot does not like upper-case file types
@@ -67,7 +67,7 @@ namespace Gekko
 
             if (count == 0)
             {
-                G.Writeln2("*** ERROR: PLOT called with 0 variables");
+                new Error("PLOT called with 0 variables");
                 throw new GekkoException();
             }
             int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
@@ -319,7 +319,7 @@ namespace Gekko
             if (palette2 == null || palette2.Count == 0)
             {
                 //this should not be possible, but in any case...
-                G.Writeln2("*** ERROR: PLOT gpt palette is empty");
+                new Error("PLOT gpt palette is empty");
                 throw new GekkoException();
             }
 
@@ -462,7 +462,7 @@ namespace Gekko
                 if (s.Trim() == "") continue;  //can contain empty entry
                 if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
                 {
-                    G.Writeln2("*** ERROR: <bold = '...'> must be title, ytitle, xtics, ytics or key");
+                    new Error("<bold = '...'> must be title, ytitle, xtics, ytics or key");
                     throw new GekkoException();
                 }
             }
@@ -485,7 +485,7 @@ namespace Gekko
                 if (s.Trim() == "") continue;  //can contain empty entry
                 if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
                 {
-                    G.Writeln2("*** ERROR: <italic = '...'> must be title, ytitle, xtics, ytics or key");
+                    new Error("<italic = '...'> must be title, ytitle, xtics, ytics or key");
                     throw new GekkoException();
                 }
             }
@@ -1017,7 +1017,7 @@ namespace Gekko
 
             if (Program.options.plot_xlabels_digits != 4 && Program.options.plot_xlabels_digits != 2)
             {
-                G.Writeln2("*** ERROR: 'OPTION plot xlabels digits' should be either 4 or 2");
+                new Error("'OPTION plot xlabels digits' should be either 4 or 2");
                 throw new GekkoException();
             }
 
