@@ -549,7 +549,7 @@ namespace Gekko
                         else
                         {
                             new Error("Month number > 12 not allowed");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                     else if (G.Equal(format, "danish-long"))
@@ -569,7 +569,7 @@ namespace Gekko
                         else
                         {
                             new Error("Month number > 12 not allowed");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                     else if (G.Equal(format, "english-short"))
@@ -589,7 +589,7 @@ namespace Gekko
                         else
                         {
                             new Error("Month number > 12 not allowed");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                     else if (G.Equal(format, "english-long"))
@@ -609,13 +609,13 @@ namespace Gekko
                         else
                         {
                             new Error("Month number > 12 not allowed");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                     else
                     {
                         new Error("OPTION table mdateformat = '" + Program.options.table_mdateformat + "' is not recognized");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     //Sets uppercase on first letter
                     if (!lower) s = char.ToUpper(s[0]) + s.Substring(1);
@@ -1372,12 +1372,12 @@ namespace Gekko
             if (Program.IsOperatorShortBase(printcode))
             {
                 new Error("You cannot use printcode '" + printcode + "' together with TABLE<" + s + ">");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (Program.IsOperatorShortMultiplier(printcode))
             {
                 new Error("You cannot use printcode '" + printcode + "' together with TABLE<" + s + ">");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -1854,7 +1854,7 @@ namespace Gekko
                 if (row.ChildNodes.Count > 0)
                 {
                     new Error("XML table: element '" + row.Name + "' should not have sub-elements");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 if (!xh.isLastRow)
                 {
@@ -1871,7 +1871,7 @@ namespace Gekko
                 if (row.ChildNodes.Count > 1)
                 {
                     new Error("XML table: element '" + row.Name + "' should not have sub-elements");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 if (nodeText != "" && nodeText != "inner" && nodeText != "outer")
@@ -2075,7 +2075,7 @@ namespace Gekko
                         else
                         {
                             new Error("You are trying to put a variable into a column that is not expandable or of 'period' type");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         //G.Writeln(nodeName + ":" + nodeText);
                     }
@@ -2093,7 +2093,7 @@ namespace Gekko
                         else
                         {
                             new Error("You are trying to put a date into a column that is not expandable or of 'period' type");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         //G.Writeln(nodeName + ":" + nodeText);
                     }
@@ -2127,7 +2127,7 @@ namespace Gekko
             if (i < 1 || i > totalBorders)
             {
                 new Error("XML table: <colborderhide> should have numbers between 1 and " + totalBorders + " (inclusive)");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (i < totalBorders)
             {
@@ -2154,7 +2154,7 @@ namespace Gekko
             if (!int.TryParse(input, out parsed))
             {
                 new Error("Could not parse colspan '" + input + "' into an integer");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return parsed;
         }

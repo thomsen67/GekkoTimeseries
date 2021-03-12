@@ -1262,9 +1262,8 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Error("The translator crashed unexpectedly on line " + line[0].line);
-                    G.Writeln("    You may try commenting out that line with //");
-                    throw new GekkoException();
+                    new Error("The translator crashed unexpectedly on line " + line[0].line + ". You may try commenting out that line with //");
+                    //throw new GekkoException();
                 }
             }
 
@@ -1314,9 +1313,9 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Error("The translator crashed unexpectedly on line " + line[0].line);
-                    G.Writeln("    You may try commenting out that line with //");
-                    throw new GekkoException();
+                    new Error("The translator crashed unexpectedly on line " + line[0].line + ". You may try commenting out that line with //");
+
+                    //throw new GekkoException();
                 }
             }
 
@@ -1366,9 +1365,8 @@ namespace Gekko
                 }
                 catch
                 {
-                    new Error("The translator crashed unexpectedly on line " + line[0].line);
-                    G.Writeln("    You may try commenting out that line with //");
-                    throw new GekkoException();
+                    new Error("The translator crashed unexpectedly on line " + line[0].line + ". You may try commenting out that line with //");
+                    //throw new GekkoException();
                 }
             }
 
