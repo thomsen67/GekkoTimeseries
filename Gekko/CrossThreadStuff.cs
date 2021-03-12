@@ -1,4 +1,4 @@
-﻿/*
+/*
     Gekko Timeseries Software (www.t-t.dk/gekko).
     Copyright (C) 2021, Thomas Thomsen, T-T Analyse.
 
@@ -136,11 +136,11 @@ namespace Gekko
             }
             else
             {
-                // It's on the same thread, no need for Invoke                
+                // It's on the same thread, no need for Invoke
                 wrap.Exe2();
             }
         }
-        
+
         //weird delegate pattern, but it works!
         delegate void ZoomCallback();
         public static void Zoom()
@@ -158,7 +158,7 @@ namespace Gekko
             {
                 Gui.gui.textBoxMainTabUpper.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
                 Gui.gui.textBoxMainTabLower.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                Gui.gui.textBoxOutputTab.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));                
+                Gui.gui.textBoxOutputTab.Font = new System.Drawing.Font("Courier New", (float)((double)Program.options.interface_zoom / 100d) * 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             }
         }
 
@@ -175,7 +175,7 @@ namespace Gekko
             {
                 Gui.gui.textBoxMainTabLower.ReadOnly = b;
                 if (b) Gui.gui.textBoxMainTabLower.BackColor = Color.LightGray;
-                else Gui.gui.textBoxMainTabLower.BackColor = Color.White;                
+                else Gui.gui.textBoxMainTabLower.BackColor = Color.White;
             }
         }
 
@@ -183,7 +183,7 @@ namespace Gekko
         delegate void SetTabCallback(string text, bool refreshArrows);
         public static void SetTab(string text, bool refreshArrows)
         {
-            if (G.IsUnitTesting()) return;  //ignore the tab shift            
+            if (G.IsUnitTesting()) return;  //ignore the tab shift
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
@@ -200,7 +200,7 @@ namespace Gekko
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     if (refreshArrows) Gui.gui.GuiBrowseArrowsStuff(null, false, ETabs.Output);
-                }                
+                }
                 if (G.Equal(text, "menu"))
                 {
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMenu;
@@ -235,18 +235,18 @@ namespace Gekko
                 }
                 else if (G.Equal(Program.options.interface_mode, "data"))
                 {
-                    double r = 191; double g = 205; double b = 219; double alpha = 0.00d;                    
+                    double r = 191; double g = 205; double b = 219; double alpha = 0.00d;
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
                 else if (G.Equal(Program.options.interface_mode, "mixed"))
                 {
-                    //double r = 255; double g = 232; double b = 166; double alpha = 0.20d;                    
+                    //double r = 255; double g = 232; double b = 166; double alpha = 0.20d;
                     //double r = 251; double g = 229; double b = 58; double alpha = 0.60d;
-                    double r = 253; double g = 245; double b = 176; double alpha = 0.00d;                    
+                    double r = 253; double g = 245; double b = 176; double alpha = 0.00d;
                     Gui.gui.statusStrip1.BackColor = System.Drawing.Color.FromArgb((int)(r * (1d - alpha) + 255d * alpha), (int)(g * (1d - alpha) + 255d * alpha), (int)(b * (1d - alpha) + 255d * alpha));
                 }
                 else Gui.gui.textBoxMainTabLower.BackColor = System.Drawing.Color.FromArgb(255, 255, 255);
-                
+
             }
         }
 
@@ -257,7 +257,7 @@ namespace Gekko
             if (G.IsUnitTesting())
             {
                 Globals.unitTestScreenOutput = new StringBuilder();  //used to capture text written on the GUI screen, for testing purposes
-                //just ignore it: do not clear the stuff                
+                //just ignore it: do not clear the stuff
                 return;
             }
             if (Gui.gui.textBoxMainTabUpper.InvokeRequired)
@@ -269,7 +269,7 @@ namespace Gekko
             {
                 if (text == "" || text == "main")
                 {
-                    Gui.gui.textBoxMainTabUpper.Clear();                    
+                    Gui.gui.textBoxMainTabUpper.Clear();
                     {
                         //To save memory, these links can no longer be clicked.
                         Globals.linkContainerCounter = 0L;
@@ -283,8 +283,8 @@ namespace Gekko
                 }
                 else if (text == "output")
                 {
-                    Gui.gui.textBoxOutputTab.Clear();                    
-                }                
+                    Gui.gui.textBoxOutputTab.Clear();
+                }
             }
         }
 
@@ -365,7 +365,7 @@ namespace Gekko
             }
         }
 
-        
+
         delegate void ShowPeriodInStatusFieldCallback();
         public static void ShowPeriodInStatusField()
         {
@@ -407,7 +407,7 @@ namespace Gekko
                 Gui.gui.Invoke(new SetCheckedCallback(SetChecked), new object[] { });
             }
             else
-            {                
+            {
                 O.SetChecked();
             }
         }
@@ -447,7 +447,7 @@ namespace Gekko
                 {
                     //w.Close();
                     Globals.ch.windowsDecompCloseCounter++;
-                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??                    
+                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
                 }
             }
             catch { };  //fail silently
@@ -468,7 +468,7 @@ namespace Gekko
                 {
                     //w.Close();
                     Globals.ch.windowsDecompCloseCounter++;
-                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??                    
+                    w.Dispatcher.Invoke(new CloseDelegate(w.Close));  //Why not just w.Close() ??
                 }
             }
             catch { };  //fail silently
@@ -519,7 +519,7 @@ namespace Gekko
                 Globals.ch.windowsDecompUpdateFailedCounter++;
             }
         }
-        
+
         //weird delegate pattern, but it works!
         delegate void CutButtonCallbackEnabled(bool status);
         public static void CutButtonEnabled(bool status)
@@ -550,7 +550,7 @@ namespace Gekko
             {
                 if (Globals.guiTimerCounter % 4 == 0) Gui.gui.toolStripStatusLabel3a.Text = " ";
                 if (Globals.guiTimerCounter % 4 == 3) Gui.gui.toolStripStatusLabel3a.Text = "+";
-                Globals.guiTimerCounter++;                
+                Globals.guiTimerCounter++;
             }
         }
 
@@ -569,11 +569,11 @@ namespace Gekko
                 //The guiTimer2 runs all the time from when the GUI starts
                 //remote.gcm should be run in two cases:
                 // 1. If it already exists and has just been changed
-                // 2. If it pops into existence 
+                // 2. If it pops into existence
                 //It should not be run just because af RESET/RESTART or change of working folder location.
 
                 //At start, Globals.remoteFileStamp is = new DateTime(0l), kind of like = null.
-                
+
                 if (Program.options.interface_remote && Globals.remoteIsInvestigating == false)
                 {
                     bool abort = false;
@@ -608,13 +608,13 @@ namespace Gekko
                             else {
 
                                 Globals.remoteExists = 1;
-                                                                
+
                                 if (Globals.remoteFileStamp.Ticks != 0l && dt.CompareTo(Globals.remoteFileStamp) != 0)
                                 {
                                     //run it
                                     Globals.remoteFileStamp = dt;
                                     //Program.Run(remoteFile, new P());
-                                    RunRemoteFile(remoteFile);                                    
+                                    RunRemoteFile(remoteFile);
                                 }
                                 else
                                 {
@@ -635,7 +635,7 @@ namespace Gekko
                     } //do not let an error crash the whole thing.
                     finally
                     {
-                        Globals.remoteIsInvestigating = false;  //make sure it is false on exit no matter what happens                        
+                        Globals.remoteIsInvestigating = false;  //make sure it is false on exit no matter what happens
                     }
                     if (abort)
                     {
