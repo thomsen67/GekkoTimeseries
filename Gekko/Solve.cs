@@ -433,9 +433,9 @@ namespace Gekko
                 //Fail-fast check of what data is missing in order to simulate
                 if (Program.databanks.GetFirst().storage.Count == 0)
                 {
-                    new Error("There were no variables in the databank. Did you forget to load a databank?");
-                    G.Writeln("           Simulation is aborted");
-                    throw new GekkoException();
+                    new Error("There were no variables in the databank. Did you forget to load a databank? Simulation is aborted");
+
+                    //throw new GekkoException();
                 }
 
                 List<string> missingVariables = new List<string>();
