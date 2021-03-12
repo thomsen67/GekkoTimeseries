@@ -2167,7 +2167,7 @@ namespace Gekko
                 if (cellA1.type == ECellLightType.None)
                 {
                     new Error("No data in position A1");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 transpose = HandlePrnFirstElement(cellA1, rowOffset, colOffset, matrix2);
             }
@@ -2188,14 +2188,14 @@ namespace Gekko
             if (cell.type != ECellLightType.String)
             {
                 new Error("Expected 'date' or 'name' as first element in prn file");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (G.Equal(cell.text.Trim(), "date")) transpose = true; //corresponds to READ<csv cols>, timeseries are in columns.
             else if (G.Equal(cell.text.Trim(), "name")) transpose = false; //corresponds to READ<csv>, timeseries are in rows.
             else
             {
                 new Error("Expected 'date' or 'name' as first element in prn file");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             return transpose;
@@ -2249,12 +2249,12 @@ namespace Gekko
                     if (oRead.openType == EOpenType.Edit)
                     {
                         new Error("OPEN<edit> must be used with 1 databank");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else if (oRead.openType == EOpenType.Ref)
                     {
                         new Error("OPEN<ref> must be used with 1 databank");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
                 if (Program.databanks.ShouldPutBankLast(oRead.openType, oRead.openTypePosition))
@@ -2446,7 +2446,7 @@ namespace Gekko
                         else
                         {
                             new Error("OPEN: The databank '" + originalFileNameWithExtension + "' could not be found (see OPEN<create> if this is intentional).");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                 }
@@ -2462,7 +2462,7 @@ namespace Gekko
                         if (!open)
                         {
                             new Error("OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                 }
@@ -2556,7 +2556,7 @@ namespace Gekko
                     if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
                     {
                         new Error("Date-truncation not yet implemented for undated frequency.");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else
                     {
@@ -2929,7 +2929,7 @@ namespace Gekko
                 else
                 {
                     new Error("The '*' cannot be used in a list of filenames");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -2943,7 +2943,7 @@ namespace Gekko
             else if (counter > 1)
             {
                 new Error("The '*' filename should not be stated in a list of files to open");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -3102,7 +3102,7 @@ namespace Gekko
                 if (listItems.Count == 0 || listItems.Count > 1)
                 {
                     new Error("For SHEET<import " + type.ToString().ToLower() + ">, only 1 name must be provided");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 collectionName = listItems[0];
             }
@@ -3194,7 +3194,7 @@ namespace Gekko
                 if (rr <= 0 || cc <= 0)
                 {
                     new Error("There is not data in the sheet area");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 if (type == ESheetCollection.Matrix)
@@ -3327,7 +3327,7 @@ namespace Gekko
             else
             {
                 new Error("Could not understand spreadsheet cell " + GetExcelCell(row, col, transpose) + " as a number");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return v;
         }
@@ -3493,11 +3493,11 @@ namespace Gekko
                 else if (File.Exists(tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal)) fileName = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal;  //IF the usual name is changed
                 else
                 {
-                    new Error("Could not find data storage file inside zipped databank file");
-                    G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
-                    throw new GekkoException();
+                    new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);
+
+                    //throw new GekkoException();
                 }
-                
+
                 using (FileStream fs = WaitForFileStream(fileName, GekkoFileReadOrWrite.Read))
                 {
                     ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
@@ -3549,9 +3549,9 @@ namespace Gekko
                 catch (Exception e)
                 {
                     new Error("Unexpected technical error while reading " + Globals.extensionDatabank + " databank");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
-                
+
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
             }
@@ -3589,7 +3589,7 @@ namespace Gekko
             if (databank_1_1.storage.Count == 0)
             {
                 new Error("Old databank in " + readInfo.databankVersion + " format has 0 variables");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             deserializedDatabank = new Databank(databank.name);
 
@@ -3836,7 +3836,7 @@ namespace Gekko
                                 catch (Exception e)
                                 {
                                     new Error("Unexpected technical error while merging databanks");
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                             }
                             else
@@ -3875,7 +3875,7 @@ namespace Gekko
                 {
                     //should not be possible since the name has no sigil
                     new Error("Internal error #8974325235");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -4054,7 +4054,7 @@ namespace Gekko
                             catch
                             {
                                 new Error("" + varName + ": could not parse '" + date1 + "' as an int (start year)");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             try
                             {
@@ -4063,7 +4063,7 @@ namespace Gekko
                             catch
                             {
                                 new Error("" + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             if (frequency == "d")
                             {
@@ -4074,7 +4074,7 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("" + varName + ": could not parse '" + date1subsub + "' as an int (start day)");
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                             }
                             try
@@ -4084,7 +4084,7 @@ namespace Gekko
                             catch
                             {
                                 new Error("" + varName + ": could not parse '" + date2 + "' as an int (end year)");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             try
                             {
@@ -4093,7 +4093,7 @@ namespace Gekko
                             catch
                             {
                                 new Error("" + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             if (frequency == "d")
                             {
@@ -4104,7 +4104,7 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("" + varName + ": could not parse '" + date2subsub + "' as an int (end day)");
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                             }
 
@@ -4140,10 +4140,10 @@ namespace Gekko
                                     else
                                     {
 
-                                        new Error("tsd read: the following name is malformed:");
-                                        G.Writeln("         : " + varName);
-                                        G.Writeln("         : The name should contain letters, digits or underscore only");
-                                        throw new GekkoException();
+                                        new Error("tsd read: the following name is malformed: " + varName + ". The name should contain letters, digits or underscore only");
+
+
+                                        //throw new GekkoException();
                                     }
                                 }
 
@@ -4200,7 +4200,7 @@ namespace Gekko
                                     {
                                         new Error("" + varName + ": could not parse '" + toParse + "' as a number");
                                         //sr.Close();
-                                        throw new GekkoException();
+                                        //throw new GekkoException();
                                     }
                                 }
 
@@ -4298,7 +4298,7 @@ namespace Gekko
                     if (linesplit.Length < 3)
                     {
                         new Error("IMPORT<flat>: Expected two dates for series '" + varname + "' (line " + n + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     string per1 = linesplit[1];
@@ -4312,7 +4312,7 @@ namespace Gekko
                     if (gt1.freq != gt2.freq)
                     {
                         new Error("IMPORT<flat>: Dates for series '" + varname + "' have different frequencies (line " + n + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     int obs = GekkoTime.Observations(gt1, gt2);
@@ -4321,25 +4321,25 @@ namespace Gekko
                     if (obs < 1)
                     {
                         new Error("IMPORT<flat>: Invalid time period for series '" + varname + "' (line " + n + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (obs > 10000)
                     {
                         new Error("IMPORT<flat>: More then 10000 periods for series '" + varname + "' (line " + n + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (obs2 == 0)
                     {
                         new Error("IMPORT<flat>: Expected > 0 observations for series '" + varname + "' (line " + n + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (obs != obs2 && obs2 > 1)  //for obs2 = 1, any timeperiod is ok.
                     {
                         new Error("IMPORT<flat>: Expected " + obs + " observations for for series '" + varname + "', got " + obs2 + " (line " + n + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     Series ts = FindOrCreateTimeSeriesInDataBank(databank, varname, gt1.freq);
@@ -4364,7 +4364,7 @@ namespace Gekko
                             catch
                             {
                                 new Error("Could not understand '" + s + "' as a number for series '" + varname + "' (line " + n + ")");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                         }
 
@@ -4514,7 +4514,7 @@ namespace Gekko
                     if (tokens[i + 1].s != "<")
                     {
                         new Error("Expected '<', " + tokens[i + 1].LineAndPosText());
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     string freq2 = tokens[i + 2].s;
@@ -4525,7 +4525,7 @@ namespace Gekko
                     else
                     {
                         new Error("Expected 'ANNUAL', 'QUARTERLY' or 'MONTHLY', " + tokens[i + 2].LineAndPosText());
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     GekkoTime gt1 = GekkoTime.tNull;
@@ -4553,7 +4553,7 @@ namespace Gekko
                     if (tokens[i + 5 + offset].s != ">")
                     {
                         new Error("Expected '>', " + tokens[i + 5 + offset].LineAndPosText());
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     string name1 = tokens[i + 6 + offset].s;
@@ -4561,7 +4561,7 @@ namespace Gekko
                     if (tokens[i + 7 + offset].s != ".")
                     {
                         new Error("Expected '.', " + tokens[i + 7 + offset].LineAndPosText());
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     string name2 = tokens[i + 8 + offset].s;
 
@@ -4580,7 +4580,7 @@ namespace Gekko
                     if (databank.ContainsIVariable(name))
                     {
                         new Error("Dublet series name ('" + name + "')");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     databank.AddIVariable(name, ts);
 
@@ -4599,7 +4599,7 @@ namespace Gekko
                     if (tokens[i + 9 + offset].s != "=")
                     {
                         new Error("Expected '=', " + tokens[i + 9 + offset].LineAndPosText());
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     int counter = -1;
@@ -4635,7 +4635,7 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("Could not understand '" + tokens[j].s + "' as a number, " + tokens[j].LineAndPosText());
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                             }
                             state = 1;
@@ -4650,7 +4650,7 @@ namespace Gekko
                             else if (tokens[j].s != ",")
                             {
                                 new Error("Expected ',', " + tokens[j].LineAndPosText());
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             state = 0;
                         }
@@ -4666,7 +4666,7 @@ namespace Gekko
                     if (tokens[i + 2 + offset].s != ".")
                     {
                         new Error("Expected '.', " + tokens[i + 2 + offset].LineAndPosText());
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     string name2 = tokens[i + 3 + offset].s;
 
@@ -4682,14 +4682,14 @@ namespace Gekko
                     if (databank.ContainsIVariable(name))
                     {
                         new Error("Dublet list name ('" + name + "')");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     databank.AddIVariable(name, lst);
 
                     if (tokens[i + 4 + offset].s != "=")
                     {
                         new Error("Expected '=', " + tokens[i + 4 + offset].LineAndPosText());
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     int counter = -1;
@@ -4713,7 +4713,7 @@ namespace Gekko
                             else if (tokens[j].s != ",")
                             {
                                 new Error("Expected ',', " + tokens[j].LineAndPosText());
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             state = 0;
                         }
@@ -4902,7 +4902,7 @@ namespace Gekko
                     if (fid[antalper - 1] != year1 + antalper - 1)
                     {
                         new Error("Strange error while reading PCIM databank file");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     for (int var = 0; var < fmaxa - 1; var++)  //There are really only fmaxa-1 variables, the last one in navne[] is fake
@@ -5149,13 +5149,13 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("Could not convert '" + temp2 + "' into a number");
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                             }
                             if (ii + jj * dates.Count >= data.Length)
                             {
                                 new Error("More than " + data.Length + " numbers found in data section");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             data[ii + jj * dates.Count] = value;  //i is date, j is variable
                             ii++;
@@ -5239,7 +5239,7 @@ namespace Gekko
                     if (i < 0)
                     {
                         new Error("Expected a '=' in this line: " + line777);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     string s3 = line777.Substring(0, i); s3 = s3.Substring(7); s3 = s3.Substring(0, s3.Length - 2);
@@ -5277,7 +5277,7 @@ namespace Gekko
                     if (names2.Count == 0)
                     {
                         new Error("Expected 1 or more items in this line: " + line);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     codes.Add(names2);
                 }
@@ -5289,7 +5289,7 @@ namespace Gekko
                     if (i < 0)
                     {
                         new Error("Expected a '=' in this line: " + line5);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     string s = line5.Substring(i + 1);
                     //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
@@ -5322,7 +5322,7 @@ namespace Gekko
                     if (values2.Count == 0)
                     {
                         new Error("Expected 1 or more items in this line: " + line5);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     values.Add(values2);
                 }
@@ -5334,7 +5334,7 @@ namespace Gekko
             if (dates.Count == 0)
             {
                 new Error("No time dimension found in px file");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             G.Writeln("    All data read, now putting into series");
@@ -5370,7 +5370,7 @@ namespace Gekko
                     if (gt_start.freq != gt_end.freq)
                     {
                         new Error("Frequency mismatch problem in px file");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (GekkoTime.Observations(gt_start, gt_end) != dates.Count)
@@ -5378,7 +5378,7 @@ namespace Gekko
                         //Guards against holes in the date sequence
                         //Note that gt_start and gt_end may be changed with datesRestrict below
                         new Error("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     int offset = 0;
@@ -5434,7 +5434,7 @@ namespace Gekko
                         if (gt_start.freq != gt_end.freq)
                         {
                             new Error("Frequency mismatch problem in px file");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
 
                         if (GekkoTime.Observations(gt_start, gt_end) != dates.Count)
@@ -5442,9 +5442,9 @@ namespace Gekko
                             //Guards against holes in the date sequence
                             //Note that gt_start and gt_end may be changed with datesRestrict below
                             new Error("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
-                        
+
                         int offset = 0;
                         
                         int obs = GekkoTime.Observations(gt_start, gt_end);
@@ -5649,9 +5649,9 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                new Error("format() function failed. The internal error message is this:");
-                G.Writeln("           " + e.Message);
-                throw new GekkoException();
+                new Error("format() function failed. The internal error message is this: " + e.Message);
+
+                //throw new GekkoException();
             }
             return x;
         }
@@ -5673,9 +5673,9 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                new Error("format() function failed. The internal error message is this:");
-                G.Writeln("           " + e.Message);
-                throw new GekkoException();
+                new Error("format() function failed. The internal error message is this:" +  e.Message);
+
+                //throw new GekkoException();
             }
             return x;
         }
@@ -5924,7 +5924,7 @@ namespace Gekko
             if (ts.freq == EFreq.A)
             {
                 new Error("WRITE <tsp> only implemented for annual data");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             res.WriteLine("smpl " + per1.super + " " + per2.super + ";");
@@ -5965,7 +5965,7 @@ namespace Gekko
             if (Program.options.freq != EFreq.A)
             {
                 new Error("Tsp to tsd conversion only works on annual data");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             res.WriteLine(var2);
             //res.WriteLine("                                 1/ 1/ 10800" + (yr1 + 0) + "0100" + (yr2 + 0) + "0100A  0");
@@ -6182,7 +6182,7 @@ namespace Gekko
                         {
                             new Error("Strange error in gcm file -- please report this to the developer");
                             //throw new GekkoException();
-                            throw;
+                            //throw;
                         }
                     }
                     else
@@ -6922,7 +6922,7 @@ namespace Gekko
                     else
                     {
                         new Error("Could not find matrix " + s);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
             }
@@ -6943,7 +6943,7 @@ namespace Gekko
                 if (fileContent == null)
                 {
                     new Error("the " + programName.ToUpper() + "_FILE is empty");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 foreach (string line in fileContent)
                 {
@@ -6968,7 +6968,7 @@ namespace Gekko
                 if (hit == false)
                 {
                     new Error("Could not find statement 'gekkoimport " + target + "' in the " + programName + " file");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 fileContent.Clear();
@@ -7020,7 +7020,7 @@ namespace Gekko
                 if (Globals.r_fileContent == null)
                 {
                     new Error("No R file defined in R_FILE");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -7086,9 +7086,9 @@ namespace Gekko
 
             if (RPathUsedHere == "[[RDetectFailed]]")
             {
-                new Error("R.exe folder could not be auto-detected.");
-                G.Writeln("           Please state the R.exe folder manually with OPTION r exe folder = ...");
-                throw new GekkoException();
+                new Error("R.exe folder could not be auto-detected. Please state the R.exe folder manually with OPTION r exe folder = ...");
+
+                //throw new GekkoException();
             }
 
             //Now RPathUsedHere is a file path ending with "\Rscript.exe"            
@@ -7313,9 +7313,9 @@ namespace Gekko
 
             if (pythonPathUsedHere == "[[PythonDetectFailed]]")
             {
-                new Error("python.exe path could not be auto-detected.");
-                G.Writeln("           Please state the python.exe path manually with OPTION python exe folder = ...");
-                throw new GekkoException();
+                new Error("python.exe path could not be auto-detected. Please state the python.exe path manually with OPTION python exe folder = ...");
+
+                //throw new GekkoException();
             }
 
             G.Writeln2("----- Python start -----");
@@ -7404,7 +7404,7 @@ namespace Gekko
                     if (G.isNumericalError(v))
                     {
                         new Error("Missing value in '" + ts.name + "', period " + G.FromDateToString(t));
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     //data += t.super + " " + t.sub + " " + v.ToString() + G.NL;
                     data += v.ToString() + G.NL;
@@ -7509,14 +7509,14 @@ namespace Gekko
                                 if (ss.Length != 2)
                                 {
                                     new Error("Error #8907523 in X12A");
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                                 try
                                 {
                                     if (ss[0].Length != 6)
                                     {
                                         new Error("Error #897525 in X12A");
-                                        throw new GekkoException();
+                                        //throw new GekkoException();
                                     }
                                     int i1 = int.Parse(ss[0].Substring(0, 4));
                                     int i2 = int.Parse(ss[0].Substring(4, 2));
@@ -7526,7 +7526,7 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("Error #897524 in X12A");
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
                             }
                             Databank db = ts0.meta.parentDatabank;
@@ -7566,12 +7566,12 @@ namespace Gekko
             if (freq == EFreq.A)
             {
                 new Error("You cannot use X12A on an annual timeseries");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             else if (freq == EFreq.U)
             {
                 new Error("You cannot use X12A on an undated timeseries");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             else if (freq == EFreq.Q)
             {
@@ -8250,7 +8250,7 @@ namespace Gekko
                 if (ts == null)
                 {
                     new Error("Variable '" + var2 + "' does not exist");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else
                 {
@@ -8492,7 +8492,7 @@ namespace Gekko
                     catch (Exception e)
                     {
                         new Error("Table (in html format) could not be written");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     finally
                     {
@@ -8595,7 +8595,7 @@ namespace Gekko
                 catch (Exception e)
                 {
                     new Error("Table (in txt format) could not be written");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 finally
                 {
@@ -8690,7 +8690,7 @@ namespace Gekko
                 if (name_list2.Count != 1)
                 {
                     new Error("List of names not accepted in DECOMP");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 name = name_list2[0];
             }
@@ -8714,7 +8714,7 @@ namespace Gekko
                     if (Program.model.modelGams == null)
                     {
                         new Error("DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     if (Program.model.modelGams.equationsByVarname != null)
                     {
@@ -8729,7 +8729,7 @@ namespace Gekko
                     if (!G.HasModelGekko())
                     {
                         new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     EquationHelper found = DecompEval(decompOptions.variable);
@@ -8786,7 +8786,7 @@ namespace Gekko
             if (found == null)
             {
                 new Error("DECOMP: Could not find variable '" + variable + "' as left-hand side in model");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             string[] ss = found.equationText.Split('=');
 
@@ -8797,7 +8797,7 @@ namespace Gekko
             if (!G.Equal(ss0[0], "frml"))
             {
                 new Error("Model equation '" + variable + "': Equation does not start with 'frml'");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             string lhs = null;
@@ -8854,7 +8854,7 @@ namespace Gekko
                 {
                     //should not happen
                     new Error("Problem with J-factors in equation " + found.lhs);
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -8968,13 +8968,13 @@ namespace Gekko
                 if (!G.HasModelGekko())
                 {
                     new Error("DECOMP: There does not seem to be any model defined");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 if (decompOptions.expressionOld == null && !Program.model.modelGekko.fromVariableToEquationNumber.ContainsKey(leftSideVariable + Globals.lagIndicator + "0"))
                 {
                     new Error("DECOMP: variable '" + leftSideVariable + "' does not exist as left-hand side variable in model");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 Dictionary<string, string> precedents = null;
@@ -9391,7 +9391,7 @@ namespace Gekko
                             else
                             {
                                 new Error("Internal error regarding decomposition");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             bool isRelative = false; //will be divided with lagged or baseline level
                             if (G.Equal(code2, "p") || G.Equal(code2, "bp") || G.Equal(code2, "dp") || G.Equal(code2, "bdp") || G.Equal(code2, "q") || G.Equal(code2, "mp"))
@@ -9528,11 +9528,11 @@ namespace Gekko
                     if (split.Length != 2)
                     {
                         new Error("internal error related to fixed periods");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     //rightSideVariables.Add(split[0], "");
                     new Error("fixed periods (" + split[0] + Globals.leftParenthesisIndicator + split[1] + Globals.rightParenthesisIndicator + ") cannot be used when decomposing");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else
                 {
@@ -9948,7 +9948,7 @@ namespace Gekko
                 if (modelCommentsHelper.infoText != null)
                 {
                     new Error("Model file contains several comment lines starting with 'Info: '");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 modelCommentsHelper.infoText = s3.Substring(6).Trim();
             }
@@ -9959,7 +9959,7 @@ namespace Gekko
                 if (modelCommentsHelper.dateText != null)
                 {
                     new Error("Model file contains several comment lines starting with 'Date: '");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 modelCommentsHelper.dateText = s3.Substring(6).Trim();
             }
@@ -9970,7 +9970,7 @@ namespace Gekko
                 if (modelCommentsHelper.signatureFoundInFileHeader != null)
                 {
                     new Error("Model file contains several comment lines starting with 'Signature: '");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 modelCommentsHelper.signatureFoundInFileHeader = s3.Substring(11).Trim();
             }
@@ -10012,7 +10012,7 @@ namespace Gekko
             if (excelPercentile < 0 || excelPercentile > 1d)
             {
                 new Error("The percentile parameter should be between 0 and 1");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             Array.Sort(sequence);
@@ -10034,7 +10034,7 @@ namespace Gekko
                     if (double.IsNaN(y))
                     {
                         new Error("#9807435237");  //should not happen in .NET 4.0 or higher
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     seq2[i - (x + 1)] = y;
                 }
@@ -11181,31 +11181,31 @@ namespace Gekko
             if (o.readTo != null)
             {
                 new Error("IMPORT<collapse=...> does not work with IMPORT ... TO ...");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (o.opt_ref != null)
             {
                 new Error("IMPORT<collapse=...> does not work with <ref>");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (o.opt_first != null)
             {
                 new Error("IMPORT<collapse=...> does not work with <first>");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (o.opt_merge != null)
             {
                 new Error("IMPORT<collapse=...> does not work with <merge>");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (o.opt_xls == null && o.opt_xlsx == null)
             {
                 new Error("IMPORT<collapse=...> should be used with xls- or xlsx-files");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             string x = "xlsx";
@@ -11256,13 +11256,13 @@ namespace Gekko
                     catch
                     {
                         new Error("Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to be a date");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (temp.Year < 1500 || temp.Year > 2500)
                     {
                         new Error("Cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " does not seem to make sense (year = " + temp.Year + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     dateList.Add(temp);
                 }
@@ -11273,7 +11273,7 @@ namespace Gekko
                 else
                 {
                     new Error("Expected cell " + Program.GetExcelCell(i_dates, j, isTranspose) + " to be date format, is " + c.type.ToString() + ": '" + c.text + "'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -11284,13 +11284,13 @@ namespace Gekko
                 if (c.type != ECellLightType.String)
                 {
                     new Error("Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a string, is " + c.type.ToString());
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 string s = c.text;
                 if (!G.IsSimpleToken(s))
                 {
                     new Error("Expected cell " + Program.GetExcelCell(i, j_names, isTranspose) + " to be a variable name, is '" + s + "'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 nameList.Add(s);
             }
@@ -11390,7 +11390,7 @@ namespace Gekko
             if (i_data < 2 || j_data < 2)
             {
                 new Error("<cell=...> has an illegal value (cannot be first row or column)");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (o.namecell == null)
             {
@@ -11414,13 +11414,13 @@ namespace Gekko
             if (i_data != i_names)
             {
                 new Error("Positions " + o.namecell + " for names and " + o.cell + " for data do not correspond");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (j_data != j_dates)
             {
                 new Error("Positions " + o.datecell + " for names and " + o.cell + " for data do not correspond");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
         
@@ -11463,7 +11463,7 @@ namespace Gekko
             if (!File.Exists(filename))
             {
                 new Error("file '" + filename + "' does not exist");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             Encoding current = null;
@@ -11562,10 +11562,10 @@ namespace Gekko
             if (fileName2 == null)
             {
                 //calling RUN gekko.ini here manually will fail if the file does not exist, which is fine
-                new Error("Could not find file: " + s);                
-                throw new GekkoException();
+                new Error("Could not find file: " + s);
+                //throw new GekkoException();
             }
-            
+
             Program.RunGekkoCommands("", fileName2, (int)o.opt_skip, o.p);
 
             if (G.Equal(s, Globals.autoExecCmdFileName))
@@ -11619,7 +11619,7 @@ namespace Gekko
             if (file == null)
             {
                 new Error("Expected a file name, but it is not defined");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             file = file.Trim(); //Most probably not necessary, but better safe than sorry
             folder = folder.Trim(); //Most probably not necessary, but better safe than sorry
@@ -13056,7 +13056,7 @@ namespace Gekko
                     if (G.Equal(type, "import") || G.Equal(type, "export"))
                     {
                         new Error("You cannot use " + type.ToUpper() + "<respect>");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     //COPY<respect>, READ<respect>, WRITE<respect>
                     truncate = new GekkoSmplSimple(Globals.globalPeriodStart, Globals.globalPeriodEnd);
@@ -13066,7 +13066,7 @@ namespace Gekko
                     if (G.Equal(type, "copy") || G.Equal(type, "read") || G.Equal(type, "write"))
                     {
                         new Error("You cannot use " + type.ToUpper() + "<all>");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     //IMPORT<all> or EXPORT<all>
                     //truncate = new GekkoSmplSimple(true);
@@ -13089,13 +13089,13 @@ namespace Gekko
                 {
                     //READ<2010 2020 respect>
                     new Error("You cannot mix dates and 'respect' in the option field");
-                    throw new GekkoException();                    
-                }                
+                    //throw new GekkoException();                    
+                }
                 else if (G.Equal(all, "yes"))
                 {
                     //IMPORT<2010 2020 all>
                     new Error("You cannot mix dates and 'all' in the option field");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else
                 {
@@ -13310,25 +13310,25 @@ namespace Gekko
                     if (!G.Equal(bankLhs1, bankLhs2))
                     {
                         new Error("You must use the same bankname before and after '..' in a range");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (!G.Equal(freqLhs1, freqLhs2))
                     {
                         new Error("You must use the same freq before and after '..' in a range");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (nameLhs1[0] == Globals.symbolScalar && nameLhs2[0] != Globals.symbolScalar)
                     {
                         new Error("Scalar symbol ('%') should be present both before and after '..'");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (nameLhs1[0] == Globals.symbolCollection && nameLhs2[0] != Globals.symbolCollection)
                     {
                         new Error("Collection symbol ('#') should be present both before and after '..'");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     bankLhs = bankLhs1;
                     nameLhsRange1 = nameLhs1;
@@ -13346,7 +13346,7 @@ namespace Gekko
                         if (bankLhs != null)
                         {
                             new Error("You cannot combine '***' with bank, frequency or index.");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         bankLhs = "*";
                         nameLhs = "**";
@@ -13375,7 +13375,7 @@ namespace Gekko
                     if (lhsHasStarOrQuestion)
                     {
                         new Error("" + command + " with wildcard indexes not yet implemented");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else
                     {
@@ -13456,15 +13456,15 @@ namespace Gekko
             if (reportError && lhsUnfolded.Count == 0)
             {
                 new Error("" + command + " wildcard/range did not match any variables");
-                throw new GekkoException();
-            }            
+                //throw new GekkoException();
+            }
 
             // ------------------------------------------------------------
             // Now the variables have been found
             // Next is which variables they (maybe) are
             // matched with, for instance with COPY or RENAME.
             // ------------------------------------------------------------
-            
+
             if (type == EWildcardSearchType.Search || type == EWildcardSearchType.Delete)
             {
                 for (int i = 0; i < lhsUnfolded.Count; i++)
@@ -13481,14 +13481,14 @@ namespace Gekko
                     {
                         //Such assignment is too error-prone, like "COPY x* TO a, b, c;"
                         new Error("Using wildcards before TO/AS, you must state a single wildcard element after TO/AS");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else
                     {
                         if (lhs.Count != rhs.Count)
                         {
                             new Error("Mismatch: there are " + lhs.Count + " elements before TO/AS, and " + rhs.Count + " elements after TO/AS");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                 }
@@ -13519,13 +13519,13 @@ namespace Gekko
                     if (name2split.Length - 1 > 1)
                     {
                         new Error("More than one '*' not allowed in name in TO/AS part of " + command + "");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if ((bankRhs != null && bankRhs.Contains("?")) || nameRhs.Contains("?"))
                     {
                         new Error("'?' not not allowed in TO/AS part of " + command + "");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (bankRhs == null)
@@ -13562,7 +13562,7 @@ namespace Gekko
                         if (!G.IsSimpleToken(bankRhs))
                         {
                             new Error("Illegal bankname in TO/AS part of " + command + "");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
 
                         //fixed bank given in second part
@@ -13586,7 +13586,7 @@ namespace Gekko
                         if (bankRhs != "*")
                         {
                             new Error("Only simple '*' allowed in TO/AS part of " + command + "");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
 
                         //original bank stated in second part
@@ -13618,12 +13618,12 @@ namespace Gekko
                     {
                         //Copying to "itself" (that is, the databank) is fine for WRITE
                         new Error("You cannot " + command2 + " element '" + two.s1 + "' to itself");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     if (lhsCheck.ContainsKey(two.s1))
                     {
                         new Error("Dublet: element '" + two.s1 + "' appears several times before TO/AS");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else
                     {
@@ -13646,7 +13646,7 @@ namespace Gekko
                             ss = G.Chop_RemoveBank(ss);
                         }
                         new Error("The variables " + G.GetListWithCommas(temp) + " are all " + command3 + " to " + ss);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else
                     {
@@ -13661,13 +13661,13 @@ namespace Gekko
                         if (!two.s1.Contains(Globals.symbolBankColon) || !two.s2.Contains(Globals.symbolBankColon))
                         {
                             new Error("Internal error #08745765398475");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         if ((!G.Chop_HasSigil(two.s1) && !two.s1.Contains(Globals.freqIndicator)) || (!G.Chop_HasSigil(two.s2) && !two.s2.Contains(Globals.freqIndicator)))
                         {
                             new Error("Internal error #08745765398475");
-                            throw new GekkoException();
-                        }                        
+                            //throw new GekkoException();
+                        }
                     }
 
                 }  //end of foreach (TwoStrings two in outputs)
@@ -13805,9 +13805,9 @@ namespace Gekko
             if (wildcardName.Contains("."))
             {
                 new Error("Wildcards contains a '.' --> please use '!' to indicate frequency");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
-            
+
             //For each matching databank
             List<string> varsMatched = new List<string>();
             List<string> allVariablesInBank = new List<string>();
@@ -13823,8 +13823,8 @@ namespace Gekko
                 if (wildcardFreq != null)
                 {
                     new Error("You cannot combine '**' wildcard with frequency");
-                    throw new GekkoException();
-                }                
+                    //throw new GekkoException();
+                }
                 foreach (string s in allVariablesInBank)
                 {
                     varsMatched.Add(bankname + Globals.symbolBankColon + s);
@@ -13980,7 +13980,7 @@ namespace Gekko
             if (!G.HasModelGekko())
             {
                 new Error("No model is defined for endogenization");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             Globals.hasBeenEndoExoStatementsSinceLastSim = 1;
@@ -14001,7 +14001,7 @@ namespace Gekko
                 if (Program.model.modelGekko.endogenized.ContainsKey(var))
                 {
                     new Error("" + var + " is already endogenized");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else Program.model.modelGekko.endogenized.Add(var, "");
 
@@ -14051,7 +14051,7 @@ namespace Gekko
             if (!G.HasModelGekko())
             {
                 new Error("No model is defined for exogenization");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             Globals.hasBeenEndoExoStatementsSinceLastSim = 1;
@@ -14070,7 +14070,7 @@ namespace Gekko
                 if (Program.model.modelGekko.exogenized.ContainsKey(var))
                 {
                     new Error("" + var + " is already exogenized");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else Program.model.modelGekko.exogenized.Add(var, "");
             }
@@ -14089,7 +14089,7 @@ namespace Gekko
             if (!G.HasModelGekko())
             {
                 new Error("DIP<info> command requires a model -- seems no model is defined");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             List<string> list = Stringlist.GetListOfStringsFromList(list2);
@@ -14097,7 +14097,7 @@ namespace Gekko
             if (!(tStart.super == tEnd.super && tStart.sub == tEnd.sub))
             {
                 new Error("DISP<info> must be called with identical start and end date");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             foreach (string var2 in list)
             {
@@ -14157,7 +14157,7 @@ namespace Gekko
                     catch
                     {
                         new Error("Failed to show list");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
                 else
@@ -14169,7 +14169,7 @@ namespace Gekko
             else
             {
                 new Error("Internal error #8794372264");
-                throw new GekkoException();                
+                //throw new GekkoException();                
             }
             return;
         }
@@ -14200,7 +14200,7 @@ namespace Gekko
             if (iv == null)
             {
                 new Error("List " + Globals.symbolCollection + m + " was not found");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             List<string> a1 = Stringlist.GetListOfStringsFromList(iv);
 
@@ -14399,9 +14399,9 @@ namespace Gekko
                 Program.GuiSetModelName();
                 if (Program.model.modelGekko.largestLead != Program.model.modelGekko.largestLeadOutsideRevertedPart)
                 {
-                    new Error("There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest");
-                    G.Writeln("           lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables", Color.Red);
-                    throw new GekkoException();
+                    new Error("There is a lead [+" + Program.model.modelGekko.largestLead + "] in one of the X- or Y-equations that is larger than the largest lead elsewhere in the model [+" + Program.model.modelGekko.largestLeadOutsideRevertedPart + "]. Please use T-equations for such variables");
+
+                    //throw new GekkoException();
                 }
                 parsingSeconds = G.Seconds(t1);
                 Parser.Frm.ParserFrmCompileAST.ParserFrmOrderAndCompileAST(ECompiledModelType.Gauss, true, false);  //default.
@@ -14724,13 +14724,13 @@ namespace Gekko
             if(pause && fileName!=null)
             {
                 new Error("You should use PIPE<pause> without a filename");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (continue2 && fileName != null)
             {
                 new Error("You should use PIPE<continue> without a filename");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (G.Equal(fileName, "con") || stop)   //PIPE con, or PIPE<stop>
@@ -14877,7 +14877,7 @@ namespace Gekko
             if (i == -1)
             {
                 new Error("Could not find </body> tag in the html file.");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             G.SplitString(out s1, out s2, s, i);
             //new we have:
@@ -14897,7 +14897,7 @@ namespace Gekko
                 if (k == -1)
                 {
                     new Error("No <body> tag found in html file");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 string s1a, s1b;
                 G.SplitString(out s1a, out s1b, s1, k);
@@ -15087,7 +15087,7 @@ namespace Gekko
             if (!G.HasModelGekko())
             {
                 new Error("No model is defined for trimming, cf. MODEL command.");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             List<Databank> banks = new List<Databank> { Program.databanks.GetFirst(), Program.databanks.GetRef() };
@@ -15384,7 +15384,7 @@ namespace Gekko
             else
             {
                 new Error("Expected 'yes' or 'no', not '" + opt + "'");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return rv;
         }
@@ -15400,9 +15400,9 @@ namespace Gekko
             if (!G.HasModelGekko())
             {
                 new Error("No model seems to be defined, see MODEL command.");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
-            
+
             bool hasContent = false;
             
             Table tab = new Table();
@@ -15452,9 +15452,9 @@ namespace Gekko
                         EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
                         if (found == null)
                         {
-                            G.Writeln();
+                            //G.Writeln();
                             new Error("ITERSHOW: Variable " + var + " is not endogenous");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         int i = found.bNumberLhs;
                         //G.Writeln("per " + t.ToString() + " it " + it + " bef " + bBefore[i] + " aft " + bAfter[i]);
@@ -15587,10 +15587,10 @@ namespace Gekko
                 {
                     if (!gt.StrictlyLargerThan(gtLag))
                     {
-                        G.Writeln();
-                        new Error("TIMEFILTER sequence problem: '" + G.FromDateToString(gtLag) + "' should be larger than '" + G.FromDateToString(gt) + "'");
-                        G.Writeln("           Please check your TIMEFILTER command", Color.Red);
-                        throw new GekkoException();
+                        //G.Writeln();
+                        new Error("TIMEFILTER sequence problem: '" + G.FromDateToString(gtLag) + "' should be larger than '" + G.FromDateToString(gt) + "'. Please check your TIMEFILTER command");
+
+                        //throw new GekkoException();
                     }
                     else
                     {
@@ -15870,12 +15870,12 @@ namespace Gekko
             if (op == "#")
             {
                 new Error("The '#' operator is not supported in EXPORT<series>");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (G.Equal(op, "mp"))
             {
                 new Error("The 'mp' operator is not supported in EXPORT<series>");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             int type = 0;
@@ -15884,19 +15884,19 @@ namespace Gekko
             if (type == 0)
             {
                 new Error("Operator type '" + op + "' not recognized");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
-                        
+
             Databank base2 = Program.databanks.GetRef();
 
             file = G.AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
             if (File.Exists(pathAndFilename))
             {
-                new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists");
-                G.Writeln("           Please remove it, for instance with SYS 'del <filename>';", Color.Red);
-                G.Writeln("           This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " command file.", Color.Red);
-                throw new GekkoException();
+                new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " command file.");
+
+
+                //throw new GekkoException();
             }
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -15997,9 +15997,9 @@ namespace Gekko
         {            
             if (!(Program.options.freq == EFreq.A))
             {
-                G.Writeln();
+                //G.Writeln();
                 new Error("Index functions only work for annual frequency at the moment");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             int indexYearI = -12345;
@@ -16159,11 +16159,11 @@ namespace Gekko
             
             if (writeType == EDatabankWriteType.Tsdx)
             {
-                new Error("You cannot use <tsdx>. The extension name has changed to ." + Globals.extensionDatabank + ".");
-                G.Writeln("           If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file,", Color.Red);
-                G.Writeln("           and rename that file to .tsdx afterwards.", Color.Red);
-                G.Writeln();
-                throw new GekkoException();
+                new Error("You cannot use <tsdx>. The extension name has changed to ." + Globals.extensionDatabank + ". If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file, and rename that file to .tsdx afterwards.");
+
+
+                //G.Writeln();
+                //throw new GekkoException();
             }
 
             bool isDefault = false;
@@ -16321,7 +16321,7 @@ namespace Gekko
                     if (fileName == null || fileName.Trim() == "")
                     {
                         new Error("Please indicate a file name for EXPORT<series>");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     Program.WriteGcm(listFilteredForCurrentFreq, tStart, tEnd, o.opt_op, fileName);
@@ -16334,7 +16334,7 @@ namespace Gekko
                     if (fileName == null || fileName.Trim() == "")
                     {
                         new Error("Please indicate a file name for EXPORT<gdx>");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     string file = G.AddExtension(fileName, "." + "gdx");
@@ -16356,7 +16356,7 @@ namespace Gekko
                     if (fileName == null || fileName.Trim() == "")
                     {
                         new Error("Please indicate a file name for EXPORT<arrow>");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     string file = G.AddExtension(fileName, "." + "arrow");
@@ -16400,13 +16400,13 @@ namespace Gekko
                     else
                     {
                         new Error("Unknown databank format");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
                 else
                 {
                     new Error("Unknown databank format");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             finally
@@ -16424,7 +16424,7 @@ namespace Gekko
             if (variablesType == EVariablesForWrite.OneNonSeries)
             {
                 new Error("The format can not be used to EXPORT matrices");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -16464,7 +16464,7 @@ namespace Gekko
             if (o.fileName == null)
             {
                 new Error("You must state a filename with FILE = ...");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
@@ -16478,18 +16478,18 @@ namespace Gekko
                     if (!s.StartsWith(Globals.symbolCollection.ToString()))
                     {
                         new Error("EXPORT<r>: expected all list items to start with '#'");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     IVariable iv = null; iv = Program.databanks.GetFirst().GetIVariable(s);
                     if (iv == null)
                     {
                         new Error("" + s + " does not exist");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     if (iv.Type() != EVariableType.Matrix)
                     {
                         new Error("" + s + " is not a matrix");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     Matrix m = (Matrix)iv;
                     file.WriteLine(Program.MatrixFromGekkoToROrPython<double>(s.Substring(1), m.data, 0));
@@ -16511,7 +16511,7 @@ namespace Gekko
             if (o.fileName == null)
             {
                 new Error("You must state a filename with FILE = ...");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
@@ -16525,18 +16525,18 @@ namespace Gekko
                     if (!s.StartsWith(Globals.symbolCollection.ToString()))
                     {
                         new Error("EXPORT<python>: expected all list items to start with '#'");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     IVariable iv = null; iv = Program.databanks.GetFirst().GetIVariable(s);
                     if (iv == null)
                     {
                         new Error("" + s + " does not exist");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     if (iv.Type() != EVariableType.Matrix)
                     {
                         new Error("" + s + " is not a matrix");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     Matrix m = (Matrix)iv;
                     file.WriteLine(Program.MatrixFromGekkoToROrPython<double>(s.Substring(1), m.data, 1));
@@ -16556,7 +16556,7 @@ namespace Gekko
             if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
             {
                 new Error("No variables to write");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -16802,9 +16802,9 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        new Error("Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
-                        G.Writeln("           Message: " + e.Message, Color.Red);
-                        throw;
+                        new Error("Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers). Message: " + e.Message);
+
+                        //throw;
                     }
 
                 }
@@ -16841,8 +16841,8 @@ namespace Gekko
                 if (isCloseCommand)
                 {
                     new Error("Closed TSD databank was changed but cannot be written back");
-                    throw new GekkoException();
-                }                
+                    //throw new GekkoException();
+                }
             }
 
             file = G.StripQuotes(file);
@@ -16892,7 +16892,7 @@ namespace Gekko
             if (databank.storage.Count == 0)
             {
                 new Error("Databank is empty");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             file = G.StripQuotes(file);
@@ -17125,7 +17125,7 @@ namespace Gekko
             if (!Directory.Exists(path_zipFileName))
             {
                 new Error("The directory '" + path_zipFileName + "' does not seem to exist");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
@@ -17234,9 +17234,9 @@ namespace Gekko
             if (xmlFile == "")
             {
                 new Error("Cannot find xml-file inside zip-file. Expected to find '" + "DatabankInfo.xml" + "' inside '" + originalFileName + "'");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
-            
+
             if (isProtobuf)
             {                
                 tsdFile = Globals.isAProto;  //okay, this is a hacky way to signal back...
@@ -17252,14 +17252,14 @@ namespace Gekko
                 if (tsdfilecounter > 1)
                 {
                     new Error("Found several tsd-files inside zip-file. Cannot decide which one to use");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 if (tsdFile == "")
                 {
                     new Error("Cannot find tsd-file inside zip-file. Expected to find '" + inside + "' inside '" + originalFileName + "'");
-                    throw new GekkoException();
-                }                             
+                    //throw new GekkoException();
+                }
             }
 
             return tsdFile;
@@ -17354,7 +17354,7 @@ namespace Gekko
                     if (Directory.Exists(pathAndFilename))
                     {
                         new Error("There exists a folder with the same name: " + pathAndFilename);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (pathName != "")  //sometimes pathAndFilename may be just the filename??
@@ -17362,7 +17362,7 @@ namespace Gekko
                         if (!Directory.Exists(pathName))
                         {
                             new Error("Could not find directory '" + pathName + "' for writing");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                 }
@@ -17391,7 +17391,7 @@ namespace Gekko
             if (fs == null)
             {
                 new Error("Gave up on file '" + pathAndFilename + "'. Is it blocked by another program?");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return fs;
         }
@@ -17411,14 +17411,14 @@ namespace Gekko
             if (!(type == "copy" || type == "delete"))
             {
                 new Error("Sorry, internal Gekko error #837432");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             string dir = Path.GetDirectoryName(pathAndFilenameDestination);
             if (type == "copy" && !Directory.Exists(dir))
             {
                 new Error("The folder " + dir + " does not exist for file copying");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             int gap = Globals.waitFileGap;  //2 second
@@ -17478,7 +17478,7 @@ namespace Gekko
                 {
                     new Error("Gave up on deleting file '" + pathAndFilenameSource + "'. Is it opened/blocked by another program?");
                 }
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return;
         }
@@ -17754,7 +17754,7 @@ namespace Gekko
             if (db == null)
             {
                 new Error("Databank '" + bankName + "' not found");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return db;
         }
@@ -17814,7 +17814,7 @@ namespace Gekko
                     if (ts == null)
                     {
                         new Error("Variable '" + var.s1 + "' is of wrong type");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     file.Write(G.varFormat(G.Chop_GetName(var.s2), prnWidth));  //prn and gnuplot
                 }
@@ -17916,7 +17916,7 @@ namespace Gekko
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
                         new Error("Writing tsp file: variable " + var.s1 + " does not exist");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     WriteTspRecord(per1, per2, file, ts, var.s2, isCaps);
                     counter++;
@@ -18014,7 +18014,7 @@ namespace Gekko
                     if (o.names != null && (o.opt_first != null || o.opt_ref != null))
                     {
                         new Error("You should use 'CLEAR<first>;' or  'CLEAR<ref>;'");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (o.names != null)
@@ -18022,7 +18022,7 @@ namespace Gekko
                         if (Program.databanks.GetDatabank(name) == null)
                         {
                             new Error("Trying to clear non-existing databank '" + name + "'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
 
                         Databank db1 = Program.databanks.GetDatabank(name);
@@ -18058,8 +18058,8 @@ namespace Gekko
                 else if (!removed.editable)
                 {
                     new Error("Internal error #872543: a non-editable bank '" + removed.name + "' should not be possible to alter.");
-                    throw new GekkoException();
-                }                
+                    //throw new GekkoException();
+                }
                 else
                 {
                     Program.WriteRemovedDatabank(removed);
@@ -18790,7 +18790,7 @@ namespace Gekko
             if (o.opt_rel != 0d && o.opt_pch != 0d)
             {
                 new Error("You cannot use <rel> and <pch> at the same time");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             double rel = o.opt_rel;
             if (o.opt_pch != 0d) rel = o.opt_pch / 100d;
@@ -18904,7 +18904,7 @@ namespace Gekko
             if (lhs.list.Count != rhs.list.Count)
             {
                 new Error("" + lhs.list.Count + " items on left, " + rhs.list.Count + " items on right");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             List<string> xlhs = O.Restrict(lhs, true, false, true, true);
@@ -18913,7 +18913,7 @@ namespace Gekko
             if (xlhs.Count != xrhs.Count)
             {
                 new Error("Internal error #89353245");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             for (int i = 0; i < xlhs.Count; i++)
@@ -18933,7 +18933,7 @@ namespace Gekko
                 if (eFreq0 == EFreq.U || eFreq1 == EFreq.U)
                 {
                     new Error("COLLAPSE cannot involve undated timeseries");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries
@@ -18970,7 +18970,7 @@ namespace Gekko
                         else
                         {
                             new Error("wrong method in COLLAPSE: " + method + "'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                 }
@@ -19005,7 +19005,7 @@ namespace Gekko
                         else
                         {
                             new Error("wrong method in COLLAPSE: " + method + "'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                 }
@@ -19079,28 +19079,28 @@ namespace Gekko
                         {
                             //TODO: first with data?
                             new Error("Option 'first' not yet implemented for daily collapse");
-                            throw new GekkoException();
-                            if (t.subsub == 1) ts_lhs.SetData(tLowFreq, value);
+                            //throw new GekkoException();
+                            //if (t.subsub == 1) ts_lhs.SetData(tLowFreq, value);
                         }
                         else if (G.Equal(method, "last"))
                         {
                             //TODO: last with data?
                             new Error("Option 'last' not yet implemented for daily collapse");
-                            throw new GekkoException();
-                            if (t.subsub == G.DaysInMonth(t.super, t.sub)) ts_lhs.SetData(tLowFreq, value);
+                            //throw new GekkoException();
+                            //if (t.subsub == G.DaysInMonth(t.super, t.sub)) ts_lhs.SetData(tLowFreq, value);
                         }
                         else
                         {
                             new Error("wrong method in COLLAPSE: " + method + "'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
-                     
+
                     }
                 }
                 else
                 {
                     new Error("Cannot COLLAPSE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 G.ServiceMessage("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
@@ -19122,7 +19122,7 @@ namespace Gekko
             if (lhs.list.Count != rhs.list.Count)
             {
                 new Error("" + lhs.list.Count + " items on left, " + rhs.list.Count + " items on right");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             List<string> xlhs = O.Restrict(lhs, true, false, true, true);
@@ -19131,7 +19131,7 @@ namespace Gekko
             if (xlhs.Count != xrhs.Count)
             {
                 new Error("Internal error #89353245");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             for (int ii = 0; ii < xlhs.Count; ii++)
@@ -19183,7 +19183,7 @@ namespace Gekko
                         else
                         {
                             new Error("wrong method in INTERPOLATE: '" + method + "'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                     else if (eFreq1 == EFreq.M && eFreq0 == EFreq.A)
@@ -19208,7 +19208,7 @@ namespace Gekko
                         else
                         {
                             new Error("wrong method in INTERPOLATE: " + method + "'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                     else if (eFreq1 == EFreq.M && eFreq0 == EFreq.Q)
@@ -19235,14 +19235,14 @@ namespace Gekko
                         else
                         {
                             new Error("wrong method in INTERPOLATE: " + method + "'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
 
                     }
                     else
                     {
                         new Error("Cannot INTERPOLATE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
                 //G.Writeln("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
@@ -19259,7 +19259,7 @@ namespace Gekko
             if (databank1 == null)
             {
                 new Error("Databank '" + b1 + "' not found");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             return databank1;
@@ -19333,9 +19333,9 @@ namespace Gekko
             else
             {
                 new Error("Expected indices to be of string or list type");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
-            if(depth > 0) stack.Pop();
+            if (depth > 0) stack.Pop();
             return;
         }
 
@@ -19494,7 +19494,7 @@ namespace Gekko
                 else
                 {
                     new Error("Can only use SERIES, VAL, 1x1 MATRIX, or LISTs with these");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             return xlistUnfolded;
@@ -19633,7 +19633,7 @@ namespace Gekko
                     if (G.isNumericalError(d))
                     {
                         new Error("Correlation cannot be computed due to missing values");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
 
@@ -20370,13 +20370,13 @@ namespace Gekko
                 if (!isMulprt && operators.Count == 1 && G.Equal(operators[0], "lev"))
                 {
                     new Error("PRT<lev> is not legal: use PRT<abs> to print absolute levels");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 if (isMulprt && operators.Count == 1 && (G.Equal(operators[0], "dif") || G.Equal(operators[0], "diff")))
                 {
                     new Error("MULPRT<dif> is not legal: use MULPRT<abs> to print multiplier differences");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 if (ope != null && ope.operators != null && ope.operators.Count > 0)
@@ -20394,7 +20394,7 @@ namespace Gekko
                         else
                         {
                             new Error("Operator = '" + ts.s2 + "' should be 'yes' or 'no'");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                 }
@@ -20424,7 +20424,7 @@ namespace Gekko
                 else
                 {
                     new Error("Operator = '" + ts.s2 + "' should be 'yes' or 'no' or 'append'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             return operatorsGlobal;
@@ -20962,7 +20962,7 @@ namespace Gekko
             if (table == null)
             {
                 new Error("No print or table recorded to put on clipboard");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             StringBuilder s = new StringBuilder();
 
@@ -21278,7 +21278,7 @@ namespace Gekko
             if (!(G.Equal(Program.databanks.GetFirst().name, Globals.Work) && G.Equal(Program.databanks.GetRef().name, Globals.Ref)))
             {
                 new Error("Please use Work and " + Globals.Ref + " as first and reference databanks");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             //In the method below, any memory vars of VAL type will be removed
             //if (isCalledFromGenr) SubstituteAssignVarsInPrecedents(precedents);  //a bit slow for GENR maybe... for PRT etc. it has already been called when this method is called
@@ -21510,7 +21510,7 @@ namespace Gekko
                 if (!G.TryParseIntoDouble(x, out y))
                 {
                     new Error("Could not parse '" + x + "' as a number");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             return y;
@@ -21722,7 +21722,7 @@ namespace Gekko
                 if (operator3 == "")
                 {
                     new Error("TABLE <" + Globals.tableOption + "> and table-file operator '" + operator2 + "' do not combine");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -21839,7 +21839,7 @@ namespace Gekko
             else
             {
                 new Error("Internal error: unrecognized print code: '" + operator3 + "'");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return;
         }
@@ -21900,7 +21900,7 @@ namespace Gekko
                     if (po.isBaseline)
                     {
                         new Error("It is not meaningful to use 'pch', 'multiplier' and 'reference' at the same time");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     var1 = ((tsWork.GetDataSimple(gt) / tsBase.GetDataSimple(gt) - 1d) * 100d);
                     if (tsWork.GetDataSimple(gt) == tsBase.GetDataSimple(gt)) var1 = 0d;     //0 and 0 gives 0%
@@ -21919,7 +21919,7 @@ namespace Gekko
                     if (po.isBaseline)
                     {
                         new Error("It is not meaningful to use 'diff', 'multiplier' and 'reference' at the same time");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     var1 = tsWork.GetDataSimple(gt) - tsBase.GetDataSimple(gt);
                     varPch = ((tsWork.GetDataSimple(gt) / tsBase.GetDataSimple(gt) - 1d) * 100d);
@@ -21938,7 +21938,7 @@ namespace Gekko
                     if (po.isBaseline)
                     {
                         new Error("It is not meaningful to use 'dlog', 'multiplier' and 'reference' at the same time");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     var1 = Math.Log(tsWork.GetDataSimple(gt) / tsBase.GetDataSimple(gt));
                 }
@@ -22002,7 +22002,7 @@ namespace Gekko
             else
             {
                 new Error("Strange error #793438734");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -22277,7 +22277,7 @@ namespace Gekko
                     if (y0a == null)
                     {
                         new Error("DECOMP expects the expression to be of series type");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     Series y0_series = y0a_series;
                     if (y0a_series.type != ESeriesType.Light)
@@ -22301,7 +22301,7 @@ namespace Gekko
                         if (y0aRef == null)
                         {
                             new Error("DECOMP expects the expression to be of series type");
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                         y0Ref_series = y0aRef_series;
                         if (y0aRef_series.type != ESeriesType.Light)
@@ -22805,7 +22805,7 @@ namespace Gekko
                 if (vars2.Count == 0)
                 {
                     new Error("Did not find variable '" + varname + "' in the equation " + expressionText);
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 foreach (string var in vars)
                 {
@@ -23017,7 +23017,7 @@ namespace Gekko
             if (xCols != yRows)
             {
                 new Error("Matrices do not conform for multiplication");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             double[,] z = new double[xRows, yCols];
             for (int i = 0; i < xRows; i++)
@@ -23450,10 +23450,10 @@ namespace Gekko
         {
             if (fileNameWithPath != null && G.Equal(Path.GetExtension(fileNameWithPath), ".xls"))
             {
-                new Error("With 'OPTION sheet engine = internal;', only xlsx files are allowed.");
-                G.Writeln("           Please use 'OPTION sheet engine = excel;' for xls files.", Color.Red);
-                G.Writeln("           Note that option 'engine = excel' requires that Excel is installed on your machine.", Color.Red);
-                throw new GekkoException();
+                new Error("With 'OPTION sheet engine = internal;', only xlsx files are allowed. Please use 'OPTION sheet engine = excel;' for xls files. Note that option 'engine = excel' requires that Excel is installed on your machine.");
+
+
+                //throw new GekkoException();
             }
         }
 
@@ -23471,7 +23471,7 @@ namespace Gekko
             if (!File.Exists(file))
             {
                 new Error("File " + file + " does not seem to exist");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             WriteXlsError(file);
@@ -23488,7 +23488,7 @@ namespace Gekko
                         if (ws == null)
                         {
                             new Error("Could not find sheet '" + sheetName + "' inside " + file);
-                            throw new GekkoException();
+                            //throw new GekkoException();
                         }
                     }
                     else
@@ -23615,7 +23615,7 @@ namespace Gekko
             if (!File.Exists(file))
             {
                 new Error("File " + file + " does not seem to exist");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             //DateTime t00 = DateTime.Now;
@@ -23756,9 +23756,9 @@ namespace Gekko
                             }
                             else
                             {
-                                new Error("Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number.");
-                                G.Writeln("           It has type " + temp.GetType().ToString(), Color.Red);
-                                throw new GekkoException();
+                                new Error("Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number. It has type " + temp.GetType().ToString());
+
+                                //throw new GekkoException();
                             }
                             matrix.Add(i, j, cell);
                         }
@@ -23822,7 +23822,7 @@ namespace Gekko
                 if (isMatrix)
                 {
                     new Error("Matrix export only supported for OPTION sheet engine = internal");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 return WriteExcel_Interop(eo, oPrt, isMulprt);
             }
@@ -23903,7 +23903,7 @@ namespace Gekko
                     else
                     {
                         new Error("Append option must be either yes, no or ifexist");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
 
@@ -23924,13 +23924,13 @@ namespace Gekko
                     {
                         //(5) and (6)
                         new Error("You cannot use SHEET<append> without indicating a xlsx filename.");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     if (!File.Exists(fileNameWithPathOriginal))
                     {
                         new Error("You cannot use SHEET<append> on a non-existing file: " + fileNameWithPathOriginal);
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
 
@@ -24987,7 +24987,7 @@ namespace Gekko
             catch (Exception e)
             {
                 new Error("problem while trying to access to existing sheet '" + sheet + "'");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             return objSheet;
@@ -25039,12 +25039,12 @@ namespace Gekko
                 if (isRows && isCols)
                 {
                     new Error("It seems that OPTION sheet rows/cols are both set to 'yes'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 if (G.Equal(oPrt.opt_rows, "yes") && G.Equal(oPrt.opt_cols, "yes"))
                 {
                     new Error("It seems that options <rows> and <cols> are used at the same time");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 if (G.Equal(oPrt.opt_rows, "yes"))
                 {
@@ -25870,7 +25870,7 @@ namespace Gekko
             {
                 //tried random name 100 times, this should never happen... 100 blocked files at one time not very realistic...
                 new Error("Could not make local copy of tsd file (filename problem)");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return tempPath;
         }
@@ -26001,7 +26001,7 @@ namespace Gekko
             else
             {
                 new Error("Expected SORT to be alpha, abs or rel.");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (variables != null && variables.Count == 0)
@@ -26471,8 +26471,8 @@ namespace Gekko
             else
             {
                 new Error("Expected 'start' or 'end' argument, not '" + startEnd + "'");
-                throw new GekkoException();
-            }            
+                //throw new GekkoException();
+            }
         }
 
         /// <summary>
@@ -26731,7 +26731,7 @@ namespace Gekko
             if (tsls == null)
             {
                 new Error("Variable '" + lhs + "' does not exist in Work databank");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             G.Writeln();
@@ -26767,7 +26767,7 @@ namespace Gekko
                 if (variable == null)
                 {
                     new Error("Variable '" + variable + "' does not exist in Work databank");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 t1 = ts.GetDataSimple(t.Add(lag));
@@ -27264,7 +27264,7 @@ namespace Gekko
             if (this.Count() > 0 || all != ELocalGlobalType.None)
             {
                 new Error("LOCAL<all> must be the only LOCAL/GLOBAL statement");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             this.all = ELocalGlobalType.Local;
         }
@@ -27274,7 +27274,7 @@ namespace Gekko
             if (this.Count() > 0 || all != ELocalGlobalType.None)
             {
                 new Error("GLOBAL<all> must be the only LOCAL/GLOBAL statement");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             this.all = ELocalGlobalType.Global;
         }
@@ -27303,13 +27303,13 @@ namespace Gekko
             if (this.all != ELocalGlobalType.None)
             {
                 new Error("Failed because " + this.all.ToString().ToUpper() + "<all> been set previously");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.storage == null) this.storage = new GekkoDictionary<string, ELocalGlobalType>(StringComparer.OrdinalIgnoreCase);
             if (this.storage.ContainsKey(s))
             {
                 new Error("The variable '" + s + "' is already set as " + this.storage[s].ToString().ToUpper());
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             this.storage.Add(s, type);
         }
@@ -28503,7 +28503,7 @@ namespace Gekko
             {
                 //string keys should be called with ignorecase
                 new Error("Technical error 437834873");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
         //public GekkoDictionary(int capacity) : base(capacity) { }  //not used
@@ -28516,7 +28516,7 @@ namespace Gekko
                 {
                     //string keys should be called with ignorecase
                     new Error("Technical error 437834874");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
         }
