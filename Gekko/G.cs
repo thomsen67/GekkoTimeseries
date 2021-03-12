@@ -175,7 +175,7 @@ namespace Gekko
             if (reportError)
             {
                 new Error("Cannot convert '" + s + "' into a value");
-                throw new GekkoException();
+                //new GekkoException();
             }
             else
             {
@@ -380,31 +380,31 @@ namespace Gekko
             if (GekkoTime.Observations(allFreqsHelper.t1Annual, allFreqsHelper.t2Annual) < 1)
             {
                 new Error("Start period must be <= end period");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.Q, t1, t2, ref allFreqsHelper.t1Quarterly, ref allFreqsHelper.t2Quarterly);
             if (GekkoTime.Observations(allFreqsHelper.t1Quarterly, allFreqsHelper.t2Quarterly) < 1)
             {
                 new Error("Start period must be <= end period");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.M, t1, t2, ref allFreqsHelper.t1Monthly, ref allFreqsHelper.t2Monthly);
             if (GekkoTime.Observations(allFreqsHelper.t1Monthly, allFreqsHelper.t2Monthly) < 1)
             {
                 new Error("Start period must be <= end period");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.D, t1, t2, ref allFreqsHelper.t1Daily, ref allFreqsHelper.t2Daily);
             if (GekkoTime.Observations(allFreqsHelper.t1Daily, allFreqsHelper.t2Daily) < 1)
             {
                 new Error("Start period must be <= end period");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.U, t1, t2, ref allFreqsHelper.t1Undated, ref allFreqsHelper.t2Undated);
             if (GekkoTime.Observations(allFreqsHelper.t1Undated, allFreqsHelper.t2Undated) < 1)
             {
                 new Error("Start period must be <= end period");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             return allFreqsHelper;
@@ -448,7 +448,7 @@ namespace Gekko
             else
             {
                 new Error("Freq error");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -575,8 +575,8 @@ namespace Gekko
             string f = G.Chop_GetFreq(s);
             if (f == null)
             {
-                new Error("freq problem");
-                throw new GekkoException();
+                new Error("freq problem"); return EFreq.None;
+                //throw new GekkoException();
             }
             else
             {
@@ -606,8 +606,8 @@ namespace Gekko
             else if (ts.freq == EFreq.D) return 3;
             else
             {
-                new Error("Internal error #726326283");
-                throw new GekkoException();
+                new Error("Internal error #726326283"); return -12345;
+                //throw new GekkoException();
             }
         }
 
@@ -999,7 +999,7 @@ namespace Gekko
             if (varname2 == null || varname2.Length == 0)
             {
                 new Error("Variable name with zero length");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             bool hasSigil = false;
             if (varname2[0] == Globals.symbolScalar || varname2[0] == Globals.symbolCollection) hasSigil = true;
@@ -1025,8 +1025,8 @@ namespace Gekko
             else if (G.Equal(s, "ignore")) return ESeriesMissing.Ignore;
             else
             {
-                new Error("Expected missing = error, m, zero, skip or ignore");
-                throw new GekkoException();
+                new Error("Expected missing = error, m, zero, skip or ignore"); return ESeriesMissing.Error;
+                //throw new GekkoException();
             }
 
         }
@@ -1520,7 +1520,7 @@ namespace Gekko
                 else
                 {
                     new Error("Table format error");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             else
@@ -1538,7 +1538,7 @@ namespace Gekko
                 else
                 {
                     new Error("Table format error");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -2407,7 +2407,7 @@ namespace Gekko
             {
                 //bad, also including a series with name 'x'
                 new Error("Variable name and type do not conform");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -2428,7 +2428,7 @@ namespace Gekko
             if (name == null || name.Length == 0)
             {
                 new Error("Name has zero length");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             if (name[0] == Globals.symbolScalar)
@@ -2445,7 +2445,7 @@ namespace Gekko
             if (hasSigil == 1 && name.Length == 1)
             {
                 new Error("Name is naked % or #");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             for (int i = hasSigil; i < name.Length; i++)
@@ -2470,13 +2470,13 @@ namespace Gekko
                     if (hasSigil == 1)
                     {
                         new Error("Cannot combine '%', '#' and '!'");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
                 else
                 {
                     new Error("Malformed name: '" + name + "'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -2511,7 +2511,7 @@ namespace Gekko
             else
             {
                 new Error("Could not recognize variable type '" + type + "'");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return etype;
         }
@@ -3405,7 +3405,7 @@ namespace Gekko
             if (n < 1)
             {
                 new Error("Start date (" + t1.ToString() + ") should be same as or before end date (" + t2.ToString() + ")");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -3682,7 +3682,7 @@ namespace Gekko
             if (G.isNumericalError(value) || Math.Abs(decimals) > 0.000001)
             {
                 new Error("Could not convert " + value + " into integer");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return rounded;
         }
@@ -3779,7 +3779,7 @@ namespace Gekko
             if (year < 1 || year > 9999)
             {
                 new Error("year must be between 1-9999");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
         }
