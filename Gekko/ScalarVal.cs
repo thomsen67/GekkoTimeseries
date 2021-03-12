@@ -113,9 +113,9 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
-            new Error("Cannot use []-indexer on VAL");
-            throw new GekkoException();
-        }       
+            new Error("Cannot use []-indexer on VAL"); return null;
+            //throw new GekkoException();
+        }
 
         public List<IVariable> ConvertToList()
         {
@@ -169,13 +169,13 @@ namespace Gekko
                     }
                 case EVariableType.Matrix:
                     {
-                        new Error("You cannot add a MATRIX and a SCALAR.");
-                        throw new GekkoException();
+                        new Error("You cannot add a MATRIX and a SCALAR."); return null;
+                        //throw new GekkoException();
                     }
                 default:
                     {
-                        new Error("Variable conversion error.");
-                        throw new GekkoException();
+                        new Error("Variable conversion error."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -191,8 +191,8 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        new Error("You cannot concatenate a SERIES and a SCALAR.");
-                        throw new GekkoException();
+                        new Error("You cannot concatenate a SERIES and a SCALAR."); return null;
+                        //throw new GekkoException();
                     }
                 case EVariableType.String:
                     {
@@ -200,13 +200,13 @@ namespace Gekko
                     }
                 case EVariableType.Matrix:
                     {
-                        new Error("You cannot add a MATRIX and a SCALAR.");
-                        throw new GekkoException();
+                        new Error("You cannot add a MATRIX and a SCALAR."); return null;
+                        //throw new GekkoException();
                     }
                 default:
                     {
-                        new Error("Variable conversion error.");
-                        throw new GekkoException();
+                        new Error("Variable conversion error."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -234,8 +234,8 @@ namespace Gekko
                     }
                 default:
                     {
-                        new Error("Variable conversion error.");
-                        throw new GekkoException();
+                        new Error("Variable conversion error."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -275,8 +275,8 @@ namespace Gekko
                     }                
                 default:
                     {
-                        new Error("Variable conversion error.");
-                        throw new GekkoException();
+                        new Error("Variable conversion error."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -304,8 +304,8 @@ namespace Gekko
                     }
                 default:
                     {
-                        new Error("Variable conversion error.");
-                        throw new GekkoException();
+                        new Error("Variable conversion error."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -333,8 +333,8 @@ namespace Gekko
                     }
                 default:
                     {
-                        new Error("Variable conversion error.");
-                        throw new GekkoException();
+                        new Error("Variable conversion error."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -342,7 +342,7 @@ namespace Gekko
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
             new Error("You cannot use an indexer [] on a VAL");
-            throw new GekkoException();
+            //throw new GekkoException();
         }
 
         public IVariable DeepClone(GekkoSmplSimple truncate)

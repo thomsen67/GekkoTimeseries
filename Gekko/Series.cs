@@ -152,7 +152,7 @@ namespace Gekko
             if (type != ESeriesType.Normal && type != ESeriesType.Light)
             {
                 new Error("Series constructor error");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
@@ -182,7 +182,7 @@ namespace Gekko
             if (this.name == null && Globals.runningOnTTComputer)
             {
                 new Error("Parent db error");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {
@@ -218,7 +218,7 @@ namespace Gekko
                 if (n < 1)
                 {
                     new Error("Attempt to create SERIES with " + n + " observation");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 this.data.SetDataarray_ONLY_INTERNAL_USE(new double[n]);  //we make the array as compact as possible --> faster
                 InitializeDataArray(this.data.GetDataArray_ONLY_INTERNAL_USE());

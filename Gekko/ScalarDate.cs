@@ -24,9 +24,9 @@ namespace Gekko
 
         public double GetValOLD(GekkoSmpl t)
         {
-            new Error("Could not convert the DATE " + this.date + " directly into a VAL.");
-            G.Writeln("           You may try the date() conversion function.");
-            throw new GekkoException();            
+            new Error("Could not convert the DATE " + this.date + " directly into a VAL. You may try the date() conversion function.");
+            return double.NaN;
+            //throw new GekkoException();            
         }
         public double GetVal(GekkoTime t)
         {
@@ -35,15 +35,15 @@ namespace Gekko
 
         public double ConvertToVal()
         {
-            new Error("Could not convert the DATE " + this.date + " directly into a VAL.");            
-            throw new GekkoException();
+            new Error("Could not convert the DATE " + this.date + " directly into a VAL."); return double.NaN;
+            //throw new GekkoException();
         }
 
         public string ConvertToString()
         {
-            new Error("Could not convert the DATE " + this.date + " directly into a STRING.");
-            G.Writeln("           You may try the string() conversion function.");            
-            throw new GekkoException();
+            new Error("Could not convert the DATE " + this.date + " directly into a STRING. You may try the string() conversion function."); return null;
+
+            //throw new GekkoException();
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
@@ -55,10 +55,10 @@ namespace Gekko
         public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
-            new Error("You are trying to convert/use the date " + this.date + " as a STRING item in a list");
-            G.Writeln("           In LIST commands, you must for example use '2015q3' instead of 2015q3.");
-            G.Writeln("           If you are using a DATE scalar %d, you may try to use string(%d) instead.");            
-            throw new GekkoException();
+            new Error("You are trying to convert/use the date " + this.date + " as a STRING item in a list. In LIST commands, you must for example use '2015q3' instead of 2015q3. If you are using a DATE scalar %d, you may try to use string(%d) instead."); return null;
+
+
+            //throw new GekkoException();
         }
 
         public EVariableType Type()
@@ -68,11 +68,11 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] index1)
         {
-            new Error("Cannot use []-indexer on DATE");
-            throw new GekkoException();
+            new Error("Cannot use []-indexer on DATE"); return null;
+            //throw new GekkoException();
         }
-        
-                
+
+
 
         public IVariable Negate(GekkoSmpl t)
         {
@@ -83,8 +83,8 @@ namespace Gekko
             }
             else
             {
-                new Error("You cannot use minus on date: " + this.date.ToString());
-                throw new GekkoException();
+                new Error("You cannot use minus on date: " + this.date.ToString()); return null;
+                //throw new GekkoException();
             }
         }
         
@@ -103,16 +103,16 @@ namespace Gekko
                     }                  
                 default:
                     {
-                        new Error("Type error regarding add");                
-                        throw new GekkoException();
+                        new Error("Type error regarding add"); return null;
+                        //throw new GekkoException();
                     }
             }
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
-            new Error("Type error regarding concat and DATE");
-            throw new GekkoException();
+            new Error("Type error regarding concat and DATE"); return null;
+            //throw new GekkoException();
         }
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
@@ -132,8 +132,8 @@ namespace Gekko
                     break;
                 default:
                     {
-                        new Error("Type error regarding subtract");                
-                        throw new GekkoException();
+                        new Error("Type error regarding subtract"); return null;
+                        //throw new GekkoException();
                     }
                     break;
             }
@@ -141,26 +141,26 @@ namespace Gekko
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
         {
-            new Error("%x*%y (multiply) is not allowed if %x is a DATE scalar.");
-            throw new GekkoException();
+            new Error("%x*%y (multiply) is not allowed if %x is a DATE scalar."); return null;
+            //throw new GekkoException();
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            new Error("%x/%y (divide) is not allowed if %x is a DATE scalar.");
-            throw new GekkoException();
+            new Error("%x/%y (divide) is not allowed if %x is a DATE scalar."); return null;
+            //throw new GekkoException();
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            new Error("%x^%y or %x**%y (power) is not allowed if %x is a DATE scalar.");
-            throw new GekkoException();
+            new Error("%x^%y or %x**%y (power) is not allowed if %x is a DATE scalar."); return null;
+            //throw new GekkoException();
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            new Error("You cannot use an indexer [] on a DATE");
-            throw new GekkoException();
+            new Error("You cannot use an indexer [] on a DATE"); return;
+            //throw new GekkoException();
         }
 
         public IVariable DeepClone(GekkoSmplSimple truncate)

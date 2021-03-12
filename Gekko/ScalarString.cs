@@ -127,17 +127,17 @@ namespace Gekko
                     if (ival < 0)
                     {
                         new Error("Illegal string indexer [" + ival + "]: negative number not allowed");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else if (ival == 0)
                     {
                         new Error("Illegal [0] string indexing. Use the length() function for string length.");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else if (ival > this.string2.Length)
                     {
                         new Error("Illegal string indexer [" + ival + "]: larger than length of string (" + this.string2.Length + ")");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     return new ScalarString(this.string2[ival - 1].ToString());
@@ -157,7 +157,7 @@ namespace Gekko
                     if (ival1 > this.string2.Length || ival2 > this.string2.Length || ival2 < ival1 || ival1 < 1 || ival2 < 1)
                     {
                         new Error("Invalid range, [" + ival1 + " .. " + ival2 + "]");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     string s = this.string2.Substring(ival1 - 1, ival2 - ival1 + 1);
@@ -167,42 +167,42 @@ namespace Gekko
                 else if (index.Type() == EVariableType.String)
                 {
                     new Error("You cannot use %s1[%s2], where %s1 and %s2 are strings. Perhaps see the search() function.");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else
                 {
                     new Error("Type mismatch regarding []-index");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             else
             {
                 new Error("Cannot use " + indexes.Length + "-dimensional indexer on string");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 
 
         public IVariable Negate(GekkoSmpl t)
         {
-            new Error("You cannot use minus on string");
-            throw new GekkoException();
+            new Error("You cannot use minus on string"); return null;
+            //throw new GekkoException();
         }
-        
+
         public double GetValOLD(GekkoSmpl smpl)
         {
 
             //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
-            new Error("You are trying to extract a numerical value from STRING '" + this.string2 + "'");
-            G.Writeln("           A STRING s ('" + this.string2 + "') can refer to a timeseries name (" + this.string2 + "), but in");
-            G.Writeln("           that case you must use {%s} instead of %s.");
-            throw new GekkoException();
+            new Error("You are trying to extract a numerical value from STRING '" + this.string2 + "'. A STRING s ('" + this.string2 + "') can refer to a timeseries name (" + this.string2 + "), but in that case you must use {%s} instead of %s."); return double.NaN;
+
+
+            //throw new GekkoException();
         }
 
         public double GetVal(GekkoTime smpl)
         {
-            new Error("Cannot extract a val from " + G.GetTypeString(this) + " type");
-            throw new GekkoException();
+            new Error("Cannot extract a val from " + G.GetTypeString(this) + " type"); return double.NaN;
+            //throw new GekkoException();
         }
 
         public double ConvertToVal()
@@ -260,10 +260,10 @@ namespace Gekko
                     }                    
                 case EVariableType.List:
                     {
-                        new Error("Adding a list and scalar with %s + #x is no longer legal");
-                        G.Writeln("           Please use #x.prefix(%s) instead.");
-                        throw new GekkoException();
-                    }                    
+                        new Error("Adding a list and scalar with %s + #x is no longer legal. Please use #x.prefix(%s) instead.");
+                        return null;
+                        //throw new GekkoException();
+                    }
                 case EVariableType.Series:
                     {
                         new Error("You cannot add a string and a timeseries");
@@ -284,8 +284,8 @@ namespace Gekko
                     }
                 default:
                     {
-                        new Error("Type error regarding add.");                        
-                        throw new GekkoException();
+                        new Error("Type error regarding add."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -306,8 +306,8 @@ namespace Gekko
                     }
                 case EVariableType.Series:
                     {
-                        new Error("You cannot concatenate a string and a timeseries");
-                        throw new GekkoException();
+                        new Error("You cannot concatenate a string and a timeseries"); return null;
+                        //throw new GekkoException();
                     }
                 case EVariableType.Val:
                     {
@@ -323,8 +323,8 @@ namespace Gekko
                     }
                 default:
                     {
-                        new Error("Type error regarding concatenate.");
-                        throw new GekkoException();
+                        new Error("Type error regarding concatenate."); return null;
+                        //throw new GekkoException();
                     }
             }
         }
@@ -359,8 +359,8 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            new Error("You cannot use an indexer [] on a STRING");
-            throw new GekkoException();
+            new Error("You cannot use an indexer [] on a STRING"); return;
+            //throw new GekkoException();
         }
 
         public IVariable DeepClone(GekkoSmplSimple truncate)
