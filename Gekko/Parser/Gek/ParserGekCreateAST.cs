@@ -363,7 +363,7 @@ namespace Gekko.Parser.Gek
             {
                 //Sanity check that nothing is forgotten
                 new Error("Technical issue with code-splitting, please use OPTION system code split = 0");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             csCode = G.ExtractTextFromLines(mainCs).ToString();
@@ -535,7 +535,7 @@ namespace Gekko.Parser.Gek
                 catch (Exception e)
                 {
                     new Error("The parser stumbled unexpectedly with the message: " + s);
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 int lineNo = lineNumber + 1;  //1-based
                 int positionNo = -12345;
@@ -546,7 +546,7 @@ namespace Gekko.Parser.Gek
                 catch (Exception e)
                 {
                     new Error("The parser stumbled unexpectedly with the message: " + s);
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
 
                 string errorMessage = ss[3];

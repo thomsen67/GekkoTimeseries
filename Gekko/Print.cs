@@ -64,7 +64,7 @@ namespace Gekko
                     if (xx0.list.Count != xx1.list.Count)
                     {
                         new Error("Lists with different number of items");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
                 if (xx0 != null) prtElementCounter = xx0.list.Count;
@@ -330,7 +330,7 @@ namespace Gekko
             if (freqs[0] && (freqs[1] || freqs[2] || freqs[3] || freqs[4]))
             {
                 new Error("You cannot mix undated and other frequencies for PRT/PLOT");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             EFreq sameFreq = EFreq.None;
@@ -374,9 +374,9 @@ namespace Gekko
                 {
                     if (!G.Equal(o.opt_nomax, "yes"))
                     {
-                        new Error("PLOT had " + n + " elements, max is " + Program.options.plot_elements_max);
-                        G.Writeln("           You can use PLOT<nomax> or set OPTION plot elements max = ... ;", Color.Red);
-                        throw new GekkoException();
+                        new Error("PLOT had " + n + " elements, max is " + Program.options.plot_elements_max + ". You can use PLOT<nomax> or set OPTION plot elements max = ... ;");
+
+                        //throw new GekkoException();
                     }
                 }
             }
@@ -386,9 +386,9 @@ namespace Gekko
                 {
                     if (!G.Equal(o.opt_nomax, "yes"))
                     {
-                        new Error("PRINT had " + n + " elements, max is " + Program.options.print_elements_max);
-                        G.Writeln("           You can use PRT<nomax> or set OPTION print elements max = ... ;", Color.Red);
-                        throw new GekkoException();
+                        new Error("PRINT had " + n + " elements, max is " + Program.options.print_elements_max + ". You can use PRT<nomax> or set OPTION print elements max = ... ;");
+
+                        //throw new GekkoException();
                     }
                 }
             }
@@ -518,7 +518,7 @@ namespace Gekko
             if (freqs[0] || freqs[1] || freqs[2])
             {
                 new Error("You cannot mix Daily and Annual/Quarterly/Undated frequencies for PRT/PLOT");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             for (int j = 1; j < n + 2; j++)
@@ -619,7 +619,7 @@ namespace Gekko
                     if (isMonthlyFreq)
                     {
                         new Error("Cannot use D and M freq at the same time");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     i++;
                     foreach (GekkoTime t in new GekkoTimeIterator(Program.ConvertFreqs(smpl.t1, smpl.t2, EFreq.D)))  //handles if the freq given is not daily
@@ -1658,7 +1658,7 @@ namespace Gekko
             else
             {
                 new Error("Transformation error");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
         }
 

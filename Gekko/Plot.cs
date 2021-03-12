@@ -36,7 +36,7 @@ namespace Gekko
                 if (!G.Equal(extension, "emf") && !G.Equal(extension, "png") && !G.Equal(extension, "svg") && !G.Equal(extension, "pdf"))
                 {
                     new Error("In PLOT, expected file type is emf, png, svg or pdf");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 extension = extension.ToLower().Trim();  //gnuplot does not like upper-case file types
             }
@@ -68,7 +68,7 @@ namespace Gekko
             if (count == 0)
             {
                 new Error("PLOT called with 0 variables");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
             int rr = Program.RandomInt();
@@ -320,7 +320,7 @@ namespace Gekko
             {
                 //this should not be possible, but in any case...
                 new Error("PLOT gpt palette is empty");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
@@ -463,7 +463,7 @@ namespace Gekko
                 if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
                 {
                     new Error("<bold = '...'> must be title, ytitle, xtics, ytics or key");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             string title_bold = null; if (bold3.Contains("title")) title_bold = " Bold";
@@ -486,7 +486,7 @@ namespace Gekko
                 if (s != "title" && s != "ytitle" && s != "xtics" && s != "ytics" && s != "key")
                 {
                     new Error("<italic = '...'> must be title, ytitle, xtics, ytics or key");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
 
@@ -1018,7 +1018,7 @@ namespace Gekko
             if (Program.options.plot_xlabels_digits != 4 && Program.options.plot_xlabels_digits != 2)
             {
                 new Error("'OPTION plot xlabels digits' should be either 4 or 2");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             string ss = null;
