@@ -65,7 +65,7 @@ namespace Gekko
 
     public enum EWrapType
     {
-        Normal,
+        Writeln,  //normal
         Error,
         Warning,
         Note
@@ -1618,9 +1618,8 @@ namespace Gekko
 
             if (!File.Exists(fullFileNameAndPath))
             {
-                if (type == EDataFormat.Csv) G.Writeln2("*** ERROR: csv file does not exist");
-                else if (type == EDataFormat.Prn) G.Writeln2("*** ERROR: prn file does not exist");
-                throw new GekkoException();
+                if (type == EDataFormat.Csv) new Error("Csv file does not exist");
+                else if (type == EDataFormat.Prn) new Error("Prn file does not exist");
             }
 
             string input = GetTextFromFileWithWait(fullFileNameAndPath);
@@ -1647,14 +1646,12 @@ namespace Gekko
                         {
                             if (!ss2.EndsWith("\""))
                             {
-                                G.Writeln2("*** ERROR: item '" + ss2 + "' seems malformed");
-                                throw new GekkoException();
+                                new Error("Item '" + ss2 + "' seems malformed");
                             }
                             ss2 = ss2.Substring(1, ss2.Length - 2);
                             if (ss2.Contains("\""))
                             {
-                                G.Writeln2("*** ERROR: item '\"" + ss2 + "\"' seems malformed");
-                                throw new GekkoException();
+                                new Error("Item '\"" + ss2 + "\"' seems malformed");
                             }
                         }
                         string s3 = ss2;
@@ -1782,9 +1779,7 @@ namespace Gekko
 
                 if (cellText == null)
                 {
-                    G.Writeln2("*** ERROR in cell " + GetExcelCell(row, col, transpose) + ".");
-                    G.Writeln2("    This cell should contain a date and not be empty.", Color.Red);
-                    throw new GekkoException();
+                    new Error("*** ERROR in cell " + GetExcelCell(row, col, transpose) + ". This cell should contain a date and not be empty.");
                 }
 
                 //The below is only for error messages
@@ -1811,8 +1806,7 @@ namespace Gekko
                     {
                         //Excel-dates are converted to yyyy-mm-dd when a xlsx is exported to csv.
                         //So this restriction seems sensibl.
-                        G.Writeln2("*** ERROR: You cannot use <datetype='excel'> for .csv or .prn file types");
-                        throw new GekkoException();
+                        new Error("You cannot use <datetype='excel'> for .csv or .prn file types");
                     }
 
                     //this is quite easy, since there is no formatting to worry about.
@@ -1828,11 +1822,8 @@ namespace Gekko
                         gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, cell.dateTime);
                     }
                     else
-                    {                        
-                        G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + cell.text + "'");
-                        G.Writeln("           It is supposed to be an Excel date, counting days since January 1, 1900. But Gekko cannot", Color.Red);
-                        G.Writeln("           convert it to a value.", Color.Red);
-                        throw new GekkoException();
+                    {
+                        new Error("Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + cell.text + "'. It is supposed to be an Excel date, counting days since January 1, 1900. But Gekko cannot convert it to a value.");
                     }
                 }
                 else
@@ -1903,9 +1894,7 @@ namespace Gekko
 
                         if (error)
                         {
-                            G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + date + "'");
-                            G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
-                            throw new GekkoException();
+                            new Error("Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + date + "'. You may want to change the frequency: OPTION freq = ...");                            
                         }
                     }
                     else
@@ -1935,8 +1924,7 @@ namespace Gekko
                     {
                         if (!gt.StrictlyLargerThan(per2))
                         {
-                            G.Writeln2("*** ERROR: The date " + gt.ToString() + " is not larger than the previous: " + per2.ToString());
-                            throw new GekkoException();
+                            new Error("The date " + gt.ToString() + " is not larger than the previous: " + per2.ToString());
                         }                        
                     }
                     per2 = gt;
@@ -1947,9 +1935,7 @@ namespace Gekko
                     int expectedPeriods = GekkoTime.Observations(per1, gt);
                     if (expectedPeriods != (col - j_dates + 1))
                     {
-                        G.Writeln2("*** ERROR: Expected to find " + expectedPeriods + " observations between the periods");
-                        G.Writeln("           '" + start[0] + "' (cell " + start[1] + ")" + " and '" + end[0] + "' (cell " + end[1] + ").", Color.Red);
-                        throw new GekkoException();
+                        new Error("*** ERROR: Expected to find " + expectedPeriods + " observations between the periods '" + start[0] + "' (cell " + start[1] + ")" + " and '" + end[0] + "' (cell " + end[1] + ").");                        
                     }
                 }
                 datesInMatrix.Add(gt);
@@ -2015,13 +2001,16 @@ namespace Gekko
                                         }
                                         catch
                                         {
-                                            G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
-                                            G.Writeln("+++ NOTE:  You may change separator: OPTION interface csv decimalseparator");
-                                            if (s3.Trim() == ".")
+                                            using (var e = new Error())
                                             {
-                                                G.Writeln("+++ NOTE:  You cannot use dot ('.') to indicate missing value, use M or NA instead");
+                                                e.Main("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
+                                                e.MainNextSection();
+                                                e.Main("Note: You may change separator: OPTION interface csv decimalseparator");                                                
+                                                if (s3.Trim() == ".")
+                                                {
+                                                    e.Main("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
+                                                }
                                             }
-                                            throw new GekkoException();
                                         }
                                     }
                                     else
@@ -14295,15 +14284,51 @@ namespace Gekko
 
             if (!File.Exists(fileName))
             {
-                //new Warning("Could not find model file '" + fileNameSimple + "'");
-                using (Error e = new Error())
+                if (false && Globals.runningOnTTComputer)
                 {
-                    e.Main("Could not find model file '" + fileNameSimple + "'");
-                    //w.MainNextSection(); // "aaa
-                    e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                    e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                    e.More("You may use 'model *;' to look for model files in the current working folder.");
-                    //w.MoreNextSection();                      
+                    using (Error e = new Error())
+                    {
+                        e.Main("Could not find model file '" + fileNameSimple + "'");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainNextSection(); // "aaa
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainNextSection(); // "aaa
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainNextSection(); // "aaa
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                        e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                        e.More("You may use 'model *;' to look for model files in the current working folder.");
+                        e.MoreNextSection();
+                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.MoreNextSection();
+                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.MoreNextSection();
+                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");                        
+                    }
+                }
+                else
+                {
+                    using (Error e = new Error())
+                    {
+                        e.Main("Could not find model file '" + fileNameSimple + "'");                        
+                        //e.MainNextSection(); // "aaa                        
+                        e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                        e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                        e.More("You may use 'model *;' to look for model files in the current working folder.");
+                        //e.MoreNextSection();
+                    }
                 }
             }
 
@@ -27007,7 +27032,7 @@ namespace Gekko
             public ETabs tab;
             public bool mustScrollToEnd;
             public bool mustAlsoPrintToScreen = false;
-            public EWrapType type = EWrapType.Normal;
+            public EWrapType type = EWrapType.Writeln;
             public bool parentOfAll = false;
 
             public WorkerThreadHelper2 Clone()

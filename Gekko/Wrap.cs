@@ -18,7 +18,7 @@ namespace Gekko
 
         private List<List<string>> storageMain = new List<List<string>>(); //shown in main error text
         private List<List<string>> storageMore = new List<List<string>>(); //link regarding more information
-        private EWrapType type = EWrapType.Normal;
+        private EWrapType type = EWrapType.Writeln;
 
         /// <summary>
         /// Constructor.
@@ -124,6 +124,10 @@ namespace Gekko
             {
                 marginFirst = Globals.noteString;
             }
+            else if (this.type == EWrapType.Writeln)
+            {
+                marginFirst = "";  //just stating the obvious
+            }
 
             bool isPiping = false;
             string margin = G.Blanks(marginFirst.Length);
@@ -177,7 +181,7 @@ namespace Gekko
                 WrapHelper(1, 1, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
             }
 
-            G.AppendText(Gui.gui.textBoxMainTabUpper, G.NL);  //we need this for some reason, else next part of error msg gets 1 line too close.
+            //G.AppendText(Gui.gui.textBoxMainTabUpper, G.NL);  //we need this for some reason, else next part of error msg gets 1 line too close.
 
         }
         
@@ -215,7 +219,9 @@ namespace Gekko
 
         
         /// <summary>
-        /// Helper for Wrap(). Note: linesAtStart == 0 similar to G.Writeln(), and lines == 1 similar to G.Writeln2(). Note: linesAtEnd = 0 similar to G.Write().
+        /// Helper for Wrap(). Note: linesAtStart == 0 similar to G.Writeln(), and lines == 1 similar to 
+        /// G.Writeln2(). Note: linesAtEnd = 0 similar to G.Write(). So if calling with WrapHelper(1, 1, ...),
+        /// it works similarly to a G.Writeln2().
         /// </summary>
         /// <param name="linesAtStart">blank lines</param>
         /// /// <param name="linesAtEnd">blank lines</param>
@@ -434,6 +440,30 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         public Note(string s) : base(EWrapType.Note)
+        {
+            this.Main(s);
+            this.Exe1();
+        }
+    }
+
+    /// <summary>
+    /// Inherits from Wrap class. For easier syntax when constructing. Use: new Writeln("..."); instead
+    /// of: G.Writeln("...");
+    /// </summary>
+    public class Writeln : Wrap
+    {
+        /// <summary>
+        /// Object of Wrap type
+        /// </summary>
+        public Writeln() : base(EWrapType.Writeln)
+        {
+        }
+
+        /// <summary>
+        /// Do not assign to anything. Usage: new Note("Beware...");
+        /// </summary>
+        /// <param name="s"></param>
+        public Writeln(string s) : base(EWrapType.Writeln)
         {
             this.Main(s);
             this.Exe1();

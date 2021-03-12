@@ -3909,7 +3909,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(string s)
         {
-            WriteAbstract(EWrapType.Normal, s, null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Writeln, s, null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3917,7 +3917,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(string s, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, s, null, false, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Writeln, s, null, false, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -3926,7 +3926,7 @@ namespace Gekko
         /// <param name="s"></param>
         public static void Write(string s, Color color)
         {
-            WriteAbstract(EWrapType.Normal, s, null, false, color, false, ETabs.Main);
+            WriteAbstract(EWrapType.Writeln, s, null, false, color, false, ETabs.Main);
         }
 
         /// <summary>
@@ -3934,7 +3934,7 @@ namespace Gekko
         /// </summary>
         public static void Write(string s, Color color, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, s, null, false, color, false, tab);
+            WriteAbstract(EWrapType.Writeln, s, null, false, color, false, tab);
         }
       
         /// <summary>
@@ -3942,7 +3942,7 @@ namespace Gekko
         /// </summary>        
         public static void Write(int x)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3950,14 +3950,14 @@ namespace Gekko
         /// </summary>
         public static void Write(int x, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, tab);
         }
         /// <summary>
         /// For writing output to screen
         /// </summary>        
         public static void Write(double x)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, ETabs.Main);            
         }
 
         /// <summary>
@@ -3965,7 +3965,7 @@ namespace Gekko
         /// </summary>
         public static void Write(double x, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, false, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, false, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -3988,7 +3988,7 @@ namespace Gekko
             //for instance input0 = "fY", "disp:fY"
             //for instance input0 = "sim", "help:sim"            
             //see Gui.textBox1_LinkClicked
-            WriteAbstract(EWrapType.Normal, text, linktype, false, Color.Empty, true, ETabs.Main);  //Color is not used anyway -- gets blue underlined
+            WriteAbstract(EWrapType.Writeln, text, linktype, false, Color.Empty, true, ETabs.Main);  //Color is not used anyway -- gets blue underlined
         }
 
         public static void WriteLink(string text, string linktype, ETabs tab)
@@ -3997,7 +3997,7 @@ namespace Gekko
             //for instance input0 = "fY", "disp:fY"
             //for instance input0 = "sim", "help:sim"            
             //see Gui.textBox1_LinkClicked
-            WriteAbstract(EWrapType.Normal, text, linktype, false, Color.Empty, true, tab);  //Color is not used anyway -- gets blue underlined
+            WriteAbstract(EWrapType.Writeln, text, linktype, false, Color.Empty, true, tab);  //Color is not used anyway -- gets blue underlined
         }
 
         /// <summary>
@@ -4033,7 +4033,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s)
         {
-            WriteAbstract(EWrapType.Normal, s, null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Writeln, s, null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4058,7 +4058,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, s, null, true, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Writeln, s, null, true, Color.Empty, false, tab);
         }        
 
         /// <summary>
@@ -4066,7 +4066,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color)
         {
-            WriteAbstract(EWrapType.Normal, s, null, true, color, false, ETabs.Main);
+            WriteAbstract(EWrapType.Writeln, s, null, true, color, false, ETabs.Main);
         }
 
 
@@ -4075,7 +4075,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color, bool mustAlsoWriteToScreen)
         {
-            WriteAbstractScroll(EWrapType.Normal, s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
+            WriteAbstractScroll(EWrapType.Writeln, s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
         }
 
 
@@ -4084,7 +4084,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(string s, Color color, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, s, null, true, color, false, tab);
+            WriteAbstract(EWrapType.Writeln, s, null, true, color, false, tab);
         }
 
 
@@ -4185,7 +4185,7 @@ namespace Gekko
         {
             if (!Globals.runningOnTTComputer) return;
             if (!Globals.printGrayLinesForDebugging) return;
-            WriteAbstract(EWrapType.Normal, s, null, true, Color.Gray, false, ETabs.Main);
+            WriteAbstract(EWrapType.Writeln, s, null, true, Color.Gray, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4621,7 +4621,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln()
         {
-            WriteAbstract(EWrapType.Normal, "", null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Writeln, "", null, true, Color.Empty, false, ETabs.Main);
         }
         
         /// <summary>
@@ -4629,7 +4629,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, "", null, true, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Writeln, "", null, true, Color.Empty, false, tab);
         }
         
         /// <summary>
@@ -4638,7 +4638,7 @@ namespace Gekko
         /// <param name="x"></param>
         public static void Writeln(int x)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4646,7 +4646,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(int x, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, true, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -4655,7 +4655,7 @@ namespace Gekko
         /// <param name="x"></param>
         public static void Writeln(double x)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, true, Color.Empty, false, ETabs.Main);
         }
 
         /// <summary>
@@ -4663,7 +4663,7 @@ namespace Gekko
         /// </summary>
         public static void Writeln(double x, ETabs tab)
         {
-            WriteAbstract(EWrapType.Normal, x.ToString(), null, true, Color.Empty, false, tab);
+            WriteAbstract(EWrapType.Writeln, x.ToString(), null, true, Color.Empty, false, tab);
         }
 
         /// <summary>
@@ -4675,18 +4675,19 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// Helper method for adding text to the GUI
+        /// Helper method for adding text to the GUI. Not intended for use outside of Wrap.cs.
         /// </summary>
         /// <param name="textBox"></param>
         /// <param name="s"></param>
         public static void AppendText(RichTextBox textBox, string s)
         {
-            AppendLink(textBox, s, null);  //no link
+            G.AppendLink(textBox, s, null);  //no link
         }
 
         /// <summary>
         /// Helper method for adding text to the GUI. The idea is that -- in the longer run -- all change to GUI text runs through
         /// this method (at the moment, only Wrap text does this). See also Gui.gui.LinkClicked().
+        /// Not intended for use outside of Wrap.cs.
         /// </summary>
         /// <param name="textBox">The GUI text box</param>
         /// <param name="s">String to show</param>

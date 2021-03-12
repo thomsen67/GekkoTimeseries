@@ -2031,8 +2031,8 @@ namespace Gekko
             if (Globals.runningOnTTComputer && text == "arrow")
             {
                 Arrow.Run();
-            }            
-
+            }
+            
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
