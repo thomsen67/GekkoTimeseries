@@ -20,7 +20,7 @@ namespace Gekko
 
             if (G.Equal(Path.GetExtension(fileName), ".csv"))
             {
-                G.Writeln2("*** ERROR: The former .csv reader for GAMS models is obsolete");
+                new Error("The former .csv reader for GAMS models is obsolete");
                 throw new GekkoException();
             }
             else
@@ -315,7 +315,7 @@ namespace Gekko
                         string s7 = tok.Offset(i).ToString();
                         if (!G.IsIdent(s7))
                         {
-                            G.Writeln2("*** ERROR: Expected a name instead of '" + s7 + "' , " + tok.Offset(i).LineAndPosText());
+                            new Error("Expected a name instead of '" + s7 + "' , " + tok.Offset(i).LineAndPosText());
                             throw new GekkoException();
                         }
                         i++;
@@ -323,7 +323,7 @@ namespace Gekko
                         string s8 = tok.Offset(i).ToString();
                         if (!(tok.Offset(i).SubnodesTypeParenthesisStart()))
                         {
-                            G.Writeln2("*** ERROR: Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
+                            new Error("Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
                             throw new GekkoException();
                         }
                         i++;
@@ -337,7 +337,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Expected '..' in eq definition, " + tok.Offset(i).LineAndPosText());
+                new Error("Expected '..' in eq definition, " + tok.Offset(i).LineAndPosText());
                 throw new GekkoException();
             }
             i++;
@@ -354,7 +354,7 @@ namespace Gekko
 
             if (iEqual == -12345)
             {
-                G.Writeln2("*** ERROR: Could not find '=e=' in eq definition, " + tok.Offset(i).LineAndPosText());
+                new Error("Could not find '=e=' in eq definition, " + tok.Offset(i).LineAndPosText());
                 throw new GekkoException();
             }
 
@@ -364,7 +364,7 @@ namespace Gekko
 
             if (iSemi == -12345)
             {
-                G.Writeln2("*** ERROR: Could not find ending ';' in eq definition, " + tok.Offset(i).LineAndPosText());
+                new Error("Could not find ending ';' in eq definition, " + tok.Offset(i).LineAndPosText());
                 throw new GekkoException();
             }
 
@@ -517,30 +517,30 @@ namespace Gekko
             {
                 if (eqnameGams.Contains("__"))
                 {
-                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': did not expect '__' substring in name");
+                    new Error("Eqname '" + eqnameGams + "': did not expect '__' substring in name");
                     throw new GekkoException();
                 }
                 string[] ss = eqnameGams.Split('_');
                 if (ss.Length <= 1)
                 {
-                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': did not find any '_' separators");
+                    new Error("Eqname '" + eqnameGams + "': did not find any '_' separators");
                     throw new GekkoException();
                 }
                 if (!G.Equal(ss[0], "e"))
                 {
-                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': expected it to start with 'e_'");
+                    new Error("Eqname '" + eqnameGams + "': expected it to start with 'e_'");
                     throw new GekkoException();
                 }
                 if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
                 {
-                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': could not resolve variable name");
+                    new Error("Eqname '" + eqnameGams + "': could not resolve variable name");
                     throw new GekkoException();
                 }
                 lhs = ss[1];
             }
             else
             {
-                G.Writeln2("*** ERROR: option model gams dep method = lhs|eqname.");
+                new Error("option model gams dep method = lhs|eqname.");
                 throw new GekkoException();
             }
 
@@ -574,7 +574,7 @@ namespace Gekko
 
                 if (equationsByEqname.ContainsKey(eqnameGams))
                 {
-                    G.Writeln2("*** ERROR: The equation name '" + eqnameGams + "' appears multiple times");
+                    new Error("The equation name '" + eqnameGams + "' appears multiple times");
                     throw new GekkoException();
                 }
                 else
@@ -598,7 +598,7 @@ namespace Gekko
                 eqs = GetGamsEquationsByEqname(eqname);
                 if (eqs == null || eqs.Count == 0)
                 {
-                    G.Writeln2("*** ERROR: Equation '" + eqname + "' was not found");
+                    new Error("Equation '" + eqname + "' was not found");
                     throw new GekkoException();
                 }
                 if (eqs.Count > 1)
@@ -612,7 +612,7 @@ namespace Gekko
                 eqs = GetGamsEquationsByVarname(varname);
                 if (eqs == null || eqs.Count == 0)
                 {
-                    G.Writeln2("*** ERROR: Variable '" + varname + "' was not found");
+                    new Error("Variable '" + varname + "' was not found");
                     throw new GekkoException();
                 }
                 if (eqs.Count > 1)
@@ -755,7 +755,7 @@ namespace Gekko
         {
             if (Program.model.modelGams.equationsByEqname == null || Program.model.modelGams.equationsByEqname.Count == 0)
             {
-                G.Writeln2("*** ERROR: No GAMS equations found");
+                new Error("No GAMS equations found");
                 throw new GekkoException();
             }
             List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
@@ -766,7 +766,7 @@ namespace Gekko
         {
             if (Program.model.modelGams.equationsByVarname == null || Program.model.modelGams.equationsByVarname.Count == 0)
             {
-                G.Writeln2("*** ERROR: No GAMS equations found");
+                new Error("No GAMS equations found");
                 throw new GekkoException();
             }
             List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
@@ -789,7 +789,7 @@ namespace Gekko
                 List lhsList_list = lhsList as List;
                 if (lhsList_list == null)
                 {
-                    G.Writeln2("*** ERROR: Variable #dependents should be of list type");
+                    new Error("Variable #dependents should be of list type");
                     throw new GekkoException();
                 }
                 int c = 0;
@@ -798,7 +798,7 @@ namespace Gekko
                     c++;
                     if (x.Type() != EVariableType.List)
                     {
-                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": should be of list type");
+                        new Error("#dependents sublist line " + c + ": should be of list type");
                         throw new GekkoException();
                     }
                     List x_list = x as List;
@@ -811,7 +811,7 @@ namespace Gekko
                     }
                     catch
                     {
-                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": all elements should be strings");
+                        new Error("#dependents sublist line " + c + ": all elements should be strings");
                         throw;
                     }
 
@@ -823,7 +823,7 @@ namespace Gekko
 
                     if (ss.Count < 2)
                     {
-                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": must have > 1 elements");
+                        new Error("#dependents sublist line " + c + ": must have > 1 elements");
                         throw new GekkoException();
                     }
                     string lhs = ss[0];
@@ -837,7 +837,7 @@ namespace Gekko
                         string temp = null; dependents.TryGetValue(ss[i], out temp);
                         if (temp != null)
                         {
-                            G.Writeln2("*** ERROR: #dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
+                            new Error("#dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
                             throw new GekkoException();
                         }
                         dependents.Add(ss[i], lhs);
@@ -906,7 +906,7 @@ namespace Gekko
                             List<TokenHelperComma> split = nextNode.SplitCommas(false);
                             if (split.Count != 2)
                             {
-                                G.Writeln2("*** ERROR: Expected sameas() function with 2 arguments");
+                                new Error("Expected sameas() function with 2 arguments");
                                 throw new GekkoException();
                             }
 
@@ -1082,7 +1082,7 @@ namespace Gekko
                                                         string plusMinus = helper.list[1].s;
                                                         if (plusMinus != "+" && plusMinus != "-")
                                                         {
-                                                            G.Writeln2("*** ERROR: Expected t plus/minus an integer, " + helper.list[2].LineAndPosText());
+                                                            new Error("Expected t plus/minus an integer, " + helper.list[2].LineAndPosText());
                                                             throw new GekkoException();
                                                         }
                                                         string number = helper.list[2].s;
@@ -1090,7 +1090,7 @@ namespace Gekko
                                                         bool ok = int.TryParse(number, out iNumber);
                                                         if (!ok)
                                                         {
-                                                            G.Writeln2("*** ERROR: Expected '" + number + "' to be an integer, " + helper.list[2].LineAndPosText());
+                                                            new Error("Expected '" + number + "' to be an integer, " + helper.list[2].LineAndPosText());
                                                             throw new GekkoException();
                                                         }
                                                         //if (plusMinus == "-") iNumber = -iNumber;
@@ -1341,7 +1341,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: The slow gdx reader is not maintained, try the faster GDX reader with:");
+                new Error("The slow gdx reader is not maintained, try the faster GDX reader with:");
                 G.Writeln("           OPTION gams fast = yes;", Color.Red);
                 throw new GekkoException();
             }
@@ -1408,7 +1408,7 @@ namespace Gekko
                     if (errNr != 0)
                     {
                         {
-                            G.Writeln2("*** ERROR: gdx io error");
+                            new Error("gdx io error");
                             throw new GekkoException();
                         }
                     }
@@ -1417,7 +1417,7 @@ namespace Gekko
                     gdx.gdxUMUelInfo(ref uelCount, ref uelHighest);
                     if (uelHighest != 0)
                     {
-                        G.Writeln2("*** ERROR: Internal UEL problem (GDX)");
+                        new Error("Internal UEL problem (GDX)");
                         throw new GekkoException();
                     }
                     string[] uel = new string[uelCount + 1];
@@ -1432,7 +1432,7 @@ namespace Gekko
                     timeIndex = -12345; gdx.gdxFindSymbol(Program.options.gams_time_set, ref timeIndex);
                     if (timeIndex == 0 || Program.options.gams_time_set == "")
                     {
-                        G.Writeln2("*** ERROR: Could not find the time set ('" + Program.options.gams_time_set + "')");
+                        new Error("Could not find the time set ('" + Program.options.gams_time_set + "')");
                         throw new GekkoException();
                     }
 
@@ -1469,7 +1469,7 @@ namespace Gekko
                             List<string> setData = new List<string>();  //contains names of sets (entryNr --> symbolName)
                             if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                             {
-                                G.Writeln2("*** ERROR: gdx error");
+                                new Error("gdx error");
                                 throw new GekkoException();
                             }
                             while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
@@ -1527,7 +1527,7 @@ namespace Gekko
 
                             if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                             {
-                                G.Writeln2("*** ERROR: gdx error");
+                                new Error("gdx error");
                                 throw new GekkoException();
                             }
 
@@ -1614,7 +1614,7 @@ namespace Gekko
                                         {
                                             if (!timeElement.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                                             {
-                                                G.Writeln2("*** ERROR: GAMS variable/parameter " + varName + " has element '" + timeElement + "' in the time dimension (" + Program.options.gams_time_set + ")");
+                                                new Error("GAMS variable/parameter " + varName + " has element '" + timeElement + "' in the time dimension (" + Program.options.gams_time_set + ")");
                                                 G.Writeln("    The time elements are expected to start with '" + prefix + "'", Color.Red);
                                                 G.Writeln("    See 'OPTION gams time set' and 'OPTION gams time prefix", Color.Red);
                                                 throw new GekkoException();
@@ -1625,7 +1625,7 @@ namespace Gekko
                                         tt = G.IntParse(timeElement);
                                         if (tt == -12345)
                                         {
-                                            G.Writeln2("*** ERROR: Could not convert '" + timeElement + "' into an annual time period");
+                                            new Error("Could not convert '" + timeElement + "' into an annual time period");
                                             if (hasPrefix)
                                             {
                                                 G.Writeln("           Original time element name: '" + uel[index[d]] + "'", Color.Red);
@@ -1756,7 +1756,7 @@ namespace Gekko
                 errNr = gdx.gdxClose();
                 if (errNr != 0)
                 {
-                    G.Writeln2("*** ERROR: gdx io error");
+                    new Error("gdx io error");
                     throw new GekkoException();
                 }
             }
@@ -1936,7 +1936,7 @@ namespace Gekko
                                 }
                                 if (ntimeless > 0 && nnontimeless > 0)
                                 {
-                                    G.Writeln2("*** ERROR: The array-timeseries " + ts.name + " has subseries that are both");
+                                    new Error("The array-timeseries " + ts.name + " has subseries that are both");
                                     G.Writeln("           timeless and non-timeless --> cannot write to GDX.");
                                     throw new GekkoException();
                                 }
@@ -1960,7 +1960,7 @@ namespace Gekko
 
                             if (gdx.gdxSymbolSetDomainX(syCnt, domains) == 0)
                             {
-                                G.Writeln2("*** ERROR: Could not write domain names");
+                                new Error("Could not write domain names");
                                 throw new GekkoException();
                             }
 
@@ -1999,7 +1999,7 @@ namespace Gekko
                             {
                                 if (gdx.gdxDataWriteStr(new string[] { s }, d) == 0)
                                 {
-                                    G.Writeln2("*** ERROR: Problem writing set for gdx");
+                                    new Error("Problem writing set for gdx");
                                     throw new GekkoException();
                                 }
                             }
@@ -2101,7 +2101,7 @@ namespace Gekko
                     }
                     if (ntimeless > 0 && nnontimeless > 0)
                     {
-                        G.Writeln2("*** ERROR: The array-timeseries " + ts.name + " has subseries that are both");
+                        new Error("The array-timeseries " + ts.name + " has subseries that are both");
                         G.Writeln("           timeless and non-timeless --> cannot write to GDX.");
                         throw new GekkoException();
                     }

@@ -433,7 +433,7 @@ namespace Gekko
                 //Fail-fast check of what data is missing in order to simulate
                 if (Program.databanks.GetFirst().storage.Count == 0)
                 {
-                    G.Writeln2("*** ERROR: There were no variables in the databank. Did you forget to load a databank?");
+                    new Error("There were no variables in the databank. Did you forget to load a databank?");
                     G.Writeln("           Simulation is aborted");
                     throw new GekkoException();
                 }
@@ -795,7 +795,7 @@ namespace Gekko
         {
             if (GekkoTime.Observations(tStart, tEnd) < 1)
             {
-                G.Writeln2("*** ERROR: start period must be before end period");
+                new Error("start period must be before end period");
                 throw new GekkoException();
             }
 
@@ -803,7 +803,7 @@ namespace Gekko
             //ErrorIfDatabanksSwapped();
             if (!G.HasModelGekko())
             {
-                G.Writeln2("*** ERROR: It seems no model is defined -- simulation cannot be performed");
+                new Error("It seems no model is defined -- simulation cannot be performed");
                 throw new GekkoException();
             }
 
@@ -828,7 +828,7 @@ namespace Gekko
                 if ((usingFairTaylor || usingNewtonFairTaylor) && G.Equal(Program.options.solve_forward_terminal, "growth"))
                 {
                     //#375204390457
-                    G.Writeln2("*** ERROR: Terminal 'GROWTH' is not working at the moment, please use 'CONST'");
+                    new Error("Terminal 'GROWTH' is not working at the moment, please use 'CONST'");
                     throw new GekkoException();
                 }
             }
@@ -867,13 +867,13 @@ namespace Gekko
             //only used with ANTLR
             if (!G.HasModelGekko() || Program.model.modelGekko.equations.Count == 0)
             {
-                G.Writeln2("*** ERROR: It seems no model is defined: did you forget a MODEL statement?");
+                new Error("It seems no model is defined: did you forget a MODEL statement?");
                 throw new GekkoException();
             }
             Globals.mayPrintConvergenceCheckVariableMissing = true;  //so that there is only 1 warning regarding this
             if (Program.model.modelGekko.endogenized.Count != Program.model.modelGekko.exogenized.Count)
             {
-                G.Writeln2("*** ERROR: different number of endogenized/exogenized variables (endo = " + Program.model.modelGekko.endogenized.Count + ", exo = " + Program.model.modelGekko.exogenized.Count + ")");
+                new Error("different number of endogenized/exogenized variables (endo = " + Program.model.modelGekko.endogenized.Count + ", exo = " + Program.model.modelGekko.exogenized.Count + ")");
                 throw new GekkoException();
             }
 
@@ -912,7 +912,7 @@ namespace Gekko
                         assembly = GetAssemblyFromModelType(modelType);
                         if (assembly == null)
                         {
-                            G.Writeln2("*** ERROR: Sorry: something has gone wrong regarding model settings");
+                            new Error("Sorry: something has gone wrong regarding model settings");
                             throw new GekkoException();
                         }
                     }
@@ -1256,7 +1256,7 @@ namespace Gekko
                                 if (so.isFix && hasEndoExo)
                                 {
                                     //This should never happen
-                                    G.Writeln2("*** ERROR: Trying to solve SIM<fix> with Gauss Seidel");
+                                    new Error("Trying to solve SIM<fix> with Gauss Seidel");
                                     throw new GekkoException();
                                 }
                                 SolveGauss777.SolveGauss(usingFairTaylor || usingNewtonFairTaylor, Program.model.modelGekko.b, isDampedPointers, isDampedPointersArray, out culprit, modelType, t, checkoff);
@@ -1688,7 +1688,7 @@ namespace Gekko
                     else
                     {
                         //should not be possible: should have been caught in SimCheckFirstPeriodForMissingStuff()
-                        G.Writeln2("*** ERROR: Internal Gekko error #874439849");
+                        new Error("Internal Gekko error #874439849");
                         throw new GekkoException();
                     }
                 }
@@ -1764,7 +1764,7 @@ namespace Gekko
                     {
                         //missing variable, and not a DJZ-type variable
                         //This will probably never happen, since it gets checked before
-                        G.Writeln2("*** ERROR: time series '" + variable + "' does not exist in the Work bank");
+                        new Error("time series '" + variable + "' does not exist in the Work bank");
                         //FIXME: undo, or at least write if DJZ variables have been created.
                         throw new GekkoException();
                     }
@@ -1850,7 +1850,7 @@ namespace Gekko
                 //NB: This check is here, to avoid having to do it for each timeseries later on.
                 //    The data is written in a special (fast) way that does not get checked automatically regarding
                 //    dirty and protect, cf. //#98726527
-                G.Writeln2("*** ERROR: You are trying to simulate with a first-position databank ('" + work.name + "') that is non-editable");
+                new Error("You are trying to simulate with a first-position databank ('" + work.name + "') that is non-editable");
                 throw new GekkoException();
             }
             DateTime dt4 = DateTime.Now;
@@ -1968,7 +1968,7 @@ namespace Gekko
             double histVar = historicalVariance;
             if (histVar == -12345d)
             {
-                G.Writeln2("*** ERROR: hist variance");
+                new Error("hist variance");
                 throw new GekkoException();
             }
             if (histVar == double.NaN)
@@ -2021,7 +2021,7 @@ namespace Gekko
                 iterMemories = new List<IterMemory>();
                 if (ftOrNft)
                 {
-                    G.Writeln2("*** ERROR: 'OPTION solve gauss dump' cannot be set while doing Fair-Taylor (would exhaust memory)");
+                    new Error("'OPTION solve gauss dump' cannot be set while doing Fair-Taylor (would exhaust memory)");
                     throw new GekkoException();
                 }
                 Program.model.modelGekko.bMemory.Add(t.ToString(), iterMemories);
@@ -2128,7 +2128,7 @@ namespace Gekko
                         }
                         catch (Exception e)
                         {
-                            G.Writeln2("*** ERROR: Out of memory -- please run for fewer years with option 'dump'");
+                            new Error("Out of memory -- please run for fewer years with option 'dump'");
                             G.Writeln("           The dump option is quite memory-intensive, since it remembers all", Color.Red);
                             G.Writeln("           intermediate simulation values.", Color.Red);
                             throw new GekkoException();
@@ -2154,7 +2154,7 @@ namespace Gekko
                             }
                             catch (Exception e)
                             {
-                                G.Writeln2("*** ERROR: Out of memory -- please run for fewer years with option 'dump'");
+                                new Error("Out of memory -- please run for fewer years with option 'dump'");
                                 G.Writeln("           The dump option is quite memory-intensive, since it remembers all", Color.Red);
                                 G.Writeln("           intermediate simulation values.", Color.Red);
                                 throw new GekkoException();
@@ -2394,7 +2394,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: #98349834");
+                new Error("#98349834");
                 throw new GekkoException();
             }
         }
@@ -3391,12 +3391,12 @@ namespace Gekko
                 alglib.rmatrixinverse(ref inv, out success, out report);
                 if (success == 3)
                 {
-                    G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
+                    new Error("Inv(): It seems the matrix is singular");
                     throw new GekkoException();
                 }
                 else if (success != 1)
                 {
-                    G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
+                    new Error("Inv(): Could not invert matrix");
                     throw new GekkoException();
                 }
 
@@ -3847,14 +3847,14 @@ namespace Gekko
                     {
                         //TODO: general error handling regarding endo/exo
                         //now we get runtime error
-                        G.Writeln2("*** ERROR: regarding endogenize: variable " + s1 + " does not exist in model");
+                        new Error("regarding endogenize: variable " + s1 + " does not exist in model");
                         throw new GekkoException();
                     }
                     int s1BNumber = ss1.bNumber;
                     //int varNumber = ss1.bNumber;
                     if (Program.model.modelGekko.m2.endogenous.ContainsKey(s1))
                     {
-                        G.Writeln2("*** ERROR: regarding endogenize: variable " + s1 + " is already endogenous");
+                        new Error("regarding endogenize: variable " + s1 + " is already endogenous");
                         throw new GekkoException();
                     }
                     else
@@ -3867,7 +3867,7 @@ namespace Gekko
                         {
                             //TODO: general error handling regarding endo/exo
                             //now we get runtime error
-                            G.Writeln2("*** ERROR: regarding exogenize: variable " + s2 + " does not exist in model");
+                            new Error("regarding exogenize: variable " + s2 + " does not exist in model");
                             throw new GekkoException();
                         }
                         int s2BNumber = ss2.bNumber;
@@ -3881,7 +3881,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: regarding exogenize: variable " + s2 + " is not endogenous");
+                            new Error("regarding exogenize: variable " + s2 + " is not endogenous");
                             throw new GekkoException();
                         }
                     }
@@ -4280,7 +4280,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: Array size problem in MODEL command");
+                new Error("Array size problem in MODEL command");
                 throw new GekkoException();
             }
 

@@ -102,7 +102,7 @@ namespace Gekko
 
             if (!G.IsSimpleToken(databank))
             {
-                G.Writeln2("*** ERROR: Databank name '" + databank + "' is not a simple name");
+                new Error("Databank name '" + databank + "' is not a simple name");
                 throw new GekkoException();
             }
 
@@ -141,7 +141,7 @@ namespace Gekko
             
             if (reportError)
             {
-                G.Writeln2("*** ERROR: Databank '" + databank + "' does not seem to be open");
+                new Error("Databank '" + databank + "' does not seem to be open");
                 throw new GekkoException();
             }
             else
@@ -157,7 +157,7 @@ namespace Gekko
             {
                 if (openPosition > this.storage.Count)
                 {
-                    G.Writeln2("*** ERROR: There are " + (this.storage.Count - 1) + " numbered databanks in the databank list (F2).");
+                    new Error("There are " + (this.storage.Count - 1) + " numbered databanks in the databank list (F2).");
                     G.Writeln("           Opening in position " + openPosition + " is not possible.", Color.Red);
                     throw new GekkoException();
                 }
@@ -174,19 +174,19 @@ namespace Gekko
             {
                 if (openType == EOpenType.Normal || openType == EOpenType.Last)
                 {
-                    G.Writeln2("*** ERROR: The 'Work' databank cannot be opened or closed (it is always open).");
+                    new Error("The 'Work' databank cannot be opened or closed (it is always open).");
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.First)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<first> with the 'Work' databank.");
+                    new Error("You cannot use OPEN<first> with the 'Work' databank.");
                     G.Writeln("           If Work is not first and it needs to be, you must CLOSE");
                     G.Writeln("           the present first databank. After that, Work will be first.");
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.Edit)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<edit> with the 'Work' databank.");
+                    new Error("You cannot use OPEN<edit> with the 'Work' databank.");
                     G.Writeln("           Work is always editable, and if Work is not first on");
                     G.Writeln("           the F2 databank list, you must CLOSE the present first");
                     G.Writeln("           databank. After that, Work will become first (and editable).");
@@ -195,7 +195,7 @@ namespace Gekko
                 }
                 else if (openType == EOpenType.Ref)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<ref> with the 'Work' databank.");
+                    new Error("You cannot use OPEN<ref> with the 'Work' databank.");
                     G.Writeln("           It is not legal to set Work as the ref databank.");
                     G.Writeln("           Use the Ref databank for such purposes.");
                     throw new GekkoException();
@@ -205,48 +205,48 @@ namespace Gekko
             {
                 if (openType == EOpenType.Normal)
                 {
-                    G.Writeln2("*** ERROR: The '" + Globals.Ref + "' databank cannot be opened or closed (it is always open).");
+                    new Error("The '" + Globals.Ref + "' databank cannot be opened or closed (it is always open).");
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.First)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<first> with the '" + Globals.Ref + "' databank.");
+                    new Error("You cannot use OPEN<first> with the '" + Globals.Ref + "' databank.");
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.Last)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<last> with the '" + Globals.Ref + "' databank.");
+                    new Error("You cannot use OPEN<last> with the '" + Globals.Ref + "' databank.");
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.Edit)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<edit> with the '" + Globals.Ref + "' databank.");
+                    new Error("You cannot use OPEN<edit> with the '" + Globals.Ref + "' databank.");
                     throw new GekkoException();
                 }
                 else if (openType == EOpenType.Ref)
                 {
-                    G.Writeln2("*** ERROR: You cannot use OPEN<ref> with the '" + Globals.Ref + "' databank.");
+                    new Error("You cannot use OPEN<ref> with the '" + Globals.Ref + "' databank.");
                     throw new GekkoException();
                 }
             }
             else if (G.Equal(name, Globals.First))
             {
-                G.Writeln2("*** ERROR: The databank name 'First' is reserved and cannot be used.");
+                new Error("The databank name 'First' is reserved and cannot be used.");
                 throw new GekkoException();
             }
             else if (G.Equal(name, Globals.All))
             {
-                G.Writeln2("*** ERROR: The databank name 'All' is reserved and cannot be used.");
+                new Error("The databank name 'All' is reserved and cannot be used.");
                 throw new GekkoException();
             }
             else if (G.Equal(name, Globals.Local))
             {
-                G.Writeln2("*** ERROR: The databank name 'Local' is reserved and cannot be used.");
+                new Error("The databank name 'Local' is reserved and cannot be used.");
                 throw new GekkoException();
             }
             else if (G.Equal(name, Globals.Global))
             {
-                G.Writeln2("*** ERROR: The databank name 'Global' is reserved and cannot be used.");
+                new Error("The databank name 'Global' is reserved and cannot be used.");
                 throw new GekkoException();
             }
 
@@ -273,7 +273,7 @@ namespace Gekko
             Databank rv = databank;
             if (openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition != 1))
             {
-                G.Writeln2("*** ERROR: Databank '" + rv.name + "' is already open. Use CLOSE to close it first.");
+                new Error("Databank '" + rv.name + "' is already open. Use CLOSE to close it first.");
                 throw new GekkoException();
             }
             else if (openType == EOpenType.Edit || openType == EOpenType.First || (openType == EOpenType.Pos && openPosition == 1))
@@ -323,7 +323,7 @@ namespace Gekko
             }
             else if (openType == EOpenType.Ref)
             {
-                G.Writeln2("*** ERROR: OPEN <ref> not allowed.");
+                new Error("OPEN <ref> not allowed.");
                 throw new GekkoException();                
             }
             return rv;
@@ -341,7 +341,7 @@ namespace Gekko
             //default logic                                
             if (openType == EOpenType.Sec)
             {
-                G.Writeln2("*** ERROR: OPEN <sec> not allowed.");
+                new Error("OPEN <sec> not allowed.");
                 throw new GekkoException();                
             }
             else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
@@ -355,7 +355,7 @@ namespace Gekko
             }
             else if (openType == EOpenType.Ref)
             {
-                G.Writeln2("*** ERROR: OPEN <ref> not allowed.");
+                new Error("OPEN <ref> not allowed.");
                 throw new GekkoException();
             }
             else if (ShouldPutBankLast(openType, openPosition))
@@ -371,7 +371,7 @@ namespace Gekko
                 //pos is not 1., 2. or count+1 ===> so 3, 4, ..., up to count.
                 if (openPosition < 1)
                 {
-                    G.Writeln2("*** ERROR: OPEN <pos = ...> cannot be 0 or negative");
+                    new Error("OPEN <pos = ...> cannot be 0 or negative");
                     throw new GekkoException();
                 }
                 m.Add(this.storage[0]);  //first
@@ -435,7 +435,7 @@ namespace Gekko
             }
             if (!ok)
             {
-                G.Writeln2("*** ERROR: Could not replace databank " + db2.name);
+                new Error("Could not replace databank " + db2.name);
                 throw new GekkoException();
             }
         }
@@ -444,19 +444,19 @@ namespace Gekko
         {
             if (G.Equal(name, Globals.Work))
             {
-                G.Writeln2("*** ERROR: " + Globals.Work + " databank cannot be closed");
+                new Error("" + Globals.Work + " databank cannot be closed");
                 throw new GekkoException();
             }
             if (G.Equal(name, Globals.Ref))
             {
-                G.Writeln2("*** ERROR: " + Globals.Ref + " databank cannot be closed");
+                new Error("" + Globals.Ref + " databank cannot be closed");
                 throw new GekkoException();
             }
 
             int existI; int WorkI; int BaseI; FindBanksI(name, out existI, out WorkI, out BaseI);
             if (existI == -12345)
             {
-                G.Writeln2("*** ERROR: Could not close databank '" + name + "': the bank is not open");
+                new Error("Could not close databank '" + name + "': the bank is not open");
                 throw new GekkoException();
             }
 
@@ -503,7 +503,7 @@ namespace Gekko
 
         public static void SwapBankAliases(string old1, string new1, string old2, string new2)
         {
-            G.Writeln2("*** ERROR: Swapping is not working at the moment.");
+            new Error("Swapping is not working at the moment.");
             throw new GekkoException();
             Databank db1 = Program.databanks.GetDatabank(old1);
             Databank db2 = Program.databanks.GetDatabank(old2);

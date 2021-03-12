@@ -73,7 +73,7 @@ namespace Gekko
             Series lhs_series = lhs as Series;
             if (lhs_series == null)
             {
-                G.Writeln2("*** ERROR: Left-hand side should be a SERIES");
+                new Error("Left-hand side should be a SERIES");
                 throw new GekkoException();
             }
 
@@ -129,7 +129,7 @@ namespace Gekko
 
                 if (cols != m + 1)
                 {
-                    G.Writeln2("*** ERROR: The impose matrix has " + cols + " cols, expected " + (m + 1));
+                    new Error("The impose matrix has " + cols + " cols, expected " + (m + 1));
                     throw new GekkoException();
                 }
 
@@ -164,7 +164,7 @@ namespace Gekko
             {
                 string s = null;
                 if (constant == 1) s = "(including constant) ";
-                G.Writeln2("*** ERROR: There are " + m + " params " + s + "and " + k + " restrictions with only " + n + " observations");
+                new Error("There are " + m + " params " + s + "and " + k + " restrictions with only " + n + " observations");
                 throw new GekkoException();
             }
 
@@ -612,7 +612,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    G.Writeln2("*** ERROR: OLS<dump> failed: is the file '" + fileName + "' blocked?");
+                    new Error("OLS<dump> failed: is the file '" + fileName + "' blocked?");
                     throw new GekkoException();
                 }
             }
@@ -684,7 +684,7 @@ namespace Gekko
         {
             if (d > trendparams.Count)
             {
-                G.Writeln2("*** ERROR: " + s + "... parameter must be <= " + (trendparams.Count) + " (poly degree)");
+                new Error("" + s + "... parameter must be <= " + (trendparams.Count) + " (poly degree)");
                 throw new GekkoException();
             }
         }
@@ -737,7 +737,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: xflat: syntax error");
+                        new Error("xflat: syntax error");
                         throw new GekkoException();
                     }
                 }
@@ -749,13 +749,13 @@ namespace Gekko
                 //xtrend = 0 will just be ignored (will not become a constant if no constant present)
                 if (xtrend.Count > 1)
                 {
-                    G.Writeln2("*** ERROR: xtrend: only 1 element is allowed");
+                    new Error("xtrend: only 1 element is allowed");
                     throw new GekkoException();
                 }
                 polydf = G.ConvertToInt(Functions.HelperValConvertFromString(xtrend[0]));
                 if ((polydf < 0))
                 {
-                    G.Writeln2("*** ERROR: xtrend: polynomium cannot be negative");
+                    new Error("xtrend: polynomium cannot be negative");
                     throw new GekkoException();
                 }
             }
@@ -766,7 +766,7 @@ namespace Gekko
         {
             if (df_start < 1)
             {
-                G.Writeln2("*** ERROR: minimum degrees of freedom must be > 0");
+                new Error("minimum degrees of freedom must be > 0");
                 throw new GekkoException();
             }
 

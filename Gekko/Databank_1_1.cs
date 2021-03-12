@@ -298,7 +298,7 @@ namespace Gekko
                 //So if Program.options.freq is quarterly, 'fy' will point to 'fy%q', and that
                 //timeseries should have .freqEnum = EFreq.Q. This is basically what the above IF tests. It is for
                 //safety, and might be omitted at some point.
-                G.Writeln2("*** ERROR: Freq mismatch");
+                new Error("Freq mismatch");
                 throw new GekkoException();
             }
             if (this.dataArray == null)
@@ -306,7 +306,7 @@ namespace Gekko
                 //If no data has been added to the timeseries, NaN will always be returned.
                 if (this.IsGhost())
                 {
-                    G.Writeln2("*** ERROR: The variable '" + this.variableName + "' is an array-timeseries,");
+                    new Error("The variable '" + this.variableName + "' is an array-timeseries,");
                     G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
                     Program.ArrayTimeseriesTip(this.variableName);
                     throw new GekkoException();
@@ -338,7 +338,7 @@ namespace Gekko
         {
             if (!this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #100");
+                new Error("Timeless variable error #100");
                 throw new GekkoException();
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -370,7 +370,7 @@ namespace Gekko
             if (this.freqEnum != t.freq)
             {
                 //See comment to GetData()
-                G.Writeln2("*** ERROR: Freq mismatch");
+                new Error("Freq mismatch");
                 throw new GekkoException();
             }
             if (this.dataArray == null)
@@ -445,7 +445,7 @@ namespace Gekko
             {
                 //This check: better safe than sorry!
                 //See comment to GetData()
-                G.Writeln2("*** ERROR: Freq mismatch");
+                new Error("Freq mismatch");
                 throw new GekkoException();
             }
             if (this.dataArray == null)
@@ -488,7 +488,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #2");
+                new Error("Timeless variable error #2");
                 throw new GekkoException();
             }
             return GetDataSequence(out index1, out index2, per1, per2, false);
@@ -506,7 +506,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #3");
+                new Error("Timeless variable error #3");
                 throw new GekkoException();
             }
             if (this.parentDatabank != null && this.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -515,7 +515,7 @@ namespace Gekko
             {
                 //This check: better safe than sorry!
                 //See comment to GetData()
-                G.Writeln2("*** ERROR: Freq mismatch");
+                new Error("Freq mismatch");
                 throw new GekkoException();
             }
             if (this.dataArray == null)
@@ -604,7 +604,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #4");
+                new Error("Timeless variable error #4");
                 throw new GekkoException();
             }
             return GetPeriod(this.firstPeriodPositionInArray);
@@ -620,7 +620,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #5");
+                new Error("Timeless variable error #5");
                 throw new GekkoException();
             }
             return GetPeriod(this.lastPeriodPositionInArray);
@@ -630,7 +630,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #6");
+                new Error("Timeless variable error #6");
                 throw new GekkoException();
             }
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
@@ -653,7 +653,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #7");
+                new Error("Timeless variable error #7");
                 throw new GekkoException();
             }
             //Could be sped up by means of looping through dataaraay with GetDataSequence, but oh well...
@@ -681,7 +681,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless variable error #7");
+                new Error("Timeless variable error #7");
                 throw new GekkoException();
             }
             //The inverse method is GetArrayIndex()
@@ -800,7 +800,7 @@ namespace Gekko
         {
             if (this.isTimeless)
             {
-                G.Writeln2("*** ERROR: Timeless error #10");
+                new Error("Timeless error #10");
                 throw new GekkoException();
             }
             else
@@ -823,7 +823,7 @@ namespace Gekko
             {
                 if (indexes[i].Type() != EVariableType.String)
                 {
-                    G.Writeln2("*** ERROR: Expected [] indexer element #" + (i + 1) + " to be STRING");
+                    new Error("Expected [] indexer element #" + (i + 1) + " to be STRING");
                     throw new GekkoException();
                 }
                 hash += ((ScalarString)indexes[i]).string2;
@@ -960,7 +960,7 @@ namespace Gekko
                 if (var2.EndsWith(Globals.freqIndicator + "q") || var2.EndsWith(Globals.freqIndicator + "m") || var2.EndsWith(Globals.freqIndicator + "u"))
                 {
                     //this is just a safety measure, to be deleted sometime
-                    G.Writeln2("*** ERROR: strange behavior regarding freq indicator");
+                    new Error("strange behavior regarding freq indicator");
                     throw new GekkoException();
                 }
                 else
@@ -987,7 +987,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Internal error #74389642");
+                new Error("Internal error #74389642");
                 throw new GekkoException();
             }
             //nothing done for "a" type
@@ -1222,7 +1222,7 @@ namespace Gekko
                         }
                         catch
                         {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1 + "' as an int (start year)");
+                            new Error("" + varName + ": could not parse '" + date1 + "' as an int (start year)");
                             throw new GekkoException();
                         }
                         try
@@ -1231,7 +1231,7 @@ namespace Gekko
                         }
                         catch
                         {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
+                            new Error("" + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
                             throw new GekkoException();
                         }
                         try
@@ -1240,7 +1240,7 @@ namespace Gekko
                         }
                         catch
                         {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2 + "' as an int (end year)");
+                            new Error("" + varName + ": could not parse '" + date2 + "' as an int (end year)");
                             throw new GekkoException();
                         }
                         try
@@ -1249,7 +1249,7 @@ namespace Gekko
                         }
                         catch
                         {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
+                            new Error("" + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
                             throw new GekkoException();
                         }
                         frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m
@@ -1273,7 +1273,7 @@ namespace Gekko
 
                                     if (!G.IsSimpleToken(v1))
                                     {
-                                        G.Writeln2("*** ERROR: tsd read: the following name is malformed:");
+                                        new Error("tsd read: the following name is malformed:");
                                         G.Writeln("         : " + v1);
                                         G.Writeln("         : The name should contain letters, digits or underscore only");
                                         G.Writeln("         : (It seems there is a label starting in position 17, this is ok)");
@@ -1286,7 +1286,7 @@ namespace Gekko
                                 else
                                 {
 
-                                    G.Writeln2("*** ERROR: tsd read: the following name is malformed:");
+                                    new Error("tsd read: the following name is malformed:");
                                     G.Writeln("         : " + varName);
                                     G.Writeln("         : The name should contain letters, digits or underscore only");
                                     throw new GekkoException();
@@ -1342,7 +1342,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    G.Writeln2("*** ERROR: " + varName + ": could not parse '" + toParse + "' as a number");
+                                    new Error("" + varName + ": could not parse '" + toParse + "' as a number");
                                     //sr.Close();
                                     throw new GekkoException();
                                 }
@@ -1423,7 +1423,7 @@ namespace Gekko
 
             if (type == -12345)
             {
-                G.Writeln2("*** ERROR: Could not find data storage file inside zipped databank file");
+                new Error("Could not find data storage file inside zipped databank file");
                 G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                 throw new GekkoException();
             }
@@ -1446,7 +1446,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
+                        new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
                         G.Writeln("           Message: " + e.Message, Color.Red);
                         G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                         throw new GekkoException();

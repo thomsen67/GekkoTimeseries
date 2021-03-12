@@ -171,7 +171,7 @@ namespace Gekko
                 if (file == null) continue;
                 if (file.Contains("/") || file.Contains("\\"))
                 {
-                    G.Writeln2("*** ERROR: '" + file + "' should not contain '/' or '\\'");
+                    new Error("'" + file + "' should not contain '/' or '\\'");
                     throw new GekkoException();
                 }
             }
@@ -206,7 +206,7 @@ namespace Gekko
                 string fileNameIndex2 = rootFolder + "\\" + fileToCopy;
                 if (!File.Exists(fileNameIndex))
                 {
-                    G.Writeln2("*** ERROR: '" + fileNameIndex + "' was not found");
+                    new Error("'" + fileNameIndex + "' was not found");
                     throw new GekkoException();
                 }
                 File.Copy(fileNameIndex, fileNameIndex2, true);
@@ -1032,7 +1032,7 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR: User abort");
+                                new Error("User abort");
                                 throw new GekkoException();
                             }
                         }

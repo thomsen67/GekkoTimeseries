@@ -69,7 +69,7 @@ namespace Gekko
                 string m_string = O.ConvertToString(m);
                 if (!G.Equal(m_string, "m"))
                 {
-                    G.Writeln2("*** ERROR: date(): expected year, month and day");
+                    new Error("date(): expected year, month and day");
                     throw new GekkoException();
                 }
                 int month_int = O.ConvertToInt(month);
@@ -77,7 +77,7 @@ namespace Gekko
                 string day_string = O.ConvertToString(d);
                 if (!G.Equal(day_string, "d"))
                 {
-                    G.Writeln2("*** ERROR: date(): expected year, month and day");
+                    new Error("date(): expected year, month and day");
                     throw new GekkoException();
                 }
                 int day_int = O.ConvertToInt(day);
@@ -86,7 +86,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: date(): expected year, month and day");
+                new Error("date(): expected year, month and day");
                 throw new GekkoException();
             }
         }
@@ -95,7 +95,7 @@ namespace Gekko
         {
             if (ths.Type() != EVariableType.Date)
             {
-                G.Writeln2("*** ERROR: getyear() expects date input");
+                new Error("getyear() expects date input");
                 throw new GekkoException();
             }
             
@@ -108,7 +108,7 @@ namespace Gekko
             //returns month for daily freq
             if (ths.Type() != EVariableType.Date)
             {
-                G.Writeln2("*** ERROR: getsubper() expects date input");
+                new Error("getsubper() expects date input");
                 throw new GekkoException();
             }
 
@@ -120,14 +120,14 @@ namespace Gekko
         {
             if (ths.Type() != EVariableType.Date)
             {
-                G.Writeln2("*** ERROR: getquarter() expects date input");
+                new Error("getquarter() expects date input");
                 throw new GekkoException();
             }
 
             GekkoTime gt = (ths as ScalarDate).date;
             if (gt.freq != EFreq.Q)
             {
-                G.Writeln2("*** ERROR: getquarter() expects quarterly date");
+                new Error("getquarter() expects quarterly date");
                 throw new GekkoException();
             }
             return new ScalarVal(gt.sub);
@@ -137,14 +137,14 @@ namespace Gekko
         {
             if (ths.Type() != EVariableType.Date)
             {
-                G.Writeln2("*** ERROR: getmonth() expects date input");
+                new Error("getmonth() expects date input");
                 throw new GekkoException();
             }
 
             GekkoTime gt = (ths as ScalarDate).date;
             if (gt.freq != EFreq.M && gt.freq != EFreq.D)
             {
-                G.Writeln2("*** ERROR: getmonth() expects monthly or daily date");
+                new Error("getmonth() expects monthly or daily date");
                 throw new GekkoException();
             }
             return new ScalarVal(gt.sub);
@@ -154,14 +154,14 @@ namespace Gekko
         {
             if (ths.Type() != EVariableType.Date)
             {
-                G.Writeln2("*** ERROR: getday() expects date input");
+                new Error("getday() expects date input");
                 throw new GekkoException();
             }
 
             GekkoTime gt = (ths as ScalarDate).date;
             if (gt.freq != EFreq.D)
             {
-                G.Writeln2("*** ERROR: getday() expects daily date");
+                new Error("getday() expects daily date");
                 throw new GekkoException();
             }
             return new ScalarVal(gt.subsub);
@@ -171,7 +171,7 @@ namespace Gekko
         {
             if (ths.Type() != EVariableType.Series)
             {                
-                G.Writeln2("*** ERROR: getparent() expects series input");
+                new Error("getparent() expects series input");
                 throw new GekkoException();
             }
 
@@ -179,23 +179,23 @@ namespace Gekko
 
             if (ts.type == ESeriesType.ArraySuper)
             {
-                G.Writeln2("*** ERROR: getparent(): this is already an array parent-series");
+                new Error("getparent(): this is already an array parent-series");
                 throw new GekkoException();
             }
             else if (ts.type == ESeriesType.Light)
             {
-                G.Writeln2("*** ERROR: getparent(): an expression cannot have a parent series");
+                new Error("getparent(): an expression cannot have a parent series");
                 throw new GekkoException();
             }
             if (ts.mmi == null)
             {
-                G.Writeln2("*** ERROR: getparent(): this series is not an array subseries");
+                new Error("getparent(): this series is not an array subseries");
                 throw new GekkoException();
             }
 
             if (ts.mmi.parent == null)
             {
-                G.Writeln2("*** ERROR: getparent(): this array subseries does not have a parent series assigned to it");
+                new Error("getparent(): this array subseries does not have a parent series assigned to it");
                 throw new GekkoException();
             }
 
@@ -566,13 +566,13 @@ namespace Gekko
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
             {
-                G.Writeln2("*** ERROR: You must use a array-timeseries variable");
+                new Error("You must use a array-timeseries variable");
                 throw new GekkoException();
             }
 
             if (iDim > ts.dimensions || iDim < 1)
             {
-                G.Writeln2("*** ERROR: Array-series does not have a dimension #" + iDim);
+                new Error("Array-series does not have a dimension #" + iDim);
                 throw new GekkoException();
             }
 
@@ -597,13 +597,13 @@ namespace Gekko
                 Series tsSub = kvp.Value as Series;
                 if (tsSub == null)
                 {
-                    G.Writeln2("*** ERROR: Element is not a series");  //should not be possible
+                    new Error("Element is not a series");  //should not be possible
                     throw new GekkoException();
                 }
 
                 if (tsSub.type == ESeriesType.Timeless)
                 {
-                    G.Writeln2("*** ERROR: Sub-series is timeless ... conversion will be fixed later on");
+                    new Error("Sub-series is timeless ... conversion will be fixed later on");
                     throw new GekkoException();
                 }
 
@@ -647,7 +647,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: bankname() accepts strings 'first' or 'ref'");
+                    new Error("bankname() accepts strings 'first' or 'ref'");
                     throw new GekkoException();
                 }
             }
@@ -658,7 +658,7 @@ namespace Gekko
                 Databank db = null;
                 if (x < 0)
                 {
-                    G.Writeln2("*** ERROR: bankname() must be called with value >= 0");
+                    new Error("bankname() must be called with value >= 0");
                     throw new GekkoException();
                 }
                 else if (x == 0)
@@ -667,7 +667,7 @@ namespace Gekko
                 }
                 else if (x >= Program.databanks.storage.Count)
                 {
-                    G.Writeln2("*** ERROR: bankname() must be called with < " + Program.databanks.storage.Count);
+                    new Error("bankname() must be called with < " + Program.databanks.storage.Count);
                     throw new GekkoException();
                 }
                 else if (x == 1) return new ScalarString(Program.databanks.GetFirst().name);
@@ -678,7 +678,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: bankname() only accepts string or val");
+                new Error("bankname() only accepts string or val");
                 throw new GekkoException();
             }
 
@@ -717,7 +717,7 @@ namespace Gekko
             Databank db = Program.databanks.GetDatabank(y1);
             if (db == null)
             {
-                G.Writeln2("*** ERROR: No open databank has the name '" + y1 + "'");
+                new Error("No open databank has the name '" + y1 + "'");
                 throw new GekkoException();
             }
 
@@ -739,7 +739,7 @@ namespace Gekko
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
             {
-                G.Writeln2("*** ERROR: ErrorHelper #" + s);
+                new Error("ErrorHelper #" + s);
                 throw new GekkoException();
             }
             return Globals.scalarVal0;
@@ -784,7 +784,7 @@ namespace Gekko
         //OBSOLETE
         public static IVariable piece(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
         {
-            G.Writeln2("*** ERROR: Rename: please use substring() instead of piece()");
+            new Error("Rename: please use substring() instead of piece()");
             throw new GekkoException();
         }
                 
@@ -797,7 +797,7 @@ namespace Gekko
             if (i3 < 0)
             {
                 //AREMOS supports this...
-                G.Writeln2("*** ERROR: piece(): size < 0 not supported.");
+                new Error("piece(): size < 0 not supported.");
                 throw new GekkoException();
             }
             int a, b = 0;
@@ -813,7 +813,7 @@ namespace Gekko
             }
             if (a < 0 || a > s1.Length - 1 || a + b > s1.Length)
             {
-                G.Writeln2("*** ERROR: piece() function with start " + (a + 1) + " and size " + b + " is not possible");
+                new Error("piece() function with start " + (a + 1) + " and size " + b + " is not possible");
                 G.Writeln("           on a string of size " + s1.Length + ".", System.Drawing.Color.Red);
                 throw new GekkoException();
             }
@@ -889,13 +889,13 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: hpfilter() logarithm argument should be 0 or 1");
+                new Error("hpfilter() logarithm argument should be 0 or 1");
                 throw new GekkoException();
             }
 
             if (obs < 2)
             {
-                G.Writeln2("*** ERROR: hpfilter() needs at least two observations to make sense");
+                new Error("hpfilter() needs at least two observations to make sense");
                 throw new GekkoException();
             }
 
@@ -1026,7 +1026,7 @@ namespace Gekko
             int n = tss.Count;
             if (n < 1)
             {
-                G.Writeln2("*** ERROR: Number of items is " + n);
+                new Error("Number of items is " + n);
                 throw new GekkoException();
             }
 
@@ -1130,7 +1130,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Expected argument 1 in series() to be VAL or STRING");
+                        new Error("Expected argument 1 in series() to be VAL or STRING");
                         throw new GekkoException();
                     }
                 }
@@ -1145,14 +1145,14 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: series() with 2 arguments must have STRING as first argument");
+                        new Error("series() with 2 arguments must have STRING as first argument");
                         throw new GekkoException();
                     }
                 }
                 else
                 {
 
-                    G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
+                    new Error("series() does not accept > 2 arguments");
                     throw new GekkoException();
                 }
 
@@ -1177,7 +1177,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Expected argument 1 in timeless() to be VAL or STRING");
+                        new Error("Expected argument 1 in timeless() to be VAL or STRING");
                         throw new GekkoException();
                     }
                 }
@@ -1192,14 +1192,14 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: timeless() with 2 arguments must have STRING as first argument");
+                        new Error("timeless() with 2 arguments must have STRING as first argument");
                         throw new GekkoException();
                     }
                 }
                 else
                 {
 
-                    G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
+                    new Error("series() does not accept > 2 arguments");
                     throw new GekkoException();
                 }
             }
@@ -1291,7 +1291,7 @@ namespace Gekko
             GekkoTime dx2 = x2.ConvertToDate(O.GetDateChoices.Strict);
             if (dx1.StrictlyLargerThan(dx2))
             {
-                G.Writeln2("*** ERROR: First date must be smaller than or equal to second date");
+                new Error("First date must be smaller than or equal to second date");
                 throw new GekkoException();
             }
             GekkoTime dy1 = t1;
@@ -1364,7 +1364,7 @@ namespace Gekko
         {
             if (items.Length < 2)
             {
-                G.Writeln2("*** ERROR: Expected 2 or more arguments");
+                new Error("Expected 2 or more arguments");
                 throw new GekkoException();
             }
 
@@ -1408,7 +1408,7 @@ namespace Gekko
         {
             if (items.Length < 2)
             {
-                G.Writeln2("*** ERROR: Expected 2 or more arguments");
+                new Error("Expected 2 or more arguments");
                 throw new GekkoException();
             }
 
@@ -1539,7 +1539,7 @@ namespace Gekko
                     string option_string = O.ConvertToString(option);
                     if (!G.Equal(option_string, "all"))
                     {
-                        G.Writeln2("*** ERROR: Expected 'all' option");
+                        new Error("Expected 'all' option");
                         throw new GekkoException();
                     }
                     Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
@@ -1693,7 +1693,7 @@ namespace Gekko
             {
                 if (m2.data.GetLength(0) != 1)
                 {
-                    G.Writeln2("*** ERROR: " + type.ToString() + "(): There are " + m1.data.GetLength(0) + " and " + m2.data.GetLength(0) + " rows in the matrices");
+                    new Error("" + type.ToString() + "(): There are " + m1.data.GetLength(0) + " and " + m2.data.GetLength(0) + " rows in the matrices");
                     throw new GekkoException();
                 }
                 else
@@ -1706,7 +1706,7 @@ namespace Gekko
             {
                 if (m2.data.GetLength(1) != 1)
                 {
-                    G.Writeln2("*** ERROR: " + type.ToString() + "(): There are " + m1.data.GetLength(1) + " and " + m2.data.GetLength(1) + " cols in the matrices");
+                    new Error("" + type.ToString() + "(): There are " + m1.data.GetLength(1) + " and " + m2.data.GetLength(1) + " cols in the matrices");
                     throw new GekkoException();
                 }
                 else
@@ -1756,13 +1756,13 @@ namespace Gekko
 
             if (m.data.GetLength(1) > 1)
             {
-                G.Writeln2("*** ERROR: The matrix provided should have 1 column only");
+                new Error("The matrix provided should have 1 column only");
                 throw new GekkoException();
             }
 
             if (m.data.GetLength(0) != obs)
             {
-                G.Writeln2("*** ERROR: You provided " + obs + " periods for a matrix with " + m.data.GetLength(0) + " rows");
+                new Error("You provided " + obs + " periods for a matrix with " + m.data.GetLength(0) + " rows");
                 throw new GekkoException();
             }
 
@@ -1786,7 +1786,7 @@ namespace Gekko
             int obs = GekkoTime.Observations(gt1, gt2);
             if (obs < 1)
             {
-                G.Writeln2("*** ERROR: Number of observations is " + obs);
+                new Error("Number of observations is " + obs);
                 throw new GekkoException();
             }
             return obs;
@@ -1825,13 +1825,13 @@ namespace Gekko
         {
             if (x.Type() != EVariableType.Matrix)
             {
-                G.Writeln2("*** ERROR: Chol() only accepts a matrix");
+                new Error("Chol() only accepts a matrix");
                 throw new GekkoException();
             }
 
             if (type.Type() != EVariableType.String)
             {
-                G.Writeln2("*** ERROR: Chol() only accepts a string as type");
+                new Error("Chol() only accepts a string as type");
                 throw new GekkoException();
             }
 
@@ -1850,7 +1850,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Type must be 'upper' or 'lower'");
+                new Error("Type must be 'upper' or 'lower'");
                 throw new GekkoException();
             }
 
@@ -1883,14 +1883,14 @@ namespace Gekko
                 int n = m.data.GetLength(0);
                 if (m.data.GetLength(1) != n)
                 {
-                    G.Writeln2("*** ERROR: Covar matrix is not square");
+                    new Error("Covar matrix is not square");
                     throw new GekkoException();
                 }
 
                 Matrix mean = (Matrix)means;
                 if (mean.data.GetLength(0) != n || mean.data.GetLength(1) != 1)
                 {
-                    G.Writeln2("*** ERROR: Mean matrix does not correspond to covar matrix");
+                    new Error("Mean matrix does not correspond to covar matrix");
                     throw new GekkoException();
                 }
 
@@ -1929,7 +1929,7 @@ namespace Gekko
         {
             if (m.GetLength(0) != m.GetLength(1))
             {
-                G.Writeln2("*** ERROR: Matrix must be square");
+                new Error("Matrix must be square");
                 throw new GekkoException();
             }
             int n = m.GetLength(0);
@@ -1960,7 +1960,7 @@ namespace Gekko
 
             if (!result)
             {
-                G.Writeln2("*** ERROR: Could not perform Cholesky decomposition");
+                new Error("Could not perform Cholesky decomposition");
                 throw new GekkoException();
             }
 
@@ -1990,13 +1990,13 @@ namespace Gekko
             Series x_series = x as Series;
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
-                G.Writeln2("*** ERROR: setdomains(): Expected array-series");
+                new Error("setdomains(): Expected array-series");
                 throw new GekkoException();
             }
             List m_list = m as List;
             if (m_list == null)
             {
-                G.Writeln2("*** ERROR: setdomains(): Expected list of strings");
+                new Error("setdomains(): Expected list of strings");
                 throw new GekkoException();
             }
             string[] ss = Stringlist.GetListOfStringsFromListOfIvariables(m_list.list.ToArray());
@@ -2017,7 +2017,7 @@ namespace Gekko
             if (x_series.meta.domains == null) return new List(new List<string>());  //empty
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
-                G.Writeln2("*** ERROR: setdomains(): Expected array-series");
+                new Error("setdomains(): Expected array-series");
                 throw new GekkoException();
             }
             List<string> ss = new List<string>();
@@ -2038,7 +2038,7 @@ namespace Gekko
             Series x_series = x as Series;
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
-                G.Writeln2("*** ERROR: getelements(): Expected array-series");
+                new Error("getelements(): Expected array-series");
                 throw new GekkoException();
             }
             
@@ -2083,14 +2083,14 @@ namespace Gekko
             Series x_series = x as Series;
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
             {
-                G.Writeln2("*** ERROR: subseries(): Expected array-series");
+                new Error("subseries(): Expected array-series");
                 throw new GekkoException();
             }
 
             ScalarString ss = option as ScalarString;
             if (ss == null)
             {
-                G.Writeln2("*** ERROR: subseries(): Expected string as option, argument 2");
+                new Error("subseries(): Expected string as option, argument 2");
                 throw new GekkoException();
             }
             string s = ss.ConvertToString();
@@ -2136,7 +2136,7 @@ namespace Gekko
                 }
                 if (!ok)
                 {
-                    G.Writeln2("*** ERROR: subseries(): Expected string as option to be 'length', 'names' or 'elements'");
+                    new Error("subseries(): Expected string as option to be 'length', 'names' or 'elements'");
                     throw new GekkoException();
                 }
             }
@@ -2219,7 +2219,7 @@ namespace Gekko
 
             if (ii < 1 || ii > (ths as List).Count())
             {
-                G.Writeln2("*** ERROR: Cannot pop() at index " + ii);
+                new Error("Cannot pop() at index " + ii);
                 throw new GekkoException();
             }
 
@@ -2288,7 +2288,7 @@ namespace Gekko
                 t2 = O.ConvertToDate(_t2);
                 if (t1.StrictlyLargerThan(t2))
                 {
-                    G.Writeln2("*** ERROR: Local time period <...> must be increasing");
+                    new Error("Local time period <...> must be increasing");
                     throw new GekkoException();
                 }
             }
@@ -2448,22 +2448,22 @@ namespace Gekko
 
             if (!IsValOrTimeseries(i1))
             {
-                G.Writeln2("*** ERROR: iif(): arg 1, type " + i1.Type().ToString() + " not supported");
+                new Error("iif(): arg 1, type " + i1.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             if (!IsValOrTimeseries(i2))
             {
-                G.Writeln2("*** ERROR: iif(): arg 3, type " + i2.Type().ToString() + " not supported");
+                new Error("iif(): arg 3, type " + i2.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             if (!IsValOrTimeseries(o1))
             {
-                G.Writeln2("*** ERROR: iif(): arg 4, type " + o1.Type().ToString() + " not supported");
+                new Error("iif(): arg 4, type " + o1.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
             if (!IsValOrTimeseries(o2))
             {
-                G.Writeln2("*** ERROR: iif(): arg 5, type " + o2.Type().ToString() + " not supported");
+                new Error("iif(): arg 5, type " + o2.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
 
@@ -2561,7 +2561,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: iif(): Expected operator '==', '<>', '<', '<=', '>' or '>='");
+                    new Error("iif(): Expected operator '==', '<>', '<', '<=', '>' or '>='");
                     throw new GekkoException();
                 }
             }
@@ -2633,7 +2633,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: log(): type " + x1.Type().ToString() + " not supported");
+                new Error("log(): type " + x1.Type().ToString() + " not supported");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2667,7 +2667,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: exp(): type " + x1.Type().ToString() + " not supported");
+                new Error("exp(): type " + x1.Type().ToString() + " not supported");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2701,7 +2701,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: sqrt(): type " + x1.Type().ToString() + " not supported");
+                new Error("sqrt(): type " + x1.Type().ToString() + " not supported");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2743,7 +2743,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                new Error("pch() function only valid for time series arguments");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2780,7 +2780,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: seq() must be fed with two values or two dates");
+                new Error("seq() must be fed with two values or two dates");
                 throw new GekkoException();
             }
             return new List(mm);
@@ -2797,7 +2797,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: dlog() function only valid for time series arguments");
+                new Error("dlog() function only valid for time series arguments");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2822,7 +2822,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: dif() function only valid for time series arguments");
+                new Error("dif() function only valid for time series arguments");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2880,7 +2880,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: movsum() only works for SERIES");
+                new Error("movsum() only works for SERIES");
                 if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2900,7 +2900,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: pchy() function only valid for time series arguments");
+                new Error("pchy() function only valid for time series arguments");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2925,7 +2925,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: dify() function only valid for time series arguments");
+                new Error("dify() function only valid for time series arguments");
                 throw new GekkoException();
             }
             return null;
@@ -2943,7 +2943,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: dlogy() function only valid for time series arguments");
+                new Error("dlogy() function only valid for time series arguments");
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -2991,13 +2991,13 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: format() expects val, date or string type");
+                    new Error("format() expects val, date or string type");
                     throw new GekkoException();
                 }
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: Format '" + format2 + "' failed");
+                new Error("Format '" + format2 + "' failed");
                 throw new GekkoException();
             }
         }
@@ -3015,7 +3015,7 @@ namespace Gekko
             int decimals = aaa1;
             if (decimals < 0)
             {
-                G.Writeln2("*** ERROR: number of decimals in round() must be positive");
+                new Error("number of decimals in round() must be positive");
                 throw new GekkoException();
             }
                         
@@ -3043,7 +3043,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: round() does not support type " + x1.Type().ToString());
+                new Error("round() does not support type " + x1.Type().ToString());
                 if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -3077,7 +3077,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: int() does not support type " + x.Type().ToString());
+                new Error("int() does not support type " + x.Type().ToString());
                 if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -3111,7 +3111,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: floor() does not support type " + x.Type().ToString());
+                new Error("floor() does not support type " + x.Type().ToString());
                 if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -3145,7 +3145,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: ceiling() does not support type " + x.Type().ToString());
+                new Error("ceiling() does not support type " + x.Type().ToString());
                 if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
@@ -3158,7 +3158,7 @@ namespace Gekko
         //OBSOLETE
         public static IVariable search(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            G.Writeln2("*** ERROR: search() is now index() in Gekko 3.0");
+            new Error("search() is now index() in Gekko 3.0");
             throw new GekkoException();
         }
 
@@ -3259,7 +3259,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: removeempty must be yes or no");
+                new Error("removeempty must be yes or no");
                 throw new GekkoException();
             }
 
@@ -3276,7 +3276,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: strip must be yes or no");
+                new Error("strip must be yes or no");
                 throw new GekkoException();
             }
 
@@ -3336,7 +3336,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Unknown type");
+                new Error("Unknown type");
                 throw new GekkoException();
             }
             ScalarString rv = new ScalarString(t);
@@ -3351,7 +3351,7 @@ namespace Gekko
         //OBSOLETE
         public static IVariable trim(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
-            G.Writeln2("*** ERROR: trim() is now strip() in Gekko 3.0.");
+            new Error("trim() is now strip() in Gekko 3.0.");
             throw new GekkoException();
         }
 
@@ -3568,7 +3568,7 @@ namespace Gekko
                 sort = O.ConvertToString(x2);
                 if (!G.Equal(sort, "natural"))
                 {
-                    G.Writeln2("*** ERROR: Expected 'natural' argument");
+                    new Error("Expected 'natural' argument");
                     throw new GekkoException();
                 }
             }            
@@ -3654,7 +3654,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Series)
             {
-                G.Writeln2("*** ERROR: Cannot convert a SERIES to a STRING");
+                new Error("Cannot convert a SERIES to a STRING");
                 throw new GekkoException();
             }
             return new ScalarString(s);
@@ -3676,7 +3676,7 @@ namespace Gekko
             }
             else 
             {
-                G.Writeln2("*** ERROR: Expected a LIST variable as argument");
+                new Error("Expected a LIST variable as argument");
                 throw new GekkoException();
             }
             return new ScalarString(s);
@@ -3698,7 +3698,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Expected a LIST variable as argument");
+                new Error("Expected a LIST variable as argument");
                 throw new GekkoException();
             }
             return new ScalarString(s);
@@ -3720,7 +3720,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Expected a LIST variable as argument");
+                new Error("Expected a LIST variable as argument");
                 throw new GekkoException();
             }
             return new ScalarString(s);
@@ -3744,12 +3744,12 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.List)
             {
-                G.Writeln2("*** ERROR: Cannot convert a LIST to a DATE");
+                new Error("Cannot convert a LIST to a DATE");
                 throw new GekkoException();
             }
             else if (x.Type() == EVariableType.Series)
             {
-                G.Writeln2("*** ERROR: Cannot convert a SERIES to a DATE");
+                new Error("Cannot convert a SERIES to a DATE");
                 throw new GekkoException();
             }
             return new ScalarDate(d);
@@ -3772,7 +3772,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Cannot only convert annual or undated DATE to VAL");
+                    new Error("Cannot only convert annual or undated DATE to VAL");
                     throw new GekkoException();
                 }
             }
@@ -3783,7 +3783,7 @@ namespace Gekko
             }
             else if (x1.Type() == EVariableType.List)
             {
-                G.Writeln2("*** ERROR: Cannot convert a LIST to a VAL");
+                new Error("Cannot convert a LIST to a VAL");
                 throw new GekkoException();
             }
             else if (x1.Type() == EVariableType.Series)
@@ -3795,7 +3795,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Cannot convert a non-timeless SERIES to a VAL");
+                    new Error("Cannot convert a non-timeless SERIES to a VAL");
                     throw new GekkoException();
                 }                
             }
@@ -3818,7 +3818,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Could not convert STRING '" + s + "' to VAL");
+                    new Error("Could not convert STRING '" + s + "' to VAL");
                     throw new GekkoException();
                 }
             }
@@ -3854,7 +3854,7 @@ namespace Gekko
             {
                 if (isInside)
                 {
-                    G.Writeln2("*** ERROR: replaceinside() is for list argument only");
+                    new Error("replaceinside() is for list argument only");
                     throw new GekkoException();
                 }
                 string s1 = O.ConvertToString(ths);
@@ -3893,7 +3893,7 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR: You cannot use max argument with replace() on a list");
+                                new Error("You cannot use max argument with replace() on a list");
                                 throw new GekkoException();
                             }
                             if (G.Equal(s, s2))
@@ -3921,13 +3921,13 @@ namespace Gekko
 
                     if (ths_series.type == ESeriesType.ArraySuper)
                     {
-                        G.Writeln2("*** ERROR: Replace(): you cannot use array-series as argument");
+                        new Error("Replace(): you cannot use array-series as argument");
                         throw new GekkoException();
                     }
 
                     if (ths_series.type == ESeriesType.Timeless)
                     {
-                        G.Writeln2("*** ERROR: Replace(): you cannot use timeless series as argument");
+                        new Error("Replace(): you cannot use timeless series as argument");
                         throw new GekkoException();
                     }
 
@@ -3955,7 +3955,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Replace(): you cannot use series type with 'inside' or 'max'");
+                    new Error("Replace(): you cannot use series type with 'inside' or 'max'");
                     throw new GekkoException();
                 }
             }
@@ -4047,7 +4047,7 @@ namespace Gekko
             GekkoTime gt = O.ConvertToDate(d);
             if (gt.freq != EFreq.D)
             {
-                G.Writeln2("*** ERROR: toExcelDate() expects a daily date as input");
+                new Error("toExcelDate() expects a daily date as input");
                 throw new GekkoException();
             }
             int iy = gt.super;
@@ -4134,7 +4134,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: fromseries(): expected first argument to be series or string type");
+                new Error("fromseries(): expected first argument to be series or string type");
                 throw new GekkoException();
             }
 
@@ -4142,7 +4142,7 @@ namespace Gekko
             
             if (ts == null)
             {
-                G.Writeln2("*** ERROR: Variable is not of series type");
+                new Error("Variable is not of series type");
                 throw new GekkoException();
             }
 
@@ -4175,7 +4175,7 @@ namespace Gekko
             }
             else if (G.Equal(s2, "perStart"))
             {
-                G.Writeln2("*** ERROR: From Gekko 3.1.4 and onwards, the use of fromSeries('perStart') is obsolete.");
+                new Error("From Gekko 3.1.4 and onwards, the use of fromSeries('perStart') is obsolete.");
                 G.Writeln("           Please use fromSeries('dataStart') instead. This is more precise, but", System.Drawing.Color.Red);
                 G.Writeln("           beware that in some cases, fromSeries('dataStart') may return a different (tighter)'.", System.Drawing.Color.Red);
                 G.Writeln("           date. In existing programs, changing 'perStart' to 'dataStart' may change the results,", System.Drawing.Color.Red);
@@ -4192,7 +4192,7 @@ namespace Gekko
                 GekkoTime gt = ts.GetRealDataPeriodFirst();
                 if (gt.IsNull())
                 {
-                    G.Writeln2("*** ERROR: 'dataStart': The series has no data or is timeless");
+                    new Error("'dataStart': The series has no data or is timeless");
                     throw new GekkoException();
                 }
                 return new ScalarDate(gt);
@@ -4210,7 +4210,7 @@ namespace Gekko
 
                 if (xx1.IsNull())
                 {
-                    G.Writeln2("*** ERROR: 'dataStartTruncate': The series has no data or is timeless");
+                    new Error("'dataStartTruncate': The series has no data or is timeless");
                     throw new GekkoException();
                 }
 
@@ -4228,7 +4228,7 @@ namespace Gekko
             }
             else if (G.Equal(s2, "perEnd"))
             {
-                G.Writeln2("*** ERROR: From Gekko 3.1.4 and onwards, the use of fromSeries('perEnd') is obsolete.");
+                new Error("From Gekko 3.1.4 and onwards, the use of fromSeries('perEnd') is obsolete.");
                 G.Writeln("           Please use fromSeries('dataEnd') instead. This is more precise, but", System.Drawing.Color.Red);
                 G.Writeln("           beware that in some cases, fromSeries('dataEnd') may return a different (tighter)'.", System.Drawing.Color.Red);
                 G.Writeln("           date. In existing programs, changing 'perEnd' to 'dataEnd' may change the results,", System.Drawing.Color.Red);
@@ -4245,7 +4245,7 @@ namespace Gekko
                 GekkoTime gt = ts.GetRealDataPeriodLast();
                 if (gt.IsNull())
                 {
-                    G.Writeln2("*** ERROR: 'dataEnd': The series has no data or is timeless");
+                    new Error("'dataEnd': The series has no data or is timeless");
                     throw new GekkoException();
                 }
                 return new ScalarDate(gt);
@@ -4263,7 +4263,7 @@ namespace Gekko
 
                 if (xx2.IsNull())
                 {
-                    G.Writeln2("*** ERROR: 'dataEndTruncate': The series has no data or is timeless");
+                    new Error("'dataEndTruncate': The series has no data or is timeless");
                     throw new GekkoException();
                 }
 
@@ -4285,7 +4285,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: fromSeries(): Argument '" + s2 + "' not recognized.");
+                new Error("fromSeries(): Argument '" + s2 + "' not recognized.");
                 throw new GekkoException();
             }
         }
@@ -4304,7 +4304,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: You can only use the union() function with two lists");
+                new Error("You can only use the union() function with two lists");
                 throw new GekkoException();
             }
 
@@ -4359,7 +4359,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: You can only use the intersect() function with two lists");
+                new Error("You can only use the intersect() function with two lists");
                 throw new GekkoException();
             }
 
@@ -4472,7 +4472,7 @@ namespace Gekko
             List temp = ths.DeepClone(null) as List;
             if (i - 1 < 0 || i - 1 > temp.list.Count)
             {
-                G.Writeln2("*** ERROR: Cannot insert at position " + i);
+                new Error("Cannot insert at position " + i);
                 throw new GekkoException();
             }
             temp.list.Insert(i - 1, x);            
@@ -4494,7 +4494,7 @@ namespace Gekko
             List temp = ths.DeepClone(null) as List;
             if (i - 1 < 0 || i - 1 > temp.list.Count)
             {
-                G.Writeln2("*** ERROR: Cannot insert at position " + i);
+                new Error("Cannot insert at position " + i);
                 throw new GekkoException();
             }
             if (x.Type() == EVariableType.List)
@@ -4588,7 +4588,7 @@ namespace Gekko
 
         private static void FunctionError(string s, IVariable x)
         {
-            G.Writeln2("*** ERROR: Function " + s + "() does not allow a " + G.GetTypeString(x) + " variable");
+            new Error("Function " + s + "() does not allow a " + G.GetTypeString(x) + " variable");
             throw new GekkoException();
         }
 
