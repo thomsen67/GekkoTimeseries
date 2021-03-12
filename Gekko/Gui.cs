@@ -1453,7 +1453,7 @@ namespace Gekko
                     if (!(ts.type == ESeriesType.ArraySuper))
                     {
                         new Error("strange error rgd. links");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     //StringBuilder sb = new StringBuilder();
@@ -1507,7 +1507,7 @@ namespace Gekko
                 else
                 {
                     new Error("Unexpected error rgd. links");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             catch
@@ -2181,7 +2181,7 @@ namespace Gekko
                             catch
                             {
                                 new Error("Could not copy styles.css from Gekko program folder");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                         }
                     }
@@ -2197,7 +2197,7 @@ namespace Gekko
                             catch
                             {
                                 new Error("Could not copy styles.css from Gekko program folder");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                         }
                     }

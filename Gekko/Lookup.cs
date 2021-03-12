@@ -150,7 +150,7 @@ namespace Gekko
                     if (iv_series == null || iv_series.type != ESeriesType.ArraySuper)
                     {
                         new Error("Expected array-series variable");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     rv = iv_series.FindArraySeries(smpl, Stringlist.GetListOfIVariablesFromListOfStrings(indexes), false, false, settings);  //last arg. not used
@@ -171,7 +171,7 @@ namespace Gekko
                 if (items == null)
                 {
                     new Error("The list contains non-string elements");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else
                 {
@@ -188,7 +188,7 @@ namespace Gekko
             else
             {
                 new Error("Expected variable name to be a string, but it is of " + G.GetTypeString(x) + " type");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return x;
         }
@@ -231,7 +231,7 @@ namespace Gekko
             if (dbName != null || freq != null)
             {
                 new Error("Expected a simple variable name without bank or frequency");
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             return new ScalarString(varname);
@@ -293,9 +293,9 @@ namespace Gekko
 
                         if (alias2 == null || alias2.Type() != EVariableType.List)
                         {
-                            new Error("No global:#alias list was found, even though");
-                            G.Writeln("           OPTION interface alias = yes.", Color.Red);
-                            throw new GekkoException();
+                            new Error("No global:#alias list was found, even though. OPTION interface alias = yes.");
+
+                            //throw new GekkoException();
                         }
 
                         GekkoDictionary<string, string> alias3 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -305,13 +305,13 @@ namespace Gekko
                             if (iv.Type() != EVariableType.List)
                             {
                                 new Error("global:#alias must be a list of lists");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             List<IVariable> element_list = (iv as List).list;
                             if (element_list.Count != 2)
                             {
                                 new Error("the elements of global:#alias must contain two strings");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             string s1 = G.Chop_AddFreq(O.ConvertToString(element_list[0]), Program.options.freq);
                             string s2 = G.Chop_AddFreq(O.ConvertToString(element_list[1]), Program.options.freq);
@@ -319,7 +319,7 @@ namespace Gekko
                             if (alias3.ContainsKey(s1))
                             {
                                 new Error("the string " + s1 + " appears several times in global:#alias");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             alias3.Add(s1, s2);
                         }
@@ -408,7 +408,7 @@ namespace Gekko
                     if (ivar2 == null)
                     {
                         new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq, true) + " for use in dot- or []-indexing");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else
                     {
@@ -554,7 +554,7 @@ namespace Gekko
                                     {
                                         //this error message is perhaps already done in LookupHelperFindVariableInSpecificBank(), but for safety it is here, too
                                         new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + db.name + "'");
-                                        throw new GekkoException();
+                                        //throw new GekkoException();
                                     }
                                 }
                                 else
@@ -588,7 +588,7 @@ namespace Gekko
                                                 if (Program.databanks.GetRef().storage.Count() > 0) s = " (excluding Ref)";
                                             }
                                             new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ss + s);
-                                            throw new GekkoException();
+                                            //throw new GekkoException();
                                         }
                                         else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
                                         {
@@ -635,7 +635,7 @@ namespace Gekko
                     if (rv == null)
                     {
                         new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in map collection");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                 }
             }
@@ -653,7 +653,7 @@ namespace Gekko
             {
 
                 new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ib.Message());
-                throw new GekkoException();
+                //throw new GekkoException();
             }
             return rv;
         }
@@ -757,7 +757,7 @@ namespace Gekko
                     else
                     {
                         new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     switch (rhs.Type())
@@ -907,13 +907,13 @@ namespace Gekko
                                 // %x = NULL
                                 //---------------------------------------------------------                            
                                 new Error("Null-value on right-hand side");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             break;
                         default:
                             {
                                 new Error("Expected variable to be series, val, date, string, list, map or matrix");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             break;
                     }
@@ -942,7 +942,7 @@ namespace Gekko
                     else
                     {
                         new Error("Name '" + varnameWithFreq + "' with '" + Globals.symbolCollection + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     switch (rhs.Type())
@@ -1078,7 +1078,7 @@ namespace Gekko
                                     default:
                                         {
                                             new Error("Expected SERIES to be 1 of 4 types");
-                                            throw new GekkoException();
+                                            //throw new GekkoException();
                                         }
                                         break;
                                 }
@@ -1167,7 +1167,7 @@ namespace Gekko
                         default:
                             {
                                 new Error("Expected IVariable to be 1 of 7 types");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             break;
                     }
@@ -1209,7 +1209,7 @@ namespace Gekko
                     else
                     {
                         new Error("Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
 
                     //Now we know that it is either SERIES x = ...  or VAR x = ...  or x = ...   
@@ -1258,7 +1258,7 @@ namespace Gekko
                                 if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                                 {
                                     new Error("Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
-                                    throw new GekkoException();
+                                    //throw new GekkoException();
                                 }
 
                                 if (Program.options.series_dyn_check)
@@ -1316,9 +1316,9 @@ namespace Gekko
                                                                                                                                         //We copy in from that window
                                                 if (lhs_series.freq != rhs_series_beware.freq)
                                                 {
-                                                    new Error("Frequency mismatch. Left-hand series is " + G.GetFreqPretty(lhs_series.freq) + ",");
-                                                    G.Writeln("           whereas right-hand series is " + G.GetFreqPretty(lhs_series.freq), Color.Red);
-                                                    throw new GekkoException();
+                                                    new Error("Frequency mismatch. Left-hand series is " + G.GetFreqPretty(lhs_series.freq) + ", whereas right-hand series is " + G.GetFreqPretty(lhs_series.freq));
+
+                                                    //throw new GekkoException();
                                                 }
 
                                                 if (rhs_series_beware.type == ESeriesType.Light)
@@ -1410,13 +1410,13 @@ namespace Gekko
                                             if (isArraySubSeries)
                                             {
                                                 new Error("You cannot put an array-series inside an array-series");
-                                                throw new GekkoException();
+                                                //throw new GekkoException();
                                             }
 
                                             if (operatorType != ESeriesUpdTypes.none && operatorType != ESeriesUpdTypes.n)
                                             {
                                                 new Error("Operators cannot be used for array-series (yet)");
-                                                throw new GekkoException();
+                                                //throw new GekkoException();
                                             }
 
                                             lhs_series = rhs.DeepClone(null) as Series;
@@ -1437,7 +1437,7 @@ namespace Gekko
                                     default:
                                         {
                                             new Error("Expected SERIES to be 1 of 4 types");
-                                            throw new GekkoException();
+                                            //throw new GekkoException();
                                         }
                                         break;
                                 }
@@ -1566,7 +1566,7 @@ namespace Gekko
                                     if (n != rhs_matrix.data.GetLength(0) || 1 != rhs_matrix.data.GetLength(1))
                                     {
                                         new Error("Expected " + n + " x 1 matrix, got " + rhs_matrix.data.GetLength(0) + " x " + rhs_matrix.data.GetLength(1));
-                                        throw new GekkoException();
+                                        //throw new GekkoException();
                                     }
 
                                     if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
@@ -1602,7 +1602,7 @@ namespace Gekko
                         default:
                             {
                                 new Error("Expected IVariable to be 1 of 7 types");
-                                throw new GekkoException();
+                                //throw new GekkoException();
                             }
                             break;
                     }  //end switch
@@ -1671,14 +1671,14 @@ namespace Gekko
                 if (settings.create == ECreatePossibilities.NoneReportError)
                 {
                     new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + db.name + "'");
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
                 else if (settings.create == ECreatePossibilities.Must || settings.create == ECreatePossibilities.Can)
                 {
                     if (G.Chop_HasSigil(varnameWithFreq))
                     {
                         new Error("Internal error #982437532");
-                        throw new GekkoException();
+                        //throw new GekkoException();
                     }
                     else
                     {
@@ -1721,8 +1721,8 @@ namespace Gekko
             }
             else
             {
-                new Error("#8097432857");
-                throw new GekkoException();
+                new Error("#8097432857"); return null;
+                //throw new GekkoException();
             }
 
             return db;
@@ -1750,13 +1750,13 @@ namespace Gekko
                 if (!lastElementStar)
                 {
                     new Error("Expected " + n + " list items, got " + rhs_list.list.Count);
-                    throw new GekkoException();
+                    //throw new GekkoException();
                 }
             }
             else if (rhs_list.list.Count > n)
             {
                 new Error("Expected " + n + " list items, got " + rhs_list.list.Count);
-                throw new GekkoException();
+                //throw new GekkoException();
             }
 
             //int offset = 1;
