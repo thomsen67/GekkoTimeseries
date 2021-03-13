@@ -62,7 +62,7 @@ namespace Gekko
         /// Add text to "main"
         /// </summary>
         /// <param name="s"></param>
-        public void Main(string s)
+        public void MainAdd(string s)
         {             
             this.storageMain[this.storageMain.Count - 1].storage.Add(s);
         }
@@ -424,7 +424,7 @@ namespace Gekko
         /// <param name="s"></param>
         public Error(string s) : base(EWrapType.Error)
         {
-            this.Main(s);
+            this.MainAdd(s);
             this.Exe1();
         }
 
@@ -448,7 +448,7 @@ namespace Gekko
         /// <param name="s"></param>
         public Warning(string s) : base(EWrapType.Warning)
         {
-            this.Main(s);
+            this.MainAdd(s);
             this.Exe1();
         }
     }
@@ -471,7 +471,7 @@ namespace Gekko
         /// <param name="s"></param>
         public Note(string s) : base(EWrapType.Note)
         {
-            this.Main(s);
+            this.MainAdd(s);
             this.Exe1();
         }
     }
@@ -495,7 +495,7 @@ namespace Gekko
         /// <param name="s"></param>
         public Writeln(string s) : base(EWrapType.Writeln)
         {
-            this.Main(s);
+            this.MainAdd(s);
             this.Exe1();
         }
     }

@@ -1765,11 +1765,8 @@ namespace Gekko
                 doc.LoadXml(xmlText);
             }
             catch (Exception e)
-            {
-                G.Writeln();
-                G.Writeln("*** ERROR: Table file: '" + filename + "'");
-                Program.WriteXmlError(e, filename);
-                throw new GekkoException();
+            {                
+                new Error("Table file: '" + filename + "'. " + Program.GetXmlError(e, filename));
             }
 
             VisitChildrenAndPutAssignvarsIntoNodes(doc, 0);

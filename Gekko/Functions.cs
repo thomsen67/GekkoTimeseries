@@ -4177,15 +4177,15 @@ namespace Gekko
             {
                 using (Error e = new Error())
                 {
-                    e.Main("From Gekko 3.1.4 and onwards, the use of fromSeries('perStart') is obsolete.");
-                    e.Main("Please use fromSeries('dataStart') instead. This is more precise, but");
-                    e.Main("beware that in some cases, fromSeries('dataStart') may return a different (tighter)");
-                    e.Main("date. In existing programs, changing 'perStart' to 'dataStart' may change the results,");
-                    e.Main("but in all imaginable cases, this is a change for the better. The use of");
-                    e.Main("fromSeries('dataStart') has a small speed penalty compared to 'perStart', but in");
-                    e.Main("most cases, this should not be noticable. The hazard of 'perStart' compared to ");
-                    e.Main("'dataStart' is no longer deemed worth the speed reward of the former, which is");
-                    e.Main("the reason for this change. Apologies for the inconvenience.");
+                    e.MainAdd("From Gekko 3.1.4 and onwards, the use of fromSeries('perStart') is obsolete.");
+                    e.MainAdd("Please use fromSeries('dataStart') instead. This is more precise, but");
+                    e.MainAdd("beware that in some cases, fromSeries('dataStart') may return a different (tighter)");
+                    e.MainAdd("date. In existing programs, changing 'perStart' to 'dataStart' may change the results,");
+                    e.MainAdd("but in all imaginable cases, this is a change for the better. The use of");
+                    e.MainAdd("fromSeries('dataStart') has a small speed penalty compared to 'perStart', but in");
+                    e.MainAdd("most cases, this should not be noticable. The hazard of 'perStart' compared to ");
+                    e.MainAdd("'dataStart' is no longer deemed worth the speed reward of the former, which is");
+                    e.MainAdd("the reason for this change. Apologies for the inconvenience.");
                 }
                 return null;
             }
@@ -4232,15 +4232,15 @@ namespace Gekko
             {
                 using (Error e = new Error())
                 {
-                    e.Main("From Gekko 3.1.4 and onwards, the use of fromSeries('perEnd') is obsolete.");
-                    e.Main("Please use fromSeries('dataEnd') instead. This is more precise, but");
-                    e.Main("beware that in some cases, fromSeries('dataEnd') may return a different (tighter)");
-                    e.Main("date. In existing programs, changing 'perEnd' to 'dataEnd' may change the results,");
-                    e.Main("but in all imaginable cases, this is a change for the better. The use of");
-                    e.Main("fromSeries('dataEnd') has a small speed penalty compared to 'perEnd', but in");
-                    e.Main("most cases, this should not be noticable. The hazard of 'perEnd' compared to ");
-                    e.Main("'dataEnd' is no longer deemed worth the speed reward of the former, which is");
-                    e.Main("the reason for this change. Apologies for the inconvenience.");
+                    e.MainAdd("From Gekko 3.1.4 and onwards, the use of fromSeries('perEnd') is obsolete.");
+                    e.MainAdd("Please use fromSeries('dataEnd') instead. This is more precise, but");
+                    e.MainAdd("beware that in some cases, fromSeries('dataEnd') may return a different (tighter)");
+                    e.MainAdd("date. In existing programs, changing 'perEnd' to 'dataEnd' may change the results,");
+                    e.MainAdd("but in all imaginable cases, this is a change for the better. The use of");
+                    e.MainAdd("fromSeries('dataEnd') has a small speed penalty compared to 'perEnd', but in");
+                    e.MainAdd("most cases, this should not be noticable. The hazard of 'perEnd' compared to ");
+                    e.MainAdd("'dataEnd' is no longer deemed worth the speed reward of the former, which is");
+                    e.MainAdd("the reason for this change. Apologies for the inconvenience.");
                 }
                 return null;
             }

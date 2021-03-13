@@ -2897,10 +2897,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Promting is only allowed for types val, date, string or name at the moment.");
-                    G.Writeln("    This restriction may be removed in a future Gekko version.", Color.Red);
-                    G.Writeln("    The type '" + type[i] + "' is not valid for prompting.", Color.Red);                    
-                    throw new GekkoException();
+                    new Error("Promting is only allowed for types val, date, string or name at the moment. This restriction may be removed in a future Gekko version. The type '" + type[i] + "' is not valid for prompting.");                    
                 }
 
                 if (question[i])

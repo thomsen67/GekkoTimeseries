@@ -738,9 +738,9 @@ namespace Gekko
             {
                 using (Error e = new Error())
                 {
-                    e.Main("The model was not compiled/loaded with the current frequency.");
-                    e.Main("This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
-                    e.Main("the MODEL statement after your 'OPTION freq ... ' statement.");
+                    e.MainAdd("The model was not compiled/loaded with the current frequency.");
+                    e.MainAdd("This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
+                    e.MainAdd("the MODEL statement after your 'OPTION freq ... ' statement.");
                 }
             }
 

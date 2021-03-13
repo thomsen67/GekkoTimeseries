@@ -98,11 +98,8 @@ namespace Gekko
                         doc1.LoadXml(xmlText);
                     }
                     catch (Exception e)
-                    {
-                        G.Writeln();
-                        G.Writeln("*** ERROR: Plot template file: '" + fileName + "'");
-                        Program.WriteXmlError(e, fileName);
-                        throw new GekkoException();
+                    {                        
+                        new Error("Plot template file: '" + fileName + "'. " + Program.GetXmlError(e, fileName));
                     }
                 }
 
@@ -127,11 +124,8 @@ namespace Gekko
                         doc2.LoadXml(xmlText);
                     }
                     catch (Exception e)
-                    {
-                        G.Writeln();
-                        G.Writeln("*** ERROR: Plot template file: '" + fileName + "'");
-                        Program.WriteXmlError(e, fileName);
-                        throw new GekkoException();
+                    {                        
+                        new Error("Plot template file: '" + fileName + "'. " + Program.GetXmlError(e, fileName));
                     }
                 }
 

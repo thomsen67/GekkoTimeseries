@@ -796,12 +796,12 @@ namespace Gekko
             {
                 using (Error e = new Error())
                 {
-                    e.Main("The number of equations and endogenous variables do not match (" + nEqs + " vs " + endo.Count + "). ");
-                    e.Main("Equations (unrolled over sets):");
+                    e.MainAdd("The number of equations and endogenous variables do not match (" + nEqs + " vs " + endo.Count + "). ");
+                    e.MainAdd("Equations (unrolled over sets):");
                     for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
                     {
                         e.MainNewLine();
-                        e.Main("Equation #" + (i + 1) + " has " + decompDatas.storage[i].Count + " unrolled equations");                        
+                        e.MainAdd("Equation #" + (i + 1) + " has " + decompDatas.storage[i].Count + " unrolled equations");                        
                     }
                 }                
             }

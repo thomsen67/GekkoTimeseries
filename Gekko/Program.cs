@@ -2003,12 +2003,12 @@ namespace Gekko
                                         {
                                             using (var e = new Error())
                                             {
-                                                e.Main("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
+                                                e.MainAdd("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
                                                 e.MainNewLines();
-                                                e.Main("Note: You may change separator: OPTION interface csv decimalseparator");                                                
+                                                e.MainAdd("Note: You may change separator: OPTION interface csv decimalseparator");                                                
                                                 if (s3.Trim() == ".")
                                                 {
-                                                    e.Main("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
+                                                    e.MainAdd("Note: You cannot use dot ('.') to indicate missing value, use M or NA instead");
                                                 }
                                             }
                                         }
@@ -3390,9 +3390,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    new Error("XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file.");
-                    Program.WriteXmlError(e, fileXml);
-                    throw new GekkoException();
+                    new Error("XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file. " + Program.GetXmlError(e, fileXml));                    
                 }
 
                 XmlElement root = doc.DocumentElement; //"DatabankInfo"
@@ -3404,11 +3402,13 @@ namespace Gekko
                 
                 if (!Globals.tsdxVersions.Contains(databankVersion))
                 {
-                    new Error("The databank version " + databankVersion + " is unknown to this Gekko version (" + Globals.gekkoVersion + ")");
-                    G.Write("           Known databank versions: "); G.PrintListWithCommas(Globals.tsdxVersions, false);
-                    G.Writeln("           The databank seems to have been written by Gekko version " + gekkoVersion);
-                    G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl);
-                    throw new GekkoException();
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("The databank version " + databankVersion + " is unknown to this Gekko version (" + Globals.gekkoVersion + ").");
+                        e.MainAdd("Known databank versions: " + G.GetListWithCommas(Globals.tsdxVersions) + ".");
+                        e.MainAdd("The databank seems to have been written by Gekko version " + gekkoVersion + ".");
+                        e.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
+                    }                    
                 }
 
                 XmlNodeList descriptions = doc.GetElementsByTagName("Info1");
@@ -4127,11 +4127,7 @@ namespace Gekko
 
                                         if (!G.IsSimpleToken(v1))
                                         {
-                                            new Error("tsd read: the following name is malformed:");
-                                            G.Writeln("         : " + v1);
-                                            G.Writeln("         : The name should contain letters, digits or underscore only");
-                                            G.Writeln("         : (It seems there is a label starting in position 17, this is ok)");
-                                            throw new GekkoException();
+                                            new Error("tsd read: the following name is malformed: " + v1 + ". The name should contain letters, digits or underscore only (it seems there is a label starting in position 17, this is ok).");
                                         }
 
                                         varName = v1;
@@ -4139,11 +4135,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-
                                         new Error("tsd read: the following name is malformed: " + varName + ". The name should contain letters, digits or underscore only");
-
-
-                                        //throw new GekkoException();
                                     }
                                 }
 
@@ -14288,22 +14280,22 @@ namespace Gekko
                 {
                     using (Error e = new Error())
                     {
-                        e.Main("Could not find model file '" + fileNameSimple + "'");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("Could not find model file '" + fileNameSimple + "'");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.MainNewLines(); // "aaa
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.MainNewLines(); // "aaa
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.MainNewLines(); // "aaa
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
+                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
                         e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
                         e.More("You may use 'model *;' to look for model files in the current working folder.");
@@ -14322,7 +14314,7 @@ namespace Gekko
                 {
                     using (Error e = new Error())
                     {
-                        e.Main("Could not find model file '" + fileNameSimple + "'");                        
+                        e.MainAdd("Could not find model file '" + fileNameSimple + "'");                        
                         //e.MainNextSection(); // "aaa                        
                         e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
                         e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
@@ -16259,12 +16251,12 @@ namespace Gekko
 
                 if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
                 {
-                    new Error("No variables to write");
+                    string s = null;
                     if (!isRecordsFormat)
                     {
-                        G.Writeln("+++ NOTE: Only variables of the current frequency (" + Program.options.freq.ToString() + ") are considered.");
+                        s += "NOTE: Only variables of the current frequency (" + Program.options.freq.ToString() + ") are considered.";
                     }
-                    throw new GekkoException();
+                    new Error("No variables to write. " + s);
                 }
 
                 if (tStart.IsNull() && tEnd.IsNull())
@@ -17331,9 +17323,11 @@ namespace Gekko
                     //checking if the file is there at all for reading
                     if (!File.Exists(pathAndFilename))
                     {
-                        new Error("Could not find file '" + pathAndFilename + "' for reading");
-                        if (!Directory.Exists(pathName)) G.Writeln2("*** ERROR: The directory '" + pathName + "' does not seem to exist");
-                        throw new GekkoException();
+                        using (Error e = new Error())
+                        {
+                            e.MainAdd("Could not find file '" + pathAndFilename + "' for reading.");
+                            if (!Directory.Exists(pathName)) e.MainAdd("The directory '" + pathName + "' does not seem to exist.");
+                        }
                     }
                 }
                 else if (type == GekkoFileReadOrWrite.WriteAppend)
@@ -17341,9 +17335,11 @@ namespace Gekko
                     //checking if the file is there at all for appending
                     if (!File.Exists(pathAndFilename))
                     {
-                        new Error("Could not find file '" + pathAndFilename + "' for appending");
-                        if (!Directory.Exists(pathName)) G.Writeln2("*** ERROR: The directory '" + pathName + "' does not seem to exist");
-                        throw new GekkoException();
+                        using (Error e = new Error())
+                        {
+                            e.MainAdd("Could not find file '" + pathAndFilename + "' for appending.");
+                            if (!Directory.Exists(pathName)) e.MainAdd("The directory '" + pathName + "' does not seem to exist.");
+                        }
                     }
                 }
                 else if (type == GekkoFileReadOrWrite.Write)
@@ -20441,11 +20437,13 @@ namespace Gekko
             ph.operators.Add("q");
         }
 
-        public static void WriteXmlError(Exception e, string file)
+        public static string GetXmlError(Exception e, string file)
         {
-            G.Writeln2("*** ERROR: The file seems to be invalid as regards XML syntax:");
-            if (e.InnerException != null) G.Writeln("           " + e.InnerException.Message, Color.Red);
-            else G.Writeln("           " + e.Message, Color.Red);
+            string s = "The file seems to be invalid as regards XML syntax: ";
+            if (e.InnerException != null) s += e.InnerException.Message;
+            else s += e.Message;
+            s += ".";
+            return s;
         }
 
         private static void ChangeOperatorsToLower(PrtHelper ph)

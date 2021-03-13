@@ -1196,12 +1196,12 @@ namespace Gekko
                             //#07549843254
                             using (Error e = new Error())
                             {
-                                e.Main("Cannot auto-create series " + varnameWithFreq + ". See the CREATE command.");
-                                e.Main("You may change the settings with the following option:");
+                                e.MainAdd("Cannot auto-create series " + varnameWithFreq + ". See the CREATE command.");
+                                e.MainAdd("You may change the settings with the following option:");
                                 e.MainNewLine();
-                                e.Main("OPTION databank create auto = yes;");
+                                e.MainAdd("OPTION databank create auto = yes;");
                                 e.MainNewLine();
-                                e.Main("Alternatively, use 'MODE data;' or 'MODE mixed;'.");
+                                e.MainAdd("Alternatively, use 'MODE data;' or 'MODE mixed;'.");
                             }                            
                         }
                     }
