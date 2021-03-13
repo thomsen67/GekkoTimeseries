@@ -1341,9 +1341,7 @@ namespace Gekko
             }
             else
             {
-                new Error("The slow gdx reader is not maintained, try the faster GDX reader with:");
-                G.Writeln("           OPTION gams fast = yes;", Color.Red);
-                throw new GekkoException();
+                new Error("The slow gdx reader is not maintained, try the faster GDX reader with: OPTION gams fast = yes;");
             }
             G.Writeln2("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.Seconds(dt1) + ")");
             if (skippedSets > 0) G.Writeln("+++ NOTE: " + skippedSets + " sets with dim > 1 were not imported");
@@ -1625,12 +1623,12 @@ namespace Gekko
                                         tt = G.IntParse(timeElement);
                                         if (tt == -12345)
                                         {
-                                            new Error("Could not convert '" + timeElement + "' into an annual time period");
+                                            string txt = null;
                                             if (hasPrefix)
                                             {
-                                                G.Writeln("           Original time element name: '" + uel[index[d]] + "'", Color.Red);
+                                                txt = ". Original time element name: '" + uel[index[d]] + "'";
                                             }
-                                            throw new GekkoException();
+                                            new Error("Could not convert '" + timeElement + "' into an annual time period" + txt);
                                         }
                                         tt = tt + offset;
                                         continue;  //do not add it to the dims

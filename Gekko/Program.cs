@@ -2004,7 +2004,7 @@ namespace Gekko
                                             using (var e = new Error())
                                             {
                                                 e.Main("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
-                                                e.MainNextSection();
+                                                e.MainNewLines();
                                                 e.Main("Note: You may change separator: OPTION interface csv decimalseparator");                                                
                                                 if (s3.Trim() == ".")
                                                 {
@@ -14292,28 +14292,28 @@ namespace Gekko
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainNextSection(); // "aaa
+                        e.MainNewLines(); // "aaa
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainNextSection(); // "aaa
+                        e.MainNewLines(); // "aaa
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainNextSection(); // "aaa
+                        e.MainNewLines(); // "aaa
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.Main("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
                         e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
                         e.More("You may use 'model *;' to look for model files in the current working folder.");
-                        e.MoreNextSection();
+                        e.MoreNewLines();
                         e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
                         e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.MoreNextSection();
+                        e.MoreNewLines();
                         e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
                         e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.MoreNextSection();
+                        e.MoreNewLines();
                         e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
                         e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");                        
                     }

@@ -800,7 +800,7 @@ namespace Gekko
                     e.Main("Equations (unrolled over sets):");
                     for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
                     {
-                        e.MainNextSection(false);
+                        e.MainNewLine();
                         e.Main("Equation #" + (i + 1) + " has " + decompDatas.storage[i].Count + " unrolled equations");                        
                     }
                 }                

@@ -20,9 +20,9 @@ namespace Gekko
 
         }
 
-        public WrapHelper5(int linesInBetween)
+        public WrapHelper5(int linesAtStart)
         {
-            this.linesAtStart = linesInBetween;
+            this.linesAtStart = linesAtStart;
         }
     }
     
@@ -68,21 +68,19 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Add a section break to "main".  SpaceBefore is implicitly true.
+        /// Add a section break to "main". Blank line in between.
         /// </summary>
-        public void MainNextSection()
+        public void MainNewLines()
         {
             this.storageMain.Add(new WrapHelper5());
         }
 
         /// <summary>
-        /// Add a section break to "main".
+        /// Add a section break to "main". No blank line in between.
         /// </summary>
-        public void MainNextSection(bool spaceBefore)
-        {
-            int linesBefore = 1;
-            if (!spaceBefore) linesBefore = 0;
-            this.storageMain.Add(new WrapHelper5(linesBefore));
+        public void MainNewLine()
+        {            
+            this.storageMain.Add(new WrapHelper5(0));
         }
 
         /// <summary>
@@ -95,21 +93,19 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Add a section break to "more".  SpaceBefore is implicitly true.
+        /// Add a section break to "more". Blank line in between.
         /// </summary>
-        public void MoreNextSection()
+        public void MoreNewLines()
         {
             this.storageMore.Add(new WrapHelper5());
         }
 
         /// <summary>
-        /// Add a section break to "more"
+        /// Add a section break to "more". No blank line in between.
         /// </summary>
-        public void MoreNextSection(bool spaceBefore)
-        {
-            int linesBefore = 1;
-            if (!spaceBefore) linesBefore = 0;
-            this.storageMore.Add(new WrapHelper5(linesBefore));
+        public void MoreNewLine()
+        {            
+            this.storageMore.Add(new WrapHelper5(0));
         }        
 
         /// <summary>
