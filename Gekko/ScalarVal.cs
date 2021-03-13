@@ -120,11 +120,14 @@ namespace Gekko
         public List<IVariable> ConvertToList()
         {
             //See similar comment: #slkfhas
-            new Error("You are trying to convert/use the value " + this.val + " as a STRING/NAME item in a list");
-            G.Writeln("           In LIST commands, you must for example use '5' instead of 5, and '01' instead of 01.");
-            G.Writeln("           Alternatively, for lists with such elements, you can use the LIST<direct> option.");
-            G.Writeln("           If you are using a VAL scalar %v, you may try to use string(%v) instead.");
-            throw new GekkoException();
+            using (Error e = new Error())
+            {
+                e.MainAdd("You are trying to convert/use the value " + this.val + " as a STRING/NAME item in a list.");
+                e.MainAdd("In LIST commands, you must for example use '5' instead of 5, and '01' instead of 01.");
+                e.MainAdd("Alternatively, for lists with such elements, you can use the LIST<direct> option.");
+                e.MainAdd("If you are using a VAL scalar %v, you may try to use string(%v) instead.");
+            }
+            return null;
         }
 
         public EVariableType Type()

@@ -1821,12 +1821,12 @@ namespace Gekko
 
         private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type, int extra)
         {
-            new Error("" + type.ToString().ToUpper() + " " + varnameWithFreq + " has a " + rhs.Type().ToString().ToUpper() + " on right-hand side");
+            string s = null;
             if (extra == 1)
             {
-                G.Writeln(Globals.stringConversionNote);
+                s+= Globals.stringConversionNote;
             }
-            throw new GekkoException();
+            new Error("" + type.ToString().ToUpper() + " " + varnameWithFreq + " has a " + rhs.Type().ToString().ToUpper() + " on right-hand side. " + s);
         }
 
         private static bool IsAllSpecialDatabank(string dbName)

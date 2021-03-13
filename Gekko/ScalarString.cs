@@ -210,19 +210,24 @@ namespace Gekko
 
         public double ConvertToVal()
         {
-            new Error("Cannot extract a val from " + G.GetTypeString(this) + " type ('" + this.string2 + "')");
-            double d = double.NaN; bool b = double.TryParse(this.string2, out d);
-            if (this.isFromNakedList && b)
+            using (Error e = new Error())
             {
-                G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
-                G.Writeln("           'naked' list without parentheses, like #m = 007, 1e5;. The items in a list like #m");
-                G.Writeln("           may look like values, but are treated as strings. You may use #m.vals() to convert the");
-                G.Writeln("           items into the numbers 7 and 100000. See more in the help on the 'Naked list' page");
-            }
-            else
-            {
-                G.Writeln(Globals.stringConversionNote);
-            }
+                e.MainAdd("Cannot extract a val from " + G.GetTypeString(this) + " type ('" + this.string2 + "'). ");
+                double d = double.NaN; bool b = double.TryParse(this.string2, out d);
+                if (this.isFromNakedList && b)
+                {
+                    e.MainNewLines();
+                    e.MainAdd("Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
+                    e.MainAdd("'naked' list without parentheses, like #m = 007, 1e5;. The items in a list like #m");
+                    e.MainAdd("may look like values, but are treated as strings. You may use #m.vals() to convert the");
+                    e.MainAdd("items into the numbers 7 and 100000. See more in the help on the 'Naked list' page");
+                }
+                else
+                {
+                    e.MainAdd(Globals.stringConversionNote);
+                }
+            }            
+            
             throw new GekkoException();
         }
 
@@ -233,18 +238,21 @@ namespace Gekko
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            new Error("Could not convert the string '" + this.string2 + "' directly into a date.");
-            G.Writeln("           You may try the date() conversion function.");
-            GekkoTime gt = GekkoTime.FromStringToGekkoTime(this.string2);            
-            if (this.isFromNakedList && !gt.IsNull())
+            using (Error e = new Error())
             {
-                G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
-                G.Writeln("           'naked' list without parentheses, like #m = 2020q1, 2020q2, 2020q3;. In such");
-                G.Writeln("           naked lists, the items are treated as strings. You should perhaps ");
-                G.Writeln("           add enclosing parentheses, #m = (2020q1, 2020q2, 2020q3);");
+                e.MainAdd("Could not convert the string '" + this.string2 + "' directly into a date.");
+                e.MainAdd("You may try the date() conversion function.");
+                GekkoTime gt = GekkoTime.FromStringToGekkoTime(this.string2);
+                if (this.isFromNakedList && !gt.IsNull())
+                {
+                    e.MainNewLines();
+                    e.MainAdd("Note that the '" + this.string2 + "' origins from a");
+                    e.MainAdd("'naked' list without parentheses, like #m = 2020q1, 2020q2, 2020q3;. In such");
+                    e.MainAdd("naked lists, the items are treated as strings. You should perhaps");
+                    e.MainAdd("add enclosing parentheses, #m = (2020q1, 2020q2, 2020q3);");
+                }
             }
-            throw new GekkoException();
-            throw new GekkoException();
+            return GekkoTime.tNull;
         }
 
         public List<IVariable> ConvertToList()
@@ -265,13 +273,11 @@ namespace Gekko
                     {
                         new Error("Adding a list and scalar with %s + #x is no longer legal. Please use #x.prefix(%s) instead.");
                         return null;
-                        //throw new GekkoException();
                     }
                 case EVariableType.Series:
                     {
-                        new Error("You cannot add a string and a timeseries");
-                        G.Writeln(Globals.stringConversionNote);
-                        throw new GekkoException();
+                        new Error("You cannot add a string and a timeseries. " + Globals.stringConversionNote);
+                        return null;
                     }                    
                 case EVariableType.Val:
                     {
@@ -334,30 +340,26 @@ namespace Gekko
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
-            new Error("Subtracting from a string ('" + this.string2 + "') is not allowed");
-            G.Writeln(Globals.stringConversionNote);
-            throw new GekkoException();
+            new Error("Subtracting from a string ('" + this.string2 + "') is not allowed. " + Globals.stringConversionNote);
+            return null;
         }
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
         {            
-            new Error("Multiplication involving a string ('" + this.string2 + "') is not allowed");
-            G.Writeln(Globals.stringConversionNote);
-            throw new GekkoException();
+            new Error("Multiplication involving a string ('" + this.string2 + "') is not allowed. " + Globals.stringConversionNote);
+            return null;
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            new Error("Division involving a string ('" + this.string2 + "') is not allowed");
-            G.Writeln(Globals.stringConversionNote);
-            throw new GekkoException();
+            new Error("Division involving a string ('" + this.string2 + "') is not allowed. " + Globals.stringConversionNote);
+            return null;
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            new Error("Exponentiation involving a string ('" + this.string2 + "') is not allowed");
-            G.Writeln(Globals.stringConversionNote);
-            throw new GekkoException();
+            new Error("Exponentiation involving a string ('" + this.string2 + "') is not allowed. " + Globals.stringConversionNote);
+            return null;
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)

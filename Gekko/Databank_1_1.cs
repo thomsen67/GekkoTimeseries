@@ -1270,11 +1270,7 @@ namespace Gekko
 
                                     if (!G.IsSimpleToken(v1))
                                     {
-                                        new Error("tsd read: the following name is malformed:");
-                                        G.Writeln("         : " + v1);
-                                        G.Writeln("         : The name should contain letters, digits or underscore only");
-                                        G.Writeln("         : (It seems there is a label starting in position 17, this is ok)");
-                                        throw new GekkoException();
+                                        new Error("Tsd read: the following name is malformed: " + v1 + ". The name should contain letters, digits or underscore only (it seems there is a label starting in position 17, this is ok).");                                    
                                     }
 
                                     varName = v1;
@@ -1439,10 +1435,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
-                        G.Writeln("           Message: " + e.Message, Color.Red);
-                        G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
-                        throw new GekkoException();
+                        new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers). Message: " + e.Message + ". Troubleshooting, try this page: " + Globals.databankformatUrl + ".");                        
                     }
                     
 

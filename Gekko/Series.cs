@@ -2091,11 +2091,13 @@ namespace Gekko
                     //why not allow this, really? Would work for 1-dimensional array-series, x['a'] = x[a] = x.a
                     //or maybe just keep disallowing it, because it would be hard to add a new dimension with a lot of x.a without []-parentheses.
                     //also a bit hard to spot that it is an array-series.
-                    new Error("Use of dot syntax not possible regarding array-series indexing.");
-                    G.Writeln("           Using x.a instead of x['a'] or x[a] would make it harder to spot x as an array-series,", Color.Red);
-                    G.Writeln("           adding a dimension would be cumbersome, and the confusion would probably not merit the", Color.Red);
-                    G.Writeln("           advantages (that are only present regarding 1-dimensional array-series anyway)", Color.Red);
-                    throw new GekkoException();
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("Use of dot syntax not possible regarding array-series indexing.");
+                        e.MainAdd("Using x.a instead of x['a'] or x[a] would make it harder to spot x as an array-series,");
+                        e.MainAdd("adding a dimension would be cumbersome, and the confusion would probably not merit the");
+                        e.MainAdd("advantages (that are only present regarding 1-dimensional array-series anyway).");
+                    }
                 }
                 else
                 {
@@ -2249,11 +2251,13 @@ namespace Gekko
                 if (this.dimensionsStorage == null)
                 {
                     string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
-                    new Error("The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
-                    G.Writeln("           Indexer used: [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
-                    G.Writeln("           You may use '" + this.name + " = series(" + keys.Length + ");' to create it,", Color.Red);
-                    G.Writeln("           perhaps with 'CREATE " + this.name + ";' first.", Color.Red);
-                    throw new GekkoException();
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
+                        e.MainAdd("Indexer used: [" + txt.Substring(0, txt.Length - 2) + "].");
+                        e.MainAdd("You may use '" + this.name + " = series(" + keys.Length + ");' to create it,");
+                        e.MainAdd("perhaps with 'CREATE " + this.name + ";' first.");
+                    }                    
                 }
 
                 IVariable iv = null;
@@ -2356,10 +2360,7 @@ namespace Gekko
                         else
                         {
                             //#07549843254
-                            new Error("Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + G.GetListWithCommas(keys) + "].");
-                            G.Writeln("           You may change the settings with the following option:", Color.Red);
-                            G.Writeln("           OPTION databank create auto = yes;", Color.Red);
-                            throw new GekkoException();
+                            new Error("Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + G.GetListWithCommas(keys) + "]. You may change the settings with the following option: OPTION databank create auto = yes;.");                      
                         }
 
                         if (rhsIsTimeless)
@@ -2415,14 +2416,18 @@ namespace Gekko
                 }
                 txt += "'" + ss + "', ";
             }
-            new Error("The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
-            G.Writeln("           [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
-            foreach (string warning in warnings)
+            using (Error e = new Error())
             {
-                G.Writeln("+++ NOTE: " + warning);
-            }
-            G.Writeln("+++ NOTE: You may ignore such errors with 'OPTION series array print missing = ... ;' and 'OPTION series array calc missing = ... ;'");
-            throw new GekkoException();
+                e.MainAdd("The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element: ");
+                e.MainAdd("[" + txt.Substring(0, txt.Length - 2) + "].");
+                foreach (string warning in warnings)
+                {
+                    e.MainNewLine();
+                    e.MainAdd("  NOTE: " + warning);
+                }
+                e.MainNewLine();
+                e.MainAdd("You may ignore such errors with 'OPTION series array print missing = ... ;' and 'OPTION series array calc missing = ... ;'");
+            }            
         }
 
         public static bool IsLagOrLead(int i)

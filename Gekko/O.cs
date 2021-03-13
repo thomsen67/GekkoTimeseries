@@ -7382,10 +7382,7 @@ namespace Gekko
 
                 if (G.Equal(opt_prim, "yes"))
                 {
-                    new Error("OPEN<prim> is obsolete. In Gekko 2.1.1 and onwards, you should");
-                    G.Writeln("           use OPEN<edit> instead of OPEN<prim>, if you intend to change", Color.Red);
-                    G.Writeln("           data in the databank.", Color.Red);
-                    throw new GekkoException();
+                    new Error("OPEN<prim> is obsolete. In Gekko 2.1.1 and onwards, you should use OPEN<edit> instead of OPEN<prim>, if you intend to change data in the databank.");
                 }
 
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.

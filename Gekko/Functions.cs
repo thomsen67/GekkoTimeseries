@@ -4586,16 +4586,12 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
-        }
-
-        
+        }        
 
         private static void FunctionError(string s, IVariable x)
         {
             new Error("Function " + s + "() does not allow a " + G.GetTypeString(x) + " variable");
-            throw new GekkoException();
         }
-
     }
 }
 

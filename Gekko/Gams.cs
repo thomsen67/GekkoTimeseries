@@ -1612,10 +1612,12 @@ namespace Gekko
                                         {
                                             if (!timeElement.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                                             {
-                                                new Error("GAMS variable/parameter " + varName + " has element '" + timeElement + "' in the time dimension (" + Program.options.gams_time_set + ")");
-                                                G.Writeln("    The time elements are expected to start with '" + prefix + "'", Color.Red);
-                                                G.Writeln("    See 'OPTION gams time set' and 'OPTION gams time prefix", Color.Red);
-                                                throw new GekkoException();
+                                                using (Error e = new Error())
+                                                {
+                                                    e.MainAdd("GAMS variable/parameter " + varName + " has element '" + timeElement + "' in the time dimension (" + Program.options.gams_time_set + ").");
+                                                    e.MainAdd("The time elements are expected to start with '" + prefix + "'.");
+                                                    e.MainAdd("See 'OPTION gams time set' and 'OPTION gams time prefix.");
+                                                }                                                
                                             }
                                             timeElement = timeElement.Substring(prefix.Length);
                                         }
@@ -1934,9 +1936,7 @@ namespace Gekko
                                 }
                                 if (ntimeless > 0 && nnontimeless > 0)
                                 {
-                                    new Error("The array-timeseries " + ts.name + " has subseries that are both");
-                                    G.Writeln("           timeless and non-timeless --> cannot write to GDX.");
-                                    throw new GekkoException();
+                                    new Error("The array-timeseries " + ts.name + " has subseries that are both timeless and non-timeless --> cannot write to GDX.");
                                 }
                                 if (ntimeless > 0) timeDimension = 0;
                                 //if ntimeless + nnontimeless == 0 it will be assumed to have time-dim in GAMS --> hard to know.

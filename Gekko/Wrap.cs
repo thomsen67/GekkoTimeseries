@@ -87,7 +87,7 @@ namespace Gekko
         /// Add text to "more".
         /// </summary>
         /// <param name="s"></param>
-        public void More(string s)
+        public void MoreAdd(string s)
         {            
             this.storageMore[this.storageMore.Count - 1].storage.Add(s);
         }

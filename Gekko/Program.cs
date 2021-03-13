@@ -3523,11 +3523,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers)");
-                        G.Writeln("           Message: " + e.Message, Color.Red);
-                        G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
-
-                        throw;
+                        new Error("Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers). Message: " + e.Message + ". Troubleshooting, try this page: " + Globals.databankformatUrl + ".");                        
                     }
 
                 }  //end of using
@@ -8307,16 +8303,19 @@ namespace Gekko
                 {
                     int endoNumber = (int)Program.model.modelGekko.m2.simulFeedback[i];
                     EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
-                    G.Writeln();
-                    new Error("Trying to invert a singular matrix. This is because the equations are");
-                    G.Writeln("           somehow undetermined, for instance because of an equation 'X = X',", Color.Red);
-                    G.Writeln("           or an equation 'Y = Z', where Z is exogenous, and the variable", Color.Red);
-                    G.Writeln("           Y has been exogenized (by means of the EXO command).", Color.Red);
-                    G.Writeln("           The problem arises in the following equation:", Color.Red);
-                    G.Writeln(eh.equationText, Color.Blue);
-                    G.Writeln("           Please correct the equation or the goals/means (ENDO/EXO variables).", Color.Red);
-                    G.Writeln();
-                    throw new GekkoException();
+
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("Trying to invert a singular matrix. This is because the equations are");
+                        e.MainAdd("somehow undetermined, for instance because of an equation 'X = X', ");
+                        e.MainAdd("or an equation 'Y = Z', where Z is exogenous, and the variable");
+                        e.MainAdd("Y has been exogenized (by means of the EXO command).");
+                        e.MainAdd("The problem arises in the following equation: ");
+                        e.MainNewLine();
+                        e.MainAdd("  " + eh.equationText);
+                        e.MainNewLine();
+                        e.MainAdd("Please correct the equation or the goals / means(ENDO / EXO variables).");
+                    }                    
                 }
 
                 vv[i] = 1.0 / big;//calculate scaling and save
@@ -14296,18 +14295,18 @@ namespace Gekko
                         e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
                         e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                        e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                        e.More("You may use 'model *;' to look for model files in the current working folder.");
+                        e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                        e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                        e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
                         e.MoreNewLines();
-                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
                         e.MoreNewLines();
-                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
                         e.MoreNewLines();
-                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.More("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");                        
+                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
+                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");                        
                     }
                 }
                 else
@@ -14316,9 +14315,9 @@ namespace Gekko
                     {
                         e.MainAdd("Could not find model file '" + fileNameSimple + "'");                        
                         //e.MainNextSection(); // "aaa                        
-                        e.More("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                        e.More("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                        e.More("You may use 'model *;' to look for model files in the current working folder.");
+                        e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                        e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                        e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
                         //e.MoreNextSection();
                     }
                 }
@@ -17431,9 +17430,11 @@ namespace Gekko
                 //checking if the file is there at all
                 if (!File.Exists(pathAndFilenameSource))
                 {
-                    new Error("Could not find file '" + pathAndFilenameSource + "' (for " + type + ")");
-                    if (!Directory.Exists(pathName)) G.Writeln2("*** ERROR: The directory '" + pathName + "' does not seem to exist");
-                    throw new GekkoException();
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("Could not find file '" + pathAndFilenameSource + "' (for " + type + "). ");
+                        if (!Directory.Exists(pathName)) e.MainAdd("The directory '" + pathName + "' does not seem to exist.");
+                    }                    
                 }
 
                 success = true;
@@ -18328,14 +18329,15 @@ namespace Gekko
             GekkoTime tStart = GekkoTime.tNull;
             GekkoTime tEnd = GekkoTime.tNull;            
             if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
-            {                
-                new Error("The databank '" + removed.name + "' was opened with the OPEN command.");
-                G.Writeln("           It has been altered, but the changes cannot be written back to the", Color.Red);
-                G.Writeln("           underlying databank file, since this file is not a ." + Globals.extensionDatabank + " file.", Color.Red);
-                G.Writeln("           (If the databank was opened with OPEN<edit>, you may use WRITE to write the ", Color.Red);
-                G.Writeln("           databank to file).", Color.Red);
-                G.Writeln();
-                throw new GekkoException();
+            {
+                using (Error e = new Error())
+                {
+                    e.MainAdd("The databank '" + removed.name + "' was opened with the OPEN command.");
+                    e.MainAdd("It has been altered, but the changes cannot be written back to the");
+                    e.MainAdd("underlying databank file, since this file is not a " + Globals.extensionDatabank + " file.");
+                    e.MainAdd("(If the databank was opened with OPEN<edit>, you may use WRITE to write the ");
+                    e.MainAdd("databank to file).");
+                }
             }
             if (true)
             {
