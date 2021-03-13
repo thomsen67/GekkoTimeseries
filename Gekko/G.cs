@@ -174,7 +174,7 @@ namespace Gekko
             if (ok) return d;
             if (reportError)
             {
-                new Error("Cannot convert '" + s + "' into a value");
+                new Error("Cannot convert '" + s + "' into a value"); return double.NaN;
                 //new GekkoException();
             }
             else
@@ -447,7 +447,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Freq error");
+                new Error("Freq error"); gt1 = GekkoTime.tNull; gt2 = GekkoTime.tNull;
                 //throw new GekkoException();
             }
         }

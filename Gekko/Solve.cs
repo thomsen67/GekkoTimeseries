@@ -2394,7 +2394,7 @@ namespace Gekko
             }
             else
             {
-                new Error("#98349834");
+                new Error("#98349834"); return false;
                 //throw new GekkoException();
             }
         }

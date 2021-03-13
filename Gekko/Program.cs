@@ -16160,7 +16160,7 @@ namespace Gekko
             if (writeType == EDatabankWriteType.Tsdx)
             {
                 new Error("You cannot use <tsdx>. The extension name has changed to ." + Globals.extensionDatabank + ". If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file, and rename that file to .tsdx afterwards.");
-
+                
 
                 //G.Writeln();
                 //throw new GekkoException();
@@ -16399,13 +16399,13 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Unknown databank format");
+                        new Error("Unknown databank format"); return 0;
                         //throw new GekkoException();
                     }
                 }
                 else
                 {
-                    new Error("Unknown databank format");
+                    new Error("Unknown databank format"); return 0;
                     //throw new GekkoException();
                 }
             }
@@ -22001,7 +22001,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Strange error #793438734");
+                new Error("Strange error #793438734"); return false;
                 //throw new GekkoException();
             }
         }
@@ -23756,8 +23756,7 @@ namespace Gekko
                             }
                             else
                             {
-                                new Error("Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number. It has type " + temp.GetType().ToString());
-
+                                new Error("Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number. It has type " + temp.GetType().ToString()); cell = new CellLight();
                                 //throw new GekkoException();
                             }
                             matrix.Add(i, j, cell);
@@ -24987,6 +24986,7 @@ namespace Gekko
             catch (Exception e)
             {
                 new Error("problem while trying to access to existing sheet '" + sheet + "'");
+                objSheet = null;
                 //throw new GekkoException();
             }
 
@@ -26471,6 +26471,7 @@ namespace Gekko
             else
             {
                 new Error("Expected 'start' or 'end' argument, not '" + startEnd + "'");
+                return GekkoTime.tNull;
                 //throw new GekkoException();
             }
         }

@@ -408,6 +408,7 @@ namespace Gekko
                     if (ivar2 == null)
                     {
                         new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq, true) + " for use in dot- or []-indexing");
+                        return null;
                         //throw new GekkoException();
                     }
                     else

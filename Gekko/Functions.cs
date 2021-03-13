@@ -86,7 +86,7 @@ namespace Gekko
             }
             else
             {
-                new Error("date(): expected year, month and day");
+                new Error("date(): expected year, month and day"); return null;
                 //throw new GekkoException();
             }
         }
@@ -647,7 +647,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("bankname() accepts strings 'first' or 'ref'");
+                    new Error("bankname() accepts strings 'first' or 'ref'"); return null;
                     //throw new GekkoException();
                 }
             }
@@ -658,7 +658,7 @@ namespace Gekko
                 Databank db = null;
                 if (x < 0)
                 {
-                    new Error("bankname() must be called with value >= 0");
+                    new Error("bankname() must be called with value >= 0"); return null;
                     //throw new GekkoException();
                 }
                 else if (x == 0)
@@ -667,7 +667,7 @@ namespace Gekko
                 }
                 else if (x >= Program.databanks.storage.Count)
                 {
-                    new Error("bankname() must be called with < " + Program.databanks.storage.Count);
+                    new Error("bankname() must be called with < " + Program.databanks.storage.Count); return null;
                     //throw new GekkoException();
                 }
                 else if (x == 1) return new ScalarString(Program.databanks.GetFirst().name);
@@ -678,7 +678,7 @@ namespace Gekko
             }
             else
             {
-                new Error("bankname() only accepts string or val");
+                new Error("bankname() only accepts string or val"); return null;
                 //throw new GekkoException();
             }
 
@@ -2997,7 +2997,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                new Error("Format '" + format2 + "' failed");
+                new Error("Format '" + format2 + "' failed"); return null;
                 //throw new GekkoException();
             }
         }
@@ -3955,7 +3955,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Replace(): you cannot use series type with 'inside' or 'max'");
+                    new Error("Replace(): you cannot use series type with 'inside' or 'max'"); return null;
                     //throw new GekkoException();
                 }
             }
@@ -4285,7 +4285,7 @@ namespace Gekko
             }
             else
             {
-                new Error("fromSeries(): Argument '" + s2 + "' not recognized.");
+                new Error("fromSeries(): Argument '" + s2 + "' not recognized."); return null;
                 //throw new GekkoException();
             }
         }

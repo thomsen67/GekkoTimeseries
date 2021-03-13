@@ -1657,7 +1657,7 @@ namespace Gekko
             else if (G.Equal(operator2, "dp")) return 0d;
             else
             {
-                new Error("Transformation error");
+                new Error("Transformation error"); return double.NaN;
                 //throw new GekkoException();
             }
         }

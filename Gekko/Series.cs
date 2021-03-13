@@ -1405,7 +1405,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Internal error #4598243755");
+                new Error("Internal error #4598243755"); rv_series = null; 
                 //throw new GekkoException();
             }
 

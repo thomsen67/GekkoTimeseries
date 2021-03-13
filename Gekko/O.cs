@@ -581,7 +581,7 @@ namespace Gekko
             else if (G.Equal(x_string, "no")) return false;
             else
             {
-                new Error("Value expected to be 'yes' or 'no', not '" + x_string + "'");
+                new Error("Value expected to be 'yes' or 'no', not '" + x_string + "'"); return false;                
                 //throw new GekkoException();
             }
         }
@@ -5635,7 +5635,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Series) return x;
             else
             {
-                new Error("Cannot convert " + G.GetTypeString(x) + " into SERIES type");
+                new Error("Cannot convert " + G.GetTypeString(x) + " into SERIES type"); return null;
                 //throw new GekkoException();
             }
         }
@@ -5718,7 +5718,7 @@ namespace Gekko
                 }
 
             }
-            new Error("Cannot convert " + G.GetTypeString(x) + " to SERIES");
+            new Error("Cannot convert " + G.GetTypeString(x) + " to SERIES"); return null;
             //throw new GekkoException();
         }
 
@@ -5734,7 +5734,7 @@ namespace Gekko
             if (x.Type() == EVariableType.Map) return x;
             else
             {
-                new Error("Cannot convert " + G.GetTypeString(x) + " into MAP type");
+                new Error("Cannot convert " + G.GetTypeString(x) + " into MAP type"); return null;
                 //throw new GekkoException();
             }
         }
@@ -6093,7 +6093,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Internal error #8073437598232");
+                    new Error("Internal error #8073437598232"); return null;
                     //throw new GekkoException();
                 }
             }
