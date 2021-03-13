@@ -14284,7 +14284,7 @@ namespace Gekko
 
             if (!File.Exists(fileName))
             {
-                if (false && Globals.runningOnTTComputer)
+                if (true && Globals.runningOnTTComputer)
                 {
                     using (Error e = new Error())
                     {

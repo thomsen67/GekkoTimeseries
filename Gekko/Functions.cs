@@ -2633,9 +2633,9 @@ namespace Gekko
             }
             else
             {
-                new Error("log(): type " + x1.Type().ToString() + " not supported");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("log(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return rv;            
         }
@@ -2666,10 +2666,10 @@ namespace Gekko
                 }
             }
             else
-            {
-                new Error("exp(): type " + x1.Type().ToString() + " not supported");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("exp(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return rv;
         }
@@ -2700,10 +2700,10 @@ namespace Gekko
                 }
             }
             else
-            {
-                new Error("sqrt(): type " + x1.Type().ToString() + " not supported");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("sqrt(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return rv;
         }
@@ -2742,10 +2742,10 @@ namespace Gekko
                 return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[10], 1);  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
-            {
-                new Error("pch() function only valid for time series arguments");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("pch(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return null;
         }
@@ -2796,10 +2796,10 @@ namespace Gekko
                 return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[11], 1); // (x, x.1) => Math.Log(x / x.1);
             }
             else
-            {
-                new Error("dlog() function only valid for time series arguments");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("dlog(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return null;
         }
@@ -2821,10 +2821,10 @@ namespace Gekko
                 return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[2], 1); // (x, x.1) => x - x.1;
             }
             else
-            {
-                new Error("dif() function only valid for time series arguments");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("dif(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return null;
         }
@@ -2879,10 +2879,10 @@ namespace Gekko
                 rv = new ScalarVal(d / divide * ((ScalarVal)x).val);
             }
             else
-            {
-                new Error("movsum() only works for SERIES");
-                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("movsum(): type " + x.Type().ToString() + " not supported" + s);
             }
 
             return rv;
@@ -2899,10 +2899,10 @@ namespace Gekko
                 return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], SeriesLagYNumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
-            {
-                new Error("pchy() function only valid for time series arguments");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("pchy(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return null;
         }
@@ -2942,10 +2942,10 @@ namespace Gekko
                 return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], SeriesLagYNumber(x1_series));  // Math.Log(x1 / x2);
             }
             else
-            {
-                new Error("dlogy() function only valid for time series arguments");
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("dlogy(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return null;
         }
@@ -3042,10 +3042,10 @@ namespace Gekko
                 return m2;
             }
             else
-            {
-                new Error("round() does not support type " + x1.Type().ToString());
-                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("round(): type " + x1.Type().ToString() + " not supported" + s); return null;
             }
         }
 
@@ -3076,10 +3076,10 @@ namespace Gekko
                 return m2;
             }
             else
-            {
-                new Error("int() does not support type " + x.Type().ToString());
-                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("dlogy(): type " + x.Type().ToString() + " not supported" + s); return null;
             }
         }
 
@@ -3110,10 +3110,10 @@ namespace Gekko
                 return m2;
             }
             else
-            {
-                new Error("floor() does not support type " + x.Type().ToString());
-                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("floor(): type " + x.Type().ToString() + " not supported" + s); return null;
             }
         }
 
@@ -3144,10 +3144,10 @@ namespace Gekko
                 return m2;
             }
             else
-            {
-                new Error("ceiling() does not support type " + x.Type().ToString());
-                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
-                throw new GekkoException();
+            {                
+                string s = null;
+                if (x.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("ceiling(): type " + x.Type().ToString() + " not supported" + s); return null;
             }
         }
 

@@ -219,7 +219,7 @@ namespace Gekko
 
         public static List<string> unitTestDependents = null;
 
-        public const string stringConversionNote = "+++ NOTE: You can use a string %s as a variable name with {%s}";
+        public const string stringConversionNote = "NOTE: You can use a string %s as a variable name with {%s}";
 
         public const string Work = "Work";
         public const string Ref = "Ref";

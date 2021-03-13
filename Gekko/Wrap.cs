@@ -12,8 +12,18 @@ namespace Gekko
     /// </summary>
     public class WrapHelper5
     {
-        public int linesInBetween = 1;
+        public int linesAtStart = 1;
         public List<string> storage = new List<string>();
+
+        public WrapHelper5()
+        {
+
+        }
+
+        public WrapHelper5(int linesInBetween)
+        {
+            this.linesAtStart = linesInBetween;
+        }
     }
     
     /// <summary>
@@ -25,8 +35,8 @@ namespace Gekko
     {
         //Note: links to documentation are easy, for instance "Read more in help system "
 
-        private List<List<string>> storageMain = new List<List<string>>(); //shown in main error text
-        private List<List<string>> storageMore = new List<List<string>>(); //link regarding more information
+        private List<WrapHelper5> storageMain = new List<WrapHelper5>(); //shown in main error text
+        private List<WrapHelper5> storageMore = new List<WrapHelper5>(); //link regarding more information
         private EWrapType type = EWrapType.Writeln;
 
         /// <summary>
@@ -36,8 +46,8 @@ namespace Gekko
         public Wrap(EWrapType type)
         {
             this.type = type;
-            this.storageMain.Add(new List<string>());
-            this.storageMore.Add(new List<string>());
+            this.storageMain.Add(new WrapHelper5());
+            this.storageMore.Add(new WrapHelper5(0));  //no blank line at start in output tab
         }
 
         /// <summary>
@@ -53,19 +63,26 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         public void Main(string s)
-        {
-            // has elements 0, 1, 2 (count = 3)
-            // i = 4
-            // has to add 2 elements. That is, i - count + 1.            
-            this.storageMain[this.storageMain.Count - 1].Add(s);
+        {             
+            this.storageMain[this.storageMain.Count - 1].storage.Add(s);
         }
 
         /// <summary>
-        /// Add a section break to "main"
+        /// Add a section break to "main".  SpaceBefore is implicitly true.
         /// </summary>
         public void MainNextSection()
         {
-            this.storageMain.Add(new List<string>());
+            this.storageMain.Add(new WrapHelper5());
+        }
+
+        /// <summary>
+        /// Add a section break to "main".
+        /// </summary>
+        public void MainNextSection(bool spaceBefore)
+        {
+            int linesBefore = 1;
+            if (!spaceBefore) linesBefore = 0;
+            this.storageMain.Add(new WrapHelper5(linesBefore));
         }
 
         /// <summary>
@@ -73,19 +90,26 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         public void More(string s)
+        {            
+            this.storageMore[this.storageMore.Count - 1].storage.Add(s);
+        }
+
+        /// <summary>
+        /// Add a section break to "more".  SpaceBefore is implicitly true.
+        /// </summary>
+        public void MoreNextSection()
         {
-            // has elements 0, 1, 2 (count = 3)
-            // i = 4
-            // has to add 2 elements. That is, i - count + 1.
-            this.storageMore[this.storageMore.Count - 1].Add(s);
+            this.storageMore.Add(new WrapHelper5());
         }
 
         /// <summary>
         /// Add a section break to "more"
         /// </summary>
-        public void MoreNextSection()
+        public void MoreNextSection(bool spaceBefore)
         {
-            this.storageMore.Add(new List<string>());
+            int linesBefore = 1;
+            if (!spaceBefore) linesBefore = 0;
+            this.storageMore.Add(new WrapHelper5(linesBefore));
         }        
 
         /// <summary>
@@ -146,17 +170,23 @@ namespace Gekko
             //-------------------------------
             List<string> ss1 = this.ConsolidateLines("main");
 
+            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
+            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
+            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
+            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
+            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
+
             int ii = -1;
             foreach (string s1 in ss1)
             {
-                ii++;
+                ii++;                
                 string m = marginFirst;
                 if (ii > 0)
                 {
                     m = margin;
                     color = Color.Empty;
                 }
-                WrapHelper(1, 1, m, margin, s1, isPiping, color, ETabs.Main);
+                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, s1, isPiping, color, ETabs.Main);
             }
 
             Action a = () =>
@@ -167,17 +197,12 @@ namespace Gekko
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                 O.Cls("output");
                 List<string> ss3 = this.ConsolidateLines("more");
-
-                int lines = 0;
+                                
                 int ii2 = -1;
                 foreach (string s3 in ss3)
                 {
-                    ii2++;
-                    if (ii2 > 0)
-                    {
-                        lines = 1;
-                    }
-                    WrapHelper(lines, 1, "", "", s3, false, Color.Empty, ETabs.Output);
+                    ii2++;                    
+                    WrapHelper(this.storageMain[ii2].linesAtStart, 1, "", "", s3, false, Color.Empty, ETabs.Output);
                 }
             };
 
@@ -185,7 +210,7 @@ namespace Gekko
             //The link in the main tab to the explanation in the output tab
             //---------------------------------------------------------------
 
-            if (this.storageMore[0].Count > 0)
+            if (this.storageMore[0].storage.Count > 0)
             {
                 WrapHelper(1, 1, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
             }
@@ -201,16 +226,16 @@ namespace Gekko
         /// <returns></returns>
         private List<string> ConsolidateLines(string type)
         {
-            List<List<string>> ss = null;
+            List<WrapHelper5> ss = null;
             if (type == "main") ss = this.storageMain;
             else if (type == "more") ss = this.storageMore;
             else throw new GekkoException();
 
             List<string> sbs = new List<string>();
-            foreach (List<string> xx in ss)
+            foreach (WrapHelper5 xx in ss)
             {
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < xx.Count; i++)
+                for (int i = 0; i < xx.storage.Count; i++)
                 {
                     string add = "";
                     bool remove = false;
@@ -218,7 +243,7 @@ namespace Gekko
                     {
                         sb.Append(" ");
                     }
-                    sb.Append(xx[i].Trim());
+                    sb.Append(xx.storage[i].Trim());
                 }
                 string s3 = sb.ToString();
                 sbs.Add(s3);
