@@ -8,6 +8,15 @@ using System.Drawing;
 namespace Gekko
 {
     /// <summary>
+    /// Essentially a List&lt;string&gt;
+    /// </summary>
+    public class WrapHelper5
+    {
+        public int linesInBetween = 1;
+        public List<string> storage = new List<string>();
+    }
+    
+    /// <summary>
     /// A helper class for printing multiple lines. It basically just stores List&lt;string&gt; inside.
     /// Supports indents and other stuff. Will eventually replace all the G.Writeln() variants. Link
     /// to help system is easy: {a{here¤series.htm}a}.

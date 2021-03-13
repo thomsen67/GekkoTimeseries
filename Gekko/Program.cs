@@ -16655,9 +16655,9 @@ namespace Gekko
             Program.WriteExcel(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat, datetype);
         }
 
-        public static void ArrayTimeseriesTip(string name)
+        public static string ArrayTimeseriesTip(string name)
         {
-            G.Writeln("           Tip: try 'DISP " + name + ";' to see the dimensions.", Color.Red);
+            return "Tip: try 'DISP " + name + ";' to see the dimensions.";
         }
         
         

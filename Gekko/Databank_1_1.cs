@@ -306,10 +306,7 @@ namespace Gekko
                 //If no data has been added to the timeseries, NaN will always be returned.
                 if (this.IsGhost())
                 {
-                    new Error("The variable '" + this.variableName + "' is an array-timeseries,");
-                    G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
-                    Program.ArrayTimeseriesTip(this.variableName);
-                    throw new GekkoException();
+                    new Error("The variable '" + this.variableName + "' is an array-timeseries, but is used as a normal timeseries here (without []-indexer)." + Program.ArrayTimeseriesTip(this.variableName));                    
                 }
                 else
                 {
@@ -1285,11 +1282,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-
-                                    new Error("tsd read: the following name is malformed:");
-                                    G.Writeln("         : " + varName);
-                                    G.Writeln("         : The name should contain letters, digits or underscore only");
-                                    throw new GekkoException();
+                                    new Error("Tsd read: the following name is malformed: " + varName + ". The name should contain letters, digits or underscore only");                                    
                                 }
                             }
 

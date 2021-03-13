@@ -510,10 +510,7 @@ namespace Gekko
                 //If no data has been added to the timeseries, NaN will always be returned.
                 if (this.type == ESeriesType.ArraySuper)
                 {
-                    new Error("The variable '" + this.name + "' is an array-timeseries,");
-                    G.Writeln("           but is used as a normal timeseries here (without []-indexer)", Color.Red);
-                    Program.ArrayTimeseriesTip(this.name);
-                    throw new GekkoException();
+                    new Error("The variable '" + this.name + "' is an array-timeseries, but is used as a normal timeseries here (without []-indexer). " + Program.ArrayTimeseriesTip(this.name));
                 }
                 else
                 {
