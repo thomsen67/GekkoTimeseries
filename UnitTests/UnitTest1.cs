@@ -1285,6 +1285,7 @@ namespace UnitTests
             //tests timeless toghether with gdx
 
             I("RESET; TIME 2001 2003;");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("x1 = timeless(100);");
             I("x2 = 200;");
             I("x3 = series(1);");
@@ -1298,6 +1299,7 @@ namespace UnitTests
 
             I("WRITE <gdx> temp;");
             I("RESET;");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> temp;");
 
             HelperTimeless();  //asserts
@@ -1357,9 +1359,11 @@ namespace UnitTests
             Assert.AreEqual(First().storage.Count, 4); DatabanksTestHelper5(); DatabanksTestHelper6(); DatabanksTestHelper7();
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             DatabanksTestHelper8();
             I("WRITE <gdx> sletmig;");
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> sletmig;");
             Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
 
@@ -1373,9 +1377,11 @@ namespace UnitTests
             Assert.AreEqual(First().storage.Count, 1); DatabanksTestHelper6();
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-            DatabanksTestHelper8();
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            DatabanksTestHelper8();            
             I("WRITE <gdx> xx1 file=sletmig;");
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> sletmig;");
             Assert.AreEqual(First().storage.Count, 1); DatabanksTestHelper6();
 
@@ -1389,9 +1395,11 @@ namespace UnitTests
             Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             DatabanksTestHelper8();
             I("WRITE <gdx> xx1, xx2 file=sletmig;");
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("READ <gdx> sletmig;");
             Assert.AreEqual(First().storage.Count, 2); DatabanksTestHelper5(); DatabanksTestHelper6();
 
@@ -12905,8 +12913,6 @@ namespace UnitTests
             string s = null;
             string ss = null;
 
-
-
             // -----------------------------------------------------
             // ----- PROCEDURES
             // -----------------------------------------------------
@@ -19193,6 +19199,7 @@ print(df2)
             I("reset;");
             I("option model type = gams;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
             I("read <gdx> testfix;"); //See c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\testfix.gms
             I("time 2001 2003;");
             I("disp d4;");

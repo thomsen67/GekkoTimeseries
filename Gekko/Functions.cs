@@ -739,8 +739,15 @@ namespace Gekko
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
             {
-                new Error("ErrorHelper #" + s);
-                //throw new GekkoException();
+                if (false)
+                {
+                    new Error("ErrorHelper #" + s);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: ErrorHelper #" + s);
+                    throw new GekkoException();
+                }
             }
             return Globals.scalarVal0;
         }
