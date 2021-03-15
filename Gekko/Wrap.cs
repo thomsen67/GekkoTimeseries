@@ -14,6 +14,7 @@ namespace Gekko
     {
         public int linesAtStart = 1;
         public List<string> storage = new List<string>();
+        public string consolidated = null;
 
         public WrapHelper5()
         {
@@ -164,25 +165,16 @@ namespace Gekko
             //-------------------------------
             //The short message in main tab
             //-------------------------------
-            List<string> ss1 = this.ConsolidateLines("main");
-
-            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
-            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
-            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
-            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
-            // !!!!!!!!!!!!! -------> put resulting string into WrapHelper5 object and use that as object.
-
-            int ii = -1;
-            foreach (string s1 in ss1)
+            this.ConsolidateLines("main");
+            for (int ii = 0; ii < this.storageMain.Count; ii++)
             {
-                ii++;
                 string m = marginFirst;
                 if (ii > 0)
                 {
                     m = margin;
                     color = Color.Empty;
                 }
-                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, s1, isPiping, color, ETabs.Main);
+                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, isPiping, color, ETabs.Main);
             }
 
             if (this.storageMore[0].storage.Count > 0)
@@ -195,13 +187,10 @@ namespace Gekko
                     //-------------------------------
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     O.Cls("output");
-                    List<string> ss3 = this.ConsolidateLines("more");
-
-                    int ii2 = -1;
-                    foreach (string s3 in ss3)
+                    this.ConsolidateLines("more");
+                    for (int ii = 0; ii < this.storageMain.Count; ii++)
                     {
-                        ii2++;
-                        WrapHelper(this.storageMain[ii2].linesAtStart, 1, "", "", s3, false, Color.Empty, ETabs.Output);
+                        WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, false, Color.Empty, ETabs.Output);
                     }
                 };
 
@@ -221,14 +210,13 @@ namespace Gekko
         /// </summary>
         /// <param name="ss"></param>
         /// <returns></returns>
-        private List<string> ConsolidateLines(string type)
+        private void ConsolidateLines(string type)
         {
             List<WrapHelper5> ss = null;
             if (type == "main") ss = this.storageMain;
             else if (type == "more") ss = this.storageMore;
             else throw new GekkoException();
-
-            List<string> sbs = new List<string>();
+                        
             foreach (WrapHelper5 xx in ss)
             {
                 StringBuilder sb = new StringBuilder();
@@ -241,11 +229,9 @@ namespace Gekko
                         sb.Append(" ");
                     }
                     sb.Append(xx.storage[i].Trim());
-                }
-                string s3 = sb.ToString();
-                sbs.Add(s3);
+                }                
+                xx.consolidated = sb.ToString();
             }
-            return sbs;
         }
 
         
