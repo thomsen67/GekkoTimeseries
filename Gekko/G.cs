@@ -4203,7 +4203,6 @@ namespace Gekko
         /// </summary>
         public static void WriteAbstract2(Object o)
         {           
-
             Program.WorkerThreadHelper2 helper = (Program.WorkerThreadHelper2)o;
             
             Color color = helper.color;

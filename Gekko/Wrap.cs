@@ -175,7 +175,7 @@ namespace Gekko
             int ii = -1;
             foreach (string s1 in ss1)
             {
-                ii++;                
+                ii++;
                 string m = marginFirst;
                 if (ii > 0)
                 {
@@ -185,34 +185,35 @@ namespace Gekko
                 WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, s1, isPiping, color, ETabs.Main);
             }
 
-            Action a = () =>
-            {
-                //-------------------------------
-                //The long explanation in output tab
-                //-------------------------------
-                Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
-                O.Cls("output");
-                List<string> ss3 = this.ConsolidateLines("more");
-                                
-                int ii2 = -1;
-                foreach (string s3 in ss3)
-                {
-                    ii2++;                    
-                    WrapHelper(this.storageMain[ii2].linesAtStart, 1, "", "", s3, false, Color.Empty, ETabs.Output);
-                }
-            };
-
-            //---------------------------------------------------------------
-            //The link in the main tab to the explanation in the output tab
-            //---------------------------------------------------------------
-
             if (this.storageMore[0].storage.Count > 0)
             {
-                WrapHelper(1, 1, margin, margin, "Read more about the error " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
+
+                Action a = () =>
+                {
+                    //-------------------------------
+                    //The long explanation in output tab
+                    //-------------------------------
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
+                    O.Cls("output");
+                    List<string> ss3 = this.ConsolidateLines("more");
+
+                    int ii2 = -1;
+                    foreach (string s3 in ss3)
+                    {
+                        ii2++;
+                        WrapHelper(this.storageMain[ii2].linesAtStart, 1, "", "", s3, false, Color.Empty, ETabs.Output);
+                    }
+                };
+
+                //---------------------------------------------------------------
+                //The link in the main tab to the explanation in the output tab
+                //---------------------------------------------------------------
+
+                WrapHelper(1, 1, margin, margin, "Detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
             }
 
-            //G.AppendText(Gui.gui.textBoxMainTabUpper, G.NL);  //we need this for some reason, else next part of error msg gets 1 line too close.
-
+            Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper);  //if not, the text is not scrolled if many lines.
+            
         }
         
         /// <summary>

@@ -739,7 +739,7 @@ namespace Gekko
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
             {
-                if (false)
+                if (true)
                 {
                     new Error("ErrorHelper #" + s);
                 }
