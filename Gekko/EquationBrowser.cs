@@ -1347,13 +1347,10 @@ namespace Gekko
         private static void InsertLinksIntoEquation(string equationText, bool html, StringBuilder sb)
         {
             int widthRemember = -12345;
-            int fileWidthRemember = -12345;
             if (!html)
             {
-                widthRemember = Program.options.print_width;
-                fileWidthRemember = Program.options.print_filewidth;
+                widthRemember = Program.options.print_width;                
                 Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
             }
             try
             {
@@ -1415,8 +1412,7 @@ namespace Gekko
                 if (!html)
                 {
                     //resetting, also if there is an error
-                    Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
+                    Program.options.print_width = widthRemember;                    
                 }
             }
         }

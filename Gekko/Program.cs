@@ -7645,9 +7645,7 @@ namespace Gekko
             List<string> xx = tab.PrintText();
 
             int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
-            Program.options.print_filewidth = int.MaxValue;
 
             //G.Writeln();
 
@@ -7661,7 +7659,6 @@ namespace Gekko
             }
 
             Program.options.print_width = widthRemember;
-            Program.options.print_filewidth = fileWidthRemember;
 
             Globals.lastPrtOrMulprtTable = tab;  //this puts the matrix on the clipboard.
             CrossThreadStuff.CopyButtonEnabled(true);
@@ -8466,9 +8463,7 @@ namespace Gekko
                 if (printRawCode)
                 {
                     int widthRemember = Program.options.print_width;
-                    int fileWidthRemember = Program.options.print_filewidth;
                     Program.options.print_width = int.MaxValue;
-                    Program.options.print_filewidth = int.MaxValue;
                     try
                     {
                         G.Write(pTag);
@@ -8489,7 +8484,6 @@ namespace Gekko
                     {
                         //resetting, also if there is an error
                         Program.options.print_width = widthRemember;
-                        Program.options.print_filewidth = fileWidthRemember;
                     }
                 }
                 else
@@ -8569,9 +8563,7 @@ namespace Gekko
                 //         TXT
                 //---------------------
                 int widthRemember = Program.options.print_width;
-                int fileWidthRemember = Program.options.print_filewidth;
                 Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
                 G.Writeln();
                 try
                 {
@@ -8592,7 +8584,6 @@ namespace Gekko
                 {
                     //resetting, also if there is an error
                     Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
                 }
             }
 
@@ -11665,9 +11656,7 @@ namespace Gekko
             Databank db = Program.databanks.GetFirst();
                         
             int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
-            Program.options.print_filewidth = int.MaxValue;
             try
             {
                 s = G.StripQuotes(s);
@@ -11761,7 +11750,6 @@ namespace Gekko
             {
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
-                Program.options.print_filewidth = fileWidthRemember;
             }
 
             return;
@@ -12042,9 +12030,7 @@ namespace Gekko
             if (found != null)
             {
                 int widthRemember = Program.options.print_width;
-                int fileWidthRemember = Program.options.print_filewidth;
                 Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
                 try
                 {
                     //check for endo (but really not necessary, exo just does not exist)
@@ -12075,7 +12061,6 @@ namespace Gekko
                 {
                     //resetting, also if there is an error
                     Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
                 }
 
                 G.Writeln("------------------------------------------------------------------------------------------");
@@ -12546,9 +12531,7 @@ namespace Gekko
         private static void PrintEquationWithLinks(bool gamsToGekko, string varnameWithoutFreq, List<ModelGamsEquation> eqs, bool showGamsEquation)
         {
             int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
-            Program.options.print_filewidth = int.MaxValue;
 
             try
             {
@@ -12588,7 +12571,6 @@ namespace Gekko
             {
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
-                Program.options.print_filewidth = fileWidthRemember;
             }
             
         }
@@ -14277,9 +14259,9 @@ namespace Gekko
             {
                 if (true && Globals.runningOnTTComputer)
                 {
-                    using (var e = new Warning())
+                    using (var e = new Error())
                     {
-                        for (int i = 0; i < 30; i++)  //test scrolling behavior
+                        for (int i = 0; i < 10; i++)  //test scrolling behavior
                         {
                             e.MainAdd("Could not find model file '" + fileNameSimple + "'");
                             e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
@@ -15671,9 +15653,7 @@ namespace Gekko
             System.Diagnostics.Process process = null;
 
             int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
-            Program.options.print_filewidth = int.MaxValue;
 
             try
             {
@@ -15817,7 +15797,6 @@ namespace Gekko
                 {
                     //resetting, also if there is an error
                     Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
                     // close process and do cleanup
                     if (true)
                     {
@@ -26711,9 +26690,7 @@ namespace Gekko
         public static void PrintEquationVariables(GekkoTime t, EquationHelper eh)
         {
             int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
-            Program.options.print_filewidth = int.MaxValue;
 
             try
             {
@@ -26723,7 +26700,6 @@ namespace Gekko
             {
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
-                Program.options.print_filewidth = fileWidthRemember;
             }
 
             string lhs = eh.lhs;
@@ -26918,9 +26894,7 @@ namespace Gekko
                 tab.CurRow.SetRightBorder(1);
 
                 int widthRemember = Program.options.print_width;
-                int fileWidthRemember = Program.options.print_filewidth;
                 Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
                 try
                 {
 
@@ -26948,7 +26922,6 @@ namespace Gekko
                 {
                     //resetting, also if there is an error
                     Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
                 }
 
                 if (this.pcim != null && this.pcim != "")

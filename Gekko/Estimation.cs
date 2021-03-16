@@ -513,9 +513,7 @@ namespace Gekko
             CrossThreadStuff.CopyButtonEnabled(true);
 
             int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
-            Program.options.print_filewidth = int.MaxValue;
 
             string flat = null;
             if (poly > 0) flat = ", poly = " + poly;
@@ -557,7 +555,6 @@ namespace Gekko
 
 
             Program.options.print_width = widthRemember;
-            Program.options.print_filewidth = fileWidthRemember;
 
             if (o.opt_dump != null)
             {

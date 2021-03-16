@@ -2035,9 +2035,9 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                using (var e = new Note())
+                using (var e = new Error())
                 {
-                    for (int i = 0; i < 30; i++)  //test scrolling behavior
+                    for (int i = 0; i < 5; i++)  //test scrolling behavior
                     {
                         e.MainAdd("Could not find model file 'xxx'");
                         e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");

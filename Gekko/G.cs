@@ -3097,9 +3097,7 @@ namespace Gekko
             if (!silent)
             {
                 int widthRemember = Program.options.print_width;
-                int fileWidthRemember = Program.options.print_filewidth;
                 Program.options.print_width = int.MaxValue;
-                Program.options.print_filewidth = int.MaxValue;
                 try
                 {
                     List<string> lines = G.ExtractLinesFromText(sb.ToString());
@@ -3112,7 +3110,6 @@ namespace Gekko
                 {
                     //resetting, also if there is an error
                     Program.options.print_width = widthRemember;
-                    Program.options.print_filewidth = fileWidthRemember;
                 }
 
                 //Program.ShowPeriodInStatusField("");                
@@ -4678,9 +4675,9 @@ namespace Gekko
         /// </summary>
         /// <param name="textBox"></param>
         /// <param name="s"></param>
-        public static void AppendText(RichTextBox textBox, string s)
+        public static void AppendText(RichTextBox textBox, string s, EWrapType type)
         {
-            G.AppendLink(textBox, s, null);  //no link
+            G.AppendLink(textBox, s, null, type);  //no link
         }
 
         /// <summary>
@@ -4691,22 +4688,101 @@ namespace Gekko
         /// <param name="textBox">The GUI text box</param>
         /// <param name="s">String to show</param>
         /// <param name="link">Link url, else null if no link</param>
-        public static void AppendLink(RichTextBox textBox, string s, string link)
+        public static void AppendLink(RichTextBox textBox, string s, string link, EWrapType type)
         {
-            if (link == null)
+
+            bool mustAlsoPrintOnScreen = false;  //???????????????????????????????????????????????
+
+            bool isMuting = false;
+            if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;
+
+            bool isPiping = false;
+            isPiping = AppendTextMaybePipe(s, isMuting, isPiping);            
+
+
+            if (!(isPiping || isMuting) || mustAlsoPrintOnScreen)
             {
-                textBox.AppendText(s);
-            }
-            else
+                if (G.IsUnitTesting())
+                {
+                    if (Globals.excelDna)
+                    {
+                        if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                    }
+                    else
+                    {
+                        Globals.unitTestScreenOutput.Append(s);
+                        System.Diagnostics.Debug.Write(s);
+                    }
+                }
+                else
+                {
+                    //not piping, not muting, not ExcelDna'ing, not unit testing --> normal printing
+                    if (link == null)
+                    {
+                        textBox.AppendText(s);
+                    }
+                    else
+                    {
+                        RichTextBoxEx textBoxEx = textBox as RichTextBoxEx;
+                        if (textBoxEx == null) MessageBox.Show("*** ERROR: Cannot use links in this RichTextBox");
+                        int position = textBoxEx.SelectionStart;
+                        textBoxEx.SelectedRtf = @"{\rtf1\ansi " + s + @"\v #" + link + @"\v0}";
+                        textBoxEx.Select(position, s.Length + link.Length + 1);
+                        textBoxEx.SetSelectionLink(true);
+                        textBoxEx.Select(position + s.Length + link.Length + 1, 0);
+                    }
+                }
+            }            
+
+            if (Globals.errorMemory != null)
             {
-                RichTextBoxEx textBoxEx = textBox as RichTextBoxEx;
-                if (textBoxEx == null) MessageBox.Show("*** ERROR: Cannot use links in this RichTextBox");
-                int position = textBoxEx.SelectionStart;
-                textBoxEx.SelectedRtf = @"{\rtf1\ansi " + s + @"\v #" + link + @"\v0}";
-                textBoxEx.Select(position, s.Length + link.Length + 1);
-                textBoxEx.SetSelectionLink(true);
-                textBoxEx.Select(position + s.Length + link.Length + 1, 0);
+                //used in stack trace error message  
+                //ok to record this even if piping, muting, etc.
+                Globals.errorMemory.Append(s);
             }
-        }                
+        }
+
+        private static bool AppendTextMaybePipe(string s, bool isMuting, bool isPiping)
+        {
+            //Not piping to normal pipe file if there is a pipe to pipe2-file (eg. for "p fy file=output.txt")
+            if (!Globals.pipe2 && Globals.pipe && Globals.pipeFileHelper.pipeFile != null)
+            {
+                isPiping = true;
+                try
+                {
+                    if (!isMuting) //will also mute in the pipe file
+                    {
+                        Globals.pipeFileHelper.pipeFile.Write(s);
+                    }
+                    Globals.pipeFileHelper.pipeFile.Flush();  ////#80435243075235 flushing turned off here
+                }
+                catch (Exception e)
+                {
+                    //#80435243075235
+                    MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper.pipeFileFileWithPath);
+                    throw new GekkoException();
+                }
+            }
+
+            //Always piping here if pipe2 is on
+            if (Globals.pipe2 && Globals.pipeFileHelper2.pipeFile != null)
+            {
+                try
+                {
+                    isPiping = true;
+                    if (!isMuting)
+                    {
+                        Globals.pipeFileHelper2.pipeFile.Write(s);
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper2.pipeFileFileWithPath);
+                    throw new GekkoException();
+                }
+            }
+
+            return isPiping;
+        }
     }    
 }

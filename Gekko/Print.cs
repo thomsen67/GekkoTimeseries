@@ -489,9 +489,7 @@ namespace Gekko
                 {
 
                     int widthRemember = Program.options.print_width;
-                    int fileWidthRemember = Program.options.print_filewidth;
                     Program.options.print_width = int.MaxValue;
-                    Program.options.print_filewidth = int.MaxValue;
                     try
                     {
                         G.Writeln("");
@@ -502,7 +500,6 @@ namespace Gekko
                     {
                         //resetting, also if there is an error
                         Program.options.print_width = widthRemember;
-                        Program.options.print_filewidth = fileWidthRemember;
                     }
                     Globals.lastPrtOrMulprtTable = table;  //if CLIP x, y, z, this Globals.lastPrtOrMulprtTable is used later on
                     CrossThreadStuff.CopyButtonEnabled(true);

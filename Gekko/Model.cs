@@ -377,9 +377,7 @@ namespace Gekko
             tab.CurRow.SetRightBorder(1);            
 
             int widthRemember = Program.options.print_width;
-            int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
-            Program.options.print_filewidth = int.MaxValue;
             try
             {
                 List<string> ss = tab.Print();
@@ -389,7 +387,6 @@ namespace Gekko
             {
                 //resetting, also if there is an error
                 Program.options.print_width = widthRemember;
-                Program.options.print_filewidth = fileWidthRemember;
             }
             
             string cache = "";

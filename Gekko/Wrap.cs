@@ -140,15 +140,20 @@ namespace Gekko
 
             string marginFirst = "";
             Color color = Color.Empty;
+            bool mustAlsoPrintOnScreen = false;
+
             if (this.type == EWrapType.Error)
             {
                 marginFirst = Globals.errorString;
                 color = Color.Red;
+                mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping or muting
+                if (Globals.errorMemory == null) Globals.errorMemory = new StringBuilder();
             }
             else if (this.type == EWrapType.Warning)
             {
                 marginFirst = Globals.warningString;
                 color = Globals.warningColor;
+                mustAlsoPrintOnScreen = true;
             }
             else if (this.type == EWrapType.Note)
             {
@@ -158,8 +163,7 @@ namespace Gekko
             {
                 marginFirst = "";  //just stating the obvious
             }
-
-            bool isPiping = false;
+            
             string margin = G.Blanks(marginFirst.Length);
 
             //-------------------------------
@@ -174,7 +178,7 @@ namespace Gekko
                     m = margin;
                     color = Color.Empty;
                 }
-                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, isPiping, color, ETabs.Main);
+                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, color, ETabs.Main, this.type);
             }
 
             if (this.storageMore[0].storage.Count > 0)
@@ -190,7 +194,7 @@ namespace Gekko
                     this.ConsolidateLines("more");
                     for (int ii = 0; ii < this.storageMain.Count; ii++)
                     {
-                        WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, false, Color.Empty, ETabs.Output);
+                        WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, Color.Empty, ETabs.Output, this.type);
                     }
                 };
 
@@ -198,7 +202,7 @@ namespace Gekko
                 //The link in the main tab to the explanation in the output tab
                 //---------------------------------------------------------------
 
-                WrapHelper(1, 1, margin, margin, "Detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", isPiping, Color.Empty, ETabs.Main);
+                WrapHelper(1, 1, margin, margin, "Detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", Color.Empty, ETabs.Main, this.type);
             }
 
             Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper);  //if not, the text is not scrolled if many lines.
@@ -248,7 +252,7 @@ namespace Gekko
         /// <param name="isPiping">Pipe to file?</param>
         /// <param name="color">Text color (can be Color.Empty)</param>
         /// <param name="tab">Which tab to print it?</param>
-        private static void WrapHelper(int linesAtStart, int linesAtEnd, string marginFirst, string margin, string s, bool isPiping, Color color, ETabs tab)
+        private static void WrapHelper(int linesAtStart, int linesAtEnd, string marginFirst, string margin, string s, Color color, ETabs tab, EWrapType type)
         {
             if (s.Trim() == "") return;
 
@@ -266,8 +270,7 @@ namespace Gekko
 
             int textLengthStart = Gui.gui.textBoxMainTabUpper.TextLength;
             int col = 0;
-            int colMax = Program.options.print_width;
-            if (isPiping) colMax = Program.options.print_filewidth;
+            int colMax = Program.options.print_width;            
 
             RichTextBoxEx textBox = Gui.gui.textBoxMainTabUpper;
             if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
@@ -278,7 +281,7 @@ namespace Gekko
                 nl += G.NL;
             }
 
-            G.AppendText(textBox, nl + marginFirst);
+            G.AppendText(textBox, nl + marginFirst, type);
 
             col = margin.Length;
 
@@ -291,7 +294,7 @@ namespace Gekko
                 string normalText = G.Substring(s, lastC, links[i].int1 - 1);
                 if (true)
                 {
-                    col = WrapText(textBox, normalText, margin, col, colMax, color);
+                    col = WrapText(textBox, normalText, margin, col, colMax, color, type);
                 }
                 string[] ss = G.Substring(s, links[i].int1 + Globals.linkActionStart.Length, links[i].int2 - 1).Split(Globals.linkActionDelimiter);  //delimiter must be there
                 string linkText = ss[0];
@@ -299,24 +302,24 @@ namespace Gekko
                 if (col + linkText.Length > colMax)
                 {
                     //insert a line break no matter what the character before is. Link cannot be broken/wrapped                        
-                    G.AppendText(textBox, G.NL + margin);
+                    G.AppendText(textBox, G.NL + margin, type);
                     col = margin.Length;
                 }
 
-                G.AppendLink(textBox, linkText, linkLink);
+                G.AppendLink(textBox, linkText, linkLink, type);
                 col += linkText.Length;
 
                 if (i == links.Count - 1)
                 {
                     //get the last bit
                     string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
-                    col = WrapText(textBox, normalText2, margin, col, colMax, color);
+                    col = WrapText(textBox, normalText2, margin, col, colMax, color, type);
                 }
             }
 
             if (links.Count == 0)
             {
-                WrapText(textBox, s, margin, col, colMax, color);
+                WrapText(textBox, s, margin, col, colMax, color, type);
             }
 
             //Always insert a newline now, we are not doing the equivalent to Write().
@@ -327,7 +330,7 @@ namespace Gekko
             {
                 nl2 += G.NL;
             }
-            if (nl2 != "") G.AppendText(textBox, nl2);
+            if (nl2 != "") G.AppendText(textBox, nl2, type);
 
             if (color != Color.Empty)
             {
@@ -336,7 +339,7 @@ namespace Gekko
             }
         }
 
-        private static int WrapText(RichTextBoxEx textBox, string text, string margin, int colCounter, int colMax, Color color)
+        private static int WrapText(RichTextBoxEx textBox, string text, string margin, int colCounter, int colMax, Color color, EWrapType type)
         {
             while (true)
             {
@@ -376,13 +379,13 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    G.AppendText(textBox, s1 + G.NL + margin);
+                    G.AppendText(textBox, s1 + G.NL + margin, type);
                     colCounter = margin.Length;
                 }
                 else
                 {
                     //easy, there is room for the text   
-                    G.AppendText(textBox, text);
+                    G.AppendText(textBox, text, type);
                     colCounter += text.Length;
                     break;  //the end
                 }

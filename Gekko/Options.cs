@@ -120,7 +120,6 @@ namespace Gekko
         public int print_fields_nwidth = 13;
         public int print_fields_pdec = 2;
         public int print_fields_pwidth = 8;  //to make more room for labels
-        public int print_filewidth = 130;        
         public string print_freq = "pretty";  //pretty or simple
         public bool print_mulprt_lev = false;  //n
         public bool print_mulprt_abs = true;  //m
@@ -370,7 +369,6 @@ namespace Gekko
             Add("PRINT FIELDS NWIDTH", Globals.xint);
             Add("PRINT FIELDS PDEC", Globals.xint);
             Add("PRINT FIELDS PWIDTH", Globals.xint);
-            Add("PRINT FILEWIDTH", Globals.xint);
             Add("PRINT FREQ", Globals.xnameOrString, "simple", "pretty");
             Add("PRINT MULPRT ABS", Globals.xbool);
             {
