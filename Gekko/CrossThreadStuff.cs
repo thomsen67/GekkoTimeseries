@@ -129,7 +129,7 @@ namespace Gekko
         delegate void SetTextUpperCallback(Wrap x);
         public static void Wrap(Wrap wrap)
         {
-            if (Gui.gui.textBoxMainTabLower.InvokeRequired)
+            if (!G.IsUnitTesting() && Gui.gui.textBoxMainTabLower.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new SetTextUpperCallback(Wrap), new object[] { wrap });

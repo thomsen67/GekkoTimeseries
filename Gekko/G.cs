@@ -4668,29 +4668,40 @@ namespace Gekko
         public static bool FilenameIncludesPath(string filename)
         {
             return filename.Contains(":") || filename.Contains("\\");
-        }        
+        }
+
+        /// <summary>
+        /// Set color of a section of text in a RichTextBox
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <param name="textLengthStart"></param>
+        /// <param name="color"></param>
+        public static void PrintLowLevelSetColor(RichTextBoxEx textBox, int textLengthStart, Color color)
+        {
+            textBox.Select(textLengthStart, textBox.TextLength);
+            textBox.SelectionColor = color;
+        }
 
         /// <summary>
         /// Helper method for adding text to the GUI. Not intended for use outside of Wrap.cs.
         /// </summary>
         /// <param name="textBox"></param>
         /// <param name="s"></param>
-        public static void AppendText(RichTextBox textBox, string s, EWrapType type)
+        public static void PrintLowLevelAppendText(RichTextBox textBox, string s, EWrapType type)
         {
-            G.AppendLink(textBox, s, null, type);  //no link
+            G.PrintLowLevelAppendTextAbstract(textBox, s, null, type);  //no link
         }
 
         /// <summary>
-        /// Helper method for adding text to the GUI. The idea is that -- in the longer run -- all change to GUI text runs through
+        /// Main method for adding text to the GUI. The idea is that -- in the longer run -- all change to GUI text runs through
         /// this method (at the moment, only Wrap text does this). See also Gui.gui.LinkClicked().
         /// Not intended for use outside of Wrap.cs.
         /// </summary>
         /// <param name="textBox">The GUI text box</param>
         /// <param name="s">String to show</param>
         /// <param name="link">Link url, else null if no link</param>
-        public static void AppendLink(RichTextBox textBox, string s, string link, EWrapType type)
+        public static void PrintLowLevelAppendTextAbstract(RichTextBox textBox, string s, string link, EWrapType type)
         {
-
             bool mustAlsoPrintOnScreen = false;  //???????????????????????????????????????????????
 
             bool isMuting = false;

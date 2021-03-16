@@ -267,13 +267,18 @@ namespace Gekko
                 links.Add(new TwoInts() { int1 = i1, int2 = i2 });
                 i1 = i2 + 1;
             }
-
-            int textLengthStart = Gui.gui.textBoxMainTabUpper.TextLength;
+                    
             int col = 0;
-            int colMax = Program.options.print_width;            
+            int colMax = Program.options.print_width;
 
-            RichTextBoxEx textBox = Gui.gui.textBoxMainTabUpper;
-            if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
+            int textLengthStart = -12345;  //used to set color at the very end    
+            RichTextBoxEx textBox = null;
+            if (!G.IsUnitTesting())
+            {
+                if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
+                else textBox = Gui.gui.textBoxMainTabUpper;                
+                textLengthStart = textBox.TextLength;
+            }
 
             string nl = "";
             for (int i = 0; i < linesAtStart; i++)
@@ -281,7 +286,7 @@ namespace Gekko
                 nl += G.NL;
             }
 
-            G.AppendText(textBox, nl + marginFirst, type);
+            G.PrintLowLevelAppendText(textBox, nl + marginFirst, type);
 
             col = margin.Length;
 
@@ -302,11 +307,11 @@ namespace Gekko
                 if (col + linkText.Length > colMax)
                 {
                     //insert a line break no matter what the character before is. Link cannot be broken/wrapped                        
-                    G.AppendText(textBox, G.NL + margin, type);
+                    G.PrintLowLevelAppendText(textBox, G.NL + margin, type);
                     col = margin.Length;
                 }
 
-                G.AppendLink(textBox, linkText, linkLink, type);
+                G.PrintLowLevelAppendTextAbstract(textBox, linkText, linkLink, type);
                 col += linkText.Length;
 
                 if (i == links.Count - 1)
@@ -324,20 +329,19 @@ namespace Gekko
 
             //Always insert a newline now, we are not doing the equivalent to Write().
 
-
             string nl2 = "";
             for (int i = 0; i < linesAtEnd; i++)
             {
                 nl2 += G.NL;
             }
-            if (nl2 != "") G.AppendText(textBox, nl2, type);
+            if (nl2 != "") G.PrintLowLevelAppendText(textBox, nl2, type);
 
-            if (color != Color.Empty)
+            if (!G.IsUnitTesting() && color != Color.Empty)
             {
-                textBox.Select(textLengthStart, textBox.TextLength);
-                textBox.SelectionColor = color;
+                G.PrintLowLevelSetColor(textBox, textLengthStart, color);
             }
         }
+
 
         private static int WrapText(RichTextBoxEx textBox, string text, string margin, int colCounter, int colMax, Color color, EWrapType type)
         {
@@ -379,13 +383,13 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    G.AppendText(textBox, s1 + G.NL + margin, type);
+                    G.PrintLowLevelAppendText(textBox, s1 + G.NL + margin, type);
                     colCounter = margin.Length;
                 }
                 else
                 {
                     //easy, there is room for the text   
-                    G.AppendText(textBox, text, type);
+                    G.PrintLowLevelAppendText(textBox, text, type);
                     colCounter += text.Length;
                     break;  //the end
                 }
