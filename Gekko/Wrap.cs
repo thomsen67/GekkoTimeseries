@@ -136,7 +136,7 @@ namespace Gekko
         /// #klsdjsdklgj9
         public void Exe2()
         {
-            //When we get here, we are typically at a line that has just breaked.            
+            //When we get here, we are typically at a line that has just breaked.
 
             string marginFirst = "";
             Color color = Color.Empty;
