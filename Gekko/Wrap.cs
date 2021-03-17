@@ -71,7 +71,7 @@ namespace Gekko
         /// <summary>
         /// Add a section break to "main". Blank line in between.
         /// </summary>
-        public void MainNewLines()
+        public void MainNewLine()
         {
             this.storageMain.Add(new WrapHelper5());
         }
@@ -79,7 +79,7 @@ namespace Gekko
         /// <summary>
         /// Add a section break to "main". No blank line in between.
         /// </summary>
-        public void MainNewLine()
+        public void MainNewLineTight()
         {            
             this.storageMain.Add(new WrapHelper5(0));
         }
@@ -96,7 +96,7 @@ namespace Gekko
         /// <summary>
         /// Add a section break to "more". Blank line in between.
         /// </summary>
-        public void MoreNewLines()
+        public void MoreNewLine()
         {
             this.storageMore.Add(new WrapHelper5());
         }
@@ -104,7 +104,7 @@ namespace Gekko
         /// <summary>
         /// Add a section break to "more". No blank line in between.
         /// </summary>
-        public void MoreNewLine()
+        public void MoreNewLineTight()
         {            
             this.storageMore.Add(new WrapHelper5(0));
         }        

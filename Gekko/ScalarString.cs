@@ -216,7 +216,7 @@ namespace Gekko
                 double d = double.NaN; bool b = double.TryParse(this.string2, out d);
                 if (this.isFromNakedList && b)
                 {
-                    e.MainNewLines();
+                    e.MainNewLine();
                     e.MainAdd("Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
                     e.MainAdd("'naked' list without parentheses, like #m = 007, 1e5;. The items in a list like #m");
                     e.MainAdd("may look like values, but are treated as strings. You may use #m.vals() to convert the");
@@ -245,7 +245,7 @@ namespace Gekko
                 GekkoTime gt = GekkoTime.FromStringToGekkoTime(this.string2);
                 if (this.isFromNakedList && !gt.IsNull())
                 {
-                    e.MainNewLines();
+                    e.MainNewLine();
                     e.MainAdd("Note that the '" + this.string2 + "' origins from a");
                     e.MainAdd("'naked' list without parentheses, like #m = 2020q1, 2020q2, 2020q3;. In such");
                     e.MainAdd("naked lists, the items are treated as strings. You should perhaps");

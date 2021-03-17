@@ -99,41 +99,31 @@ namespace Gekko
                     IVariable rv = null; this.storage.TryGetValue(varnameWithFreq, out rv);
                     if (rv == null)
                     {
-                        G.Writeln2("*** ERROR: The MAP does not contain the name '" + varnameWithFreq + "'");
-                        throw new GekkoException();
+                        new Error("The MAP does not contain the name '" + varnameWithFreq + "'");
                     }
                     return rv;
                 }                
                 else
                 {
-                    G.Writeln2("*** ERROR: Type mismatch regarding MAP []-index (only STRING is allowed)");
-                    throw new GekkoException();
+                    new Error("Type mismatch regarding MAP []-index (only STRING is allowed)"); return null;
                 }
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional []-index on MAP");
-                throw new GekkoException();
+                new Error("Cannot use " + indexes.Length + "-dimensional []-index on MAP"); return null;
             }
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: Type error regarding concat and MAP");
-            throw new GekkoException();
+            new Error("Type error regarding concat and MAP"); return null;
+            
         }
 
         public IVariable Negate(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: You cannot use minus with MAP");
-            throw new GekkoException();
+            new Error("You cannot use minus with MAP"); return null;
         }
-
-        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        //{
-        //    G.Writeln2("*** ERROR: #8703458724");
-        //    throw new GekkoException();
-        //}
 
         public double GetValOLD(GekkoSmpl t)
         {

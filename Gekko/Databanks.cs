@@ -268,7 +268,7 @@ namespace Gekko
                     {
                         if (rv.editable)
                         {
-                            G.Writeln2("Databank '" + name + "' is already editable in first position.");
+                            new Writeln("Databank '" + name + "' is already editable in first position.");
                         }
                     }
                     m.AddRange(this.storage);  //just copied, and put back again later on
@@ -299,9 +299,9 @@ namespace Gekko
                 if (openType == EOpenType.Edit)
                 {
                     if (openType == EOpenType.Edit) rv.editable = true;
-                    G.Writeln2("Databank '" + name + "' set as editable databank, put in first position.");
+                    new Writeln("Databank '" + name + "' set as editable databank, put in first position.");
                 }
-                else G.Writeln2("Databank '" + name + "' put in first position.");
+                else new Writeln("Databank '" + name + "' put in first position.");
             }
             else if (openType == EOpenType.Ref)
             {
@@ -332,8 +332,8 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref
                 m.Add(this.storage[0]);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                if (openType == EOpenType.Edit) G.Writeln2("Opening databank '" + name + "' as editable in first position");
-                else G.Writeln2("Opening databank '" + name + "' in first position");
+                if (openType == EOpenType.Edit) new Writeln("Opening databank '" + name + "' as editable in first position");
+                else new Writeln("Opening databank '" + name + "' in first position");
             }
             else if (openType == EOpenType.Ref)
             {
@@ -346,7 +346,7 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref                
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                 m.Add(rv);
-                G.Writeln2("Opening databank '" + name + "'");
+                new Writeln("Opening databank '" + name + "'");
             }
             else if (openType == EOpenType.Pos)
             {
@@ -367,7 +367,7 @@ namespace Gekko
                 {
                     m.Add(this.storage[i]);
                 }
-                G.Writeln2("Opening databank '" + name + "' in position " + openPosition);
+                new Writeln("Opening databank '" + name + "' in position " + openPosition);
             }
             else
             {
@@ -513,7 +513,7 @@ namespace Gekko
                 dbList.Add(databank);
             }
             Program.databanks.storage = dbList;
-            G.Writeln2("Moved Work and Ref back to their normal positions in the databank list (F2)");                     
+            new Writeln("Moved Work and Ref back to their normal positions in the databank list (F2)");                     
         }
     }
 }

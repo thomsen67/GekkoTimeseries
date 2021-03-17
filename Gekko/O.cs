@@ -3291,19 +3291,22 @@ namespace Gekko
             {
                 if (G.isNumericalError(lhs_series.GetDataSimple(t)))
                 {
-                    G.Writeln2("*** ERROR: Missing value encountered in series " + lhs_series.GetNameAndFreqPretty(true) + ", period: " + t.ToString());
-                    if (!t1.IsSamePeriod(t2))
+                    using (var e = new Error())
                     {
-                        G.Writeln("Values:");
-                        foreach (GekkoTime tt in new GekkoTimeIterator(t1, t2))
+                        e.MainAdd("Missing value encountered in series " + lhs_series.GetNameAndFreqPretty(true) + ", period: " + t.ToString());                        
+                        if (!t1.IsSamePeriod(t2))
                         {
-                            G.Writeln(tt.ToString() + "    " + G.levelFormat(lhs_series.GetDataSimple(tt), 20));
+                            e.MainNewLineTight();
+                            e.MainAdd("Values:");
+                            foreach (GekkoTime tt in new GekkoTimeIterator(t1, t2))
+                            {
+                                e.MainNewLineTight();
+                                e.MainAdd(tt.ToString() + "    " + G.levelFormat(lhs_series.GetDataSimple(tt), 20));
+                            }
                         }
-                    }
-                    G.Writeln();
-                    G.Writeln("+++ NOTE: To ignore such errors: set OPTION series failsafe = no;");
-                    G.Writeln();
-                    throw new GekkoException();
+                        e.MainNewLineTight();
+                        e.MainAdd("NOTE: To ignore such errors: set OPTION series failsafe = no;");                        
+                    }                    
                 }
             }
         }
@@ -5174,7 +5177,7 @@ namespace Gekko
         {
             if (name.StartsWith(Globals.procedure))
             {
-                G.Writeln2("*** ERROR: Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + (n - 2) + " arguments");
+                new Error("Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + (n - 2) + " arguments");
             }
             else
             {
@@ -5187,7 +5190,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with " + (n - 2) + " arguments");
+                    new Error("Cannot find user function '" + name + "()' with " + (n - 2) + " arguments");
                 }
             }
         }
@@ -5217,7 +5220,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 0);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5235,7 +5237,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 1);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5253,7 +5254,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 2);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5271,7 +5271,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 3);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5289,7 +5288,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 4);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5307,7 +5305,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 5);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5325,7 +5322,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 6);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5343,7 +5339,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 7);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5361,7 +5356,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 8);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5379,7 +5373,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 9);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5397,7 +5390,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 10);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5415,7 +5407,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 11);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5433,7 +5424,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 12);
-                throw new GekkoException();
             }
             return rv;
         }
@@ -5451,7 +5441,6 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 13);
-                throw new GekkoException();
             }
             return rv;
         }

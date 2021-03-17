@@ -2422,10 +2422,10 @@ namespace Gekko
                 e.MainAdd("[" + txt.Substring(0, txt.Length - 2) + "].");
                 foreach (string warning in warnings)
                 {
-                    e.MainNewLine();
+                    e.MainNewLineTight();
                     e.MainAdd("  NOTE: " + warning);
                 }
-                e.MainNewLine();
+                e.MainNewLineTight();
                 e.MainAdd("You may ignore such errors with 'OPTION series array print missing = ... ;' and 'OPTION series array calc missing = ... ;'");
             }            
         }

@@ -1198,9 +1198,9 @@ namespace Gekko
                             {
                                 e.MainAdd("Cannot auto-create series " + varnameWithFreq + ". See the CREATE command.");
                                 e.MainAdd("You may change the settings with the following option:");
-                                e.MainNewLine();
+                                e.MainNewLineTight();
                                 e.MainAdd("OPTION databank create auto = yes;");
-                                e.MainNewLine();
+                                e.MainNewLineTight();
                                 e.MainAdd("Alternatively, use 'MODE data;' or 'MODE mixed;'.");
                             }                            
                         }

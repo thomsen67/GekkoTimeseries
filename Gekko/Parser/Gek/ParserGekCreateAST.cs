@@ -864,11 +864,13 @@ namespace Gekko.Parser.Gek
             {
                 if (alType[i] == "Number" && al[i].EndsWith("."))
                 {
-                    G.Writeln2("*** ERROR: You cannot write a number like '" + al[i] + "' ending with period, please use");
-                    G.Writeln("            '" + al[i] + "0'. Such numbers interfere really poorly with the range ", Color.Red);
-                    G.Writeln("           indicator '..' used in Gekko, but the numbers are legal in the model", Color.Red);
-                    G.Writeln("           (.frm) file, at least for the time being.", Color.Red);
-                    G.Writeln();
+                    using (var n = new Note())
+                    {
+                        n.MainAdd("You cannot write a number like '" + al[i] + "' ending with period, please use");
+                        n.MainAdd("'" + al[i] + "0'. Such numbers interfere really poorly with the range ");
+                        n.MainAdd("indicator '..' used in Gekko, but the numbers are legal in the model");
+                        n.MainAdd("(.frm) file, at least for the time being.");
+                    }                        
                     break;  //no more of these messages
                 }
             }
@@ -950,7 +952,7 @@ namespace Gekko.Parser.Gek
             }
             if (flag)
             {
-                G.Write(indent + "See help file: "); G.WriteLink(firstWord.ToUpper(), "help:" + firstWord); G.Writeln();
+                new Writeln("See {a{" + firstWord.ToUpper() + "¤" + firstWord + ".htm" + "}a} in help system.");               
             }
         }
 
