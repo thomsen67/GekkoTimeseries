@@ -505,6 +505,12 @@ namespace Gekko.Parser.Gek
             return ast.Text == null && !(ast.Children != null && ast.Children.Count > 0);
         }
 
+        /// <summary>
+        /// This method prints syntax errors (of the type with illegal symbols)
+        /// </summary>
+        /// <param name="errors"></param>
+        /// <param name="inputFileLines"></param>
+        /// <param name="ph"></param>
         public static void PrintLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
             if (Globals.threadIsInProcessOfAborting) return;
@@ -549,16 +555,7 @@ namespace Gekko.Parser.Gek
                     //throw new GekkoException();
                 }
 
-                string errorMessage = ss[3];
-
-                //if (!Globals.useTestParser)
-                //{
-                //    errorMessage = errorMessage.Replace(" RPGLUE", " ')'");
-                //    errorMessage = errorMessage.Replace(" LPGLUE", " '('");
-                //    errorMessage = errorMessage.Replace(" RP", " ')'");
-                //    errorMessage = errorMessage.Replace(" LP", " '('");
-                //    //errorMessage = errorMessage.Replace("expecting set", "");  //remove this, is confusing
-                //}
+                string errorMessage = ss[3];                
 
                 errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
 
@@ -647,6 +644,12 @@ namespace Gekko.Parser.Gek
             if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
         }
 
+        /// <summary>
+        /// This method prints syntax errors
+        /// </summary>
+        /// <param name="errors"></param>
+        /// <param name="inputFileLines"></param>
+        /// <param name="ph"></param>
         public static void PrintParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
             List<string> lineTemp2 = new List<string>();
@@ -830,7 +833,6 @@ namespace Gekko.Parser.Gek
 
                             CheckForBadDouble(lineTemp);
                         }
-
                     }
                 }
 
