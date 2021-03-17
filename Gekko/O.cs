@@ -5972,8 +5972,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "SERIES"));
-                    throw;
+                    TypeErrorString(position, "SERIES");                    
                 }
             }
             else
@@ -6000,8 +5999,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "VAL"));
-                    throw;
+                    TypeErrorString(position, "VAL");                    
                 }
             }
             return x;
@@ -6023,8 +6021,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "STRING"));
-                    throw;
+                    TypeErrorString(position, "STRING");
                 }
             }
             return x;
@@ -6041,8 +6038,7 @@ namespace Gekko
             if (x == null)
             {
                 //hmmm, x == null??
-                G.Writeln(TypeErrorString(position, "NAME"));
-                throw new GekkoException();
+                TypeErrorString(position, "NAME");                
             }
             if (x.Type() != EVariableType.String)
             {
@@ -6052,8 +6048,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "NAME"));
-                    throw new GekkoException();
+                    TypeErrorString(position, "NAME");                    
                 }
             }
             return x;
@@ -6108,8 +6103,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "DATE"));
-                    throw;
+                    TypeErrorString(position, "DATE");
                 }
             }
             return x;
@@ -6131,8 +6125,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "LIST"));
-                    throw;
+                    TypeErrorString(position, "LIST");                    
                 }
             }
             else
@@ -6158,8 +6151,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "MATRIX"));
-                    throw;
+                    TypeErrorString(position, "MATRIX");                    
                 }
             }
             else
@@ -6175,38 +6167,32 @@ namespace Gekko
         /// <param name="position"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static string TypeErrorString(int position, string type)
-        {
-            string rv = null;
+        private static void TypeErrorString(int position, string type)
+        {            
             if (position == -1)
             {
-                rv = "***ERROR: The right-hand side should be " + type + " type";
+                new Error("The right-hand side should be " + type + " type");
             }
             else if (position == 0)
             {
-                rv = "*** ERROR: The return type should be " + type + " type";
+                new Error("The return type should be " + type + " type");
             }
             else if (position == 1)
             {
-                rv = "*** ERROR: The start date %t1 in a f(<%t1 %t2>, ...) call should be " + type + " type";
+                new Error("The start date %t1 in a f(<%t1 %t2>, ...) call should be " + type + " type");
             }
             else if (position == 2)
             {
-                rv = "*** ERROR: The end date %t2 in a f(<%t1 %t2>, ...) call should be " + type + " type";
+                new Error("The end date %t2 in a f(<%t1 %t2>, ...) call should be " + type + " type");
             }
             else  //3 or larger, corresponding to argument 1 and so on. However, using UFCS, position = 3 is the variable before dot, and position = 4, 5, 6... are the first, second etc. arguments inside the parenthesis.
             {
-                Action a = () =>
+                using (var e = new Error())
                 {
-                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
-                    O.Cls("output");
-                    string txt = "When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.";
-                    G.Writeln(txt, ETabs.Output);
-                };
-                string s = G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a));
-                rv = "*** ERROR: Argument #" + (position - 2) + " should be " + type + " type (see more on argument number counting " + s + ")";
+                    e.MainAdd("Argument #" + (position - 2) + " should be " + type + " type.");                    
+                    e.MoreAdd("When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.");
+                }                
             }
-            return rv;
         }
 
         /// <summary>
@@ -6225,8 +6211,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln(TypeErrorString(position, "MAP"));
-                    throw;
+                    TypeErrorString(position, "MAP");
                 }
             }
             else
@@ -8739,15 +8724,15 @@ namespace Gekko
                         else
                         {
                             //not series (including array-series and vals)                                                        
-                            if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
-                            {
-                                //G.Writeln2(Program.RemoveSplitter(this.prtElements[0].labelGiven[0]));
-                                G.Writeln2("[empty list]");
-                            }
-                            else if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
+                            if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
                             {
                                 G.Writeln2("+++ WARNING: Skipped one variable for printing");
                             }
+                            else if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
+                            {
+                                //G.Writeln2(Program.RemoveSplitter(this.prtElements[0].labelGiven[0]));
+                                G.Writeln2("[empty list]");
+                            }                            
                             else
                             {
                                 Program.NonSeriesHandling(this);
