@@ -140,20 +140,17 @@ namespace Gekko
 
             string marginFirst = "";
             Color color = Color.Empty;
-            bool mustAlsoPrintOnScreen = false;
 
             if (this.type == EWrapType.Error)
             {
                 marginFirst = Globals.errorString;
-                color = Color.Red;
-                mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping or muting
+                color = Color.Red;                
                 if (Globals.errorMemory == null) Globals.errorMemory = new StringBuilder();
             }
             else if (this.type == EWrapType.Warning)
             {
                 marginFirst = Globals.warningString;
                 color = Globals.warningColor;
-                mustAlsoPrintOnScreen = true;
             }
             else if (this.type == EWrapType.Note)
             {

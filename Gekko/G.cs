@@ -4702,7 +4702,8 @@ namespace Gekko
         /// <param name="link">Link url, else null if no link</param>
         public static void PrintLowLevelAppendTextAbstract(RichTextBox textBox, string s, string link, EWrapType type)
         {
-            bool mustAlsoPrintOnScreen = false;  //???????????????????????????????????????????????
+            bool mustAlsoPrintOnScreen = false;
+            if (type == EWrapType.Error || type == EWrapType.Warning) mustAlsoPrintOnScreen = true;  //so that errors and warnings get seen
 
             bool isMuting = false;
             if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;

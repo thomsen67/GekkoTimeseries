@@ -2033,48 +2033,9 @@ namespace Gekko
                 Arrow.Run();
             }
 
-            if (Globals.runningOnTTComputer)
-            {
-                using (var e = new Error())
-                {
-                    for (int i = 0; i < 5; i++)  //test scrolling behavior
-                    {
-                        e.MainAdd("Could not find model file 'xxx'");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainNewLines(); // "aaa
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainNewLines(); // "aaa
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainNewLines(); // "aaa
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                        e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                        e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                        e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
-                        e.MoreNewLines();
-                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.MoreNewLines();
-                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.MoreNewLines();
-                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                    }
-                }
-            }
-            else
-            {
-                if (nocr) G.Write(text);
-                else G.Writeln(text);
-            }
+            if (nocr) G.Write(text);
+            else G.Writeln(text);
+
         }
 
         /// <summary>

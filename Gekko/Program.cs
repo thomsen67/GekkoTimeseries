@@ -14261,7 +14261,7 @@ namespace Gekko
                 {
                     using (var e = new Error())
                     {
-                        for (int i = 0; i < 10; i++)  //test scrolling behavior
+                        for (int i = 0; i < 3; i++)  //test scrolling behavior
                         {
                             e.MainAdd("Could not find model file '" + fileNameSimple + "'");
                             e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
@@ -14696,8 +14696,8 @@ namespace Gekko
             fileName = G.StripQuotes(fileName);
             //NOTE: If there is an error, Globals.pipeFile will be closed and disposed somewhere else in the
             //      code. So no need to think about using an "using" statement here.    
-            
-            if(pause && fileName!=null)
+
+            if (pause && fileName != null)
             {
                 new Error("You should use PIPE<pause> without a filename");
                 //throw new GekkoException();
@@ -14715,7 +14715,7 @@ namespace Gekko
                 {
                     if (!mute)
                     {
-                        G.Writeln("+++ WARNING: you are not currently piping output to a file. Command ignored.");
+                        //G.Writeln("+++ WARNING: you are not currently piping output to a file. Command ignored.");
                         if (G.Equal(fileName, "con")) G.Writeln("+++ WARNING: please use PIPE<stop> instead of PIPE con");
                     }
                 }
@@ -18046,14 +18046,19 @@ namespace Gekko
             }
         }
 
-        
+        /// <summary>
+        /// Reset or Restart. s may be "reset" or "restart" .
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="s"></param>
+        /// <param name="p"></param>
         public static void Re(GekkoSmpl smpl, string s, P p)
-        {
-            
-            //s may be "reset" or "restart"
+        {            
             bool ini = false;
             if (s == "restart") ini = true;
-            Pipe("con", null, true);  //silently (mute) sets output to screen (Gekko might be piping)            
+            
+            Pipe(null, new List<string>() { "stop" }, true);  //silently (mute) sets output to screen (Gekko might be piping)            
+
             int w = -12345;
             int b = -12345;
             MaybeWriteOpenDatabanks(ref w, ref b);
