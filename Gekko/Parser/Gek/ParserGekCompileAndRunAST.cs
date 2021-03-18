@@ -18,6 +18,11 @@ namespace Gekko.Parser.Gek
 {
     public class ParserGekCompileAndRunAST
     {
+        /// <summary>
+        /// Run the compiled C# code from .gcm commands.
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <param name="p"></param>
         public static void CompileAndRunAST(ConvertHelper ch, P p)
         {            
 
@@ -71,7 +76,8 @@ namespace Gekko.Parser.Gek
             }
             catch (Exception e)
             {
-                HandleRunErrors(p, e);
+                //This Exception typically has a GekkoException inside
+                HandleRunErrors(p, e);                
                 throw;  //changed from return til throw here. This provides a 'more' link with C# line, also if the error occurs in a gcm file. The question is: does this break something??
                 //return;
             }
@@ -136,15 +142,29 @@ namespace Gekko.Parser.Gek
             return cr;
         }
 
+        /// <summary>
+        /// Run errors, that is, not lexer/parser/syntax errors, or compile errors. These are "real" error messages,
+        /// typically from an Error(...) with implied GekkoException.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="e"></param>
         private static void HandleRunErrors(P p, Exception e)
         {
             if (Globals.threadIsInProcessOfAborting)
             {
                 throw e;
-            }                    
+            }
 
             if (p.hasWrittenRunTimeErrorOnce) return;  //We now write a stack first time an error is encountered
             p.hasWrittenRunTimeErrorOnce = true;
+
+            GekkoException ge = null;
+            if (e.InnerException != null) ge = e.InnerException as GekkoException;
+            List<Wrap> wraps = GetWrapsFromGekkoException(ge);
+            foreach (Wrap wrap in wraps)
+            {
+                CrossThreadStuff.Wrap(wrap); //.Exe2() will fail because it is on another thread than GUI
+            }
 
             string exception = "";
             if (e.InnerException != null) exception = e.InnerException.Message;
@@ -186,7 +206,7 @@ namespace Gekko.Parser.Gek
                         temp.Add(exception);
                         Parser.Frm.ParserFrmCompileAST.PrintModelLexerErrors(temp, Globals.cmdFileLines, new ParseHelper());
                     }
-                    
+
                     if (originalFileName == "" && commandLines.Count == 1)  //more-liners get file-type error messages
                     {
                         if (lexer == true) G.Writeln("*** ERROR: Problem parsing/lexing command line:");
@@ -204,7 +224,7 @@ namespace Gekko.Parser.Gek
 
                         string s2 = "*** ERROR: ";
                         if (p.hasSeenStopCommand > 0) s2 = null;  //do not issue an error here
-                        
+
                         if (originalFileName == null || originalFileName == "")
                         {
                             //text block user input
@@ -217,12 +237,23 @@ namespace Gekko.Parser.Gek
                         }
 
                         Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);
-                        
+
                     }
                 }
             }
             Program.WriteCallStack(false, p);  //will only be performed once
             throw e;
+        }
+
+        /// <summary>
+        /// Fetces error message(s) from inside GekkoException, for printing. Will always return a List obj,
+        /// but the List may have 0 elements.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static List<Wrap> GetWrapsFromGekkoException(GekkoException e)
+        {
+            return e.wraps;
         }
 
         private static void HandleCompileErrors(P p, CompilerResults cr)

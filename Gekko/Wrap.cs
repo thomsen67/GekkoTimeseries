@@ -115,17 +115,22 @@ namespace Gekko
         /// Will call Exe2(), on the GUI thread.
         /// </summary>
         public void Exe1()
-        {
-            CrossThreadStuff.Wrap(this);  //calls .Exe2()
+        {            
             if (type == EWrapType.Error)
             {
                 Globals.numberOfErrors++;
-                throw new GekkoException();                
+                //this "stores" the error, for later pretty printing when the exception is caught (HandleRunErrors.cs)
+                //the GekkoException will be stored inside an innerException when caught later on, 
+                //not sure why.
+                //will never execute CrossThreadStuff.Wrap(this) below here, but it is called where the 
+                //exception is caught (HandleRunErrors.cs).
+                throw new GekkoException(this);  
             }
             else if (type == EWrapType.Warning)
             {                
                 Globals.numberOfWarnings++;
             }
+            CrossThreadStuff.Wrap(this);  //calls .Exe2()
         }
 
         /// <summary>
