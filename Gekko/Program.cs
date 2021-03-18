@@ -845,8 +845,15 @@ namespace Gekko
 
     public class GekkoException : System.Exception
     {
+        public List<Wrap> wraps = new List<Wrap>();
+
         public GekkoException() { }
         public GekkoException(string s) : base(s) { }
+        public GekkoException(Wrap wrap)
+        {
+            this.wraps.Add(wrap);
+        }
+        
     }
 
 

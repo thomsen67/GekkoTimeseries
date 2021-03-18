@@ -116,7 +116,7 @@ namespace Gekko
         /// </summary>
         public void Exe1()
         {
-            CrossThreadStuff.Wrap(this);  //calls G.Wrap(), see #klsdjsdklgj9
+            CrossThreadStuff.Wrap(this);  //calls .Exe2()
             if (type == EWrapType.Error)
             {
                 Globals.numberOfErrors++;
@@ -133,7 +133,6 @@ namespace Gekko
         /// of the G.Write() and G.Writeln() methods.
         /// </summary>
         /// <param name="w"></param>
-        /// #klsdjsdklgj9
         public void Exe2()
         {
             //When we get here, we are typically at a line that has just breaked.
@@ -202,7 +201,7 @@ namespace Gekko
                 WrapHelper(1, 1, margin, margin, "Detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", Color.Empty, ETabs.Main, this.type);
             }
 
-            Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper);  //if not, the text is not scrolled if many lines.
+            if (!G.IsUnitTesting()) Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper); //if not, the text is not scrolled if many lines.
             
         }
         

@@ -1121,8 +1121,8 @@ namespace Gekko
                 }
                 else if (this.freq == EFreq.Q) subPeriods = 4;
                 else if (this.freq == EFreq.M) subPeriods = 12;
-                else if (this.freq == EFreq.U) subPeriods = 1;  
-                else throw new GekkoException("Error regarding frequencies");
+                else if (this.freq == EFreq.U) subPeriods = 1;
+                else new Error("Error regarding frequencies");
 
                 int subs = (this.sub - 1) + addedPeriods; //a lot easier if first converting from quarters 1,2,3,4 into 0,1,2,3
                 int supers = subs / subPeriods;  //divisor
