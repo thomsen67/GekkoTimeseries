@@ -922,12 +922,12 @@ namespace Gekko
 
                     if (missingsAtStart > 0)
                     {
-                        G.Writeln("*** ERROR: " + missingsAtStart + " missing values at start of sample");
+                        new Error(missingsAtStart + " missing values at start of sample", false);
                     }
 
                     if (missingsAtEnd > 0)
                     {
-                        G.Writeln("*** ERROR: " + missingsAtEnd + " missing values at end of sample");
+                        new Error(missingsAtEnd + " missing values at end of sample", false);
                     }
 
                     if (missingsAtStart > 0 || missingsAtEnd > 0)
@@ -943,13 +943,13 @@ namespace Gekko
 
                     if (e.Message != null && e.Message != "")
                     {
-                        G.Writeln2("*** ERROR: " + e.Message);
-                        G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                        new Error(e.Message, false);
+                        new Error("OLS does not solve, please check data for missings etc.", false);
                     }
                     if (e.InnerException != null && e.InnerException.Message != null && e.InnerException.Message != "")
                     {
-                        G.Writeln2("*** ERROR: " + e.InnerException.Message);
-                        G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                        new Error(e.InnerException.Message, false);
+                        new Error("OLS does not solve, please check data for missings etc.", false);
                     }
                 }
                 throw;
@@ -958,16 +958,14 @@ namespace Gekko
             {
                 if (calledFromRecursive == false)
                 {
-                    G.Writeln2("*** ERROR: OLS does not solve.");
+                    new Error("OLS does not solve.", false);
                     if (info2 == -2)
                     {
-                        G.Writeln("           Internal SVD decomposition subroutine failed (degenerate systems only)");
+                        new Error("Internal SVD decomposition subroutine failed (degenerate systems only)", false);
                     }
                     if (info2 == -3)
                     {
-                        G.Writeln("           Either too many constraints (more than # of parameters),");
-                        G.Writeln("           degenerate constraints (some constraints are");
-                        G.Writeln("           repeated twice) or inconsistent constraints were specified.");
+                        new Error("Either too many constraints (more than # of parameters), degenerate constraints (some constraints are repeated twice) or inconsistent constraints were specified.", false);
                     }
                 }
                 throw new GekkoException();

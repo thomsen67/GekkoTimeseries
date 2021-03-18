@@ -351,6 +351,7 @@ namespace Gekko
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
             {
+
                 G.Writeln("*** ERROR: iterator problem");
                 throw new GekkoException();
             }
@@ -607,7 +608,7 @@ namespace Gekko
             int x_int = O.ConvertToInt(x);
             if (x_int < 0)
             {
-                G.Writeln2("*** ERROR: Expected integer >= 0, not " + x_int);
+                new Error(" Expected integer >= 0, not " + x_int);
             }
             return x_int;
         }
@@ -1826,7 +1827,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Table '" + name + "' does not seem to exist");
+                new Error(" Table '" + name + "' does not seem to exist");
             }
             return xx;
         }
@@ -6442,15 +6443,15 @@ namespace Gekko
                         //READ...TO  ==> same as OPEN
                         if (this.opt_merge != null)
                         {
-                            new Error("you cannot mix <merge> with TO keyword");
+                            new Error("You cannot mix <merge> with TO keyword");
                         }
                         if (this.opt_first != null)
                         {
-                            new Error("you cannot mix <first> with TO keyword");
+                            new Error("You cannot mix <first> with TO keyword");
                         }
                         if (this.opt_ref != null)
                         {
-                            G.Writeln2("*** ERROR: you cannot mix <ref> with TO keyword");
+                            new Error("You cannot mix <ref> with TO keyword");
                         }
                     }
                     else
@@ -6467,7 +6468,6 @@ namespace Gekko
                                 if (!Program.databanks.GetFirst().editable)
                                 {
                                     new Error("Cannot READ<first>, since first-position databank is non-editable");
-                                    //throw new GekkoException();
                                 }
                             }
                             else if (hlp.openType == EOpenType.Ref)
@@ -6475,7 +6475,6 @@ namespace Gekko
                                 if (!Program.databanks.GetRef().editable)
                                 {
                                     new Error("Cannot READ<ref>, since ref databank is non-editable");
-                                    //throw new GekkoException();
                                 }
                             }
                             else
@@ -6483,12 +6482,10 @@ namespace Gekko
                                 if (!Program.databanks.GetFirst().editable)
                                 {
                                     new Error("Cannot READ, since first-position databank is non-editable");
-                                    //throw new GekkoException();
                                 }
                                 if (!Program.databanks.GetRef().editable)
                                 {
                                     new Error("Cannot READ, since ref databank is non-editable");
-                                    //throw new GekkoException();
                                 }
                             }
                         }
@@ -6498,7 +6495,6 @@ namespace Gekko
                             if (!Program.databanks.GetFirst().editable)
                             {
                                 new Error("Cannot IMPORT, since first-position databank is non-editable");
-                                //throw new GekkoException();
                             }
                         }
                     }
@@ -6509,8 +6505,7 @@ namespace Gekko
                         {
                             if (Globals.modeIntendedWarning)
                             {
-                                G.Writeln2("+++ WARNING: General READ is not intended for data-mode.");
-                                G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                                new Warning("General READ is not intended for data-mode. Please use IMPORT, or consider READ<first>");
                             }
                         }
                         if (isRead && !isTo && hlp.openType == EOpenType.Ref)

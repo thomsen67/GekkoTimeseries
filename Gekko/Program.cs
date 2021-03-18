@@ -262,12 +262,16 @@ namespace Gekko
         public GekkoError(int t1Problem, int t2Problem)
         {
             G.WritelnGray("*** ERROR: TooSmallTooLarge: " + t1Problem + " " + t2Problem);
-            G.Writeln2("*** ERROR: Unfortunately, you ran into a lag problem in Gekko 3.0.");
-            G.Writeln("    This typically arises in expressions like x1[-1] + x2, where timeseries with lags are");
-            G.Writeln("    involved. You may try to use an intermediate variable which will often provide a work-around");
-            G.Writeln("    for the problem, for instance defining y = x1[-1] + x2, and then use y instead of the ");
-            G.Writeln("    expression. For more on this problem, see this page: https://t-t.dk/gekko/the-lag-problem");
-            throw new GekkoException();
+
+            using (var e = new Error())
+            {
+                e.MainAdd("Unfortunately, you ran into a lag problem in Gekko 3.0.");
+                e.MainAdd("This typically arises in expressions like x1[-1] + x2, where timeseries with lags are");
+                e.MainAdd("involved. You may try to use an intermediate variable which will often provide a work-around");
+                e.MainAdd("for the problem, for instance defining y = x1[-1] + x2, and then use y instead of the ");
+                e.MainAdd("expression. For more on this problem, see this page: https://t-t.dk/gekko/the-lag-problem");             
+            }
+
             this.t1Problem = t1Problem;
             this.t2Problem = t2Problem;
         }
@@ -1343,7 +1347,7 @@ namespace Gekko
                 string ramProblem = "";
                 if (FindException(e2, "System.OutOfMemoryException"))
                 {
-                    G.Writeln2("*** ERROR: Out of memory (RAM). Please close some unnessecary programs if possible.");
+                    new Error("Out of memory (RAM). Please close some unnessecary programs if possible.", false);
                     Process[] processlist = Process.GetProcesses();
                     int counter = 0;
                     foreach (Process theprocess in processlist)
@@ -1438,8 +1442,7 @@ namespace Gekko
         /// <param name="s"></param>
         public static void ProtectError(string s)
         {
-            G.Writeln2("*** ERROR: " + s);
-            throw new GekkoException();
+            new Error(s);
         }
 
         /// <summary>
@@ -9169,7 +9172,7 @@ namespace Gekko
                                 }
                                 break;
                             case "xsm":
-                                G.Writeln2("*** ERROR: DECOMP option <" + transformationCodeAugmented + "> does not make (much) sense: did you mean <ms>?");
+                                new Error("DECOMP option <" + transformationCodeAugmented + "> does not make (much) sense: did you mean <ms>?", false);
                                 break;
                             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             case "":
@@ -9301,7 +9304,7 @@ namespace Gekko
                                 }
                                 break;
                             case "xsd":
-                                G.Writeln2("*** ERROR: DECOMP option <" + transformationCodeAugmented + "> does not make (much) sense: did you mean <s>?");
+                                new Error("DECOMP option <" + transformationCodeAugmented + "> does not make (much) sense: did you mean <s>?", false);
                                 break;
 
 
@@ -10376,9 +10379,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("*** ERROR: Conversion failed completely: " + file);
-                        G.Writeln("----------------------------------------------------------------------");
-                        G.Writeln("");
+                        new Error("Conversion failed completely: " + file, false);                        
                         Globals.convertTabToTextErrorCounter++;
                         x = null;
                     }
@@ -10496,7 +10497,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: please choose a folder");
+                new Error("Please choose a folder");
             }
         }
 
@@ -15782,7 +15783,7 @@ namespace Gekko
                 if (!Globals.threadIsInProcessOfAborting)
                 {
                     // Error
-                    G.Writeln2("*** ERROR: SYS Win32 exception: " + _Win32Exception.ToString());
+                    new Error("SYS Win32 exception: " + _Win32Exception.ToString(), false);
                     fail = true;
                 }
             }
@@ -15791,7 +15792,7 @@ namespace Gekko
                 if (!Globals.threadIsInProcessOfAborting)
                 {
                     // Error
-                    G.Writeln2("*** ERROR: SYS exception: " + _Exception.ToString());
+                    new Error("SYS exception: " + _Exception.ToString(), false);
                     fail = true;
                 }
             }
@@ -17178,7 +17179,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: Zip extraction failed: " + e.InnerException + " " + e.Message);
+                new Error("Zip extraction failed: " + e.InnerException + " " + e.Message, false);
             }
             
             string xmlFile = "";
@@ -17262,7 +17263,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: Zip extraction failed: " + e.InnerException + " " + e.Message);
+                new Error("Zip extraction failed: " + e.InnerException + " " + e.Message, false);
             }
 
             return;
@@ -17356,17 +17357,15 @@ namespace Gekko
                     fs = File.Open(pathAndFilename, fm, fa, fsh);
                 }
                 catch (UnauthorizedAccessException e)
-                {
-                    //G.Writeln2("*** ERROR: It seems the file may be read-only: " + pathAndFilename);
-                    //throw;
-                    G.Writeln("+++ WARNING: File '" + pathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
+                {                    
+                    new Warning("File '" + pathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
                     System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
 
                 }
                 catch (Exception e)
-                {                    
-                    G.Writeln("+++ WARNING: File '" + pathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                {
+                    new Warning("File '" + pathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
                 }
@@ -18576,7 +18575,7 @@ namespace Gekko
                 {
                     if (tablefile != null)
                     {
-                        G.Writeln2("*** ERROR: Table file failed: " + tablefile);
+                        new Error("Table file failed: " + tablefile, false);
                     }
 
                     G.Writeln();
@@ -18678,7 +18677,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
+                    new Error("Could not find variable " + s + " in " + db2 + " databank");
                 }
             }
             return (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t);  //#getvar
@@ -18695,7 +18694,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
+                    new Error("Could not find variable " + s + " in Work databank");
                 }
             }
             if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
@@ -18706,7 +18705,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
+                    new Error("Could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
             return (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t);  //#getvar
@@ -18732,7 +18731,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
+                    new Error("Could not find variable " + s + " in " + db2 + " databank");
                 }
             }
             return ((db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) / (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
@@ -18749,7 +18748,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
+                    new Error("Could not find variable " + s + " in Work databank");
                 }
             }
             if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
@@ -18760,7 +18759,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
+                    new Error("Could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
             double pch_base = ((Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) / (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)) - 1) * 100;  //#getvar
@@ -18816,7 +18815,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
+                    new Error("Could not find variable " + s + " in " + db2 + " databank");
                 }
             }
             return (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) - (db.GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1));  //#getvar
@@ -18833,7 +18832,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
+                    new Error("Could not find variable " + s + " in Work databank");
                 }
             }
             if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)))
@@ -18844,7 +18843,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
+                    new Error("Could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
             double dif_base = (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series).GetDataSimple(t.Add(-1)); //#getvar
@@ -19137,7 +19136,7 @@ namespace Gekko
 
                 if (ts_lhs == null)
                 {
-                    G.Writeln2("*** ERROR: Cannot find: " + yRhs);
+                    new Error("Cannot find: " + yRhs);
                 }
 
                 if (method == null) method = "repeat";
@@ -19951,7 +19950,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Unkonwn variable type");
+                    new Error("Unkonwn variable type", false);  //why new exception
                     //SERIES: should not be possible
                 }
             }
@@ -21966,13 +21965,13 @@ namespace Gekko
             alglib.rmatrixinverse(ref matrix, out success, out report);
             if (success == 3)
             {
-                if (printError) G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
-                throw new GekkoException();
+                if (printError) new Error("Inv(): It seems the matrix is singular");
+                else throw new GekkoException();
             }
             else if (success != 1)
             {
-                if (printError) G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
-                throw new GekkoException();
+                if (printError) new Error("Inv(): Could not invert matrix");
+                else throw new GekkoException();
             }
             return matrix;
         }
@@ -23325,7 +23324,7 @@ namespace Gekko
                     }
                     if (error)
                     {
-                        G.Writeln2("*** ERROR: could not parse indices in '" + var3 + "'");
+                        new Error("Could not parse indices in '" + var3 + "'", false);
                         G.Writeln(line);
                         G.Writeln();
                     }
@@ -23380,7 +23379,7 @@ namespace Gekko
                                 }
                                 if (success == false)
                                 {
-                                    G.Writeln2("*** ERROR: indices do not match");
+                                    new Error("Indices do not match");
                                     G.Writeln(line);
                                     G.Writeln();
                                 }
@@ -23575,7 +23574,7 @@ namespace Gekko
                 {
                     if (e.Message != null && e.Message != "")
                     {
-                        G.Writeln2("*** ERROR: " + e.Message);
+                        new Error(e.Message, false);
                         WriteExcelError();
                     }
                 }
@@ -23590,11 +23589,14 @@ namespace Gekko
         /// </summary>
         private static void WriteExcelError()
         {
-            G.Writeln("+++ NOTE: You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2.");
-            G.Writeln("          Gekko 3.0 and on uses 'engine = internal' instead of 'engine = excel'. The new engine is");
-            G.Writeln("          faster and more robust, but only supports .xslx, and not .xls files. In order to");
-            G.Writeln("          use .xls files, you must use 'engine = excel'. If you encounter unexpected errors, please");
-            G.Writeln("          try to see if 'engine = excel' solves them (requires Excel).");
+            using (var n = new Note())
+            {
+                n.MainAdd("You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2.");
+                n.MainAdd("Gekko 3.0 and on uses 'engine = internal' instead of 'engine = excel'. The new engine is");
+                n.MainAdd("faster and more robust, but only supports .xslx, and not .xls files. In order to");
+                n.MainAdd("use .xls files, you must use 'engine = excel'. If you encounter unexpected errors, please");
+                n.MainAdd("try to see if 'engine = excel' solves them (requires Excel).");
+            }
         }
 
         /// <summary>
@@ -23676,7 +23678,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: The sheet '" + sheetName + "' does not seem to exist");
+                        new Error("The sheet '" + sheetName + "' does not seem to exist", false);
                     }
                 }
 
@@ -23763,9 +23765,8 @@ namespace Gekko
             catch (Exception ex)
             {
                 //if you need to handle stuff
-                G.Writeln2("*** ERROR: Get data from Excel failed with the following message:");
+                new Error("Get data from Excel failed with the following message:", false);
                 G.Writeln(ex.Message, Color.Red);
-
                 ErrorMessageExcelInterop();
             }
             finally
@@ -24280,9 +24281,13 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("*** ERROR: Opening the produced .xlsx file with an external program associated with .xlsx");
-                        G.Writeln("    files (such as for example Microsoft Excel) failed.", Color.Red);
-                        G.Writeln("*** ERROR: " + e.Message);
+                        using (var err = new Error())
+                        {
+                            err.MainAdd("Opening the produced .xlsx file with an external program associated with .xlsx");
+                            err.MainAdd("files (such as for example Microsoft Excel) failed.");
+                            err.MainAdd(e.Message);
+                            err.NoException();
+                        }
                     }
                 }
             }
@@ -24292,7 +24297,7 @@ namespace Gekko
                 {
                     if (e.Message != null && e.Message != "")
                     {
-                        G.Writeln2("*** ERROR: " + e.Message);
+                        new Error(e.Message, false);
                         WriteExcelError();
                     }
                 }
@@ -24894,11 +24899,13 @@ namespace Gekko
         /// Error message for read/write of Excel xls(X) file using interop
         /// </summary>
         private static void ErrorMessageExcelInterop()
-        {            
-            G.Writeln2("+++ NOTE: The Excel engine for import/export of Excel sheets is slow and unstable.");
-            G.Writeln("          Consider setting OPTION sheet engine = internal, using a better in-built engine for this.");
-            G.Writeln("          However, this only works for the newer .xlsx file format, not for .xls files.");
-            G.Writeln();
+        {
+            using (var n = new Note())
+            {
+                n.MainAdd("The Excel engine for import/export of Excel sheets is slow and unstable.");
+                n.MainAdd("Consider setting OPTION sheet engine = internal, using a better in-built engine for this.");
+                n.MainAdd("However, this only works for the newer .xlsx file format, not for .xls files.");
+            }
         }
 
         /// <summary>
@@ -25423,9 +25430,7 @@ namespace Gekko
         {
             if (!G.HasModelGekko())
             {
-                G.Writeln2("*** ERROR: No model seems to be loaded, cf. the MODEL statement.");
-                G.Writeln("*** ERROR: The comparison could not be performed.");
-                return;
+                new Error("No model seems to be loaded, cf. the MODEL statement. The comparison could not be performed.");
             }
             int dublets = 0;
             Dictionary<string, int> varlistDublets = new Dictionary<string, int>();
@@ -26690,7 +26695,7 @@ namespace Gekko
                     success = true;
                 }
             }
-            if (!success) G.Writeln2("*** ERROR: Variable " + var1 + " was not found as left-hand side variable in model");
+            if (!success) new Error("Variable " + var1 + " was not found as left-hand side variable in model", false);
         }
 
         /// <summary>
@@ -28284,7 +28289,7 @@ namespace Gekko
             }
             if (j == -12345)
             {
-                G.Writeln2("*** ERROR: Could not find name '" + colname + "'");
+                new Error("Could not find name '" + colname + "'");
             }
             return j;
         }

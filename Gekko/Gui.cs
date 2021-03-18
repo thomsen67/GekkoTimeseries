@@ -1513,7 +1513,7 @@ namespace Gekko
             catch
             {
                 Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageMain;
-                G.Writeln2("*** ERROR: problem with link");
+                new Error("Problem with link", false);
                 //consume this error: otherwise the whole GUI will close (for instance if a DISP-variable does not exist)
             }
         }
@@ -1613,8 +1613,7 @@ namespace Gekko
             }
             catch
             {
-                G.Writeln2("*** ERROR: Comparing failed");
-                G.Writeln();
+                new Error("Comparing failed");
             }
 
         }
@@ -1629,8 +1628,7 @@ namespace Gekko
             }
             catch
             {
-                G.Writeln2("*** ERROR: Comparing failed");
-                G.Writeln();
+                new Error("Comparing failed");
             }
         }
 
@@ -1645,8 +1643,7 @@ namespace Gekko
             }
             catch
             {
-                G.Writeln2("*** ERROR: Comparing failed");
-                G.Writeln();
+                new Error("Comparing failed");
             }
         }
 
@@ -2444,7 +2441,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: please choose a folder");
+                    new Error(" please choose a folder");
                 }
 
             }

@@ -39,6 +39,7 @@ namespace Gekko
         private List<WrapHelper5> storageMain = new List<WrapHelper5>(); //shown in main error text
         private List<WrapHelper5> storageMore = new List<WrapHelper5>(); //link regarding more information
         private EWrapType type = EWrapType.Writeln;
+        private bool throwExceptionForError = true;
 
         /// <summary>
         /// Constructor.
@@ -57,7 +58,15 @@ namespace Gekko
         public void Dispose()
         {
             this.Exe1();
-        }        
+        }
+
+        /// <summary>
+        /// With this, the Error object will not throw any exception
+        /// </summary>
+        public void NoException()
+        {
+            this.throwExceptionForError = false;
+        }
 
         /// <summary>
         /// Add text to "main"
@@ -115,19 +124,20 @@ namespace Gekko
         /// Will call Exe2(), on the GUI thread.
         /// </summary>
         public void Exe1()
-        {            
-            if (type == EWrapType.Error)
+        {
+            if (type == EWrapType.Error && this.throwExceptionForError)
             {
+                //if throwExceptionForError == false, an exception is not thrown, and CrossThreadStuff.Wrap() will print the error below.
                 Globals.numberOfErrors++;
                 //this "stores" the error, for later pretty printing when the exception is caught (HandleRunErrors.cs)
                 //the GekkoException will be stored inside an innerException when caught later on, 
                 //not sure why.
                 //will never execute CrossThreadStuff.Wrap(this) below here, but it is called where the 
                 //exception is caught (HandleRunErrors.cs).
-                throw new GekkoException(this);  
+                throw new GekkoException(this);
             }
             else if (type == EWrapType.Warning)
-            {                
+            {
                 Globals.numberOfWarnings++;
             }
             CrossThreadStuff.Wrap(this);  //calls .Exe2()
@@ -397,7 +407,6 @@ namespace Gekko
             }
             return colCounter;
         }
-
     }
 
 
@@ -414,12 +423,24 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Do not assign to anything. Usage: new Error("Error in ...");
+        /// Usage: new Error("Error in ...");
         /// </summary>
         /// <param name="s"></param>
         public Error(string s) : base(EWrapType.Error)
         {
             this.MainAdd(s);
+            this.Exe1();
+        }
+
+        /// <summary>
+        /// Usage: new Error("Error in ...");. If throwExceptionForError == false, an exception will not 
+        /// be thrown (which it normally will for the Error object).
+        /// </summary>
+        /// <param name="s"></param>
+        public Error(string s, bool throwExceptionForError) : base(EWrapType.Error)
+        { 
+            this.MainAdd(s);
+            if (throwExceptionForError == false) this.NoException();
             this.Exe1();
         }
 
