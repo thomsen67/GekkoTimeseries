@@ -898,9 +898,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: Unexpected link error");
-                throw new GekkoException();
-
+                new Error("Unexpected link error");
             }
         }    
 
@@ -1049,13 +1047,7 @@ namespace Gekko
                 if (this.decompOptions.expression == null)
                 {
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
-
-                    //if (this.decompOptions.modelHash == null) this.decompOptions.modelHash = Program.model.modelGekko.modelHashTrue; //To make sure that decomp is not clicked and results shown, after a new model has been loaded
-                    //if (this.decompOptions.modelHash != Program.model.modelGekko.modelHashTrue)
-                    //{
-                    //    MessageBox.Show("*** ERROR: A new model seems to have been loaded." + "\n" + "Please reload the old model, or close this window" + "\n" + "and open it again from the command prompt");
-                    //    return;
-                    //}
+                    
                 }
 
                 //Setting defaults
@@ -1100,8 +1092,7 @@ namespace Gekko
 
                 if (this.decompOptions.guiDecompIsRaw && this.decompOptions.guiDecompIsShares)
                 {
-                    G.Writeln2("*** ERROR: Cannot show decomposition with both 'raw' and 'shares' option at the same time");
-                    throw new GekkoException();
+                    new Error("Cannot show decomposition with both 'raw' and 'shares' option at the same time");
                 }
 
                 //"x" and "s" are mutually exclusive: in raw mode shares are not meaningful
@@ -1273,8 +1264,7 @@ namespace Gekko
 
             if (table1.GetColMaxNumber() != table2.GetColMaxNumber())
             {
-                G.Writeln2("*** ERROR: Table merge problem");
-                throw new GekkoException();
+                new Error("Table merge problem");
             }
 
             for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
@@ -1300,8 +1290,7 @@ namespace Gekko
                                 Cell temp1 = table1.Get(i, jj);
                                 if (temp1 == null || temp1.cellType != CellType.Number)
                                 {
-                                    G.Writeln2("*** ERROR: Table merge problem");
-                                    throw new GekkoException();
+                                    new Error("Table merge problem");
                                 }
                                 double original = temp1.number;
 
@@ -1311,8 +1300,7 @@ namespace Gekko
                                     Cell temp2 = table2.Get(ii, jj);
                                     if (temp2 == null || temp2.cellType != CellType.Number)
                                     {
-                                        G.Writeln2("*** ERROR: Table merge problem");
-                                        throw new GekkoException();
+                                        new Error("Table merge problem");
                                     }
                                     rowsum += temp2.number;
                                 }
@@ -1354,8 +1342,7 @@ namespace Gekko
                         //test that dates conform, only row merging                        
                         if (c1 == null || c2 == null || c1.cellType != CellType.Date || c2.cellType != CellType.Date || c1.date != c2.date)
                         {
-                            G.Writeln2("*** ERROR: Table merge problem");
-                            throw new GekkoException();
+                            new Error("Table merge problem");
                         }
                     }
                     if (c1 != null) rv.Set(new Coord(irv, j), c1);

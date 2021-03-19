@@ -2552,8 +2552,7 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm stalled");
-                                throw new GekkoException();
+                                new Error("Problem simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm stalled");
                             }
                         }
 
@@ -2650,8 +2649,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm stalled");
-                                        throw new GekkoException();
+                                        new Error("Problem simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm stalled");
                                     }
                                 }
                                 IElementalAccessVector x2 = new DenseVector(n);
@@ -2737,10 +2735,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " Newton backtrack could not make further progress.");
-                                        G.Writeln("    This may indicate that the problem is somehow misspecified, or some of the variables");
-                                        G.Writeln("    may have very different scale.");
-                                        throw new GekkoException();
+                                        new Error("Problem simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " Newton backtrack could not make further progress. This may indicate that the problem is somehow misspecified, or some of the variables may have very different scale.");                                        
                                     }
                                 }
 
@@ -3648,7 +3643,7 @@ namespace Gekko
                     eqEndo = eh.equationNumber;
                 }
             }
-            if (eqEndo == -12345) G.Writeln2("*** ERROR: variable " + endo + " is not found as left-hand side var");
+            if (eqEndo == -12345) new Error("Variable " + endo + " is not found as left-hand side var", false);
             return eqEndo;
         }
 
@@ -4047,7 +4042,7 @@ namespace Gekko
                     for (int i = 1; i < al.Count; i++)
                     {
                         int number = al[i];
-                        if (number == exoBtype) G.Writeln2("*** ERROR #32108743");
+                        if (number == exoBtype) new Error("#32108743", false);
                     }
                     al.Add(exoBtype);
                 }
@@ -4223,7 +4218,7 @@ namespace Gekko
 
             if (!(simulEpi.Count == 0))
             {
-                G.Writeln2("*** ERROR in feedback/recursive");
+                new Error("In feedback/recursive", false);
             }
 
             //=================================

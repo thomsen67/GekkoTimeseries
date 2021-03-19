@@ -138,8 +138,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Input must be a string or list of strings");
-                throw new GekkoException();
+                new Error("Input must be a string or list of strings"); return null;
             }
         }
 

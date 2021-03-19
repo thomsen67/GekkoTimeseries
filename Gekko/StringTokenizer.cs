@@ -486,8 +486,7 @@ namespace Gekko
             {
                 if (s != "" && !(s == Globals.artificial))
                 {
-                    G.Writeln2("*** ERROR: #875627897");
-                    throw new GekkoException();
+                    new Error("#875627897");
                 }
                 string ss = null;
                 foreach (TokenHelper tha in subnodes.storage)
@@ -1305,16 +1304,14 @@ namespace Gekko
                 {
                     if (Globals.parenthesesInvert.ContainsKey(input.storage[i].s))
                     {
-                        G.Writeln2("*** ERROR: The '" + input[i].s + "' parenthesis at " + input[i].LineAndPosText() + " does not have a corresponding '" + Globals.parenthesesInvert[input[i].s] + "'");
-                        throw new GekkoException();
+                        new Error("The '" + input[i].s + "' parenthesis at " + input[i].LineAndPosText() + " does not have a corresponding '" + Globals.parenthesesInvert[input[i].s] + "'");
                     }
                     output.Add(input[i]);
                 }
             }
             if (endparen != null)
             {
-                G.Writeln2("*** ERROR: The '" + startparen.s + "' parenthesis at " + startparen.LineAndPosText() + " does not have a corresponding '" + endparen + "'");
-                throw new GekkoException();
+                new Error("The '" + startparen.s + "' parenthesis at " + startparen.LineAndPosText() + " does not have a corresponding '" + endparen + "'");
             }
 
             TokenList temp3 = new TokenList(output);

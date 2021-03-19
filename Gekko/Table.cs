@@ -160,13 +160,11 @@ namespace Gekko
             //only outer borders, not inner
             if (row1 > row2)
             {
-                G.Writeln("*** ERROR: Table SetBorder: arg1 should be <= arg3");
-                throw new GekkoException();
+                new Error("Table SetBorder: arg1 should be <= arg3");
             }
             if (col1 > col2)
             {
-                G.Writeln("*** ERROR: Table SetBorder: arg2 should be <= arg4");
-                throw new GekkoException();
+                new Error("Table SetBorder: arg2 should be <= arg4");
             }
 
             string color = null;
@@ -247,13 +245,11 @@ namespace Gekko
         {
             if (x1 > x2)
             {
-                G.Writeln("*** ERROR: Table SetAlign: arg1 should be <= arg3");
-                throw new GekkoException();
+                new Error("Table SetAlign: arg1 should be <= arg3");
             }
             if (y1 > y2)
             {
-                G.Writeln("*** ERROR: Table SetAlign: arg2 should be <= arg4");
-                throw new GekkoException();
+                new Error("Table SetAlign: arg2 should be <= arg4");
             }
             for (int i = x1; i <= x2; i++)
             {
@@ -315,8 +311,7 @@ namespace Gekko
                 Cell c = _data[xy];
                 string s = "";
 
-                G.Writeln();
-                G.Writeln("*** ERROR: Tried to override data in position (" + xy.Row + ", " + xy.Col + ") in table object.");
+                new Error("Tried to override data in position (" + xy.Row + ", " + xy.Col + ") in table object.", false);
 
                 string s2 = GetCellContent(c);
                 G.Writeln("           " + s2);
@@ -364,8 +359,7 @@ namespace Gekko
         {
             if (x1 != x2)
             {
-                G.Writeln("*** ERROR: Table merge: arg1 should be = arg3, merge does not work over rows");
-                throw new GekkoException();
+                new Error("Table merge: arg1 should be = arg3, merge does not work over rows");
             }
             if (y1 > y2)
             {
@@ -1269,13 +1263,15 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: At the moment, the only table printcodes working are <m> or <r>. Of course, ");
-                G.Writeln("           table printcodes such as <p> will be provided, but it has to be determined", Color.Red);
-                G.Writeln("           what to do if for instance <p> is used on a table containing variables with", Color.Red);
-                G.Writeln("           percentage transformation. Should this provoke an error or not, for instance? ", Color.Red);
-                G.Writeln("           Probably there will be some options determining what happens. Until this is", Color.Red);
-                G.Writeln("           sorted out, please be patient.", Color.Red);
-                G.Writeln();
+                using (var e = new Error())
+                {
+                    e.MainAdd("At the moment, the only table printcodes working are <m> or <r>. Of course,");
+                    e.MainAdd("table printcodes such as <p> will be provided, but it has to be determined");
+                    e.MainAdd("what to do if for instance <p> is used on a table containing variables with");
+                    e.MainAdd("percentage transformation. Should this provoke an error or not, for instance? ");
+                    e.MainAdd("Probably there will be some options determining what happens. Until this is");
+                    e.MainAdd("sorted out, please be patient.");
+                }
                 throw new GekkoException();
             }
             string db = Globals.Work;
@@ -1300,7 +1296,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln("*** ERROR: Table insert: expected code 'n' or 'p' or 'd'");
+                        new Error("Table insert: expected code 'n' or 'p' or 'd'", false);
                     }
                 }
                 else
@@ -1319,7 +1315,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln("*** ERROR: Table insert: expected code 'n' or 'p' or 'd'");
+                        new Error("Table insert: expected code 'n' or 'p' or 'd'", false);
                     }
                 }
                 counter++;
@@ -1879,7 +1875,7 @@ namespace Gekko
                         int col = -12345;
                         if (!int.TryParse(s, out col))
                         {
-                            G.Writeln2("*** ERROR: XML table: could not convert '" + s + "' to list of integers");
+                            new Error("XML table: could not convert '" + s + "' to list of integers", false);
                         }
                         killCols.Add(col);
                     }
@@ -1952,12 +1948,14 @@ namespace Gekko
                     counter++;
                     if (counter > xh.cols.Count)
                     {
-                        G.Writeln2("*** ERROR in XML table: there were more elements put into a <row> than defined columns");
-                        G.Writeln("    Please note that since Gekko 1.5.7, the behavoior regarding attribute 'colspan' has ");
-                        G.Writeln("    been changed so that for instance after '<txt colspan = \"3\">', the next column");
-                        G.Writeln("    will be the 4. column (and not the 2. column as in Gekko versions prior to 1.5.7.");
-                        G.Writeln("    So if you use 'colspan', you may have to remove some empty <txt> tags...");
-                        throw new GekkoException();
+                        using (var e = new Error())
+                        {
+                            e.MainAdd("Problem in XML table: there were more elements put into a <row> than defined columns.");
+                            e.MainAdd("Please note that since Gekko 1.5.7, the behavoior regarding attribute 'colspan' has ");
+                            e.MainAdd("been changed so that for instance after '<txt colspan = \"3\">', the next column");
+                            e.MainAdd("will be the 4. column (and not the 2. column as in Gekko versions prior to 1.5.7.");
+                            e.MainAdd("So if you use 'colspan', you may have to remove some empty <txt> tags...");
+                        }                        
                     }
                     Attrib colInfo = xh.cols[counter - 1].attrib;
                     Attrib childA = new Attrib();
@@ -2292,7 +2290,7 @@ namespace Gekko
                 string value = achild.Value;
                 if (a.Set(name, value) == false)
                 {
-                    G.Writeln2("*** ERROR: XML table has duplicate attribute name: " + name);
+                    new Error("XML table has duplicate attribute name: " + name, false);
                 }
             }
         }
@@ -2860,7 +2858,7 @@ namespace Gekko
                 catch (Exception e)
                 {
                     ok = false;
-                    G.Writeln2("*** ERROR: Problem with style-sheets, may impact the menus (files styles.css and table.png)");
+                    new Error("Problem with style-sheets, may impact the menus (files styles.css and table.png)", false);
                 }
 
                 G.Writeln();
@@ -2880,7 +2878,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: please choose a folder");
+                new Error("Please choose a folder, false");
             }
         }
 
@@ -2918,7 +2916,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: Converting menus: file name: " + newfile);
+                            new Error("*** ERROR: Converting menus: file name: " + newfile, false);
                         }
                         string path = Path.GetDirectoryName(newfile);
                         if (!Directory.Exists(path))

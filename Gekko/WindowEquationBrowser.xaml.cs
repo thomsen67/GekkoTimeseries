@@ -171,8 +171,7 @@ namespace Gekko
 
                 if (equation.expressions.Count != equation.expressionVariablesWithSets.Count)
                 {
-                    G.Writeln2("*** ERROR: Internal error #8973428374");
-                    throw new GekkoException();
+                    new Error("Internal error #8973428374");
                 }
 
                 //fixme: [0] must be counter

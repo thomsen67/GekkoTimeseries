@@ -1564,8 +1564,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: Unexpected link error");
-                throw new GekkoException();
+                new Error("Unexpected link error");
             }
         }
 
@@ -1728,8 +1727,7 @@ namespace Gekko
                     if (this.decompOptions2.operatorHelper.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
                     if (this.decompOptions2.operatorHelper.guiDecompIsRaw && this.decompOptions2.operatorHelper.guiDecompIsShares)
                     {
-                        G.Writeln2("*** ERROR: Cannot show decomposition with both 'raw' and 'shares' option at the same time");
-                        throw new GekkoException();
+                        new Error("Cannot show decomposition with both 'raw' and 'shares' option at the same time");
                     }
                     this.decompOptions2.prtOptionLower = transformationCodeAugmented;
                 }                

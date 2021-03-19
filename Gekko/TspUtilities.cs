@@ -343,7 +343,7 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Writeln("*** ERROR in TSP utility");
+                                new Error("Problem in TSP utility", false);
                             }
                         }
                     }
@@ -364,7 +364,7 @@ namespace Gekko
                             }
                             else
                             {
-                                G.Writeln("*** ERROR in TSP utility");
+                                new Error("Problem in TSP utility", false);
                             }
                         }
                         if (alType[i] == "Number")
@@ -399,7 +399,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln("*** ERROR in TSP utility");
+                            new Error("Problem in TSP utility", false);
                         }
                     }
                 }
