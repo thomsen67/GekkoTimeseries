@@ -28,8 +28,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("+++ WARNING: The .json file does not seem correctly formatted.");
-                G.Writeln("             " + e.Message);
+                new Warning("The .json file does not seem correctly formatted. " + e.Message);
                 //throw;
             }
 

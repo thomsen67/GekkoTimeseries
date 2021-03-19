@@ -4236,8 +4236,8 @@ namespace Gekko
                 readInfo.startPerInFile = d1min;
                 readInfo.endPerInFile = d2max;
                 readInfo.variables = counter;
-                if (emptyWarnings > 0) G.Writeln2("+++ WARNING: " + emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
-                if (smallWarnings > 0) G.Writeln2("+++ WARNING: " + smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
+                if (emptyWarnings > 0) new Warning(emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
+                if (smallWarnings > 0) new Warning(smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
 
             }
         }
@@ -4558,7 +4558,7 @@ namespace Gekko
                         if (!G.Equal(name2, G.ConvertFreq(freq)))
                         {
                             //for instance quarterly x.sol (not x.q)
-                            G.Writeln2("+++ WARNING: Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
+                            new Warning("Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.ConvertFreq(freq));
                             name += "_" + name2;
                         }
                     }
@@ -4936,7 +4936,7 @@ namespace Gekko
                     readInfo.endPerResultingBank = readInfo.endPerInFile;
                     
 
-                    if (firstYearWarnings > 0) G.Writeln("+++ WARNING: " + firstYearWarnings + " variables had data before databank time period (data skipped)");
+                    if (firstYearWarnings > 0) new Warning(firstYearWarnings + " variables had data before databank time period (data skipped)");
 
                     //readInfo.databank.info1 = readInfo.info1;
                     //readInfo.databank.date = readInfo.date;
@@ -5478,21 +5478,20 @@ namespace Gekko
             if (data.LongLength != allCounter2)
             {
                 //See not in constrution of data array
-                G.Writeln2("+++ WARNING: " + downloadOrImport + " " + allCounter2 + " numbers, expected " + data.LongLength);
-                G.Writeln("+++ WARNING: Please review the resulting timeseries carefully!");
-                if (Globals.runningOnTTComputer || G.IsUnitTesting()) throw new GekkoException();
+                new Warning(downloadOrImport + " " + allCounter2 + " numbers, expected " + data.LongLength + "." + "Please review the resulting timeseries carefully!");
+                if (Globals.runningOnTTComputer || (G.IsUnitTesting() && !Globals.excelDna)) throw new GekkoException();
             }            
 
             if (hyphenFound)
             {
                 //Only for !isArray
-                G.Writeln2("+++ WARNING: Hyphens ('-') in names have been removed");
+                new Warning("Hyphens ('-') in names have been removed");
             }
 
             if (underscoreFound)
             {
                 //Only for !isArray
-                G.Writeln2("+++ WARNING: Underscores ('_') in names have been removed");
+                new Warning("Underscores ('_') in names have been removed");
             }
             
         }        
@@ -14710,9 +14709,8 @@ namespace Gekko
                 if (Globals.pipe == false)
                 {
                     if (!mute)
-                    {
-                        //G.Writeln("+++ WARNING: you are not currently piping output to a file. Command ignored.");
-                        if (G.Equal(fileName, "con")) G.Writeln("+++ WARNING: please use PIPE<stop> instead of PIPE con");
+                    {                        
+                        if (G.Equal(fileName, "con")) new Warning("Please use PIPE<stop> instead of PIPE con");
                     }
                 }
                 else
@@ -14727,7 +14725,9 @@ namespace Gekko
                     if (!mute)
                         G.Writeln2("Directing output to main window");
                     if (G.Equal(fileName, "con"))
-                        G.Writeln("+++ WARNING: please use PIPE<stop> instead of PIPE con");
+                    {
+                        new Warning("Please use PIPE<stop> instead of PIPE con");
+                    }
                 }
             }
             else if(pause)
@@ -15601,7 +15601,7 @@ namespace Gekko
             else
             {
                 G.Writeln("[none]");
-                G.Writeln("+++ WARNING: Nothing is filtered out, so filter has no effect!");
+                new Warning("Nothing is filtered out, so filter has no effect!");
             }
             Globals.globalPeriodTimeFilters2 = negativeFilter;
             if (Program.options.timefilter == false)
@@ -15740,8 +15740,7 @@ namespace Gekko
                     int exitCode = process.ExitCode;
                     if (exitCode != 0)
                     {
-                        G.Writeln2("+++ WARNING: System call exited with code: " + exitCode, Globals.warningColor);
-                        G.Writeln("             System command: " + _CommandLine, Globals.warningColor);
+                        new Warning("System call exited with code: " + exitCode + ". System command: " + _CommandLine);
                         //fail = true;
                     }
                 }
@@ -15760,7 +15759,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("+++ WARNING: Could not write output from system command", Globals.warningColor);
+                        new Warning("Could not write output from system command");
                         //fail = true;
                     }
                 }
@@ -16549,8 +16548,7 @@ namespace Gekko
 
                     if (ts == null)
                     {
-                        //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                        //G.Writeln("+++ WARNING: variable '" + newList[i] + "' is of wrong type, skipped");
+                        //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)                        
                         continue;
                     }
                     counter++;
@@ -17090,13 +17088,11 @@ namespace Gekko
             {
                 if (zipFileName.ToLower().EndsWith("." + Globals.extensionDatabank + "") && Program.options.databank_file_gbk_compress == false)
                 {
-                    G.Writeln2("+++ WARNING: 'OPTION databank file gbk compress = yes' is deprecated");
-                    G.Writeln("             in Gekko 3.1.9 and onwards.", Globals.warningColor);
-                    throw new GekkoException();
+                    new Error("'OPTION databank file gbk compress = yes' is deprecated in Gekko 3.1.9 and onwards.");                    
                 }
                 if (!System.IO.Directory.Exists(folderInfo.FullName))
                 {
-                    G.Writeln("+++ WARNING: zip file could not be created");  //should not be possible                        
+                    new Warning("Zip file could not be created");  //should not be possible                        
                 }
 
                 int sleepMs = 10;
@@ -17415,11 +17411,11 @@ namespace Gekko
                     success = false;
                     if (type == "copy")
                     {
-                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "'seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                        new Warning("File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "'seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     else if (type == "delete")
                     {
-                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                        new Warning("File '" + pathAndFilenameSource + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     System.Threading.Thread.Sleep(gap * 1000);  //2 seconds
                     continue;
@@ -19332,11 +19328,14 @@ namespace Gekko
             GekkoAction ga = null;
             Globals.linkAction.TryGetValue(n, out ga);
             if (ga == null || ga.action == null)
-            {            
-                G.Writeln2("+++ WARNING: Link of type '" + ga.type.ToString() + "' has expired");
-                if (ga.type == EGekkoActionTypes.Ols)
+            {
+                using (var w = new Warning())
                 {
-                    G.Writeln("             You may use different names for your OLS equations to avoid this", Globals.warningColor);
+                    w.MainAdd("Link of type '" + ga.type.ToString() + "' has expired. ");
+                    if (ga.type == EGekkoActionTypes.Ols)
+                    {
+                        w.MainAdd("You may use different names for your OLS equations to avoid this.");
+                    }
                 }
             }
             return Globals.linkAction[n];
@@ -21206,7 +21205,7 @@ namespace Gekko
                             G.ExtractVariableAndLag(prec, out variable2, out lag);
                             if (G.Equal(variable, variable2) && lag != 0)
                             {
-                                G.Writeln("+++ WARNING: The non-existing variable " + variable + " appears with lag or leads on right hand side -- so this will produce missing values");
+                                new Warning("The non-existing variable " + variable + " appears with lag or leads on right hand side -- so this will produce missing values");
                                 break;
                             }
                         }
@@ -21256,7 +21255,7 @@ namespace Gekko
                             {
                                 //p<m>@fy                --------- this is not really meaningful
                                 banks.Add(Globals.Ref);
-                                if (!hasIssuedWarning) G.Writeln("+++ WARNING: Note that you are using @-variables in combination with the <m> (multiplier) option");
+                                if (!hasIssuedWarning) new Warning("Note that you are using @-variables in combination with the <m> (multiplier) option");
                                 hasIssuedWarning = true;
                             }
                             else
@@ -21274,7 +21273,7 @@ namespace Gekko
                                 {
                                     //p<b>@fy                --------- this is not really meaningful
                                     banks.Add(Globals.Ref);
-                                    if (!hasIssuedWarning) G.Writeln("+++ WARNING: Note that you are using @-variables in combination with the <r> (reference) option");
+                                    if (!hasIssuedWarning) new Warning("Note that you are using @-variables in combination with the <r> (reference) option");
                                     hasIssuedWarning = true;
                                 }
                                 else
@@ -23513,11 +23512,7 @@ namespace Gekko
                             else
                             {
                                 Type tt = temp.GetType();
-                                string ttt = temp.GetType().ToString();
-
-                                //G.Writeln2("+++ WARNING: Cell " + GetExcelCell(i, j, false) + " seems to be neither text or number.");
-                                //G.Writeln("           It has type " + temp.GetType().ToString(), Color.Red);
-                                //throw new GekkoException();
+                                string ttt = temp.GetType().ToString();                                
                                 cell = new CellLight("[data not recognized error]");
                             }
                             matrix.Add(i + 1, j + 1, cell);  //i and j are 0-based, matrix needs to be 1-based.
@@ -25661,13 +25656,13 @@ namespace Gekko
                     {
                         if (code.Length <= 1)
                         {
-                            G.Writeln("+++ WARNING: formula code regarding '" + var + "' seems problematic: " + code);
+                            new Warning("Formula code regarding '" + var + "' seems problematic: " + code);
                         }
                         if (code.Length >= 2)
                         {
                             if (code.Substring(0, 1) != "_")
                             {
-                                G.Writeln("+++ WARNING: formula code regarding '" + var + "' does not start with '_' or 'i' or 'y': " + code);
+                                new Warning("Formula code regarding '" + var + "' does not start with '_' or 'i' or 'y': " + code);
                             }
                             else
                             {
@@ -25694,13 +25689,13 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    G.Writeln("+++ WARNING: there was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
+                                    new Warning("There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
                                 }
                             }
                         }
                         else
                         {
-                            G.Writeln("+++ WARNING: there was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
+                            new Warning("There was a unknown formula code type (i.e. not _d, _g, _i, _k or _s) regarding '" + var + "': " + code);
                         }
                     }
                 }
@@ -26900,11 +26895,7 @@ namespace Gekko
 
                 if (this.nanCounter > 0)
                 {
-                    G.Writeln();
-                    G.Writeln("+++ WARNING: Encountered " + this.nanCounter + " instances of 'NaN' in the file.");
-                    G.Writeln("             These are set to missing -- proper .tsd syntax is to use '1.000000E+15'");
-                    G.Writeln("             to indicate a missing value");
-                    G.Writeln();
+                    new Warning("Encountered " + this.nanCounter + " instances of 'NaN' in the file. These are set to missing -- proper .tsd syntax is to use '1.000000E+15' to indicate a missing value");                 
                 }
 
                 if (this.conversionMessage)

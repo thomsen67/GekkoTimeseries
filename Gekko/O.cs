@@ -2979,7 +2979,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln("+++ WARNING: Variable " + dbName + Globals.symbolBankColon + nameWithFreq + " does not exist for deletion");
+                    new Warning("Variable " + dbName + Globals.symbolBankColon + nameWithFreq + " does not exist for deletion");
                     return iv;
                 }
             }
@@ -4734,8 +4734,7 @@ namespace Gekko
         /// </summary>
         /// <param name="p"></param>
         private static void MissingProblem(P p)
-        {
-            //G.Writeln2("+++ WARNING: missing problem " + p.lastFileSentToANTLR + " ");
+        {            
             int lineNumber; string originalFileName; List<string> commandLines;
             Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
             string ss = null;
@@ -6509,9 +6508,7 @@ namespace Gekko
                         {
                             if (Globals.modeIntendedWarning)
                             {
-                                G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
-                                //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
-                                //throw new GekkoException();
+                                new Warning("READ<ref> is not intended for data-mode.");                                
                             }
                         }
                     }
@@ -6757,7 +6754,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Writeln2("+++ WARNING: CLONE is not intended for data-mode (cf. MODE)");
+                        new Warning("CLONE is not intended for data-mode (cf. MODE)");
                     }
                 }
             }
@@ -6972,7 +6969,7 @@ namespace Gekko
 
                         if (realStartOverlay.IsNull())
                         {
-                            G.Writeln2("+++ WARNING: The overlay series '" + overlay.GetName() + "' has no observations");
+                            new Warning("The overlay series '" + overlay.GetName() + "' has no observations");
                         }
                         else
                         {
@@ -7468,8 +7465,7 @@ namespace Gekko
 
                 if (G.Equal(Program.options.interface_mode, "sim"))
                 {
-                    G.Writeln2("+++ WARNING: READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE).");
-                    G.Writeln("             For instance, 'READ databk TO *;' instead of 'OPEN databk;'", Globals.warningColor);
+                    new Warning("READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE). For instance, 'READ databk TO *;' instead of 'OPEN databk;'");
                 }
             }
         }
@@ -8718,7 +8714,7 @@ namespace Gekko
                             //not series (including array-series and vals)                                                        
                             if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
                             {
-                                G.Writeln2("+++ WARNING: Skipped one variable for printing");
+                                new Warning("Skipped one variable for printing");
                             }
                             else if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
                             {
@@ -8743,7 +8739,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                        new Warning("MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                     }
                 }
                                 
@@ -9165,7 +9161,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Writeln2("+++ WARNING: SIM is not intended for data-mode (cf. MODE).");
+                        new Warning("SIM is not intended for data-mode (cf. MODE).");
                     }
                 }
             }
@@ -9186,7 +9182,7 @@ namespace Gekko
                 {
                     if (Globals.modeIntendedWarning)
                     {
-                        G.Writeln2("+++ WARNING: MODEL is not intended for data-mode (cf. MODE).");
+                        new Warning("MODEL is not intended for data-mode (cf. MODE).");
                     }
                 }
             }

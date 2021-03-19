@@ -1608,7 +1608,7 @@ namespace Gekko.Parser.Frm
             if (false)
             {
                 //Probably no need to report these
-                G.Writeln("+++ WARNING: equation type set to _I for this equation:" + G.NL + eh.equationText);
+                new Warning("Equation type set to _I for this equation:" + G.NL + eh.equationText);
             }
             return;
         }

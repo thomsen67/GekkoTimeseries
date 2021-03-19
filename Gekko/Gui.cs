@@ -2869,13 +2869,13 @@ namespace Gekko
         private static void DecompUpdatePrint()
         {
             G.Writeln("Updated " + Globals.ch.windowsDecompUpdateCounter + " DECOMP windows");
-            if (Globals.ch.windowsDecompUpdateFailedCounter > 0) G.Writeln("+++ WARNING: Failed updating " + Globals.ch.windowsDecompUpdateFailedCounter + " DECOMP windows");
+            if (Globals.ch.windowsDecompUpdateFailedCounter > 0) new Warning("Failed updating " + Globals.ch.windowsDecompUpdateFailedCounter + " DECOMP windows");
         }
 
         private static void GraphUpdatePrint()
         {
             G.Writeln("Updated " + Globals.ch.windowsGraphUpdateCounter + " PLOT windows");
-            if (Globals.ch.windowsGraphUpdateFailedCounter > 0) G.Writeln("+++ WARNING: Failed updating " + Globals.ch.windowsGraphUpdateFailedCounter + " PLOT windows");
+            if (Globals.ch.windowsGraphUpdateFailedCounter > 0) new Warning("Failed updating " + Globals.ch.windowsGraphUpdateFailedCounter + " PLOT windows");
         }
 
         private void cutToolStripMenuItem1_Click(object sender, EventArgs e)

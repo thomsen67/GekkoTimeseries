@@ -1373,8 +1373,8 @@ namespace Gekko
                 readInfo.startPerInFile = d1min;
                 readInfo.endPerInFile = d2max;
                 readInfo.variables = counter;
-                if (emptyWarnings > 0) G.Writeln2("+++ WARNING: " + emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
-                if (smallWarnings > 0) G.Writeln2("+++ WARNING: " + smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
+                if (emptyWarnings > 0) new Warning(emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
+                if (smallWarnings > 0) new Warning(smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
 
             }
         }
@@ -1479,7 +1479,7 @@ namespace Gekko
                 }
 
             }
-            if (emptyWarnings > 0) G.Writeln("+++ WARNING: " + emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
+            if (emptyWarnings > 0) new Warning(emptyWarnings + " variables with empty string as name in ." + Globals.extensionDatabank + " file (skipped)");
 
             readInfo.startPerInFile = minYearInProtobufFile;
             readInfo.endPerInFile = maxYearInProtobufFile;

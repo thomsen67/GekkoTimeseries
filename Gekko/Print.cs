@@ -221,7 +221,7 @@ namespace Gekko
 
                         if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
                         {
-                            G.Writeln2("+++ WARNING: Non-value in PRT");
+                            new Warning("Non-value in PRT");
                             return;
                         }
 
@@ -360,7 +360,7 @@ namespace Gekko
 
             if (numberOfOtherVariables == 0 && numberOfGekkoNullVariables > 0)
             {
-                G.Writeln2("+++ WARNING: Non-existing array-series (skipped)");
+                new Warning("Non-existing array-series (skipped)");
                 return;
             }
 

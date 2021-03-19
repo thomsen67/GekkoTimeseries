@@ -41,8 +41,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("+++ WARNING: The .json file does not seem correctly formatted.");
-                G.Writeln("             " + e.Message);
+                new Warning("The .json file does not seem correctly formatted. " + e.Message);
                 //throw;
             }
 
@@ -68,8 +67,7 @@ namespace Gekko
                 catch { }
                 if (tableName == null)
                 {
-                    G.Writeln2("+++ WARNING: You should use \"table\": \"...\", in the .json file");
-                    //throw new GekkoException();
+                    new Warning("You should use \"table\": \"...\", in the .json file");
                 }
             }
             
@@ -81,8 +79,7 @@ namespace Gekko
             catch { }
             if (format == null || !G.Equal(format, "px"))
             {
-                G.Writeln2("+++ WARNING: You should use \"format\": \"px\", in the .json file");
-                //throw new GekkoException();
+                new Warning("You should use \"format\": \"px\", in the .json file");
             }
 
             List<string> codesHeaderJson = null;
@@ -99,8 +96,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    G.Writeln2("+++ WARNING: The \"variables\" field in the .json file seems malformed");
-                    //throw new GekkoException();
+                    new Warning("The \"variables\" field in the .json file seems malformed");
                 }
             }
 
@@ -188,7 +184,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("+++ WARNING: DOWNLOAD<file> failed: is '" + fileName + "' blocked?");
+                        new Warning("DOWNLOAD<file> failed: is '" + fileName + "' blocked?");
                     }
                 }
                 else

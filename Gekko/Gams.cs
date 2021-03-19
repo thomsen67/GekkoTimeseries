@@ -617,7 +617,7 @@ namespace Gekko
                 }
                 if (eqs.Count > 1)
                 {
-                    G.Writeln2("+++ WARNING: Variable '" + varname + "' appears in several equations, first one is picked");
+                    new Warning("Variable '" + varname + "' appears in several equations, first one is picked");
                 }
                 found = eqs[0];  //#820948324: pick the first one, a variable name may point to several equations, for instance if y is present on the lhs in several equations.
             }

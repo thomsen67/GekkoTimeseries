@@ -366,8 +366,6 @@ namespace Gekko
                 //#837433329. maybe revive this error in fall 2013 when table generation has been redone
                 //only reason is to allow timefilters that out-filter all periods.
                 return;  //since row merge does not work this means that nothing needs to be done
-                //G.Writeln("+++ WARNING: Table merge: arg2 should be <= arg4");
-                //throw new GekkoException();
             }
 
             if (y1 == y2)
@@ -1915,26 +1913,12 @@ namespace Gekko
                     string nodeText = node.InnerText;
 
                     if (nodeText.Contains("'"))
-                    {
-                        //G.Writeln();
-                        //G.Writeln("+++ WARNING: XML table should not contain this hyphen: '");
-                        //G.Writeln("             The hyphen is changed to this hyphen: ´ (see the key to the left of the backspace key)");
-                        //G.Writeln("             Please change the table file, in order for this warning to disappear. The reason the");
-                        //G.Writeln("             hyphen is problematic is that it is used to denote strings in Gekko command files.");
-                        //G.Writeln("             File: " + filename);
-                        //G.Writeln("    " + "[" + G.IntFormat(i + 1, 4) + "]:" + "   " + G.ReplaceGlueNew(line), Color.Blue);
+                    {                        
                         nodeText = nodeText.Replace("'", "´");
                     }
 
                     if (nodeText.Contains("`"))
-                    {
-                        //G.Writeln();
-                        //G.Writeln("+++ WARNING: XML table should not contain this hyphen: `");
-                        //G.Writeln("             The hyphen is changed to this hyphen: ´ (see the key to the left of the backspace key)");
-                        //G.Writeln("             Please change the table file, in order for this warning to disappear. The reason the");
-                        //G.Writeln("             hyphen is problematic is that it is used internally in Gekko for other purposes.");
-                        //G.Writeln("             File: " + filename);
-                        //G.Writeln("    " + "[" + G.IntFormat(i + 1, 4) + "]:" + "   " + G.ReplaceGlueNew(line), Color.Blue);
+                    {                        
                         nodeText = nodeText.Replace("`", "´");
                     }
 

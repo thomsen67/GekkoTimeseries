@@ -741,7 +741,7 @@ namespace Gekko
                 }
                 catch
                 {
-                    G.Writeln2("+++ WARNING: PLOT<dump> failed: are gekkoplot.gp or gekkoplot.dat blocked?");
+                    new Warning("PLOT<dump> failed: are gekkoplot.gp or gekkoplot.dat blocked?");
                 }
             }
 

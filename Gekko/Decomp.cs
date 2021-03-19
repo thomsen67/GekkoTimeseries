@@ -693,7 +693,7 @@ namespace Gekko
                     }
                     foreach (string linkVariable in problem)
                     {
-                        G.Writeln("+++ WARNING: DECOMP: Variable " + linkVariable + " is not eliminated");
+                        new Warning("DECOMP: Variable " + linkVariable + " is not eliminated");
                     }
 
                     DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
@@ -710,7 +710,7 @@ namespace Gekko
                     {
                         if (used[i] != true)
                         {
-                            G.Writeln2("+++ WARNING: did not use link-equation #" + i + " of " + (decompDatas.storage.Count - 1) + " (is it superfluous?)");
+                            new Warning("Did not use link-equation #" + i + " of " + (decompDatas.storage.Count - 1) + " (is it superfluous?)");
                         }
                     }
                 }
@@ -2112,7 +2112,7 @@ namespace Gekko
                 }
                 else
                 {
-                    MessageBox.Show("+++ WARNING: Normalization ordering not implemented for sets of equations");
+                    new Warning("Normalization ordering not implemented for sets of equations");
                 }
             }
 
