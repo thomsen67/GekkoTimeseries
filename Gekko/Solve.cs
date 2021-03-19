@@ -1917,7 +1917,7 @@ namespace Gekko
         public static void WriteAboutFailsafeOption()
         {
             if (Program.options.solve_failsafe == true) return;
-            new Note("Use 'OPTION solve failsafe = yes;' to help tracking the root of the problem", Globals.warningColor);
+            new Note("Use 'OPTION solve failsafe = yes;' to help tracking the root of the problem");
         }
 
         /// <summary>

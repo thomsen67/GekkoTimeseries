@@ -26899,12 +26899,9 @@ namespace Gekko
                 {
                     LinkContainer lc = new LinkContainer("The databank is a ." + Globals.extensionDatabank + " file version 1.0. Newer ." + Globals.extensionDatabank + " files load around three times faster, so please consider converting the " + Globals.extensionDatabank + " file. Converting from 'oldfile." + Globals.extensionDatabank + "' to 'newfile." + Globals.extensionDatabank + "' is very simple:" + G.NL + G.NL + "  READ <" + Globals.extensionDatabank + "> oldfile;" + G.NL + "  WRITE <" + Globals.extensionDatabank + "> newfile;" + G.NL + G.NL + "There is no loss of data or data quality in this process, so the new ." + Globals.extensionDatabank + " file is a perfect substitute for the old one. The difference is that these old ." + Globals.extensionDatabank + " files are not using a binary format (as the newer ones do).");
                     Globals.linkContainer.Add(lc.counter, lc);
-                    new Note("You may convert the databank file for speedier reading (", Color.Gray); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")", Color.Gray);
+                    G.Write("You may convert the databank file for speedier reading (", Color.Gray); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")", Color.Gray);
                 }
-
-            }
-
-            
+            }            
         }
 
         public static void GetYearPeriod(int startPerInFile, int endPerInFile, out string i1, out string i2)
