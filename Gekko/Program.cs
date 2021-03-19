@@ -1489,7 +1489,7 @@ namespace Gekko
             if (G.Equal(Program.options.interface_mute, "yes"))
             {
                 Program.options.interface_mute = "no";
-                G.Writeln2("+++ NOTE: Because of errors, OPTION interface mute = 'no'");
+                new Note("Because of errors, OPTION interface mute = 'no'");
             }
         }
 
@@ -3140,7 +3140,7 @@ namespace Gekko
             if (G.Equal(o.opt_cols, "yes"))
             {
                 transpose = true;
-                if (type != ESheetCollection.None) G.Writeln2("+++ NOTE: Because of <cols> option, the resulting " + type.ToString().ToLower() + " is transposed");
+                if (type != ESheetCollection.None) new Note("Because of <cols> option, the resulting " + type.ToString().ToLower() + " is transposed");
             }
 
             if (transpose)
@@ -4714,7 +4714,7 @@ namespace Gekko
 
             if (matrixError > 0)
             {
-                G.Writeln("+++ NOTE: Matrix not yet implemented (" + matrixError + " statements ignored)");
+                new Note("Matrix not yet implemented (" + matrixError + " statements ignored)");
             }
 
             n = nSeries + nList;
@@ -7535,7 +7535,7 @@ namespace Gekko
             {
                 if (o.opt_param.ToLower().Contains("saa"))
                 {
-                    G.Writeln("+++ NOTE: For 'saa' type, you need 'force=totals'");
+                    new Note("For 'saa' type, you need 'force=totals'");
                 }
             }
         }
@@ -9859,18 +9859,15 @@ namespace Gekko
 
             if (modelCommentsHelper.infoText == null && modelCommentsHelper.infoCounter > 0)
             {
-                G.Writeln("+++ NOTE: The correct syntax for info is 'Info: ' (followed by text)");
-                G.Writeln("          Note capital 'I' and the blank after ':'");
+                new Note("The correct syntax for info is 'Info: ' (followed by text). Note capital 'I' and the blank after ':'");
             }
             if (modelCommentsHelper.dateText == null && modelCommentsHelper.dateCounter > 0)
             {
-                G.Writeln("+++ NOTE: The correct syntax for date is 'Date: ' (followed by date)");
-                G.Writeln("          Note capital 'D' and the blank after ':'");
+                new Note("The correct syntax for date is 'Date: ' (followed by date). Note capital 'D' and the blank after ':'");
             }
             if (modelCommentsHelper.signatureFoundInFileHeader == null && modelCommentsHelper.signatureCounter > 0)
             {
-                G.Writeln("+++ NOTE: The correct syntax for signature is 'Signature: ' (followed by the signature)");
-                G.Writeln("          Note capital 'S' and the blank after ':'");
+                new Note("The correct syntax for signature is 'Signature: ' (followed by the signature). Note capital 'S' and the blank after ':'");
             }
 
             //The statement below makes sure that -- if a cached model is to be used -- the MODEL statement that created the cached model and the current MODEL statement are done under the same frequency
@@ -12263,7 +12260,7 @@ namespace Gekko
             {
                 if (G.Chop_HasIndex(varnameWithoutFreq) && eqs.Count > 1)
                 {
-                    G.Writeln("+++ NOTE: Some of the following equations may relate to other elements of " + varnameWithoutFreqAndIndex + " than " + varnameWithoutFreq);
+                    new Note("Some of the following equations may relate to other elements of " + varnameWithoutFreqAndIndex + " than " + varnameWithoutFreq);
                 }
 
                 PrintEquationWithLinks(gamsToGekko, varnameWithoutFreqAndIndex, eqs, showDetailed);
@@ -12954,7 +12951,7 @@ namespace Gekko
                 {
                     if (ignoreErrors)
                     {
-                        G.Writeln2("+++ NOTE: Could not find variable '" + output.s1 + "' for copying");
+                        new Note("Could not find variable '" + output.s1 + "' for copying");
                         nIgnores++;
                         continue;
                     }
@@ -15466,10 +15463,10 @@ namespace Gekko
                     G.Writeln();
                     foreach (string s in problems)
                     {
-                        G.Writeln("+++ NOTE: Variable '" + s + "' might be part of the prologue or epilogue, and if so it does not change during Gauss iterations. Regarding ordering, see the [model]__info.zip file, inside [model].ordering.");
+                        new Note("Variable '" + s + "' might be part of the prologue or epilogue, and if so it does not change during Gauss iterations. Regarding ordering, see the [model]__info.zip file, inside [model].ordering.");
                     }
                 }
-                G.Writeln("+++ NOTE: Damped variables have stricter convergence crits than non-damped.");
+                new Note("Damped variables have stricter convergence crits than non-damped.");
             }
             else
             {
@@ -15508,7 +15505,7 @@ namespace Gekko
             G.Writeln2("Global time set: " + G.FromDateToString(Globals.globalPeriodStart) + " to " + G.FromDateToString(Globals.globalPeriodEnd) + " (" + GekkoTime.Observations(Globals.globalPeriodStart, Globals.globalPeriodEnd) + " periods)");
             if (t1.freq != Program.options.freq || t2.freq != Program.options.freq)
             {
-                G.Writeln("+++ NOTE: The dates have been converted to " + G.GetFreqPretty(Program.options.freq) + " frequency");
+                new Note("The dates have been converted to " + G.GetFreqPretty(Program.options.freq) + " frequency");
             }            
         }        
 
@@ -16780,7 +16777,7 @@ namespace Gekko
                 {
                     if (!file.Contains(":"))  //Don't write this message if it is a absolute path, for instance c:\mybank\myfile. Relative paths will get the message (that must be ok)
                     {
-                        G.Writeln("+++ NOTE: Wrote to user-indicated folder (see 'option folder bank = ...')");
+                        new Note("Wrote to user-indicated folder (see 'option folder bank = ...')");
                     }
                 }
             }
@@ -16833,7 +16830,7 @@ namespace Gekko
                 {
                     if (!file.Contains(":"))  //Don't write this message if it is a absolute path, for instance c:\mybank\myfile. Relative paths will get the message (that must be ok)
                     {
-                        G.Writeln("+++ NOTE: Wrote to user-indicated folder (see 'option folder bank = ...')");
+                        new Note("Wrote to user-indicated folder (see 'option folder bank = ...')");
                     }
                 }
             }
@@ -16878,7 +16875,7 @@ namespace Gekko
                 {
                     if (!file.Contains(":"))  //Don't write this message if it is a absolute path, for instance c:\mybank\myfile. Relative paths will get the message (that must be ok)
                     {
-                        G.Writeln("+++ NOTE: Wrote to user-indicated folder (see 'option folder bank = ...')");
+                        new Note("Wrote to user-indicated folder (see 'option folder bank = ...')");
                     }
                 }
             }
@@ -21183,7 +21180,7 @@ namespace Gekko
                 {
                     IssueCreateWarning(variable);
                 }
-                G.Writeln("+++ NOTE: Variable " + variable + " not found in databank -- is created");
+                new Note("Variable " + variable + " not found in databank -- is created");
                 Series tempTs = new Series(Program.options.freq, variable);
                 Program.databanks.GetFirst().AddIVariable(tempTs.name, tempTs);
 
@@ -22473,7 +22470,7 @@ namespace Gekko
             if (funcCounter > 0)
             {
                 G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - dt).TotalMilliseconds) + " --> " + funcCounter + " evals");
-                G.Writeln("+++ NOTE: DECOMP only works well on simulated values -- a patch for 3.0 will fix this.");
+                new Note("DECOMP only works well on simulated values -- a patch for 3.0 will fix this.");
             }
 
             DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, o.vars2);
@@ -25407,7 +25404,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("+++ NOTE: a variable list was not found inside model file");
+                new Note("A variable list was not found inside model file");
             }
 
             List<string> bothModelAndVarlist = new List<string>();
@@ -26349,7 +26346,7 @@ namespace Gekko
             if (dumpList) G.Writeln2("List " + Globals.symbolCollection + "dif contains the " + dif.Count + " different variables");
             if (notFoundBoth2.Count > 0)
             {
-                G.Writeln("+++ NOTE: " + notFoundBoth2.Count + " series not found");
+                new Note(notFoundBoth2.Count + " series not found");
             }
         }
 
@@ -26879,7 +26876,7 @@ namespace Gekko
                         sb.AppendLine("Model largest lag/lead: " + this.modelLargestLag + "/" + this.modelLargestLead);
                         LinkContainer lc = new LinkContainer(sb.ToString());
                         Globals.linkContainer.Add(lc.counter, lc);
-                        G.Write("+++ NOTE: The databank contains MODEL/SIM info ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")");
+                        new Note("The databank contains MODEL/SIM info ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")");
                     }
                 }
                 finally
@@ -26902,7 +26899,7 @@ namespace Gekko
                 {
                     LinkContainer lc = new LinkContainer("The databank is a ." + Globals.extensionDatabank + " file version 1.0. Newer ." + Globals.extensionDatabank + " files load around three times faster, so please consider converting the " + Globals.extensionDatabank + " file. Converting from 'oldfile." + Globals.extensionDatabank + "' to 'newfile." + Globals.extensionDatabank + "' is very simple:" + G.NL + G.NL + "  READ <" + Globals.extensionDatabank + "> oldfile;" + G.NL + "  WRITE <" + Globals.extensionDatabank + "> newfile;" + G.NL + G.NL + "There is no loss of data or data quality in this process, so the new ." + Globals.extensionDatabank + " file is a perfect substitute for the old one. The difference is that these old ." + Globals.extensionDatabank + " files are not using a binary format (as the newer ones do).");
                     Globals.linkContainer.Add(lc.counter, lc);
-                    G.Write("+++ NOTE: You may convert the databank file for speedier reading (", Color.Gray); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")", Color.Gray);
+                    new Note("You may convert the databank file for speedier reading (", Color.Gray); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")", Color.Gray);
                 }
 
             }

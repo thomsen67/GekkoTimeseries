@@ -1111,9 +1111,7 @@ namespace Gekko
 
         private static void ChangeWorkingFolderNoteMessage()
         {
-            G.Writeln("+++ NOTE: You may consider a RESTART (or RESET) command now. A RESTART command will");
-            G.Writeln("          clear the workspace and run any INI file '" + Globals.autoExecCmdFileName + "' in the");
-            G.Writeln("          newly chosen working folder.");
+            new Note("You may consider a RESTART (or RESET) command now. A RESTART command will clear the workspace and run any INI file '" + Globals.autoExecCmdFileName + "' in the newly chosen working folder.");
         }
 
         private void textBox2_VisibleChanged(object sender, EventArgs e)
@@ -2374,7 +2372,7 @@ namespace Gekko
             {
                 if (threadWorkerThread != null && threadWorkerThread.IsAlive == true)
                 {
-                    G.Writeln("+++ NOTE: Trying to stop the job -- may take some time...", Color.Red);
+                    new Note("Trying to stop the job -- may take some time...");
                     Globals.threadIsInProcessOfAborting = true;
                 }
             }

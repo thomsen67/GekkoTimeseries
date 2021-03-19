@@ -882,9 +882,7 @@ namespace Gekko
             if (so.isFix)
             {
                 if (hasEndoExo && !G.Equal(so.method, "newton"))
-                {
-                    //G.Writeln("+++ NOTE: SIM uses Newton method when ENDO/EXO vars are set.");
-                    //hasBeenAutoSetToNewton = true;
+                {                    
                     so.method = "newton";
                     modelType = GetModelTypeFromOptions(so);  //5 types
                 }
@@ -1098,7 +1096,7 @@ namespace Gekko
                     //if (Program.model.modelGekko.m2.endogenous.ContainsKey(leadVar)) ... go from bnumber to varname #980734323
                     leadedVarsList.Add(leadVar);
                 }
-                G.Writeln("+++ NOTE: There are " + Program.model.modelGekko.leadedVariables.Count + " variable(s) with leads: Fair-Taylor algorithm is used");
+                new Note("There are " + Program.model.modelGekko.leadedVariables.Count + " variable(s) with leads: Fair-Taylor algorithm is used");
             }
 
             double[,] oldNftJacobi = null;
@@ -1432,11 +1430,11 @@ namespace Gekko
                     //SIM<fix>
                     if (hasEndoExo)
                     {
-                        G.Writeln("+++ NOTE: " + Program.model.modelGekko.endogenized.Count + " ENDO/EXO vars (goals) were enforced with SIM<fix>");
+                        new Note(Program.model.modelGekko.endogenized.Count + " ENDO/EXO vars (goals) were enforced with SIM<fix>");
                     }
                     else
                     {
-                        G.Writeln("+++ NOTE: SIM<fix> did not enforce any goals, since there are no ENDO/EXO vars (goals) set");
+                        new Note("SIM<fix> did not enforce any goals, since there are no ENDO/EXO vars (goals) set");
                     }
                 }
                 else
@@ -1444,7 +1442,7 @@ namespace Gekko
                     //normal SIM
                     if (hasEndoExo)
                     {
-                        G.Writeln("+++ NOTE: There are " + Program.model.modelGekko.endogenized.Count + " ENDO/EXO vars (goals) set, you may use SIM<fix> to enforce them");
+                        new Note("There are " + Program.model.modelGekko.endogenized.Count + " ENDO/EXO vars (goals) set, you may use SIM<fix> to enforce them");
                     }
                     else
                     {
@@ -1919,7 +1917,7 @@ namespace Gekko
         public static void WriteAboutFailsafeOption()
         {
             if (Program.options.solve_failsafe == true) return;
-            G.Writeln("+++ NOTE: Use 'OPTION solve failsafe = yes;' to help tracking the root of the problem", Globals.warningColor);
+            new Note("Use 'OPTION solve failsafe = yes;' to help tracking the root of the problem", Globals.warningColor);
         }
 
         /// <summary>

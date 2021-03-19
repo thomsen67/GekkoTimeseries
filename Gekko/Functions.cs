@@ -590,7 +590,7 @@ namespace Gekko
                 int a = G.IntParse(s);
                 if (a == -12345)
                 {
-                    G.Writeln2("+++ NOTE: Could not parse '" + s + "' as an integer, skipped");
+                    new Note("Could not parse '" + s + "' as an integer, skipped");
                     continue;
                 }
 

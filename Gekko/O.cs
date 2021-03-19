@@ -705,7 +705,7 @@ namespace Gekko
             catch { };
             if (rv == null)
             {
-                G.Writeln2("+++ NOTE: Could not resolve the path '" + fileName2 + "'");
+                new Note("Could not resolve the path '" + fileName2 + "'");
                 rv = fileName2;
             }
             return rv;
@@ -763,10 +763,8 @@ namespace Gekko
                 Program.RemoteInit();
             }
             else if (isBlock == 0 && G.Equal(s2, "solve_gauss_reorder"))
-            {
-                G.Writeln();
-                G.Writeln("+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.");
-                G.Writeln("+++       (In command files, place this option before any MODEL statements).");
+            {                
+                new Note("Reorder: you must issue a MODEL statement afterwards, for this option to take effect. (In command files, place this option before any MODEL statements).");
             }
             else if (isBlock == 0 && G.Equal(s2, "series_dyn"))
             {
@@ -781,7 +779,7 @@ namespace Gekko
             }
             else if (isBlock == 0 && G.Equal(s2, "timefilter_type"))  //TODO: only issue if really avg
             {
-                G.Writeln2("+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.");
+                new Note("Timefilter type = 'avg' only works for PRT and MULPRT.");
             }                        
         }
 
@@ -6640,7 +6638,7 @@ namespace Gekko
                         O.Cls("output");
                         G.Writeln(s, ETabs.Output);
                     };
-                    G.Writeln("+++ NOTE: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    new Note("There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                 }
 
                 if (onlyModelNotDatabank.Count > 0)
@@ -6660,7 +6658,7 @@ namespace Gekko
                         O.Cls("output");
                         G.Writeln(s, ETabs.Output);
                     };
-                    G.Writeln("+++ NOTE: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    new Note("There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
                 }
             }
 
@@ -7287,7 +7285,7 @@ namespace Gekko
                     }
                     if (G.Equal(opt_save, "no"))
                     {
-                        G.Writeln("+++ NOTE: CLOSE<save=no> was used.");
+                        new Note("CLOSE<save=no> was used.");
                     }
                 }
                 else
@@ -7341,7 +7339,7 @@ namespace Gekko
 
                 if (G.Equal(opt_prot, "yes"))
                 {
-                    G.Writeln2("+++ NOTE: The OPEN<prot> option is obsolete and can be omitted here.");
+                    new Note("The OPEN<prot> option is obsolete and can be omitted here.");
                 }
 
                 if (G.Equal(opt_prim, "yes"))
@@ -8309,7 +8307,6 @@ namespace Gekko
 
                 }
                 G.Writeln2("Rebased " + count + " series");
-                //if (counter > 0) G.Writeln("+++ NOTE: Prefix names replaced " + counter + " existing variables");
             }
         }
 

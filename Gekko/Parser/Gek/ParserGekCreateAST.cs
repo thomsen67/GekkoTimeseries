@@ -1039,15 +1039,7 @@ namespace Gekko.Parser.Gek
                 G.Writeln2("+++ NOTE: Since Gekko 1.5.11, the logical comparison operator can only be '==' and not '=',", Color.Red);
                 G.Writeln("          for instance: IF '#x1' == '#x2'... Could this be the problem here?", Color.Red);
             }
-
-            //if ((lowLine.StartsWith("for") && lowLine.Contains(" to ")) && (!lowLine.Contains("val") && !lowLine.Contains("date")))
-            //{
-            //    G.Writeln2("+++ NOTE: FOR statements should contain the type of the loop variable.", Color.Red);
-            //    G.Writeln("          For instance 'FOR name n = ...', 'FOR val v = ... TO ...' or 'FOR date d = ... TO ...'.", Color.Red);
-            //    G.Writeln("          This is to improve readability of command files and avoid ambiguities.", Color.Red);
-            //    G.Writeln("          The type can optionally be omitted for 'name' loops, however.", Color.Red);
-            //}
-
+            
             if (lowLine.StartsWith("new"))
             {
                 G.Writeln2("+++ NOTE: Please use RESET instead of NEW.", Color.Red);

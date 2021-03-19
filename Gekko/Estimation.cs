@@ -529,8 +529,7 @@ namespace Gekko
 
             if (Math.Abs(ols.resMean) > 0.000001d * ols.see)
             {
-                G.Writeln2("+++ NOTE: The residuals do not seem to sum to zero. Did you omit a constant term?");
-                G.Writeln("          Note that R2 and other statistics may be misleading in this case.");
+                new Note("The residuals do not seem to sum to zero. Did you omit a constant term? Note that R2 and other statistics may be misleading in this case.");
             }
 
             name_stats.data[1 - 1, 0] = ols.rss;

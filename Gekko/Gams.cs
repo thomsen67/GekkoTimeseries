@@ -1344,7 +1344,7 @@ namespace Gekko
                 new Error("The slow gdx reader is not maintained, try the faster GDX reader with: OPTION gams fast = yes;");
             }
             G.Writeln2("Finished GAMS import of " + counterVariables + " variables, " + counterParameters + " parameters and " + importedSets + " sets (" + G.Seconds(dt1) + ")");
-            if (skippedSets > 0) G.Writeln("+++ NOTE: " + skippedSets + " sets with dim > 1 were not imported");
+            if (skippedSets > 0) new Note(skippedSets + " sets with dim > 1 were not imported");
 
             readInfo.startPerInFile = yearMin;
             readInfo.endPerInFile = yearMax;
@@ -1370,7 +1370,7 @@ namespace Gekko
         {
             if (Program.options.gams_time_detect_auto)
             {
-                G.Writeln2("+++ NOTE: 'OPTION gams time detect_auto = yes' ignored in 'OPTION gams fast = yes' mode");
+                new Note("'OPTION gams time detect_auto = yes' ignored in 'OPTION gams fast = yes' mode");
             }
             try
             {
@@ -2009,7 +2009,7 @@ namespace Gekko
                 }
 
                 G.Writeln2("Wrote " + counterVariables + " variables and " + exportedSets + " sets to " + pathAndFilename + " (" + G.Seconds(t) + ")");
-                if (skippedSets > 0) G.Writeln("+++ NOTE: " + skippedSets + " sets with dim > 1 were not imported");
+                if (skippedSets > 0) new Note(skippedSets + " sets with dim > 1 were not imported");
 
 
             }
@@ -2108,7 +2108,7 @@ namespace Gekko
             db.Export(pathAndFilename);
 
             G.Writeln2("Exported " + counterVariables + " variables to " + pathAndFilename + " (" + G.SecondsFormat((DateTime.Now - t00).TotalMilliseconds) + ")");
-            if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");
+            if (timelessCounter > 0) new Note(timelessCounter + " timeless timeseries skipped");
         }
 
         private static void WriteGdxHelper2(GekkoTime t1, GekkoTime t2, bool usePrefix, GdxFast gdx, Series ts2, string[] ss, double[] gdxValues)
@@ -2262,15 +2262,18 @@ namespace Gekko
 
         private static void GdxErrorMessage()
         {
-            G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder',");
-            G.Writeln("           for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. In general, the");
-            G.Writeln("           GAMS component is pretty good at auto-detecting the location of GAMS on the pc,");
-            G.Writeln("           including finding a 32-bit GAMS if 32-bit Gekko is used, and a 64-bit GAMS if 64-bit");
-            G.Writeln("           Gekko is used. It is probably not possible to use a 32-bit GAMS from a 64-bit Gekko,");
-            G.Writeln("           but the inverse may be possible. In general, consider the bitness of both GAMS and");
-            G.Writeln("           Gekko. Newer GAMS versions are 64-bit only, and in general, using Gekko 64-bit is");
-            G.Writeln("           advised, too.");
-            G.Writeln("           Bitness info: " + Program.Get64Bitness());            
+            using (var n = new Note())
+            {
+                n.MainAdd("You may manually indicate the GAMS program folder with 'OPTION gams exe folder',");
+                n.MainAdd("for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. In general, the");
+                n.MainAdd("GAMS component is pretty good at auto-detecting the location of GAMS on the pc,");
+                n.MainAdd("including finding a 32-bit GAMS if 32-bit Gekko is used, and a 64-bit GAMS if 64-bit");
+                n.MainAdd("Gekko is used. It is probably not possible to use a 32-bit GAMS from a 64-bit Gekko,");
+                n.MainAdd("but the inverse may be possible. In general, consider the bitness of both GAMS and");
+                n.MainAdd("Gekko. Newer GAMS versions are 64-bit only, and in general, using Gekko 64-bit is");
+                n.MainAdd("advised, too.");
+                n.MainAdd("Bitness info: " + Program.Get64Bitness() + ".");
+            }
         }
 
         private static void GetGAMSWorkspace(ref string gamsDir, ref GAMSWorkspace ws)
