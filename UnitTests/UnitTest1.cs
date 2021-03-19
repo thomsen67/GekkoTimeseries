@@ -7517,9 +7517,7 @@ namespace UnitTests
 
             I("%s = 'https://api.jobindsats.dk/v1/data/Y36C01/json?';");
             I("DOWNLOAD <key = %key> %s input.json dump = output.json;");
-
-
-
+                       
         }
 
 
