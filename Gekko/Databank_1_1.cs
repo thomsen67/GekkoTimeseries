@@ -976,8 +976,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR #745387463");
-                        throw new GekkoException();
+                        new Error("#745387463");
                     }
                     //for instance fy%q for fY in quarters
                 }
@@ -1125,13 +1124,11 @@ namespace Gekko
             }
             if (!G.Equal(varName, ts.variableName))
             {
-                G.Writeln2("*** ERROR in findOrCreateTimeSeriesInDataBank(), name");  //safety, can be deleted for speed sometime
-                throw new GekkoException();  //safety, can be deleted for speed sometime
+                new Error("In findOrCreateTimeSeriesInDataBank(), name");  //safety, can be deleted for speed sometime                
             }
             if (!(frequency == ts.freqEnum))
             {
-                G.Writeln2("*** ERROR in findOrCreateTimeSeriesInDataBank(), freq");  //safety, can be deleted for speed sometime
-                throw new GekkoException();  //safety, can be deleted for speed sometime
+                new Error("In findOrCreateTimeSeriesInDataBank(), freq");  //safety, can be deleted for speed sometime                
             }
             return ts;
         }

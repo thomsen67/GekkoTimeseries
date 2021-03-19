@@ -39,105 +39,105 @@ namespace Gekko
             try { settings_index_filename = (string)jsonTree["index_filename"]; } catch { }
             if (settings_index_filename == null)
             {
-                G.Writeln2("*** ERROR: JSON: index_filename not found"); throw new GekkoException();
+                new Error("JSON: index_filename not found");
             }
 
             string settings_list_filename = null;
             try { settings_list_filename = (string)jsonTree["list_filename"]; } catch { }
             if (settings_list_filename == null)
             {
-                G.Writeln2("*** ERROR: JSON: list_filename not found"); throw new GekkoException();
+                new Error("JSON: list_filename not found");
             }
 
             string settings_find_filename = null;
             try { settings_find_filename = (string)jsonTree["find_filename"]; } catch { }
             if (settings_find_filename == null)
             {
-                G.Writeln2("*** ERROR: JSON: find_filename not found"); throw new GekkoException();
+                new Error("Find_filename not found");
             }
 
             string settings_css_filename = null;
             try { settings_css_filename = (string)jsonTree["css_filename"]; } catch { }
             if (settings_css_filename == null)
             {
-                G.Writeln2("*** ERROR: JSON: css_filename not found"); throw new GekkoException();
+                new Error("JSON: css_filename not found");
             }
 
             string settings_dok_filename = null;
             try { settings_dok_filename = (string)jsonTree["dok_filename"]; } catch { }
             if (settings_dok_filename == null)
             {
-                G.Writeln2("*** ERROR: JSON: dok_filename not found"); throw new GekkoException();
+                new Error("JSON: dok_filename not found");
             }
 
             string settings_est_filename = null;
             try { settings_est_filename = (string)jsonTree["est_filename"]; } catch { }
             if (settings_est_filename == null)
             {
-                G.Writeln2("*** ERROR: JSON: est_filename not found"); throw new GekkoException();
+                new Error("JSON: est_filename not found");
             }
 
             string settings_icon_filename = null;
             try { settings_icon_filename = (string)jsonTree["icon_filename"]; } catch { }
             if (settings_icon_filename == null)
             {
-                G.Writeln2("*** ERROR: JSON: icon_filename not found"); throw new GekkoException();
+                new Error("JSON: icon_filename not found");
             }
 
             string settings_vars_foldername = null;
             try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
             if (settings_vars_foldername == null)
             {
-                G.Writeln2("*** ERROR: JSON: vars_foldername not found"); throw new GekkoException();
+                new Error("JSON: vars_foldername not found");
             }
 
             string settings_commands = null;
             try { settings_commands = (string)jsonTree["commands"]; } catch { }
             if (settings_commands == null)
             {
-                G.Writeln2("*** ERROR: JSON: commands not found"); throw new GekkoException();
+                new Error("JSON: commands not found");
             }
 
             string settings_plot_start = null;
             try { settings_plot_start = (string)jsonTree["plot_start"]; } catch { }
             if (settings_plot_start == null)
             {
-                G.Writeln2("*** ERROR: JSON: plot_start not found"); throw new GekkoException();
+                new Error("JSON: plot_start not found");
             }
 
             string settings_plot_end = null;
             try { settings_plot_end = (string)jsonTree["plot_end"]; } catch { }
             if (settings_plot_end == null)
             {
-                G.Writeln2("*** ERROR: JSON: plot_end not found"); throw new GekkoException();
+                new Error("JSON: plot_end not found");
             }
 
             string settings_plot_line = null;
             try { settings_plot_line = (string)jsonTree["plot_line"]; } catch { }
             if (settings_plot_line == null)
             {
-                G.Writeln2("*** ERROR: JSON: plot_line not found"); throw new GekkoException();
+                new Error("Plot_line not found");
             }
 
             string settings_print_start = null;
             try { settings_print_start = (string)jsonTree["print_start"]; } catch { }
             if (settings_print_start == null)
             {
-                G.Writeln2("*** ERROR: JSON: print_start not found"); throw new GekkoException();
+                new Error("Print_start not found");
             }
 
             string settings_print_end = null;
             try { settings_print_end = (string)jsonTree["print_end"]; } catch { }
             if (settings_print_end == null)
             {
-                G.Writeln2("*** ERROR: JSON: print_end not found"); throw new GekkoException();
+                new Error("Print_end not found");
             }
 
             string include_p_type = null;
             try { include_p_type = (string)jsonTree["include_p_type"]; } catch { }
             if (include_p_type == null)
             {
-                G.Writeln2("*** ERROR: JSON: include_p_type"); throw new GekkoException();
+                new Error("Include_p_type");
             }
 
             bool settings_show_source = true;
@@ -147,7 +147,7 @@ namespace Gekko
             try { settings_ekstrafiler = (object[])jsonTree["ekstrafiler"]; } catch { }
             if (settings_ekstrafiler == null)
             {
-                G.Writeln2("*** ERROR: JSON: ekstrafiler"); throw new GekkoException();
+                new Error("JSON: ekstrafiler");
             }
 
             // -------------------------------------------------------------
@@ -195,7 +195,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln2("*** ERROR: JSON: ekstrafiler"); throw new GekkoException();
+                    new Error("JSON: ekstrafiler");
                 }
                 if (s != null) filesToCopy.Add(s);
             }
@@ -381,7 +381,7 @@ namespace Gekko
 
                 if (ts1 == null)
                 {
-                    G.Writeln2("*** ERROR: Could not find series " + var + " in databank " + Program.databanks.GetFirst().name);
+                    new Error("Could not find series " + var + " in databank " + Program.databanks.GetFirst().name);
                 }
 
                 Series ts2 = Program.databanks.GetRef().GetIVariable(var + "!a") as Series;
@@ -1258,8 +1258,7 @@ namespace Gekko
                             }
                             else
                             {
-                                //G.Writeln2("*** ERROR: Nested FOR not supported yet");
-                                //throw new GekkoException();
+                                
                             }
                         }
                     }

@@ -166,12 +166,16 @@ namespace Gekko
             }
             catch (Exception err)
             {
-                G.Writeln("*** ERROR when trying to write the " + programShortcut + ".bat file. The folder may be read-only. Maybe try to save");
-                G.Writeln("    the " + programShortcut + ".bat to some other folder (for instance your desktop) as as an intermediate step, and ");
-                G.Writeln("    afterwards move it to " + Environment.GetEnvironmentVariable("SystemRoot") + ".");
-                G.Writeln("    If you have administrator rights, this usually works out. Otherwise you will have to ");
-                G.Writeln("    look up the Windows path (it is a so-called 'Environment variable' (Danish: 'miljøvariabel')),");
-                G.Writeln("    and place gekko.bat in one of the folders belongning to the Windows path.");
+                using (var error = new Error())
+                {                    
+                    error.MainAdd("Problem when trying to write the " + programShortcut + ".bat file. The folder may be read-only. Maybe try to save");
+                    error.MainAdd("the " + programShortcut + ".bat to some other folder (for instance your desktop) as as an intermediate step, and ");
+                    error.MainAdd("afterwards move it to " + Environment.GetEnvironmentVariable("SystemRoot") + ".");
+                    error.MainAdd("If you have administrator rights, this usually works out. Otherwise you will have to ");
+                    error.MainAdd("look up the Windows path (it is a so-called 'Environment variable' (Danish: 'miljøvariabel')),");
+                    error.MainAdd("and place gekko.bat in one of the folders belongning to the Windows path.");
+                    error.NoException();
+                }
                 return;
             }
             G.Writeln("The " + programShortcut + ".bat file was successfully created here: " + m_strFileName);

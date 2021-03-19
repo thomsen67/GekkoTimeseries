@@ -64,18 +64,15 @@ namespace Gekko
                     int ival = O.ConvertToInt(index);
                     if (ival < 0)
                     {
-                        G.Writeln2("*** ERROR: Illegal LIST indexer [" + ival + "]: negative number not allowed");
-                        throw new GekkoException();
+                        new Error("Illegal LIST indexer [" + ival + "]: negative number not allowed");
                     }
                     else if (ival == 0)
                     {
-                        G.Writeln2("*** ERROR: Illegal [0] list indexing. Use #m.len() or len(#m) instead of #m[0] to get the length of list #m.");
-                        throw new GekkoException();
+                        new Error("Illegal [0] list indexing. Use #m.len() or len(#m) instead of #m[0] to get the length of list #m.");
                     }
                     else if (ival > this.list.Count)
                     {
-                        G.Writeln2("*** ERROR: Illegal LIST indexer [" + ival + "]: larger than length of list (" + this.list.Count + ")");
-                        throw new GekkoException();
+                        new Error("Illegal LIST indexer [" + ival + "]: larger than length of list (" + this.list.Count + ")");
                     }
 
                     return this.list[ival - 1];
@@ -142,8 +139,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Type mismatch regarding []-index");
-                    throw new GekkoException();
+                    new Error("Type mismatch regarding []-index");
                 }
             }
             else if (indexes.Length == 2)
@@ -188,20 +184,18 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Expected value or range for second dimension of indexer");
-                        throw new GekkoException();
+                        new Error("Expected value or range for second dimension of indexer");
                     }
                     return m;
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Invalid use of [..., ...] indexer on list");
-                    throw new GekkoException();
+                    new Error("Invalid use of [..., ...] indexer on list");
                 }
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on LIST");
+                new Error("Cannot use " + indexes.Length + "-dimensional indexer on LIST");
                 throw new GekkoException();
             }
         }

@@ -738,16 +738,8 @@ namespace Gekko
         {
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
-            {
-                if (true)
-                {
-                    new Error("ErrorHelper #" + s);
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: ErrorHelper #" + s);
-                    throw new GekkoException();
-                }
+            {                
+                new Error("ErrorHelper #" + s);                
             }
             return Globals.scalarVal0;
         }
@@ -974,8 +966,7 @@ namespace Gekko
                     List mm = iv as List;
                     if (mm == null)
                     {
-                        G.Writeln("*** ERROR: t(): transpose on list only when it contains sublists");
-                        throw new GekkoException();
+                        new Error("t(): transpose on list only when it contains sublists");
                     }
                     max = Math.Max(max, mm.list.Count);
                 }
@@ -1001,8 +992,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: t(): transpose can only be used on list or matrix");
-                throw new GekkoException();
+                new Error("t(): transpose can only be used on list or matrix"); return null;
             }
         }
 
@@ -1267,8 +1257,7 @@ namespace Gekko
         {
             if (m.data.GetLength(0) != m.data.GetLength(1))
             {
-                G.Writeln("*** ERROR: The matrix is not square (rows = " + m.data.GetLength(0) + ", cols = " + m.data.GetLength(1));
-                throw new GekkoException();
+                new Error("The matrix is not square (rows = " + m.data.GetLength(0) + ", cols = " + m.data.GetLength(1));
             }
             return m.data.GetLength(0);
         }
@@ -2400,7 +2389,7 @@ namespace Gekko
             }            
             else
             {
-                G.Writeln2("*** ERROR: abs(): type " + x1.Type().ToString() + " not supported");
+                new Error("abs(): type " + x1.Type().ToString() + " not supported");
             }
             return rv;
         }
@@ -3016,8 +3005,7 @@ namespace Gekko
             int aaa1 = 0;
             if (!G.ConvertToInt(out aaa1, d2))
             {
-                G.Writeln("*** ERROR: Could not convert decimals variable to integer");
-                throw new GekkoException();
+                new Error("Could not convert decimals variable to integer");
             }
             int decimals = aaa1;
             if (decimals < 0)
@@ -3218,7 +3206,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: yesno(): expected input 0 or 1, got " + d);
+                new Error("yesno(): expected input 0 or 1, got " + d);
             }
             return rv;
         }
@@ -4092,8 +4080,7 @@ namespace Gekko
             }
             catch
             {
-                G.Writeln("*** ERROR: Function 'filteredperiods' takes two dates as arguments.");
-                throw new GekkoException();
+                new Error("Function 'filteredperiods' takes two dates as arguments.");
             }
 
             ScalarVal z2 = null;

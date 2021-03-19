@@ -603,7 +603,7 @@ namespace Gekko
                 }
                 if (eqs.Count > 1)
                 {
-                    G.Writeln2("*** ERROR: Internal error #809735208375");
+                    new Error("Internal error #809735208375", false);
                 }
                 found = eqs[0];  //pick the first one, probably always only one here, cf. #820948324: 
             }
@@ -1395,8 +1395,7 @@ namespace Gekko
                 GdxFast gdx = new GdxFast(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
                 if (msg != string.Empty)
                 {
-                    G.Writeln("*** ERROR: Could not load GDX library");
-                    G.Writeln("*** ERROR: " + msg);
+                    new Error("Could not load GDX library. Message: " + msg, false);
                     GdxErrorMessage();
                     throw new GekkoException();
                 }
@@ -1489,21 +1488,7 @@ namespace Gekko
                             databank.AddIVariable(name, ml);
 
                             importedSets++;
-                        }
-                        //else if (varType == 3) //equ
-                        //{
-                        //    if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
-                        //    {
-                        //        G.Writeln2("*** ERROR: gdx error");
-                        //        throw new GekkoException();
-                        //    }
-                        //    while (gdx.gdxDataReadRaw(ref index, ref values, ref n) != 0)
-                        //    {
-                        //        string s = null;
-
-                        //    }
-                        //    gdx.gdxDataReadDone();
-                        //}
+                        }                        
                         else if (varType == 1 || varType == 2) //parameter or variable
                         {
                             //
@@ -1762,8 +1747,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: GDX import failed with an unexpected error.");
-                throw;
+                new Error("GDX import failed with an unexpected error.");
             }
         }
 
@@ -2057,12 +2041,16 @@ namespace Gekko
             }
             catch (Exception e)
             {
-
-                G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. GAMSWorkspace problem.");
-                G.Writeln("           Technical error:");
-                G.Writeln("           " + e.Message);
-                G.Writeln("+++ NOTE:  You may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
-                throw;
+                using (var err = new Error())
+                {
+                    err.MainAdd("*** ERROR: Import of gdx file (GAMS) failed. GAMSWorkspace problem.");
+                    err.MainNewLineTight();
+                    err.MainAdd("Technical error:");
+                    err.MainNewLineTight();
+                    err.MainAdd(e.Message);
+                    err.MainNewLineTight();
+                    err.MainAdd("Note: you may manually indicate the GAMS program folder with 'OPTION gams exe folder = ...;'");
+                }                
             }
 
             GAMSDatabase db = ws.AddDatabase();
@@ -2309,9 +2297,15 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln2("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
-                    G.Writeln("           Technical error:");
-                    G.Writeln("           " + e.Message);
+                    using (var err = new Error())
+                    {
+                        err.MainAdd("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
+                        err.MainNewLineTight();
+                        err.MainAdd("Technical error:");
+                        err.MainNewLineTight();
+                        err.MainAdd(e.Message);                        
+                        err.NoException();
+                    }
                     GdxErrorMessage();
                     throw;
                 }

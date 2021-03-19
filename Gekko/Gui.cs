@@ -1309,7 +1309,7 @@ namespace Gekko
                             }
                         }
                     }
-                    else throw new Exception("*** ERROR: strange error rgd. links");
+                    else MessageBox.Show("*** ERROR: strange error rgd. links");
                 }
                 else if (type == "disp")
                 {
@@ -1360,7 +1360,6 @@ namespace Gekko
                         //do nothing -- this link is dead because of problems with the hidden text
                         //in the rtf file (the hidden text may be missing).
                         MessageBox.Show("*** ERROR: This link is not working because the link address is not given \nNormally the link address is provided as hidden text in the help file.");
-
                     }
                     else
                     {
@@ -1399,9 +1398,8 @@ namespace Gekko
                 else if (type == "undosim")
                 {
                     if (!G.Equal(Globals.undoSim.id.ToString(), input))
-                    {
-                        G.Writeln();
-                        G.Writeln("*** ERROR: You can only undo the last simulation, not previous ones");
+                    {                        
+                        new Error("You can only undo the last simulation, not previous ones", false);
                         return;
                     }
                     else
@@ -1414,9 +1412,8 @@ namespace Gekko
                 else if (type == "packsim")
                 {
                     if (!G.Equal(Globals.packSim.id.ToString(), input))
-                    {
-                        G.Writeln();
-                        G.Writeln("*** ERROR: You can only pack the last simulation, not previous ones");
+                    {                        
+                        new Error("You can only pack the last simulation, not previous ones", false);
                         return;
                     }
                     else
@@ -2210,11 +2207,7 @@ namespace Gekko
                     this.webBrowser.Url = new Uri("file:///" + "c:\\lkasd\\lkajsdf.sad");
                 }
                 else
-                {
-                    //string s = Program.options.menu_startfile;
-                    //this.webBrowser.Navigate("about:blank");
-                    //HtmlDocument doc = this.webBrowser.Document;
-                    //doc.Write("<html><body><FONT FACE= \"Courier New\"><FONT SIZE=2 color=\"red\"><p>" + "*** ERROR: Could not find start menu file (" + orignialFileName + ")" + "<p>" + "The file menu.html must be available in working or menu folder ('OPTION folder menu = ...')" + "</p></body></html>");
+                {                    
                     this.webBrowser.DocumentText = "<html><body><FONT FACE= \"Courier New\"><FONT SIZE=2 color=\"red\"><p>" + "*** ERROR: Could not find start menu file (" + orignialFileName + ")" + "<p>" + "The menu file must be available in working or menu folder ('OPTION folder menu = ...')" + "</p></body></html>";
                 }
             }
@@ -2534,12 +2527,11 @@ namespace Gekko
                 }
             }
 
-
             if (templateFile == "")
             {
-                G.Writeln2("*** ERROR in TSP import: nothing converted");
-                return;
+                new Error("TSP import: nothing converted");
             };
+
             String dir = Path.GetDirectoryName(templateFile);
             String frmOutputFile = dir + Path.DirectorySeparatorChar + "output.frm";
             //String tsdOutputFile = dir + Path.DirectorySeparatorChar + "output.tsd";
@@ -2593,8 +2585,7 @@ namespace Gekko
             }
             if (dataFile == "")
             {
-                G.Writeln2("*** ERROR in TSP data import: nothing converted");
-                return;
+                new Error("TSP data import: nothing converted");
             }
             string dir = Path.GetDirectoryName(dataFile);
             string tsdOutputFile = dir + Path.DirectorySeparatorChar + "output.tsd";

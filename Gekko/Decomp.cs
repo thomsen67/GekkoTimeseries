@@ -482,7 +482,7 @@ namespace Gekko
                         }
                         catch (Exception e)
                         {
-                            G.Writeln2("*** ERROR: Matrix inversion for DECOMP failed for period " + t.ToString());
+                            new Error("Matrix inversion for DECOMP failed for period " + t.ToString(), false);
                             bool nan = false;
                             foreach (double d in mEndo)
                             {
@@ -494,7 +494,7 @@ namespace Gekko
                             }
                             if (nan)
                             {
-                                G.Writeln("*** ERROR: The matrix contains missing or infinite values");
+                                new Error("The matrix contains missing or infinite values", false);
                             }
                             throw new GekkoException();
                         }                        
@@ -2199,137 +2199,7 @@ namespace Gekko
         
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
-        {
-            //double d = double.NaN;
-            //if (code1 == "n" || code1 == "xn" || code1 == "x")
-            //{
-            //    d = decompTables.cellsQuo[colname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
-            //}
-            //else if (code1 == "r" || code1 == "xr" || code1 == "xrn")
-            //{
-            //    d = decompTables.cellsRef[colname].GetData(smpl, t2);
-            //}
-            //else if (code1 == "d")
-            //{
-            //    d = decompTables.cellsContribD[colname].GetData(smpl, t2);
-            //}
-            //else if (code1 == "rd")
-            //{
-            //    d = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
-            //}
-            //else if (code1 == "xd")
-            //{
-            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
-            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
-            //    d = d1 - d0;
-            //}
-            //else if (code1 == "xrd")
-            //{
-            //    double d1 = decompTables.cellsRef[colname].GetData(smpl, t2);
-            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
-            //    d = d1 - d0;
-            //}
-            //else if (code1 == "m")
-            //{
-            //    d = decompTables.cellsContribM[colname].GetData(smpl, t2);
-            //}
-            //else if (code1 == "xm")
-            //{
-            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
-            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2);
-            //    d = d1 - d0;
-            //}
-            //else if (code1 == "p")
-            //{
-            //    double dd = decompTables.cellsContribD[colname].GetData(smpl, t2);
-            //    double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
-            //    d = (dd / dLhsLag) * 100d;
-            //}
-            //else if (code1 == "rp")
-            //{
-            //    double dd = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
-            //    double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
-            //    d = (dd / dLhsLag) * 100d;
-            //}
-            //else if (code1 == "xp")
-            //{
-            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
-            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
-            //    d = (d1 / d0 - 1d) * 100d;
-            //}
-            //else if (code1 == "xrp")
-            //{
-            //    double d1 = decompTables.cellsRef[colname].GetData(smpl, t2);
-            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
-            //    d = (d1 / d0 - 1d) * 100d;
-            //}
-            //else if (code1 == "q")
-            //{
-            //    double dd = decompTables.cellsContribM[colname].GetData(smpl, t2);
-            //    double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2);
-            //    d = (dd / dLhsLag) * 100d;
-            //}
-            //else if (code1 == "xq")
-            //{
-            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
-            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2);
-            //    d = (d1 / d0 - 1d) * 100d;
-            //}
-            //else if (code1 == "dp")
-            //{
-            //    double dd = decompTables.cellsContribD[colname].GetData(smpl, t2);
-            //    double dd_lag = decompTables.cellsContribD[colname].GetData(smpl, t2.Add(-1));
-            //    double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
-            //    double dLhsLag_lag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
-            //    d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
-            //}
-            //else if (code1 == "rdp")
-            //{
-            //    double dd = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
-            //    double dd_lag = decompTables.cellsContribDRef[colname].GetData(smpl, t2.Add(-1));
-            //    double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
-            //    double dLhsLag_lag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
-            //    d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
-            //}
-            //else if (code1 == "xdp")
-            //{
-            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
-            //    double d1_lag = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
-            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
-            //    double d0_lag = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1).Add(-1));
-            //    d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
-            //}
-            //else if (code1 == "xrdp")
-            //{
-            //    double d1 = decompTables.cellsRef[colname].GetData(smpl, t2);
-            //    double d1_lag = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
-            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
-            //    double d0_lag = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1).Add(-1));
-            //    d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
-            //}
-            //else if (code1 == "mp")  // <p> - <rp>
-            //{
-            //    double dd = decompTables.cellsContribD[colname].GetData(smpl, t2);
-            //    double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
-
-            //    double dd2 = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
-            //    double dLhsLag2 = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
-            //    d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
-            //}
-            //else if (code1 == "xmp")
-            //{
-            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
-            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
-            //    double d1_ref = decompTables.cellsRef[colname].GetData(smpl, t2);
-            //    double d0_ref = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
-            //    d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
-            //}
-            //else
-            //{
-            //    MessageBox.Show("*** ERROR: Wrong operator");
-            //    throw new GekkoException();
-            //}
-
+        {            
             double d = double.NaN;
             
             if (code1 == "d" || code1 == "p")

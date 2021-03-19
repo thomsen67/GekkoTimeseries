@@ -89,8 +89,7 @@ namespace Gekko
             }
             catch (Exception err)
             {
-                G.Writeln("*** ERROR when trying to write the gekko.lnk file to the desktop folder.");
-                return;
+                new Error("Problem when trying to write the gekko.lnk file to the desktop folder.");
             }
             G.Writeln("The gekko.lnk file was successfully created here: " + m_strFileName);
             G.Writeln();

@@ -371,8 +371,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: Internal error #89435735");
-                throw new GekkoException();
+                new Error("Internal error #89435735");
             }
 
             return rv;

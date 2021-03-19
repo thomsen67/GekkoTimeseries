@@ -558,8 +558,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR regarding frequency: '" + freq + "' not recognized");
-                    throw new GekkoException();
+                    new Error("Regarding frequency: '" + freq + "' not recognized");
                 }
             }
             return eFreq;
@@ -1064,7 +1063,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: strange error regarding freq");
+                new Error("Strange error regarding freq");
             }
             return freq;
         }
@@ -1448,15 +1447,13 @@ namespace Gekko
 
                 if (!format2.StartsWith("f") && !format2.StartsWith("s"))
                 {
-                    G.Writeln("*** ERROR: Number format should start with 'f' or 's', e.g. 'f10.2': " + format);
-                    throw new GekkoException();
+                    new Error("Number format should start with 'f' or 's', e.g. 'f10.2': " + format);
                 }
                 string format3 = format.Substring(1);
                 string[] format4 = format3.Split('.');
                 if (format4.Length != 2)
                 {
-                    G.Writeln("*** ERROR: Number format should contain a '.', e.g. 'f10.2': " + format);
-                    throw new GekkoException();
+                    new Error("Number format should contain a '.', e.g. 'f10.2': " + format);
                 }
                 string f0 = format4[0];
                 string f1 = format4[1];
@@ -1467,8 +1464,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln("*** ERROR: Number format should contain numbers, e.g. 'f10.2': " + format);
-                    throw new GekkoException();
+                    new Error("Number format should contain numbers, e.g. 'f10.2': " + format);
                 }
                 int ff1 = -12345;
                 if (int.TryParse(f1, out ff1))
@@ -1477,14 +1473,12 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln("*** ERROR: Number format should contain numbers, e.g. 'f10.2': " + format);
-                    throw new GekkoException();
+                    new Error("Number format should contain numbers, e.g. 'f10.2': " + format);
                 }
             }
             catch
             {
-                G.Writeln("*** ERROR: Number format: could not parse: " + format);
-                throw new GekkoException();
+                new Error("Number format: could not parse: " + format);
             }
 
             var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
@@ -2713,7 +2707,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: It seems the folder '" + Program.options.folder_working + "' is blocked or does not exist");
+                new Error("It seems the folder '" + Program.options.folder_working + "' is blocked or does not exist", false);
                 if (throwException) throw new GekkoException();
                 else return true;  //problem
             }
@@ -3311,8 +3305,8 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR regarding year");
-                throw new GekkoException();
+                new Error("Regarding year");
+                return -12345;  //will never return anything
             }
         }
 
@@ -3385,7 +3379,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: strange error regarding freq");
+                new Error("Strange error regarding freq");
             }
 
             return f;
@@ -4109,12 +4103,12 @@ namespace Gekko
             {
                 s = "";
             }
-            if (s.Trim().StartsWith("*** ERROR"))
+            if (s.Trim().StartsWith(Globals.errorString))
             {
                 color = Color.Red;
                 Globals.numberOfErrors++;
             }
-            else if (s.Trim().StartsWith("+++ WARNING"))
+            else if (s.Trim().StartsWith(Globals.warningString))
             {
                 color = Globals.warningColor;
                 Globals.numberOfWarnings++;
@@ -4535,7 +4529,7 @@ namespace Gekko
             while (s != null)
             {
                 int colPosition = Globals.guiMainLinePosition;                   //Often 0. Globals.guiMainLinePosition handles some inserts (like links) that there must be room for. But it also handles G.Write() without newline, so that this position is remembered (and no blank-indent is inserted)
-                int indent2 = 0; if (colPosition == 0) indent2 = start.Length;   //indent2 is 11 if start = "*** ERROR" and we are after a newline.
+                int indent2 = 0; if (colPosition == 0) indent2 = start.Length;   //indent2 is 11 if start = "* * * ERROR" and we are after a newline.
                 string start2 = start; if (indent2 == 0) start2 = "";            //hmm
                 int rest = Program.options.print_width - colPosition - indent2;
                 int restRemember = rest;

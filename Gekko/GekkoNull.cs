@@ -15,14 +15,12 @@ namespace Gekko
         
         public double GetValOLD(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return double.NaN;
         }
 
         public double GetVal(GekkoTime t)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return double.NaN;
         }
 
         public double ConvertToVal()
@@ -37,8 +35,7 @@ namespace Gekko
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return GekkoTime.tNull;
         }
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
@@ -49,8 +46,7 @@ namespace Gekko
 
         public List<IVariable> ConvertToList()
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return null;
         }
 
         public EVariableType Type()
@@ -60,8 +56,7 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return null;
         }
                         
         public IVariable Add(GekkoSmpl smpl, IVariable input)
@@ -75,16 +70,14 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-                        throw new GekkoException();
+                        new Error("Invalid operation on null/empty value"); return null;
                     }
             }            
         }
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return null;
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
@@ -98,16 +91,14 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-                        throw new GekkoException();
+                        new Error("Invalid operation on null/empty value"); return null;
                     }
             }            
         }
 
         public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return null;
         }
 
         public IVariable Divide(GekkoSmpl smpl, IVariable input)
@@ -118,14 +109,12 @@ namespace Gekko
 
         public IVariable Power(GekkoSmpl smpl, IVariable input)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value"); return null;
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
-            throw new GekkoException();
+            new Error("Invalid operation on null/empty value");
         }
 
         public IVariable DeepClone(GekkoSmplSimple truncate)

@@ -113,46 +113,40 @@ namespace Gekko
                 //sub and subsub can be anything <= 1
                 if (sub > 1 || subsub > 1)
                 {
-                    G.Writeln2("*** ERROR: freq 'a' cannot have subperiod > 1");
-                    throw new GekkoException();
+                    new Error("Freq 'a' cannot have subperiod > 1");
                 }
             }
             else if (freq == EFreq.Q)
             {
                 if (sub < 1 || sub > 4 || subsub > 1)
                 {
-                    G.Writeln2("*** ERROR: freq 'q' wrong quarter: " + sub);
-                    throw new GekkoException();
+                    new Error("Freq 'q' wrong quarter: " + sub);
                 }
             }
             else if (freq == EFreq.M)
             {
                 if (sub < 1 || sub > 12 || subsub > 1)
                 {
-                    G.Writeln2("*** ERROR: freq 'm' wrong month: " + sub);
-                    throw new GekkoException();
+                    new Error("Freq 'm' wrong month: " + sub);
                 }
             }
             else if (freq == EFreq.D)
             {
                 if (sub < 1 || sub > 12)
                 {
-                    G.Writeln2("*** ERROR: freq 'd' wrong month: " + sub);
-                    throw new GekkoException();
+                    new Error("Freq 'd' wrong month: " + sub);
                 }
                 int maxDays = G.DaysInMonth(super, sub);  //see also #9832453429857
                 if (subsub < 1 || subsub > maxDays)
                 {
-                    G.Writeln2("*** ERROR: freq 'd' wrong day: " + subsub);
-                    throw new GekkoException();
+                    new Error("Freq 'd' wrong day: " + subsub);
                 }
             }
             else if (freq == EFreq.U)
             {
                 if (sub > 1 || subsub > 1)
                 {
-                    G.Writeln2("*** ERROR: freq 'u' cannot have subperiod > 1");
-                    throw new GekkoException();
+                    new Error("Freq 'u' cannot have subperiod > 1");
                 }
             }
         }
@@ -204,8 +198,7 @@ namespace Gekko
             }
             else if (freq == EFreq.U)
             {
-                G.Writeln2("*** ERROR: Cannot convert date to undated frequency");
-                throw new GekkoException();
+                new Error("Cannot convert date to undated frequency");
             }
 
             return new GekkoTime(freq, super, sub, subsub);
@@ -280,8 +273,7 @@ namespace Gekko
             }
             else if (gt.freq == EFreq.U)
             {
-                G.Writeln2("*** ERROR: You cannot use dateformat together with an undated frequency");
-                throw new GekkoException();
+                new Error("You cannot use dateformat together with an undated frequency");
             }
 
             //Now: three possibilities regarding format:
@@ -321,8 +313,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                G.Writeln2("*** ERROR: The date '" + s + "' does not comply with the format '" + format + "'");
-                throw new GekkoException();
+                new Error("The date '" + s + "' does not comply with the format '" + format + "'");
             }
             return dt;
         }
@@ -376,8 +367,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                        throw new GekkoException();
+                        new Error("Timeperiod " + s + " not valid");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -394,8 +384,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                        throw new GekkoException();
+                        new Error("Timeperiod " + s + " not valid");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -413,8 +402,7 @@ namespace Gekko
                     {
                         if (reportError)
                         {
-                            G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
-                            throw new GekkoException();
+                            new Error("Should have quarters from 1 to and including 4");
                         }
                         else return GekkoTime.tNull;
                     }
@@ -424,8 +412,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                        throw new GekkoException();
+                        new Error("Timeperiod " + s + " not valid");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -441,8 +428,7 @@ namespace Gekko
                     {
                         if (reportError)
                         {
-                            G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
-                            throw new GekkoException();
+                            new Error("Should have quarters from 1 to and including 4");
                         }
                         else return GekkoTime.tNull;
                     }
@@ -452,8 +438,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                        throw new GekkoException();
+                        new Error("Timeperiod " + s + " not valid");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -470,8 +455,7 @@ namespace Gekko
                     {
                         if (reportError)
                         {
-                            G.Writeln("*** ERROR: should have months from 1 to and including 12");
-                            throw new GekkoException();
+                            new Error("Should have months from 1 to and including 12");
                         }
                         else return GekkoTime.tNull;
                     }
@@ -479,8 +463,7 @@ namespace Gekko
                     int maxDays = G.DaysInMonth(y1, m1); //see also #9832453429857
                     if (d < 1 || d > maxDays)
                     {
-                        G.Writeln("*** ERROR: illegal day in daily date");
-                        throw new GekkoException();
+                        new Error("Illegal day in daily date");
                     }
                     t = new GekkoTime(EFreq.D, y1, m1, d);
                 }
@@ -488,8 +471,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                        throw new GekkoException();
+                        new Error("Timeperiod " + s + " not valid");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -505,8 +487,7 @@ namespace Gekko
                     {
                         if (reportError)
                         {
-                            G.Writeln("*** ERROR: should have months from 1 to and including 12");
-                            throw new GekkoException();
+                            new Error("Should have months from 1 to and including 12");
                         }
                         else return GekkoTime.tNull;
                     }
@@ -516,8 +497,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                        throw new GekkoException();
+                        new Error("Timeperiod " + s + " not valid");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -542,8 +522,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                        throw new GekkoException();
+                        new Error("Timeperiod " + s + " not valid");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -552,8 +531,7 @@ namespace Gekko
             {
                 if (reportError)
                 {
-                    G.Writeln2("*** ERROR: Could not understand the timeperiod: " + s);
-                    throw new GekkoException();
+                    new Error("Could not understand the timeperiod: " + s);
                 }
                 else return GekkoTime.tNull;
             }
@@ -576,8 +554,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Freq convertion problem");
-                    throw new GekkoException();
+                    new Error("Freq convertion problem");
                 }
             }
             else if (gt.freq == EFreq.Q)
@@ -593,8 +570,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Freq convertion problem");
-                    throw new GekkoException();
+                    new Error("Freq convertion problem");
                 }
             }
             else if (gt.freq == EFreq.M)
@@ -609,8 +585,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Freq convertion problem");
-                    throw new GekkoException();
+                    new Error("Freq convertion problem");
                 }
             }
             else if (gt.freq == EFreq.D)
@@ -620,8 +595,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Freq convertion problem");
-                throw new GekkoException();
+                new Error("Freq convertion problem");
             }
         }
 
@@ -635,8 +609,7 @@ namespace Gekko
             //Also checks that freqs are the same
             if (t1.freq != t2.freq)
             {
-                G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqPretty(t1.freq) + " vs. " + G.GetFreqPretty(t2.freq));
-                throw new GekkoException();
+                new Error("Frequency mismatch: " + G.GetFreqPretty(t1.freq) + " vs. " + G.GetFreqPretty(t2.freq));
             }
             EFreq efreq = t1.freq;
 
@@ -667,8 +640,7 @@ namespace Gekko
                 else if (efreq == EFreq.U) subPeriods = 1;
                 else
                 {
-                    G.Writeln2("*** ERROR: Error regarding frequency");
-                    throw new GekkoException();
+                    new Error("Error regarding frequency");
                 }
 
                 int obs = subPeriods * (t2.super - t1.super) + t2.sub - t1.sub + 1;
@@ -955,8 +927,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Incompatible freqs: " + G.ConvertFreq(this.freq) + " vs. " + G.ConvertFreq(gt2.freq));
-                    throw new GekkoException();
+                    new Error("Incompatible freqs: " + G.ConvertFreq(this.freq) + " vs. " + G.ConvertFreq(gt2.freq));
                 }
             }
         }
@@ -1172,8 +1143,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Problem with freq");
-                throw new GekkoException();
+                new Error("Problem with freq");
             }
         }
 
@@ -1243,8 +1213,7 @@ namespace Gekko
             _EndDate = t2;
             if (t1.freq != t2.freq)
             {
-                G.Writeln2("*** ERROR: Mismatch of frequencies in time iterator");
-                throw new GekkoException();
+                new Error("Mismatch of frequencies in time iterator");
             }
             _freq = t1.freq;
         }
@@ -1270,8 +1239,7 @@ namespace Gekko
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            G.Writeln("*** ERROR: iterator problem");
-            throw new GekkoException();
+            new Error("Iterator problem"); throw new GekkoException();  //must throw explicitly here, else C# whines.
         }
     }
 
@@ -1335,8 +1303,7 @@ namespace Gekko
             _EndDate = endDate;
             if (startDate.freq != endDate.freq)
             {
-                G.Writeln2("*** ERROR: Internal error, mismatch of frequencies");
-                throw new GekkoException();
+                new Error("Internal error, mismatch of frequencies");
             }
             _freq = startDate.freq;
         }
@@ -1354,8 +1321,7 @@ namespace Gekko
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            G.Writeln("*** ERROR: iterator problem");
-            throw new GekkoException();
+            new Error("Iterator problem"); throw new GekkoException();  //must throw explicit exception, else C# whines
         }
     }
 
