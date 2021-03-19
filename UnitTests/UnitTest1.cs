@@ -7504,7 +7504,7 @@ namespace UnitTests
         public void _Test_DownloadJobindsats()
         {
             Databank work = First();
-            I("RESET;");
+            I("RESET;"); 
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("%key = ' " + Private.jobindsatsKey + "';");
 
