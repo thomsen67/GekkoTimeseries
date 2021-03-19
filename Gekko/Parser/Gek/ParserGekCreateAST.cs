@@ -562,7 +562,7 @@ namespace Gekko.Parser.Gek
                 if (lineNo > inputFileLines.Count)
                 {
                     {
-                        G.Writeln("*** ERROR: " + errorMessage);
+                        new Error(errorMessage, false);
                     }
 
                     continue;  //doesn't give meaning

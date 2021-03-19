@@ -5107,8 +5107,7 @@ namespace Gekko.Parser.Gek
             }
             else
             {
-                G.Writeln("*** ERROR: Option type problem");
-                throw new GekkoException();
+                new Error("Option type problem");
             }
 
             Tuple<string, string> tup = new Tuple<string, string>("Program.options." + ss7.Replace(" ", "_"), f + node[node.ChildrenCount() - 1].Code + ")");

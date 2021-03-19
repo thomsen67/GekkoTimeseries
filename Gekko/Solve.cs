@@ -456,9 +456,7 @@ namespace Gekko
                         }
                         else
                         {
-                            //missing variable, and not a DJZ-type variable
-                            //G.Writeln("*** ERROR: time series " + variable + " (and possibly more) does not exist in Work bank");
-                            //G.Writeln("    Did you forget to load a databank? Simulation is stopped.");
+                            //missing variable, and not a DJZ-type variable                            
                             if (!missingVariables.Contains(variable))
                             {
                                 missingVariables.Add(variable);
@@ -521,8 +519,6 @@ namespace Gekko
                                 {
                                     //real lagged endo or exo
                                     //todo: write if exo, lagged endo, and the lag
-                                    //G.Writeln("*** ERROR: In period " + (t + lagPointers[i]) + " the variable " + variable + " has a missing");
-                                    //G.Writeln("    value. Please check your data bank -- simulation is not performed.");
                                     //FIXME: undo, or at least write if DJZ variables have been created.
                                     //return -12345;
 
@@ -1652,12 +1648,8 @@ namespace Gekko
                         if (Program.model.modelGekko.b[i] != bCheck[i])  //probably is false if left side is 0 and right side is NaN. Not good.
                         {
                             //should change according to b[] arrays, but does not get written back.
-                            string var = Program.model.modelGekko.varsBTypeInverted[i];
-                            G.Writeln();
-                            G.Writeln("*** ERROR: While backwriting from SIM command -- please report this error to the Gekko editor");
-                            G.Writeln("*** ERROR: Variable: " + var);
-                            G.Writeln();
-                            throw new GekkoException();
+                            string var = Program.model.modelGekko.varsBTypeInverted[i];                            
+                            new Error("While backwriting from SIM command -- please report this error to the Gekko editor. Variable: " + var);
                         }
                     }
                 }
@@ -2415,14 +2407,10 @@ namespace Gekko
         {
             if (printError)
             {
-
-                G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the maximum number of newton simulations (" + Program.options.solve_newton_itermax + ") was exceeded.");
-                G.Writeln("    You may augment this number, see the Newton options: 'OPTION solve newton ...'");
+                new Error("Problem simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the maximum number of newton simulations (" + Program.options.solve_newton_itermax + ") was exceeded. You may augment this number, see the Newton options: 'OPTION solve newton ...'", false);
             }
             throw new GekkoException();
         }
-
-
 
         //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.modelGekko.b[] via RSS(). These are typically the same, but what if not
         public static void SolveNewtonAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
@@ -2483,9 +2471,7 @@ namespace Gekko
                         if (double.IsNaN(number))
                         {
                             //we will accept infinity, for instance 1/0
-                            G.Writeln2("*** ERROR simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm had starting value problems");
-                            G.Writeln("+++ NOTE: You may try 'OPTION solve failsafe = yes;' to handle this problem.");
-                            throw new GekkoException();
+                            new Error("Simulating " + nah.tStart + "-" + nah.tEnd + ": in " + nah.t + " the Newton algorithm had starting value problems. Note: You may try 'OPTION solve failsafe = yes;' to handle this problem.");                            
                         }
                     }
                 }

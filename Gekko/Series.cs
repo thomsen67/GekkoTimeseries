@@ -1940,8 +1940,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln("*** ERROR: TT NOTE: Window test, #08753205743");
-                        //throw new GekkoException();
+                        new Error("TT NOTE: Window test, #08753205743", false);
                     }
                 }
 
@@ -2116,16 +2115,7 @@ namespace Gekko
                 {
                     //This is a lag or lead, [-...] or [+...]
                     //TODO: Broken lags!!
-
-                    //We remove this restriction. The users at Hawaii have long lags on quarterly or monthly data,
-                    //so no need to do any restrictions about lag/lead allowed ranges.
-
-                    //if (!IsLagOrLead(i))
-                    //{
-                    //    G.Writeln2("*** ERROR: lags or leads should be in the interval [-99, 99].");
-                    //    throw new GekkoException();
-                    //}
-
+                    
                     if (this.type == ESeriesType.Timeless)
                     {
                         rv = this;  //no effect of lag/lead
@@ -2263,8 +2253,7 @@ namespace Gekko
                 IVariable iv = null;
                 if (this.dimensions != keys.Length)
                 {
-                    G.Writeln("*** ERROR: " + keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
-                    throw new GekkoException();
+                    new Error(keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
                 }
                                 
                 this.dimensionsStorage.TryGetValue(new MultidimItem(keys), out iv);                
@@ -2480,8 +2469,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: Variables are of wrong type for summation");
-                throw new GekkoException();
+                new Error("Variables are of wrong type for summation");
             }
             return;
         }

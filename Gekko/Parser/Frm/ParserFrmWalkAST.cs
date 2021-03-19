@@ -1558,8 +1558,7 @@ namespace Gekko.Parser.Frm
 
             if (intLags <= 0 || intLags >= 100)
             {
-                G.Writeln2("*** ERROR: Expected lags in " + function + "() function to > 0 and < 100");
-                throw new GekkoException();
+                new Error("Expected lags in " + function + "() function to > 0 and < 100");
             }
 
             return intLags;
@@ -1572,8 +1571,7 @@ namespace Gekko.Parser.Frm
             string value = null;
             if (wh2.vals == null || !wh2.vals.TryGetValue(key, out value))
             {
-                G.Writeln2("*** ERROR: Could not find VAL '" + key + "' definition in .frm file");
-                throw new GekkoException();
+                new Error("Could not find VAL '" + key + "' definition in .frm file");
             }
             if (value.EndsWith(".")) value = value + "0";  //otherwise "1." becomes "1.d" which is not allowed
             return value;
@@ -1721,8 +1719,7 @@ namespace Gekko.Parser.Frm
             }      
             else
             {
-                G.Writeln2("*** ERROR: Internal error #980725238579");
-                throw new GekkoException();
+                new Error("Internal error #980725238579");
             }
         }
 

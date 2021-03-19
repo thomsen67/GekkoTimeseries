@@ -1955,7 +1955,7 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                G.Writeln2("*** ERROR: Mismatch (only TT computer)");
+                new Error("Mismatch (only TT computer)", false);
             }
         }
 
