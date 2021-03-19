@@ -153,8 +153,7 @@ namespace Gekko
 
         public List<IVariable> ConvertToList()
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a LIST from a MAP.");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a LIST from a MAP."); return null;
         }
 
         public EVariableType Type()
@@ -164,32 +163,27 @@ namespace Gekko
 
         public IVariable Add(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use add with MAPs");
-            throw new GekkoException();
+            new Error("You cannot use add with MAPs"); return null;
         }
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use subtract with MAPs");
-            throw new GekkoException();
+            new Error("You cannot use subtract with MAPs"); return null;
         }
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use multiply with MAPs");
-            throw new GekkoException();
+            new Error("You cannot use multiply with MAPs"); return null;
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use divide with MAPs");
-            throw new GekkoException();
+            new Error("You cannot use divide with MAPs"); return null;
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use power function with MAPs");
-            throw new GekkoException();
+            new Error("You cannot use power function with MAPs"); return null;
         }
 
         public string Message()
@@ -205,8 +199,7 @@ namespace Gekko
                 string dbName, varName, freq; string[] indexes; O.Chop(s, out dbName, out varName, out freq, out indexes);  
                 if(dbName!=null)
                 {
-                    G.Writeln2("*** ERROR: You cannot state bank name (with colon) on the left-hand side in a MAP element");
-                    throw new GekkoException();
+                    new Error("You cannot state bank name (with colon) on the left-hand side in a MAP element");
                 }
                 string varnameWithFreq = G.AddFreq(varName, freq, EVariableType.Var, O.ELookupType.LeftHandSide);
                 O.LookupHelperLeftside(smpl, this, varnameWithFreq, freq, rhsExpression, EVariableType.Var, options);
@@ -214,8 +207,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Unexpected indexer type on MAP (left-hand side)");
-                throw new GekkoException();
+                new Error("Unexpected indexer type on MAP (left-hand side)");
             }
         }
 

@@ -82,27 +82,7 @@ namespace Gekko
                     this.data[i, j] = d;
                 }
             }
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions start----------------
-        // ----------------------------------------------------
-
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------
+        }        
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
@@ -123,9 +103,7 @@ namespace Gekko
                 string s = null;
                 if (index.Type() == EVariableType.Val) s += "" + O.ConvertToInt(index);
                 else if (index.Type() == EVariableType.Range) s += "" + O.ConvertToInt(((Range)index).first) + ".." + O.ConvertToInt(((Range)index).first);
-                G.Writeln("*** ERROR: You are trying to use [" + s + "] on a " + d1 + " x " + d2 + " matrix");
-                G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
-                throw new GekkoException();
+                new Error("You are trying to use [" + s + "] on a " + d1 + " x " + d2 + " matrix. This notation can only be used regarding nx1 matrices (column vectors)"); return null;
             }
             else if (indexes.Length == 2)
             {
@@ -133,8 +111,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on MATRIX");
-                throw new GekkoException();
+                new Error("Cannot use " + indexes.Length + "-dimensional indexer on MATRIX"); return null;
             }
         }
 
@@ -165,124 +142,7 @@ namespace Gekko
                 RangeHelper(index1, index2, out xx1, out xx2);
                 return GetDataHelper((Range)xx1, (Range)xx2);
             }
-        }
-
-        ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        ////{
-        ////    int d1 = this.data.GetLength(0);
-        ////    int d2 = this.data.GetLength(1);
-        ////    if (d2 == 1)
-        ////    {
-        ////        return Indexer(t, indexRange, new ScalarVal(1d));                
-        ////    }
-        ////    G.Writeln("*** ERROR: You are trying to use [ .. ] on a " + d1 + "x" + d2 + " matrix");
-        ////    G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
-        ////    throw new GekkoException();
-        ////}
-
-        ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        ////{
-        ////    int i1 = 1;
-        ////    int i2 = this.data.GetLength(0);
-        ////    int j1 = 1;
-        ////    int j2 = this.data.GetLength(1);
-        ////    if (indexRange1.first != null) i1 = O.ConvertToInt(indexRange1.first);
-        ////    if (indexRange1.last != null) i2 = O.ConvertToInt(indexRange1.last);
-        ////    if (indexRange2.first != null) j1 = O.ConvertToInt(indexRange2.first);
-        ////    if (indexRange2.last != null) j2 = O.ConvertToInt(indexRange2.last);
-        ////    if (i1 > i2)
-        ////    {
-        ////        G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
-        ////        throw new GekkoException();                
-        ////    }
-        ////    if (j1 > j2)
-        ////    {
-        ////        G.Writeln2("*** ERROR: Range " + j1 + ".." + j2 + " is descending");
-        ////        throw new GekkoException();
-        ////    }
-        ////    try
-        ////    {
-        ////        Matrix m = new Matrix(i2 - i1 + 1, j2 - j1 + 1);
-        ////        int ii1 = i1 - 1;
-        ////        int jj1 = j1 - 1;
-        ////        for (int i = i1 - 1; i <= i2 - 1; i++)
-        ////        {
-        ////            for (int j = j1 - 1; j <= j2 - 1; j++)
-        ////            {
-        ////                m.data[i - ii1, j - jj1] = this.data[i, j];
-        ////            }
-        ////        }
-        ////        return m;
-        ////    }
-        ////    catch (System.IndexOutOfRangeException e)  // CS0168
-        ////    {
-        ////        G.Writeln("*** ERROR: Index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
-        ////        if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
-        ////        throw new GekkoException();
-        ////    }
-        ////}
-
-        ////public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        ////{
-        ////    int i0 = O.ConvertToInt(index);            
-        ////    int j1 = 1;
-        ////    int j2 = this.data.GetLength(1);            
-        ////    if (indexRange.first != null) j1 = O.ConvertToInt(indexRange.first);
-        ////    if (indexRange.last != null) j2 = O.ConvertToInt(indexRange.last);
-        ////    try
-        ////    {
-        ////        Matrix m = new Matrix(1, j2 - j1 + 1);
-
-        ////        int jj1 = j1 - 1;
-        ////        int i = i0 - 1;
-
-        ////        for (int j = j1 - 1; j <= j2 - 1; j++)
-        ////        {
-        ////            m.data[0, j - jj1] = this.data[i, j];
-        ////        }
-
-        ////        return m;
-        ////    }
-        ////    catch (System.IndexOutOfRangeException e)  // CS0168
-        ////    {
-        ////        G.Writeln("*** ERROR: Index out of range: [" + i0 + ", " + j1 + " .. " + j2 + " ]");
-        ////        if (i0 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
-        ////        throw new GekkoException();
-        ////    }
-        ////}
-
-        ////public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        ////{
-        ////    int i1 = 1;
-        ////    int i2 = this.data.GetLength(0);            
-        ////    if (indexRange.first != null) i1 = O.ConvertToInt(indexRange.first);
-        ////    if (indexRange.last != null) i2 = O.ConvertToInt(indexRange.last);
-        ////    if (i1 > i2)
-        ////    {
-        ////        G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
-        ////        throw new GekkoException();
-        ////    }
-        ////    int j0 = O.ConvertToInt(index);
-        ////    try
-        ////    {
-        ////        Matrix m = new Matrix(i2 - i1 + 1, 1);
-        ////        int ii1 = i1 - 1;
-        ////        int j = j0 - 1;
-        ////        for (int i = i1 - 1; i <= i2 - 1; i++)
-        ////        {
-
-        ////                m.data[i - ii1, 0] = this.data[i, j];
-
-        ////        }
-        ////        return m;
-        ////    }
-        ////    catch (System.IndexOutOfRangeException e)  // CS0168
-        ////    {
-        ////        G.Writeln("*** ERROR: Index out of range: [" + i1 + " .. " + i2 + ", " + j0 + "]");
-        ////        if (i1 == 0 || i2 == 0 || j0 == 0) G.Writeln("           Please note that indicies are 1-based");
-        ////        throw new GekkoException();
-        ////    }
-        ////}
+        }        
 
         public IVariable Negate(GekkoSmpl t)
         {
@@ -298,13 +158,7 @@ namespace Gekko
             }
             return m;
         }
-
-        //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
-        //{
-        //    G.Writeln2("*** ERROR: #8703458724");
-        //    throw new GekkoException();
-        //}
-
+        
         public double GetValOLD(GekkoSmpl t)
         {
             if (this.data.GetLength(0) == 1 && this.data.GetLength(1) == 1)
@@ -313,10 +167,8 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a matrix.");
-                G.Writeln("           Maybe you need an [x, y]-indexer on the matrix, for instance #a[2, 3]?");
-            }
-            throw new GekkoException();
+                new Error("Type mismatch: you are trying to extract a VAL from a matrix. Maybe you need an [x, y]-indexer on the matrix, for instance #a[2, 3]?"); return double.NaN;
+            }         
         }
 
         public double GetVal(GekkoTime t)
@@ -332,15 +184,13 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a " + this.data.GetLength(0) + " x " + this.data.GetLength(1) + " matrix.");
-                throw new GekkoException();
+                new Error("Type mismatch: you are trying to extract a VAL from a " + this.data.GetLength(0) + " x " + this.data.GetLength(1) + " matrix."); return double.NaN;
             }
         }
 
         public string ConvertToString()
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a STRING from a matrix.");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a STRING from a matrix."); return null;
         }
 
         public string DimensionsAsString()
@@ -350,14 +200,12 @@ namespace Gekko
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a DATE from a matrix.");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a DATE from a matrix."); return GekkoTime.tNull;
         }
 
         public List<IVariable> ConvertToList()
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a LIST from a matrix.");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a LIST from a matrix."); return null;
         }
 
         public EVariableType Type()
@@ -395,9 +243,7 @@ namespace Gekko
                         int k = a.GetLength(1);
                         if (b.GetLength(0) != m || b.GetLength(1) != k)
                         {
-                            G.Writeln2("*** ERROR: The two matrices are not compatible for addition");
-                            G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
-                            throw new GekkoException();
+                            new Error("The two matrices are not compatible for addition, " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                         }
                         double[,] c = Program.AddMatrixMatrix(a, b, m, k);
                         Matrix z = new Matrix();
@@ -407,13 +253,11 @@ namespace Gekko
                 case EVariableType.Val:
                     {
                         //addition of a scalar is not legal, this is like AREMOS
-                        G.Writeln2("*** ERROR: You cannot add a MATRIX and a VAL");
-                        throw new GekkoException();
+                        new Error("You cannot add a MATRIX and a VAL"); return null;
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: You are trying to add a MATRIX and a " + x.Type().ToString().ToUpper());
-                        throw new GekkoException();
+                        new Error("You are trying to add a MATRIX and a " + x.Type().ToString().ToUpper()); return null;
                     }
             }
         }
@@ -430,9 +274,7 @@ namespace Gekko
                 int k = a.GetLength(1);
                 if (b.GetLength(0) != m || b.GetLength(1) != k)
                 {
-                    G.Writeln2("*** ERROR: The two matrices are not compatible for subtraction");
-                    G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
-                    throw new GekkoException();
+                    new Error("The two matrices are not compatible for subtraction, " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                 }
                 double[,] c = Program.SubtractMatrixMatrix(a, b, m, k);
                 Matrix z = new Matrix();
@@ -442,8 +284,7 @@ namespace Gekko
             else
             {
                 //subtraction of a scalar is not legal, this is like AREMOS
-                G.Writeln2("*** ERROR: You are trying to add a MATRIX and a " + type.ToString().ToUpper());
-                throw new GekkoException();
+                new Error("You are trying to add a MATRIX and a " + type.ToString().ToUpper()); return null;
             }
         }
 
@@ -481,8 +322,7 @@ namespace Gekko
 
                     if (k != p)
                     {
-                        G.Writeln2("*** ERROR: The two matrices are not compatible for multiplication");
-                        G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
+                        new Error("The two matrices are not compatible for multiplication, " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                     }
                     double[,] c = null;
 
@@ -516,15 +356,13 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: You are trying to multiply a MATRIX and a " + type.ToString().ToUpper());
-                throw new GekkoException();
+                new Error("You are trying to multiply a MATRIX and a " + type.ToString().ToUpper()); return null;
             }
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: Type error regarding concat and MATRIX");
-            throw new GekkoException();
+            new Error("Type error regarding concat and MATRIX"); return null;
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
@@ -552,8 +390,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: You can only divide a matrix with a scalar or 1x1 matrix.");
-                            throw new GekkoException();
+                            new Error("You can only divide a matrix with a scalar or 1x1 matrix."); return null;
                         }
                     }
                 case EVariableType.Val:
@@ -569,16 +406,14 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: You can only divide a matrix with a scalar or 1x1 matrix.");
-                        throw new GekkoException();
+                        new Error("You can only divide a matrix with a scalar or 1x1 matrix."); return null;
                     }
             }
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use power function with matrices");
-            throw new GekkoException();            
+            new Error("You cannot use power function with matrices"); return null;
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
@@ -628,8 +463,7 @@ namespace Gekko
             if (x2.Type() == EVariableType.Val) xx2 = new Range(x2, x2);
             if (xx1.Type() != EVariableType.Range || xx1.Type() != EVariableType.Range)
             {
-                G.Writeln2("*** ERROR: Matrix []-indexer on left-hand side has wrong type");
-                throw new GekkoException();
+                new Error("Matrix []-indexer on left-hand side has wrong type");
             }
         }
 
@@ -645,13 +479,11 @@ namespace Gekko
             if (indexRange2.last != null) j2 = O.ConvertToInt(indexRange2.last);
             if (i1 > i2)
             {
-                G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
-                throw new GekkoException();
+                new Error("Range " + i1 + ".." + i2 + " is descending");
             }
             if (j1 > j2)
             {
-                G.Writeln2("*** ERROR: Range " + j1 + ".." + j2 + " is descending");
-                throw new GekkoException();
+                new Error("Range " + j1 + ".." + j2 + " is descending");
             }
 
             int dimI = i2 - i1 + 1;
@@ -674,9 +506,12 @@ namespace Gekko
             }
             catch (System.IndexOutOfRangeException e)  // CS0168
             {
-                G.Writeln("*** ERROR: Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
-                if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
-                throw new GekkoException();
+                using (var error = new Error())
+                {
+                    error.MainAdd("Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]. ");
+                    if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) error.MainAdd("Please note that indicies are 1-based");
+                }
+                return null;
             }
         }
 
