@@ -90,8 +90,7 @@ namespace Gekko.Parser.Frm
 
                     if (vals.ContainsKey(key))
                     {
-                        G.Writeln2("*** ERROR: Model parsing error: seems VAL '" + key + "' is defined several times.");
-                        throw new GekkoException();
+                        new Error("Model parsing error: seems VAL '" + key + "' is defined several times.");
                     }
                     else
                     {
@@ -133,13 +132,11 @@ namespace Gekko.Parser.Frm
             {
                 if (wh.after2Encountered)
                 {
-                    G.Writeln2("*** ERROR: Expected AFTER$ before AFTER2$ in model");
-                    throw new GekkoException();
+                    new Error("Expected AFTER$ before AFTER2$ in model");
                 }
                 if (wh.afterEncountered)
                 {
-                    G.Writeln2("*** ERROR: It seems there are more than one AFTER$ in model");
-                    throw new GekkoException();
+                    new Error("It seems there are more than one AFTER$ in model");
                 }
                 wh.afterEncountered = true;
             }
@@ -147,8 +144,7 @@ namespace Gekko.Parser.Frm
             {
                 if (wh.after2Encountered)
                 {
-                    G.Writeln2("*** ERROR: It seems there are more than one AFTER2$ in model");
-                    throw new GekkoException();
+                    new Error("It seems there are more than one AFTER2$ in model");
                 }
                 wh.after2Encountered = true;
             }
@@ -268,14 +264,11 @@ namespace Gekko.Parser.Frm
 
                 }
                 
-                errorMessage = G.ReplaceGlueSymbols(errorMessage);                
+                errorMessage = G.ReplaceGlueSymbols(errorMessage);
 
                 if (lineNo > inputFileLines.Count)
                 {
-                    {
-                        G.Writeln2("*** ERROR: " + errorMessage);
-                    }
-
+                    new Error(errorMessage, false);
                     continue;  //doesn't give meaning
                 }
                 string line = "";

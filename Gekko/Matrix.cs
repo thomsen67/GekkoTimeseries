@@ -527,13 +527,11 @@ namespace Gekko
             if (indexRange2.last != null) j2 = O.ConvertToInt(indexRange2.last);
             if (i1 > i2)
             {
-                G.Writeln2("*** ERROR: Range " + i1 + ".." + i2 + " is descending");
-                throw new GekkoException();
+                new Error("Range " + i1 + ".." + i2 + " is descending");
             }
             if (j1 > j2)
             {
-                G.Writeln2("*** ERROR: Range " + j1 + ".." + j2 + " is descending");
-                throw new GekkoException();
+                new Error("Range " + j1 + ".." + j2 + " is descending");
             }
 
             if (x3.Type() == EVariableType.Matrix)
@@ -543,8 +541,7 @@ namespace Gekko
                 int dimJ = j2 - j1 + 1;
                 if (dimI != m.data.GetLength(0) || dimJ != m.data.GetLength(1))
                 {
-                    G.Writeln2("*** ERROR: Left-hand side selection is " + dimI + " x " + dimJ + ", but right-hand matrix is " + m.data.GetLength(0) + " x " + m.data.GetLength(1));
-                    throw new GekkoException();
+                    new Error("Left-hand side selection is " + dimI + " x " + dimJ + ", but right-hand matrix is " + m.data.GetLength(0) + " x " + m.data.GetLength(1));
                 }
 
                 try
@@ -562,9 +559,12 @@ namespace Gekko
                 }
                 catch (System.IndexOutOfRangeException e)  // CS0168
                 {
-                    G.Writeln("*** ERROR: Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
-                    if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
-                    throw new GekkoException();
+                    using (var error = new Error())
+                    {
+                        error.MainAdd("Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]. ");
+                        if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) error.MainAdd("Please note that indicies are 1-based");
+                    }
+                    return null;
                 }
             }
             else if (x3.Type() == EVariableType.Val)
@@ -585,15 +585,17 @@ namespace Gekko
                 }
                 catch (System.IndexOutOfRangeException e)  // CS0168
                 {
-                    G.Writeln("*** ERROR: Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]");
-                    if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) G.Writeln("           Please note that indicies are 1-based");
-                    throw new GekkoException();
+                    using (var error = new Error())
+                    {
+                        error.MainAdd("Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]. ");
+                        if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) error.MainAdd("Please note that indicies are 1-based");
+                    }
+                    return null;
                 }
             }
             else
             {
-                G.Writeln2("*** ERROR: Expected right-hand side to be a matrix or a scalar");
-                throw new GekkoException();
+                new Error("Expected right-hand side to be a matrix or a scalar"); return null;
             }
         }
 
@@ -605,11 +607,11 @@ namespace Gekko
             int maxDim2 = this.data.GetLength(1);
             if (dim1 > maxDim1 || dim2 > maxDim2)
             {
-                G.Writeln2("*** ERROR: Indexer [" + dim1 + ", " + dim2 + "] on a matrix with dimensions " + maxDim1 + " x " + maxDim2);
+                new Error("Indexer [" + dim1 + ", " + dim2 + "] on a matrix with dimensions " + maxDim1 + " x " + maxDim2);
             }
             if (dim1 < 1 || dim2 < 1)
             {
-                G.Writeln2("*** ERROR: Indexer [" + dim1 + ", " + dim2 + "]: indexers must be >= 1");
+                new Error("Indexer [" + dim1 + ", " + dim2 + "]: indexers must be >= 1");
             }
         }
 

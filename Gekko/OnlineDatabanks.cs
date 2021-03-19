@@ -112,9 +112,7 @@ namespace Gekko
             catch (Exception e)
             {
                 //May get something like this: System.Net.WebException: Der kunne ikke oprettes forbindelse til fjernserveren ---> System.Net.Sockets.SocketException: Det blev forsøgt at få adgang til en socket på en måde, der er forbudt af den pågældende sockets adgangstilladelser 91.208.143.3:80
-                G.Writeln2("*** ERROR: Connection failed with the following error:");
-                G.Writeln("           " + e.Message);
-                throw;
+                new Error("Connection failed with the following error: " + e.Message);
             }
             using (streamWriter)
             {
@@ -137,12 +135,14 @@ namespace Gekko
                     bool is405 = false; if (e.Message.Contains("405")) is405 = true;
                     bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
                     //timeout errors and the like
-                    G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
-                    G.Writeln("           " + e.Message);
-                    if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
-                    if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'");
-                    if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
-                    throw;
+                    using (var error = new Error())
+                    {
+                        error.MainAdd("Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error: ");
+                        error.MainAdd(e.Message + ".");
+                        if (e.InnerException != null && e.InnerException.Message != null) error.MainAdd(e.InnerException.Message + ".");
+                        if (is405) error.MainAdd("This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'.");
+                        if (isTransport) error.MainAdd("The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
+                    }
                 }
 
                 Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");
@@ -236,9 +236,7 @@ namespace Gekko
             catch (Exception e)
             {
                 //May get something like this: System.Net.WebException: Der kunne ikke oprettes forbindelse til fjernserveren ---> System.Net.Sockets.SocketException: Det blev forsøgt at få adgang til en socket på en måde, der er forbudt af den pågældende sockets adgangstilladelser 91.208.143.3:80
-                G.Writeln2("*** ERROR: Connection failed with the following error:");
-                G.Writeln("           " + e.Message);
-                throw;
+                new Error("Connection failed with the following error: " + e.Message);
             }
 
             using (streamWriter)
@@ -263,12 +261,14 @@ namespace Gekko
                     bool is405 = false; if (e.Message.Contains("405")) is405 = true;
                     bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
                     //timeout errors and the like
-                    G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
-                    G.Writeln("           " + e.Message);
-                    if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
-                    if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'https://api.jobindsats.dk/v1/data/...' instead of 'https://api.jobindsats.dk/v1/data/...'");
-                    if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
-                    throw;
+                    using (var error = new Error())
+                    {
+                        error.MainAdd("Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error: ");
+                        error.MainAdd(e.Message + ".");
+                        if (e.InnerException != null && e.InnerException.Message != null) error.MainAdd(e.InnerException.Message + ".");
+                        if (is405) error.MainAdd("This error type may indicate an erroneous path, for instance 'https://api.jobindsats.dk/v1/data/...' instead of 'https://api.jobindsats.dk/v1/data/...'.");
+                        if (isTransport) error.MainAdd("The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
+                    }
                 }
 
                 Encoding encoding = System.Text.Encoding.GetEncoding("Windows-1252");

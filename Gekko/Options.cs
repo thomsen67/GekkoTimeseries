@@ -261,15 +261,13 @@ namespace Gekko
                 //input array elements will be trimmed (and first element is set lowercase)
                 if (!types.Contains(ss[1]))
                 {
-                    G.Writeln("*** ERROR: Option type error");
-                    throw new GekkoException();
+                    new Error("Option type error");
                 }
                 List<string> ss5 = new List<string>();
                 string w = ss[0].Trim().ToLower();
                 if (w.Contains("  "))
                 {
-                    G.Writeln("*** ERROR: Option type error, too many blanks");
-                    throw new GekkoException();
+                    new Error("Option type error, too many blanks");
                 }
                 //if (w.Contains("("))
                 //{
@@ -519,8 +517,7 @@ namespace Gekko
                 
                 if (s_handmadeList != s_listFromReflection)
                 {
-                    G.Writeln2("*** ERROR: Mismatch regarding options, cf. Options.Syntax()");
-                    throw new GekkoException();
+                    new Error("Mismatch regarding options, cf. Options.Syntax()");
                 }
                 i1++;
                 i2++;

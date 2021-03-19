@@ -269,8 +269,7 @@ namespace Gekko.Parser.Frm
 
                     if (cr.Errors.HasErrors)
                     {
-                        G.Writeln2("*** ERROR: model not compiled due to errors while compiling for Gauss-Seidel algorithm.");
-                        throw new GekkoException();
+                        new Error("Model not compiled due to errors while compiling for Gauss-Seidel algorithm.");
                     }
                     if (modelType == ECompiledModelType.Gauss)
                     {
@@ -695,8 +694,7 @@ namespace Gekko.Parser.Frm
                 {
                     //Sanity check: each eq must be either auto, Y, T or L
                     //Should not be possible
-                    G.Writeln2("*** ERROR: Model equation code error #843784272449");
-                    throw new GekkoException();
+                    new Error("Model equation code error #843784272449");
                 }
             }
 
@@ -1025,10 +1023,7 @@ namespace Gekko.Parser.Frm
 
                 if (lineNo > inputFileLines.Count)
                 {
-                    {
-                        G.Writeln("*** ERROR: " + errorMessage);
-                    }
-
+                    new Error(errorMessage, false);
                     continue;  //doesn't give meaning
                 }
                 string line = inputFileLines[lineNo - 1];

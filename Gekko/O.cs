@@ -351,9 +351,7 @@ namespace Gekko
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
             {
-
-                G.Writeln("*** ERROR: iterator problem");
-                throw new GekkoException();
+                new Error("Iterator problem"); return null;
             }
         }
 
@@ -979,8 +977,7 @@ namespace Gekko
             ScalarVal x = iv as ScalarVal;
             if (x == null)
             {
-                G.Writeln("*** ERROR: trying to use -x on a variable x that is not a value");
-                throw new GekkoException();
+                new Error("Trying to use -x on a variable x that is not a value");
             }
             return new ScalarVal(-x.val);
         }
