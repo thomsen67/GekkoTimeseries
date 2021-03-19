@@ -2028,39 +2028,12 @@ namespace Gekko
             {
                 Arrow.Run();
             }
-
-            if (Globals.runningOnTTComputer)
-            {
-                try
-                {
-                    SLETMIG();
-                    G.Writeln("--2");
-                }
-                catch
-                {
-                    new Error("This is error 2");
-                }
-            }
-
+            
             if (nocr) G.Write(text);
             else G.Writeln(text);
 
         }
-
-        private static void SLETMIG()
-        {
-            try
-            {
-                ScalarVal v = null;
-                double vv = v.ConvertToVal();
-            }
-            catch
-            {
-                G.Writeln("--1");
-                new Error("This is error 1");
-            }
-        }
-
+        
         /// <summary>
         /// EXIt command.
         /// </summary>

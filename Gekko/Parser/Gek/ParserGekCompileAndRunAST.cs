@@ -161,6 +161,8 @@ namespace Gekko.Parser.Gek
             GekkoException ge = null;
             if (e.InnerException != null) ge = e.InnerException as GekkoException;
             List<Wrap> wraps = GetWrapsFromGekkoException(ge);
+
+            //Could consolidate the nested errors here to make them look nice
             foreach (Wrap wrap in wraps)
             {
                 CrossThreadStuff.Wrap(wrap); //.Exe2() will fail because it is on another thread than GUI
@@ -251,8 +253,9 @@ namespace Gekko.Parser.Gek
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        private static List<Wrap> GetWrapsFromGekkoException(GekkoException e)
+        public static List<Wrap> GetWrapsFromGekkoException(GekkoException e)
         {
+            if (e == null) return new List<Wrap>();  //empty list
             return e.wraps;
         }
 

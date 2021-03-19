@@ -123,7 +123,7 @@ namespace Gekko
         /// If the type is Error, a GekkoException will be thrown after printing.
         /// Will call Exe2(), on the GUI thread.
         /// </summary>
-        public void Exe1()
+        public void Exe1(Exception e)
         {
             if (type == EWrapType.Error && this.throwExceptionForError)
             {
@@ -134,13 +134,44 @@ namespace Gekko
                 //not sure why.
                 //will never execute CrossThreadStuff.Wrap(this) below here, but it is called where the 
                 //exception is caught (HandleRunErrors.cs).
-                throw new GekkoException(this);
+                if (e == null)
+                {
+                    throw new GekkoException(this);
+                }
+                else
+                {
+                    GekkoException ge = e as GekkoException;
+                    if (ge == null)
+                    {
+                        //not a GekkoException, but a normal Exception.
+                        //this may sometimes occur when we are doing a try/catch, catching Exception, 
+                        //and using that Exception in Error(..., e). If the exception is not a GekkoException,
+                        //we end up here.
+                        //??? should we piggyback any C# error message here?
+                        throw new GekkoException(this);  
+                    }
+                    else
+                    {
+                        ge.wraps.Add(this);
+                        throw ge;  //rethrow it
+                    }                    
+                }
             }
             else if (type == EWrapType.Warning)
             {
                 Globals.numberOfWarnings++;
             }
             CrossThreadStuff.Wrap(this);  //calls .Exe2()
+        }
+
+        /// <summary>
+        /// Actually "runs" the object, printing stuff on screen.
+        /// If the type is Error, a GekkoException will be thrown after printing.
+        /// Will call Exe2(), on the GUI thread.
+        /// </summary>
+        public void Exe1()
+        {
+            Exe1(null);
         }
 
         /// <summary>
@@ -430,6 +461,16 @@ namespace Gekko
         {
             this.MainAdd(s);
             this.Exe1();
+        }
+
+        /// <summary>
+        /// Usage: new Error("Error in ...", e);
+        /// </summary>
+        /// <param name="s"></param>
+        public Error(string s, Exception e) : base(EWrapType.Error)
+        {
+            this.MainAdd(s);
+            this.Exe1(e);
         }
 
         /// <summary>

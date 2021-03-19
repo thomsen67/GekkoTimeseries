@@ -18902,6 +18902,64 @@ print(df2)
         }
 
         [TestMethod]
+        public void _Test_Exceptions_Nested()
+        {
+            //
+            // This exemplifies how to do nested errors.
+            // The inner try/catch could be inside method calls, but shown explicitly here.
+            // Output:
+            //
+            // *** ERROR: This is error 1
+            // *** ERROR: This is error 2
+            // *** ERROR: This is error 3
+            //
+
+            Globals.unitTestScreenOutput.Clear();
+            try
+            {
+                try
+                {
+                    try
+                    {
+                        try
+                        {
+                            ScalarVal v = null;
+                            double vv = v.ConvertToVal();
+                        }
+                        catch (Exception e1)
+                        {
+                            //e1 is a normal C# Exception
+                            //if it was a C# parsing error, this error could be added to the string below (using e1.Message)
+                            new Error("This is error 1", e1); 
+                        }
+                    }
+                    catch (Exception e2)
+                    {
+                        //e2 is a GekkoException
+                        new Error("This is error 2", e2);
+                    }
+                }
+                catch (Exception e3)
+                {
+                    //e3 is a GekkoException
+                    new Error("This is error 3", e3);
+                }
+            }
+            catch (GekkoException ge)
+            {
+                List<Wrap> wraps = ge.wraps;
+                Assert.AreEqual(wraps.Count, 3);
+                wraps[0].Exe2();
+                wraps[1].Exe2();
+                wraps[2].Exe2();
+            }
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("This is error 1"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("This is error 2"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("This is error 3"));
+        }
+
+
+        [TestMethod]
         public void _Test_Exceptions_Periods()
         {
             //See Basic syntax rules in the Help system

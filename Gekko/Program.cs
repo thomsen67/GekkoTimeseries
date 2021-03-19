@@ -5636,8 +5636,6 @@ namespace Gekko
             catch (Exception e)
             {
                 new Error("format() function failed. The internal error message is this: " + e.Message);
-
-                //throw new GekkoException();
             }
             return x;
         }
@@ -5660,8 +5658,6 @@ namespace Gekko
             catch (Exception e)
             {
                 new Error("format() function failed. The internal error message is this:" +  e.Message);
-
-                //throw new GekkoException();
             }
             return x;
         }
