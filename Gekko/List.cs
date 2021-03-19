@@ -139,7 +139,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Type mismatch regarding []-index");
+                    new Error("Type mismatch regarding []-index"); return null;
                 }
             }
             else if (indexes.Length == 2)
@@ -184,19 +184,18 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("Expected value or range for second dimension of indexer");
+                        new Error("Expected value or range for second dimension of indexer"); return null;
                     }
                     return m;
                 }
                 else
                 {
-                    new Error("Invalid use of [..., ...] indexer on list");
+                    new Error("Invalid use of [..., ...] indexer on list"); return null;
                 }
             }
             else
             {
-                new Error("Cannot use " + indexes.Length + "-dimensional indexer on LIST");
-                throw new GekkoException();
+                new Error("Cannot use " + indexes.Length + "-dimensional indexer on LIST"); return null;
             }
         }
 
@@ -208,13 +207,11 @@ namespace Gekko
                 List m2 = this.list[i - 1] as List;
                 if (m2 == null)
                 {
-                    G.Writeln2("*** ERROR: element " + i + " of list is not a (sub)list");
-                    throw new GekkoException();
+                    new Error("Element " + i + " of list is not a (sub)list");
                 }
                 if (j < 1 || j > m2.list.Count)
                 {
-                    G.Writeln2("*** ERROR: Sublist " + i + " of list has illegal index (" + j + ")");
-                    throw new GekkoException();
+                    new Error("Sublist " + i + " of list has illegal index (" + j + ")");
                 }
                 m.list.Add(m2.list[j - 1]);
             }
@@ -226,48 +223,40 @@ namespace Gekko
         {
             if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
             {
-                if (twod) G.Writeln2("*** ERROR: Invalid range in first dimension, [" + ival1 + " .. " + ival2 + ", ...]");
-                else G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
-                throw new GekkoException();
+                if (twod) new Error("Invalid range in first dimension, [" + ival1 + " .. " + ival2 + ", ...]");
+                else new Error("Invalid range, [" + ival1 + " .. " + ival2 + "]");
             }
         }
 
         public IVariable Negate(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: You cannot use minus with lists");                
-            throw new GekkoException();
+            new Error("You cannot use minus with lists"); return null;                
         }
 
         
         public double GetValOLD(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a list.");
-            G.Writeln("           Maybe you need an []-indexer on the list, for instance #mylist[2]?");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a VAL from a list. Maybe you need an []-indexer on the list, for instance #mylist[2]?"); return double.NaN;
         }
 
         public double GetVal(GekkoTime t)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a list.");            
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a VAL from a list."); return double.NaN;
         }
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
-            throw new GekkoException();
+            new Error("Cannot extract a val from " + G.GetTypeString(this) + " type"); return double.NaN;
         }
 
         public string ConvertToString()
         {
-            G.Writeln2("*** ERROR: Trying to convert a LIST into a STRING.");            
-            throw new GekkoException();
+            new Error("Trying to convert a LIST into a STRING."); return null;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a DATE from a list.");            
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a DATE from a list."); return GekkoTime.tNull;
         }
 
         public List<IVariable> ConvertToList()
@@ -293,15 +282,12 @@ namespace Gekko
                 case EVariableType.Val:
                 case EVariableType.Date:
                     {
-                        G.Writeln2("*** ERROR: Adding a list and scalar with #x + %s is no longer legal");
-                        G.Writeln("           Please use #x.suffix(%s) instead.");
-                        throw new GekkoException();
+                        new Error("Adding a list and scalar with #x + %s is no longer legal. Please use #x.suffix(%s) instead.");                        
                     }
                     break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Add to list not allowed for this type: " + G.GetTypeString(x));
-                        throw new GekkoException();
+                        new Error("Add to list not allowed for this type: " + G.GetTypeString(x));
                     }
                     break;
             }
@@ -340,8 +326,7 @@ namespace Gekko
                     break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Concat to list not allowed for this type: " + G.GetTypeString(x));
-                        throw new GekkoException();
+                        new Error("Concat to list not allowed for this type: " + G.GetTypeString(x));
                     }
                     break;
             }
@@ -365,8 +350,7 @@ namespace Gekko
                     break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Subtract from list not allowed for this type: " + G.GetTypeString(x));
-                        throw new GekkoException();
+                        new Error("Subtract from list not allowed for this type: " + G.GetTypeString(x)); return null;
                     }
                     break;               
             }
@@ -388,8 +372,7 @@ namespace Gekko
                     break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Intersect with list not allowed for this type: " + G.GetTypeString(x));
-                        throw new GekkoException();
+                        new Error("Intersect with list not allowed for this type: " + G.GetTypeString(x)); return null;
                     }
                     break;
             }
@@ -397,14 +380,12 @@ namespace Gekko
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use divide with lists");                
-            throw new GekkoException();
+            new Error("You cannot use divide with lists"); return null;                
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: You cannot use power function with lists");                
-            throw new GekkoException();
+            new Error("You cannot use power function with lists"); return null;
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
@@ -414,15 +395,13 @@ namespace Gekko
                 int i = O.ConvertToInt(dims[0]);
                 if (i < 1 || i > this.list.Count)
                 {
-                    G.Writeln2("*** ERROR: List index [" + i + "] out of range 1.." + this.list.Count);
-                    throw new GekkoException();
+                    new Error("List index [" + i + "] out of range 1.." + this.list.Count);
                 }
                 this.list[i - 1] = rhsExpression.DeepClone(null);
             }
             else
             {
-                G.Writeln2("*** ERROR: Expected indexer type VAL on LIST object (left-hand side)");
-                throw new GekkoException();
+                new Error("Expected indexer type VAL on LIST object (left-hand side)");
             }
         }
 

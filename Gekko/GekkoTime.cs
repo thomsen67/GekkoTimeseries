@@ -554,7 +554,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Freq convertion problem");
+                    new Error("Freq convertion problem"); return DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.Q)
@@ -570,7 +570,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Freq convertion problem");
+                    new Error("Freq convertion problem"); return DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.M)
@@ -585,7 +585,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Freq convertion problem");
+                    new Error("Freq convertion problem"); return DateTime.MinValue;
                 }
             }
             else if (gt.freq == EFreq.D)
@@ -595,7 +595,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Freq convertion problem");
+                new Error("Freq convertion problem"); return DateTime.MinValue;
             }
         }
 
@@ -1143,7 +1143,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Problem with freq");
+                new Error("Problem with freq"); return null;
             }
         }
 

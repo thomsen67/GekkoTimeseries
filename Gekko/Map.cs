@@ -127,14 +127,12 @@ namespace Gekko
 
         public double GetValOLD(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a MAP.");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a VAL from a MAP."); return double.NaN;
         }
 
         public double GetVal(GekkoTime t)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a MAP.");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a VAL from a MAP."); return double.NaN;
         }
 
         public double ConvertToVal()
@@ -145,14 +143,12 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            G.Writeln2("*** ERROR: Trying to convert a MAP into a STRING.");
-            throw new GekkoException();
+            new Error("Trying to convert a MAP into a STRING."); return null;
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a DATE from a MAP.");
-            throw new GekkoException();
+            new Error("Type mismatch: you are trying to extract a DATE from a MAP."); return GekkoTime.tNull;
         }
 
         public List<IVariable> ConvertToList()

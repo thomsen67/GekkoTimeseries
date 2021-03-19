@@ -370,8 +370,7 @@ namespace Gekko
 
                     if (IsAllSpecialDatabank(dbName))
                     {
-                        G.Writeln("*** ERROR: all:x = ... is not supported, use first:x = ... instead to circumvent LOCAL/GLOBAL<all>.");
-                        throw new GekkoException();
+                        new Error("all:x = ... is not supported, use first:x = ... instead to circumvent LOCAL/GLOBAL<all>.");
                     }
                     else
                     {
@@ -592,11 +591,7 @@ namespace Gekko
                                             //throw new GekkoException();
                                         }
                                         else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
-                                        {
-                                            ////This should actually not be possible, since calling with noSearch=false and .Can or .Must is caught as an error earlier on in GetIVariableFromString()
-                                            ////This is a variable x without bankcolon, and with autosearch true. In that case, we refuse to create it.
-                                            //G.Writeln2("*** ERROR: Internal error #98253298");
-                                            //throw new GekkoException();
+                                        {                                            
                                             //it is probably ok to create it here like this                                            
                                             //never mind...
                                             rv = new Series(G.ConvertFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
