@@ -4189,6 +4189,17 @@ namespace Gekko
             else return false;
         }
 
+        public static bool IsMuting()
+        {
+            return G.Equal(Program.options.interface_mute, "yes");
+        }
+
+        public static bool IsPiping()
+        {
+            return Globals.pipe || Globals.pipe2;
+        }
+
+
         /// <summary>
         /// This is the "real" method actually doing the printing
         /// </summary>
@@ -4681,9 +4692,9 @@ namespace Gekko
         /// </summary>
         /// <param name="textBox"></param>
         /// <param name="s"></param>
-        public static void PrintLowLevelAppendText(RichTextBox textBox, string s, EWrapType type)
+        public static void PrintLowLevelAppendText(RichTextBox textBox, string s, EWrapType type, bool mustAlsoPrintOnScreen)
         {
-            G.PrintLowLevelAppendTextAbstract(textBox, s, null, type);  //no link
+            G.PrintLowLevelAppendTextAbstract(textBox, s, null, type, mustAlsoPrintOnScreen);  //no link
         }
 
         /// <summary>
@@ -4694,10 +4705,9 @@ namespace Gekko
         /// <param name="textBox">The GUI text box</param>
         /// <param name="s">String to show</param>
         /// <param name="link">Link url, else null if no link</param>
-        public static void PrintLowLevelAppendTextAbstract(RichTextBox textBox, string s, string link, EWrapType type)
-        {
-            bool mustAlsoPrintOnScreen = false;
-            if (type == EWrapType.Error || type == EWrapType.Warning) mustAlsoPrintOnScreen = true;  //so that errors and warnings get seen
+        public static void PrintLowLevelAppendTextAbstract(RichTextBox textBox, string s, string link, EWrapType type, bool mustAlsoPrintOnScreen)
+        {            
+            if (type == EWrapType.Error || type == EWrapType.Warning) mustAlsoPrintOnScreen = true;  //so that errors and warnings get seen. The argument can be true if set in Writeln(...)
 
             bool isMuting = false;
             if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;

@@ -26,7 +26,7 @@ namespace Gekko
             this.linesAtStart = linesAtStart;
         }
     }
-    
+
     /// <summary>
     /// A helper class for printing multiple lines. It basically just stores List&lt;string&gt; inside.
     /// Supports indents and other stuff. Will eventually replace all the G.Writeln() variants. Link
@@ -73,7 +73,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         public void MainAdd(string s)
-        {             
+        {
             this.storageMain[this.storageMain.Count - 1].storage.Add(s);
         }
 
@@ -89,7 +89,7 @@ namespace Gekko
         /// Add a section break to "main". No blank line in between.
         /// </summary>
         public void MainNewLineTight()
-        {            
+        {
             this.storageMain.Add(new WrapHelper5(0));
         }
 
@@ -98,7 +98,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         public void MoreAdd(string s)
-        {            
+        {
             this.storageMore[this.storageMore.Count - 1].storage.Add(s);
         }
 
@@ -114,9 +114,9 @@ namespace Gekko
         /// Add a section break to "more". No blank line in between.
         /// </summary>
         public void MoreNewLineTight()
-        {            
+        {
             this.storageMore.Add(new WrapHelper5(0));
-        }        
+        }
 
         /// <summary>
         /// Actually "runs" the object, printing stuff on screen.
@@ -148,13 +148,13 @@ namespace Gekko
                         //and using that Exception in Error(..., e). If the exception is not a GekkoException,
                         //we end up here.
                         //??? should we piggyback any C# error message here?
-                        throw new GekkoException(this);  
+                        throw new GekkoException(this);
                     }
                     else
                     {
                         ge.wraps.Add(this);
                         throw ge;  //rethrow it
-                    }                    
+                    }
                 }
             }
             else if (type == EWrapType.Warning)
@@ -184,12 +184,15 @@ namespace Gekko
             //When we get here, we are typically at a line that has just breaked.
 
             string marginFirst = "";
+            int lineWidth = Program.options.print_width;
+            bool mustAlsoPrintOnScreen = false;
+
             Color color = Color.Empty;
 
             if (this.type == EWrapType.Error)
             {
                 marginFirst = Globals.errorString;
-                color = Color.Red;                
+                color = Color.Red;
                 if (Globals.errorMemory == null) Globals.errorMemory = new StringBuilder();
             }
             else if (this.type == EWrapType.Warning)
@@ -203,13 +206,17 @@ namespace Gekko
             }
             else if (this.type == EWrapType.Writeln)
             {
-                marginFirst = "";  //just stating the obvious
+                Writeln w = this as Writeln;  //used later on            
+                color = w.color;
+                lineWidth = w.lineWidth;
+                mustAlsoPrintOnScreen = w.mustAlsoPrintToScreen;
+                marginFirst = w.indent;
             }
-            
+
             string margin = G.Blanks(marginFirst.Length);
 
             //-------------------------------
-            //The short message in main tab
+            //The message in main tab
             //-------------------------------
             this.ConsolidateLines("main");
             for (int ii = 0; ii < this.storageMain.Count; ii++)
@@ -218,9 +225,9 @@ namespace Gekko
                 if (ii > 0)
                 {
                     m = margin;
-                    color = Color.Empty;
+                    //color = Color.Empty;
                 }
-                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, color, ETabs.Main, this.type);
+                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, lineWidth, color, ETabs.Main, this.type, mustAlsoPrintOnScreen);
             }
 
             if (this.storageMore[0].storage.Count > 0)
@@ -236,7 +243,7 @@ namespace Gekko
                     this.ConsolidateLines("more");
                     for (int ii = 0; ii < this.storageMain.Count; ii++)
                     {
-                        WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, Color.Empty, ETabs.Output, this.type);
+                        WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, lineWidth, Color.Empty, ETabs.Output, this.type, mustAlsoPrintOnScreen);
                     }
                 };
 
@@ -244,13 +251,13 @@ namespace Gekko
                 //The link in the main tab to the explanation in the output tab
                 //---------------------------------------------------------------
 
-                WrapHelper(1, 1, margin, margin, "Detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", Color.Empty, ETabs.Main, this.type);
+                WrapHelper(1, 1, margin, margin, "Detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", lineWidth, Color.Empty, ETabs.Main, this.type, mustAlsoPrintOnScreen);
             }
 
             if (!G.IsUnitTesting()) Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper); //if not, the text is not scrolled if many lines.
-            
+
         }
-        
+
         /// <summary>
         /// Helper method to consolidate List&lt;string&gt; lines in a section into one string. Handles blanks etc. too so that it is pretty.
         /// </summary>
@@ -262,7 +269,7 @@ namespace Gekko
             if (type == "main") ss = this.storageMain;
             else if (type == "more") ss = this.storageMore;
             else throw new GekkoException();
-                        
+
             foreach (WrapHelper5 xx in ss)
             {
                 StringBuilder sb = new StringBuilder();
@@ -275,12 +282,12 @@ namespace Gekko
                         sb.Append(" ");
                     }
                     sb.Append(xx.storage[i].Trim());
-                }                
+                }
                 xx.consolidated = sb.ToString();
             }
         }
 
-        
+
         /// <summary>
         /// Helper for Wrap(). Note: linesAtStart == 0 similar to G.Writeln(), and lines == 1 similar to 
         /// G.Writeln2(). Note: linesAtEnd = 0 similar to G.Write(). So if calling with WrapHelper(1, 1, ...),
@@ -294,7 +301,7 @@ namespace Gekko
         /// <param name="isPiping">Pipe to file?</param>
         /// <param name="color">Text color (can be Color.Empty)</param>
         /// <param name="tab">Which tab to print it?</param>
-        private static void WrapHelper(int linesAtStart, int linesAtEnd, string marginFirst, string margin, string s, Color color, ETabs tab, EWrapType type)
+        private static void WrapHelper(int linesAtStart, int linesAtEnd, string marginFirst, string margin, string s, int lineWidth, Color color, ETabs tab, EWrapType type, bool mustAlsoPrintOnScreen)
         {
             if (s.Trim() == "") return;
 
@@ -309,16 +316,15 @@ namespace Gekko
                 links.Add(new TwoInts() { int1 = i1, int2 = i2 });
                 i1 = i2 + 1;
             }
-                    
+
             int col = 0;
-            int colMax = Program.options.print_width;
 
             int textLengthStart = -12345;  //used to set color at the very end    
             RichTextBoxEx textBox = null;
             if (!G.IsUnitTesting())
             {
                 if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
-                else textBox = Gui.gui.textBoxMainTabUpper;                
+                else textBox = Gui.gui.textBoxMainTabUpper;
                 textLengthStart = textBox.TextLength;
             }
 
@@ -328,7 +334,7 @@ namespace Gekko
                 nl += G.NL;
             }
 
-            G.PrintLowLevelAppendText(textBox, nl + marginFirst, type);
+            G.PrintLowLevelAppendText(textBox, nl + marginFirst, type, mustAlsoPrintOnScreen);
 
             col = margin.Length;
 
@@ -341,32 +347,32 @@ namespace Gekko
                 string normalText = G.Substring(s, lastC, links[i].int1 - 1);
                 if (true)
                 {
-                    col = WrapText(textBox, normalText, margin, col, colMax, color, type);
+                    col = WrapText(textBox, normalText, margin, col, lineWidth, color, type, mustAlsoPrintOnScreen);
                 }
                 string[] ss = G.Substring(s, links[i].int1 + Globals.linkActionStart.Length, links[i].int2 - 1).Split(Globals.linkActionDelimiter);  //delimiter must be there
                 string linkText = ss[0];
                 string linkLink = "action:" + ss[1];
-                if (col + linkText.Length > colMax)
+                if (col + linkText.Length > lineWidth)
                 {
                     //insert a line break no matter what the character before is. Link cannot be broken/wrapped                        
-                    G.PrintLowLevelAppendText(textBox, G.NL + margin, type);
+                    G.PrintLowLevelAppendText(textBox, G.NL + margin, type, mustAlsoPrintOnScreen);
                     col = margin.Length;
                 }
 
-                G.PrintLowLevelAppendTextAbstract(textBox, linkText, linkLink, type);
+                G.PrintLowLevelAppendTextAbstract(textBox, linkText, linkLink, type, mustAlsoPrintOnScreen);
                 col += linkText.Length;
 
                 if (i == links.Count - 1)
                 {
                     //get the last bit
                     string normalText2 = G.Substring(s, links[i].int2 + Globals.linkActionEnd.Length, s.Length - 1);
-                    col = WrapText(textBox, normalText2, margin, col, colMax, color, type);
+                    col = WrapText(textBox, normalText2, margin, col, lineWidth, color, type, mustAlsoPrintOnScreen);
                 }
             }
 
             if (links.Count == 0)
             {
-                WrapText(textBox, s, margin, col, colMax, color, type);
+                WrapText(textBox, s, margin, col, lineWidth, color, type, mustAlsoPrintOnScreen);
             }
 
             //Always insert a newline now, we are not doing the equivalent to Write().
@@ -376,20 +382,23 @@ namespace Gekko
             {
                 nl2 += G.NL;
             }
-            if (nl2 != "") G.PrintLowLevelAppendText(textBox, nl2, type);
+            if (nl2 != "") G.PrintLowLevelAppendText(textBox, nl2, type, mustAlsoPrintOnScreen);
 
-            if (!G.IsUnitTesting() && color != Color.Empty)
+            if (color == Color.Empty || G.IsUnitTesting() || G.IsPiping() || G.IsMuting())
+            {
+                //ingore color
+            }
+            else
             {
                 G.PrintLowLevelSetColor(textBox, textLengthStart, color);
             }
         }
-
-
-        private static int WrapText(RichTextBoxEx textBox, string text, string margin, int colCounter, int colMax, Color color, EWrapType type)
+        
+        private static int WrapText(RichTextBoxEx textBox, string text, string margin, int colCounter, int lineWidth, Color color, EWrapType type, bool mustAlsoPrintOnScreen)
         {
             while (true)
             {
-                if (colCounter + text.Length > colMax)
+                if (colCounter + text.Length > lineWidth)
                 {
                     //          |mmmmm..............................|
                     //          |mmmmm..................this is a really long line
@@ -409,7 +418,7 @@ namespace Gekko
                     {
                         if (text[ii] == ' ')
                         {
-                            if (colCounter + ii > colMax)
+                            if (colCounter + ii > lineWidth)
                             {
                                 if (bestWrapI != -12345) break;  //we found a wrap inside margin, else carry on
                             }
@@ -425,13 +434,13 @@ namespace Gekko
 
                     string s1 = G.Substring(text, 0, bestWrapI);
                     text = G.Substring(text, bestWrapI + 1, text.Length - 1);
-                    G.PrintLowLevelAppendText(textBox, s1 + G.NL + margin, type);
+                    G.PrintLowLevelAppendText(textBox, s1 + G.NL + margin, type, mustAlsoPrintOnScreen);
                     colCounter = margin.Length;
                 }
                 else
                 {
                     //easy, there is room for the text   
-                    G.PrintLowLevelAppendText(textBox, text, type);
+                    G.PrintLowLevelAppendText(textBox, text, type, mustAlsoPrintOnScreen);
                     colCounter += text.Length;
                     break;  //the end
                 }
@@ -479,7 +488,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         public Error(string s, bool throwExceptionForError) : base(EWrapType.Error)
-        { 
+        {
             this.MainAdd(s);
             if (throwExceptionForError == false) this.NoException();
             this.Exe1();
@@ -539,21 +548,60 @@ namespace Gekko
     /// </summary>
     public class Writeln : Wrap
     {
+        public string indent = "";
+        public Color color = Color.Empty;
+        public int lineWidth = Program.options.print_width;  //-12345 for null, int.MaxValue for no limits
+        public bool mustAlsoPrintToScreen = false;  //is always activated for Error() or Warning() types.
+        
         /// <summary>
-        /// Object of Wrap type
+        /// Usage only via "using": using(var w = new Writeln()) {... w.MainAdd(...) ...}
         /// </summary>
         public Writeln() : base(EWrapType.Writeln)
         {
         }
 
         /// <summary>
-        /// Do not assign to anything. Usage: new Note("Beware...");
+        /// Usage only via "using": using(var w = new Writeln(130, Color.Gray)) {... w.MainAdd(...) ...}
+        /// </summary>
+        /// <param name="indent">"  " for indent, "* " for bullet point, etc.</param>
+        /// <param name="lineWidth">Use -12345 to indicate null, or int.MaxValue for no limits</param>
+        /// <param name="color">use Color.Empty to indicate null</param>
+        /// <param name="mustAlsoWriteToScreen">true if it will print to screen even when piping</param>
+        public Writeln(string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen) : base(EWrapType.Writeln)
+        {
+            Helper(indent, lineWidth, color, mustAlsoWriteToScreen);
+        }
+
+        /// <summary>
+        /// Usage via "new": new Writeln("Hello hello...");
         /// </summary>
         /// <param name="s"></param>
         public Writeln(string s) : base(EWrapType.Writeln)
         {
             this.MainAdd(s);
             this.Exe1();
+        }
+
+        /// <summary>
+        /// Usage via "new": new Writeln("Hello hello", 130, Color.Gray). Use -12345 for lineWidth to indicate null or int.MaxValue for no limits,
+        /// or Color.Empty for color to indicate null.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="lineWidth">Use -12345 to indicate null, , or int.MaxValue for no limits</param>
+        /// <param name="color">use Color.Empty to indicate null</param>
+        public Writeln(string s, string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen) : base(EWrapType.Writeln)
+        {
+            Helper(indent, lineWidth, color, mustAlsoWriteToScreen);
+            this.MainAdd(s);
+            this.Exe1();
+        }
+
+        private void Helper(string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen)
+        {
+            if (lineWidth != -12345) this.lineWidth = lineWidth;
+            if (color != Color.Empty) this.color = color;
+            if (indent != "") this.indent = indent;
+            this.mustAlsoPrintToScreen = mustAlsoWriteToScreen;
         }
     }
 }

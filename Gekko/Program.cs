@@ -18443,7 +18443,7 @@ namespace Gekko
             if (syntaxError || p.hasBeenCompilationError) limit = 0;
             if (max > limit)
             {
-                //G.Writeln();
+                
                 for (int i = 1; i <= max; i++)  //index 0 is not used
                 {
                     int lineNumber2;
@@ -18535,17 +18535,22 @@ namespace Gekko
                         new Error("Table file failed: " + tablefile, false);
                     }
 
-                    G.Writeln();
-                    foreach (StackHelper sh in stackLines)
+                    using (var w = new Writeln("    ", int.MaxValue, Color.Gray, true))
                     {
-                        if (sh.file.Contains("tablecode." + Globals.defaultCommandFileExtension))
+                        foreach (StackHelper sh in stackLines)
                         {
-                            string tablefile2 = GetOriginalTableFileName(sh.file);
-                            G.Writeln("    " + tablefile2 + " calling -->", Color.Gray, true);
+                            if (sh.file.Contains("tablecode." + Globals.defaultCommandFileExtension))
+                            {
+                                string tablefile2 = GetOriginalTableFileName(sh.file);                                
+                                w.MainAdd("    " + tablefile2 + " calling -->");
+                                w.MainNewLineTight();
+                            }
+                            w.MainAdd(sh.line);
+                            w.MainNewLineTight();
                         }
-                        G.Writeln(sh.line, Color.Gray, true);
                     }
-                    G.Writeln();
+
+                    G.Writeln();  //hack, we need an extra line
                 }
             }
             return stackLines;
