@@ -62,7 +62,7 @@ namespace Gekko.Parser.Gek
                 temp.Add(e.Message);
                 //string textInput = ph.commandsText + "\r\n";
                 string input2 = textInput + "\r\n";
-                PrintLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
+                HandleLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
                 throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
             }
 
@@ -70,7 +70,7 @@ namespace Gekko.Parser.Gek
 
             if (parser3.GetErrors().Count > 0)
             {
-                PrintParserErrors(parser3.GetErrors(), Stringlist.CreateListOfStringsFromFile(textInput), ph);
+                HandleParserErrors(parser3.GetErrors(), Stringlist.CreateListOfStringsFromFile(textInput), ph);
                 throw new GekkoException();
             }
             t = (CommonTree)r3.Tree;
@@ -511,7 +511,7 @@ namespace Gekko.Parser.Gek
         /// <param name="errors"></param>
         /// <param name="inputFileLines"></param>
         /// <param name="ph"></param>
-        public static void PrintLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        public static void HandleLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
             if (Globals.threadIsInProcessOfAborting) return;
             if (ph.fileName == null && ph.commandsText == null)
@@ -650,7 +650,7 @@ namespace Gekko.Parser.Gek
         /// <param name="errors"></param>
         /// <param name="inputFileLines"></param>
         /// <param name="ph"></param>
-        public static void PrintParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        public static void HandleParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
             List<string> lineTemp2 = new List<string>();
             List<string> lineTemp2Numbers = new List<string>();
