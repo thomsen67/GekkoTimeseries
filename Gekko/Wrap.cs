@@ -383,12 +383,8 @@ namespace Gekko
                 nl2 += G.NL;
             }
             if (nl2 != "") G.PrintLowLevelAppendText(textBox, nl2, type, mustAlsoPrintOnScreen);
-
-            if (color == Color.Empty || G.IsUnitTesting() || G.IsPiping() || G.IsMuting())
-            {
-                //ingore color
-            }
-            else
+            
+            if (color != Color.Empty && textBox != null && textLengthStart != -12345 && textBox.TextLength - textLengthStart > 0)
             {
                 G.PrintLowLevelSetColor(textBox, textLengthStart, color);
             }

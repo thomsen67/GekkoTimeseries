@@ -630,7 +630,7 @@ namespace Gekko.Parser.Gek
 
                     G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
                     G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-                    //G.Writeln();
+                    
                 }
 
                 if (paranthesesError != "") G.Writeln(paranthesesError);
