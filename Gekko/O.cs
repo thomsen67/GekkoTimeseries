@@ -3287,7 +3287,7 @@ namespace Gekko
             {
                 if (G.isNumericalError(lhs_series.GetDataSimple(t)))
                 {
-                    using (var e = new Error())
+                    using (Error e = new Error())
                     {
                         e.MainAdd("Missing value encountered in series " + lhs_series.GetNameAndFreqPretty(true) + ", period: " + t.ToString());                        
                         if (!t1.IsSamePeriod(t2))
@@ -6182,7 +6182,7 @@ namespace Gekko
             }
             else  //3 or larger, corresponding to argument 1 and so on. However, using UFCS, position = 3 is the variable before dot, and position = 4, 5, 6... are the first, second etc. arguments inside the parenthesis.
             {
-                using (var e = new Error())
+                using (Error e = new Error())
                 {
                     e.MainAdd("Argument #" + (position - 2) + " should be " + type + " type.");                    
                     e.MoreAdd("When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.");

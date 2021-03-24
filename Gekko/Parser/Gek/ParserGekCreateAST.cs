@@ -864,7 +864,7 @@ namespace Gekko.Parser.Gek
             {
                 if (alType[i] == "Number" && al[i].EndsWith("."))
                 {
-                    using (var n = new Note())
+                    using (Note n = new Note())
                     {
                         n.MainAdd("You cannot write a number like '" + al[i] + "' ending with period, please use");
                         n.MainAdd("'" + al[i] + "0'. Such numbers interfere really poorly with the range ");

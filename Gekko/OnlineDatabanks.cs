@@ -131,7 +131,7 @@ namespace Gekko
                     bool is405 = false; if (e.Message.Contains("405")) is405 = true;
                     bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
                     //timeout errors and the like
-                    using (var error = new Error())
+                    using (Error error = new Error())
                     {
                         error.MainAdd("Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error: ");
                         error.MainAdd(e.Message + ".");
@@ -257,7 +257,7 @@ namespace Gekko
                     bool is405 = false; if (e.Message.Contains("405")) is405 = true;
                     bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
                     //timeout errors and the like
-                    using (var error = new Error())
+                    using (Error error = new Error())
                     {
                         error.MainAdd("Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error: ");
                         error.MainAdd(e.Message + ".");

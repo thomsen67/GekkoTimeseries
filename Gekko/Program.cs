@@ -263,7 +263,7 @@ namespace Gekko
         {
             G.WritelnGray("*** ERROR: TooSmallTooLarge: " + t1Problem + " " + t2Problem);
 
-            using (var e = new Error())
+            using (Error e = new Error())
             {
                 e.MainAdd("Unfortunately, you ran into a lag problem in Gekko 3.0.");
                 e.MainAdd("This typically arises in expressions like x1[-1] + x2, where timeseries with lags are");
@@ -2009,7 +2009,7 @@ namespace Gekko
                                         }
                                         catch
                                         {
-                                            using (var e = new Error())
+                                            using (Error e = new Error())
                                             {
                                                 e.MainAdd("Cell " + GetExcelCell(row, col, transpose) + ". Could not parse '" + s3 + "' as a number");
                                                 e.MainNewLine();
@@ -14245,9 +14245,9 @@ namespace Gekko
 
             if (!File.Exists(fileName))
             {
-                if (true && Globals.runningOnTTComputer)
+                if (false && Globals.runningOnTTComputer)
                 {
-                    using (var e = new Error())
+                    using (Error e = new Error())
                     {
                         for (int i = 0; i < 3; i++)  //test scrolling behavior
                         {
@@ -19327,7 +19327,7 @@ namespace Gekko
             Globals.linkAction.TryGetValue(n, out ga);
             if (ga == null || ga.action == null)
             {
-                using (var w = new Warning())
+                using (Warning w = new Warning())
                 {
                     w.MainAdd("Link of type '" + ga.type.ToString() + "' has expired. ");
                     if (ga.type == EGekkoActionTypes.Ols)
@@ -20835,7 +20835,7 @@ namespace Gekko
                 {
                     if (operatorType == EOperatorTypes.LongVersionHasAppend || operatorType == EOperatorTypes.LongVersionHasYes || operatorType == EOperatorTypes.LongVersionOnlyNo)
                     {                        
-                        using (var e = new Error()) {
+                        using (Error e = new Error()) {
                             e.MainAdd("You cannot mix display codes of short and long type, for example");
                             e.MainAdd("PRT <p abs> or PRT<d pch=no> etc. Please consult the help file regarding");
                             e.MainAdd("the PRT and MULPRT commands. Short types are n, d, p, m, q, mp and");
@@ -21322,7 +21322,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    using (var e = new Error())
+                                    using (Error e = new Error())
                                     {
                                         e.MainAdd("Could not find variable '" + variableName + "' (freq = " + Program.options.freq + ") in '" + bank + "' databank" + ss);
                                         if (noBank)
@@ -23540,7 +23540,7 @@ namespace Gekko
         /// </summary>
         private static void WriteExcelError()
         {
-            using (var n = new Note())
+            using (Note n = new Note())
             {
                 n.MainAdd("You may set 'OPTION sheet engine = excel;' to use the Excel engine from Gekko 2.2.");
                 n.MainAdd("Gekko 3.0 and on uses 'engine = internal' instead of 'engine = excel'. The new engine is");
@@ -24230,7 +24230,7 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        using (var err = new Error())
+                        using (Error err = new Error())
                         {
                             err.MainAdd("Opening the produced .xlsx file with an external program associated with .xlsx");
                             err.MainAdd("files (such as for example Microsoft Excel) failed.");
@@ -24845,7 +24845,7 @@ namespace Gekko
         /// </summary>
         private static void ErrorMessageExcelInterop()
         {
-            using (var n = new Note())
+            using (Note n = new Note())
             {
                 n.MainAdd("The Excel engine for import/export of Excel sheets is slow and unstable.");
                 n.MainAdd("Consider setting OPTION sheet engine = internal, using a better in-built engine for this.");

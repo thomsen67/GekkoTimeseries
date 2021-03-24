@@ -506,7 +506,7 @@ namespace Gekko
             }
             catch (System.IndexOutOfRangeException e)  // CS0168
             {
-                using (var error = new Error())
+                using (Error error = new Error())
                 {
                     error.MainAdd("Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]. ");
                     if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) error.MainAdd("Please note that indicies are 1-based");
@@ -559,7 +559,7 @@ namespace Gekko
                 }
                 catch (System.IndexOutOfRangeException e)  // CS0168
                 {
-                    using (var error = new Error())
+                    using (Error error = new Error())
                     {
                         error.MainAdd("Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]. ");
                         if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) error.MainAdd("Please note that indicies are 1-based");
@@ -585,7 +585,7 @@ namespace Gekko
                 }
                 catch (System.IndexOutOfRangeException e)  // CS0168
                 {
-                    using (var error = new Error())
+                    using (Error error = new Error())
                     {
                         error.MainAdd("Left-side index out of range: [" + i1 + " .. " + i2 + ", " + j1 + " .. " + j2 + " ]. ");
                         if (i1 == 0 || i2 == 0 || j1 == 0 || j2 == 0) error.MainAdd("Please note that indicies are 1-based");

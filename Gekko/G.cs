@@ -4180,7 +4180,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// For developer use/debugging
+        /// For developer use/debugging. Will also be true if ExcelDna is active.
         /// </summary>
         public static bool IsUnitTesting()  
         {
@@ -4189,16 +4189,23 @@ namespace Gekko
             else return false;
         }
 
+        /// <summary>
+        /// Not used at the moment
+        /// </summary>
+        /// <returns></returns>
         public static bool IsMuting()
         {
             return G.Equal(Program.options.interface_mute, "yes");
         }
 
+        /// <summary>
+        /// Not used at the moment
+        /// </summary>
+        /// <returns></returns>
         public static bool IsPiping()
         {
             return Globals.pipe || Globals.pipe2;
         }
-
 
         /// <summary>
         /// This is the "real" method actually doing the printing

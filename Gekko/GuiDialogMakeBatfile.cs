@@ -166,7 +166,7 @@ namespace Gekko
             }
             catch (Exception err)
             {
-                using (var error = new Error())
+                using (Error error = new Error())
                 {                    
                     error.MainAdd("Problem when trying to write the " + programShortcut + ".bat file. The folder may be read-only. Maybe try to save");
                     error.MainAdd("the " + programShortcut + ".bat to some other folder (for instance your desktop) as as an intermediate step, and ");

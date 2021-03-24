@@ -2454,7 +2454,7 @@ namespace Gekko.Parser.Gek
                                         args.Add(node[i].Code.ToString());
                                     }
 
-                                    if (lagIndex >= 3)
+                                    if (lagIndex >= 3 && (lagIndex - 1 < node.ChildrenCount()))
                                     {
                                         if (lagIndexOffset == 0)
                                         {

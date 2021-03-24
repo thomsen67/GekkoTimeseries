@@ -1261,7 +1261,7 @@ namespace Gekko
             }
             else
             {
-                using (var e = new Error())
+                using (Error e = new Error())
                 {
                     e.MainAdd("At the moment, the only table printcodes working are <m> or <r>. Of course,");
                     e.MainAdd("table printcodes such as <p> will be provided, but it has to be determined");
@@ -1932,7 +1932,7 @@ namespace Gekko
                     counter++;
                     if (counter > xh.cols.Count)
                     {
-                        using (var e = new Error())
+                        using (Error e = new Error())
                         {
                             e.MainAdd("Problem in XML table: there were more elements put into a <row> than defined columns.");
                             e.MainAdd("Please note that since Gekko 1.5.7, the behavoior regarding attribute 'colspan' has ");

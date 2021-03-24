@@ -2041,7 +2041,7 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                using (var err = new Error())
+                using (Error err = new Error())
                 {
                     err.MainAdd("*** ERROR: Import of gdx file (GAMS) failed. GAMSWorkspace problem.");
                     err.MainNewLineTight();
@@ -2262,7 +2262,7 @@ namespace Gekko
 
         private static void GdxErrorMessage()
         {
-            using (var n = new Note())
+            using (Note n = new Note())
             {
                 n.MainAdd("You may manually indicate the GAMS program folder with 'OPTION gams exe folder',");
                 n.MainAdd("for instance 'OPTION gams exe folder = c:\\GAMS\\win32\\24.8;'. In general, the");
@@ -2300,7 +2300,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    using (var err = new Error())
+                    using (Error err = new Error())
                     {
                         err.MainAdd("*** ERROR: Import of gdx file (GAMS) failed. Could not locate GAMS (GAMSWorkspace problem).");
                         err.MainNewLineTight();
