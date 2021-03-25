@@ -21683,6 +21683,9 @@ namespace Gekko
                 }
             }
 
+            Func<double, double> a = (d) => d;
+            if (isLogTransform) a = (d) => Math.Log(d);
+
             GekkoTime tMinusOne = gt.Add(-1);
             var1 = 0;
             varPch = 0;
@@ -21705,23 +21708,23 @@ namespace Gekko
                 for (int i = 0; i < sumOver; i++)
                 {
                     //for instance if gt is 2020m3, we will add 2020m3+2020m2+2020m1.
-                    x += tsWork.GetDataSimple(gt.Add(-i)); //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
+                    x += a(tsWork.GetDataSimple(gt.Add(-i))); //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
                     //for instance if gt is 2020m3, we will add 2019m12+2019m11+2010m10.
-                    xLag += tsWork.GetDataSimple(gt.Add(-sumOver - i));
+                    xLag += a(tsWork.GetDataSimple(gt.Add(-sumOver - i)));
                     //for instance if gt is 2020m3, we will add 2019m9+2019m8+2010m7.
-                    xLag2 += tsWork.GetDataSimple(gt.Add(-2 * sumOver - i));
+                    xLag2 += a(tsWork.GetDataSimple(gt.Add(-2 * sumOver - i)));
                 }
 
                 x = x / divide;
                 xLag = xLag / divide;
                 xLag2 = xLag2 / divide;
                 
-                if (isLogTransform)
-                {
-                    x = Math.Log(x);
-                    xLag = Math.Log(xLag);
-                    xLag2 = Math.Log(xLag2);
-                }
+                //if (isLogTransform)
+                //{
+                //    x = Math.Log(x);
+                //    xLag = Math.Log(xLag);
+                //    xLag2 = Math.Log(xLag2);
+                //}
             }
             if (tsRef != null)
             {                
@@ -21730,21 +21733,21 @@ namespace Gekko
                 yLag2 = 0d;
                 for (int i = 0; i < sumOver; i++)
                 {
-                    y += tsRef.GetDataSimple(gt.Add(-i));
-                    yLag += tsRef.GetDataSimple(gt.Add(-sumOver - i));
-                    yLag2 += tsRef.GetDataSimple(gt.Add(-2 * sumOver - i));
+                    y += a(tsRef.GetDataSimple(gt.Add(-i)));
+                    yLag += a(tsRef.GetDataSimple(gt.Add(-sumOver - i)));
+                    yLag2 += a(tsRef.GetDataSimple(gt.Add(-2 * sumOver - i)));
                 }
 
                 y = y / divide;
                 yLag = yLag / divide;
                 yLag2 = yLag2 / divide;
 
-                if (isLogTransform)
-                {
-                    y = Math.Log(y);
-                    yLag = Math.Log(yLag);
-                    yLag2 = Math.Log(yLag2);
-                }
+                //if (isLogTransform)
+                //{
+                //    y = Math.Log(y);
+                //    yLag = Math.Log(yLag);
+                //    yLag2 = Math.Log(yLag2);
+                //}
             }
 
             if (operator3 == "" || operator3 == "n")

@@ -1639,11 +1639,18 @@ namespace Gekko
         }
 
         public static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
-        {
+        {           
+
             if (logTransform)
             {
                 scalarWork = Math.Log(scalarWork);
                 scalarRef = Math.Log(scalarRef);
+            }
+
+            if (collapse == EPrtCollapseTypes.Total && sumOver != 1)
+            {
+                scalarWork = sumOver * scalarWork;
+                scalarRef = sumOver * scalarRef;
             }
 
             if (G.Equal(operator2, "n")) return scalarWork;
@@ -1655,7 +1662,6 @@ namespace Gekko
             else
             {
                 new Error("Transformation error"); return double.NaN;
-                //throw new GekkoException();
             }
         }
 
