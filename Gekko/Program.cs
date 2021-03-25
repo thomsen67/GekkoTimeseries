@@ -21740,7 +21740,7 @@ namespace Gekko
 
                 y = y / divide;
                 yLag = yLag / divide;
-                yLag2 = yLag2 / divide;
+                yLag2 = yLag2 / divide; 
 
                 //if (isLogTransform)
                 //{
