@@ -848,6 +848,8 @@ namespace Gekko
                                     }
                                     else
                                     {
+                                        EFreq freq = tsWork.freq;
+                                        int year2 = year;
                                         PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                     }
                                 }
@@ -1509,7 +1511,10 @@ namespace Gekko
             }
             else
             {
-                if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn)) d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, isLogTransform, sumOver, skipCounter);
+                if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn))
+                {
+                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, isLogTransform, sumOver, skipCounter);
+                }                    
             }
             if (d != null)
             {

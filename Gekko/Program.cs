@@ -21510,8 +21510,19 @@ namespace Gekko
         }
                
         
-
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsBase, bool isLogTransform, bool isCalledFromTable, int sumOver)
+        /// <summary>
+        /// Computes operator-corrected values for a single GekkoTime (gt)
+        /// </summary>
+        /// <param name="var1"></param>
+        /// <param name="varPch"></param>
+        /// <param name="operator2"></param>
+        /// <param name="gt"></param>
+        /// <param name="tsWork"></param>
+        /// <param name="tsRef"></param>
+        /// <param name="isLogTransform"></param>
+        /// <param name="isCalledFromTable"></param>
+        /// <param name="sumOver"></param>
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isCalledFromTable, int sumOver)
         {
             string operator3 = operator2.Trim();  //when it comes from for instance a table
 
@@ -21696,11 +21707,11 @@ namespace Gekko
                     xLag2 = Math.Log(xLag2);
                 }
             }
-            if (tsBase != null)
+            if (tsRef != null)
             {
-                y = tsBase.GetDataSimple(gt);
-                yLag = tsBase.GetDataSimple(gt.Add(-1));
-                yLag2 = tsBase.GetDataSimple(gt.Add(-2));
+                y = tsRef.GetDataSimple(gt);
+                yLag = tsRef.GetDataSimple(gt.Add(-1));
+                yLag2 = tsRef.GetDataSimple(gt.Add(-2));
                 if (isLogTransform)
                 {
                     y = Math.Log(y);
