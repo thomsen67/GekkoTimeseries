@@ -1338,7 +1338,7 @@ namespace Gekko
 
                 if (true)
                 {
-                    Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsBase, false, true, 1);
+                    Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsBase, false, true, EPrtCollapseTypes.None, 1);
                 }                             
 
                 this.SetNumber(row, col + counter, scale * var1, format);

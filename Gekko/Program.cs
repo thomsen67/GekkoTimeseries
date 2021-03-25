@@ -19796,17 +19796,15 @@ namespace Gekko
 
                 int i = 0;
                 foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, freqHere)))  //handles if the freq given is different from the series freq
-                {
-
-                    int sumOver = 0;  //what does this boolean do??
+                {   
                     double d = double.NaN;
                     if (isScalar)  //not series
                     {                        
-                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                        d = Print.PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     else
                     {
-                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                        d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
                     }
                     i++;
                     double tt = ((ScalarVal)Functions.helper_time(t)).val;
@@ -21522,7 +21520,7 @@ namespace Gekko
         /// <param name="isLogTransform"></param>
         /// <param name="isCalledFromTable"></param>
         /// <param name="sumOver"></param>
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isCalledFromTable, int sumOver)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
             string operator3 = operator2.Trim();  //when it comes from for instance a table
 
@@ -21689,6 +21687,9 @@ namespace Gekko
             var1 = 0;
             varPch = 0;
 
+            double divide = 1d;
+            if (collapse == EPrtCollapseTypes.Avg) divide = (double)sumOver;
+
             double x = double.NaN;
             double xLag = double.NaN;
             double xLag2 = double.NaN;
@@ -21697,9 +21698,24 @@ namespace Gekko
             double yLag2 = double.NaN;
             if (tsWork != null)
             {
-                x = tsWork.GetDataSimple(gt);  //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
-                xLag = tsWork.GetDataSimple(gt.Add(-1));
-                xLag2 = tsWork.GetDataSimple(gt.Add(-2));
+                x = 0d;
+                xLag = 0d;
+                xLag2 = 0d;
+
+                for (int i = 0; i < sumOver; i++)
+                {
+                    //for instance if gt is 2020m3, we will add 2020m3+2020m2+2020m1.
+                    x += tsWork.GetDataSimple(gt.Add(-i)); //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
+                    //for instance if gt is 2020m3, we will add 2019m12+2019m11+2010m10.
+                    xLag += tsWork.GetDataSimple(gt.Add(-sumOver - i));
+                    //for instance if gt is 2020m3, we will add 2019m9+2019m8+2010m7.
+                    xLag2 += tsWork.GetDataSimple(gt.Add(-2 * sumOver - i));
+                }
+
+                x = x / divide;
+                xLag = xLag / divide;
+                xLag2 = xLag2 / divide;
+                
                 if (isLogTransform)
                 {
                     x = Math.Log(x);
@@ -21708,10 +21724,21 @@ namespace Gekko
                 }
             }
             if (tsRef != null)
-            {
-                y = tsRef.GetDataSimple(gt);
-                yLag = tsRef.GetDataSimple(gt.Add(-1));
-                yLag2 = tsRef.GetDataSimple(gt.Add(-2));
+            {                
+                y = 0d;
+                yLag = 0d;
+                yLag2 = 0d;
+                for (int i = 0; i < sumOver; i++)
+                {
+                    y += tsRef.GetDataSimple(gt.Add(-i));
+                    yLag += tsRef.GetDataSimple(gt.Add(-sumOver - i));
+                    yLag2 += tsRef.GetDataSimple(gt.Add(-2 * sumOver - i));
+                }
+
+                y = y / divide;
+                yLag = yLag / divide;
+                yLag2 = yLag2 / divide;
+
                 if (isLogTransform)
                 {
                     y = Math.Log(y);

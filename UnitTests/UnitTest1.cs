@@ -4039,12 +4039,12 @@ namespace UnitTests
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(6, 8).number, 3006d);
-                    Assert.AreEqual(table.Get(6, 9).number, double.NaN, deltaHere);
+                    Assert.AreEqual(table.Get(6, 9).number, double.NaN);
                 }
                 else
                 {
                     Assert.AreEqual(table.Get(6, 8).number, 3006d / 3d);
-                    Assert.AreEqual(table.Get(6, 9).number, double.NaN, deltaHere);
+                    Assert.AreEqual(table.Get(6, 9).number, double.NaN);
                 }
 
                 Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "q1");
@@ -4087,12 +4087,12 @@ namespace UnitTests
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(24, 6).number, 1001d + 1002d + 1003d + 1004d);
-                    Assert.AreEqual(table.Get(24, 7).number, double.NaN, deltaHere);
+                    Assert.AreEqual(table.Get(24, 7).number, double.NaN);
                 }
                 else
                 {
                     Assert.AreEqual(table.Get(24, 6).number, (1001d + 1002d + 1003d + 1004d) / 4d);
-                    Assert.AreEqual(table.Get(24, 7).number, double.NaN, deltaHere);
+                    Assert.AreEqual(table.Get(24, 7).number, double.NaN);
                 }
 
                 Assert.AreEqual(table.Get(25, 1).CellText.TextData[0], "a");
