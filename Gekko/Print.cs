@@ -1502,7 +1502,7 @@ namespace Gekko
             double? d = null;
             if (tsWork == null && tsRef == null)  //not series
             {
-                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, isLogTransform, EPrtCollapseTypes.None, sumOver, skipCounter);
+                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, isLogTransform, collapse, sumOver, skipCounter);
             }
             else
             {
