@@ -4035,7 +4035,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(5, 8).number, 1003d);
                 Assert.AreEqual(table.Get(5, 9).number, 0.0998, deltaHere);
 
-                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "mSUM");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "m1-m3");
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(6, 8).number, 3006d);
@@ -4063,7 +4063,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(10, 8).number, 1006d);
                 Assert.AreEqual(table.Get(10, 9).number, 0.0995, deltaHere);
 
-                Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "mSUM");
+                Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "m4-m6");
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(11, 8).number, 3015d);
@@ -4083,7 +4083,7 @@ namespace UnitTests
                 //skip until row 24
                 //------------------------------------------------------------
 
-                Assert.AreEqual(table.Get(24, 1).CellText.TextData[0], "qSUM");
+                Assert.AreEqual(table.Get(24, 1).CellText.TextData[0], "q1-q4");
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(24, 6).number, 1001d + 1002d + 1003d + 1004d);
@@ -4111,7 +4111,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(70, 8).number, 1036d);
                 Assert.AreEqual(table.Get(70, 9).number, 0.0966, deltaHere);
 
-                Assert.AreEqual(table.Get(71, 1).CellText.TextData[0], "mSUM");
+                Assert.AreEqual(table.Get(71, 1).CellText.TextData[0], "m10-m12");
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(71, 8).number, 1034d + 1035d + 1036d);
@@ -4123,7 +4123,7 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(71, 9).number, ((1034d + 1035d + 1036d) / (1031d + 1032d + 1033d) - 1d) * 100d, deltaHere);
                 }
 
-                Assert.AreEqual(table.Get(72, 1).CellText.TextData[0], "mSUM12");
+                Assert.AreEqual(table.Get(72, 1).CellText.TextData[0], "m1-m12");
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(72, 8).number, 1025d + 1026d + 1027d + 1028d + 1029d + 1030d + 1031d + 1032d + 1033d + 1034d + 1035d + 1036d);
@@ -4139,7 +4139,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(73, 6).number, 1012d);
                 Assert.AreEqual(table.Get(73, 7).number, 0.0989, deltaHere);
 
-                Assert.AreEqual(table.Get(74, 1).CellText.TextData[0], "qSUM");
+                Assert.AreEqual(table.Get(74, 1).CellText.TextData[0], "q1-q4");
                 if (s == "total")
                 {
                     Assert.AreEqual(table.Get(74, 6).number, 1009d + 1010d + 1011d + 1012d);
