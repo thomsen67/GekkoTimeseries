@@ -840,7 +840,7 @@ namespace Gekko
                                 {
                                     if (j == 1)
                                     {
-                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        table.Set(i, j, uglyYear + "m1-m3"); if (rows) table.SetAlign(i, j, Align.Right);
                                         //no date hack
                                     }
                                     else
@@ -989,7 +989,7 @@ namespace Gekko
                                 {
                                     if (j == 1)
                                     {
-                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        table.Set(i, j, uglyYear + "m4-m6"); if (rows) table.SetAlign(i, j, Align.Right);
                                         //no date hack
                                     }
                                     else
@@ -1154,7 +1154,7 @@ namespace Gekko
                                 {
                                     if (j == 1)
                                     {
-                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        table.Set(i, j, uglyYear + "m7-m9"); if (rows) table.SetAlign(i, j, Align.Right);
                                         //no date hack
                                     }
                                     else
@@ -1309,7 +1309,7 @@ namespace Gekko
                                 {
                                     if (j == 1)
                                     {
-                                        table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        table.Set(i, j, uglyYear + "m10-m12"); if (rows) table.SetAlign(i, j, Align.Right);
                                         //no date hack
                                     }
                                     else
@@ -1349,7 +1349,7 @@ namespace Gekko
                                 {
                                     if (j == 1)
                                     {
-                                        table.Set(i, j, uglyYear + "mSUM12"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        table.Set(i, j, uglyYear + "m1-m12"); if (rows) table.SetAlign(i, j, Align.Right);
                                         //no date hack
                                     }
                                     else
@@ -1413,7 +1413,7 @@ namespace Gekko
                                 {
                                     if (j == 1)
                                     {
-                                        table.Set(i, j, uglyYear + "qSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                        table.Set(i, j, uglyYear + "q1-q4"); if (rows) table.SetAlign(i, j, Align.Right);
                                         //no date hack
                                     }
                                     else
