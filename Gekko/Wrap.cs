@@ -63,7 +63,7 @@ namespace Gekko
         /// <summary>
         /// With this, the Error object will not throw any exception
         /// </summary>
-        public void NoException()
+        public void ThrowNoException()
         {
             this.throwExceptionForError = false;
         }
@@ -451,6 +451,8 @@ namespace Gekko
     /// </summary>
     public class Error : Wrap
     {
+        //public bool showImmediatelyAndDoNotThrowException = false;
+
         /// <summary>
         /// Object of Wrap type
         /// </summary>
@@ -480,15 +482,25 @@ namespace Gekko
 
         /// <summary>
         /// Usage: new Error("Error in ...");. If throwExceptionForError == false, an exception will not 
-        /// be thrown (which it normally will for the Error object).
+        /// be thrown (which it normally will for the Error object). Setting throwExceptionForError = false is
+        /// used a few places when failing, but should not normally be used.
         /// </summary>
         /// <param name="s"></param>
         public Error(string s, bool throwExceptionForError) : base(EWrapType.Error)
         {
             this.MainAdd(s);
-            if (throwExceptionForError == false) this.NoException();
+            if (throwExceptionForError == false) this.ThrowNoException();
             this.Exe1();
         }
+
+        ///// <summary>
+        ///// Do not use this normally: this is for a few special cases. Calling this method means that the error is shown immediately, as if it was just printed, and no further
+        ///// actions were taken (including throwing an execption). 
+        ///// </summary>
+        //public void ShowImmediatelyAndDoNotThrowException()
+        //{
+
+        //}
 
     }
 

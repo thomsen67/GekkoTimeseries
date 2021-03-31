@@ -1336,7 +1336,7 @@ namespace Gekko
                     string s2 = p.GetStackCommandFileText(p.GetDepth());
                     string s3 = "";
                     if (s2 != null) s3 = s2;
-                    Gekko.Parser.Frm.ParserFrmCreateAST.PrintModelParserErrors(Stringlist.CreateListOfStringsFromFile(e2.Message), Stringlist.CreateListOfStringsFromFile(s3), ph);
+                    Gekko.Parser.Frm.ParserFrmCreateAST.HandleModelParserErrors(Stringlist.CreateListOfStringsFromFile(e2.Message), Stringlist.CreateListOfStringsFromFile(s3), ph);
                 }
                 if (FindException(e2, "***") || FindException(e2, "+++"))
                 {                    
@@ -21325,7 +21325,7 @@ namespace Gekko
                                         {
                                             e.MainAdd("The databank '" + bank + "' does not seem to exist");
                                         }
-                                        e.NoException();
+                                        e.ThrowNoException();
                                     }
                                 }
                             }
@@ -24276,7 +24276,7 @@ namespace Gekko
                             err.MainAdd("Opening the produced .xlsx file with an external program associated with .xlsx");
                             err.MainAdd("files (such as for example Microsoft Excel) failed.");
                             err.MainAdd(e.Message);
-                            err.NoException();
+                            err.ThrowNoException();
                         }
                     }
                 }

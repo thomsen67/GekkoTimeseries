@@ -62,7 +62,7 @@ namespace Gekko.Parser.Gek
                 temp.Add(e.Message);
                 //string textInput = ph.commandsText + "\r\n";
                 string input2 = textInput + "\r\n";
-                HandleLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
+                HandleCommandLexerErrors(temp, Stringlist.CreateListOfStringsFromFile(input2), ph);
                 throw new GekkoException(); //this will make a double error -- but the other one will be identified later on (both text and filename are null) and skipped -- a little bit hacky, but oh well...
             }
 
@@ -70,7 +70,7 @@ namespace Gekko.Parser.Gek
 
             if (parser3.GetErrors().Count > 0)
             {
-                HandleParserErrors(parser3.GetErrors(), Stringlist.CreateListOfStringsFromFile(textInput), ph);
+                HandleCommandParserErrors(parser3.GetErrors(), Stringlist.CreateListOfStringsFromFile(textInput), ph);
                 throw new GekkoException();
             }
             t = (CommonTree)r3.Tree;
@@ -511,255 +511,80 @@ namespace Gekko.Parser.Gek
         /// <param name="errors"></param>
         /// <param name="inputFileLines"></param>
         /// <param name="ph"></param>
-        public static void HandleLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        public static void HandleCommandLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
-            if (Globals.threadIsInProcessOfAborting) return;
-            if (ph.fileName == null && ph.commandsText == null)
+            if (Globals.newErrors)
             {
-                //ignore, probably an error dublet
-                return;
+
             }
-            Program.StopPipeAndMute(2);
-            int number = 0;
-            foreach (string s in errors)
+            else
             {
-                number++;
-                if (errors.Count > 1)  //always just one
-                {
-                    if (number == 1) G.Writeln();
-                    G.Writeln("--------------------- error #" + number + " of " + errors.Count + "-----------------");
-                    //G.Writeln();
-                }
-                else G.Writeln();
 
-                string[] ss = s.Split(Globals.parserErrorSeparator);
-                int lineNumber = -12345;
-                try
+                if (Globals.threadIsInProcessOfAborting) return;
+                if (ph.fileName == null && ph.commandsText == null)
                 {
-                    lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                    //ignore, probably an error dublet
+                    return;
                 }
-                catch (Exception e)
+                Program.StopPipeAndMute(2);
+                int number = 0;
+                foreach (string s in errors)
                 {
-                    new Error("The parser stumbled unexpectedly with the message: " + s);
-                    //throw new GekkoException();
-                }
-                int lineNo = lineNumber + 1;  //1-based
-                int positionNo = -12345;
-                try
-                {
-                    positionNo = int.Parse(ss[1]) + 1;  //1-based
-                }
-                catch (Exception e)
-                {
-                    new Error("The parser stumbled unexpectedly with the message: " + s);
-                    //throw new GekkoException();
-                }
-
-                string errorMessage = ss[3];                
-
-                errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
-
-                if (lineNo > inputFileLines.Count)
-                {
+                    number++;
+                    if (errors.Count > 1)  //always just one
                     {
-                        new Error(errorMessage, false);
+                        if (number == 1) G.Writeln();
+                        G.Writeln("--------------------- error #" + number + " of " + errors.Count + "-----------------");
+                        //G.Writeln();
+                    }
+                    else G.Writeln();
+
+                    string[] ss = s.Split(Globals.parserErrorSeparator);
+                    int lineNumber = -12345;
+                    try
+                    {
+                        lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                    }
+                    catch (Exception e)
+                    {
+                        new Error("The parser stumbled unexpectedly with the message: " + s);
+                        //throw new GekkoException();
+                    }
+                    int lineNo = lineNumber + 1;  //1-based
+                    int positionNo = -12345;
+                    try
+                    {
+                        positionNo = int.Parse(ss[1]) + 1;  //1-based
+                    }
+                    catch (Exception e)
+                    {
+                        new Error("The parser stumbled unexpectedly with the message: " + s);
+                        //throw new GekkoException();
                     }
 
-                    continue;  //doesn't give meaning
-                }
-                string line = inputFileLines[lineNo - 1];
-                int firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
+                    string errorMessage = ss[3];
 
-                bool previousLineProbablyCulprit = false;
-                if (positionNo == firstWordPosInLine && errorMessage.Contains("no viable"))
-                {
-                    //get preceding line (or really: statement) -- most probably the culprit.
-                    previousLineProbablyCulprit = true;
-                }
+                    errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
 
-                string paranthesesError = "";
-
-                if (ph.isOneLinerFromGui == true && lineNo != 1)
-                {
-                    G.Writeln("*** ERROR: Parsing this line:");
-                    G.Writeln("    " + G.ReplaceGlueSymbols(inputFileLines[0]), Color.Blue);
-                    G.Writeln("*** ERROR: " + errorMessage);
-                }
-                else
-                {
-                    if (ph.isOneLinerFromGui == false)
+                    if (lineNo > inputFileLines.Count)
                     {
                         {
-                            string fn = ph.fileName;
-                            if (fn == null || fn == "")
-                            {
-                                G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
-                            }
-                            else
-                            {
-                                G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNo + " pos " + positionNo);
-                            }
-
-                            string e2 = errorMessage.Replace("Der blev udløst en undtagelse af typen ", "");
-                            G.Writeln("           " + e2);
+                            new Error(errorMessage, false);
                         }
+
+                        continue;  //doesn't give meaning
                     }
-                    else
-                    {
-                        G.Writeln("*** ERROR: Parsing pos " + positionNo + ":  " + errorMessage);
-                    }
-                    line = line + "  ";  //hack to avoid ending problems.....
-                    string lineTemp = line;
+                    string line = inputFileLines[lineNo - 1];
+                    int firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
 
-                    lineTemp = G.ReplaceGlueSymbols(lineTemp);
-
-                    string line0 = lineTemp.Substring(0, positionNo - 1);
-                    string line1 = lineTemp.Substring(positionNo - 1, 1);
-                    string line2 = lineTemp.Substring(positionNo - 1 + 1);
-
-                    if (previousLineProbablyCulprit && lineNo > 1)
-                    {
-                        G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
-                        string lineBefore = inputFileLines[lineNo - 1 - 1];
-                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
-                    }
-
-                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
-                    G.Write(line1, Color.Red);
-                    G.Writeln(line2, Color.Blue);
-
-                    G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-                    G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-                    
-                }
-
-                if (paranthesesError != "") G.Writeln(paranthesesError);
-
-                if (ph.isModel == false && previousLineProbablyCulprit == false)
-                {
-                    WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
-                    if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
-                }
-            }
-            if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
-        }
-
-        /// <summary>
-        /// This method prints syntax errors
-        /// </summary>
-        /// <param name="errors"></param>
-        /// <param name="inputFileLines"></param>
-        /// <param name="ph"></param>
-        public static void HandleParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
-        {
-            List<string> lineTemp2 = new List<string>();
-            List<string> lineTemp2Numbers = new List<string>();
-            if (Globals.threadIsInProcessOfAborting) return;
-            Program.StopPipeAndMute(2);
-            int number = 0;
-            foreach (string s in errors)
-            {
-                number++;
-                if (errors.Count > 1)
-                {
-                    if (number == 1) G.Writeln();
-                    G.Writeln("--------------------- error #" + number + " of " + errors.Count + "-----------------");
-                    //G.Writeln();
-                }
-                else G.Writeln();
-
-
-                string[] ss = s.Split(Globals.parserErrorSeparator);
-                int lineNumber = 0;
-                int lineNo = 0;
-                int positionNo = 0;
-                string errorMessage = "General error";
-
-                try
-                {
-                    lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1                
-                    lineNo = lineNumber + 1;  //1-based
-                    positionNo = int.Parse(ss[1]) + 1;  //1-based                               
-                    errorMessage = ss[3];
-                }
-                catch
-                {
-
-                }
-                
-                errorMessage = G.ReplaceGlueSymbols(errorMessage);                
-
-                if (true)
-                {
-                    errorMessage = errorMessage.Replace(" AT", " '@'");
-                    errorMessage = errorMessage.Replace(" HAT", " '^'");
-                    errorMessage = errorMessage.Replace(" SEMICOLON", " ';'");
-                    errorMessage = errorMessage.Replace(" COLON", " ':'");
-                    errorMessage = errorMessage.Replace(" COMMA2", " ','");
-                    errorMessage = errorMessage.Replace(" DOT", " '.'");
-                    errorMessage = errorMessage.Replace(" HASH", " '#'");
-                    errorMessage = errorMessage.Replace(" PERCENT", " '%'");
-                    errorMessage = errorMessage.Replace(" LEFTCURLY", " '{'");
-                    errorMessage = errorMessage.Replace(" RIGHTCURLY", " '}'");
-                    errorMessage = errorMessage.Replace(" LEFTPAREN", " '('");
-                    errorMessage = errorMessage.Replace(" RIGHTPAREN", " ')'");
-                    errorMessage = errorMessage.Replace(" LEFTBRACKETGLUE", " '['");
-                    errorMessage = errorMessage.Replace(" LEFTBRACKET", " '['");
-                    errorMessage = errorMessage.Replace(" RIGHTBRACKET", " ']'");
-                    errorMessage = errorMessage.Replace(" LEFTANGLESIMPLE", " '<'");
-                    errorMessage = errorMessage.Replace(" RIGHTANGLE", " '>'");
-                    errorMessage = errorMessage.Replace(" STAR", " '*'");
-                    errorMessage = errorMessage.Replace(" VERTICALBAR", " '|'");
-                    errorMessage = errorMessage.Replace(" PLUS", " '+'");
-                    errorMessage = errorMessage.Replace(" MINUS", " '-'");
-                    errorMessage = errorMessage.Replace(" DIV", " '/'");
-                    errorMessage = errorMessage.Replace(" STARS", " '**'");
-                    errorMessage = errorMessage.Replace(" EQUAL", " '='");
-                    errorMessage = errorMessage.Replace(" BACKSLASH", " '\\'");
-                    errorMessage = errorMessage.Replace(" DOLLAR", " '$'");
-                    errorMessage = errorMessage.Replace(" QUESTION", " '?'");
-
-                    errorMessage = errorMessage.Replace("EOF", "[End of input]");
-                    errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
-                    errorMessage = errorMessage.Replace("expecting set", "");  //not meningful                
-                    errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
-                    errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
-
-                    if (errorMessage.Contains("'<[End of input]>' expecting END"))
-                    {
-                        errorMessage += G.NL + "  Check your loop structures";
-                        errorMessage += G.NL + "  (FOR) and conditionals (IF).";
-                        errorMessage += G.NL + "  For each FOR or IF, an";
-                        errorMessage += G.NL + "  END is expected.";
-                    }
-
-                }
-
-
-                if (lineNo > inputFileLines.Count)
-                {
-                    {
-                        G.Writeln("*** ERROR: " + errorMessage);
-                    }
-
-                    continue;  //doesn't give meaning
-                }
-                string line = "";
-                int firstWordPosInLine = -12345;
-                bool previousLineProbablyCulprit = false;
-                if (lineNo > 0)
-                {
-                    line = inputFileLines[lineNo - 1];
-                    firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
-                }
-
-                if (true)
-                {
+                    bool previousLineProbablyCulprit = false;
                     if (positionNo == firstWordPosInLine && errorMessage.Contains("no viable"))
                     {
                         //get preceding line (or really: statement) -- most probably the culprit.
                         previousLineProbablyCulprit = true;
                     }
+
+                    string paranthesesError = "";
 
                     if (ph.isOneLinerFromGui == true && lineNo != 1)
                     {
@@ -771,79 +596,269 @@ namespace Gekko.Parser.Gek
                     {
                         if (ph.isOneLinerFromGui == false)
                         {
-                            string fn = ph.fileName;
-                            string extra = "";
-                            if (lineNo >= 1 && positionNo > 0)
                             {
-                                extra = " line " + lineNo + " pos " + positionNo;
-                            }
+                                string fn = ph.fileName;
+                                if (fn == null || fn == "")
+                                {
+                                    G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
+                                }
+                                else
+                                {
+                                    G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNo + " pos " + positionNo);
+                                }
 
-                            if (fn == null || fn == "")
-                            {
-                                G.Writeln("*** ERROR: User input block," + extra);
+                                string e2 = errorMessage.Replace("Der blev udløst en undtagelse af typen ", "");
+                                G.Writeln("           " + e2);
                             }
-                            else
-                            {
-                                G.Writeln("*** ERROR: Parsing file: " + fn + extra);
-                            }
-                            G.Writeln("           " + errorMessage);
                         }
                         else
                         {
-                            if (positionNo > 0)
-                            {
-                                G.Writeln("*** ERROR: Parsing pos " + positionNo + ":  " + errorMessage);
-                            }
-                            else G.Writeln("*** ERROR: " + errorMessage);
+                            G.Writeln("*** ERROR: Parsing pos " + positionNo + ":  " + errorMessage);
                         }
                         line = line + "  ";  //hack to avoid ending problems.....
+                        string lineTemp = line;
 
-                        if (positionNo - 1 >= 0)
+                        lineTemp = G.ReplaceGlueSymbols(lineTemp);
+
+                        string line0 = lineTemp.Substring(0, positionNo - 1);
+                        string line1 = lineTemp.Substring(positionNo - 1, 1);
+                        string line2 = lineTemp.Substring(positionNo - 1 + 1);
+
+                        if (previousLineProbablyCulprit && lineNo > 1)
                         {
-                            string lineTemp = line;
-                            if (lineTemp != null && lineTemp != "")
-                            {
-                                lineTemp2.Add(lineTemp);  //used for suggestions later on
-                                lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNo, 4) + "]:");
-                            }
-
-                            lineTemp = G.ReplaceGlueSymbols(lineTemp);
-
-                            //try: not the end of the world if one of these fails
-                            string line0 = "";
-                            string line1 = "";
-                            string line2 = "";
-                            try  { line0 = lineTemp.Substring(0, positionNo - 1); } catch { };
-                            try  { line1 = lineTemp.Substring(positionNo - 1, 1); } catch { };
-                            try  { line2 = lineTemp.Substring(positionNo - 1 + 1); } catch { };
-
-                            if (previousLineProbablyCulprit && lineNo > 1)
-                            {
-                                G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
-                                string lineBefore = inputFileLines[lineNo - 1 - 1];
-                                G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
-                            }
-
-                            G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
-                            G.Write(line1, Color.Red);
-                            G.Writeln(line2, Color.Blue);
-
-                            G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-                            G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
-
-                            CheckForBadDouble(lineTemp);
+                            G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
+                            string lineBefore = inputFileLines[lineNo - 1 - 1];
+                            G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
                         }
+
+                        G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
+                        G.Write(line1, Color.Red);
+                        G.Writeln(line2, Color.Blue);
+
+                        G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                        G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+
+                    }
+
+                    if (paranthesesError != "") G.Writeln(paranthesesError);
+
+                    if (ph.isModel == false && previousLineProbablyCulprit == false)
+                    {
+                        WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                        if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
                     }
                 }
+                if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
 
-                if (ph.isModel == false)
-                {
-                    WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
-                    if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
-                }
             }
-            if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
-                        
+        }
+
+        /// <summary>
+        /// This method prints syntax errors
+        /// </summary>
+        /// <param name="errors"></param>
+        /// <param name="inputFileLines"></param>
+        /// <param name="ph"></param>
+        public static void HandleCommandParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        {
+            if (Globals.newErrors)
+            {
+
+            }
+            else
+            {
+                List<string> lineTemp2 = new List<string>();
+                List<string> lineTemp2Numbers = new List<string>();
+                if (Globals.threadIsInProcessOfAborting) return;
+                Program.StopPipeAndMute(2);
+                int number = 0;
+                foreach (string s in errors)
+                {
+                    number++;
+                    if (errors.Count > 1)
+                    {
+                        if (number == 1) G.Writeln();
+                        G.Writeln("--------------------- error #" + number + " of " + errors.Count + "-----------------");
+                        //G.Writeln();
+                    }
+                    else G.Writeln();
+
+
+                    string[] ss = s.Split(Globals.parserErrorSeparator);
+                    int lineNumber = 0;
+                    int lineNo = 0;
+                    int positionNo = 0;
+                    string errorMessage = "General error";
+
+                    try
+                    {
+                        lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1                
+                        lineNo = lineNumber + 1;  //1-based
+                        positionNo = int.Parse(ss[1]) + 1;  //1-based                               
+                        errorMessage = ss[3];
+                    }
+                    catch
+                    {
+
+                    }
+
+                    errorMessage = G.ReplaceGlueSymbols(errorMessage);
+
+                    if (true)
+                    {
+                        errorMessage = errorMessage.Replace(" AT", " '@'");
+                        errorMessage = errorMessage.Replace(" HAT", " '^'");
+                        errorMessage = errorMessage.Replace(" SEMICOLON", " ';'");
+                        errorMessage = errorMessage.Replace(" COLON", " ':'");
+                        errorMessage = errorMessage.Replace(" COMMA2", " ','");
+                        errorMessage = errorMessage.Replace(" DOT", " '.'");
+                        errorMessage = errorMessage.Replace(" HASH", " '#'");
+                        errorMessage = errorMessage.Replace(" PERCENT", " '%'");
+                        errorMessage = errorMessage.Replace(" LEFTCURLY", " '{'");
+                        errorMessage = errorMessage.Replace(" RIGHTCURLY", " '}'");
+                        errorMessage = errorMessage.Replace(" LEFTPAREN", " '('");
+                        errorMessage = errorMessage.Replace(" RIGHTPAREN", " ')'");
+                        errorMessage = errorMessage.Replace(" LEFTBRACKETGLUE", " '['");
+                        errorMessage = errorMessage.Replace(" LEFTBRACKET", " '['");
+                        errorMessage = errorMessage.Replace(" RIGHTBRACKET", " ']'");
+                        errorMessage = errorMessage.Replace(" LEFTANGLESIMPLE", " '<'");
+                        errorMessage = errorMessage.Replace(" RIGHTANGLE", " '>'");
+                        errorMessage = errorMessage.Replace(" STAR", " '*'");
+                        errorMessage = errorMessage.Replace(" VERTICALBAR", " '|'");
+                        errorMessage = errorMessage.Replace(" PLUS", " '+'");
+                        errorMessage = errorMessage.Replace(" MINUS", " '-'");
+                        errorMessage = errorMessage.Replace(" DIV", " '/'");
+                        errorMessage = errorMessage.Replace(" STARS", " '**'");
+                        errorMessage = errorMessage.Replace(" EQUAL", " '='");
+                        errorMessage = errorMessage.Replace(" BACKSLASH", " '\\'");
+                        errorMessage = errorMessage.Replace(" DOLLAR", " '$'");
+                        errorMessage = errorMessage.Replace(" QUESTION", " '?'");
+
+                        errorMessage = errorMessage.Replace("EOF", "[End of input]");
+                        errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
+                        errorMessage = errorMessage.Replace("expecting set", "");  //not meningful                
+                        errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
+                        errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
+
+                        if (errorMessage.Contains("'<[End of input]>' expecting END"))
+                        {
+                            errorMessage += G.NL + "  Check your loop structures";
+                            errorMessage += G.NL + "  (FOR) and conditionals (IF).";
+                            errorMessage += G.NL + "  For each FOR or IF, an";
+                            errorMessage += G.NL + "  END is expected.";
+                        }
+
+                    }
+
+
+                    if (lineNo > inputFileLines.Count)
+                    {
+                        {
+                            G.Writeln("*** ERROR: " + errorMessage);
+                        }
+
+                        continue;  //doesn't give meaning
+                    }
+                    string line = "";
+                    int firstWordPosInLine = -12345;
+                    bool previousLineProbablyCulprit = false;
+                    if (lineNo > 0)
+                    {
+                        line = inputFileLines[lineNo - 1];
+                        firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
+                    }
+
+                    if (true)
+                    {
+                        if (positionNo == firstWordPosInLine && errorMessage.Contains("no viable"))
+                        {
+                            //get preceding line (or really: statement) -- most probably the culprit.
+                            previousLineProbablyCulprit = true;
+                        }
+
+                        if (ph.isOneLinerFromGui == true && lineNo != 1)
+                        {
+                            G.Writeln("*** ERROR: Parsing this line:");
+                            G.Writeln("    " + G.ReplaceGlueSymbols(inputFileLines[0]), Color.Blue);
+                            G.Writeln("*** ERROR: " + errorMessage);
+                        }
+                        else
+                        {
+                            if (ph.isOneLinerFromGui == false)
+                            {
+                                string fn = ph.fileName;
+                                string extra = "";
+                                if (lineNo >= 1 && positionNo > 0)
+                                {
+                                    extra = " line " + lineNo + " pos " + positionNo;
+                                }
+
+                                if (fn == null || fn == "")
+                                {
+                                    G.Writeln("*** ERROR: User input block," + extra);
+                                }
+                                else
+                                {
+                                    G.Writeln("*** ERROR: Parsing file: " + fn + extra);
+                                }
+                                G.Writeln("           " + errorMessage);
+                            }
+                            else
+                            {
+                                if (positionNo > 0)
+                                {
+                                    G.Writeln("*** ERROR: Parsing pos " + positionNo + ":  " + errorMessage);
+                                }
+                                else G.Writeln("*** ERROR: " + errorMessage);
+                            }
+                            line = line + "  ";  //hack to avoid ending problems.....
+
+                            if (positionNo - 1 >= 0)
+                            {
+                                string lineTemp = line;
+                                if (lineTemp != null && lineTemp != "")
+                                {
+                                    lineTemp2.Add(lineTemp);  //used for suggestions later on
+                                    lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNo, 4) + "]:");
+                                }
+
+                                lineTemp = G.ReplaceGlueSymbols(lineTemp);
+
+                                //try: not the end of the world if one of these fails
+                                string line0 = "";
+                                string line1 = "";
+                                string line2 = "";
+                                try { line0 = lineTemp.Substring(0, positionNo - 1); } catch { };
+                                try { line1 = lineTemp.Substring(positionNo - 1, 1); } catch { };
+                                try { line2 = lineTemp.Substring(positionNo - 1 + 1); } catch { };
+
+                                if (previousLineProbablyCulprit && lineNo > 1)
+                                {
+                                    G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
+                                    string lineBefore = inputFileLines[lineNo - 1 - 1];
+                                    G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
+                                }
+
+                                G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
+                                G.Write(line1, Color.Red);
+                                G.Writeln(line2, Color.Blue);
+
+                                G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+                                G.Writeln(G.Blanks(positionNo - 1 + 4 + 5 + 5) + "^", Color.Blue);
+
+                                CheckForBadDouble(lineTemp);
+                            }
+                        }
+                    }
+
+                    if (ph.isModel == false)
+                    {
+                        WriteLinkToHelpFile2(G.ReplaceGlueSymbols(line));
+                        if (number == 1) ExtraErrorMessages(G.ReplaceGlueSymbols(line));
+                    }
+                }
+                if (errors.Count > 1) G.Writeln("--------------------- end of " + errors.Count + " errors --------------");
+            }            
         }
         
         private static void CheckForBadDouble(string lineTemp)

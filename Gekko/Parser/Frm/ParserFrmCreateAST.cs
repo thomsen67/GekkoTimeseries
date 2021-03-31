@@ -65,7 +65,7 @@ namespace Gekko.Parser.Frm
 
             if (errors.Count > 0)
             {
-                PrintModelParserErrors(errors, inputFileLines, ph);
+                HandleModelParserErrors(errors, inputFileLines, ph);
                 throw new GekkoException();
             }
             else
@@ -229,7 +229,7 @@ namespace Gekko.Parser.Frm
         }
 
 
-        public static void PrintModelParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        public static void HandleModelParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
             if (Globals.threadIsInProcessOfAborting) return;
             Program.StopPipeAndMute(2);

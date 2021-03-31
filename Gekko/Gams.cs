@@ -2307,7 +2307,7 @@ namespace Gekko
                         err.MainAdd("Technical error:");
                         err.MainNewLineTight();
                         err.MainAdd(e.Message);                        
-                        err.NoException();
+                        err.ThrowNoException();
                     }
                     GdxErrorMessage();
                     throw;

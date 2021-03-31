@@ -50,6 +50,8 @@ namespace Gekko
 
         public static bool if_old_helper = false;
 
+        public static bool newErrors = false;
+
         //Must be near the top of Globals.cs
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
 

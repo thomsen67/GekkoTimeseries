@@ -5172,7 +5172,8 @@ namespace Gekko
         {
             if (name.StartsWith(Globals.procedure))
             {
-                new Error("Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + (n - 2) + " arguments");
+                //..., false, because we are failing while parsing/compiling.
+                new Error("Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + (n - 2) + " arguments.", false);
             }
             else
             {
@@ -5185,7 +5186,8 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Cannot find user function '" + name + "()' with " + (n - 2) + " arguments");
+                    //..., false, because we are failing while parsing/compiling.
+                    new Error("Cannot find user function '" + name + "()' with " + (n - 2) + " arguments.", false);
                 }
             }
         }

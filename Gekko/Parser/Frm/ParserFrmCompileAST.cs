@@ -990,7 +990,7 @@ namespace Gekko.Parser.Frm
             }
         }
 
-        public static void PrintModelLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
+        public static void HandleModelLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
             if (Globals.threadIsInProcessOfAborting) return;
             if (false && ph.fileName == null && ph.commandsText == null)

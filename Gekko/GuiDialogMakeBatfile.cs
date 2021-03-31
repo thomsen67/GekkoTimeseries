@@ -174,7 +174,7 @@ namespace Gekko
                     error.MainAdd("If you have administrator rights, this usually works out. Otherwise you will have to ");
                     error.MainAdd("look up the Windows path (it is a so-called 'Environment variable' (Danish: 'miljøvariabel')),");
                     error.MainAdd("and place gekko.bat in one of the folders belongning to the Windows path.");
-                    error.NoException();
+                    error.ThrowNoException();
                 }
                 return;
             }
