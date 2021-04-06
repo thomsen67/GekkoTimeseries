@@ -12978,37 +12978,39 @@ namespace UnitTests
     [   1]:   run cc1;
 
     Call stack: Command line calling -->
-    c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";
-            //-------------------------------------------------------------------------------
-
-            for (int i = 0; i < Math.Min(c1.Length, cc1.Length); i++)
-            {
-                char x1 = c1[i + 2];
-                char xx1 = cc1[i];
-                string s1 = x1.ToString();
-                string ss1 = xx1.ToString();                
-                if (s1.Equals("\r")) s1 = "NL1";
-                if (ss1.Equals("\r")) ss1 = "NL1";
-                if (s1.Equals("\n")) s1 = "NL2";
-                if (ss1.Equals("\n")) ss1 = "NL2";
-                if (s1 == " ") s1 = "_";
-                if (ss1 == " ") ss1 = "_";
-                string s = null;
-                int i1 = (int)x1;
-                int ii1 = (int)xx1;
-                if (i1 != ii1) s = " -------------------> " + i1 + " " + ii1;
-                new Writeln(i + " " + s1 + " " + ss1 + s);
-            }
-
+    c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";            
             Assert.IsTrue(c1.Contains(cc1));
+
+            // ====================================================
 
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run c2;");
             string c2 = Globals.unitTestScreenOutput.ToString();
 
+            string cc2 =
+@"*** ERROR: Parsing file: c:\Thomas\Gekko\regres\StackTrace\cc2.gcm line 5 pos 1
+           did not expect input 'x'
+    [   5]:   x = (y+;  
+              ^
+              ^
+*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\c2.gcm', line 1
+    [   1]:   run cc2;
+
+    Call stack: Command line calling -->
+    c:\Thomas\Gekko\regres\StackTrace\c2.gcm (run-time error in line 1)";
+            Assert.IsTrue(c2.Contains(cc2));
+
+            // ====================================================
+
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run c3;");
             string c3 = Globals.unitTestScreenOutput.ToString();
+
+            if (true)
+            {
+                File.WriteAllText("c:\\Thomas\\Desktop\\gekko\\testing\\temp.txt", c3);
+                //CompareTwoStrings(c3, cc3);
+            }
 
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run c4;");
@@ -13025,6 +13027,28 @@ namespace UnitTests
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run m2;");
             string m2 = Globals.unitTestScreenOutput.ToString();
+        }
+
+        private static void CompareTwoStrings(string w1, string w2)
+        {
+            for (int i = 0; i < Math.Min(w1.Length, w2.Length); i++)
+            {
+                char x1 = w1[i + 2];
+                char xx1 = w2[i];
+                string s1 = x1.ToString();
+                string ss1 = xx1.ToString();
+                if (s1.Equals("\r")) s1 = "NL1";
+                if (ss1.Equals("\r")) ss1 = "NL1";
+                if (s1.Equals("\n")) s1 = "NL2";
+                if (ss1.Equals("\n")) ss1 = "NL2";
+                if (s1 == " ") s1 = "_";
+                if (ss1 == " ") ss1 = "_";
+                string s = null;
+                int i1 = (int)x1;
+                int ii1 = (int)xx1;
+                if (i1 != ii1) s = " -------------------> " + i1 + " " + ii1;
+                new Writeln(i + " " + s1 + " " + ss1 + s);
+            }
         }
 
         [TestMethod]
