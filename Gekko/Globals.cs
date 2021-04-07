@@ -52,6 +52,8 @@ namespace Gekko
 
         public static bool newErrors = false;
 
+        public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
+
         //Must be near the top of Globals.cs
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
 

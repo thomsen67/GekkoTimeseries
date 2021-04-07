@@ -1536,38 +1536,58 @@ namespace Gekko
         /// Helper method (hook) for Gekcel. BEWARE: Do not change name or signature without changing in 
         /// Gekcel solution, too!!
         /// </summary>
-        /// <param name="path">Note: must be real path, not a path+filename</param></param>
+        /// <param name="xllPath">Note: must be real path, not a path+filename</param>
         //ok that it is not referenced to, is used in Gekcel
-        public static void PrepareExcelDna(string path)
+        public static void PrepareExcelDna(string xllPath)
         {
-            //MessageBox.Show("PrepareExcelDna() called with: " + path);
-
+            if (File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna() called with: " + xllPath);
             Globals.excelDna = true;
-            Globals.excelDnaPath = path;
+            Globals.excelDnaPath = xllPath;
         }
 
         /// <summary>
         /// Helper method (hook) for Gekcel. BEWARE: Do not change name or signature without changing in 
         /// Gekcel solution, too!!
         /// </summary>
-        /// <param name="path">Note: must be real path, not a path+filename</param>
+        /// <param name="xllPath">Note: must be real path, not a path+filename</param>
         //ok that it is not referenced to, is used in Gekcel
-        public static void PrepareExcelDna2(string path)
+        public static void PrepareExcelDna2(string xllPath, string xlsmPath)
         {
-            //MessageBox.Show("PrepareExcelDna2() called with: " + path);
+            if (File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna2() called with: " + xllPath + "  -----  " + xlsmPath);
 
-            InitUfunctionsAndArithmeticsAndMore();
+            PrepareExcelDna(xllPath); //necessary for it to run ANTLR etc.          
 
-            PrepareExcelDna(path); //necessary for it to run ANTLR etc.          
-
-            if (string.IsNullOrEmpty(Program.options.folder_working)) Program.options.folder_working = path;
+            //See similar code used in in GuiStuff(), see: #09785932405
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if (string.IsNullOrEmpty(Program.options.folder_working))
+            {
+                if (string.IsNullOrEmpty(xlsmPath))
+                {
+                    Program.options.folder_working = desktop;
+                    new Note("Gekcel working folder set to desktop folder, because calling Excel workbook folder could not be located. Desktop folder: '" + desktop + "'. You may set the working folder manually with the Gekko command 'OPTION folder working = ... ;'");
+                }
+                else
+                {
+                    try
+                    {
+                        //Do not use 'using' and G.GekkoStreamWriter() here -- it is just a quick test, and will be caught if it fails!
+                        Globals.screenOutput = new StreamWriter(xlsmPath + "\\" + Globals.funnyFileName);
+                        Program.options.folder_working = xlsmPath;  //seems ok
+                    }
+                    catch (Exception e)
+                    {
+                        Program.options.folder_working = desktop;
+                        new Note("Gekcel working folder set to desktop folder. The calling Excel workbook folder '" + Program.options.folder_working + "' does not seem to have write access. Desktop folder: '" + desktop + "'. You may set the working folder manually with the Gekko command'OPTION folder working = ... ;'");
+                    }                    
+                    Gui.GuiReadOnlyHelper(false);  //delete any funny file
+                }
+            }
 
             Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
 
             Program.databanks.storage.Clear();
             Program.databanks.storage.Add(new Databank("Work"));
             Program.databanks.storage.Add(new Databank("Ref"));
-
             Program.databanks.local.Clear();
             Program.databanks.global.Clear();
             Program.databanks.localGlobal = new LocalGlobal();
@@ -1575,7 +1595,6 @@ namespace Gekko
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
             Program.InitUfunctionsAndArithmeticsAndMore();
             Program.model = new Gekko.Model();
-
             Program.GetStartingPeriod();
         }
         

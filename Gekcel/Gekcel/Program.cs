@@ -68,7 +68,7 @@ namespace Gekcel
     
     //-------------------------------------------------------------
     //-------------------------------------------------------------
-
+    
     [ComVisible(true)]
     public class RibbonController : ExcelRibbon
     {
@@ -78,6 +78,7 @@ namespace Gekcel
 
         public override string GetCustomUI(string RibbonID)
         {
+            do Link to guided tour in ribbon
             //This is the Ribbon interface (a 'Gekko' tab) that will show up in Excel
             return @"
 <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui'>
@@ -161,7 +162,7 @@ namespace Gekcel
     }
 
     public static class ExcelFunctionCalls
-    {
+    {   
         //TT: Type this in cell: =Gekko_Setup()
         [ExcelFunction(Name = "Gekko_Setup", Description = "Sets up Gekko environment")]
         public static double Gekko_Setup()
@@ -178,9 +179,9 @@ namespace Gekcel
 
         [ExcelFunction(Name = "Gekko_Put", Description = "Transfers data from sheet cells to a Gekko databank (baseOfArray can be index = 0 or 1)")]
         public static double Gekko_Put(object[,] cells, int baseOfArrayZeroOrOne)
-        {
+        {            
             Program.PrepareExcelDna(Path.GetDirectoryName(ExcelDnaUtil.XllPath)); //necessary for it to run ANTLR etc. MUST use GetDirectoryName()          
-
+            
             TableLight matrix = new TableLight();  //1-based
 
             int offset = 1 - baseOfArrayZeroOrOne;
@@ -226,6 +227,24 @@ namespace Gekcel
         public static string Gekko(string commands)
         {
             return InternalHelperMethods.Run(commands);
+        }
+
+        /// <summary>
+        /// Taken from here: https://microsoft.public.excel.sdk.narkive.com/NJhRTpmT/obtaining-the-full-path-of-a-workbook-from-an-xll
+        /// </summary>
+        /// <returns></returns>
+        [ExcelFunction(IsMacroType = true)]
+        public static string CallingFileName()
+        {
+            string s = null;
+            try
+            {
+                ExcelReference reference = (ExcelReference)XlCall.Excel(XlCall.xlfCaller);
+                string sheetName = (string)XlCall.Excel(XlCall.xlSheetNm, reference);
+                s = System.IO.Path.Combine((string)XlCall.Excel(XlCall.xlfGetDocument, 2, sheetName), (string)XlCall.Excel(XlCall.xlfGetDocument, 88, sheetName));
+            }
+            catch { }
+            return s;
         }
     }
 
@@ -367,12 +386,10 @@ End Sub
             if (counter == 0)
             {
                 //TODO: set this up in a better way, using Program.Re() or RESTART
-
                 //#7980345743573
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-                Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
-
-                Program.PrepareExcelDna2(Path.GetDirectoryName(ExcelDnaUtil.XllPath));  //MUST use GetDirectoryName()
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;                
+                Program.PrepareExcelDna2(Path.GetDirectoryName(ExcelDnaUtil.XllPath), Path.GetDirectoryName(ExcelFunctionCalls.CallingFileName()));  //MUST use GetDirectoryName()                
             }
 
             counter++;

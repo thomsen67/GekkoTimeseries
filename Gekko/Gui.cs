@@ -390,19 +390,7 @@ namespace Gekko
                 string fileName = null;
 
                 fileName = e.Filename;
-
-                //if (config != null && !G.NullOrEmpty(config.FilePath))
-                //{
-                //    fileName = config.FilePath;
-                //}
-                //else
-                //{
-                //    try
-                //    {
-                //        fileName = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                //    }
-                //    catch { }
-                //}
+                
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("+++ WARNING: An internal Gekko config file could not be read.");
                 sb.AppendLine("These user settings files are used to store window positions, ");
@@ -555,7 +543,7 @@ namespace Gekko
             for (int i = 0; i < 2; i++)
             {
                 if (track) MessageBox.Show("16.1");
-                bool exc = false;                
+                bool exc = false;
                 if (track) MessageBox.Show("16.3");
                 if (!Directory.Exists(Program.options.folder_working))
                 {
@@ -564,10 +552,11 @@ namespace Gekko
                 }
 
                 //Testing write access of working folder (writing a file, and deleting it again)
+                //See similar code used in Gekcel hooks, see: #09785932405
                 try
                 {
                     //Do not use 'using' and G.GekkoStreamWriter() here -- it is just a quick test, and will be caught if it fails!
-                    Globals.screenOutput = new StreamWriter(Program.options.folder_working + "\\" + "delete_ksajrhdfjdssdj.txt");
+                    Globals.screenOutput = new StreamWriter(Program.options.folder_working + "\\" + Globals.funnyFileName);
                 }
                 catch (Exception e)
                 {
@@ -576,23 +565,8 @@ namespace Gekko
                     //MessageBox.Show(e.Message);
                     Program.options.folder_working = desktop;
                 }
-                if (track) MessageBox.Show("16.4");
-                if (Globals.screenOutput != null)
-                {
-                    Globals.screenOutput.Flush();
-                    Globals.screenOutput.Close();
-                }
-
-                if (track) MessageBox.Show("16.5"); 
-                if (File.Exists(Program.options.folder_working + "\\" + "delete_ksajrhdfjdssdj.txt"))
-                {
-                    if (track) MessageBox.Show("16.6");
-                    try
-                    {
-                        File.Delete(Program.options.folder_working + "\\" + "delete_ksajrhdfjdssdj.txt");  //best not to use WaitForFileDelete() here, since it is ok if delete fails here
-                    }
-                    catch { };
-                }
+                
+                GuiReadOnlyHelper(track);
                 if (track) MessageBox.Show("16.7");
                 if (exc == false) break;
             }
@@ -685,7 +659,33 @@ namespace Gekko
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-        }        
+        }
+
+        /// <summary>
+        /// Helper to delete temporary file that tests if folder is read-only
+        /// </summary>
+        /// <param name="track"></param>
+        public static void GuiReadOnlyHelper(bool track)
+        {
+            if (track) MessageBox.Show("16.4");
+            if (Globals.screenOutput != null)
+            {
+                Globals.screenOutput.Flush();
+                Globals.screenOutput.Close();
+            }
+
+            if (track) MessageBox.Show("16.5");
+
+            if (File.Exists(Program.options.folder_working + "\\" + Globals.funnyFileName))
+            {
+                if (track) MessageBox.Show("16.6");
+                try
+                {
+                    File.Delete(Program.options.folder_working + "\\" + Globals.funnyFileName);  //best not to use WaitForFileDelete() here, since it is ok if delete fails here
+                }
+                catch { };
+            }
+        }
 
         /// <summary>
         /// Files of type temp*.emf/dat/gp in \gnuplot\tempfiles are deleted
