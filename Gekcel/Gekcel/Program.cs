@@ -22,7 +22,6 @@ using Extensibility;
 //      Other commands like TELL to decorate cells?
 //      Option to aviod overwrites.
 //      Buttons and clicks etc.
-//      Guided tour of this.
 //      Setting up immediate window, activate if not activated, focus, perhaps clear. Putting it on top??
 //      How to issue commands one by one?
 //      Do plots work??
@@ -78,7 +77,7 @@ namespace Gekcel
 
         public override string GetCustomUI(string RibbonID)
         {
-            do Link to guided tour in ribbon
+            //do Link to guided tour in ribbon
             //This is the Ribbon interface (a 'Gekko' tab) that will show up in Excel
             return @"
 <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui'>

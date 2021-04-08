@@ -174,12 +174,16 @@ namespace Deploy
 
             File.Delete(tools + @"\"+ bit32Or64() + @"\sha.txt"); //for safety
 
-            string sha1 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\InstallerForGekko.msi");
-            string sha2 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\Setup.exe");
-            string sha3 = ComputeSha1(tools + @"\"+ bit32Or64() + @"\Gekko.zip");
-            string sha4 = ComputeSha1(tools + @"\" + "Gekcel" + @"\Gekcel.zip");
+            string sha1_32 = ComputeSha1(tools + @"\" + "32" + @"\InstallerForGekko.msi");
+            string sha2_32 = ComputeSha1(tools + @"\"+ "32" + @"\Setup.exe");
+            string sha3_32 = ComputeSha1(tools + @"\"+ "32" + @"\Gekko.zip");
+            string sha4_32 = ComputeSha1(tools + @"\" + "Gekcel" + @"\" + "32" + @"\Gekcel.zip");
+            string sha1_64 = ComputeSha1(tools + @"\" + "64" + @"\InstallerForGekko.msi");
+            string sha2_64 = ComputeSha1(tools + @"\" + "64" + @"\Setup.exe");
+            string sha3_64 = ComputeSha1(tools + @"\" + "64" + @"\Gekko.zip");
+            string sha4_64 = ComputeSha1(tools + @"\" + "Gekcel" + @"\" + "64" + @"\Gekcel.zip");
 
-            if (sha1 == null || sha2 == null || sha3 == null || sha4 == null)
+            if (sha1_32 == null || sha2_32 == null || sha3_32 == null || sha4_32 == null || sha1_64 == null || sha2_64 == null || sha3_64 == null || sha4_64 == null)
             {
                 MessageBox.Show("Problem with SHA1, not computed, aborting...");
                 return;
@@ -188,15 +192,19 @@ namespace Deploy
             string txt = null;
             txt += "<strong>Gekko " + version + " </strong>" + "\r\n";
             txt += "<ul>" + "\r\n";
-            txt += "  <li>" + sha1 + "    " + "InstallerForGekko.msi ("+ bit32Or64() + "-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha2 + "    " + "Setup.exe ("+ bit32Or64() + "-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha3 + "    " + "Gekko.zip ("+ bit32Or64() + "-bit)" + "</li>" + "\r\n";
-            txt += "  <li>" + sha4 + "    " + "Gekcel.zip (32-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha1_32 + "    " + "InstallerForGekko.msi (32-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha1_64 + "    " + "InstallerForGekko.msi (64-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha2_32 + "    " + "Setup.exe (32-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha2_64 + "    " + "Setup.exe (64-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha3_32 + "    " + "Gekko.zip (32-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha3_64 + "    " + "Gekko.zip (64-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha4_32 + "    " + "Gekcel.zip (32-bit)" + "</li>" + "\r\n";
+            txt += "  <li>" + sha4_64 + "    " + "Gekcel.zip (64-bit)" + "</li>" + "\r\n";
             txt += "</ul>" + "\r\n";
 
-            System.IO.File.WriteAllText(tools + @"\"+ bit32Or64() + @"\sha.txt", txt);            
+            System.IO.File.WriteAllText(tools + @"\sha.txt", txt);
 
-            MessageBox.Show(@"SHA ok, copied to " + tools);
+            MessageBox.Show(@"SHA ok, copied to: " + tools);
 
         }
 
@@ -381,10 +389,11 @@ namespace Deploy
             foreach (DirectoryInfo dir in di.GetDirectories())
             {
                 dir.Delete(true);
-            }
-            MessageBox.Show("Folder " + tools + " is now wiped (empty)");            
+            }                        
             Directory.CreateDirectory(tools + @"\" + @"32");
             Directory.CreateDirectory(tools + @"\" + @"64");
+            Directory.CreateDirectory(tools + @"\" + @"Gekcel");
+            MessageBox.Show("Folder " + tools + " is now wiped (empty), with 3 subfolders.");
         }
 
         public static class ZipHelper
