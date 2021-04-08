@@ -12,6 +12,7 @@ using Gekko;
 using ExcelDna.IntelliSense;
 using ExcelDna.ComInterop;
 using Extensibility;
+using System.Diagnostics;
 
 //About 64-bit, maybe see this: https://colinlegg.wordpress.com/2016/09/07/my-first-c-net-udf-using-excel-dna-and-visual-studio/
 
@@ -84,8 +85,8 @@ namespace Gekcel
   <ribbon>
     <tabs>
       <tab id='tab1' label='Gekko'>        
-        <group id='group3' label='Setup'>   
-          <button id='button3a' imageMso='MacroPlay' size='large' label='Setup' onAction='OnButtonPressed3' />  
+        <group id='group3' label='Info'>   
+          <button id='button3a' imageMso='Info' size='large' label='Gekko/Gekcel' onAction='OnButtonPressed3' />  
         </group>            
 <!-- 
         <group id='group1' label='Gekko reading'>              
@@ -126,10 +127,20 @@ namespace Gekcel
             MessageBox.Show("Write Gekko data // value of cell D2 is: " + d);
         }
 
+        /// <summary>
+        /// When info icon is pressed in Gekko Ribbon add-in, the Gekcel guide opens up.
+        /// </summary>
+        /// <param name="control"></param>
         public void OnButtonPressed3(IRibbonControl control)
         {
-            InternalHelperMethods.Setup();
-        }        
+            //This way of starting a process will work in .NET Core too.
+            var psi = new ProcessStartInfo
+            {
+                FileName = @"https://www.t-t.dk/gekko/docs/user-manual/index.html?excel_addin_gekcel.htm",
+                UseShellExecute = true
+            };
+            Process.Start(psi);
+        }
     }
 
     [ComVisible(true)]
@@ -168,6 +179,12 @@ namespace Gekcel
         {
             InternalHelperMethods.Setup();
             return 1d;
+        }
+
+        [ExcelFunction(Name = "Gekko_Deleteme", Description = "Delete this")]
+        public static string Gekko_Deleteme()
+        {
+            return ExcelFunctionCalls.CallingFileName();
         }
 
         [ExcelFunction(Name = "Gekko_Get", Description = "Transfers data from a Gekko databank to sheet cells")]
@@ -240,7 +257,11 @@ namespace Gekcel
             {
                 ExcelReference reference = (ExcelReference)XlCall.Excel(XlCall.xlfCaller);
                 string sheetName = (string)XlCall.Excel(XlCall.xlSheetNm, reference);
-                s = System.IO.Path.Combine((string)XlCall.Excel(XlCall.xlfGetDocument, 2, sheetName), (string)XlCall.Excel(XlCall.xlfGetDocument, 88, sheetName));
+                object o1 = XlCall.Excel(XlCall.xlfGetDocument, 2, sheetName);
+                object o2 = XlCall.Excel(XlCall.xlfGetDocument, 88, sheetName);
+                string s1 = (string)o1;
+                string s2 = (string)o2;
+                s = System.IO.Path.Combine(s1, s2);
             }
             catch { }
             return s;

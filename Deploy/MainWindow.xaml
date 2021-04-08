@@ -24,23 +24,25 @@
         <Button x:Name="button3" Content="RAM aware on 32-bit" HorizontalAlignment="Left" Margin="392,213,0,0" VerticalAlignment="Top" Width="138" Click="button3_Click"/>
         <TextBox x:Name="textBox9" HorizontalAlignment="Left" Height="22" Margin="14,275,0,0" TextWrapping="Wrap" Text="Zip a Gekko.zip and copy to c:\tools\tmp\gekko_files" VerticalAlignment="Top" Width="359" TextChanged="textBox9_TextChanged"/>
         <Button x:Name="button4" Content="Zip and copy 1 file" HorizontalAlignment="Left" Margin="499,275,0,0" VerticalAlignment="Top" Width="129" Click="button4_Click" Height="19"/>
-        <TextBox x:Name="textBox10" HorizontalAlignment="Left" Height="21" Margin="14,343,0,0" TextWrapping="Wrap" Text="SHA1 of files" VerticalAlignment="Top" Width="359"/>
-        <Button x:Name="button5" Content="SHA1" HorizontalAlignment="Left" Margin="392,346,0,0" VerticalAlignment="Top" Width="75" Click="button5_Click" Height="19"/>
-        <TextBox x:Name="textBox11" HorizontalAlignment="Left" Height="20" Margin="14,401,0,0" TextWrapping="Wrap" Text="Zip source code" VerticalAlignment="Top" Width="359"/>
-        <Button x:Name="button6" Content="Zip source" HorizontalAlignment="Left" Margin="392,401,0,0" VerticalAlignment="Top" Width="75" Click="button6_Click" Height="17"/>
+        <TextBox x:Name="textBox10" HorizontalAlignment="Left" Height="21" Margin="19,424,0,0" TextWrapping="Wrap" Text="SHA1 of files, do this after 64-bit is done" VerticalAlignment="Top" Width="359"/>
+        <Button x:Name="button5" Content="SHA1" HorizontalAlignment="Left" Margin="394,426,0,0" VerticalAlignment="Top" Width="75" Click="button5_Click" Height="19"/>
+        <TextBox x:Name="textBox11" HorizontalAlignment="Left" Height="20" Margin="19,347,0,0" TextWrapping="Wrap" Text="Zip source code, only when doing 32-bit" VerticalAlignment="Top" Width="359"/>
+        <Button x:Name="button6" Content="Zip source" HorizontalAlignment="Left" Margin="394,347,0,0" VerticalAlignment="Top" Width="75" Click="button6_Click" Height="17"/>
         <TextBox x:Name="textBox7" HorizontalAlignment="Left" Height="23" Margin="16,309,0,0" TextWrapping="Wrap" Text="Test the new Gekko a bit, including help files" VerticalAlignment="Top" Width="359"/>
         <TextBox x:Name="textBox12" HorizontalAlignment="Left" Height="110" Margin="16,466,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="Git commit &quot;release x.x.x&quot;.&#xD;&#xA;Upload 3 files from c:\tools\tmp\gekko_files to \downloads\....&#xD;&#xA;Goto t-t.dk/gekko/admin, and update 3 pages:&#xD;&#xA;1. Installer - signature/checksums:&#xA;  copy c:\tools\tmp\gekko_files\sha.txt into txt version of page and copy finished text version of page into \Diverse\sha.html. &#xA;2. Change-log: Update from git show log&#xA;3. Download - devel versions: condensate changelog into version on devel page&#xA;&#xA;&#xA;&#xA;" VerticalAlignment="Top" Width="220" TextChanged="textBox12_TextChanged"/>
         <TextBox x:Name="textBox13" HorizontalAlignment="Left" Height="20" Margin="35,630,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <Button x:Name="button7" Content="TOKEN" HorizontalAlignment="Left" Margin="175,629,0,0" VerticalAlignment="Top" Width="75" Click="button7_Click" Height="17"/>
         <Button x:Name="button8" Content="Uninstall Gekko" HorizontalAlignment="Left" Margin="392,129,0,0" VerticalAlignment="Top" Width="135" Click="button8_Click"/>
-        <TextBox x:Name="textBox1_Copy" HorizontalAlignment="Left" Height="23" Margin="16,373,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="359" BorderThickness="0" Text="See two boxes below"/>
         <TextBox x:Name="textBoxSha1" Foreground="Blue" BorderThickness="0" HorizontalAlignment="Left" Height="72" Margin="486,347,0,0" Text="" VerticalAlignment="Top" Width="194" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
         <Button Content="Wipe" HorizontalAlignment="Left" Margin="392,247,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_1"/>
         <TextBox Text="Before release, do a Bitdefender check on Gekko.zip, also upload Gekko.zip to VirusTotal.com for testing." HorizontalAlignment="Left" Height="110" Margin="260,466,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="319"/>
         <Button Content="Test exe/dll hashes" HorizontalAlignment="Left" Margin="528,178,0,0" VerticalAlignment="Top" Width="114" Click="Button_Click_2"/>
         <Button Content="Change 32-/64-bit for installer" HorizontalAlignment="Left" Margin="392,70,0,0" VerticalAlignment="Top" Width="199" Click="Button_Click_3"/>
         <Label x:Name="label_Bitness" Foreground="Red" Content="" HorizontalAlignment="Left" Margin="447,95,0,0" VerticalAlignment="Top" Width="144"/>
-        <Button Content="Gekcel: do this now, when doing Gekko32" HorizontalAlignment="Left" Margin="16,426,0,0" VerticalAlignment="Top" Width="268" Click="Button_Click_4"/>
+        <Button Content="Gekcel: copy files 32-bit" HorizontalAlignment="Left" Margin="237,374,0,0" VerticalAlignment="Top" Width="177" Click="Button_Click_44a"/>
+        <Button Content="Gekcel: package 32-bit zip" HorizontalAlignment="Left" Margin="237,399,0,0" VerticalAlignment="Top" Width="177" Click="Button_Click_4a"/>
+        <Button Content="Gekcel: copy files 64-bit" HorizontalAlignment="Left" Margin="435,374,0,0" VerticalAlignment="Top" Width="177" Click="Button_Click_44b"/>
+        <Button Content="Gekcel: package 64-bit zip" HorizontalAlignment="Left" Margin="435,399,0,0" VerticalAlignment="Top" Width="177" Click="Button_Click_4b"/>
 
     </Grid>
 </Window>

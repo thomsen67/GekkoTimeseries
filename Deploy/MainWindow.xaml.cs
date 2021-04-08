@@ -393,6 +393,8 @@ namespace Deploy
             Directory.CreateDirectory(tools + @"\" + @"32");
             Directory.CreateDirectory(tools + @"\" + @"64");
             Directory.CreateDirectory(tools + @"\" + @"Gekcel");
+            Directory.CreateDirectory(tools + @"\" + @"Gekcel\32");
+            Directory.CreateDirectory(tools + @"\" + @"Gekcel\64");            
             MessageBox.Show("Folder " + tools + " is now wiped (empty), with 3 subfolders.");
         }
 
@@ -472,6 +474,19 @@ namespace Deploy
                 }
 
                 return result;
+            }
+
+            public static void CreateZipFromFiles(string fileName, List<string> files)
+            {
+                // Create and open a new ZIP file
+                var zip = ZipFile.Open(fileName, ZipArchiveMode.Create);
+                foreach (var file in files)
+                {
+                    // Add the entry for each file
+                    zip.CreateEntryFromFile(file, Path.GetFileName(file), CompressionLevel.Optimal);
+                }
+                // Dispose of the object when we are done
+                zip.Dispose();
             }
         }
 
@@ -668,25 +683,133 @@ namespace Deploy
             }
         }
 
-        private void Button_Click_4(object sender, RoutedEventArgs e)
+        public static bool CheckExpiry(string file)
         {
-            string s = "Set Gekko Debug|x86 (that is, debug 32-bit) and compile" + "\n";
-            s += "Now we copy gekko.exe, gekko.pdb and ANTLR.dll from /?to /Diverse/ExternalDllFiles";
-            s += "Maybe get all these files from Gekko32.zip, so we are sure all is good (but keep Gekcel_orig.xlsm)";
-            s += "only 32-bit, about 64-bit see: https://colinlegg.wordpress.com/2016/09/07/my-first-c-net-udf-using-excel-dna-and-visual-studio/";
-        
-            MessageBox.Show(s);
-            s = "If there are problems injecting VBA, see Gekcel/Program.cs for trust stuff" + "\n";
-            s += "1. Double-click Gekcel.xll" + "\n";
-            s += "2. If there is a security warning, click 'activate'" + "\n";
-            s += "3. Now there should be a 'Gekko' tab on the ribbon. Click this tab and click the 'Setup' button'" + "\n";
-            s += "   You should get a message that the Gekko environment is set up." + "\n";
-            s += "4. Run the macro 'Demo' " + "\n";
-            MessageBox.Show(s);
-            s = "Now package files in Gekcel32.zip, see what files were in last time" + "\n";
+            FileInfo fi = new FileInfo(file);
+            double min = (DateTime.Now - fi.LastWriteTime).TotalMinutes;
+            if (min > 15)
+            {
+                MessageBox.Show("ERROR: the file '" + file + "' seems too old (> 15 minutes)");
+                return true;
+            }
+            return false;
+        }        
 
-            MessageBox.Show(s);
+        private void Button_Click_4a(object sender, RoutedEventArgs e)
+        {
+            GekcelZipHelper(32);
+        }
 
+        private void Button_Click_4b(object sender, RoutedEventArgs e)
+        {
+            GekcelZipHelper(64);
+        }
+
+        private void Button_Click_44a(object sender, RoutedEventArgs e)
+        {
+            GekcelFileHelper(32);
+        }
+
+        private void Button_Click_44b(object sender, RoutedEventArgs e)
+        {
+            GekcelFileHelper(64);
+        }
+
+        private static void GekcelFileHelper(int bitness)
+        {
+            string path1 = null;
+            if (bitness == 32)
+            {
+                path1 = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x86\Debug\";
+            }
+            else
+            {
+                path1 = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\x64\Debug\";
+            }
+            string path2 = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\Diverse\ExternalDllFiles\";
+
+            bool fail = false;
+
+            //see also list here: #8907520357238
+            List<string> files = new List<string>();
+            files.Add("Gekko.exe");
+            files.Add("Gekko.pdb");
+            files.Add("ANTLR.dll");
+            foreach (string s in files)
+            {
+                bool b = CheckExpiry(path1 + s);  //only check on these, not the rest
+                if(b)
+                {
+                    fail = true;
+                    break;
+                }
+            }
+            if (fail) return;
+            files.Add("protobuf-net.dll");
+            files.Add("GAMS.net4.dll");
+            files.Add("EPPlus.dll");
+            files.Add("Antlr3.Runtime.dll");
+
+            foreach (string s in files)
+            {
+                File.Copy(path1 + s, path2 + s, true);  //overwrite
+            }
+            MessageBox.Show("Files copied");
+        }
+
+        private static void GekcelZipHelper(int bitness)
+        {
+            string path1 = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\Diverse\ExternalDllFiles\";
+
+            bool fail = false;
+
+            //see also list here: #8907520357238
+            List<string> files = new List<string>();
+            files.Add(path1 + "Gekko.exe");
+            files.Add(path1 + "Gekko.pdb");
+            files.Add(path1 + "ANTLR.dll");            
+            foreach (string s in files)
+            {
+                bool b = CheckExpiry(s);  //only check on these, not the rest
+                if (b)
+                {
+                    fail = true;
+                    break;
+                }
+            }
+            if (fail) return;
+            files.Add(path1 + "protobuf-net.dll");
+            files.Add(path1 + "GAMS.net4.dll");
+            files.Add(path1 + "EPPlus.dll");
+            files.Add(path1 + "Antlr3.Runtime.dll");
+            //hmmmmmmmmmmm what about all the other files??
+            files.Add(path1 + "demo.gbk");
+            // -----
+            string path2 = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\bin\Debug\";
+            files.Add(path2 + "ExcelDna.Integration.dll");
+            files.Add(path2 + "ExcelDna.IntelliSense.dll");
+            files.Add(path2 + "Gekcel.dll");
+            files.Add(path2 + "Gekcel.dna");
+            files.Add(path2 + "Gekcel.pdb");
+            files.Add(path2 + "Gekcel.xll");
+            files.Add(path2 + "Gekcel.xlsm");
+
+            string zip = tools + @"\Gekcel\" + bitness + @"\Gekcel.zip";
+            if (File.Exists(zip)) File.Delete(zip);
+            ZipHelper.CreateZipFromFiles(zip, files);
+
+            //about 64-bit see: https://colinlegg.wordpress.com/2016/09/07/my-first-c-net-udf-using-excel-dna-and-visual-studio/";
+
+            //s = "If there are problems injecting VBA, see Gekcel/Program.cs for trust stuff" + "\n";
+            //s += "1. Double-click Gekcel.xll" + "\n";
+            //s += "2. If there is a security warning, click 'activate'" + "\n";
+            //s += "3. Now there should be a 'Gekko' tab on the ribbon. Click this tab and click the 'Setup' button'" + "\n";
+            //s += "   You should get a message that the Gekko environment is set up." + "\n";
+            //s += "4. Run the macro 'Demo' " + "\n";
+            //MessageBox.Show(s);
+            //s = "Now package files in Gekcel32.zip, see what files were in last time" + "\n";
+
+            MessageBox.Show("Finished packing a Gekcel.zip");
         }
     }
 
