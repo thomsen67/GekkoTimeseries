@@ -8337,9 +8337,11 @@ namespace Gekko
                 Program.Time(t1, t2);
             }
             public static void Q()
-            {
-                G.Writeln2("Global time is: " + G.FromDateToString(Globals.globalPeriodStart) + " to " + G.FromDateToString(Globals.globalPeriodEnd));
+            {                
+                new Writeln(G.FreqAndPeriodPretty(false));
             }
+
+            
         }
 
         public class TimeFilterHelper

@@ -3062,7 +3062,7 @@ namespace Gekko
                         foreach (string ss in ss2) sb.AppendLine("   " + ss.Trim());
                     }
 
-                    sb.AppendLine(" Bitness: " + Program.Get64Bitness());                    
+                    sb.AppendLine(" Bitness: " + Program.Get64Bitness(0));                    
 
                     if(Globals.runningOnTTComputer)
                     {
@@ -3109,6 +3109,20 @@ namespace Gekko
                 //Program.ShowPeriodInStatusField("");                
             }
             return sb;
+        }
+
+        /// <summary>
+        /// Pretty showing current frequency and period, like "Quarterly 2020q1-2024q4".
+        /// </summary>
+        /// <returns></returns>
+        public static string FreqAndPeriodPretty(bool lowerCaseFirstChar)
+        {
+            string start = G.FromDateToString(Globals.globalPeriodStart);
+            string end = G.FromDateToString(Globals.globalPeriodEnd);
+            string f = G.GetFreqPretty();
+            string ss2 = f + " " + start + "-" + end;
+            if (lowerCaseFirstChar) ss2 = char.ToLower(ss2[0]) + ss2.Substring(1);
+            return ss2;
         }
 
         /// <summary>

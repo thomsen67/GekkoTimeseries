@@ -1557,27 +1557,31 @@ namespace Gekko
 
             PrepareExcelDna(xllPath); //necessary for it to run ANTLR etc.          
 
+            string note = null;
+
             //See similar code used in in GuiStuff(), see: #09785932405
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             if (string.IsNullOrEmpty(Program.options.folder_working))
             {
                 if (string.IsNullOrEmpty(xlsmPath))
                 {
+                    //probably happens very rarely
                     Program.options.folder_working = desktop;
-                    new Note("Gekcel working folder set to desktop folder, because calling Excel workbook folder could not be located. Desktop folder: '" + desktop + "'. You may set the working folder manually with the Gekko command 'OPTION folder working = ... ;'");
+                    note = "Gekcel working folder set to desktop folder, because Excel workbook folder could not be located.";
                 }
                 else
                 {
                     try
                     {
                         //Do not use 'using' and G.GekkoStreamWriter() here -- it is just a quick test, and will be caught if it fails!
+                        //detects if xlsm file is in read-only folder.
                         Globals.screenOutput = new StreamWriter(xlsmPath + "\\" + Globals.funnyFileName);
                         Program.options.folder_working = xlsmPath;  //seems ok
                     }
                     catch (Exception e)
                     {
                         Program.options.folder_working = desktop;
-                        new Note("Gekcel working folder set to desktop folder. The calling Excel workbook folder '" + Program.options.folder_working + "' does not seem to have write access. Desktop folder: '" + desktop + "'. You may set the working folder manually with the Gekko command'OPTION folder working = ... ;'");
+                        note = "Gekcel working folder set to desktop folder, because Excel workbook folder seems to be read-only.";
                     }                    
                     Gui.GuiReadOnlyHelper(false);  //delete any funny file
                 }
@@ -1596,6 +1600,8 @@ namespace Gekko
             Program.InitUfunctionsAndArithmeticsAndMore();
             Program.model = new Gekko.Model();
             Program.GetStartingPeriod();
+            if (note != null) new Note(note);
+            new Writeln("Gekko " + Globals.gekkoVersion + " (" + Get64Bitness(1) + "-bit), working folder: " + Program.options.folder_working);
         }
         
         /// <summary>
@@ -6325,7 +6331,6 @@ namespace Gekko
 
             start = G.FromDateToString(Globals.globalPeriodStart);
             end = G.FromDateToString(Globals.globalPeriodEnd);
-
             string f = G.GetFreqPretty();
 
             string workingFolder = "";
@@ -6404,7 +6409,7 @@ namespace Gekko
 
             if (Globals.workerThread != null)
             {
-                string ss2 = f + " " + start + "-" + end + banks + "    |    " + workingFolder;
+                string ss2 = G.FreqAndPeriodPretty(false) + banks + "    |    " + workingFolder;
                 WorkerThreadHelper1 wh = new WorkerThreadHelper1();                
                 wh.statusField = ss2;
                 Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
@@ -6624,7 +6629,7 @@ namespace Gekko
                 //with 64 bit it probably uses pagefile, got all the way up to around 40 mio chunks        --> 16 GB...
                 //     However, 64-bit got SLOW fast, so probably needs tuning regarding page file. 
 
-                G.Writeln(Get64Bitness());
+                G.Writeln(Get64Bitness(0));
 
                 int ii = 0;
                 //memory test to test 64-bit versions
@@ -6712,17 +6717,28 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Info on bitness of Gekko.
+        /// Info on bitness of Gekko. Type == 0 is verbose, type == 1 only returns "32" or "64".
         /// </summary>
         /// <returns></returns>
-        public static string Get64Bitness()
+        public static string Get64Bitness(int type)
         {
-            string s = null;
-            if (Environment.Is64BitProcess) s = "64-bit Gekko process on ";
-            else s = "32-bit Gekko process on ";
-            if (Environment.Is64BitOperatingSystem) s += "64-bit Windows system";
-            else s += "32-bit Windows system";
-            return s;
+            string s1 = null;
+            string s2 = null;
+            if (Environment.Is64BitProcess)
+            {
+                s1 = "64-bit Gekko process on ";
+                s2 = "64";
+            }
+            else
+            {
+                s1 = "32-bit Gekko process on ";
+                s2 = "32";
+            }
+            if (Environment.Is64BitOperatingSystem) s1 += "64-bit Windows system";
+            else s1 += "32-bit Windows system";
+
+            if (type == 0) return s1;
+            else return s2;
         }
 
         /// <summary>

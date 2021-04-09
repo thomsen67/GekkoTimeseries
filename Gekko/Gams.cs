@@ -2272,7 +2272,7 @@ namespace Gekko
                 n.MainAdd("but the inverse may be possible. In general, consider the bitness of both GAMS and");
                 n.MainAdd("Gekko. Newer GAMS versions are 64-bit only, and in general, using Gekko 64-bit is");
                 n.MainAdd("advised, too.");
-                n.MainAdd("Bitness info: " + Program.Get64Bitness() + ".");
+                n.MainAdd("Bitness info: " + Program.Get64Bitness(0) + ".");
             }
         }
 

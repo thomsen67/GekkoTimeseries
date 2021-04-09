@@ -165,9 +165,9 @@ namespace Gekcel
             return ExcelFunctionCalls.Gekko_Put(cells, baseOfArrayZeroOrOne);
         }
 
-        public string Gekko(string commands)
+        public string Gekko(string commands, string path)
         {
-            return ExcelFunctionCalls.Gekko(commands);
+            return ExcelFunctionCalls.Gekko(commands, path);
         }
     }
 
@@ -181,11 +181,11 @@ namespace Gekcel
             return 1d;
         }
 
-        [ExcelFunction(Name = "Gekko_Deleteme", Description = "Delete this")]
-        public static string Gekko_Deleteme()
-        {
-            return ExcelFunctionCalls.CallingFileName();
-        }
+        //[ExcelFunction(Name = "Gekko_Deleteme", Description = "Delete this")]
+        //public static string Gekko_Deleteme()
+        //{
+        //    return ExcelFunctionCalls.CallingFileName();
+        //}
 
         [ExcelFunction(Name = "Gekko_Get", Description = "Transfers data from a Gekko databank to sheet cells")]
         public static object[,] Gekko_Get()
@@ -240,32 +240,32 @@ namespace Gekcel
         }
 
         [ExcelFunction(Name = "Gekko", Description = "Run Gekko command(s)")]
-        public static string Gekko(string commands)
+        public static string Gekko(string commands, string path)
         {
-            return InternalHelperMethods.Run(commands);
+            return InternalHelperMethods.Run(commands, path);
         }
 
-        /// <summary>
-        /// Taken from here: https://microsoft.public.excel.sdk.narkive.com/NJhRTpmT/obtaining-the-full-path-of-a-workbook-from-an-xll
-        /// </summary>
-        /// <returns></returns>
-        [ExcelFunction(IsMacroType = true)]
-        public static string CallingFileName()
-        {
-            string s = null;
-            try
-            {
-                ExcelReference reference = (ExcelReference)XlCall.Excel(XlCall.xlfCaller);
-                string sheetName = (string)XlCall.Excel(XlCall.xlSheetNm, reference);
-                object o1 = XlCall.Excel(XlCall.xlfGetDocument, 2, sheetName);
-                object o2 = XlCall.Excel(XlCall.xlfGetDocument, 88, sheetName);
-                string s1 = (string)o1;
-                string s2 = (string)o2;
-                s = System.IO.Path.Combine(s1, s2);
-            }
-            catch { }
-            return s;
-        }
+        ///// <summary>
+        ///// Taken from here: https://microsoft.public.excel.sdk.narkive.com/NJhRTpmT/obtaining-the-full-path-of-a-workbook-from-an-xll
+        ///// </summary>
+        ///// <returns></returns>
+        //[ExcelFunction(IsMacroType = true)]
+        //public static string CallingFileName()
+        //{
+        //    string s = null;
+        //    try
+        //    {
+        //        ExcelReference reference = (ExcelReference)XlCall.Excel(XlCall.xlfCaller);
+        //        string sheetName = (string)XlCall.Excel(XlCall.xlSheetNm, reference);
+        //        object o1 = XlCall.Excel(XlCall.xlfGetDocument, 2, sheetName);
+        //        object o2 = XlCall.Excel(XlCall.xlfGetDocument, 88, sheetName);
+        //        string s1 = (string)o1;
+        //        string s2 = (string)o2;
+        //        s = System.IO.Path.Combine(s1, s2);
+        //    }
+        //    catch { }
+        //    return s;
+        //}
     }
 
     public static class InternalHelperMethods
@@ -347,8 +347,8 @@ namespace Gekcel
 
 Public Function Gekko(commands As String) As String  
   Dim gekcel As Object
-  Set gekcel = CreateObject(""Gekcel.COMLibrary"")  
-  Gekko = gekcel.Gekko(commands)
+  Set gekcel = CreateObject(""Gekcel.COMLibrary"")
+  Gekko = gekcel.Gekko(commands, Application.ActiveWorkbook.Path)
   Debug.Print Gekko;
   If InStr(1, Gekko, """ + InternalHelperMethods.gekcelError1 + @""") <> 0 Then
     Err.Raise Number:=vbObjectError + 513, Description:=""" + gekcelError2 + @"""    '513 to not collide with Excel's own error numbers
@@ -376,6 +376,7 @@ Public Sub Gekko_Put()
 End Sub
 
 Public Sub Gekko_Demo()  
+  Gekko ""tell gekkoinfo('short4');""
   Gekko ""time 2015 2020;""
   Gekko ""x1 = 1, 2, 3, 4, 5, 6;""
   Gekko ""x2 = 2, 3, 4, 5, 6, 7;""
@@ -401,7 +402,7 @@ End Sub
             //app.Quit();
         }                        
 
-        public static string Run(string commands)
+        public static string Run(string commands, string xlsmPath)
         {
             if (counter == 0)
             {
@@ -409,7 +410,7 @@ End Sub
                 //#7980345743573
                 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;                
-                Program.PrepareExcelDna2(Path.GetDirectoryName(ExcelDnaUtil.XllPath), Path.GetDirectoryName(ExcelFunctionCalls.CallingFileName()));  //MUST use GetDirectoryName()                
+                Program.PrepareExcelDna2(Path.GetDirectoryName(ExcelDnaUtil.XllPath), xlsmPath);
             }
 
             counter++;
