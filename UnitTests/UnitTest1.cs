@@ -12957,7 +12957,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_StackTrace2()
         {
-            if(true)
+            if (false)
             {
                 //Use this if problems.
                 //temp.txt can be opened with Kedit and pasted. May remove some end-line blanks, though...

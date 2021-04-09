@@ -49,9 +49,7 @@ namespace Gekko
         public static bool fixPxProblem = true;
 
         public static bool if_old_helper = false;
-
-        public static bool newErrors = false;
-
+        
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
 
         //Must be near the top of Globals.cs
@@ -669,13 +667,11 @@ namespace Gekko
         public static int guiItershowWindowTopDistance = 50;
         public static int guiItershowWindowLeftDistance = 100;
 
-        public const string linkActionStart = "{a{";
-        public const string linkActionEnd = "}a}";
+        public const string linkActionStart = "{a{";  //these links take up chars, so both Wrap and Table may not be precise, if the link url is too long.
+        public const string linkActionEnd = "}a}";    //this could be remedied by adjusting "real" length of line, but perhaps not worth the effort right now?
         public const char linkActionDelimiter = '¤';
 
-        public static bool newPrint = true;
-
-        //Perhaps merge all this stuff in LinkContainer
+        //Perhaps merge all this stuff with GekkoAction?
         public static long linkContainerCounter = 0L;
         public static Dictionary<long, Program.LinkContainer> linkContainer = new Dictionary<long, Program.LinkContainer>();
         public static long outputTabTextCounter = 0L;
