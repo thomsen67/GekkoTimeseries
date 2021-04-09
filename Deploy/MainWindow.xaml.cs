@@ -760,6 +760,7 @@ namespace Deploy
         private static void GekcelZipHelper(int bitness)
         {
             string path1 = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\Diverse\ExternalDllFiles\";
+            string path2 = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\bin\Debug\";
 
             bool fail = false;
 
@@ -767,7 +768,8 @@ namespace Deploy
             List<string> files = new List<string>();
             files.Add(path1 + "Gekko.exe");
             files.Add(path1 + "Gekko.pdb");
-            files.Add(path1 + "ANTLR.dll");            
+            files.Add(path1 + "ANTLR.dll");
+            if(bitness == 32) files.Add(path2 + "Gekcel.xlsm");  //note: path2 --> this file must be newly createdj for Gekcel 32-bit: good to check that here.
             foreach (string s in files)
             {
                 bool b = CheckExpiry(s);  //only check on these, not the rest
@@ -784,15 +786,14 @@ namespace Deploy
             files.Add(path1 + "Antlr3.Runtime.dll");
             //hmmmmmmmmmmm what about all the other files??
             files.Add(path1 + "demo.gbk");
-            // -----
-            string path2 = @"c:\Thomas\Gekko\GekkoCS\Gekcel\Gekcel\bin\Debug\";
+            // -----            
             files.Add(path2 + "ExcelDna.Integration.dll");
             files.Add(path2 + "ExcelDna.IntelliSense.dll");
             files.Add(path2 + "Gekcel.dll");
             files.Add(path2 + "Gekcel.dna");
             files.Add(path2 + "Gekcel.pdb");
             files.Add(path2 + "Gekcel.xll");
-            files.Add(path2 + "Gekcel.xlsm");
+            if (bitness == 64) files.Add(path2 + "Gekcel.xlsm");  //when packaging Gekcel 64-bit, the file may be > 15 minutes if we are slow...
 
             string zip = tools + @"\Gekcel\" + bitness + @"\Gekcel.zip";
             if (File.Exists(zip)) File.Delete(zip);

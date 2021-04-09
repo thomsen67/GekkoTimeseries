@@ -3123,7 +3123,56 @@ namespace Gekko
             string ss2 = f + " " + start + "-" + end;
             if (lowerCaseFirstChar) ss2 = char.ToLower(ss2[0]) + ss2.Substring(1);
             return ss2;
+        }        
+
+        /// <summary>
+        /// Used for the gekkoInfo() in-built function
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string GekkoInfo(string s)
+        {
+            string rv = null;
+            if (G.Equal(s, "short1"))
+            {
+                //Gekko 3.0.1
+                rv = "Gekko " + Globals.gekkoVersion;
+            }
+            else if (G.Equal(s, "short2"))
+            {
+                //Gekko 3.0.1 (64-bit)
+                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit)";
+            }
+            else if (G.Equal(s, "short3"))
+            {
+                //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
+                string wf = "[empty]";
+                if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
+                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true);
+            }
+            else if (G.Equal(s, "short4"))
+            {
+                //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
+                string wf = "[empty]";
+                if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
+                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), working folder = " + wf;
+            }
+            else if (G.Equal(s, "short5"))
+            {
+                //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
+                string wf = "[empty]";
+                if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
+                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true) + ", working folder = " + wf;
+            }
+            else
+            {
+                new Error("Illegal argument '" + s + "'");
+            }
+
+            return rv;
         }
+
+
 
         /// <summary>
         /// Helper for getting installed .NET versions

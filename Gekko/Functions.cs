@@ -3974,45 +3974,11 @@ namespace Gekko
         public static IVariable gekkoinfo(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             string s = O.ConvertToString(x);
-            string rv = null;
-            if (G.Equal(s, "short1"))
-            {
-                //Gekko 3.0.1
-                rv = "Gekko " + Globals.gekkoVersion;
-            }
-            else if (G.Equal(s, "short2"))
-            {
-                //Gekko 3.0.1 (64-bit)
-                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit)";
-            }
-            else if (G.Equal(s, "short3"))
-            {
-                //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
-                string wf = "[empty]";
-                if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
-                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true);
-            }
-            else if (G.Equal(s, "short4"))
-            {
-                //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
-                string wf = "[empty]";
-                if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
-                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), working folder = " + wf;
-            }
-            else if (G.Equal(s, "short5"))
-            {
-                //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
-                string wf = "[empty]";
-                if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
-                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true) + ", working folder = " + wf;
-            }
-            else
-            {
-                new Error("Illegal argument '" + s + "'");
-            }
+            string rv = G.GekkoInfo(s);
             return new ScalarString(rv);
         }
 
+        
         public static IVariable currentfreq(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarString(G.ConvertFreq(Program.options.freq));

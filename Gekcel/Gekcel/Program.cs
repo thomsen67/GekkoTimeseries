@@ -397,7 +397,7 @@ End Sub
             // -----------------------------------------------------
 
             codeModule.InsertLines(lineNum, codeText);
-            targetExcelFile.Save();  //saves file            
+            targetExcelFile.Save();  //writes the .xlsm file with the VBA-macro included. The file is used in both Gekcel 32- and 64-bit.
 
             //app.Quit();
         }                        

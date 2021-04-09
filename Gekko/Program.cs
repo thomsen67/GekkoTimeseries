@@ -1540,7 +1540,7 @@ namespace Gekko
         //ok that it is not referenced to, is used in Gekcel
         public static void PrepareExcelDna(string xllPath)
         {
-            if (File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna() called with: " + xllPath);
+            if (Globals.runningOnTTComputer && File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna() called with: " + xllPath);
             Globals.excelDna = true;
             Globals.excelDnaPath = xllPath;
         }
@@ -1553,7 +1553,7 @@ namespace Gekko
         //ok that it is not referenced to, is used in Gekcel
         public static void PrepareExcelDna2(string xllPath, string xlsmPath)
         {
-            if (File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna2() called with: " + xllPath + "  -----  " + xlsmPath);
+            if (Globals.runningOnTTComputer && File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna2() called with: " + xllPath + "  -----  " + xlsmPath);
 
             PrepareExcelDna(xllPath); //necessary for it to run ANTLR etc.          
 
@@ -1600,8 +1600,17 @@ namespace Gekko
             Program.InitUfunctionsAndArithmeticsAndMore();
             Program.model = new Gekko.Model();
             Program.GetStartingPeriod();
-            if (note != null) new Note(note);
-            new Writeln("Gekko " + Globals.gekkoVersion + " (" + Get64Bitness(1) + "-bit), working folder: " + Program.options.folder_working);
+
+            //The stuff below does not get printed in Gekcel: wonder why?
+            if (true)
+            {
+                if (note != null)
+                {
+                    //if working folder is set to desktop
+                    new Note(note);
+                }
+                new Writeln(G.GekkoInfo("short4"));
+            }
         }
         
         /// <summary>
