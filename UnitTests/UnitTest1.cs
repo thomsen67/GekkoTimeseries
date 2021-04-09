@@ -12957,6 +12957,16 @@ namespace UnitTests
         [TestMethod]
         public void _Test_StackTrace2()
         {
+            if(true)
+            {
+                //Use this if problems.
+                //temp.txt can be opened with Kedit and pasted. May remove some end-line blanks, though...
+                string s1 = null;
+                string s2 = null;
+                File.WriteAllText("c:\\Thomas\\Desktop\\gekko\\testing\\temp.txt", s1);
+                CompareTwoStrings(s1, s2);
+            }
+
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");            
 
@@ -12978,7 +12988,8 @@ namespace UnitTests
     [   1]:   run cc1;
 
     Call stack: Command line calling -->
-    c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";            
+    c:\Thomas\Gekko\regres\StackTrace\c1.gcm (run-time error in line 1)";   
+            
             Assert.IsTrue(c1.Contains(cc1));
 
             // ====================================================
@@ -12998,6 +13009,7 @@ namespace UnitTests
 
     Call stack: Command line calling -->
     c:\Thomas\Gekko\regres\StackTrace\c2.gcm (run-time error in line 1)";
+
             Assert.IsTrue(c2.Contains(cc2));
 
             // ====================================================
@@ -13005,16 +13017,32 @@ namespace UnitTests
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run c3;");
             string c3 = Globals.unitTestScreenOutput.ToString();
+            string cc3 =
+@"*** ERROR: Cannot find user function 'notexisting()' with 0 arguments.
+*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\cc3.gcm', line 5
+    [   5]:   y = notexisting();
 
-            if (true)
-            {
-                File.WriteAllText("c:\\Thomas\\Desktop\\gekko\\testing\\temp.txt", c3);
-                //CompareTwoStrings(c3, cc3);
-            }
+    Call stack: Command line calling -->
+    c:\Thomas\Gekko\regres\StackTrace\c3.gcm line 1 calling -->
+    c:\Thomas\Gekko\regres\StackTrace\cc3.gcm (run-time error in line 5)";
+
+            Assert.IsTrue(c3.Contains(cc3));
+
+            // ====================================================
 
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run c4;");
             string c4 = Globals.unitTestScreenOutput.ToString();
+            string cc4 =
+@"*** ERROR: Could not find variable '%x' in any open databank
+*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\cc4.gcm', line 5
+    [   5]:   y = %x;  //will fail with a run-error
+
+    Call stack: Command line calling -->
+    c:\Thomas\Gekko\regres\StackTrace\c4.gcm line 1 calling -->
+    c:\Thomas\Gekko\regres\StackTrace\cc4.gcm (run-time error in line 5)";
+
+            Assert.IsTrue(c4.Contains(cc4));            
 
             // ------------------
             // Models
@@ -13022,11 +13050,41 @@ namespace UnitTests
 
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run m1;");
-            string m1 = Globals.unitTestScreenOutput.ToString();
+            string m1 = Globals.unitTestScreenOutput.ToString();            
+            string mm1 =
+@"*** ERROR: Parsing user input block, line 5 pos 16
+           Model lexer error: Exception of type 'Antlr.Runtime.NoViableAltException' was thrown.
+    [   5]:   frml _i y = x1 ¤ x2;  
+                             ^
+                             ^
+*** ERROR: Problem parsing/lexing file 'c:\Thomas\Gekko\regres\StackTrace\mm1.gcm', line 5
+    [   5]:   model m1;
+
+    Call stack: Command line calling -->
+    c:\Thomas\Gekko\regres\StackTrace\m1.gcm line 1 calling -->
+    c:\Thomas\Gekko\regres\StackTrace\mm1.gcm (run-time error in line 5)";
+            
+            Assert.IsTrue(m1.Contains(mm1));
+
+            // ====================================================
 
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run m2;");
             string m2 = Globals.unitTestScreenOutput.ToString();
+            string mm2 =
+@"*** ERROR: Parsing file: c:\Thomas\Gekko\regres\StackTrace\m2.frm line 5 pos 21
+           missing RP at ';'
+    [   5]:   frml _i y = (x1 * x2;  
+                                  ^
+                                  ^
+*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\mm2.gcm', line 5
+    [   5]:   model m2;
+
+    Call stack: Command line calling -->
+    c:\Thomas\Gekko\regres\StackTrace\m2.gcm line 1 calling -->
+    c:\Thomas\Gekko\regres\StackTrace\mm2.gcm (run-time error in line 5)";
+            
+            Assert.IsTrue(m2.Contains(mm2));            
         }
 
         private static void CompareTwoStrings(string w1, string w2)
