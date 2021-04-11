@@ -2017,7 +2017,7 @@ namespace Gekko
                             O.Help("restore_session");
                         };
 
-                        G.Writeln2("Restore session (" + Program.GetDateTimePretty(dt, true) + ")?  " + G.GetLinkAction("snapshot (" + G.CountLines(Globals.sessionMemorySnapshot, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "  |  " + G.GetLinkAction("history (" + G.CountLines(Globals.sessionMemoryHistory, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + "  |  " + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
+                        G.Writeln2("Restore session (" + Program.GetDateTimePretty(dt, true) + ")?  " + G.GetLinkAction("snapshot (" + G.CountLines(Globals.sessionMemorySnapshot, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "  |  " + G.GetLinkAction("history (" + G.CountLines(Globals.sessionMemoryHistory, true) + " lines)", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + "  |  " + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, a3)));
                     }
                 }
 
