@@ -409,7 +409,13 @@ namespace Gekko
                 }
 
                 string explanation = null;
-                if (varExpl != null && varExpl.Count > 0) explanation = G.HandleQuoteInQuote(varExpl[0], true);
+                if (varExpl != null && varExpl.Count > 0)
+                {
+                    foreach (string varExpl2 in varExpl)
+                    {
+                        explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";
+                    }
+                }
                 vars2.Add(var + "¤" + explanation);
 
                 StringBuilder sb4 = new StringBuilder();

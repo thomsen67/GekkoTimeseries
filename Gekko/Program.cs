@@ -19491,8 +19491,17 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Can only use SERIES, VAL, 1x1 MATRIX, or LISTs with these");
-                    //throw new GekkoException();
+                    using (Error e = new Error())
+                    {
+                        string type = G.GetTypeString(x);
+                        e.MainAdd("The argument is of " + type + " type.");
+                        e.MainAdd("The argument can only be series, value, 1x1 matrix (or lists containing these).");
+                        if (type == "string")
+                        {
+                            e.MainAdd("If you are using a string %s as a name, you should enclose it in {}-braces: {%s}.");
+                        }
+                        //e.MoreAdd("");
+                    } 
                 }
             }
             return xlistUnfolded;
