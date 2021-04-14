@@ -245,21 +245,7 @@ namespace Gekko
                 foreach (string s14 in temp.Keys) vars.Add(s14);
             }
 
-            if (false)
-            {
-                List<string> ss9 = new List<string>();
-                foreach (string s in vars)
-                {
-                    if (s.ToLower().StartsWith("phk")) ss9.Add(s);
-                }
-                //MessageBox.Show(ss9);                
-                List<EquationHelper> p = Program.model.modelGekko.equationsNotRunAtAll;
-                List<EquationHelper> yt = Program.model.modelGekko.equationsReverted;
-                //here we could use .lhsvariable and .precedentsWithLagIndicator to
-                //obtain variables for p-type equations.
-                return;
-            }
-
+            
             if (Globals.browserLimit)
             {
                 vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon", "phk2", "phk3", "JNTPPIK" };  //phk2 is t-type, phk3 is p-type and JNTPPIK is y-type. The y-type is not shown
@@ -413,6 +399,7 @@ namespace Gekko
                 {
                     foreach (string varExpl2 in varExpl)
                     {
+                        if (varExpl2.Trim().StartsWith("Series: " + var, StringComparison.OrdinalIgnoreCase)) continue;  //not interesting here
                         explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";
                     }
                 }
@@ -876,7 +863,7 @@ namespace Gekko
             string js = @"
 
             function varnavns() {
-                var varnavn = [" + s1.ToLower() + @"];
+                var varnavn = [" + s1 + @"];
                 return varnavn;
             }
 

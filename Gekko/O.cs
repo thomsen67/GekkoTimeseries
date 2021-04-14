@@ -8205,10 +8205,7 @@ namespace Gekko
 
                 for (int i = 0; i < listItems.Count; i++)
                 {
-                    //#098098q3453
-                    //maybe this.opt_bank should be <frombank=...> not <bank=...>
-                    //and we could have a <tobank=...>
-
+                    
                     string frombank = null;
                     if (this.opt_bank != null) frombank = this.opt_bank;
                     if (this.opt_frombank != null) frombank = this.opt_frombank;
@@ -8219,10 +8216,9 @@ namespace Gekko
 
                     Series ts = iv as Series;
 
-                    if (ts.Type() != EVariableType.Series)
+                    if (ts == null)
                     {
-                        new Error("Expected series type");
-                        //throw new GekkoException();
+                        new Error("Rebasing is only meaningful for series type. Type is: " + G.GetTypeString(iv));
                     }
 
                     GekkoTime ddate1 = t1;

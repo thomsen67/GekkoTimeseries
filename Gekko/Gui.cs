@@ -308,19 +308,28 @@ namespace Gekko
             
             G.WriteDirs("small", false);
 
-            if (Globals.gekkoVersion == "3.1.7" || Globals.gekkoVersion == "3.1.8" || Globals.gekkoVersion == "3.1.9" || Globals.gekkoVersion == "3.1.10")
+            if (Globals.gekkoVersion == "3.1.12" || Globals.gekkoVersion == "3.1.13" || Globals.gekkoVersion == "3.1.14")
             {
-                Action a = () =>
+                using (Note note = new Note())
                 {
-                    O.Help("i_dynamic_statements");
-                };
-
-                G.Writeln("+++ NOTE: Starting with the Gekko 3.1.7 version, dynamic statements with lagged dependent/endogenous");
-                G.Writeln("    variables like for instance x = x[-1] + 1 need to be decorated with either <dyn> or <dyn = no>");
-                G.Writeln("    in order to run without errors. Such errors may break existing programs written for Gekko");
-                G.Writeln("    versions 3.1.6 or earlier. See more on " + G.GetLinkAction("this help page", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + " on dynamics checking, dynamics errors,");
-                G.Writeln("    and how to suppress or fix such errors.");
-                G.Writeln();
+                    note.MainAdd("Starting with the Gekko 3.1.12 version, the default {a{MODE¤mode.htm}a} of Gekko is changed to 'mixed'.");
+                    note.MainAdd("This is the most general mode, and the change should have no concequences for existing Gekko 3.x programs.");
+                    note.MainAdd("Per default, the status bar at the bottom of the main window is now yellow because of this change.");
+                    //
+                    note.MoreAdd("Gekko has three {a{modes¤mode.htm}a}: mixed-mode (the most general), data-mode (for data management), and sim-mode (for modeling).");
+                    note.MoreAdd("The most particular of these three modes is sim-mode, where you must use {a{CREATE¤create.htm}a} to define a non-model timeseries,");
+                    note.MoreAdd("and where databank searching is deactivated. The other two modes are more similar, and the differences between data-mode and mixed-mode");
+                    note.MoreAdd("are limited. In contrast to mixed-mode, data-mode issues some warnings when using commands like READ, MULPRT, etc.");
+                    note.MoreAdd("Since these commands can still be useful in non-modeling programs, the default mode has been changed to 'mixed'.");
+                    note.MoreNewLine();
+                    note.MoreAdd("Note that it is entirely possible to do modeling in mixed-mode. Some users even prefer that, because of the added flexibility,");
+                    note.MoreAdd("and the possibility of doing data management and modeling using the same mode.");
+                    note.MoreAdd("There are some drawbacks to the flexibility, though. When doing modeling in mixed mode, the user may think that a statement like 'y = ... ;' changes a model variable y,");
+                    note.MoreAdd("but the user will not be alerted if y is not part of the model. Also, a statement like 'y = x;' may find x in an {a{OPEN¤open.htm}a} databank, if x is not");
+                    note.MoreAdd("present in the first-position (typically: Work) databank.");
+                    note.MoreNewLine();
+                    note.MoreAdd("Whether to use mixed-mode or alternate between sim- and data-mode is basically a question of taste, and perhaps habit.");
+                }                
             }
             
             Program.CreateLocalCopyHelpChm();

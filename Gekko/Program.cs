@@ -19498,9 +19498,8 @@ namespace Gekko
                         e.MainAdd("The argument can only be series, value, 1x1 matrix (or lists containing these).");
                         if (type == "string")
                         {
-                            e.MainAdd("If you are using a string %s as a name, you should enclose it in {}-braces: {%s}.");
+                            e.MainAdd("If you are using a string %s as a series name, you should enclose it in curlies: {%s}.");
                         }
-                        //e.MoreAdd("");
                     } 
                 }
             }

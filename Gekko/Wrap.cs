@@ -241,7 +241,7 @@ namespace Gekko
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     O.Cls("output");
                     this.ConsolidateLines("more");
-                    for (int ii = 0; ii < this.storageMain.Count; ii++)
+                    for (int ii = 0; ii < this.storageMore.Count; ii++)
                     {
                         WrapHelper(this.storageMore[ii].linesAtStart, 1, "", "", this.storageMore[ii].consolidated, lineWidth, Color.Empty, ETabs.Output, this.type, mustAlsoPrintOnScreen);
                     }
