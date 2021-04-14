@@ -2979,6 +2979,67 @@ namespace Gekko
         }
 
 
+        public static IVariable interpolate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            // interpolate(x)
+            // interpolate(x, 'repeat')
+            // interpolate(x, 'm')
+            // interpolate(x, 'm', 'repeat')
+
+            //either a --> q, a --> m, or q --> m.
+            //if freq not stated: a --> q, q --> m. Else fail.            
+
+            GekkoTime t1, t2;
+            Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            
+            if (x.Length < 1) new Error("Expected interpolate() with >= 1 arguments.");
+            if (x.Length > 3) new Error("Expected interpolate() with <= 3 arguments.");
+
+            IVariable iv = x[0];
+            if (G.IsGekkoNull(iv)) return iv;
+            Series ts = iv as Series;
+            if (ts == null) new Error("Expected a timeseries as first argument, got " + G.GetTypeString(iv) + " type");
+
+            string freq_destination = null;
+            string method = "repeat";
+
+            if (x.Length > 1)
+            {
+                string s = O.ConvertToString(x[1]);
+                if (G.Equal(s, "repeat") || G.Equal(s, "prorate"))
+                {
+                    method = s;
+                    if (x.Length == 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the frequency first, and then the method.");
+                }
+                else
+                {
+                    freq_destination = s;
+                    if (x.Length == 3) method = O.ConvertToString(x[2]);
+                }
+            }
+
+            if (freq_destination == null)
+            {
+                //state defaults
+                if (ts.freq == EFreq.D) new Error("You cannot input a daily series for interpolate().");
+                else if (ts.freq == EFreq.M) new Error("You cannot input a monthly series for interpolate().");
+                else if (ts.freq == EFreq.Q) freq_destination = "m";
+                else if (ts.freq == EFreq.A) freq_destination = "q";
+                else
+                {
+                    new Error("The frequency of the input timeseries should be Q or M for interpolate().");
+                }
+            }
+
+            Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
+
+            EFreq e0; EFreq e1;
+            Program.InterpolateHelper(tsNew, ts, method, out e0, out e1);
+
+            return tsNew;
+        }
+
+
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable pchy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {

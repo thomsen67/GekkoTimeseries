@@ -16786,6 +16786,26 @@ print(df2)
             }
             _AssertSeries(First(), "x1!m", EFreq.M, 2002, 4, double.NaN, sharedDelta);
 
+            // -------------------
+            // function interpolate()
+            // -------------------
+
+            //also testing bank on rhs, implicitely also tests this for COLLAPSE
+            I("RESET; MODE data;");
+            I("OPTION freq a;");
+            I("TIME 2001 2005;");
+            I("SERIES @x = (1, 5, 3, m(), 10);");
+            I("x1!q = interpolate(ref:x!a, 'repeat');");
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            for (int i = 1; i <= 4; i++)
+            {
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2001, i, 1d, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2002, i, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2003, i, 3d, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2005, i, 10d, sharedDelta);
+            }
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
         }
 
         [TestMethod]

@@ -19228,108 +19228,115 @@ namespace Gekko
                     new Error("Cannot find: " + yRhs);
                 }
 
-                if (method == null) method = "repeat";
+                EFreq eFreq0, eFreq1;
+                method = InterpolateHelper(ts_lhs, ts_rhs, method, out eFreq0, out eFreq1);
 
-                EFreq eFreq0 = ts_rhs.freq;
-                EFreq eFreq1 = ts_lhs.freq;
-
-                GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries.
-                GekkoTime last = ts_rhs.GetPeriodLast(); //end of high-freq timeseries
-
-                double vsum = double.NaN;
-                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
-                {
-                    double value = ts_rhs.GetDataSimple(t);
-                    if (value == double.NaN) continue;
-                    if (eFreq1 == EFreq.Q && eFreq0 == EFreq.A)
-                    {
-                        //Conversion from A to Q                                        
-                        if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
-                        {
-                            for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
-                            {
-                                GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
-                                ts_lhs.SetData(gt, value);
-                            }
-                        }
-                        else if (G.Equal(method, "prorate"))
-                        {
-                            for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
-                            {
-                                GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
-                                ts_lhs.SetData(gt, value / (double)Globals.freqQSubperiods);
-                            }
-                        }
-                        else
-                        {
-                            new Error("wrong method in INTERPOLATE: '" + method + "'");
-                            //throw new GekkoException();
-                        }
-                    }
-                    else if (eFreq1 == EFreq.M && eFreq0 == EFreq.A)
-                    {
-                        //Conversion from A to M
-                        if (G.Equal(method, "repeat"))
-                        {
-                            for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
-                            {
-                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                                ts_lhs.SetData(gt, value);
-                            }
-                        }
-                        else if (G.Equal(method, "prorate"))
-                        {
-                            for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
-                            {
-                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                                ts_lhs.SetData(gt, value / (double)Globals.freqMSubperiods);
-                            }
-                        }
-                        else
-                        {
-                            new Error("wrong method in INTERPOLATE: " + method + "'");
-                            //throw new GekkoException();
-                        }
-                    }
-                    else if (eFreq1 == EFreq.M && eFreq0 == EFreq.Q)
-                    {
-                        //Conversion from Q to M
-                        int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
-                        int startSub = (t.sub - 1) * mInQ + 1;  //1->1, 2->4, 3->7, 4->10
-                        if (G.Equal(method, "repeat"))
-                        {
-                            for (int i = startSub; i < startSub + mInQ; i++)
-                            {
-                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                                ts_lhs.SetData(gt, value);
-                            }
-                        }
-                        else if (G.Equal(method, "prorate"))
-                        {
-                            for (int i = startSub; i < startSub + mInQ; i++)
-                            {
-                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                                ts_lhs.SetData(gt, value / (double)mInQ);
-                            }
-                        }
-                        else
-                        {
-                            new Error("wrong method in INTERPOLATE: " + method + "'");
-                            //throw new GekkoException();
-                        }
-
-                    }
-                    else
-                    {
-                        new Error("Cannot INTERPOLATE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
-                        //throw new GekkoException();
-                    }
-                }
-                //G.Writeln("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
                 G.ServiceMessage("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
             }
             return;
-        }        
+        }
+
+        public static string InterpolateHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq eFreq0, out EFreq eFreq1)
+        {
+            if (method == null) method = "repeat";
+
+            eFreq0 = ts_rhs.freq;
+            eFreq1 = ts_lhs.freq;
+            GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries.
+            GekkoTime last = ts_rhs.GetPeriodLast(); //end of high-freq timeseries
+
+            double vsum = double.NaN;
+            foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+            {
+                double value = ts_rhs.GetDataSimple(t);
+                if (value == double.NaN) continue;
+                if (eFreq1 == EFreq.Q && eFreq0 == EFreq.A)
+                {
+                    //Conversion from A to Q                                        
+                    if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
+                    {
+                        for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
+                            ts_lhs.SetData(gt, value);
+                        }
+                    }
+                    else if (G.Equal(method, "prorate"))
+                    {
+                        for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
+                            ts_lhs.SetData(gt, value / (double)Globals.freqQSubperiods);
+                        }
+                    }
+                    else
+                    {
+                        new Error("wrong method in INTERPOLATE: '" + method + "'");
+                        //throw new GekkoException();
+                    }
+                }
+                else if (eFreq1 == EFreq.M && eFreq0 == EFreq.A)
+                {
+                    //Conversion from A to M
+                    if (G.Equal(method, "repeat"))
+                    {
+                        for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                            ts_lhs.SetData(gt, value);
+                        }
+                    }
+                    else if (G.Equal(method, "prorate"))
+                    {
+                        for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                            ts_lhs.SetData(gt, value / (double)Globals.freqMSubperiods);
+                        }
+                    }
+                    else
+                    {
+                        new Error("wrong method in INTERPOLATE: " + method + "'");
+                        //throw new GekkoException();
+                    }
+                }
+                else if (eFreq1 == EFreq.M && eFreq0 == EFreq.Q)
+                {
+                    //Conversion from Q to M
+                    int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
+                    int startSub = (t.sub - 1) * mInQ + 1;  //1->1, 2->4, 3->7, 4->10
+                    if (G.Equal(method, "repeat"))
+                    {
+                        for (int i = startSub; i < startSub + mInQ; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                            ts_lhs.SetData(gt, value);
+                        }
+                    }
+                    else if (G.Equal(method, "prorate"))
+                    {
+                        for (int i = startSub; i < startSub + mInQ; i++)
+                        {
+                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                            ts_lhs.SetData(gt, value / (double)mInQ);
+                        }
+                    }
+                    else
+                    {
+                        new Error("wrong method in INTERPOLATE: " + method + "'");
+                        //throw new GekkoException();
+                    }
+
+                }
+                else
+                {
+                    new Error("Cannot INTERPOLATE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
+                    //throw new GekkoException();
+                }
+            }
+
+            return method;
+        }
 
         private static Databank GetDatabank(string b1)
         {
