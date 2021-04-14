@@ -19005,188 +19005,188 @@ namespace Gekko
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
-                if (method == null) method = "total";
-
-                EFreq eFreq0 = ts_rhs.freq;
-                EFreq eFreq1 = ts_lhs.freq;
-
-                if (eFreq0 == EFreq.U || eFreq1 == EFreq.U)
-                {
-                    new Error("COLLAPSE cannot involve undated timeseries");
-                    //throw new GekkoException();
-                }
-
-                GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries
-                GekkoTime last = ts_rhs.GetPeriodLast(); //end of high-freq timeseries
-                
-                if (eFreq0 == EFreq.Q && eFreq1 == EFreq.A)
-                {
-                    //Conversion from Q to A
-                    double vsum = double.NaN;
-                    foreach (GekkoTime t in new GekkoTimeIterator(first, last))
-                    {
-                        
-                        double value = ts_rhs.GetDataSimple(t);
-                        if (t.sub == 1) vsum = 0d;
-                        GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
-                        if (G.Equal(method, "total"))
-                        {
-                            vsum += value;
-                            if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, vsum);
-                        }
-                        else if (G.Equal(method, "avg"))
-                        {
-                            vsum += value;
-                            if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, vsum / (double)Globals.freqQSubperiods);
-                        }
-                        else if (G.Equal(method, "first"))
-                        {
-                            if (t.sub == 1) ts_lhs.SetData(ttemp, value);
-                        }
-                        else if (G.Equal(method, "last"))
-                        {
-                            if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, value);
-                        }
-                        else
-                        {
-                            new Error("wrong method in COLLAPSE: " + method + "'");
-                            //throw new GekkoException();
-                        }
-                    }
-                }
-                else if (eFreq0 == EFreq.M && eFreq1 == EFreq.A)
-                {
-                    //Conversion from M to A
-                    double vsum = double.NaN;
-                    foreach (GekkoTime t in new GekkoTimeIterator(first, last))
-                    {
-                        
-                        double value = ts_rhs.GetDataSimple(t);
-                        if (t.sub == 1) vsum = 0d;
-                        GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
-                        if (G.Equal(method, "total"))
-                        {
-                            vsum += value;
-                            if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, vsum);
-                        }
-                        else if (G.Equal(method, "avg"))
-                        {
-                            vsum += value;
-                            if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, vsum / (double)Globals.freqMSubperiods);
-                        }
-                        else if (G.Equal(method, "first"))
-                        {
-                            if (t.sub == 1) ts_lhs.SetData(ttemp, value);
-                        }
-                        else if (G.Equal(method, "last"))
-                        {
-                            if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, value);
-                        }
-                        else
-                        {
-                            new Error("wrong method in COLLAPSE: " + method + "'");
-                            //throw new GekkoException();
-                        }
-                    }
-                }
-                else if (eFreq0 == EFreq.M && eFreq1 == EFreq.Q)
-                {
-                    //Conversion from M to Q
-                    double vsum = double.NaN;
-                    foreach (GekkoTime t in new GekkoTimeIterator(first, last))
-                    {
-                        double value = ts_rhs.GetDataSimple(t);
-                        int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
-                        int quarter = (t.sub - 1) / mPerQ + 1;
-                        if (t.sub % mPerQ == 1) vsum = 0d;
-                        GekkoTime ttemp = new GekkoTime(eFreq1, t.super, quarter);
-                        if (G.Equal(method, "total"))
-                        {
-                            vsum += value;
-                            if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, vsum);
-                        }
-                        else if (G.Equal(method, "avg"))
-                        {
-                            vsum += value;
-                            if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, vsum / (double)mPerQ);
-                        }
-                        else if (G.Equal(method, "first"))
-                        {
-                            if (t.sub % mPerQ == 1) ts_lhs.SetData(ttemp, value);
-                        }
-                        else if (G.Equal(method, "last"))
-                        {
-                            if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, value);
-                        }
-                    }
-                }
-                else if (eFreq0 == EFreq.D && eFreq1 == EFreq.M)
-                {
-                    //Conversion from D to M
-                    double vsum = 0d;
-                    bool ignoreNaN = true;
-
-                    double n = 0d;                                
-
-                    foreach (GekkoTime t in new GekkoTimeIterator(first, last))
-                    {
-                        //!! BEWARE: if a 'continue' is used, a tLowFreqPrevious = tLowFreq must be issued.
-                                                
-                        GekkoTime tLowFreq = new GekkoTime(eFreq1, t.super, t.sub);
-                        GekkoTime tNext = t.Add(1);
-                        GekkoTime tLowFreqNext = new GekkoTime(eFreq1, tNext.super, tNext.sub);
-
-                        bool shouldCollapse = tLowFreqNext.StrictlyLargerThan(tLowFreq) || t.IsSamePeriod(last);
-
-                        double value = ts_rhs.GetDataSimple(t);                                                
-                        
-                        if (G.Equal(method, "avg") || G.Equal(method, "total"))
-                        {
-                            if (!(ignoreNaN && G.isNumericalError(value)))
-                            {
-                                vsum += value;
-                                n++;
-                            }
-
-                            if (shouldCollapse)
-                            {
-                                CollapseHelper(method, ts_lhs, vsum, n, tLowFreq);
-                                vsum = 0d;
-                                n = 0d;
-                            }
-                        }                        
-                        else if (G.Equal(method, "first"))
-                        {
-                            //TODO: first with data?
-                            new Error("Option 'first' not yet implemented for daily collapse");
-                            //throw new GekkoException();
-                            //if (t.subsub == 1) ts_lhs.SetData(tLowFreq, value);
-                        }
-                        else if (G.Equal(method, "last"))
-                        {
-                            //TODO: last with data?
-                            new Error("Option 'last' not yet implemented for daily collapse");
-                            //throw new GekkoException();
-                            //if (t.subsub == G.DaysInMonth(t.super, t.sub)) ts_lhs.SetData(tLowFreq, value);
-                        }
-                        else
-                        {
-                            new Error("wrong method in COLLAPSE: " + method + "'");
-                            //throw new GekkoException();
-                        }
-
-                    }
-                }
-                else
-                {
-                    new Error("Cannot COLLAPSE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
-                    //throw new GekkoException();
-                }
+                EFreq eFreq0, eFreq1;
+                method = CollapseHelper(ts_lhs, ts_rhs, method, out eFreq0, out eFreq1);
 
                 G.ServiceMessage("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
 
             }
             return;
+        }
+
+        public static string CollapseHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq eFreq0, out EFreq eFreq1)
+        {
+            if (method == null) method = "total";
+
+            eFreq0 = ts_rhs.freq;
+            eFreq1 = ts_lhs.freq;
+            if (eFreq0 == EFreq.U || eFreq1 == EFreq.U)
+            {
+                new Error("COLLAPSE cannot involve undated timeseries");
+            }
+
+            GekkoTime first = ts_rhs.GetPeriodFirst(); //start of high-freq timeseries
+            GekkoTime last = ts_rhs.GetPeriodLast(); //end of high-freq timeseries
+
+            if (eFreq0 == EFreq.Q && eFreq1 == EFreq.A)
+            {
+                //Conversion from Q to A
+                double vsum = double.NaN;
+                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                {
+
+                    double value = ts_rhs.GetDataSimple(t);
+                    if (t.sub == 1) vsum = 0d;
+                    GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
+                    if (G.Equal(method, "total"))
+                    {
+                        vsum += value;
+                        if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, vsum);
+                    }
+                    else if (G.Equal(method, "avg"))
+                    {
+                        vsum += value;
+                        if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, vsum / (double)Globals.freqQSubperiods);
+                    }
+                    else if (G.Equal(method, "first"))
+                    {
+                        if (t.sub == 1) ts_lhs.SetData(ttemp, value);
+                    }
+                    else if (G.Equal(method, "last"))
+                    {
+                        if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, value);
+                    }
+                    else
+                    {
+                        new Error("wrong method in COLLAPSE: " + method + "'");
+                        //throw new GekkoException();
+                    }
+                }
+            }
+            else if (eFreq0 == EFreq.M && eFreq1 == EFreq.A)
+            {
+                //Conversion from M to A
+                double vsum = double.NaN;
+                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                {
+
+                    double value = ts_rhs.GetDataSimple(t);
+                    if (t.sub == 1) vsum = 0d;
+                    GekkoTime ttemp = new GekkoTime(eFreq1, t.super, 1);
+                    if (G.Equal(method, "total"))
+                    {
+                        vsum += value;
+                        if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, vsum);
+                    }
+                    else if (G.Equal(method, "avg"))
+                    {
+                        vsum += value;
+                        if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, vsum / (double)Globals.freqMSubperiods);
+                    }
+                    else if (G.Equal(method, "first"))
+                    {
+                        if (t.sub == 1) ts_lhs.SetData(ttemp, value);
+                    }
+                    else if (G.Equal(method, "last"))
+                    {
+                        if (t.sub == Globals.freqMSubperiods) ts_lhs.SetData(ttemp, value);
+                    }
+                    else
+                    {
+                        new Error("wrong method in COLLAPSE: " + method + "'");
+                        //throw new GekkoException();
+                    }
+                }
+            }
+            else if (eFreq0 == EFreq.M && eFreq1 == EFreq.Q)
+            {
+                //Conversion from M to Q
+                double vsum = double.NaN;
+                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                {
+                    double value = ts_rhs.GetDataSimple(t);
+                    int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
+                    int quarter = (t.sub - 1) / mPerQ + 1;
+                    if (t.sub % mPerQ == 1) vsum = 0d;
+                    GekkoTime ttemp = new GekkoTime(eFreq1, t.super, quarter);
+                    if (G.Equal(method, "total"))
+                    {
+                        vsum += value;
+                        if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, vsum);
+                    }
+                    else if (G.Equal(method, "avg"))
+                    {
+                        vsum += value;
+                        if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, vsum / (double)mPerQ);
+                    }
+                    else if (G.Equal(method, "first"))
+                    {
+                        if (t.sub % mPerQ == 1) ts_lhs.SetData(ttemp, value);
+                    }
+                    else if (G.Equal(method, "last"))
+                    {
+                        if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, value);
+                    }
+                }
+            }
+            else if (eFreq0 == EFreq.D && eFreq1 == EFreq.M)
+            {
+                //Conversion from D to M
+                double vsum = 0d;
+                bool ignoreNaN = true;
+
+                double n = 0d;
+
+                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                {
+                    //!! BEWARE: if a 'continue' is used, a tLowFreqPrevious = tLowFreq must be issued.
+
+                    GekkoTime tLowFreq = new GekkoTime(eFreq1, t.super, t.sub);
+                    GekkoTime tNext = t.Add(1);
+                    GekkoTime tLowFreqNext = new GekkoTime(eFreq1, tNext.super, tNext.sub);
+
+                    bool shouldCollapse = tLowFreqNext.StrictlyLargerThan(tLowFreq) || t.IsSamePeriod(last);
+
+                    double value = ts_rhs.GetDataSimple(t);
+
+                    if (G.Equal(method, "avg") || G.Equal(method, "total"))
+                    {
+                        if (!(ignoreNaN && G.isNumericalError(value)))
+                        {
+                            vsum += value;
+                            n++;
+                        }
+
+                        if (shouldCollapse)
+                        {
+                            CollapseHelper(method, ts_lhs, vsum, n, tLowFreq);
+                            vsum = 0d;
+                            n = 0d;
+                        }
+                    }
+                    else if (G.Equal(method, "first"))
+                    {
+                        //TODO: first with data?
+                        new Error("Option 'first' not yet implemented for daily collapse");
+                    }
+                    else if (G.Equal(method, "last"))
+                    {
+                        //TODO: last with data?
+                        new Error("Option 'last' not yet implemented for daily collapse");
+                    }
+                    else
+                    {
+                        new Error("wrong method in COLLAPSE: " + method + "'");
+                    }
+
+                }
+            }
+            else
+            {
+                new Error("Cannot COLLAPSE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
+            }
+
+            return method;
         }
 
         private static void CollapseHelper(string method, Series ts_lhs, double vsum, double n, GekkoTime tLowFreq)

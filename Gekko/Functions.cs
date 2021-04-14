@@ -2916,6 +2916,68 @@ namespace Gekko
             return tsNew;
         }
 
+        public static IVariable collapse(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            // collapse(x)
+            // collapse(x, 'avg')
+            // collapse(x, 'q')
+            // collapse(x, 'q', 'avg')
+
+            //The two last are only used when collapsing from m --> a.
+            //Otherwise, we collapse per default from d --> m, m --> q, q --> a.
+
+            GekkoTime t1, t2;
+            Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+
+            //hmmm, what if we are doing a PLOT <2010 2030> pch(rebase(x, 2020)) --> we will get a missing in 2010...?
+
+            if (x.Length < 1) new Error("Expected collapse() with >= 1 arguments.");
+            if (x.Length > 3) new Error("Expected collapse() with <= 3 arguments.");
+            
+            IVariable iv = x[0];
+            if (G.IsGekkoNull(iv)) return iv;
+            Series ts = iv as Series;
+            if (ts == null) new Error("Expected a timeseries as first argument, got " + G.GetTypeString(iv) + " type");
+
+            string freq_destination = null;
+            string method = "total";
+
+            if (x.Length > 1)
+            {
+                string s = O.ConvertToString(x[1]);
+                if (G.Equal(s, "total") || G.Equal(s, "avg") || G.Equal(s, "first") || G.Equal(s, "last"))
+                {
+                    method = s;
+                    if (x.Length == 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the frequency first, and then the method.");
+                }
+                else
+                {
+                    freq_destination = s;
+                    if (x.Length == 3) method = O.ConvertToString(x[2]);                    
+                }
+            }
+
+            if (freq_destination == null)
+            {
+                //state defaults
+                if (ts.freq == EFreq.A) new Error("You cannot input an annual series for collapse().");
+                else if (ts.freq == EFreq.Q) freq_destination = "a";
+                else if (ts.freq == EFreq.M) freq_destination = "q";
+                else if (ts.freq == EFreq.D) freq_destination = "m";
+                else
+                {
+                    new Error("The frequency of the input timeseries should be D, M or Q for collapse().");
+                }
+            }
+
+            Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
+
+            EFreq e0; EFreq e1;
+            Program.CollapseHelper(tsNew, ts, method, out e0, out e1);
+
+            return tsNew;
+        }
+
 
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable pchy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
