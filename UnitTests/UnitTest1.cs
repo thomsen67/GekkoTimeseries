@@ -18966,6 +18966,48 @@ print(df2)
             _AssertSeries(First(), "z3", EFreq.Q, 2012, 1, 6d / (14d / 4d) * 100d, sharedDelta);
             _AssertSeries(First(), "z3", EFreq.Q, 2012, 2, double.NaN, sharedDelta);
 
+            // -----------------------------
+            // function
+            // -----------------------------
+
+            I("RESET;");
+            I("TIME 2010 2012;");
+            I("MODE data;");
+            I("SER y1 = -7, 3, 4;");
+            I("OPEN <edit> temp;");
+            I("SER y2 = 7, -3, -4;");
+            I("CLOSE temp; OPEN temp;");
+            I("OPEN <edit> temp2; CLEAR temp2;");
+            I("temp2:y1 = rebase(work:y1, 2011);");
+            I("temp2:y2 = rebase(temp:y2, 2011);");
+            //"REBASE <tobank=temp2 index = 100> work:y1, temp:y2 2011;");
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", 2010, -7d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", 2011, 3d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", 2012, 4d / 3d * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", 2012, -4d / (-3d) * 100d, sharedDelta);
+
+            //quarterly and with index value
+            I("RESET; option freq q;");
+            I("TIME 2010q1 2010q3;");
+            I("MODE data;");
+            I("SER y1 = -7, 3, 4;");
+            I("OPEN <edit> temp;");
+            I("SER y2 = 7, -3, -4;");
+            I("CLOSE temp; OPEN temp;");
+            I("OPEN <edit> temp2; CLEAR temp2;");
+            I("temp2:y1 = rebase(work:y1, 2010q2, 7);");
+            I("temp2:y2 = rebase(temp:y2, 2010q2, 7);");
+            //"REBASE <tobank=temp2 index = 100> work:y1, temp:y2 2011;");
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", EFreq.Q, 2010, 1,  -7d / 3d *7d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", EFreq.Q, 2010, 2, 3d / 3d * 7d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y1", EFreq.Q, 2010, 3, 4d / 3d * 7d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", EFreq.Q, 2010, 1, 7d / (-3d) * 7d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", EFreq.Q, 2010, 2, -3d / (-3d) * 7d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp2"), "y2", EFreq.Q, 2010, 3, -4d / (-3d) * 7d, sharedDelta);
+
+
         }
 
         [TestMethod]

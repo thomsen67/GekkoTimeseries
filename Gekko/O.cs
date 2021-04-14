@@ -8205,7 +8205,7 @@ namespace Gekko
 
                 for (int i = 0; i < listItems.Count; i++)
                 {
-                    
+
                     string frombank = null;
                     if (this.opt_bank != null) frombank = this.opt_bank;
                     if (this.opt_frombank != null) frombank = this.opt_frombank;
@@ -8214,68 +8214,15 @@ namespace Gekko
 
                     IVariable iv = O.GetIVariableFromString(varnameWithBank, ECreatePossibilities.NoneReportError);
 
-                    Series ts = iv as Series;
-
-                    if (ts == null)
-                    {
-                        new Error("Rebasing is only meaningful for series type. Type is: " + G.GetTypeString(iv));
-                    }
-
-                    GekkoTime ddate1 = t1;
-                    GekkoTime ddate2 = t2;
-
-                    if (t1.freq == EFreq.A && (ts.freq == EFreq.Q || ts.freq == EFreq.M))
-                    {
-                        //if a year is used for a quarterly series, q1-q4 is used.
-                        ddate1 = new GekkoTime(ts.freq, t1.super, 1);
-                        int end = -12345;
-                        if (ts.freq == EFreq.Q)
-                        {
-                            end = Globals.freqQSubperiods;
-                        }
-                        else if (ts.freq == EFreq.M)
-                        {
-                            end = Globals.freqMSubperiods;
-                        }
-                        else
-                        {
-                            new Error("freq error #903853245");
-                            //throw new GekkoException();
-                        }
-                        ddate2 = new GekkoTime(ts.freq, t1.super, end);
-                    }
-
-                    if (ddate1.freq != ts.freq || ddate2.freq != ts.freq)
-                    {
-                        new Error("frequency of timeseries and frequency of period(s) do not match");
-                        //throw new GekkoException();
-                    }
-
-                    double sum = 0d;
-                    double n = 0d;
-                    foreach (GekkoTime t in new GekkoTimeIterator(ddate1, ddate2))
-                    {
-                        sum += ts.GetDataSimple(t);
-                        n++;
-                    }
-
-                    if (G.isNumericalError(sum))
-                    {
-                        new Error("Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
-                        //throw new GekkoException();
-                    }
-                    if (sum == 0d)
-                    {
-                        new Error("Series " + ts.meta.parentDatabank + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
-                        //throw new GekkoException();
-                    }
+                    Series ts; double sum, n;
+                    Program.RebaseHelper1(this.t1, this.t2, iv, out ts, out sum, out n);
 
                     Series tsNew = null;
                     if (opt_prefix != null || opt_tobank != null)  ////#098098q3453 or a tobank is set
                     {
                         Databank tobank = ts.meta.parentDatabank;
                         if (optionToBank_databank != null) tobank = optionToBank_databank;  //overriding if designated tobank is there
-                                                                        
+
                         tsNew = ts.DeepClone(null) as Series; //parentDatabank for tsNew will be null here 
                         tsNew.name = opt_prefix + ts.name;
 
@@ -8292,20 +8239,16 @@ namespace Gekko
                     {
                         //Necessary, otherwise it only fails when trying to write the databank to file (better to catch the problem here)
                         tsNew = ts;
-                        if (!tsNew.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tsNew.meta.parentDatabank.name + "), see OPEN<edit> or UNLOCK");                        
-                    }                    
-
-                    double[] data = tsNew.GetDataSequenceUnsafePointerAlterBEWARE();  //do not optionally change NaN to 0
-                    for (int ii = 0; ii < data.Length; ii++)
-                    {
-                        //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct
-                        data[ii] = data[ii] / (sum / n) * opt_index;
+                        if (!tsNew.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tsNew.meta.parentDatabank.name + "), see OPEN<edit> or UNLOCK");
                     }
+
+                    Program.RebaseHelper2(tsNew, sum, n, opt_index);
+
                     count++;
 
                 }
                 G.Writeln2("Rebased " + count + " series");
-            }
+            }            
         }
 
         /// <summary>

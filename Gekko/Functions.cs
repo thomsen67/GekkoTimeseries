@@ -2884,6 +2884,39 @@ namespace Gekko
             return rv;
         }
 
+        public static IVariable rebase(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            // x, i         --> rebase(x, 2020)
+            // x, i, v      --> rebase(x, 2020, 1)
+            // Does not support rebasing over a window of periods --> use REBASE command
+
+            GekkoTime t1, t2;
+            Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+
+            //hmmm, what if we are doing a PLOT <2010 2030> pch(rebase(x, 2020)) --> we will get a missing in 2010...?
+
+            if (x.Length < 2) new Error("Expected rebase() with >= 2 arguments.");
+            if (x.Length > 3) new Error("Expected rebase() with <= 3 arguments.");
+
+            IVariable iv = x[0];
+            if (G.IsGekkoNull(iv)) return iv;
+
+            GekkoTime gti = O.ConvertToDate(x[1], O.GetDateChoices.Strict);
+            double indexValue = 100d;
+
+            if (x.Length == 3) indexValue = O.ConvertToVal(x[2]);
+
+            Series ts; double sum; double n;
+            Program.RebaseHelper1(gti, gti, iv, out ts, out sum, out n);
+
+            Series tsNew = ts.DeepClone(new GekkoSmplSimple(t1, t2)) as Series;
+
+            Program.RebaseHelper2(tsNew, sum, n, indexValue);
+
+            return tsNew;
+        }
+
+
         [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
         public static IVariable pchy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {

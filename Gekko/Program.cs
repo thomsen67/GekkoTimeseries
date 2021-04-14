@@ -14435,6 +14435,91 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Helper for REBASE and rebase(). The series tsNew should be a (deep) clone of the input series. Sum is sum over period for the input series.
+        /// n is the observations in the period. The period is often n = 1.  See also RebaseHelpe12().
+        /// </summary>
+        /// <param name="tsNew"></param>
+        /// <param name="sum"></param>
+        /// <param name="n"></param>
+        public static void RebaseHelper2(Series tsNew, double sum, double n, double indexValue)
+        {
+            double[] data = tsNew.GetDataSequenceUnsafePointerAlterBEWARE();  //do not optionally change NaN to 0
+            for (int ii = 0; ii < data.Length; ii++)
+            {
+                //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct
+                data[ii] = data[ii] / (sum / n) * indexValue;
+            }
+        }
+
+        /// <summary>
+        /// Helper for REBASE and rebase(). For the period t1-t2 (rebase window, often just 1 period), sum and n (number of obs) is calculated. 
+        /// A series t2 is returned (which is iv cast as Series). See also RebaseHelper2().
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="iv"></param>
+        /// <param name="ts"></param>
+        /// <param name="sum"></param>
+        /// <param name="n"></param>
+        public static void RebaseHelper1(GekkoTime t1, GekkoTime t2, IVariable iv, out Series ts, out double sum, out double n)
+        {
+            ts = iv as Series;
+            if (ts == null)
+            {
+                new Error("Rebasing is only meaningful for series type. Type is: " + G.GetTypeString(iv));
+            }
+
+            GekkoTime ddate1 = t1;
+            GekkoTime ddate2 = t2;
+
+            if (t1.freq == EFreq.A && (ts.freq == EFreq.Q || ts.freq == EFreq.M))
+            {
+                //if a year is used for a quarterly series, q1-q4 is used.
+                ddate1 = new GekkoTime(ts.freq, t1.super, 1);
+                int end = -12345;
+                if (ts.freq == EFreq.Q)
+                {
+                    end = Globals.freqQSubperiods;
+                }
+                else if (ts.freq == EFreq.M)
+                {
+                    end = Globals.freqMSubperiods;
+                }
+                else
+                {
+                    new Error("freq error #903853245");
+                    //throw new GekkoException();
+                }
+                ddate2 = new GekkoTime(ts.freq, t1.super, end);
+            }
+
+            if (ddate1.freq != ts.freq || ddate2.freq != ts.freq)
+            {
+                new Error("frequency of timeseries and frequency of period(s) do not match");
+                //throw new GekkoException();
+            }
+
+            sum = 0d;
+            n = 0d;
+            foreach (GekkoTime t in new GekkoTimeIterator(ddate1, ddate2))
+            {
+                sum += ts.GetDataSimple(t);
+                n++;
+            }
+
+            if (G.isNumericalError(sum))
+            {
+                new Error("Series " + ts.meta.parentDatabank.name + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " contains missing values");
+                //throw new GekkoException();
+            }
+            if (sum == 0d)
+            {
+                new Error("Series " + ts.meta.parentDatabank.name + ":" + ts.name + " from " + ddate1.ToString() + "-" + ddate2.ToString() + " sums to 0, cannot rebase");
+                //throw new GekkoException();
+            }
+        }
+
+        /// <summary>
         /// Load a cached model from an internal protobuf file.
         /// </summary>
         /// <param name="fileName"></param>
