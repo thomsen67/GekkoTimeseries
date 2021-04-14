@@ -482,8 +482,11 @@ namespace Deploy
                 var zip = ZipFile.Open(fileName, ZipArchiveMode.Create);
                 foreach (var file in files)
                 {
-                    // Add the entry for each file
-                    zip.CreateEntryFromFile(file, Path.GetFileName(file), CompressionLevel.Optimal);
+                    // Add the entry for each file, cf. #89u3258572345
+                    string entryName = Path.GetFileName(file);
+                    if (entryName == "Gekcel64.xll") entryName = "Gekcel.xll";
+                    else if (entryName == "Gekcel64.dna") entryName = "Gekcel.dna";
+                    zip.CreateEntryFromFile(file, entryName, CompressionLevel.Optimal);
                 }
                 // Dispose of the object when we are done
                 zip.Dispose();
@@ -789,11 +792,20 @@ namespace Deploy
             // -----            
             files.Add(path2 + "ExcelDna.Integration.dll");
             files.Add(path2 + "ExcelDna.IntelliSense.dll");
-            files.Add(path2 + "Gekcel.dll");
-            files.Add(path2 + "Gekcel.dna");
+            files.Add(path2 + "Gekcel.dll");            
             files.Add(path2 + "Gekcel.pdb");
-            files.Add(path2 + "Gekcel.xll");
-            if (bitness == 64) files.Add(path2 + "Gekcel.xlsm");  //when packaging Gekcel 64-bit, the file may be > 15 minutes if we are slow...
+            
+            if (bitness == 64)
+            {
+                files.Add(path2 + "Gekcel.xlsm");   //when packaging Gekcel 64-bit, the file may be > 15 minutes if we are slow...
+                files.Add(path2 + "Gekcel64.dna");  //will have 64 removed later on, see #89u3258572345
+                files.Add(path2 + "Gekcel64.xll");  //will have 64 removed later on, see #89u3258572345
+            }
+            else
+            {
+                files.Add(path2 + "Gekcel.dna");
+                files.Add(path2 + "Gekcel.xll");
+            }
 
             string zip = tools + @"\Gekcel\" + bitness + @"\Gekcel.zip";
             if (File.Exists(zip)) File.Delete(zip);

@@ -116,6 +116,8 @@ namespace Gekko
         public static string ageName = "a";
         public static string pivotTableDelimiter = " | ";
 
+        public static DateTime tictoc = DateTime.Now;
+
         public static bool eliminateConcatenator = true;
 
         public static bool modeIntendedWarning = false;        

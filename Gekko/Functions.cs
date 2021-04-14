@@ -934,6 +934,24 @@ namespace Gekko
             return lhs;
         }
 
+        /// <summary>
+        /// Helper for timings.
+        /// </summary>
+        public static IVariable tic(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            Globals.tictoc = DateTime.Now;
+            return GekkoNull.gekkoNull;
+        }
+         
+
+        /// <summary>
+        /// Helper for timings.
+        /// </summary>
+        public static IVariable toc(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal((DateTime.Now - Globals.tictoc).TotalSeconds);
+        }
+
         // ====================== matrix stuff ===============================
         // ====================== matrix stuff ===============================
         // ====================== matrix stuff ===============================

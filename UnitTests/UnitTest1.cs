@@ -13569,13 +13569,7 @@ namespace UnitTests
             //pC * qY skal acceptere forskellige sets, hvis begge er betinget på ét element fx [tot] -> behøver ikke være det samme
             //pC * qY[#s] skal være samme som pC[tot] * qY[#s]
         }
-
-        [TestMethod]
-        public void _TestErrorMessages()
-        {
-            Assert.IsTrue(false);  //Globals.newErrors
-        }
-
+        
         [TestMethod]
         public void _TestOverloadAndPrompt()
         {
