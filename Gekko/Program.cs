@@ -25326,8 +25326,8 @@ namespace Gekko
             if (input == eOfficeVersion.eOfficeVersion_2013) return "2013";
             if (input == eOfficeVersion.eOfficeVersion_2016) return "2016";
             if (input == eOfficeVersion.eOfficeVersion_2019) return "2019?";
-            if (input == eOfficeVersion.eOfficeVersion_Unrecognized) return "[Unrecognized version]";
-            return "[Unrecognized version]";
+            if (input == eOfficeVersion.eOfficeVersion_Unrecognized) return "[Unrecognized]";
+            return "[Unrecognized]";
         }
 
         /// <summary>

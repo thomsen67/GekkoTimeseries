@@ -1936,15 +1936,14 @@ namespace Gekko
                 {
                     O.Help("i_missing_values");
                 };
-                G.Writeln("    Read more about missing values " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are uprading from a Gekko version < 3.1.8 to a", Globals.warningColor);
+                G.Writeln("    Read more about missing values " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ". If you are upgrading from a Gekko version < 3.1.8 to a", Globals.warningColor);
                 G.Writeln("    Gekko version >= 3.1.8, this warning may come out of the blue. In that case, as a work-around,", Globals.warningColor);
                 G.Writeln("    you may replace the problematic IF(...) with IF_OLD(...), to emulate the behavior of", Globals.warningColor);
                 G.Writeln("    Gekko < 3.1.8. If you are using the trick IF(x == x) to check if a series x contains missings, ", Globals.warningColor);
                 G.Writeln("    you may instead use IF(x.ismiss('all').sumt() > 0) to check for missings.", Globals.warningColor);
                 G.Writeln("    If all this turns problematic or cumbersome, you may set OPTION bugfix missing = no, to", Globals.warningColor);
                 G.Writeln("    emulate Gekko < 3.1.8 completely regarding IF and missings. Using the option generally", Globals.warningColor);
-                G.Writeln("    is not recommended though.", Globals.warningColor);
-                
+                G.Writeln("    is not recommended though.", Globals.warningColor);                
 
                 G.Writeln();
             }

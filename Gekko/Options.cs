@@ -85,7 +85,7 @@ namespace Gekko
         public string interface_excel_language = "danish";
         public bool interface_excel_modernlook = true;
         public bool interface_help_copylocal = true;        
-        public string interface_mode = "data";  //sim, data, mixed
+        public string interface_mode = "mixed";  //sim, data, mixed. Mixed since 3.1.12.
         public string interface_mute = "no";  //yes, no
         public bool interface_remote = false;  //remote control via remote.gcm
         public string interface_remote_file = "";
