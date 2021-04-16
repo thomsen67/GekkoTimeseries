@@ -158,17 +158,8 @@ namespace Gekko.Parser.Gek
 
             if (p.hasWrittenRunTimeErrorOnce) return;  //We now write a stack first time an error is encountered
             p.hasWrittenRunTimeErrorOnce = true;
-
-            GekkoException ge = null;
-            if (e.InnerException != null) ge = e.InnerException as GekkoException;
-            List<Wrap> wraps = GetWrapsFromGekkoException(ge);
-
-            //TODO:
-            //Could consolidate the nested errors here to make them look nice
-            foreach (Wrap wrap in wraps)
-            {
-                CrossThreadStuff.Wrap(wrap); //.Exe2() will fail because it is on another thread than GUI
-            }
+            
+            Program.PrintExceptionWraps(e.InnerException);
 
             string exception = "";
             if (e.InnerException != null) exception = e.InnerException.Message;
@@ -253,20 +244,9 @@ namespace Gekko.Parser.Gek
             Program.WriteCallStack(false, p);  //will only be performed once
             throw e;
 
-        }
+        }        
 
-        /// <summary>
-        /// Fetces error message(s) from inside GekkoException, for printing. Will always return a List obj,
-        /// but the List may have 0 elements.
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        public static List<Wrap> GetWrapsFromGekkoException(GekkoException e)
-        {
-            if (e == null) return new List<Wrap>();  //empty list
-            return e.wraps;
-        }
-
+        
         private static void HandleCommandCompileErrors(P p, CompilerResults cr)
         {
 

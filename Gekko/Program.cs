@@ -858,8 +858,7 @@ namespace Gekko
             this.wraps.Add(wrap);
         }
         
-    }
-
+    }    
 
     /// <summary>
     /// A storage implementation where the key "example7" and the key "ExAmpLe7" are treated as equal.
@@ -6181,6 +6180,8 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
+                    Program.PrintExceptionWraps(e);
+
                     if (G.Equal(Program.options.interface_debug, "dialog"))
                     {
                         string eh = Program.ErrorHandling(islooping, p, false);
@@ -13108,6 +13109,28 @@ namespace Gekko
                 }
             }
             return truncate;
+        }
+
+        /// <summary>
+        /// Fetces error message(s) from inside GekkoException, for printing. Will always return a List obj,
+        /// but the List may have 0 elements.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static void PrintExceptionWraps(Exception e)
+        {
+            GekkoException ge = e as GekkoException;
+
+            if (ge != null)
+            {
+                //TODO:
+                //Could consolidate the nested errors here to make them look nice
+                foreach (Wrap wrap in ge.wraps)
+                {
+                    CrossThreadStuff.Wrap(wrap); //Printing out --> .Exe2() will fail because it is on another thread than GUI
+                }
+                ge.wraps = new List<Wrap>();  //to make absolutely sure they are not printed > 1 time!
+            }
         }
 
         /// <summary>

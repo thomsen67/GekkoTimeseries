@@ -13042,7 +13042,22 @@ namespace UnitTests
     c:\Thomas\Gekko\regres\StackTrace\c4.gcm line 1 calling -->
     c:\Thomas\Gekko\regres\StackTrace\cc4.gcm (run-time error in line 5)";
 
-            Assert.IsTrue(c4.Contains(cc4));            
+            Assert.IsTrue(c4.Contains(cc4));
+
+            // =====================================================
+            
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("run c5;");
+            string c5 = Globals.unitTestScreenOutput.ToString();
+            string cc5 =
+@"*** ERROR: The variable name %x1 is used several times in a FUNCTION definition
+*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\c5.gcm', line 1
+    [   1]:   run cc5;
+
+    Call stack: Command line calling -->
+    c:\Thomas\Gekko\regres\StackTrace\c5.gcm (run-time error in line 1)";
+
+            Assert.IsTrue(c5.Contains(cc5));
 
             // ------------------
             // Models

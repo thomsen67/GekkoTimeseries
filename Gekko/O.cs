@@ -2026,7 +2026,14 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer && text == "arrow")
             {
-                Arrow.Run();
+                //while (true)
+                //{
+                //    var codeToEval = Console.ReadLine();
+                //    var result = await CSharpScript.EvaluateAsync(codeToEval);
+                //    Console.WriteLine(result);
+                //}
+
+                //Arrow.Run();
             }
             
             if (nocr) G.Write(text);
