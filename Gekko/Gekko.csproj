@@ -362,6 +362,7 @@
     <Compile Include="IBank.cs" />
     <Compile Include="GuiInputBox.cs" />
     <Compile Include="IVariable.cs" />
+    <Compile Include="Libraries.cs" />
     <Compile Include="List.cs" />
     <Compile Include="ListViewDragDropManager.cs" />
     <Compile Include="Lookup.cs" />

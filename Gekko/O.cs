@@ -2035,7 +2035,30 @@ namespace Gekko
                 //}
 
                 //Arrow.Run();
-                
+
+                Libraries libs = new Libraries();
+
+                Library lib = new Library();
+                lib.SetName("test1");
+                libs.Add(lib);
+                GekkoFunction function = new GekkoFunction();
+                function.SetName("f");
+                lib.AddFunction(function);
+
+                Library lib2 = new Library();
+                lib.SetName("test2");
+                libs.Add(lib2);
+                GekkoFunction libi2 = new GekkoFunction();
+                libi2.SetName("f");
+                lib2.AddFunction(libi2);
+
+                GekkoFunction thisFunction = libs.GetFunction("f");
+                if (thisFunction == null)
+                {
+                    //error
+                }
+
+                                                                      
             }
             
             if (nocr) G.Write(text);
