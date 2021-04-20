@@ -66,7 +66,7 @@ namespace Gekko
 
         public GekkoFunction GetFunction(string functionName)
         {
-            functionName = functionName.ToLower();
+            //functionName = functionName.ToLower(); --> NO! no need to do this!
             GekkoFunction thisFunction = null;
             foreach (int i in this.GetHierarchy())
             {
@@ -77,7 +77,7 @@ namespace Gekko
 
             if(thisFunction==null)
             {
-                new Error("Function '" + functionName + "' was not found.");
+                new Error("Function '" + functionName.ToLower() + "' was not found.");
             }
 
             return thisFunction;
@@ -137,11 +137,18 @@ namespace Gekko
 
         public int id = -12345;
 
+        /// <summary>
+        /// Name of package/library
+        /// </summary>
         public void SetName(string s)
         {
             this.name = s.ToLower();
         }
 
+        /// <summary>
+        /// Name of package/library
+        /// </summary>
+        /// <returns></returns>
         public string GetName()
         {
             return this.name;
@@ -151,6 +158,7 @@ namespace Gekko
 
         public void AddFunction(GekkoFunction function)
         {
+            function.packageName = this.GetName();
             this.functions.Add(function.GetName(), function);            
         }
 
@@ -188,6 +196,7 @@ namespace Gekko
     public class GekkoFunction
     {
         private string name = null; //for instance 'f'
+        public string packageName = null;
 
         string code = null;  //may contain code from several places, snippets of f(), f(...), f(..., ...)
         // ---------------------------------    
@@ -206,11 +215,17 @@ namespace Gekko
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function12 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function13 = null;
 
+        /// <summary>
+        /// Name of function, irrespective of overloads.
+        /// </summary>
         public void SetName(string s)
         {
             this.name = s.ToLower();
         }
 
+        /// <summary>
+        /// Name of function, irrespective of overloads.
+        /// </summary>
         public string GetName()
         {
             return this.name;

@@ -2053,7 +2053,9 @@ namespace Gekko
                 lib2.AddFunction(libi2);
 
                 GekkoFunction f1 = libs.GetFunction("f");
-                GekkoFunction f2 = libs.GetFunction("test1", "f");
+                GekkoFunction f2 = libs.GetFunction("f");
+                GekkoFunction f3 = libs.GetFunction("test1", "f");
+                GekkoFunction f4 = libs.GetFunction("test1", "f");
 
 
             }
