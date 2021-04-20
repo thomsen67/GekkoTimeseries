@@ -97,6 +97,11 @@ namespace Gekko
 
         public void Add(Library lib)
         {
+            if (lib.GetName() == null)
+            {
+                new Error("Library name cannot be null");
+            }
+
             foreach (Library x in this.libraries)
             {
                 if (lib.GetName() == x.GetName())
@@ -155,7 +160,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private GekkoFunction GetFunction(string name)
+        public GekkoFunction GetFunction(string name)
         {
             name = name.ToLower();
 

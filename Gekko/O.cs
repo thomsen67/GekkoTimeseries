@@ -2046,19 +2046,16 @@ namespace Gekko
                 lib.AddFunction(function);
 
                 Library lib2 = new Library();
-                lib.SetName("test2");
+                lib2.SetName("test2");
                 libs.Add(lib2);
                 GekkoFunction libi2 = new GekkoFunction();
                 libi2.SetName("f");
                 lib2.AddFunction(libi2);
 
-                GekkoFunction thisFunction = libs.GetFunction("f");
-                if (thisFunction == null)
-                {
-                    //error
-                }
+                GekkoFunction f1 = libs.GetFunction("f");
+                GekkoFunction f2 = libs.GetFunction("test1", "f");
 
-                                                                      
+
             }
             
             if (nocr) G.Write(text);
