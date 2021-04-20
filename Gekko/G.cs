@@ -36,6 +36,7 @@ using System.Collections.Generic;
 
 namespace Gekko
 {
+        
     /// <summary>
     /// Class containing a library of functions used in many places
     /// </summary>
@@ -3109,7 +3110,7 @@ namespace Gekko
                 //Program.ShowPeriodInStatusField("");                
             }
             return sb;
-        }
+        }        
 
         /// <summary>
         /// Pretty showing current frequency and period, like "Quarterly 2020q1-2024q4".

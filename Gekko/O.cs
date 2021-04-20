@@ -2017,6 +2017,7 @@ namespace Gekko
             Program.Cut(true);
         }
 
+
         /// <summary>
         /// TELL command.
         /// </summary>
@@ -2034,6 +2035,7 @@ namespace Gekko
                 //}
 
                 //Arrow.Run();
+                
             }
             
             if (nocr) G.Write(text);
@@ -5080,23 +5082,17 @@ namespace Gekko
 
             if (number > 13)
             {
-                new Error("More than 13 user function/procedure arguments is not allowed at the moment. You may consider using a MAP argument to work around this restriction.");
-
-                //throw new GekkoException();
+                new Error("More than 13 user function/procedure arguments is not allowed at the moment. You may consider using a MAP argument to work around this restriction.");                
             }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
-                new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko function. Please use another name.");
-
-                //throw new GekkoException();
+                new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko function. Please use another name.");                
             }
             foreach (string s in Globals.commandNames)
             {
                 if (G.Equal(s, name))
                 {
-                    new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko command. Please use another name.");
-
-                    //throw new GekkoException();
+                    new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko command. Please use another name.");                    
                 }
             }
 
@@ -5158,8 +5154,8 @@ namespace Gekko
                 else if (number == 13)
                 {
                     if (Globals.ufunctionsNew13.ContainsKey(name)) Globals.ufunctionsNew13.Remove(name);
-                }            }
-            
+                }
+            }            
         }
 
         // USER FUNCTION STUFF START
