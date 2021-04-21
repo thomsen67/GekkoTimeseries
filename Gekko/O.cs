@@ -2042,7 +2042,7 @@ namespace Gekko
                 lib.SetName("test1");
                 libs.Add(lib);
                 GekkoFunction function = new GekkoFunction();
-                function.SetName("f");
+                function.SetName("g");
                 lib.AddFunction(function);
 
                 Library lib2 = new Library();
@@ -2056,6 +2056,8 @@ namespace Gekko
                 GekkoFunction f2 = libs.GetFunction("f");
                 GekkoFunction f3 = libs.GetFunction("test1", "f");
                 GekkoFunction f4 = libs.GetFunction("test1", "f");
+
+                libs.GetFunction()
 
 
             }

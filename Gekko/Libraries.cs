@@ -64,6 +64,12 @@ namespace Gekko
             return this.libraries[i];
         }
 
+        /// <summary>
+        /// Get a function from the loaded libraries/packages. Gekko will search for the function,
+        /// starting with the last loaded package.
+        /// </summary>
+        /// <param name="functionName"></param>
+        /// <returns></returns>
         public GekkoFunction GetFunction(string functionName)
         {
             //functionName = functionName.ToLower(); --> NO! no need to do this!
@@ -83,6 +89,9 @@ namespace Gekko
             return thisFunction;
         }
 
+        /// <summary>
+        /// Get a function from a particular library/package, like p1:f(...).
+        /// </summary>
         public GekkoFunction GetFunction(string libraryName, string functionName)
         {
             Library library = this.GetLibrary(libraryName);
@@ -95,6 +104,12 @@ namespace Gekko
             return this.hierarchy;
         }
 
+        /// <summary>
+        /// Add a library/package to Gekko. Packages are generally only added, not removed (until
+        /// RESET/RESTART). A library contains functions/methods, stored in a zip-file.
+        /// 
+        /// </summary>
+        /// <param name="lib"></param>
         public void Add(Library lib)
         {
             if (lib.GetName() == null)
