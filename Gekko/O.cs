@@ -2038,18 +2038,14 @@ namespace Gekko
 
                 Libraries libs = new Libraries();
 
-                Library lib = new Library();
-                lib.SetName("test1");
+                Library lib = new Library("test1");
                 libs.Add(lib);
-                GekkoFunction function = new GekkoFunction();
-                function.SetName("g");
+                GekkoFunction function = new GekkoFunction("g");
                 lib.AddFunction(function);
 
-                Library lib2 = new Library();
-                lib2.SetName("test2");
+                Library lib2 = new Library("test2");
                 libs.Add(lib2);
-                GekkoFunction libi2 = new GekkoFunction();
-                libi2.SetName("f");
+                GekkoFunction libi2 = new GekkoFunction("f");
                 lib2.AddFunction(libi2);
 
                 GekkoFunction f1 = libs.GetFunction("f");
@@ -2057,7 +2053,7 @@ namespace Gekko
                 GekkoFunction f3 = libs.GetFunction("test1", "f");
                 GekkoFunction f4 = libs.GetFunction("test1", "f");
 
-                libs.GetFunction()
+                
 
 
             }
@@ -2066,7 +2062,85 @@ namespace Gekko
             else G.Writeln(text);
 
         }
-        
+
+        public static GekkoFunction FunctionDef()
+        {
+            //NB, may be an overload, check if already exists in library...
+
+            GekkoFunction function = new GekkoFunction("f");
+            function.function3 = (GekkoSmpl smpl, P p, bool q10, GekkoArg
+            functionarg_xf7dke8cj_6_func, GekkoArg functionarg_xf7dke8cj_7_func, GekkoArg
+            functionarg_xf7dke8cj_8_func) =>
+            {
+                IVariable functionarg_xf7dke8cj_6 =
+              O.TypeCheck_date(functionarg_xf7dke8cj_6_func, smpl, 1);
+                IVariable functionarg_xf7dke8cj_7 =
+                O.TypeCheck_date(functionarg_xf7dke8cj_7_func, smpl, 2);
+                IVariable functionarg_xf7dke8cj_8 =
+                O.TypeCheck_val(functionarg_xf7dke8cj_8_func.f1(smpl), 3);
+
+                Databank local0 =
+                Program.databanks.local;
+                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 =
+                Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();
+                p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
+                try
+                {
+
+
+                    return null;
+                }
+                catch { p.Deeper(); throw; }
+                finally
+                {
+                    Program.databanks.local =
+                    local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
+                }
+            };
+            return function;
+        }
+
+
+        public static void FunctionDef9()
+        {
+
+            O.PrepareUfunction(3, "f");
+
+            Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, bool q10, GekkoArg
+            functionarg_xf7dke8cj_6_func, GekkoArg functionarg_xf7dke8cj_7_func, GekkoArg
+            functionarg_xf7dke8cj_8_func) =>
+
+
+            {
+                IVariable functionarg_xf7dke8cj_6 =
+              O.TypeCheck_date(functionarg_xf7dke8cj_6_func, smpl, 1);
+                IVariable functionarg_xf7dke8cj_7 =
+                O.TypeCheck_date(functionarg_xf7dke8cj_7_func, smpl, 2);
+                IVariable functionarg_xf7dke8cj_8 =
+                O.TypeCheck_val(functionarg_xf7dke8cj_8_func.f1(smpl), 3);
+
+                Databank local0 =
+                Program.databanks.local;
+                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 =
+                Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();
+                p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
+                try
+                {
+
+                    return null;
+                }
+                catch { p.Deeper(); throw; }
+                finally
+                {
+                    Program.databanks.local =
+                    local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
+                }
+            });
+
+        }
+
+
+
         /// <summary>
         /// EXIt command.
         /// </summary>

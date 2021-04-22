@@ -106,8 +106,8 @@ namespace Gekko
 
         /// <summary>
         /// Add a library/package to Gekko. Packages are generally only added, not removed (until
-        /// RESET/RESTART). A library contains functions/methods, stored in a zip-file.
-        /// 
+        /// RESET/RESTART). A library contains functions/methods, often stored in a zip-file.
+        /// If the library is already there (loaded), the method is ignored.        /// 
         /// </summary>
         /// <param name="lib"></param>
         public void Add(Library lib)
@@ -153,11 +153,12 @@ namespace Gekko
         public int id = -12345;
 
         /// <summary>
-        /// Name of package/library
+        /// Create a new package/library.
         /// </summary>
-        public void SetName(string s)
+        /// <param name="name"></param>
+        public Library(string name)
         {
-            this.name = s.ToLower();
+            this.name = name;
         }
 
         /// <summary>
@@ -210,6 +211,11 @@ namespace Gekko
 
     public class GekkoFunction
     {
+        public GekkoFunction(string name)
+        {
+            this.name = name;
+        }
+
         private string name = null; //for instance 'f'
         public string packageName = null;
 
@@ -229,15 +235,7 @@ namespace Gekko
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function11 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function12 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function13 = null;
-
-        /// <summary>
-        /// Name of function, irrespective of overloads.
-        /// </summary>
-        public void SetName(string s)
-        {
-            this.name = s.ToLower();
-        }
-
+        
         /// <summary>
         /// Name of function, irrespective of overloads.
         /// </summary>

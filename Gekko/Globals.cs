@@ -166,6 +166,9 @@ namespace Gekko
 
         public static string artificial = "artificial_parent_at_the_top_of_the_node_tree";
 
+        public static Libraries functions = new Libraries();
+        public static Libraries procedures = new Libraries();
+
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
 
