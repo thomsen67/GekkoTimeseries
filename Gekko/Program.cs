@@ -11607,16 +11607,16 @@ namespace Gekko
         /// <param name="folder"></param>
         /// <returns></returns>
         public static string CreateFullPathAndFileNameFromFolder(string file, string folder)
-        {            
+        {
             //This method can be called with path = null or path = "", in that case it reduces to
             //only adding the working folder if file is without colon.
             //Path is given from options: "option folder bank = ..." for instance
             //String is user input.
             //RULES:
-            //If file includes colon
+            //If file includes ":\" or starts with "\\"
             //   return = file
             //else
-            //   if path includes colon
+            //   if path includes ":\" or starts with "\\"
             //      return = path + file
             //   else
             //      return working_folder + path + file
@@ -11624,7 +11624,7 @@ namespace Gekko
             //end
             //
             //    +++           If path = null or path = "", the above reduces to this:
-            //    +++           If file includes colon
+            //    +++           If file includes ":\" or starts with "\\"
             //    +++              return = file
             //    +++           else
             //    +++              return working_folder + "" + file (i.e. working_folder + file)
@@ -11639,13 +11639,13 @@ namespace Gekko
             file = file.Trim(); //Most probably not necessary, but better safe than sorry
             folder = folder.Trim(); //Most probably not necessary, but better safe than sorry
             string fileName2 = "";
-            if (file.Contains(":\\"))
+            if (file.Contains(":\\") || file.StartsWith("\\\\"))  //either 'c:\...' or '\\server1\...'
             {
                 fileName2 = file;
             }
             else
             {
-                if (folder.Contains(":\\"))
+                if (folder.Contains(":\\") || folder.StartsWith("\\\\"))   //either 'c:\...' or '\\server1\...'
                 {
                     fileName2 = folder + "\\" + file;
                 }
@@ -11655,12 +11655,21 @@ namespace Gekko
                 }
             }
 
+            bool isUNC = false;
+            if (fileName2.StartsWith("\\\\"))
+            {
+                isUNC = true;
+                fileName2 = fileName2.Substring(2);
+            }
+
             while (true)
             {
                 int count = fileName2.Length;
                 fileName2 = fileName2.Replace("\\\\", "\\");
                 if (count == fileName2.Length) break;  //keeps on going until nothing more to substitute
             }
+
+            if (isUNC) fileName2 = "\\\\" + fileName2;
 
             string rv = O.ResolvePath(fileName2);
 
@@ -18297,7 +18306,9 @@ namespace Gekko
 
         public static void InitUfunctionsAndArithmeticsAndMore()
         {
-            
+            Globals.functions = new Libraries();
+            Globals.procedures = new Libraries();
+
             Globals.ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>>(StringComparer.OrdinalIgnoreCase);
             Globals.ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
             Globals.ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);

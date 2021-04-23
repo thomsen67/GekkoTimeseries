@@ -155,16 +155,34 @@ namespace Gekko
             if (ths.Type() != EVariableType.Date)
             {
                 new Error("getday() expects date input");
-                //throw new GekkoException();
             }
 
             GekkoTime gt = (ths as ScalarDate).date;
             if (gt.freq != EFreq.D)
             {
                 new Error("getday() expects daily date");
-                //throw new GekkoException();
             }
             return new ScalarVal(gt.subsub);
+        }
+
+        public static IVariable getweekday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            if (ths.Type() != EVariableType.Date)
+            {
+                new Error("getweekday() expects date input");
+            }
+
+            GekkoTime gt = (ths as ScalarDate).date;
+            if (gt.freq != EFreq.D)
+            {
+                new Error("getweekday() expects daily date");
+            }
+
+            DateTime dt1 = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.Strict);
+            int day = (int)dt1.DayOfWeek;  //sunday = 0, monday = 1, ... , saturday = 6.
+            if (day == 0) day = 7;
+
+            return new ScalarVal(day);
         }
 
         public static IVariable getparent(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
@@ -1332,7 +1350,7 @@ namespace Gekko
         /// <summary>
         /// Helper method to deal with two-argument function, where arguments may be scalar or series or even 1x1 matrix.
         /// The function must be given normal and "swapped", for instance (x1, x2) => x1 - x2, followed by (x1, x2) => x2 - x1.
-        /// For symmetrical functions swapping yields the same, but must still be stated.
+        /// Just swap varnames on rhs only in the swapped function (pure syntactics, no thinking needed). For symmetrical functions swapping yields the same, but must still be stated.
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="_t1"></param>
@@ -1340,7 +1358,7 @@ namespace Gekko
         /// <param name="iv1">x1</param>
         /// <param name="iv2">x2</param>
         /// <param name="a">Normal function, like (x1, x2) => x1 - x2</param>
-        /// <param name="aSwapped">Swapped function, like (x1, x2) => x2 - x1</param>
+        /// <param name="aSwapped">Swapped function, like (x1, x2) => x2 - x1. Just swap varnames on rhs only.</param>
         /// <returns></returns>
         public static IVariable Helper_GeneralFunction(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2, Func<double, double, double> a, Func<double, double, double> aSwapped)
         {
@@ -1353,7 +1371,7 @@ namespace Gekko
                 iv1_series.PrepareInput(smpl, iv2, out x1_series, out x2_series, out x2_val);
                 Series rv_series = null;
                 if (x2_series != null) rv_series = Series.ArithmeticsSeriesSeries(smpl, x1_series, x2_series, a);
-                else rv_series = Series.ArithmeticsSeriesVal(smpl, x1_series, x2_val, aSwapped);
+                else rv_series = Series.ArithmeticsSeriesVal(smpl, x1_series, x2_val, a);
                 return rv_series;
             }
             else if ((iv1.Type() == EVariableType.Val || (iv1.Type() == EVariableType.Matrix && ((Matrix)iv1).data.Length == 1)) && iv2.Type() == EVariableType.Series)
@@ -3217,6 +3235,12 @@ namespace Gekko
                 new Error("round(): type " + x1.Type().ToString() + " not supported" + s); return null;
             }
         }
+
+        public static IVariable mod(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2)
+        {            
+            return Helper_GeneralFunction(smpl, _t1, _t2, iv1, iv2, (x1, x2) => x1 % x2, (x1, x2) => x2 % x1);
+        }
+
 
         public static IVariable int2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {

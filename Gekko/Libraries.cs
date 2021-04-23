@@ -22,6 +22,30 @@ namespace Gekko
     //                 2
     // --------------------------------------
 
+    /* same logic as databanks. Starts out like this:
+     * 
+     *             gekko (reserved)
+     *             global (reserved, also local).
+     *             lib1
+     *             lib2
+     *             
+     * when using global:f() calling g(), it first searches global, then lib1, then lib2.
+     * when using lib2:f() calling g(), it first searches lib2, then global, then lib1.
+     * LIBRARY lib1, lib2; LIBRARY<first>...; LIBRARY<last>; LIBRARY<clear>; LIBRARY<remove>...;
+     * BLOCK lib1, lib2, lib3 --> libs are restored after END.
+     * can use y = lib2:f(x).
+     * 
+     * getlibraries(), setlibraries().
+     * Gekko will look for .zip libraries the same places as for RUN commands.
+     * LIBRARY xx will look for xx.zip. If it contains no gcm files --> error.
+     * 
+     * the gekko library cannot be masked by others, else --> error. This COULD be overwritten with option?
+     * 
+     * 
+     * 
+     */
+
+
     /// <summary>
     /// Functionality dealing with the LIBRARY command.
     /// </summary>

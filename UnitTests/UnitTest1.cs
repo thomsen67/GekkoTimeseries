@@ -12963,9 +12963,12 @@ namespace UnitTests
             //function string f2(string %x1); return 'px_f2_' + %x1; end;
             //function string f2(string %x1, string %x2); return 'px_f2_' + %x1 + %x2; end;
             //
-            //p1 and p2 have both.
-            //p3 only has 2-argument overload
-            //p4 only has f2 functions.
+            //        f1(...)    f1(..., ...)     f2(...)    f2(..., ...)
+            //
+            // p1     x          x                x          x
+            // p2     x          x                x          x
+            // p3                x                          
+            
 
             // ------------------------------------------------------------
             // simple
@@ -12978,74 +12981,95 @@ namespace UnitTests
             _AssertScalarString(First(), "%y2", "p1_f1_ab");
 
             // ------------------------------------------------------------
-            // masking
+            // masking1
             // ------------------------------------------------------------            
             I("reset;");
             I("library p1;");  
-            I("library p2;");  //p2 will be first
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "p2_f1_a");
-            I("%y2 = f1('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p2_f1_ab");
-
-            // ------------------------------------------------------------
-            // masking
-            // ------------------------------------------------------------            
-            I("reset;");
-            I("library p1;");
-            I("library p3;");  //p3 will be first, but only has f1(... , ...), not f1(...)
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "p1_f1_a");
-            FAIL("%y2 = f1('a', 'b');");  //cannot find it in p3, therefore error.
-
-            // ------------------------------------------------------------
-            // masking
-            // ------------------------------------------------------------            
-
-            I("reset;");
-            I("library p1;");
-            I("library p4;");  //p4 will be first, only has f2(...) and f2(..., ...)
+            I("library p2;");  //p1 will be first
             I("%y1 = f1('a');");
             _AssertScalarString(First(), "%y1", "p1_f1_a");
             I("%y2 = f1('a', 'b');");
             _AssertScalarString(First(), "%y2", "p1_f1_ab");
-            I("%y3 = f2('a');");
-            _AssertScalarString(First(), "%y3", "p4_f2_a");
-            I("%y4 = f2('a', 'b');");
-            _AssertScalarString(First(), "%y4", "p4_f2_ab");
+
+            // ------------------------------------------------------------
+            // masking2
+            // ------------------------------------------------------------            
+            I("reset;");
+            I("library p3;");
+            I("library p1;");
+            //p3 will be first, but only has f1(... , ...), not f1(...)
+            I("%y1 = f1('a');");
+            _AssertScalarString(First(), "%y1", "p1_f1_a");
+            FAIL("%y2 = f1('a', 'b');");  //finds f1 in p3, but not this overload. Will not use p1:f(..., ...)
+
+            // ------------------------------------------------------------
+            // masking3
+            // ------------------------------------------------------------            
+
+            I("reset;");
+            I("library p3;");
+            I("library p1;");
+            //p3 will be first, but does not have any f2
+            I("%y1 = f2('a');");
+            _AssertScalarString(First(), "%y1", "p1_f2_a");
+            I("%y2 = f2('a', 'b');");
+            _AssertScalarString(First(), "%y2", "p1_f2_ab");            
 
             // ------------------------------------------------------------
             // colon and remove
-            // ------------------------------------------------------------            
+            // ------------------------------------------------------------   
+            
             I("reset;");
-            I("library p1;");
-            I("library p2;");  //p2 will be first
+            I("library p2;");
+            I("library p1;");  //p2 will be first
             I("%y1 = f1('a');");
             _AssertScalarString(First(), "%y1", "p2_f1_a");
+            I("%y2 = f1('a', 'b');");
+            _AssertScalarString(First(), "%y2", "p2_f1_ab");
             I("%y2 = p1:f1('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p1_f1_ab"); //without colon, it would be p2_f1_a                        
+            _AssertScalarString(First(), "%y2", "p1_f1_ab"); //without colon, it is be p2_f1_a (see above)                       
             I("library <remove> p2;");  //now p1 is first
             I("%y1 = f1('a');");
             _AssertScalarString(First(), "%y1", "p1_f1_a");
             FAIL("%y2 = p2:f1('a', 'b');");
 
             // ------------------------------------------------------------
+            // <first>, <last>, 
+            // ------------------------------------------------------------   
+
+            // ------------------------------------------------------------
             // errors
             // ------------------------------------------------------------            
 
             I("reset;");
+            FAIL("library notexisting;");
             I("library p1;");
             FAIL("library p1;");
-
             I("reset;");
             I("library p1;");
+
+            I("reset;");
+            I("library p1 as p1;");  //also cheks as.
             FAIL("library <remove> p2;");
+            I("library <clear> global;");  //legal
+            FAIL("library <clear> gekko;");  //illegal
+            FAIL("library <clear> p1;");  //illegal
 
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("library gekko;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
 
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("library global;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
 
-
-
-
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("library local;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
+                        
+            FAIL("library <remove> gekko;");
+            FAIL("library <remove> global;");
+            FAIL("library <remove> local;");
         }
 
         [TestMethod]
@@ -14445,8 +14469,13 @@ print(df2)
             _AssertSeries(First(), "y!a", 2002, 3d, sharedDelta);
             _AssertSeries(First(), "y!a", 2003, 2.6d, sharedDelta);
 
-
-
+            I("reset;");
+            //getweekday()
+            I("%x1 = 2021m4d23.getweekday();");
+            _AssertScalarVal(First(), "%x1", 5);
+            //mod()
+            I("%x2 = 10.mod(7);");
+            _AssertScalarVal(First(), "%x2", 3);
         }
 
         [TestMethod]
