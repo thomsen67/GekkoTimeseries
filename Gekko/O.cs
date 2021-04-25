@@ -5049,6 +5049,56 @@ namespace Gekko
             }
         }
 
+        // ===================
+
+        public static void Add0_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 0;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function0 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function0 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew0.Add(functionName, f);
+            }
+        }
+
+        public static void Add1_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 1;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function1 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function1 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew1.Add(functionName, f);
+            }
+        }
+
+        public static void Add2_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 2;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function2 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function2 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew2.Add(functionName, f);
+            }
+        }
+
         public static void Add3_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
             if (Globals.library)
@@ -5064,6 +5114,168 @@ namespace Gekko
                 Globals.ufunctionsNew3.Add(functionName, f);
             }
         }
+
+        public static void Add4_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 4;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function4 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function4 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew4.Add(functionName, f);
+            }
+        }
+
+        public static void Add5_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 5;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function5 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function5 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew5.Add(functionName, f);
+            }
+        }
+
+        public static void Add6_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 6;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function6 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function6 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew6.Add(functionName, f);
+            }
+        }
+
+        public static void Add7_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 7;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function7 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function7 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew7.Add(functionName, f);
+            }
+        }
+
+        public static void Add8_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 8;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function8 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function8 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew8.Add(functionName, f);
+            }
+        }
+
+        public static void Add9_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 9;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function9 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function9 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew9.Add(functionName, f);
+            }
+        }
+
+        public static void Add10_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 10;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function10 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function10 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew10.Add(functionName, f);
+            }
+        }
+
+        public static void Add11_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 11;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function11 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function11 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew11.Add(functionName, f);
+            }
+        }
+
+        public static void Add12_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 12;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function12 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function12 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew12.Add(functionName, f);
+            }
+        }
+
+        public static void Add13_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 13;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function13 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function13 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew13.Add(functionName, f);
+            }
+        }
+
+        // ====================================================
 
         private static Error UfunctionErroMessage(string libraryName, string functionName, int i)
         {
