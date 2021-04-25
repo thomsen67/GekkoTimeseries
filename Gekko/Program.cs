@@ -1593,17 +1593,15 @@ namespace Gekko
 
             Library library = new Library(libraryName);
             Globals.functions.Add(library);  //TODO: check if already there...
-            LibraryExtractor(tempPath, library);                        
-            
-            Library lib2 = new Library("test2");
-            Globals.functions.Add(lib2);
-            GekkoFunction libi2 = new GekkoFunction("f");
-            lib2.AddFunction(libi2);
+            LibraryExtractor(tempPath, library);
 
-            GekkoFunction f1 = Globals.functions.GetFunction("f");
-            GekkoFunction f2 = Globals.functions.GetFunction("f");
-            GekkoFunction f3 = Globals.functions.GetFunction("test1", "f");
-            GekkoFunction f4 = Globals.functions.GetFunction("test1", "f");
+            if (true)
+            {
+                GekkoFunction f1 = Globals.functions.GetFunction("f1");
+                GekkoFunction f2 = Globals.functions.GetFunction("f2");
+                GekkoFunction f3 = Globals.functions.GetFunction("p3", "f1");
+                GekkoFunction f4 = Globals.functions.GetFunction("p3", "f2");
+            }
 
             try
             {
