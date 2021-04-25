@@ -1677,16 +1677,19 @@ namespace Gekko
             int i0 = 0;
             List<string> functionNamesLower = new List<string>();
             for (int i = 0; i < t2.subnodes.Count(); i++)
-            {                
+            {
                 if (t2.subnodes[i].type == ETokenType.Word && G.Equal(t2.subnodes[i].s, "function")) //--> procedure
                 {
                     TokenHelper th1 = null;
                     TokenHelper th2 = null;
-                    th1 = t2.subnodes[i].SiblingBefore(true);                    
-                    th2 = t2.subnodes[i].SiblingAfter(true);                    
+                    TokenHelper th3 = null;
+                    th1 = t2.subnodes[i].SiblingBefore(1, true);
+                    th2 = t2.subnodes[i].SiblingAfter(1, true);
+                    th3 = t2.subnodes[i].SiblingAfter(2, true);
                     bool problem = false;
                     if (th1 != null && th1.s != ";") problem = true;
-                    if (th2 != null && th2.type != ETokenType.Word) problem = true;
+                    if (th2 == null || th2.type != ETokenType.Word) problem = true;
+                    if (th3 == null || th3.type != ETokenType.Word) problem = true;
 
                     if (!problem)
                     {
@@ -1694,15 +1697,17 @@ namespace Gekko
                         //this will guard against for instance series definitions like "function = 3;" or "procedure = 3;" (unlikely though).
 
                         functionCounter++;
-                        functionNamesLower.Add(t2.subnodes[i + 2].s.ToLower());
+                        TokenHelper temp2 = t2.subnodes[i].SiblingAfter(2, true);  //skips comments, newlines, etc.
+                        functionNamesLower.Add(temp2.s.ToLower());
 
                         if (functionCounter >= 2)
                         {
                             LibraryExtractorGetFunctionCode(library, i0, i, functionNamesLower[functionCounter - 2], t2.subnodes);
                             i0 = i;
                         }
+
                     }
-                }                
+                }
             }
 
             if (functionCounter > 0) LibraryExtractorGetFunctionCode(library, i0, t2.subnodes.Count(), functionNamesLower[functionNamesLower.Count - 1], t2.subnodes);  //get the rest

@@ -348,17 +348,20 @@ namespace Gekko
         /// <returns></returns>
         public TokenHelper SiblingBefore()
         {
-            return SiblingBefore(false);
+            return SiblingBefore(1, false);
         }
 
         /// <summary>
         /// Returns the token to the left (null if not possible). May skip noise like whitespace, comments, breaks, etc.
+        /// Step = 1 is right before.
         /// </summary>
         /// <param name="ignoreWhitespaceEtc"></param>
         /// <returns></returns>
-        public TokenHelper SiblingBefore(bool ignoreWhitespaceEtc)
+        public TokenHelper SiblingBefore(int step, bool ignoreWhitespaceEtc)
         {
+            if (step < 1) new Error("Internal error. Step must be positive.");
             TokenHelper rv = null;
+            int counter = 0;
             if (ignoreWhitespaceEtc)
             {
                 for (int i = -1; i > int.MinValue; i--)
@@ -375,14 +378,18 @@ namespace Gekko
                     }
                     else
                     {
-                        rv = th;
-                        break;
+                        counter++;
+                        if (counter == step)
+                        {
+                            rv = th;
+                            break;
+                        }
                     }
                 }
             }
             else
             {
-                rv = this.Offset(-1);
+                rv = this.Offset(-step);
             }
             return rv;
         }
@@ -393,17 +400,20 @@ namespace Gekko
         /// <returns></returns>
         public TokenHelper SiblingAfter()
         {
-            return SiblingAfter(false);
+            return SiblingAfter(1, false);
         }
 
         /// <summary>
         /// Returns the token to the right (null if not possible). May skip noise like whitespace, comments, breaks, etc.
+        /// Step = 1 is right after.
         /// </summary>
         /// <param name="ignoreWhitespaceEtc"></param>
         /// <returns></returns>
-        public TokenHelper SiblingAfter(bool ignoreWhitespaceEtc)
+        public TokenHelper SiblingAfter(int step, bool ignoreWhitespaceEtc)
         {
+            if (step < 1) new Error("Internal error. Step must be positive.");
             TokenHelper rv = null;
+            int counter = 0;
             if (ignoreWhitespaceEtc)
             {
                 for (int i = 1; i < int.MaxValue; i++)
@@ -419,15 +429,19 @@ namespace Gekko
                         //skip
                     }
                     else
-                    {
-                        rv = th;
-                        break;
+                    {                        
+                        counter++;
+                        if (counter == step)
+                        {
+                            rv = th;
+                            break;
+                        }
                     }
                 }
             }
             else
             {
-                rv = this.Offset(1);
+                rv = this.Offset(step);
             }
             return rv;
         }
