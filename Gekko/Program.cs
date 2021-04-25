@@ -1656,11 +1656,11 @@ namespace Gekko
             //=========================================
             // ...
             // ...
-            // function ...
+            // function ...                                functionNames[0], functionCounter = 1
             // ...
             // ...
             //=========================================
-            // function ...
+            // function ...                                functionNames[1], functionCounter = 2
             // ...
             // ...
             //=========================================
@@ -1672,41 +1672,71 @@ namespace Gekko
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };            
             List<TokenHelper> t = StringTokenizer.GetTokensWithLeftBlanks(s, fat, tags1, tags2, null, null).storage;
-            bool first = true;
+            int functionCounter = 0;
             int i0 = 0;
+            List<string> functionNamesLower = new List<string>();
             for (int i = 0; i < t.Count; i++)
             {                
-                if (t[i].type == ETokenType.Word && G.Equal(t[i].s, "function") && i + 1 < t.Count && t[i + 1].type == ETokenType.Word)
+                if (t[i].type == ETokenType.Word && G.Equal(t[i].s, "function")) //--> procedure
                 {
-                    if (i == 0 || t[i - 1].s == ";")
-                    {
-                        //Now we know that we have the pattern [";"] ["function"] [word].
 
-                        if (first == false)
+                    make a function to find next real token, and get name for function as i+2, and for proc as i+1.
+
+                    bool problem1 = false;
+                    for (int i3 = i - 1; i3 >= 0; i3--)
+                    {
+                        //Token before must be ";", unless it is blank, newline etc.
+                        if (t[i3].type == ETokenType.Comment || t[i3].type == ETokenType.WhiteSpace || t[i3].type == ETokenType.EOL || t[i3].type == ETokenType.EOF) continue;
+                        if (t[i3].s != ";")
                         {
-                            LibraryExtractorGetFunctionCode(library, i0, i, t);
+                            problem1 = true;                            
+                        }
+                        break;
+                    }
+
+                    bool problem2 = false;
+                    for (int i3 = i + 1; i3 < t.Count; i3++)
+                    {
+                        //Token after must be a word, unless it is blank, newline etc.
+                        if (t[i3].type == ETokenType.Comment || t[i3].type == ETokenType.WhiteSpace || t[i3].type == ETokenType.EOL || t[i3].type == ETokenType.EOF) continue;
+                        if (t[i3].type != ETokenType.Word)
+                        {
+                            problem2 = true;
+                        }
+                        break;
+                    }
+
+                    if (!problem1 && !problem2)
+                    {
+                        //Now we know that we have the pattern [";"] ["function"] [word]
+                        //this will guard against for instance series definitions like "function = 3;" or "procedure = 3;" (unlikely though).
+
+                        functionCounter++;
+                        functionNamesLower.Add(t[i + 2].s.ToLower());
+
+                        if (functionCounter >= 2)
+                        {
+                            LibraryExtractorGetFunctionCode(library, i0, i, functionNamesLower[functionCounter - 2], t);
                             i0 = i;
                         }
                     }
-                }
-                first = false;
+                }                
             }
 
-            LibraryExtractorGetFunctionCode(library, i0, t.Count, t);  //get the rest
-
+            if (functionCounter > 0) LibraryExtractorGetFunctionCode(library, i0, t.Count, functionNamesLower[functionNamesLower.Count - 1], t);  //get the rest
         }
 
         /// <summary>
         /// Extracts the code (as text) corresponding to one function/procedure definition. Puts it into the corresponding library object.
+        /// Starts at token i0 (included), and ends 1 token before token i (so i is excluded).
         /// </summary>
         /// <param name="library"></param>
         /// <param name="i0"></param>
         /// <param name="i"></param>
         /// <param name="th"></param>
         /// <param name="t"></param>
-        private static void LibraryExtractorGetFunctionCode(Library library, int i0, int i, List<TokenHelper> t)
-        {
-            string functionNameLower = t[i + 1].s.ToLower();
+        private static void LibraryExtractorGetFunctionCode(Library library, int i0, int i, string functionNameLower, List<TokenHelper> t)
+        {            
             StringBuilder sb = new StringBuilder();
             for (int i2 = i0; i2 < i - 1; i2++)
             {
@@ -1720,7 +1750,7 @@ namespace Gekko
                 function = new GekkoFunction(functionNameLower);
                 library.AddFunction(function);
             }
-            function.code.Append(sb);
+            function.code += sb.ToString();
         }
 
         /// <summary>

@@ -243,7 +243,7 @@ namespace Gekko
         private string name = null; //for instance 'f'
         public string packageName = null;
 
-        public StringBuilder code = null;  //may contain code from several places, snippets of f(), f(...), f(..., ...)
+        public string code = null;  //may contain code from several places, snippets of f(), f(...), f(..., ...)
         // ---------------------------------    
         public Func<GekkoSmpl, P, bool, IVariable> function0 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, IVariable> function1 = null;
