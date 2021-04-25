@@ -348,7 +348,43 @@ namespace Gekko
         /// <returns></returns>
         public TokenHelper SiblingBefore()
         {
-            return this.Offset(-1);
+            return SiblingBefore(false);
+        }
+
+        /// <summary>
+        /// Returns the token to the left (null if not possible). May skip noise like whitespace, comments, breaks, etc.
+        /// </summary>
+        /// <param name="ignoreWhitespaceEtc"></param>
+        /// <returns></returns>
+        public TokenHelper SiblingBefore(bool ignoreWhitespaceEtc)
+        {
+            TokenHelper rv = null;
+            if (ignoreWhitespaceEtc)
+            {
+                for (int i = -1; i > int.MinValue; i--)
+                {
+                    TokenHelper th = this.Offset(i);
+                    if (th == null)
+                    {
+                        rv = null;
+                        break;
+                    }
+                    if (th.type == ETokenType.Comment || th.type == ETokenType.EOF || th.type == ETokenType.EOL || th.type == ETokenType.WhiteSpace)
+                    {
+                        //skip
+                    }
+                    else
+                    {
+                        rv = th;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                rv = this.Offset(-1);
+            }
+            return rv;
         }
 
         /// <summary>
@@ -357,7 +393,43 @@ namespace Gekko
         /// <returns></returns>
         public TokenHelper SiblingAfter()
         {
-            return this.Offset(1);
+            return SiblingAfter(false);
+        }
+
+        /// <summary>
+        /// Returns the token to the right (null if not possible). May skip noise like whitespace, comments, breaks, etc.
+        /// </summary>
+        /// <param name="ignoreWhitespaceEtc"></param>
+        /// <returns></returns>
+        public TokenHelper SiblingAfter(bool ignoreWhitespaceEtc)
+        {
+            TokenHelper rv = null;
+            if (ignoreWhitespaceEtc)
+            {
+                for (int i = 1; i < int.MaxValue; i++)
+                {
+                    TokenHelper th = this.Offset(i);
+                    if (th == null)
+                    {
+                        rv = null;
+                        break;
+                    }
+                    if (th.type == ETokenType.Comment || th.type == ETokenType.EOF || th.type == ETokenType.EOL || th.type == ETokenType.WhiteSpace)
+                    {
+                        //skip
+                    }
+                    else
+                    {
+                        rv = th;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                rv = this.Offset(1);
+            }
+            return rv;
         }
 
         public string LineAndPosText()
@@ -418,6 +490,7 @@ namespace Gekko
         public TokenHelper Offset(int offset)
         {
             //-1 is left sibling, +1 is right sibling
+            if (this.parent == null) new Error("Internal error #8724322423, has no parent.");
             int ii = this.id + offset;
             if (ii < 0 || ii >= this.parent.subnodes.Count())
             {
@@ -434,6 +507,7 @@ namespace Gekko
         /// <returns></returns>
         public TokenHelper OffsetInterval(int start, int end)
         {
+            if (this.parent == null) new Error("Internal error #8724322423, has no parent.");
             TokenList rv2 = new TokenList();
             for (int i = start; i <= end; i++)
             {
