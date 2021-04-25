@@ -101,7 +101,7 @@ namespace Gekko
             foreach (int i in this.GetHierarchy())
             {
                 Library thisLib = this.GetLibrary(i);
-                thisFunction = thisLib.GetFunction(functionName);
+                thisFunction = thisLib.GetFunction(functionName, false);
                 if (thisFunction != null) break;
             }
 
@@ -119,7 +119,7 @@ namespace Gekko
         public GekkoFunction GetFunction(string libraryName, string functionName)
         {
             Library library = this.GetLibrary(libraryName, true);
-            GekkoFunction function = library.GetFunction(functionName);
+            GekkoFunction function = library.GetFunction(functionName, false);
             return function;
         }        
 
@@ -208,7 +208,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public GekkoFunction GetFunction(string name)
+        public GekkoFunction GetFunction(string name, bool abortWithError)
         {
             name = name.ToLower();
 
@@ -221,7 +221,7 @@ namespace Gekko
             this.functions.TryGetValue(name, out rv);
             if (rv == null)
             {
-                //error?
+                if (abortWithError) new Error("Function name '" + name + "' not found in library '" + this.name + "'");
             }
             else
             {

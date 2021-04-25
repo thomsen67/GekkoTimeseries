@@ -1725,7 +1725,7 @@ namespace Gekko
             }
 
             GekkoFunction function = null;
-            function = library.GetFunction(functionNameLower);
+            function = library.GetFunction(functionNameLower, false);
             if (function == null)
             {
                 function = new GekkoFunction(functionNameLower);

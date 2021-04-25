@@ -5047,7 +5047,40 @@ namespace Gekko
                     //throw new GekkoException();
                 }
             }
-        }        
+        }
+
+        public static void Add3_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
+        {
+            if (Globals.library)
+            {
+                //number is hardcoded 2 places below.
+                int i = 3;
+                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+                if (function.function3 != null) UfunctionErroMessage(libraryName, functionName, i);
+                function.function3 = f;
+            }
+            else
+            {
+                Globals.ufunctionsNew3.Add(functionName, f);
+            }
+        }
+
+        private static Error UfunctionErroMessage(string libraryName, string functionName, int i)
+        {
+            return new Error("Function '" + functionName + "' with " + i + " arguments in library '" + libraryName + "' already has been added");
+        }
+
+        private static GekkoFunction AddUfunctionHelper(string libraryName, string functionName)
+        {
+            Gekko.Library library = Globals.functions.GetLibrary(libraryName, false);
+            if (library == null)
+            {
+                library = new Gekko.Library(libraryName);
+                Globals.functions.Add(library);
+            }
+            GekkoFunction function = library.GetFunction(functionName, false);
+            return function;
+        }
 
         /// <summary>
         /// Helper regarding user-defined functions.
@@ -5059,7 +5092,7 @@ namespace Gekko
             //If the user has defined a procedure MYPROC, and Gekko later implements a MYPROC command,
             //we will get an error here, since Gekko will refuse to load a procedure with that name.
             //This guards agains compatibility issues with new Gekko versions.
-
+            
             if (number > 13)
             {
                 new Error("More than 13 user function/procedure arguments is not allowed at the moment. You may consider using a MAP argument to work around this restriction.");                
@@ -5244,7 +5277,7 @@ namespace Gekko
         /// <param name="name"></param>
         /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(string name)
-        {
+        {            
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
@@ -5252,19 +5285,9 @@ namespace Gekko
                 var function = f.function3;
                 if (function == null)
                 {
-                    P p = new P();
-                    
-                    string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(f.code);
-                    string commandLinesFlat = Program.HandleGekkoCommands(text0);
-                    Parser.ParseHelper ph = new Parser.ParseHelper();
-                    ph.commandsText = commandLinesFlat;
-                    Parser.ConvertHelper ch = null;                         
-                                         
-                    ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
-                    ch.commandsText = commandLinesFlat;
-                    Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                    FunctionLookupHelper(f);
+                    function = f.function3;
                 }
-                rv = function;
             }
             else
             {
@@ -5278,6 +5301,7 @@ namespace Gekko
             return rv;
         }
 
+        
         /// <summary>
         /// Used for Gekko user-defined functions.
         /// </summary>
@@ -5447,7 +5471,27 @@ namespace Gekko
             }
             return rv;
         }
-        
+
+        // ---------------------
+
+        /// <summary>
+        /// Gets stored function/procedure code from library, parses it and compiles it.
+        /// </summary>
+        /// <param name="f"></param>
+        private static void FunctionLookupHelper(GekkoFunction f)
+        {
+            P p = new P();
+            string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(f.code);
+            string commandLinesFlat = Program.HandleGekkoCommands(text0);
+            Parser.ParseHelper ph = new Parser.ParseHelper();
+            ph.commandsText = commandLinesFlat;
+            Parser.ConvertHelper ch = null;
+            ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
+            ch.commandsText = commandLinesFlat;
+            text0 = text0.Replace(Globals.ufunctionSpecialName + "(null, ", Globals.ufunctionSpecialName + "(" + f.packageName + ", ");
+            Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+        }
+
 
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END
@@ -5456,6 +5500,8 @@ namespace Gekko
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END
+
+
 
         /// <summary>
         /// Convert a Gekko matrix into a timeseries.

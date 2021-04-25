@@ -2036,7 +2036,7 @@ namespace Gekko.Parser.Gek
 
                             //Version with all parameters, also optional parameters
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
-                            w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParameters + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
+                            w.headerCs.AppendLine("O.Add" + numberOfParameters + Globals.ufunctionSpecialName + "(null, `" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
                             w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
 
                             //for instance, f(x1, x2, x3, x4=..., x5=...)
@@ -2121,7 +2121,7 @@ namespace Gekko.Parser.Gek
                                 string defaultValues = null;
 
                                 w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverloadedVersion + ", `" + functionNameLower + "`);" + G.NL);
-                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverloadedVersion + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParametersOverloadedVersion, 0) + ") => " + G.NL);
+                                w.headerCs.AppendLine("O.Add" + numberOfParametersOverloadedVersion + Globals.ufunctionSpecialName + "(null, `" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParametersOverloadedVersion, 0) + ") => " + G.NL);
                                 w.headerCs.AppendLine(G.NL + "{ " + G.NL);
 
                                 w.headerCs.AppendLine("if(" + qName + ") {" + G.NL);
