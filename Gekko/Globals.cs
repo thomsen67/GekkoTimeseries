@@ -600,6 +600,7 @@ namespace Gekko
             "INI",
             "INTERPOLATE",
             "ITERSHOW",
+            "LIBRARY",
             "LIST",
             "LOCAL",
             "LOCK",

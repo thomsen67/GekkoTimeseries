@@ -2573,7 +2573,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | index                SEMICOLON!
 						  | ini                  SEMICOLON!
 						  | interpolate          SEMICOLON!
-						  | itershow             SEMICOLON!	
+						  | itershow             SEMICOLON!
+						  | library              SEMICOLON!
 						  | local                SEMICOLON!
 						  | lock_                SEMICOLON!
 						  | mem                  SEMICOLON!
@@ -3141,6 +3142,23 @@ localOpt1h:				    ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)
 global:					    GLOBAL globalOpt1? seqOfBankvarnames? -> ^({token("ASTGLOBAL", ASTGLOBAL, input.LT(1).Line)} ^(ASTPLACEHOLDER globalOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
 globalOpt1:				    ISNOTQUAL | leftAngle globalOpt1h* RIGHTANGLE -> ^(ASTOPT1 globalOpt1h*);
 globalOpt1h:				ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
+						    ;
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// LIBRARY
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+													    
+library:                    LIBRARY libraryOpt1? fileNameStar (AS nameOrStar)? -> ^({token("ASTLIBRARY", ASTLIBRARY, input.LT(1).Line)} ^(ASTPLACEHOLDER libraryOpt1?) ^(ASTHANDLEFILENAME fileNameStar) ^(ASTPLACEHOLDER nameOrStar?))
+						    ;
+
+libraryOpt1:                ISNOTQUAL
+						  | leftAngle libraryOpt1h* RIGHTANGLE -> libraryOpt1h*
+                            ;
+
+libraryOpt1h:               FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
+						  | LAST (EQUAL yesNo)? -> ^(ASTOPT_STRING_LAST yesNo?)
+						  | REMOVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_REMOVE yesNo?)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

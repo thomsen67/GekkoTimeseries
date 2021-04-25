@@ -12968,12 +12968,13 @@ namespace UnitTests
             // p1     x          x                x          x
             // p2     x          x                x          x
             // p3                x                          
-            
+
 
             // ------------------------------------------------------------
             // simple
-            // ------------------------------------------------------------            
+            // ------------------------------------------------------------                                    
             I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p1;"); 
             I("%y1 = f1('a');");        
             _AssertScalarString(First(), "%y1", "p1_f1_a");
@@ -12984,6 +12985,7 @@ namespace UnitTests
             // masking1
             // ------------------------------------------------------------            
             I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p1;");  
             I("library p2;");  //p1 will be first
             I("%y1 = f1('a');");
@@ -12995,6 +12997,7 @@ namespace UnitTests
             // masking2
             // ------------------------------------------------------------            
             I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p3;");
             I("library p1;");
             //p3 will be first, but only has f1(... , ...), not f1(...)
@@ -13005,21 +13008,21 @@ namespace UnitTests
             // ------------------------------------------------------------
             // masking3
             // ------------------------------------------------------------            
-
             I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p3;");
             I("library p1;");
             //p3 will be first, but does not have any f2
             I("%y1 = f2('a');");
             _AssertScalarString(First(), "%y1", "p1_f2_a");
             I("%y2 = f2('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p1_f2_ab");            
+            _AssertScalarString(First(), "%y2", "p1_f2_ab");
 
             // ------------------------------------------------------------
             // colon and remove
             // ------------------------------------------------------------   
-            
             I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p2;");
             I("library p1;");  //p2 will be first
             I("%y1 = f1('a');");
@@ -13032,41 +13035,35 @@ namespace UnitTests
             I("%y1 = f1('a');");
             _AssertScalarString(First(), "%y1", "p1_f1_a");
             FAIL("%y2 = p2:f1('a', 'b');");
-
-            // ------------------------------------------------------------
-            // <first>, <last>, 
-            // ------------------------------------------------------------   
-
+            
             // ------------------------------------------------------------
             // errors
             // ------------------------------------------------------------            
-
             I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             FAIL("library notexisting;");
             I("library p1;");
             FAIL("library p1;");
             I("reset;");
             I("library p1;");
 
+            // -----------------------------------------------------------------------------
             I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p1 as p1;");  //also cheks as.
             FAIL("library <remove> p2;");
             I("library <clear> global;");  //legal
             FAIL("library <clear> gekko;");  //illegal
             FAIL("library <clear> p1;");  //illegal
-
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("library gekko;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
-
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("library global;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
-
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("library local;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
-                        
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));                        
             FAIL("library <remove> gekko;");
             FAIL("library <remove> global;");
             FAIL("library <remove> local;");

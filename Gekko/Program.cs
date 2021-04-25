@@ -1532,6 +1532,198 @@ namespace Gekko
         }
 
         /// <summary>
+        /// TELL command.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="nocr"></param>
+        public static void Tell(string text, bool nocr)
+        {
+            if (Globals.runningOnTTComputer && text == "arrow")
+            {
+                //while (true)
+                //{
+                //    var codeToEval = Console.ReadLine();
+                //    var result = await CSharpScript.EvaluateAsync(codeToEval);
+                //    Console.WriteLine(result);
+                //}
+
+                //Arrow.Run();
+
+            }
+
+            if (nocr) G.Write(text);
+            else G.Writeln(text);
+
+        }
+
+        /// <summary>
+        /// Helper for the LIBRARY command. Unzips the library, extracts the function/procedure code, puts this in
+        /// a Library object for later use. Does not compile the code, this is done lazily.
+        /// </summary>
+        /// <param name="o"></param>
+        public static void LibraryHelper(O.Library o)
+        {
+            string fileName = O.ConvertToString(o.fileName);
+            string as2 = null; if (o.as2 != null) as2 = O.ConvertToString(o.as2);
+
+            string fileName2 = G.AddExtension(fileName, "." + "zip");
+            string libraryName = Path.GetFileNameWithoutExtension(fileName2);
+
+            List<string> folders = new List<string>();
+            folders.Add(Program.options.folder_command);
+            folders.Add(Program.options.folder_command1);
+            folders.Add(Program.options.folder_command2);
+            string zipFileWithPath = FindFile(fileName2, folders);  //also calls CreateFullPathAndFileName()
+            if (zipFileWithPath == null)
+            {                
+                new Error("Could not find library file: " + fileName2);
+            }            
+
+            string tempPath = GetTempGbkFolderPath();
+            if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
+            {
+                Directory.CreateDirectory(tempPath);
+            }
+            else
+            {
+                Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
+            }         
+            
+            WaitForZipRead(tempPath, zipFileWithPath);
+
+            Library library = new Library(libraryName);
+            Globals.functions.Add(library);  //TODO: check if already there...
+            LibraryExtractor(tempPath, library);                        
+            
+            Library lib2 = new Library("test2");
+            Globals.functions.Add(lib2);
+            GekkoFunction libi2 = new GekkoFunction("f");
+            lib2.AddFunction(libi2);
+
+            GekkoFunction f1 = Globals.functions.GetFunction("f");
+            GekkoFunction f2 = Globals.functions.GetFunction("f");
+            GekkoFunction f3 = Globals.functions.GetFunction("test1", "f");
+            GekkoFunction f4 = Globals.functions.GetFunction("test1", "f");
+
+            try
+            {
+                G.DeleteFolder(tempPath);
+            }
+            catch
+            {
+                //not catastrofic if this fails
+            }
+        }
+
+        /// <summary>
+        /// Finds all .gcm files in a folder structure, and extracts functions/procedures.
+        /// </summary>
+        /// <param name="targetDirectory"></param>
+        public static void LibraryExtractor(string targetDirectory, Library library)
+        {
+            // Process the list of files found in the directory.
+            string[] fileEntries = Directory.GetFiles(targetDirectory);
+            foreach (string fileName in fileEntries)
+            {
+                if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase)) LibraryExtractorHandleGcmFile(fileName, library);
+            }
+
+            // Recurse into subdirectories of this directory.
+            string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+            foreach (string subdirectory in subdirectoryEntries)
+            {
+                LibraryExtractor(subdirectory, library);
+            }
+        }
+
+        /// <summary>
+        /// Extract function/procedure code as text.
+        /// </summary>
+        /// <param name="file"></param>
+        public static void LibraryExtractorHandleGcmFile(string file, Library library)
+        {
+            // ...
+            // ...
+            // function ...
+            // ...
+            // ...
+            // function ...
+            // ...
+            // ...
+
+            // will be cut like this:
+
+            //=========================================
+            // ...
+            // ...
+            // function ...
+            // ...
+            // ...
+            //=========================================
+            // function ...
+            // ...
+            // ...
+            //=========================================
+
+            //It basically cuts before second "function" and so on.
+
+            string s = Program.GetTextFromFileWithWait(file);
+            int fat = 5;
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };            
+            List<TokenHelper> t = StringTokenizer.GetTokensWithLeftBlanks(s, fat, tags1, tags2, null, null).storage;
+            bool first = true;
+            int i0 = 0;
+            for (int i = 0; i < t.Count; i++)
+            {                
+                if (t[i].type == ETokenType.Word && G.Equal(t[i].s, "function") && i + 1 < t.Count && t[i + 1].type == ETokenType.Word)
+                {
+                    if (i == 0 || t[i - 1].s == ";")
+                    {
+                        //Now we know that we have the pattern [";"] ["function"] [word].
+
+                        if (first == false)
+                        {
+                            LibraryExtractorGetFunctionCode(library, i0, i, t);
+                            i0 = i;
+                        }
+                    }
+                }
+                first = false;
+            }
+
+            LibraryExtractorGetFunctionCode(library, i0, t.Count, t);  //get the rest
+
+        }
+
+        /// <summary>
+        /// Extracts the code (as text) corresponding to one function/procedure definition. Puts it into the corresponding library object.
+        /// </summary>
+        /// <param name="library"></param>
+        /// <param name="i0"></param>
+        /// <param name="i"></param>
+        /// <param name="th"></param>
+        /// <param name="t"></param>
+        private static void LibraryExtractorGetFunctionCode(Library library, int i0, int i, List<TokenHelper> t)
+        {
+            string functionNameLower = t[i + 1].s.ToLower();
+            StringBuilder sb = new StringBuilder();
+            for (int i2 = i0; i2 < i - 1; i2++)
+            {
+                sb.Append(t[i2].ToString());
+            }
+
+            GekkoFunction function = null;
+            function = library.GetFunction(functionNameLower);
+            if (function == null)
+            {
+                function = new GekkoFunction(functionNameLower);
+                library.AddFunction(function);
+            }
+            function.code.Append(sb);
+        }
+
+        /// <summary>
         /// Helper method (hook) for Gekcel. BEWARE: Do not change name or signature without changing in 
         /// Gekcel solution, too!!
         /// </summary>
@@ -17277,10 +17469,17 @@ namespace Gekko
             }
         }
 
-        //Only used for reading TSDX files, much more specific than WaitForZipRead()
+        //
+        /// <summary>
+        /// Only used for reading TSDX files, much more specific than WaitForZipRead()
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <param name="zipFileName"></param>
+        /// <param name="inside"></param>
+        /// <param name="originalFileName"></param>
+        /// <returns></returns>
         public static string WaitForZipRead_TSDX(string folder, string zipFileName, string inside, string originalFileName)
-        {
-            
+        {           
             
             //is not actually waiting...
             int gap = Globals.waitFileGap;  //1 second
@@ -17367,6 +17566,11 @@ namespace Gekko
             return tsdFile;
         }
 
+        /// <summary>
+        /// Extract the contents of a zip file.
+        /// </summary>
+        /// <param name="folderToUseForOutput"></param>
+        /// <param name="zipFileNameAndPath"></param>
         public static void WaitForZipRead(string folderToUseForOutput, string zipFileNameAndPath)
         {
             //is not actually waiting...

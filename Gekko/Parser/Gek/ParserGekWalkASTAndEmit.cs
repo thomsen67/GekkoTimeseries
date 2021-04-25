@@ -4631,6 +4631,17 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
+                    case "ASTLIBRARY":
+                        {                            
+                            node.Code.A("O.Library o" + Num(node) + " = new O.Library();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                            GetCodeFromAllChildren(node, node[0]);  //options
+                            //GetCodeFromAllChildren(node, node[1]);  //filename
+                            if (node[1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".fileName = " + node[1][0].Code + ";" + G.NL);
+                            if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".as2 = " + node[2][0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
+                        }
+                        break;
                     case "ASTREAD":
                         {
                             //node.Code.A(Globals.clearTsCsCode + G.NL);

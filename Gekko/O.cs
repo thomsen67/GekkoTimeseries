@@ -2017,50 +2017,9 @@ namespace Gekko
             Program.Cut(true);
         }
 
-
-        /// <summary>
-        /// TELL command.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (Globals.runningOnTTComputer && text == "arrow")
-            {
-                //while (true)
-                //{
-                //    var codeToEval = Console.ReadLine();
-                //    var result = await CSharpScript.EvaluateAsync(codeToEval);
-                //    Console.WriteLine(result);
-                //}
-
-                //Arrow.Run();
-
-                Libraries libs = new Libraries();
-
-                Library lib = new Library("test1");
-                libs.Add(lib);
-                GekkoFunction function = new GekkoFunction("g");
-                lib.AddFunction(function);
-
-                Library lib2 = new Library("test2");
-                libs.Add(lib2);
-                GekkoFunction libi2 = new GekkoFunction("f");
-                lib2.AddFunction(libi2);
-
-                GekkoFunction f1 = libs.GetFunction("f");
-                GekkoFunction f2 = libs.GetFunction("f");
-                GekkoFunction f3 = libs.GetFunction("test1", "f");
-                GekkoFunction f4 = libs.GetFunction("test1", "f");
-
-                
-
-
-            }
-            
-            if (nocr) G.Write(text);
-            else G.Writeln(text);
-
+            Program.Tell(text, nocr);
         }
 
         public static GekkoFunction FunctionDef()
@@ -6475,13 +6434,11 @@ namespace Gekko
                     if (isRead && this.opt_all != null)
                     {
                         new Error("READ<all> is not allowed");
-                        //throw new GekkoException();
                     }
 
                     if (!isRead && this.opt_respect != null)
                     {
                         new Error("IMPORT<respect> is not allowed");
-                        //throw new GekkoException();
                     }
 
                     if (this.opt_prim != null)
@@ -6489,12 +6446,10 @@ namespace Gekko
                         if (isRead == false)
                         {   //import
                             new Error("IMPORT<prim> is obsolete, use IMPORT.");
-                            //throw new GekkoException();
                         }
                         else
                         {   //read
-                            new Error("READ<prim> is obsolete, use READ<first>.");
-                            //throw new GekkoException();
+                            new Error("READ<prim> is obsolete, use READ<first>.");                            
                         }
                     }
 
@@ -6503,12 +6458,10 @@ namespace Gekko
                         if (this.opt_first != null)
                         {
                             new Error("IMPORT<first> is not legal syntax, just use IMPORT.");
-                            //throw new GekkoException();
                         }
                         if (this.opt_merge != null)
                         {
                             new Error("IMPORT<merge> is not legal syntax, IMPORT merges already.");
-                            //throw new GekkoException();
                         }
                         hlp.Merge = true;               //this is so for IMPORT
                         hlp.openType = EOpenType.First;  //this is so for IMPORT                    
@@ -6614,12 +6567,7 @@ namespace Gekko
                         }
                     }
 
-                    List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-
-                    //if (Globals.excelDna)
-                    //{
-                    //    MessageBox.Show("fname: " + hlp.FileName);
-                    //}
+                    List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();                    
 
                     bool open = false;
                     if (isTo)
@@ -7242,6 +7190,28 @@ namespace Gekko
                 }
                 ts3.Stamp();
                 G.Writeln2("Spliced '" + ts3.name + "' by means of " + obs + " common observations");
+            }
+        }
+
+        public class LibraryOptions
+        {
+            public string opt_first = null;
+            public string opt_last = null;
+            public string opt_remove = null;
+        }
+
+        public class Library
+        {
+            public P p = null;
+            public IVariable fileName = null;
+            public IVariable as2 = null;
+            public string opt_first = null;
+            public string opt_last = null;
+            public string opt_remove = null;
+
+            public void Exe()
+            {                
+                Program.LibraryHelper(this);
             }
         }
 
