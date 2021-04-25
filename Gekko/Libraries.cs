@@ -59,7 +59,7 @@ namespace Gekko
         private List<int> hierarchy = new List<int>();  //order of packages
         private Library cache = null;
 
-        private Library GetLibrary(string name)
+        public Library GetLibrary(string name, bool abortWithError)
         {
             name = name.ToLower();
 
@@ -78,9 +78,9 @@ namespace Gekko
                 }
             }
 
-            new Error("Library '" + name + "' could not be found.");
+            if (abortWithError) new Error("Library '" + name + "' could not be found.");
 
-            return null;  //will actually never get here
+            return null;
         }
 
         private Library GetLibrary(int i)
@@ -118,7 +118,7 @@ namespace Gekko
         /// </summary>
         public GekkoFunction GetFunction(string libraryName, string functionName)
         {
-            Library library = this.GetLibrary(libraryName);
+            Library library = this.GetLibrary(libraryName, true);
             GekkoFunction function = library.GetFunction(functionName);
             return function;
         }        

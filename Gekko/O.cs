@@ -2021,84 +2021,7 @@ namespace Gekko
         {
             Program.Tell(text, nocr);
         }
-
-        public static GekkoFunction FunctionDef()
-        {
-            //NB, may be an overload, check if already exists in library...
-
-            GekkoFunction function = new GekkoFunction("f");
-            function.function3 = (GekkoSmpl smpl, P p, bool q10, GekkoArg
-            functionarg_xf7dke8cj_6_func, GekkoArg functionarg_xf7dke8cj_7_func, GekkoArg
-            functionarg_xf7dke8cj_8_func) =>
-            {
-                IVariable functionarg_xf7dke8cj_6 =
-              O.TypeCheck_date(functionarg_xf7dke8cj_6_func, smpl, 1);
-                IVariable functionarg_xf7dke8cj_7 =
-                O.TypeCheck_date(functionarg_xf7dke8cj_7_func, smpl, 2);
-                IVariable functionarg_xf7dke8cj_8 =
-                O.TypeCheck_val(functionarg_xf7dke8cj_8_func.f1(smpl), 3);
-
-                Databank local0 =
-                Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 =
-                Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();
-                p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
-                try
-                {
-
-
-                    return null;
-                }
-                catch { p.Deeper(); throw; }
-                finally
-                {
-                    Program.databanks.local =
-                    local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
-                }
-            };
-            return function;
-        }
-
-
-        public static void FunctionDef9()
-        {
-
-            O.PrepareUfunction(3, "f");
-
-            Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, bool q10, GekkoArg
-            functionarg_xf7dke8cj_6_func, GekkoArg functionarg_xf7dke8cj_7_func, GekkoArg
-            functionarg_xf7dke8cj_8_func) =>
-
-
-            {
-                IVariable functionarg_xf7dke8cj_6 =
-              O.TypeCheck_date(functionarg_xf7dke8cj_6_func, smpl, 1);
-                IVariable functionarg_xf7dke8cj_7 =
-                O.TypeCheck_date(functionarg_xf7dke8cj_7_func, smpl, 2);
-                IVariable functionarg_xf7dke8cj_8 =
-                O.TypeCheck_val(functionarg_xf7dke8cj_8_func.f1(smpl), 3);
-
-                Databank local0 =
-                Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 =
-                Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();
-                p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
-                try
-                {
-
-                    return null;
-                }
-                catch { p.Deeper(); throw; }
-                finally
-                {
-                    Program.databanks.local =
-                    local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
-                }
-            });
-
-        }
-
-
+        
 
         /// <summary>
         /// EXIt command.
@@ -5322,12 +5245,35 @@ namespace Gekko
         /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(string name)
         {
-            //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew3.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 3);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                var function = f.function3;
+                if (function == null)
+                {
+                    P p = new P();
+                    
+                    string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(f.code);
+                    string commandLinesFlat = Program.HandleGekkoCommands(text0);
+                    Parser.ParseHelper ph = new Parser.ParseHelper();
+                    ph.commandsText = commandLinesFlat;
+                    Parser.ConvertHelper ch = null;                         
+                                         
+                    ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
+                    ch.commandsText = commandLinesFlat;
+                    Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                }
+                rv = function;
+            }
+            else
+            {
+                //NOTE: the number of args is hardcoded two places below                
+                Globals.ufunctionsNew3.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 3);
+                }
             }
             return rv;
         }

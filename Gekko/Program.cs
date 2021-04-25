@@ -1592,16 +1592,12 @@ namespace Gekko
             WaitForZipRead(tempPath, zipFileWithPath);
 
             Library library = new Library(libraryName);
-            Globals.functions.Add(library);  //TODO: check if already there...
-            LibraryExtractor(tempPath, library);
-
-            if (true)
+            if (Globals.functions.GetLibrary(libraryName, false) != null)
             {
-                GekkoFunction f1 = Globals.functions.GetFunction("f1");
-                GekkoFunction f2 = Globals.functions.GetFunction("f2");
-                GekkoFunction f3 = Globals.functions.GetFunction("p3", "f1");
-                GekkoFunction f4 = Globals.functions.GetFunction("p3", "f2");
+                new Error("Library '" + libraryName + "' cannot be loaded, because it exists already");
             }
+            Globals.functions.Add(library);
+            LibraryExtractor(tempPath, library);            
 
             try
             {
