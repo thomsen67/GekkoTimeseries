@@ -1211,6 +1211,11 @@ namespace Gekko
         public static Options options = new Options();
 
         /// <summary>
+        /// User-defined functions/procedures.
+        /// </summary>
+        public static Libraries functions = new Libraries();
+
+        /// <summary>
         /// Helper for name aliases
         /// </summary>
         public static GekkoDictionary<string, string> alias = null;
@@ -1592,11 +1597,11 @@ namespace Gekko
             WaitForZipRead(tempPath, zipFileWithPath);
 
             Library library = new Library(libraryName);
-            if (Globals.functions.GetLibrary(libraryName, false) != null)
+            if (Program.functions.GetLibrary(libraryName, false) != null)
             {
                 new Error("Library '" + libraryName + "' cannot be loaded, because it exists already");
             }
-            Globals.functions.Add(library);
+            Program.functions.Add(library);
             LibraryExtractor(tempPath, library);            
 
             try
@@ -18521,23 +18526,7 @@ namespace Gekko
 
         public static void InitUfunctionsAndArithmeticsAndMore()
         {
-            Globals.functions = new Libraries();
-            Globals.procedures = new Libraries();
-
-            Globals.ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew3 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew4 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew5 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew6 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew7 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew8 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew9 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew10 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Program.functions = new Libraries();
             
             Globals.arithmentics[0] = (x1, x2) => x1 + x2;
             Globals.arithmentics[1] = (x1, x2) => x2 + x1;

@@ -285,7 +285,7 @@ namespace Gekko
                 s = G.FromDateToString(t1) + "-" + G.FromDateToString(t2) + ": ";
             }
             return s;
-        }        
+        }
 
         public class HandleEndoHelper2
         {
@@ -424,7 +424,7 @@ namespace Gekko
         /// <param name="y"></param>
         /// <returns></returns>
         public static IVariable Percent(GekkoSmpl smpl, IVariable x, IVariable y)
-        {            
+        {
             Series x_series = x as Series;
             AssignmentError(x_series, "%= operator");
             return x.Divide(smpl, y);
@@ -438,7 +438,7 @@ namespace Gekko
         /// <param name="y"></param>
         /// <returns></returns>
         public static IVariable Hash(GekkoSmpl smpl, IVariable x, IVariable y)
-        {            
+        {
             Series x_series = x as Series;
             AssignmentError(x_series, "#= operator");
             return x.Divide(smpl, y);
@@ -452,8 +452,8 @@ namespace Gekko
         /// <param name="y"></param>
         /// <returns></returns>
         public static IVariable Hat(GekkoSmpl smpl, IVariable x, IVariable y)
-        {            
-            Series x_series = x as Series;            
+        {
+            Series x_series = x as Series;
             AssignmentError(x_series, "^= operator");
             foreach (GekkoTime t in smpl.Iterate03())
             {
@@ -479,7 +479,7 @@ namespace Gekko
         {
             return Program.options.decomp_maxlead;
         }
-        
+
         /// <summary>
         /// The math power function
         /// </summary>
@@ -502,7 +502,7 @@ namespace Gekko
         {
             return x.Negate(smpl);
         }
-        
+
         /// <summary>
         /// A list function
         /// </summary>
@@ -513,7 +513,7 @@ namespace Gekko
         public static IVariable Union(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             return Functions.union(smpl, null, null, x, y);
-        }        
+        }
 
         /// <summary>
         /// A list function
@@ -580,7 +580,7 @@ namespace Gekko
             else if (G.Equal(x_string, "no")) return false;
             else
             {
-                new Error("Value expected to be 'yes' or 'no', not '" + x_string + "'"); return false;                
+                new Error("Value expected to be 'yes' or 'no', not '" + x_string + "'"); return false;
                 //throw new GekkoException();
             }
         }
@@ -618,7 +618,7 @@ namespace Gekko
         /// <returns></returns>
         public static int XSint(IVariable x)  //signed int
         {
-            int x_int = O.ConvertToInt(x);            
+            int x_int = O.ConvertToInt(x);
             return x_int;
         }
 
@@ -661,7 +661,7 @@ namespace Gekko
         /// <param name="x"></param>
         /// <returns></returns>
         public static string XNameOrStringOrFilename(IVariable x)
-        { 
+        {
             return XNameOrString(x);
         }
 
@@ -763,7 +763,7 @@ namespace Gekko
                 Program.RemoteInit();
             }
             else if (isBlock == 0 && G.Equal(s2, "solve_gauss_reorder"))
-            {                
+            {
                 new Note("Reorder: you must issue a MODEL statement afterwards, for this option to take effect. (In command files, place this option before any MODEL statements).");
             }
             else if (isBlock == 0 && G.Equal(s2, "series_dyn"))
@@ -780,7 +780,7 @@ namespace Gekko
             else if (isBlock == 0 && G.Equal(s2, "timefilter_type"))  //TODO: only issue if really avg
             {
                 new Note("Timefilter type = 'avg' only works for PRT and MULPRT.");
-            }                        
+            }
         }
 
         /// <summary>
@@ -822,12 +822,12 @@ namespace Gekko
                         break;
                     }
                 }
-                
+
                 if (hasLlist)
                 {
                     List mm = new List();
                     for (int i = 0; i < m.list.Count; i += 2)
-                    {                        
+                    {
                         if (m.list[i].Type() == EVariableType.List)
                         {
                             if (m.list[i + 1] != null)
@@ -853,8 +853,8 @@ namespace Gekko
             else
             {
                 m = new List(FlattenIVariablesHelper(iv));
-            }            
-            
+            }
+
             if (isNaked)
             {
                 bool allNumbers = IsListAllNumbers(m, 2);
@@ -989,7 +989,7 @@ namespace Gekko
         {
             return new List(FlattenIVariablesHelper(iv));
         }
-        
+
         /// <summary>
         /// Recursive helper method
         /// </summary>
@@ -997,7 +997,7 @@ namespace Gekko
         /// <returns></returns>
         //is recursive
         private static List<IVariable> FlattenIVariablesHelper(IVariable iv)
-        {            
+        {
             List<IVariable> temp = new List<IVariable>();
             if (iv.Type() == EVariableType.List)
             {
@@ -1017,20 +1017,20 @@ namespace Gekko
             else temp.Add(iv);
             return temp;
         }
-        
-        
+
+
         /// <summary>
         /// Helper for PRT/PLOT/SHEET
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="ope0"></param>
         public static void PrtElementHandleLabel(GekkoSmpl smpl, O.Prt.Element ope0)
-        {            
+        {
             if (ope0.labelRecordedPieces == null) ope0.labelRecordedPieces = new List<RecordedPieces>();
             ope0.labelRecordedPieces.AddRange(smpl.labelRecordedPieces);
         }
-        
-        
+
+
         public enum ECreatePossibilities
         {
             NoneReturnNull,
@@ -1046,7 +1046,7 @@ namespace Gekko
             FlexibleStart,
             FlexibleEnd
         }
-        
+
         /// <summary>
         /// Helper method for ENDO/EXO.
         /// </summary>
@@ -1099,7 +1099,7 @@ namespace Gekko
             }
 
             int count = 0;
-            
+
             List<string> simModeVariables = new List<string>();  //only for sim-mode
 
             foreach (HandleEndoHelper h in helper)
@@ -1210,7 +1210,7 @@ namespace Gekko
                             }
                         }
                     }
-                }                
+                }
             }
 
             if (!G.Equal(Program.options.model_type, "gams"))
@@ -1222,7 +1222,7 @@ namespace Gekko
             {
                 G.Writeln2("Set " + count + " " + endoOrExoPrefix + "_... variables");
             }
-        }                
+        }
 
         /// <summary>
         /// Helper for 'bank' or 'ref' option
@@ -1239,7 +1239,7 @@ namespace Gekko
             {
                 Program.databanks.optionRef = Program.databanks.GetDatabank(opt_ref, true);
             }
-        }        
+        }
 
         /// <summary>
         /// Handle missing values, also in array-series
@@ -1288,7 +1288,7 @@ namespace Gekko
             Program.options.series_array_calc_missing = r2;
             Program.options.series_data_missing = r3;
         }
-        
+
         /// <summary>
         /// Iteration, next step forwards.
         /// </summary>
@@ -1339,7 +1339,7 @@ namespace Gekko
                     IVariable item = start_list.list[counter];
                     x = item.DeepClone(null);  //necessary to clone?? Note sure... but safest to do
                 }
-            }         
+            }
         }
 
         /// <summary>
@@ -1404,7 +1404,7 @@ namespace Gekko
             else throw new GekkoException();
             return v;
         }
-        
+
         /// <summary>
         /// Start of iterator.
         /// </summary>
@@ -1526,7 +1526,7 @@ namespace Gekko
                     new Error("Expected FOR to loop over list, not a " + G.GetTypeString(start) + " type");
                     //throw new GekkoException();
                 }
-                if (counter <= start_list.list.Count) rv = true;                
+                if (counter <= start_list.list.Count) rv = true;
             }
             else
             {
@@ -1614,7 +1614,7 @@ namespace Gekko
                 }
             }
             return rv;
-        }                
+        }
 
         /// <summary>
         /// Small helper method.
@@ -1706,7 +1706,7 @@ namespace Gekko
                 {
                     m.Add(iv);
                 }
-                
+
             }
             return new List(m);
         }
@@ -1922,7 +1922,7 @@ namespace Gekko
                 count++;
             }
             if (count > 0) G.Writeln2("Removed " + count + " " + endoOrExoPrefix + "_... variables");
-        }        
+        }
 
         /// <summary>
         /// Used when the user changes frequency, printing info on this.
@@ -2021,7 +2021,7 @@ namespace Gekko
         {
             Program.Tell(text, nocr);
         }
-        
+
 
         /// <summary>
         /// EXIt command.
@@ -2455,7 +2455,7 @@ namespace Gekko
             }
 
             List ml = GetRawListElements(fileName);
-            
+
             return ml;
         }
 
@@ -2491,7 +2491,7 @@ namespace Gekko
                 //throw new GekkoException();
             }
         }
-        
+
         /// <summary>
         /// Helper for Global and Local databank. Used in Program.SearchFromTo() searching hub.
         /// </summary>
@@ -2642,8 +2642,8 @@ namespace Gekko
         {
             IVariable rv = null;
             if (x.Type() == EVariableType.Val && Program.options.string_interpolate_format_val != "")
-            {                
-                rv = Functions.format(smpl, null, null, x, new ScalarString(Program.options.string_interpolate_format_val));                
+            {
+                rv = Functions.format(smpl, null, null, x, new ScalarString(Program.options.string_interpolate_format_val));
             }
             else rv = x;
             return rv;
@@ -2656,7 +2656,7 @@ namespace Gekko
         /// <returns></returns>
         public static IVariable DecompLooper(string fullname)
         {
-            IVariable iv = GetIVariableFromString(fullname, ECreatePossibilities.NoneReportError, true);            
+            IVariable iv = GetIVariableFromString(fullname, ECreatePossibilities.NoneReportError, true);
             return iv;
         }
 
@@ -2667,7 +2667,7 @@ namespace Gekko
         /// <param name="type"></param>
         /// <returns></returns>
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
-        {            
+        {
             return GetIVariableFromString(fullname, type, false);  //no searching per default
         }
 
@@ -2681,7 +2681,7 @@ namespace Gekko
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type, bool canSearch)
         {
             //canSearch = true will only have effect if also "OPTION databank search = yes".
-            
+
             //if noSearch = true, type .Can and .Must can be used, 
             //else there will be a crash (too dangerous to create a series when the exact bank is not known)
 
@@ -2697,7 +2697,7 @@ namespace Gekko
             LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, type, canSearch);
             IVariable iv2 = O.Lookup(null, null, new ScalarString(fullname), null, settings, EVariableType.Var, null);
             return iv2;
-            
+
         }
 
         /// <summary>
@@ -2811,7 +2811,7 @@ namespace Gekko
         /// <returns></returns>
         public static string AcceptHelper2(string type, IVariable iv)
         {
-            
+
             string s = null;
             if (iv == null)
             {
@@ -2883,7 +2883,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("Promting is only allowed for types val, date, string or name at the moment. This restriction may be removed in a future Gekko version. The type '" + type[i] + "' is not valid for prompting.");                    
+                    new Error("Promting is only allowed for types val, date, string or name at the moment. This restriction may be removed in a future Gekko version. The type '" + type[i] + "' is not valid for prompting.");
                 }
 
                 if (question[i])
@@ -2899,8 +2899,8 @@ namespace Gekko
                     else
                     {
                         try
-                        {                            
-                            rv = AcceptHelper2(type[i], tmp);                            
+                        {
+                            rv = AcceptHelper2(type[i], tmp);
                         }
                         catch { }
 
@@ -2919,9 +2919,9 @@ namespace Gekko
                             break; //this and all the following will attain their default values, similar to AREMOS.
                         }
                         else
-                        {                            
+                        {
                             defaultValue[i] = AcceptHelper1(type[i], rvTrim);
-                        }                        
+                        }
                     }
                 }
                 promptResults.Add(defaultValue[i]);
@@ -2929,7 +2929,7 @@ namespace Gekko
 
             return promptResults;
         }
-        
+
         /// <summary>
         /// Remove an IVariable from a string name like "b1:x!q".
         /// </summary>
@@ -2942,7 +2942,7 @@ namespace Gekko
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes, bool reportError)
         {
             string nameWithFreq = G.AddFreqToName(varName, freq);
-                        
+
             Databank bank = null;
             if (dbName == null)
             {
@@ -3025,7 +3025,7 @@ namespace Gekko
                 }
             }
             return iv;
-        }        
+        }
 
         /// <summary>
         /// Looks at a list of variables (naked list) and restricts their types or indexes. Returns a Gekko List.
@@ -3278,7 +3278,7 @@ namespace Gekko
                 {
                     using (Error e = new Error())
                     {
-                        e.MainAdd("Missing value encountered in series " + lhs_series.GetNameAndFreqPretty(true) + ", period: " + t.ToString());                        
+                        e.MainAdd("Missing value encountered in series " + lhs_series.GetNameAndFreqPretty(true) + ", period: " + t.ToString());
                         if (!t1.IsSamePeriod(t2))
                         {
                             e.MainNewLineTight();
@@ -3290,8 +3290,8 @@ namespace Gekko
                             }
                         }
                         e.MainNewLineTight();
-                        e.MainAdd("NOTE: To ignore such errors: set OPTION series failsafe = no;");                        
-                    }                    
+                        e.MainAdd("NOTE: To ignore such errors: set OPTION series failsafe = no;");
+                    }
                 }
             }
         }
@@ -3307,7 +3307,7 @@ namespace Gekko
 
             string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             //List<string> temp = Stringlist.GetListOfStringsFromList(rhs);
-            
+
             file = G.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
 
@@ -3465,7 +3465,7 @@ namespace Gekko
 
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);            
+            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
 
             lhs_series.SetDataSequence(t1, t2, lhsData, Globals.smplOffset);
         }
@@ -3484,7 +3484,7 @@ namespace Gekko
         {
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);                        
+            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
 
             rhsData = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
             lhsDataOriginal = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
@@ -3516,17 +3516,17 @@ namespace Gekko
         /// <param name="lhsData"></param>
         /// <param name="lhsDataOriginal"></param>
         private static void OperatorHelper1a(GekkoSmpl smpl, Series lhs_series, out double[] lhsData, out double[] lhsDataOriginal)
-        {            
+        {
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);            
+            if (O.UseFlexFreq(t1, lhs_series.freq)) O.Helper_Convert12(smpl, lhs_series.freq, out t1, out t2);
 
             lhsDataOriginal = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
             lhsData = new double[GekkoTime.Observations(t1, t2) + Globals.smplOffset];
-         
+
             int i = 0;
             foreach (GekkoTime t in new GekkoTimeIterator(t1.Add(-Globals.smplOffset), t2))
-            {                
+            {
                 lhsDataOriginal[i] = lhs_series.GetDataSimple(t);  //lhs_series cannot be light (expression)
                 lhsData[i] = lhsDataOriginal[i];
                 i++;
@@ -3543,10 +3543,10 @@ namespace Gekko
         /// <param name="lhsDataOriginal"></param>
         /// <param name="rhsData"></param>
         private static void OperatorHelper2(GekkoSmpl smpl, EFreq lhs_series_freq, ESeriesUpdTypes operatorType, double[] lhsData, double[] lhsDataOriginal, double[] rhsData)
-        {            
+        {
             GekkoTime t1 = smpl.t1;
             GekkoTime t2 = smpl.t2;
-            if (O.UseFlexFreq(t1, lhs_series_freq)) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);            
+            if (O.UseFlexFreq(t1, lhs_series_freq)) O.Helper_Convert12(smpl, lhs_series_freq, out t1, out t2);
 
             int i = Globals.smplOffset;  //offset = 2
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
@@ -3578,7 +3578,7 @@ namespace Gekko
                     lhsData[i] = lhsData[i - 1] * Math.Exp(rhsData[i]);
                 }
                 else if (operatorType == ESeriesUpdTypes.l)  //log(x) = ...
-                {                    
+                {
                     lhsData[i] = Math.Exp(rhsData[i]);
                 }
                 i++;
@@ -3708,7 +3708,7 @@ namespace Gekko
         /// <param name="i"></param>
         public static void AdjustT0(GekkoSmpl smpl, int i)
         {
-            smpl.t0 = smpl.t0.Add(i);            
+            smpl.t0 = smpl.t0.Add(i);
         }
 
         /// <summary>
@@ -3914,8 +3914,8 @@ namespace Gekko
         /// <param name="smpl"></param>
         /// <param name="i"></param>
         public static void AdjustSmplForDecomp(GekkoSmpl smpl, int i)
-        {           
-            
+        {
+
             int add2a = O.MaxLag();
             int add2b = O.MaxLead();
 
@@ -4114,13 +4114,13 @@ namespace Gekko
         public static IVariable Indexer(GekkoSmpl2 smplRemember, GekkoSmpl smpl, O.EIndexerType indexerType, IVariable x, params IVariable[] indexes)
         {
             Program.RevertSmpl(smplRemember, smpl);
-                        
+
             //x[y]
             //a[1] or #a['q*']
             //#x[1, 2]                 
             //x['nz', 'w']    
             //x[-1] or x[+1]
-            
+
             IVariable rv = x.Indexer(smpl, indexerType, indexes);
             return rv;
         }
@@ -4137,9 +4137,9 @@ namespace Gekko
             List<IVariable> temp = new List<IVariable>();
             temp.Add(r);
             List m = new List(temp);
-            List<string> mm = Program.Search(m, null, EVariableType.Var);            
+            List<string> mm = Program.Search(m, null, EVariableType.Var);
             return new List(mm);
-        }       
+        }
 
         /// <summary>
         /// Helper method for labels in PRT, but is it used??
@@ -4161,7 +4161,7 @@ namespace Gekko
         /// <returns></returns>
         public static List<List<LabelHelperIVariable>> AddLabelHelper2(GekkoSmpl smpl)
         {
-            List<List<LabelHelperIVariable>> rv = null;            
+            List<List<LabelHelperIVariable>> rv = null;
             rv = new List<List<LabelHelperIVariable>>();
             return rv;
         }
@@ -4172,7 +4172,7 @@ namespace Gekko
         /// <param name="x"></param>
         /// <returns></returns>
         public static IVariable HandleString(ScalarString x)
-        {            
+        {
             if (!x.string2.Contains("~"))
             {
                 //fast, covers most cases
@@ -4184,7 +4184,7 @@ namespace Gekko
             //s = s.Replace("~~", "~");
             //s = s.Replace("\"", "\"\"");
             return new ScalarString(s);  //costs a bit of time, but only if the string contains ~ or ".
-        }        
+        }
 
         /// <summary>
         /// List elements logic for naked lists.
@@ -4207,10 +4207,10 @@ namespace Gekko
             // 1e5 this can be confusing. But then the .vals() function can be used.
 
             TableLight table = Program.ReadCsvPrn(EDataFormat.Csv, fileName);
-            
+
             int iMax = table.GetRowMaxNumber();
             int jMax = table.GetColMaxNumber();
-            
+
             List temp = new List();
             for (int i = 1; i <= iMax; i++)
             {
@@ -4218,8 +4218,8 @@ namespace Gekko
                 {
                     CellLight cell = table.Get(i, j);
                     if (cell.type == ECellLightType.String)
-                    {                        
-                        temp.Add(new ScalarString(cell.text));                        
+                    {
+                        temp.Add(new ScalarString(cell.text));
                     }
                     else if (cell.type == ECellLightType.Double)
                     {
@@ -4243,7 +4243,7 @@ namespace Gekko
                 bool problem = false;
                 for (int j = 1; j <= jMax; j++)
                 {
-                    
+
                     CellLight cell = table.Get(i, j);
                     if (cell.type == ECellLightType.String)
                     {
@@ -4255,7 +4255,7 @@ namespace Gekko
                         }
                         else
                         {
-                            if(interpretAsNumbers)
+                            if (interpretAsNumbers)
                             {
                                 double d;
                                 if (G.TryParseIntoDouble(cell.text, out d))
@@ -4272,7 +4272,7 @@ namespace Gekko
                             {
                                 m2.Add(new ScalarString(cell.text));
                             }
-                            
+
                         }
                     }
                     else if (cell.type == ECellLightType.Double)
@@ -4283,8 +4283,8 @@ namespace Gekko
                     else if (cell.type == ECellLightType.None)
                     {
                         //skip                                      
-                        emptyFound = true;          
-                    }                    
+                        emptyFound = true;
+                    }
                 }
                 if (problem)
                 {
@@ -4304,8 +4304,8 @@ namespace Gekko
                     m.Add(m2);
                 }
             }
-            return m;                       
-        }                
+            return m;
+        }
 
         /// <summary>
         /// Helper method for FOR lists (parallel loops)
@@ -4355,9 +4355,9 @@ namespace Gekko
                 //throw new GekkoException();
             }
             return (List)a;
-        }        
+        }
 
-        
+
         // ========================================================================================
         // ========================================================================================
         // ============== Logical operations start ================================================
@@ -4486,7 +4486,7 @@ namespace Gekko
         // ============ conditional logic start ====================================
         // =========================================================================
         // =========================================================================
-        
+
         /// <summary>
         /// Handle $-conditionals in expressions and assignments. [1 of 3].
         /// </summary>
@@ -4672,7 +4672,7 @@ namespace Gekko
                 //must return a VAL, not a SERIES                
                 double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
                 bool b = G.Equals(d1, d2);
-                if(b) rv = Globals.scalarVal1;
+                if (b) rv = Globals.scalarVal1;
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
@@ -4721,7 +4721,7 @@ namespace Gekko
         /// </summary>
         /// <param name="p"></param>
         private static void MissingProblem(P p)
-        {            
+        {
             int lineNumber; string originalFileName; List<string> commandLines;
             Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
             string ss = null;
@@ -4748,7 +4748,7 @@ namespace Gekko
         public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
-            IVariable rv = Globals.scalarVal0;            
+            IVariable rv = Globals.scalarVal0;
             if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
                 //must return a VAL, not a SERIES                
@@ -4773,7 +4773,7 @@ namespace Gekko
                         else rv_series.SetData(t, 0d);  //else it would be missing  
                     }
                     else
-                    {                        
+                    {
                         if (!G.Equals(x.GetVal(t), y.GetVal(t)) != (x.GetVal(t) != y.GetVal(t)))
                         {
                             MissingProblem(smpl.p);
@@ -4808,14 +4808,14 @@ namespace Gekko
         /// <param name="y"></param>
         /// <returns></returns>
         public static IVariable StrictlySmallerThan(GekkoSmpl smpl, IVariable x, IVariable y)
-        {            
+        {
             //hmm, comparing two 1x1 matrices will fail
             IVariable rv = Globals.scalarVal0;
             if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
                 //must return a VAL, not a SERIES
-                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();                
-                if (d1 < d2) rv = Globals.scalarVal1; ;                
+                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
+                if (d1 < d2) rv = Globals.scalarVal1; ;
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
@@ -4830,16 +4830,16 @@ namespace Gekko
                 }
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
-            {                
+            {
                 if (O.ConvertToDate(x).StrictlySmallerThan(O.ConvertToDate(y))) rv = Globals.scalarVal1;
-            }            
+            }
             else
             {
                 //G.Writeln();
                 new Error("Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '<' compare");
                 //throw new GekkoException();
             }
-            return rv;                        
+            return rv;
         }
 
         /// <summary>
@@ -5053,226 +5053,128 @@ namespace Gekko
 
         public static void Add0_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 0;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function0 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function0 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew0.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 0;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function0 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function0 = f;
         }
 
         public static void Add1_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 1;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function1 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function1 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew1.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 1;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function1 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function1 = f;
         }
 
         public static void Add2_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 2;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function2 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function2 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew2.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 2;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function2 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function2 = f;
         }
 
         public static void Add3_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 3;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function3 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function3 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew3.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 3;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function3 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function3 = f;
         }
 
         public static void Add4_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 4;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function4 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function4 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew4.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 4;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function4 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function4 = f;
         }
 
         public static void Add5_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 5;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function5 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function5 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew5.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 5;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function5 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function5 = f;
         }
 
         public static void Add6_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 6;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function6 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function6 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew6.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 6;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function6 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function6 = f;
         }
 
         public static void Add7_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 7;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function7 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function7 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew7.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 7;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function7 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function7 = f;
         }
 
         public static void Add8_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 8;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function8 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function8 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew8.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 8;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function8 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function8 = f;
         }
 
         public static void Add9_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 9;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function9 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function9 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew9.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 9;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function9 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function9 = f;
         }
 
         public static void Add10_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 10;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function10 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function10 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew10.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 10;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function10 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function10 = f;
         }
 
         public static void Add11_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 11;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function11 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function11 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew11.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 11;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function11 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function11 = f;
         }
 
         public static void Add12_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 12;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function12 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function12 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew12.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 12;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function12 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function12 = f;
         }
 
         public static void Add13_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> f)
         {
-            if (Globals.library)
-            {
-                //number is hardcoded 2 places below.
-                int i = 13;
-                GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
-                if (function.function13 != null) UfunctionErroMessage(libraryName, functionName, i);
-                function.function13 = f;
-            }
-            else
-            {
-                Globals.ufunctionsNew13.Add(functionName, f);
-            }
+            //number is hardcoded 2 places below.
+            int i = 13;
+            GekkoFunction function = AddUfunctionHelper(libraryName, functionName);
+            if (function.function13 != null) UfunctionErroMessage(libraryName, functionName, i);
+            function.function13 = f;
         }
 
         // ====================================================
@@ -5284,8 +5186,8 @@ namespace Gekko
         }
 
         private static GekkoFunction AddUfunctionHelper(string libraryName, string functionName)
-        {            
-            Gekko.Library library = Globals.functions.GetLibrary(libraryName, false);
+        {
+            Gekko.Library library = Program.functions.GetLibrary(libraryName, false);
             if (library == null)
             {
                 new Error("The library '" + libraryName + "' does not exist for handling the function '" + functionName + "'.");
@@ -5311,83 +5213,22 @@ namespace Gekko
             //If the user has defined a procedure MYPROC, and Gekko later implements a MYPROC command,
             //we will get an error here, since Gekko will refuse to load a procedure with that name.
             //This guards agains compatibility issues with new Gekko versions.
-            
+
             if (number > 13)
             {
-                new Error("More than 13 user function/procedure arguments is not allowed at the moment. You may consider using a MAP argument to work around this restriction.");                
+                new Error("More than 13 user function/procedure arguments is not allowed at the moment. You may consider using a MAP argument to work around this restriction.");
             }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
-                new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko function. Please use another name.");                
+                new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko function. Please use another name.");
             }
             foreach (string s in Globals.commandNames)
             {
                 if (G.Equal(s, name))
                 {
-                    new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko command. Please use another name.");                    
+                    new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko command. Please use another name.");
                 }
             }
-
-            if (true)
-            {
-
-                if (number == 0)
-                {
-                    if (Globals.ufunctionsNew0.ContainsKey(name)) Globals.ufunctionsNew0.Remove(name);
-                }
-                else if (number == 1)
-                {
-                    if (Globals.ufunctionsNew1.ContainsKey(name)) Globals.ufunctionsNew1.Remove(name);
-                }
-                else if (number == 2)
-                {
-                    if (Globals.ufunctionsNew2.ContainsKey(name)) Globals.ufunctionsNew2.Remove(name);
-                }
-                else if (number == 3)
-                {
-                    if (Globals.ufunctionsNew3.ContainsKey(name)) Globals.ufunctionsNew3.Remove(name);
-                }
-                else if (number == 4)
-                {
-                    if (Globals.ufunctionsNew4.ContainsKey(name)) Globals.ufunctionsNew4.Remove(name);
-                }
-                else if (number == 5)
-                {
-                    if (Globals.ufunctionsNew5.ContainsKey(name)) Globals.ufunctionsNew5.Remove(name);
-                }
-                else if (number == 6)
-                {
-                    if (Globals.ufunctionsNew6.ContainsKey(name)) Globals.ufunctionsNew6.Remove(name);
-                }
-                else if (number == 7)
-                {
-                    if (Globals.ufunctionsNew7.ContainsKey(name)) Globals.ufunctionsNew7.Remove(name);
-                }
-                else if (number == 8)
-                {
-                    if (Globals.ufunctionsNew8.ContainsKey(name)) Globals.ufunctionsNew8.Remove(name);
-                }
-                else if (number == 9)
-                {
-                    if (Globals.ufunctionsNew9.ContainsKey(name)) Globals.ufunctionsNew9.Remove(name);
-                }
-                else if (number == 10)
-                {
-                    if (Globals.ufunctionsNew10.ContainsKey(name)) Globals.ufunctionsNew10.Remove(name);
-                }
-                else if (number == 11)
-                {
-                    if (Globals.ufunctionsNew11.ContainsKey(name)) Globals.ufunctionsNew11.Remove(name);
-                }
-                else if (number == 12)
-                {
-                    if (Globals.ufunctionsNew12.ContainsKey(name)) Globals.ufunctionsNew12.Remove(name);
-                }
-                else if (number == 13)
-                {
-                    if (Globals.ufunctionsNew13.ContainsKey(name)) Globals.ufunctionsNew13.Remove(name);
-                }
-            }            
         }
 
         // USER FUNCTION STUFF START
@@ -5448,24 +5289,12 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, IVariable> rv = null;
-            if (Globals.library)
-            {
-                GekkoFunction f = Globals.functions.GetFunction(name, 0);
+            GekkoFunction f = Program.functions.GetFunction(name, 0);
+            rv = f.function0;
+            if (rv == null) {
+                FunctionLookupHelper(f);
                 rv = f.function0;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function0;
-                    if (rv == null) FunctionLookupError(name, f, 0);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew0.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 0);
-                }
+                if (rv == null) FunctionLookupError(name, f, 0);
             }
             return rv;
         }
@@ -5479,24 +5308,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 1);
+            rv = f.function1;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 1);
+                FunctionLookupHelper(f);
                 rv = f.function1;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function1;
-                    if (rv == null) FunctionLookupError(name, f, 1);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew1.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 1);
-                }
+                if (rv == null) FunctionLookupError(name, f, 1);
             }
             return rv;
         }
@@ -5510,24 +5328,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 2);
+            rv = f.function2;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 2);
+                FunctionLookupHelper(f);
                 rv = f.function2;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function2;
-                    if (rv == null) FunctionLookupError(name, f, 2);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew2.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 2);
-                }
+                if (rv == null) FunctionLookupError(name, f, 2);
             }
             return rv;
         }
@@ -5538,32 +5345,20 @@ namespace Gekko
         /// <param name="name"></param>
         /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(string name)
-        {            
+        {
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 3);
+            rv = f.function3;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 3);
+                FunctionLookupHelper(f);
                 rv = f.function3;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function3;
-                    if (rv == null) FunctionLookupError(name, f, 3);                    
-                }
-            }
-            else
-            {
-                //NOTE: the number of args is hardcoded two places below                
-                Globals.ufunctionsNew3.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 3);
-                }
+                if (rv == null) FunctionLookupError(name, f, 3);
             }
             return rv;
         }
 
-        
+
         /// <summary>
         /// Used for Gekko user-defined functions.
         /// </summary>
@@ -5573,24 +5368,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 4);
+            rv = f.function4;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 4);
+                FunctionLookupHelper(f);
                 rv = f.function4;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function4;
-                    if (rv == null) FunctionLookupError(name, f, 4);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew4.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 4);
-                }
+                if (rv == null) FunctionLookupError(name, f, 4);
             }
             return rv;
         }
@@ -5604,24 +5388,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 5);
+            rv = f.function5;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 5);
+                FunctionLookupHelper(f);
                 rv = f.function5;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function5;
-                    if (rv == null) FunctionLookupError(name, f, 5);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew5.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 5);
-                }
+                if (rv == null) FunctionLookupError(name, f, 5);
             }
             return rv;
         }
@@ -5635,24 +5408,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 6);
+            rv = f.function6;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 6);
+                FunctionLookupHelper(f);
                 rv = f.function6;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function6;
-                    if (rv == null) FunctionLookupError(name, f, 6);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew6.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 6);
-                }
+                if (rv == null) FunctionLookupError(name, f, 6);
             }
             return rv;
         }
@@ -5666,24 +5428,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 7);
+            rv = f.function7;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 7);
+                FunctionLookupHelper(f);
                 rv = f.function7;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function7;
-                    if (rv == null) FunctionLookupError(name, f, 7);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew7.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 7);
-                }
+                if (rv == null) FunctionLookupError(name, f, 7);
             }
             return rv;
         }
@@ -5697,24 +5448,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 8);
+            rv = f.function8;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 8);
+                FunctionLookupHelper(f);
                 rv = f.function8;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function8;
-                    if (rv == null) FunctionLookupError(name, f, 8);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew8.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 8);
-                }
+                if (rv == null) FunctionLookupError(name, f, 8);
             }
             return rv;
         }
@@ -5728,24 +5468,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 9);
+            rv = f.function9;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 9);
+                FunctionLookupHelper(f);
                 rv = f.function9;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function9;
-                    if (rv == null) FunctionLookupError(name, f, 9);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew9.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 9);
-                }
+                if (rv == null) FunctionLookupError(name, f, 9);
             }
             return rv;
         }
@@ -5759,24 +5488,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 10);
+            rv = f.function10;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 10);
+                FunctionLookupHelper(f);
                 rv = f.function10;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function10;
-                    if (rv == null) FunctionLookupError(name, f, 10);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew10.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 10);
-                }
+                if (rv == null) FunctionLookupError(name, f, 10);
             }
             return rv;
         }
@@ -5790,24 +5508,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 11);
+            rv = f.function11;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 11);
+                FunctionLookupHelper(f);
                 rv = f.function11;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function11;
-                    if (rv == null) FunctionLookupError(name, f, 11);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew11.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 11);
-                }
+                if (rv == null) FunctionLookupError(name, f, 11);
             }
             return rv;
         }
@@ -5821,24 +5528,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 12);
+            rv = f.function12;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 12);
+                FunctionLookupHelper(f);
                 rv = f.function12;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function12;
-                    if (rv == null) FunctionLookupError(name, f, 12);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew12.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 12);
-                }
+                if (rv == null) FunctionLookupError(name, f, 12);
             }
             return rv;
         }
@@ -5852,24 +5548,13 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            if (Globals.library)
+            GekkoFunction f = Program.functions.GetFunction(name, 13);
+            rv = f.function13;
+            if (rv == null)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name, 13);
+                FunctionLookupHelper(f);
                 rv = f.function13;
-                if (rv == null)
-                {
-                    FunctionLookupHelper(f);
-                    rv = f.function13;
-                    if (rv == null) FunctionLookupError(name, f, 13);
-                }
-            }
-            else
-            {
-                Globals.ufunctionsNew13.TryGetValue(name, out rv);
-                if (rv == null)
-                {
-                    FunctionErrorMessage(name, 13);
-                }
+                if (rv == null) FunctionLookupError(name, f, 13);
             }
             return rv;
         }
@@ -5887,7 +5572,7 @@ namespace Gekko
             {
                 error.MainAdd("The function '" + name + "' was found in the library '" + f.packageName + "', but not in a variant with " + (i - 2) + " arguments.");
                 List<string> v = new List<string>();
-                //if (f.function0 != null) v.Add("");
+                 //if (f.function0 != null) v.Add("");
                 //if (f.function1 != null) v.Add("");
                 if (f.function2 != null) v.Add("0");
                 if (f.function3 != null) v.Add("1");

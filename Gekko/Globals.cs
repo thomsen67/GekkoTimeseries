@@ -41,9 +41,8 @@ namespace Gekko
     public class Globals
     {
         public static string smpl = "§¤£";  //this line must be at top
-
-        public static bool library = true;
-        public const string ufunctionSpecialName = "_UfunctionSpecialName";
+                
+        public const string ufunctionSpecialName = "_UfunctionSpecialName";        
 
         public static string versionInternal = "";
 
@@ -168,10 +167,7 @@ namespace Gekko
         public static string splitEnd = "//[[commandEnd]]";
 
         public static string artificial = "artificial_parent_at_the_top_of_the_node_tree";
-
-        public static Libraries functions = new Libraries();
-        public static Libraries procedures = new Libraries();
-
+        
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
         public static Func<double, double>[] arithmentics1 = new Func<double, double>[10];
 
@@ -179,21 +175,6 @@ namespace Gekko
         /// BEWARE: This is used in dynamic C# code, no rename please! Or change the dynamic code...
         /// </summary>
         public static Dictionary<int, Func<GraphHelper, string>> printStorageAsFunc = new Dictionary<int, Func<GraphHelper, string>>();
-
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>> ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>> ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable>> ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew3 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew4 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew5 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew6 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew7 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew8 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew9 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew10 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-        public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
         
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
