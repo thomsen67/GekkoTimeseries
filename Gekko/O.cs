@@ -5441,10 +5441,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, IVariable> rv = null;
-            Globals.ufunctionsNew0.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 0);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function0;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function0;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew0.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 0);
+                }
             }
             return rv;
         }
@@ -5458,10 +5471,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew1.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 1);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function1;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function1;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew1.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 1);
+                }
             }
             return rv;
         }
@@ -5475,10 +5501,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew2.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 2);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function2;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function2;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew2.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 2);
+                }
             }
             return rv;
         }
@@ -5494,11 +5533,11 @@ namespace Gekko
             if (Globals.library)
             {
                 GekkoFunction f = Globals.functions.GetFunction(name);
-                var function = f.function3;
-                if (function == null)
+                rv = f.function3;
+                if (rv == null)
                 {
                     FunctionLookupHelper(f);
-                    function = f.function3;
+                    rv = f.function3;
                 }
             }
             else
@@ -5523,10 +5562,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew4.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 4);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function4;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function4;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew4.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 4);
+                }
             }
             return rv;
         }
@@ -5540,10 +5592,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew5.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 5);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function5;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function5;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew5.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 5);
+                }
             }
             return rv;
         }
@@ -5557,10 +5622,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew6.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 6);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function6;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function6;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew6.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 6);
+                }
             }
             return rv;
         }
@@ -5574,10 +5652,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew7.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 7);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function7;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function7;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew7.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 7);
+                }
             }
             return rv;
         }
@@ -5591,10 +5682,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew8.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 8);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function8;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function8;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew8.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 8);
+                }
             }
             return rv;
         }
@@ -5608,10 +5712,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew9.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 9);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function9;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function9;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew9.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 9);
+                }
             }
             return rv;
         }
@@ -5625,10 +5742,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew10.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 10);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function10;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function10;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew10.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 10);
+                }
             }
             return rv;
         }
@@ -5642,10 +5772,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew11.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 11);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function11;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function11;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew11.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 11);
+                }
             }
             return rv;
         }
@@ -5659,10 +5802,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew12.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 12);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function12;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function12;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew12.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 12);
+                }
             }
             return rv;
         }
@@ -5676,10 +5832,23 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            Globals.ufunctionsNew13.TryGetValue(name, out rv);
-            if (rv == null)
+            if (Globals.library)
             {
-                FunctionErrorMessage(name, 13);
+                GekkoFunction f = Globals.functions.GetFunction(name);
+                rv = f.function13;
+                if (rv == null)
+                {
+                    FunctionLookupHelper(f);
+                    rv = f.function13;
+                }
+            }
+            else
+            {
+                Globals.ufunctionsNew13.TryGetValue(name, out rv);
+                if (rv == null)
+                {
+                    FunctionErrorMessage(name, 13);
+                }
             }
             return rv;
         }
