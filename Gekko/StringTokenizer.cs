@@ -503,8 +503,8 @@ namespace Gekko
         /// <returns></returns>
         public TokenHelper Offset(int offset)
         {
-            //-1 is left sibling, +1 is right sibling
-            if (this.parent == null) new Error("Internal error #8724322423, has no parent.");
+            //-1 is left sibling, +1 is right sibling            
+            if (this.id == -12345) return null;
             int ii = this.id + offset;
             if (ii < 0 || ii >= this.parent.subnodes.Count())
             {
@@ -521,7 +521,7 @@ namespace Gekko
         /// <returns></returns>
         public TokenHelper OffsetInterval(int start, int end)
         {
-            if (this.parent == null) new Error("Internal error #8724322423, has no parent.");
+            if (this.id == -12345) return null;
             TokenList rv2 = new TokenList();
             for (int i = start; i <= end; i++)
             {

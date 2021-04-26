@@ -2590,8 +2590,8 @@ namespace Gekko
         {
             if (this.type == ESeriesType.Light)
             {
-                new Error("Light series cannot be set dirty");
-                //throw new GekkoException();
+                //for instance prt sumt(2) will end here.
+                //no need to issue error.
             }
             else
             {

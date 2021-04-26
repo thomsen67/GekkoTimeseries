@@ -5450,7 +5450,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 0);
                 rv = f.function0;
                 if (rv == null)
                 {
@@ -5481,7 +5481,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 1);
                 rv = f.function1;
                 if (rv == null)
                 {
@@ -5512,7 +5512,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 2);
                 rv = f.function2;
                 if (rv == null)
                 {
@@ -5542,7 +5542,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 3);
                 rv = f.function3;
                 if (rv == null)
                 {
@@ -5575,7 +5575,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 4);
                 rv = f.function4;
                 if (rv == null)
                 {
@@ -5606,7 +5606,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 5);
                 rv = f.function5;
                 if (rv == null)
                 {
@@ -5637,7 +5637,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 6);
                 rv = f.function6;
                 if (rv == null)
                 {
@@ -5668,7 +5668,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 7);
                 rv = f.function7;
                 if (rv == null)
                 {
@@ -5699,7 +5699,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 8);
                 rv = f.function8;
                 if (rv == null)
                 {
@@ -5730,7 +5730,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 9);
                 rv = f.function9;
                 if (rv == null)
                 {
@@ -5761,7 +5761,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 10);
                 rv = f.function10;
                 if (rv == null)
                 {
@@ -5792,7 +5792,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 11);
                 rv = f.function11;
                 if (rv == null)
                 {
@@ -5823,7 +5823,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 12);
                 rv = f.function12;
                 if (rv == null)
                 {
@@ -5854,7 +5854,7 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             if (Globals.library)
             {
-                GekkoFunction f = Globals.functions.GetFunction(name);
+                GekkoFunction f = Globals.functions.GetFunction(name, 13);
                 rv = f.function13;
                 if (rv == null)
                 {

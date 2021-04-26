@@ -13127,7 +13127,7 @@ namespace UnitTests
             FAIL("run c3;");
             string c3 = Globals.unitTestScreenOutput.ToString();
             string cc3 =
-@"*** ERROR: Cannot find user function 'notexisting()' with 0 arguments.
+@"*** ERROR: Cannot find function 'notexisting()' with 0 arguments.
 *** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\cc3.gcm', line 5
     [   5]:   y = notexisting();
 

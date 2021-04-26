@@ -99,7 +99,7 @@ namespace Gekko
         /// </summary>
         /// <param name="functionName"></param>
         /// <returns></returns>
-        public GekkoFunction GetFunction(string functionName)
+        public GekkoFunction GetFunction(string functionName, int arguments)
         {
             //functionName = functionName.ToLower(); --> NO! no need to do this!
             GekkoFunction thisFunction = null;
@@ -110,9 +110,9 @@ namespace Gekko
                 if (thisFunction != null) break;
             }
 
-            if(thisFunction==null)
+            if (thisFunction == null)
             {
-                new Error("Function '" + functionName.ToLower() + "' was not found.");
+                new Error("Cannot find function '" + functionName.ToLower() + "()' with " + Math.Max(0, arguments - 2) + " arguments.");
             }
 
             return thisFunction;
