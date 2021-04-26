@@ -43,6 +43,7 @@ namespace Gekko
         public static string smpl = "§¤£";  //this line must be at top
 
         public static bool library = true;
+        public const string ufunctionSpecialName = "_UfunctionSpecialName";
 
         public static string versionInternal = "";
 
@@ -193,9 +194,7 @@ namespace Gekko
         public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
-
-        public const string ufunctionSpecialName = "_UfunctionSpecialName";
-
+        
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
 
@@ -231,6 +230,8 @@ namespace Gekko
         public static List<string> unitTestDependents = null;
 
         public const string stringConversionNote = "NOTE: You can use a string %s as a variable name with {%s}";
+
+        public const string globalLibraryString = "global";
 
         public const string Work = "Work";
         public const string Ref = "Ref";

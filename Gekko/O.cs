@@ -5277,20 +5277,27 @@ namespace Gekko
 
         // ====================================================
 
-        private static Error UfunctionErroMessage(string libraryName, string functionName, int i)
+        private static void UfunctionErroMessage(string libraryName, string functionName, int i)
         {
-            return new Error("Function '" + functionName + "' with " + i + " arguments in library '" + libraryName + "' already has been added");
+            if (libraryName == Globals.globalLibraryString) return;  //no error, just overwrite the function
+            new Error("Function '" + functionName + "' with " + i + " arguments exists as dublet in library '" + libraryName + "'");
         }
 
         private static GekkoFunction AddUfunctionHelper(string libraryName, string functionName)
-        {
+        {            
             Gekko.Library library = Globals.functions.GetLibrary(libraryName, false);
             if (library == null)
             {
-                library = new Gekko.Library(libraryName);
-                Globals.functions.Add(library);
+                new Error("The library '" + libraryName + "' does not exist for handling the function '" + functionName + "'.");
+                //library = new Gekko.Library(libraryName);
+                //Globals.functions.Add(library);
             }
             GekkoFunction function = library.GetFunction(functionName, false);
+            if (function == null)
+            {
+                function = new GekkoFunction(functionName);
+                library.AddFunction(function);
+            }
             return function;
         }
 
@@ -5449,6 +5456,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function0;
+                    if (rv == null) FunctionLookupError(name, f, 0);
                 }
             }
             else
@@ -5479,6 +5487,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function1;
+                    if (rv == null) FunctionLookupError(name, f, 1);
                 }
             }
             else
@@ -5509,6 +5518,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function2;
+                    if (rv == null) FunctionLookupError(name, f, 2);
                 }
             }
             else
@@ -5538,6 +5548,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function3;
+                    if (rv == null) FunctionLookupError(name, f, 3);                    
                 }
             }
             else
@@ -5570,6 +5581,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function4;
+                    if (rv == null) FunctionLookupError(name, f, 4);
                 }
             }
             else
@@ -5600,6 +5612,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function5;
+                    if (rv == null) FunctionLookupError(name, f, 5);
                 }
             }
             else
@@ -5630,6 +5643,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function6;
+                    if (rv == null) FunctionLookupError(name, f, 6);
                 }
             }
             else
@@ -5660,6 +5674,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function7;
+                    if (rv == null) FunctionLookupError(name, f, 7);
                 }
             }
             else
@@ -5690,6 +5705,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function8;
+                    if (rv == null) FunctionLookupError(name, f, 8);
                 }
             }
             else
@@ -5720,6 +5736,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function9;
+                    if (rv == null) FunctionLookupError(name, f, 9);
                 }
             }
             else
@@ -5750,6 +5767,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function10;
+                    if (rv == null) FunctionLookupError(name, f, 10);
                 }
             }
             else
@@ -5780,6 +5798,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function11;
+                    if (rv == null) FunctionLookupError(name, f, 11);
                 }
             }
             else
@@ -5810,6 +5829,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function12;
+                    if (rv == null) FunctionLookupError(name, f, 12);
                 }
             }
             else
@@ -5840,6 +5860,7 @@ namespace Gekko
                 {
                     FunctionLookupHelper(f);
                     rv = f.function13;
+                    if (rv == null) FunctionLookupError(name, f, 13);
                 }
             }
             else
@@ -5854,6 +5875,38 @@ namespace Gekko
         }
 
         // ---------------------
+        /// <summary>
+        /// Writes out an error if a function is found in a library, but not with the right number of arguments.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="f"></param>
+        /// <param name="i"></param>
+        private static void FunctionLookupError(string name, GekkoFunction f, int i)
+        {
+            using (Error error = new Error())
+            {
+                error.MainAdd("The function '" + name + "' was found in the library '" + f.packageName + "', but not in a variant with " + (i - 2) + " arguments.");
+                List<string> v = new List<string>();
+                //if (f.function0 != null) v.Add("");
+                //if (f.function1 != null) v.Add("");
+                if (f.function2 != null) v.Add("0");
+                if (f.function3 != null) v.Add("1");
+                if (f.function4 != null) v.Add("2");
+                if (f.function5 != null) v.Add("3");
+                if (f.function6 != null) v.Add("4");
+                if (f.function7 != null) v.Add("5");
+                if (f.function8 != null) v.Add("6");
+                if (f.function9 != null) v.Add("7");
+                if (f.function10 != null) v.Add("8");
+                if (f.function11 != null) v.Add("9");
+                if (f.function12 != null) v.Add("10");
+                if (f.function13 != null) v.Add("11");
+                error.MoreAdd("Function '" + name + "' from library '" + f.packageName + "' has variants with the following number of arguments: " + G.GetListWithCommas(v));
+            }
+        }
+
+
+
 
         /// <summary>
         /// Gets stored function/procedure code from library, parses it and compiles it.
@@ -5861,16 +5914,24 @@ namespace Gekko
         /// <param name="f"></param>
         private static void FunctionLookupHelper(GekkoFunction f)
         {
-            P p = new P();
-            string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(f.code);
-            string commandLinesFlat = Program.HandleGekkoCommands(text0);
-            Parser.ParseHelper ph = new Parser.ParseHelper();
-            ph.commandsText = commandLinesFlat;
-            Parser.ConvertHelper ch = null;
-            ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
-            ch.commandsText = commandLinesFlat;
-            ch.code = ch.code.Replace(Globals.ufunctionSpecialName + "(null, ", Globals.ufunctionSpecialName + "(" + Globals.QT + f.packageName + Globals.QT + ", ");
-            Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+            if (f.hasBeenCompiled)
+            {
+                //do not compile
+            }
+            else
+            {
+                P p = new P();
+                string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(f.code);
+                string commandLinesFlat = Program.HandleGekkoCommands(text0);
+                Parser.ParseHelper ph = new Parser.ParseHelper();
+                ph.commandsText = commandLinesFlat;
+                Parser.ConvertHelper ch = null;
+                ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
+                ch.commandsText = commandLinesFlat;
+                ch.code = ch.code.Replace(Globals.ufunctionSpecialName + "(" + Globals.QT + Globals.globalLibraryString + Globals.QT + ", ", Globals.ufunctionSpecialName + "(" + Globals.QT + f.packageName + Globals.QT + ", ");
+                Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                f.hasBeenCompiled = true;
+            }
         }
 
 

@@ -59,6 +59,11 @@ namespace Gekko
         private List<int> hierarchy = new List<int>();  //order of packages
         private Library cache = null;
 
+        public Libraries()
+        {
+            this.Add(new Library(Globals.globalLibraryString));
+        }
+
         public Library GetLibrary(string name, bool abortWithError)
         {
             name = name.ToLower();
@@ -151,12 +156,21 @@ namespace Gekko
             lib.id = this.libraries.Count;
             this.libraries.Add(lib);
 
-            //putting the new id FIRST in hierarchy (will be searched first)
-            List<int> temp = this.hierarchy;
-            this.hierarchy = new List<int>();
-            this.hierarchy.Add(lib.id);
-            this.hierarchy.AddRange(temp);
-            temp = null;  //to free the memory fast
+            if (true)
+            {
+                //putting the new id LAST in hierarchy (will be searched last)                
+                this.hierarchy.Add(lib.id);
+            }
+
+            if (false)
+            {
+                //putting the new id FIRST in hierarchy (will be searched last)
+                List<int> temp = this.hierarchy;
+                this.hierarchy = new List<int>();
+                this.hierarchy.Add(lib.id);
+                this.hierarchy.AddRange(temp);
+                temp = null;  //to free the memory fast
+            }
         }        
     }
 
@@ -242,6 +256,7 @@ namespace Gekko
 
         private string name = null; //for instance 'f'
         public string packageName = null;
+        public bool hasBeenCompiled = false;
 
         public string code = null;  //may contain code from several places, snippets of f(), f(...), f(..., ...)
         // ---------------------------------    

@@ -13000,24 +13000,18 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p3;");
             I("library p1;");
-            //p3 will be first, but only has f1(... , ...), not f1(...)
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "p1_f1_a");
-            FAIL("%y2 = f1('a', 'b');");  //finds f1 in p3, but not this overload. Will not use p1:f(..., ...)
-
-            // ------------------------------------------------------------
-            // masking3
-            // ------------------------------------------------------------            
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p3;");
-            I("library p1;");
-            //p3 will be first, but does not have any f2
-            I("%y1 = f2('a');");
-            _AssertScalarString(First(), "%y1", "p1_f2_a");
-            I("%y2 = f2('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p1_f2_ab");
-
+            //p3 will be first, but only has f1(... , ...), not f1(...) or any f2.
+            //        f1(...)    f1(..., ...)     f2(...)    f2(..., ...)            
+            // p3                x                         
+            // p1     x          x                x          x   
+            I("%y1 = f1('a', 'b');");
+            _AssertScalarString(First(), "%y1", "p3_f1_ab");
+            FAIL("%y2 = f1('a');");  //finds f1 in p3, but not overload with 1 argument. Will not use p1:f().
+            I("%y2 = f2('a');");
+            _AssertScalarString(First(), "%y2", "p1_f2_a");
+            I("%y3 = f2('a', 'b');");
+            _AssertScalarString(First(), "%y3", "p1_f2_ab");
+            
             // ------------------------------------------------------------
             // colon and remove
             // ------------------------------------------------------------   
