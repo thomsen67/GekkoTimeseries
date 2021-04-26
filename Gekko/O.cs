@@ -5869,7 +5869,7 @@ namespace Gekko
             Parser.ConvertHelper ch = null;
             ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
             ch.commandsText = commandLinesFlat;
-            text0 = text0.Replace(Globals.ufunctionSpecialName + "(null, ", Globals.ufunctionSpecialName + "(" + f.packageName + ", ");
+            ch.code = ch.code.Replace(Globals.ufunctionSpecialName + "(null, ", Globals.ufunctionSpecialName + "(" + Globals.QT + f.packageName + Globals.QT + ", ");
             Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
         }
 

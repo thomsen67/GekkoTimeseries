@@ -42,7 +42,7 @@ namespace Gekko
     {
         public static string smpl = "§¤£";  //this line must be at top
 
-        public static bool library = false;
+        public static bool library = true;
 
         public static string versionInternal = "";
 
