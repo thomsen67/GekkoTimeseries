@@ -132,7 +132,9 @@ namespace Gekko.Parser.Gek
 
         public static void FindFunctionsUsedInGekkoCode(ASTNode node, Dictionary<string, int> functions)
         {
-            if (node.Text == "ASTFUNCTION" || node.Text == "ASTFUNCTION_Q")
+            //asdfg added [0]
+            //if (node.Text == "ASTFUNCTION" || node.Text == "ASTFUNCTION_Q")
+            if (node[0].Text == "ASTFUNCTION" || node[0].Text == "ASTFUNCTION_Q")
             {                
                 string functionName = GetFunctionName(node);
                 if (!functions.ContainsKey(functionName)) functions.Add(functionName, 1);  //1 just arbitrary            
@@ -285,7 +287,9 @@ namespace Gekko.Parser.Gek
                         while (true)
                         {
                             if (node2 == null || node2.Text == null) break;
-                            if ((node2.Text == "ASTFUNCTION" || node2.Text == "ASTFUNCTION_Q") && (G.Equal(node2[0][0].Text, "sum") || G.Equal(node2[0][0].Text, "unfold")))
+                            //asdfg added [0] to test for "sum" and "unfold"
+                            //if ((node2.Text == "ASTFUNCTION" || node2.Text == "ASTFUNCTION_Q") && (G.Equal(node2[0][0].Text, "sum") || G.Equal(node2[0][0].Text, "unfold")))
+                            if ((node2.Text == "ASTFUNCTION" || node2.Text == "ASTFUNCTION_Q") && (G.Equal(node2[0][0][0].Text, "sum") || G.Equal(node2[0][0][0].Text, "unfold")))
                             {
                                 if (node2[2].Text == "ASTBANKVARNAME")
                                 {
@@ -385,8 +389,9 @@ namespace Gekko.Parser.Gek
                         //    ASTPRTELEMENT
                         // 0    ASTEXPRESSION
                         // 1      ASTFUNCTION    <----------- our insert begins here
-                        // 2        ASTIDENT  
-                        // 3          unfold
+                        // 1a       ASTPLACEHOLDER    asdfg new node
+                        // 2          ASTIDENT                          
+                        // 3            unfold
                         // 3a       ASTSPECIALARGS
                         // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF and LISTDEFITEM node is inserted here, and the ASTBANKVARNAME nodes are subnodes
                         // 5          ASTPLACEHOLDER
@@ -402,12 +407,23 @@ namespace Gekko.Parser.Gek
 
                         ASTNode n0 = new ASTNode("ASTEXPRESSION", true);
                         ASTNode n1 = new ASTNode("ASTFUNCTION", true);
+                        //asdfg new node:
+                        ASTNode n1a = new ASTNode("ASTPLACEHOLDER", true);
                         ASTNode n2 = new ASTNode("ASTIDENT", true);
                         ASTNode n3 = new ASTNode("unfold", true);
                         ASTNode n3a = new ASTNode("ASTSPECIALARGSDEF", true);
 
                         n0.Add(n1);
-                        n1.Add(n2);
+                        if (false)
+                        {
+                            n1.Add(n2);                            
+                        }
+                        else
+                        {
+                            //asdfg rewiring
+                            n1.Add(n1a);
+                            n1a.Add(n2);
+                        }
                         n2.Add(n3);
                         n1.Add(n3a);
 
@@ -2909,6 +2925,8 @@ namespace Gekko.Parser.Gek
 
                                 if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTION_Q" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                 {
+                                    //asdfg added [0]
+                                    //string functionNameLower = node[1][0][0][0].Text.ToLower();
                                     string functionNameLower = node[1][0][0][0][0].Text.ToLower();
 
                                     bool isInbuilt = false;
@@ -5529,7 +5547,9 @@ namespace Gekko.Parser.Gek
 
         private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName, bool onlySum)
         {
-            if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q") return null;
+            //asdfg added [0]
+            //if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q") return null;
+            if (node[0].Text == "ASTOBJECTFUNCTION" || node[0].Text == "ASTOBJECTFUNCTION_Q" || node[0].Text == "ASTOBJECTFUNCTIONNAKED" || node[0].Text == "ASTOBJECTFUNCTIONNAKED_Q") return null;
             //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
             if (onlySum)
@@ -5631,6 +5651,8 @@ namespace Gekko.Parser.Gek
 
         private static string GetFunctionName(ASTNode node)
         {
+            //asdfg added [0]
+            //string functionName = node[0][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
             string functionName = node[0][0][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
             if (functionName == "string") functionName = "tostring";
             return functionName;
