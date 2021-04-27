@@ -212,7 +212,7 @@ namespace Gekko
 
         public void AddFunction(GekkoFunction function)
         {
-            function.packageName = this.GetName();
+            function.libraryName = this.GetName();
             this.functions.Add(function.GetName(), function);            
         }
 
@@ -255,7 +255,7 @@ namespace Gekko
         }
 
         private string name = null; //for instance 'f'
-        public string packageName = null;
+        public string libraryName = null;
         public bool hasBeenCompiled = false;
 
         public string code = null;  //may contain code from several places, snippets of f(), f(...), f(..., ...)

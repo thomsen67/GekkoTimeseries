@@ -37,6 +37,7 @@ namespace Gekko.Parser
         public string commandsText = null;
         public string fileName = null;
         public bool isModel = false;
+        public string libraryName = null;
     }
 
     public class ConvertHelper

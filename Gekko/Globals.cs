@@ -41,7 +41,7 @@ namespace Gekko
     public class Globals
     {
         public const string smpl = "§¤£";  //this line must be at top
-        public const string libraryPlaceholder = "¤§£";
+
         public const string globalLibraryString = "global";
         public const string ufunctionSpecialName = "_UfunctionSpecialName";        
 

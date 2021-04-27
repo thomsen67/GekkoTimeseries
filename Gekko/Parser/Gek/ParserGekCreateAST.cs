@@ -92,6 +92,7 @@ namespace Gekko.Parser.Gek
             //EmitCsCodeForCmdHelperStatic helperStatic = new EmitCsCodeForCmdHelperStatic(textInput);
 
             wh2.fileNameContainingParsedCode = ph.fileName;
+            wh2.libraryName = ph.libraryName;
 
             ASTNode root = new ASTNode(null);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Create AST start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);

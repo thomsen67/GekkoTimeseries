@@ -5570,7 +5570,7 @@ namespace Gekko
         {
             using (Error error = new Error())
             {
-                error.MainAdd("The function '" + name + "' was found in the library '" + f.packageName + "', but not in a variant with " + (i - 2) + " arguments.");
+                error.MainAdd("The function '" + name + "' was found in the library '" + f.libraryName + "', but not in a variant with " + (i - 2) + " arguments.");
                 List<string> v = new List<string>();
                  //if (f.function0 != null) v.Add("");
                 //if (f.function1 != null) v.Add("");
@@ -5586,7 +5586,7 @@ namespace Gekko
                 if (f.function11 != null) v.Add("9");
                 if (f.function12 != null) v.Add("10");
                 if (f.function13 != null) v.Add("11");
-                error.MoreAdd("Function '" + name + "' from library '" + f.packageName + "' has variants with the following number of arguments: " + G.GetListWithCommas(v));
+                error.MoreAdd("Function '" + name + "' from library '" + f.libraryName + "' has variants with the following number of arguments: " + G.GetListWithCommas(v));
             }
         }
 
@@ -5610,11 +5610,11 @@ namespace Gekko
                 string commandLinesFlat = Program.HandleGekkoCommands(text0);
                 Parser.ParseHelper ph = new Parser.ParseHelper();
                 ph.commandsText = commandLinesFlat;
-                Parser.ConvertHelper ch = null;
-                ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
+                ph.libraryName = f.libraryName;
+                Parser.ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
                 ch.commandsText = commandLinesFlat;
                 //ch.code = ch.code.Replace(Globals.ufunctionSpecialName + "(" + Globals.QT + Globals.libraryPlaceholder + Globals.QT + ", ", Globals.ufunctionSpecialName + "(" + Globals.QT + f.packageName + Globals.QT + ", ");
-                ch.code = ch.code.Replace(Globals.libraryPlaceholder, f.packageName);
+                //ch.code = ch.code.Replace(Globals.libraryPlaceholder, f.libraryName);
                 Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                 f.hasBeenCompiled = true;
             }
