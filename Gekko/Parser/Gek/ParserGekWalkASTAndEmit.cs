@@ -392,6 +392,7 @@ namespace Gekko.Parser.Gek
                         // 1a       ASTPLACEHOLDER    asdfg new node
                         // 2          ASTIDENT                          
                         // 3            unfold
+                        // 2a         ASTPLACEHOLDER  <-- normally contains an ident with library name
                         // 3a       ASTSPECIALARGS
                         // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF and LISTDEFITEM node is inserted here, and the ASTBANKVARNAME nodes are subnodes
                         // 5          ASTPLACEHOLDER
@@ -410,6 +411,8 @@ namespace Gekko.Parser.Gek
                         //asdfg new node:
                         ASTNode n1a = new ASTNode("ASTPLACEHOLDER", true);
                         ASTNode n2 = new ASTNode("ASTIDENT", true);
+                        //asdfg new node:
+                        ASTNode n2a = new ASTNode("ASTPLACEHOLDER", true);
                         ASTNode n3 = new ASTNode("unfold", true);
                         ASTNode n3a = new ASTNode("ASTSPECIALARGSDEF", true);
 
@@ -423,6 +426,7 @@ namespace Gekko.Parser.Gek
                             //asdfg rewiring
                             n1.Add(n1a);
                             n1a.Add(n2);
+                            n1a.Add(n2a);
                         }
                         n2.Add(n3);
                         n1.Add(n3a);
@@ -2298,8 +2302,8 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
-
                                 //NOTE: local functions are in C#7, but to compile them .NET 4.6 is necessary. So use Func<> for now, small speed penalty.
+                                //Hmm, tried this 27/4 2021, did not work...
                                 //sb1.AppendLine(iv + " " + funcName + "(" + parentListLoopVars1 + ")" + " {");
                                                                 
                                 if (node.localInsideLoopVariablesCs != null)
