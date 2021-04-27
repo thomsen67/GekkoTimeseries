@@ -99,7 +99,7 @@ namespace Gekko
         /// </summary>
         /// <param name="functionName"></param>
         /// <returns></returns>
-        public GekkoFunction GetFunction(string functionName, int arguments)
+        public GekkoFunction GetFunction(string libraryName, string functionName, int arguments)
         {
             //functionName = functionName.ToLower(); --> NO! no need to do this!
             GekkoFunction thisFunction = null;
