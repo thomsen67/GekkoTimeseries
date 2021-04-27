@@ -2251,10 +2251,10 @@ mapItem:                    assignmentMap2 -> ^(ASTMAPITEM assignmentMap2);
 //listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
-function:                   ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs)
-						  |	ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTFUNCTION_Q ident fargs);
-objectFunction:             ident leftParenGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs)
-						  | ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION_Q ident fargs)
+function:                   libraryWithColon? ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)
+						  |	libraryWithColon? ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTFUNCTION_Q ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs);
+objectFunction:             libraryWithColon? ident leftParenGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)
+						  | libraryWithColon? ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION_Q ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)
 						    ;
 specialArg: 			    ISNOTQUAL -> ^(ASTSPECIALARGS)						  					
 						  | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTSPECIALARGS dates?)
@@ -3052,8 +3052,8 @@ typeRv: 				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
 typeArg:				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | NAME;
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX;
 
-objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident fargs)))
-						  |	bankvarname GLUEDOT DOT ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED_Q ident fargs)))
+objectFunctionNaked:        bankvarname GLUEDOT DOT libraryWithColon? ident leftParenGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)))
+						  |	bankvarname GLUEDOT DOT libraryWithColon? ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED_Q ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)))
 							;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3296,12 +3296,12 @@ predictOpt1:			    ISNOTQUAL
 // PROCEDURE CALL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-procedure:					identWithoutCommand fargs_proc -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} identWithoutCommand fargs_proc)
-						  | identWithoutCommand questionGlueLeft fargs_proc -> ^({token("ASTPROCEDURE_Q", ASTPROCEDURE_Q, input.LT(1).Line)} identWithoutCommand fargs_proc)
+procedure:					libraryWithColon? identWithoutCommand fargs_proc -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} ^(ASTPLACEHOLDER identWithoutCommand ^(ASTPLACEHOLDER libraryWithColon?)) fargs_proc)
+						  | libraryWithColon? identWithoutCommand questionGlueLeft fargs_proc -> ^({token("ASTPROCEDURE_Q", ASTPROCEDURE_Q, input.LT(1).Line)} ^(ASTPLACEHOLDER identWithoutCommand ^(ASTPLACEHOLDER libraryWithColon?)) fargs_proc)
 						    ;
 
-functionNaked:              ident leftParenGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident fargs)
-						  |	ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED_Q", ASTFUNCTIONNAKED_Q, input.LT(1).Line)} ident fargs)
+functionNaked:              libraryWithColon? ident leftParenGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)
+						  |	libraryWithColon? ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED_Q", ASTFUNCTIONNAKED_Q, input.LT(1).Line)} ^(ASTPLACEHOLDER ident ^(ASTPLACEHOLDER libraryWithColon?)) fargs)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3987,6 +3987,8 @@ optionType2:
 // ------------------------------------
 // Semi lexer stuff here
 // ------------------------------------
+
+libraryWithColon:           ident ':' -> ident;
 
 integer:                    Integer -> ^(ASTINTEGER Integer);
 

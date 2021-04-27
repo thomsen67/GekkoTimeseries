@@ -2909,7 +2909,7 @@ namespace Gekko.Parser.Gek
 
                                 if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTION_Q" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                 {
-                                    string functionNameLower = node[1][0][0][0].Text.ToLower();
+                                    string functionNameLower = node[1][0][0][0][0].Text.ToLower();
 
                                     bool isInbuilt = false;
                                     string meta = null;
@@ -5631,7 +5631,7 @@ namespace Gekko.Parser.Gek
 
         private static string GetFunctionName(ASTNode node)
         {
-            string functionName = node[0][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
+            string functionName = node[0][0][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
             if (functionName == "string") functionName = "tostring";
             return functionName;
         }
