@@ -199,8 +199,8 @@ namespace Gekko
         public static List<string> r_fileContent = null;
         public static List<string> python_fileContent = null;
 
-        public static bool UNITTESTFOLLOWUP = false;
-        public static bool UNITTESTFOLLOWUP_important = false;
+        public const bool UNITTESTFOLLOWUP = false;
+        public const bool UNITTESTFOLLOWUP_important = false;
 
         public static bool holesFix = true;
 

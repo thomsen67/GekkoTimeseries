@@ -5289,7 +5289,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 0);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function0;
             if (rv == null) {
                 FunctionLookupHelper(f);
@@ -5308,7 +5308,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 1);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function1;
             if (rv == null)
             {
@@ -5328,7 +5328,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 2);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function2;
             if (rv == null)
             {
@@ -5347,7 +5347,7 @@ namespace Gekko
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(string library, string name)
         {
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 3);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function3;
             if (rv == null)
             {
@@ -5368,7 +5368,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 4);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function4;
             if (rv == null)
             {
@@ -5388,7 +5388,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 5);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function5;
             if (rv == null)
             {
@@ -5408,7 +5408,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 6);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function6;
             if (rv == null)
             {
@@ -5428,7 +5428,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 7);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function7;
             if (rv == null)
             {
@@ -5448,7 +5448,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 8);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function8;
             if (rv == null)
             {
@@ -5468,7 +5468,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 9);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function9;
             if (rv == null)
             {
@@ -5488,7 +5488,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 10);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function10;
             if (rv == null)
             {
@@ -5508,7 +5508,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 11);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function11;
             if (rv == null)
             {
@@ -5528,7 +5528,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 12);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function12;
             if (rv == null)
             {
@@ -5548,7 +5548,7 @@ namespace Gekko
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
-            GekkoFunction f = Program.functions.GetFunction(library, name, 13);
+            GekkoFunction f = Program.functions.GetFunction(library, name);
             rv = f.function13;
             if (rv == null)
             {

@@ -96,39 +96,51 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get a function from the loaded libraries/packages. Gekko will search for the function,
-        /// starting with the last loaded package.
+        /// Get a function from the loaded libraries/packages. If libraryName == null, Gekko will search for the function,
+        /// in the list of libraries (first opened first). If libraryName != null, only this particular library will be searched
+        /// for the function. 
+        /// We are obtaining a GekkoFunction of a particular name, and the GekkoFunction contains all overloads inside.
         /// </summary>
         /// <param name="functionName"></param>
         /// <returns></returns>
-        public GekkoFunction GetFunction(string libraryName, string functionName, int arguments)
-        {
-            //functionName = functionName.ToLower(); --> NO! no need to do this!
-            GekkoFunction thisFunction = null;
-            foreach (int i in this.GetHierarchy())
-            {
-                Library thisLib = this.GetLibrary(i);
-                thisFunction = thisLib.GetFunction(functionName, false);
-                if (thisFunction != null) break;
-            }
-
-            if (thisFunction == null)
-            {
-                new Error("Cannot find function '" + functionName.ToLower() + "()' with " + Math.Max(0, arguments - 2) + " arguments.");
-            }
-
-            return thisFunction;
-        }
-
-        /// <summary>
-        /// Get a function from a particular library/package, like p1:f(...).
-        /// </summary>
         public GekkoFunction GetFunction(string libraryName, string functionName)
         {
-            Library library = this.GetLibrary(libraryName, true);
-            GekkoFunction function = library.GetFunction(functionName, false);
-            return function;
-        }        
+            //functionName = functionName.ToLower(); --> NO! no need to do this!
+
+            GekkoFunction rv = null;
+
+            if (libraryName != null)
+            {
+                Library thisLib = this.GetLibrary(libraryName, true);
+                rv = thisLib.GetFunction(functionName, true);
+            }
+            else
+            {
+                foreach (int i in this.GetHierarchy())
+                {
+                    Library thisLib = this.GetLibrary(i);
+                    rv = thisLib.GetFunction(functionName, false);
+                    if (rv != null) break;
+                }
+
+                if (rv == null)
+                {
+                    new Error("The function '" + functionName.ToLower() + "()' does not seem to exist.");
+                }
+            }
+
+            return rv;
+        }
+
+        ///// <summary>
+        ///// Get a function from a particular library/package, like p1:f(...).
+        ///// </summary>
+        //public GekkoFunction GetFunction(string libraryName, string functionName)
+        //{
+        //    Library library = this.GetLibrary(libraryName, true);
+        //    GekkoFunction function = library.GetFunction(functionName, false);
+        //    return function;
+        //}        
 
         private List<int> GetHierarchy()
         {

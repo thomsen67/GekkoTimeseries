@@ -13029,38 +13029,42 @@ namespace UnitTests
             I("%y1 = f1('a');");
             _AssertScalarString(First(), "%y1", "p1_f1_a");
             FAIL("%y2 = p2:f1('a', 'b');");
-            
-            // ------------------------------------------------------------
-            // errors
-            // ------------------------------------------------------------            
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            FAIL("library notexisting;");
-            I("library p1;");
-            FAIL("library p1;");
-            I("reset;");
-            I("library p1;");
 
-            // -----------------------------------------------------------------------------
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p1 as p1;");  //also cheks as.
-            FAIL("library <remove> p2;");
-            I("library <clear> global;");  //legal
-            FAIL("library <clear> gekko;");  //illegal
-            FAIL("library <clear> p1;");  //illegal
-            Globals.unitTestScreenOutput = new StringBuilder();
-            FAIL("library gekko;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
-            Globals.unitTestScreenOutput = new StringBuilder();
-            FAIL("library global;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
-            Globals.unitTestScreenOutput = new StringBuilder();
-            FAIL("library local;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));                        
-            FAIL("library <remove> gekko;");
-            FAIL("library <remove> global;");
-            FAIL("library <remove> local;");
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+
+                // ------------------------------------------------------------
+                // errors
+                // ------------------------------------------------------------            
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                FAIL("library notexisting;");
+                I("library p1;");
+                FAIL("library p1;");
+                I("reset;");
+                I("library p1;");
+
+                // -----------------------------------------------------------------------------
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p1 as p1;");  //also cheks as.
+                FAIL("library <remove> p2;");
+                I("library <clear> global;");  //legal
+                FAIL("library <clear> gekko;");  //illegal
+                FAIL("library <clear> p1;");  //illegal
+                Globals.unitTestScreenOutput = new StringBuilder();
+                FAIL("library gekko;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
+                Globals.unitTestScreenOutput = new StringBuilder();
+                FAIL("library global;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
+                Globals.unitTestScreenOutput = new StringBuilder();
+                FAIL("library local;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("reserved name"));
+                FAIL("library <remove> gekko;");
+                FAIL("library <remove> global;");
+                FAIL("library <remove> local;");
+            }
         }
 
         [TestMethod]
