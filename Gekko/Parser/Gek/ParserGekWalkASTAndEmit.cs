@@ -2233,6 +2233,8 @@ namespace Gekko.Parser.Gek
                             if (functionNameLower == "null") functionNameLower = "null2";  //cannot have the name Functions.null(...)
                             else if (functionNameLower == "int") functionNameLower = "int2";  //cannot have the name Functions.int(...)
 
+                            string libraryNameLower = GetLibraryName(node);
+
                             if (node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
                             {
                                 functionNameLower = Globals.procedure + functionNameLower;
@@ -2241,7 +2243,7 @@ namespace Gekko.Parser.Gek
                             //will always be null for ASTOBJECTFUNCTION
                             string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionNameLower);  //also checks that the name is "sum"
 
-                            if (listNames != null && listNames.Length > 0 && listNames[0] != null)
+                            if (libraryNameLower == null && listNames != null && listNames.Length > 0 && listNames[0] != null)
                             {
                                 //We do not expect this to be called with sum?(...), but it will work if so
                                 
@@ -2388,7 +2390,7 @@ namespace Gekko.Parser.Gek
                                 //Not a sum() or unfold() function that is going to be looped                                
                                 
                                 string meta = null;
-                                if (Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
+                                if (libraryNameLower == null && Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
                                 {
                                     //Inbuilt function
 
@@ -2547,8 +2549,7 @@ namespace Gekko.Parser.Gek
                                     string aa1, aa2;
                                     FunctionHelper10(args, out aa1, out aa2);
 
-                                    string fl = "O.FunctionLookup";
-                                    fl = "O.FunctionLookupNew";
+                                    string fl = "O.FunctionLookupNew";
 
                                     string q = "false";
                                     if (isQuestion) q = "true";
@@ -2559,7 +2560,6 @@ namespace Gekko.Parser.Gek
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {                                        
-                                        //node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                         node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
                                     else
@@ -5656,6 +5656,14 @@ namespace Gekko.Parser.Gek
             string functionName = node[0][0][0].Text.ToLower();  //no string composition allowed for functions, it is simple ident.
             if (functionName == "string") functionName = "tostring";
             return functionName;
+        }
+
+        private static string GetLibraryName(ASTNode node)
+        {
+            string libraryName = null;
+            ASTNode n = node[0][1][0]?[0];
+            if (n != null) libraryName = n.Text.ToLower();  //no string composition allowed for library, it is simple ident.            
+            return libraryName;
         }
 
         private static string GetFunctionName2(ASTNode node)
