@@ -55,13 +55,13 @@ namespace Gekko
         /// All items (loaded packages). Never unloaded, so the items list can only grow.
         /// The hierarchy list tells which packages are actually active, and in what order.
         /// </summary>
-        private List<Library> libraries = new List<Library>();
-        private List<int> hierarchy = new List<int>();  //order of packages
+        //private List<Library> librariesCache = new List<Library>();
+        private List<Library> libraries = new List<Library>();  //order of packages
         private Library cache = null;
 
         public Libraries()
         {
-            this.Add(new Library(Globals.globalLibraryString));
+            this.Add(new Library(Globals.globalLibraryString, null));
         }
 
         public Library GetLibrary(string name2, bool abortWithError)
@@ -76,23 +76,9 @@ namespace Gekko
                 if (this.cache.GetName() == name) return this.cache;
             }
 
-            foreach (Library lib in this.libraries)
-            {
-                if (lib.GetName() == name)
-                {
-                    this.cache = lib;
-                    return lib;
-                }
-            }
-
             if (abortWithError) new Error("Library '" + name + "' could not be found.");
 
             return null;
-        }
-
-        private Library GetLibrary(int i)
-        {
-            return this.libraries[i];
         }
 
         /// <summary>
@@ -116,9 +102,8 @@ namespace Gekko
             }
             else
             {
-                foreach (int i in this.GetHierarchy())
+                foreach (Library thisLib in this.GetHierarchy())
                 {
-                    Library thisLib = this.GetLibrary(i);
                     rv = thisLib.GetFunction(functionName, false);
                     if (rv != null) break;
                 }
@@ -142,9 +127,9 @@ namespace Gekko
         //    return function;
         //}        
 
-        private List<int> GetHierarchy()
+        private List<Library> GetHierarchy()
         {
-            return this.hierarchy;
+            return this.libraries;
         }
 
         /// <summary>
@@ -152,40 +137,49 @@ namespace Gekko
         /// RESET/RESTART). A library contains functions/methods, often stored in a zip-file.
         /// If the library is already there (loaded), the method is ignored.        /// 
         /// </summary>
-        /// <param name="lib"></param>
-        public void Add(Library lib)
+        /// <param name="library"></param>
+        public void Add(Library library)
         {
-            if (lib.GetName() == null)
+            // library p1; library p2; library p3;   installed = p1, p2, p3     libraries = p1, p2, p3
+            // library <remove> p2;                  installed = p1, p2, p3     libraries = p1, p3
+            // library p2;                           installed = p1, p2, p3     libraries = p1, p3, p2            
+
+            if (library.GetName() == null)
             {
-                new Error("Library name cannot be null");
+                new Error("Library name cannot be null");  //probably cannot happen?
             }
 
             foreach (Library x in this.libraries)
             {
-                if (lib.GetName() == x.GetName())
+                if (library.GetName() == x.GetName())
                 {
-                    new Error("Library '" + lib.GetName() + "' has already been loaded.");
+                    new Error("Library '" + library.GetName() + "' is already loaded.");
                 }
             }
-            lib.id = this.libraries.Count;
-            this.libraries.Add(lib);
 
-            if (true)
+            this.libraries.Add(library);
+        }
+
+        public void Remove(string libraryName)
+        {
+            List<Library> temp = new List<Library>();
+            bool hit = false;
+            foreach (Library x in this.libraries)
             {
-                //putting the new id LAST in hierarchy (will be searched last)                
-                this.hierarchy.Add(lib.id);
+                if (G.Equal(libraryName, x.GetName()))
+                {
+                    hit = true;
+                }
+                else
+                {
+                    temp.Add(x);
+                }
             }
 
-            if (false)
-            {
-                //putting the new id FIRST in hierarchy (will be searched last)
-                List<int> temp = this.hierarchy;
-                this.hierarchy = new List<int>();
-                this.hierarchy.Add(lib.id);
-                this.hierarchy.AddRange(temp);
-                temp = null;  //to free the memory fast
-            }
-        }        
+            if (hit == false) new Error("Could not find library '" + libraryName + "' for removal.");
+
+            this.libraries = temp;
+        }
     }
 
     /// <summary>
@@ -197,20 +191,25 @@ namespace Gekko
         /// Name of the library, like in LIBRARY mylib;
         /// </summary>
         private string name = null;
+
+        /// <summary>
+        /// Filename of zip. Can be null, for the global library.
+        /// </summary>
+        private string fileNameWithPath = null;
+
         /// <summary>
         /// The different functions of the library.
         /// </summary>
         /// 
 
-        public int id = -12345;
-
         /// <summary>
         /// Create a new package/library.
         /// </summary>
         /// <param name="name"></param>
-        public Library(string name)
+        public Library(string name, string fileNameWithPath)
         {
             this.name = name;
+            this.fileNameWithPath = fileNameWithPath;
         }
 
         /// <summary>

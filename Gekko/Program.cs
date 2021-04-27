@@ -1572,7 +1572,7 @@ namespace Gekko
             string as2 = null; if (o.as2 != null) as2 = O.ConvertToString(o.as2);
 
             string fileName2 = G.AddExtension(fileName, "." + "zip");
-            string libraryName = Path.GetFileNameWithoutExtension(fileName2);
+            string libraryNameLower = Path.GetFileNameWithoutExtension(fileName2).ToLower();
 
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_command);
@@ -1596,13 +1596,9 @@ namespace Gekko
             
             WaitForZipRead(tempPath, zipFileWithPath);
 
-            Library library = new Library(libraryName);
-            if (Program.functions.GetLibrary(libraryName, false) != null)
-            {
-                new Error("Library '" + libraryName + "' cannot be loaded, because it exists already");
-            }
-            Program.functions.Add(library);
-            LibraryExtractor(tempPath, library);            
+            Library library = new Library(libraryNameLower, zipFileWithPath);
+            LibraryExtractor(tempPath, library);
+            Program.functions.Add(library);            
 
             try
             {
