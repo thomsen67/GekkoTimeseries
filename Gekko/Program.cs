@@ -6426,6 +6426,7 @@ namespace Gekko
 
                 try
                 {
+                    ch.code = ch.code.Replace(Globals.libraryPlaceholder, Globals.globalLibraryString);
                     Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                 }
                 catch (Exception e)

@@ -5613,7 +5613,8 @@ namespace Gekko
                 Parser.ConvertHelper ch = null;
                 ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
                 ch.commandsText = commandLinesFlat;
-                ch.code = ch.code.Replace(Globals.ufunctionSpecialName + "(" + Globals.QT + Globals.globalLibraryString + Globals.QT + ", ", Globals.ufunctionSpecialName + "(" + Globals.QT + f.packageName + Globals.QT + ", ");
+                //ch.code = ch.code.Replace(Globals.ufunctionSpecialName + "(" + Globals.QT + Globals.libraryPlaceholder + Globals.QT + ", ", Globals.ufunctionSpecialName + "(" + Globals.QT + f.packageName + Globals.QT + ", ");
+                ch.code = ch.code.Replace(Globals.libraryPlaceholder, f.packageName);
                 Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                 f.hasBeenCompiled = true;
             }

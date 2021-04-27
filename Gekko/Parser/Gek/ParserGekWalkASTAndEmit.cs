@@ -2025,7 +2025,7 @@ namespace Gekko.Parser.Gek
                             //FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME                             
                             //FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME 
                             //FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME 
-                            string libraryNameLower = Globals.globalLibraryString;  //what to do with this?
+                            string libraryNameLower = Globals.libraryPlaceholder;  //what to do with this?
 
                             if (node.Text == "ASTPROCEDUREDEF")
                             {

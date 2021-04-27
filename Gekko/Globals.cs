@@ -40,8 +40,9 @@ namespace Gekko
     /// </summary>
     public class Globals
     {
-        public static string smpl = "§¤£";  //this line must be at top
-                
+        public const string smpl = "§¤£";  //this line must be at top
+        public const string libraryPlaceholder = "¤§£";
+        public const string globalLibraryString = "global";
         public const string ufunctionSpecialName = "_UfunctionSpecialName";        
 
         public static string versionInternal = "";
@@ -211,9 +212,7 @@ namespace Gekko
         public static List<string> unitTestDependents = null;
 
         public const string stringConversionNote = "NOTE: You can use a string %s as a variable name with {%s}";
-
-        public const string globalLibraryString = "global";
-
+        
         public const string Work = "Work";
         public const string Ref = "Ref";
         public const string First = "First";
