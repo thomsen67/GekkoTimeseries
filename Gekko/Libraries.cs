@@ -64,9 +64,11 @@ namespace Gekko
             this.Add(new Library(Globals.globalLibraryString));
         }
 
-        public Library GetLibrary(string name, bool abortWithError)
+        public Library GetLibrary(string name2, bool abortWithError)
         {
-            name = name.ToLower();
+            //if library name == null, it is understood as "global".
+            string name = Globals.globalLibraryString;
+            if (name2 != null) name = name2.ToLower();
 
             if (this.cache != null)
             {
