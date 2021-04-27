@@ -979,6 +979,13 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
+                    case "ASTLIBRARYREMOVE":
+                        {
+                            node.Code.A("O.LibraryRemove o" + Num(node) + " = new O.LibraryRemove();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
                     case "ASTRESET":
                         {
                             node.Code.A("O.Reset o" + Num(node) + " = new O.Reset();" + G.NL);

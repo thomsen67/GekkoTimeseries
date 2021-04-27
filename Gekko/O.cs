@@ -7312,11 +7312,17 @@ namespace Gekko
             }
         }
 
-        public class LibraryOptions
-        {
-            public string opt_first = null;
-            public string opt_last = null;
-            public string opt_remove = null;
+        public class LibraryRemove
+        {            
+            public List listItems = null;
+            public void Exe()
+            {
+                List<string> items = O.Restrict(this.listItems, false, false, false, false);
+                foreach (string item in items)
+                {
+                    Program.functions.Remove(item);
+                }
+            }
         }
 
         public class Library

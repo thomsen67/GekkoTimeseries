@@ -67,6 +67,9 @@ namespace Gekko
         public Library GetLibrary(string name2, bool abortWithError)
         {
             //if library name == null, it is understood as "global".
+
+            Library rv = null;
+
             string name = Globals.globalLibraryString;
             if (name2 != null) name = name2.ToLower();
 
@@ -74,6 +77,15 @@ namespace Gekko
             {
                 //check for fast return if library name is same as last time
                 if (this.cache.GetName() == name) return this.cache;
+            }
+
+            foreach (Library lib in this.libraries)
+            {
+                if (lib.GetName() == name)
+                {
+                    this.cache = lib;
+                    return lib;
+                }
             }
 
             if (abortWithError) new Error("Library '" + name + "' could not be found.");
@@ -160,13 +172,14 @@ namespace Gekko
             this.libraries.Add(library);
         }
 
-        public void Remove(string libraryName)
+        public void Remove(string libraryName2)
         {
+            string libraryName = libraryName2.ToLower();
             List<Library> temp = new List<Library>();
             bool hit = false;
             foreach (Library x in this.libraries)
             {
-                if (G.Equal(libraryName, x.GetName()))
+                if (libraryName == x.GetName())
                 {
                     hit = true;
                 }
@@ -177,8 +190,9 @@ namespace Gekko
             }
 
             if (hit == false) new Error("Could not find library '" + libraryName + "' for removal.");
-
-            this.libraries = temp;
+            this.libraries.Clear();
+            this.libraries.AddRange(temp);
+            new Writeln("Removed library '" + libraryName + "'");
         }
     }
 
