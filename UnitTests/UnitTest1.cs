@@ -13056,18 +13056,13 @@ namespace UnitTests
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
             I("library p1 as p1;");  //also checks as.
-
             FAIL("library <close> p2;");
             FAIL("library <clear> p1;");
             FAIL("library <clear> p2;");
-            I("library <close> p1;");
             FAIL("library <close> global;");
-
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("library global;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" reserved "));
-
-            I("library <clear> global;");
         }
 
         [TestMethod]

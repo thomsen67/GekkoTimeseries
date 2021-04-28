@@ -5049,7 +5049,9 @@ namespace Gekko
             }
         }
 
-        // ===================
+        // ========================
+        // Code to handle LIBRARY
+        // ========================
 
         public static void Add0_UfunctionSpecialName(string libraryName, string functionName, Func<GekkoSmpl, P, bool, IVariable> f)
         {
@@ -5181,18 +5183,18 @@ namespace Gekko
 
         private static void UfunctionErroMessage(string libraryName, string functionName, int i)
         {
-            if (libraryName == Globals.globalLibraryString) return;  //no error, just overwrite the function
+            if (libraryName == null || Libraries.IsReservedName(libraryName)) return;  //no error, just overwrite the function
             new Error("Function '" + functionName + "' with " + i + " arguments exists as dublet in library '" + libraryName + "'");
         }
+
+        // ====================================================
 
         private static GekkoFunction AddUfunctionHelper(string libraryName, string functionName)
         {
             Gekko.Library library = Program.functions.GetLibrary(libraryName, false);
             if (library == null)
             {
-                new Error("The library '" + libraryName + "' does not exist for handling the function '" + functionName + "'.");
-                //library = new Gekko.Library(libraryName);
-                //Globals.functions.Add(library);
+                new Error("The library '" + libraryName + "' does not exist for handling the function '" + functionName + "'.");                
             }
             GekkoFunction function = library.GetFunction(functionName, false);
             if (function == null)
@@ -5239,35 +5241,7 @@ namespace Gekko
         // USER FUNCTION STUFF START
         // USER FUNCTION STUFF START
 
-        /// <summary>
-        /// Used for Gekko user-defined functions.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="n"></param>
-        private static void FunctionErrorMessage(string name, int n)
-        {
-            if (name.StartsWith(Globals.procedure))
-            {
-                //..., false, because we are failing while parsing/compiling.
-                new Error("Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + (n - 2) + " arguments.", false);
-            }
-            else
-            {
-                if (name == Globals.stopHelper)
-                {
-                    G.Writeln2("-------------------------------------------------------------", Color.Red);
-                    G.Writeln("------------ The job was stopped by STOP command ------------", Color.Red);
-                    G.Writeln("-------------------------------------------------------------", Color.Red);
-                    G.Writeln();
-                }
-                else
-                {
-                    //..., false, because we are failing while parsing/compiling.
-                    new Error("Cannot find user function '" + name + "()' with " + (n - 2) + " arguments.", false);
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Used for Gekko user-defined functions.
         /// </summary>
@@ -5590,9 +5564,6 @@ namespace Gekko
             }
         }
 
-
-
-
         /// <summary>
         /// Gets stored function/procedure code from library, parses it and compiles it.
         /// </summary>
@@ -5628,8 +5599,6 @@ namespace Gekko
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END
-
-
 
         /// <summary>
         /// Convert a Gekko matrix into a timeseries.
@@ -7349,6 +7318,16 @@ namespace Gekko
             public void Exe()
             {                
                 Libraries.LoadLibrary(this);
+            }
+
+            public static void Q()
+            {
+                Libraries.Q(null);
+            }
+
+            public static void Q(IVariable iv)
+            {
+                Libraries.Q(iv);
             }
         }
 

@@ -22,30 +22,10 @@ namespace Gekko
     //                 1
     //                 2
     // --------------------------------------
-
-    /* same logic as databanks. Starts out like this:
-     * 
-     *             gekko (reserved)
-     *             global (reserved, also local).
-     *             lib1
-     *             lib2
-     *             
-     * when using global:f() calling g(), it first searches global, then lib1, then lib2.
-     * when using lib2:f() calling g(), it first searches lib2, then global, then lib1.
-     * LIBRARY lib1, lib2; LIBRARY<first>...; LIBRARY<last>; LIBRARY<clear>; LIBRARY<remove>...;
-     * BLOCK lib1, lib2, lib3 --> libs are restored after END.
-     * can use y = lib2:f(x).
-     * 
-     * getlibraries(), setlibraries().
-     * Gekko will look for .zip libraries the same places as for RUN commands.
-     * LIBRARY xx will look for xx.zip. If it contains no gcm files --> error.
-     * 
-     * the gekko library cannot be masked by others, else --> error. This COULD be overwritten with option?
-     * 
-     * 
-     * 
-     */
-
+    //
+    // If at some point, a Gekko inbuilt function/procedure is provided in Gekko .gcm form, perhaps it could
+    // be stated as a string inside Functions.cs, and loaded via RunGekkoCommands() or something akin to the way
+    // library zip-files are loaded.
 
     /// <summary>
     /// Functionality dealing with the LIBRARY command.
@@ -59,30 +39,74 @@ namespace Gekko
         //private List<Library> librariesCache = new List<Library>();
         private List<Library> libraries = new List<Library>();  //order of packages
         private Library cache = null;
-
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Libraries()
         {
             this.Add(new Library(Globals.globalLibraryString, null));
         }
 
+        /// <summary>
+        /// If "Global", "Local" or "Gekko"
+        /// </summary>
+        /// <param name="libraryName"></param>
+        /// <returns></returns>
+        public static bool IsReservedName(string libraryName)
+        {
+            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || G.Equal(libraryName, Globals.gekkoLibraryString);
+        }
+
+        /// <summary>
+        /// Handles LIBRARY ? and LIBRARY ? name.
+        /// </summary>
+        public static void Q(IVariable iv)
+        {
+            string name = null;
+            if (iv != null) name = O.ConvertToString(iv);
+
+            using (Writeln writeln = new Writeln())
+            {
+                foreach (Library library in Program.functions.GetLibraries())
+                {
+                    if (name != null && !G.Equal(library.GetName(), name)) continue;
+                    writeln.MainAdd("Library '" + library.GetName() + "' has " + G.AddS(library.GetFunctionNames().Count, "function"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of libraries. Do not alter the list: it points directly to the real list.
+        /// </summary>
+        /// <returns></returns>
+        public List<Library> GetLibraries()
+        {
+            return this.libraries;
+        }
+
+        /// <summary>
+        /// Get a library via a name. Choose if Gekko should abort or return null if it does not exist.
+        /// </summary>
+        /// <param name="name2"></param>
+        /// <param name="abortWithError"></param>
+        /// <returns></returns>
         public Library GetLibrary(string name2, bool abortWithError)
         {
             //if library name == null, it is understood as "global".
-
             Library rv = null;
-
             string name = Globals.globalLibraryString;
-            if (name2 != null) name = name2.ToLower();
+            if (name2 != null) name = name2;
 
             if (this.cache != null)
             {
                 //check for fast return if library name is same as last time
-                if (this.cache.GetName() == name) return this.cache;
+                if (G.Equal(this.cache.GetName(), name)) return this.cache;
             }
 
             foreach (Library lib in this.libraries)
             {
-                if (lib.GetName() == name)
+                if (G.Equal(lib.GetName(), name))
                 {
                     this.cache = lib;
                     return lib;
@@ -103,9 +127,7 @@ namespace Gekko
         /// <param name="functionName"></param>
         /// <returns></returns>
         public GekkoFunction GetFunction(string libraryName, string functionName)
-        {
-            //functionName = functionName.ToLower(); --> NO! no need to do this!
-
+        {            
             GekkoFunction rv = null;
 
             if (libraryName != null)
@@ -123,10 +145,23 @@ namespace Gekko
 
                 if (rv == null)
                 {
-                    new Error("The function '" + functionName.ToLower() + "()' does not seem to exist.");
+                    if (functionName == Globals.stopHelper)
+                    {
+                        using (Writeln writeln = new Writeln())
+                        {
+                            writeln.MainAdd("-------------------------------------------------------------");
+                            writeln.MainNewLineTight();
+                            writeln.MainAdd("------------ The job was stopped by STOP command ------------");
+                            writeln.MainNewLineTight();
+                            writeln.MainAdd("-------------------------------------------------------------");
+                        }                        
+                    }
+                    else
+                    {
+                        new Error("The function '" + functionName + "()' does not seem to exist.");
+                    }
                 }
             }
-
             return rv;
         }
 
@@ -141,9 +176,9 @@ namespace Gekko
             {
                 string fileName3 = O.ConvertToString(o.files[i]);
                 string fileName2 = G.AddExtension(fileName3, "." + "zip");
-                string libraryNameLower = Path.GetFileNameWithoutExtension(fileName2).ToLower();
-                if (o.aliases[i] != null) libraryNameLower = O.ConvertToString(o.aliases[i]);
-                if (IsReservedName(libraryNameLower)) new Error("The name '" + libraryNameLower + "' is reserved regarding libraries");
+                string libraryName = Path.GetFileNameWithoutExtension(fileName2);
+                if (o.aliases[i] != null) libraryName = O.ConvertToString(o.aliases[i]);
+                if (IsReservedName(libraryName)) new Error("The name '" + libraryName + "' is reserved regarding libraries");
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_command);
                 folders.Add(Program.options.folder_command1);
@@ -166,7 +201,7 @@ namespace Gekko
 
                 Program.WaitForZipRead(tempPath, fileName);
 
-                Library library = new Library(libraryNameLower, fileName);
+                Library library = new Library(libraryName, fileName);
                 Program.LibraryExtractor(tempPath, library);
                 Program.functions.Add(library);
 
@@ -181,7 +216,7 @@ namespace Gekko
 
                 int count = library.GetFunctionNames().Count;
 
-                new Writeln("Loaded library '" + libraryNameLower + "' with " + G.AddS(count, "function") + ". Library path: " + fileName);
+                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(count, "function") + ". Library path: " + fileName);
             }
         }
 
@@ -205,7 +240,7 @@ namespace Gekko
 
             foreach (Library x in this.libraries)
             {
-                if (library.GetName() == x.GetName())
+                if (G.Equal(x.GetName(), library.GetName()))
                 {
                     new Error("Library '" + library.GetName() + "' is already loaded.");
                 }
@@ -214,9 +249,9 @@ namespace Gekko
             this.libraries.Add(library);
         }
 
-        public void Close(string libraryName2)
+        public void Close(string libraryName)
         {
-            if (libraryName2 == "*")
+            if (libraryName == "*")
             {
                 int count = this.libraries.Count;  //includes 'Global'
                 Library global = this.GetLibrary(Globals.globalLibraryString, true); //cannot be non-existing
@@ -225,13 +260,12 @@ namespace Gekko
                 new Writeln("Removed " + G.AddS(count - 1, "library") + " (excluding Global library).");
             }
             else
-            {
-                string libraryName = libraryName2.ToLower();
+            {                
                 List<Library> temp = new List<Library>();
                 bool found = false;
                 foreach (Library x in this.libraries)
                 {
-                    if (libraryName == x.GetName())
+                    if (G.Equal(x.GetName(), libraryName))
                     {
                         found = true;
                         if (IsReservedName(libraryName)) new Error("The name '" + libraryName + "' is special and cannot be closed. You may try LIBRARY<clear> instead.");                        
@@ -245,12 +279,7 @@ namespace Gekko
                 this.libraries = temp;
                 new Writeln("Closed library '" + libraryName + "'");
             }
-        }
-
-        private static bool IsReservedName(string libraryName)
-        {
-            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || G.Equal(libraryName, Globals.gekkoLibraryString);
-        }
+        }        
 
         public void Clear(string libraryName)
         {
@@ -316,7 +345,7 @@ namespace Gekko
             return this.name;
         }
 
-        private Dictionary<string, GekkoFunction> functions = new Dictionary<string, GekkoFunction>();
+        private GekkoDictionary<string, GekkoFunction> functions = new GekkoDictionary<string, GekkoFunction>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Adds a function to the library.
@@ -340,19 +369,16 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// Find a library by name, for instance argument 'f' if we are finding f() or f(2, 3). The
-        /// argument MUST be lowercase. This code has to be fast, could be inside a tight loop.
+        /// Find a library by name, for instance argument 'f' if we are finding f() or f(2, 3). This code has to be fast, could be inside a tight loop.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         public GekkoFunction GetFunction(string name, bool abortWithError)
         {
-            name = name.ToLower();
-
             if (this.itemCache != null)
             {
                 //fast check, will avoid dict lookup if there is a hit
-                if (name == itemCache.GetName()) return itemCache;
+                if (G.Equal(name, itemCache.GetName())) return itemCache;
             }
             GekkoFunction rv = null;
             this.functions.TryGetValue(name, out rv);
@@ -366,7 +392,6 @@ namespace Gekko
             }
             return rv;
         }
-
         GekkoFunction itemCache = null;
     }
 
@@ -378,7 +403,7 @@ namespace Gekko
         }
 
         private string name = null; //for instance 'f'
-        public string libraryName = null;
+        public string libraryName = null;  //where the function is stored
         public bool hasBeenCompiled = false;
 
         public string code = null;  //may contain code from several places, snippets of f(), f(...), f(..., ...)

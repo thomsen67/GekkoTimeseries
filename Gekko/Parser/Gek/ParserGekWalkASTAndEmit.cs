@@ -3209,6 +3209,15 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Mode.Q();" + G.NL);                            
                         }
                         break;
+                    case "ASTLIBRARYQUESTION":
+                        {
+                            if (node[0].ChildrenCount() == 0) node.Code.A("O.Library.Q();" + G.NL);
+                            else
+                            {
+                                node.Code.A("O.Library.Q(" + node[0][0].Code + ");" + G.NL);
+                            }
+                        }
+                        break;
                     case "ASTTIMEQUESTION":
                         {                            
                             node.Code.A("O.Time.Q();" + G.NL);                            

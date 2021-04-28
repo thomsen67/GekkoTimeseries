@@ -42,9 +42,9 @@ namespace Gekko
     {
         public const string smpl = "§¤£";  //this line must be at top
 
-        public const string globalLibraryString = "global";
-        public const string localLibraryString = "local";  //--> maybe used later
-        public const string gekkoLibraryString = "gekko";  //--> maybe used later
+        public const string globalLibraryString = "Global";
+        public const string localLibraryString = "Local";  //--> maybe used later
+        public const string gekkoLibraryString = "Gekko";  //--> maybe used later
 
         public const string ufunctionSpecialName = "_UfunctionSpecialName";        
 
@@ -453,7 +453,7 @@ namespace Gekko
 
         public static string userSettingsPath = "";
 
-        public static string stopHelper = "calling_non_existing_function";
+        public const string stopHelper = "calling_non_existing_function";
 
         public static string linkSeparator1 = "#";
         public static char linkSeparator2 = ':';

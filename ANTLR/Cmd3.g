@@ -246,6 +246,7 @@ ASTCOMPARE2;
     ASTLIBRARY;
 	ASTLIBRARYCLOSE;
 	ASTLIBRARYCLEAR;
+	ASTLIBRARYQUESTION;
 	ASTIMPOSE;
 	ASTNAMEHELPER;
 	ASTINTERPOLATE;
@@ -3154,6 +3155,7 @@ globalOpt1h:				ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)
 library:                    LIBRARY libraryOpt1? libraryHelper (COMMA2 libraryHelper)* -> ^({token("ASTLIBRARY", ASTLIBRARY, input.LT(1).Line)} ^(ASTPLACEHOLDER libraryOpt1?) ^(ASTPLACEHOLDER libraryHelper+))
                           | LIBRARY leftAngle CLOSE RIGHTANGLE seqOfBankvarnames -> ^({token("ASTLIBRARYCLOSE", ASTLIBRARYCLOSE, input.LT(1).Line)} seqOfBankvarnames)
 						  | LIBRARY leftAngle CLEAR RIGHTANGLE seqOfBankvarnames -> ^({token("ASTLIBRARYCLEAR", ASTLIBRARYCLEAR, input.LT(1).Line)} seqOfBankvarnames)
+                          | LIBRARY question name? -> ^({token("ASTLIBRARYQUESTION", ASTLIBRARYQUESTION, input.LT(1).Line)} ^(ASTPLACEHOLDER name?))
 						    ;
 
 libraryHelper:              fileNameStar (AS name)? -> ^(ASTPLACEHOLDER fileNameStar name?);
