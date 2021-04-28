@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Gekko
 {
@@ -114,7 +115,7 @@ namespace Gekko
             }
             else
             {
-                foreach (Library thisLib in this.GetHierarchy())
+                foreach (Library thisLib in  this.libraries)
                 {
                     rv = thisLib.GetFunction(functionName, false);
                     if (rv != null) break;
@@ -129,20 +130,61 @@ namespace Gekko
             return rv;
         }
 
-        ///// <summary>
-        ///// Get a function from a particular library/package, like p1:f(...).
-        ///// </summary>
-        //public GekkoFunction GetFunction(string libraryName, string functionName)
-        //{
-        //    Library library = this.GetLibrary(libraryName, true);
-        //    GekkoFunction function = library.GetFunction(functionName, false);
-        //    return function;
-        //}        
-
-        private List<Library> GetHierarchy()
+        /// <summary>
+        /// Helper for the LIBRARY command. Unzips the library, extracts the function/procedure code, puts this in
+        /// a Library object for later use. Does not compile the code, this is done lazily.
+        /// </summary>
+        /// <param name="o"></param>
+        public static void LoadLibrary(O.Library o)
         {
-            return this.libraries;
+            for (int i = 0; i < o.files.Count; i++)
+            {
+                string fileName3 = O.ConvertToString(o.files[i]);
+                string fileName2 = G.AddExtension(fileName3, "." + "zip");
+                string libraryNameLower = Path.GetFileNameWithoutExtension(fileName2).ToLower();
+                if (o.aliases[i] != null) libraryNameLower = O.ConvertToString(o.aliases[i]);
+                if (IsReservedName(libraryNameLower)) new Error("The name '" + libraryNameLower + "' is reserved regarding libraries");
+                List<string> folders = new List<string>();
+                folders.Add(Program.options.folder_command);
+                folders.Add(Program.options.folder_command1);
+                folders.Add(Program.options.folder_command2);
+                string fileName = Program.FindFile(fileName2, folders);  //also calls CreateFullPathAndFileName()
+                if (fileName == null)
+                {
+                    new Error("Could not find library file: " + fileName2);
+                }
+
+                string tempPath = Program.GetTempGbkFolderPath();
+                if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
+                {
+                    Directory.CreateDirectory(tempPath);
+                }
+                else
+                {
+                    Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
+                }
+
+                Program.WaitForZipRead(tempPath, fileName);
+
+                Library library = new Library(libraryNameLower, fileName);
+                Program.LibraryExtractor(tempPath, library);
+                Program.functions.Add(library);
+
+                try
+                {
+                    G.DeleteFolder(tempPath);
+                }
+                catch
+                {
+                    //not catastrofic if this fails
+                }
+
+                int count = library.GetFunctionNames().Count;
+
+                new Writeln("Loaded library '" + libraryNameLower + "' with " + G.AddS(count, "function") + ". Library path: " + fileName);
+            }
         }
+
 
         /// <summary>
         /// Add a library/package to Gekko. Packages are generally only added, not removed (until
@@ -172,27 +214,66 @@ namespace Gekko
             this.libraries.Add(library);
         }
 
-        public void Remove(string libraryName2)
+        public void Close(string libraryName2)
         {
-            string libraryName = libraryName2.ToLower();
-            List<Library> temp = new List<Library>();
-            bool hit = false;
-            foreach (Library x in this.libraries)
+            if (libraryName2 == "*")
             {
-                if (libraryName == x.GetName())
+                int count = this.libraries.Count;  //includes 'Global'
+                Library global = this.GetLibrary(Globals.globalLibraryString, true); //cannot be non-existing
+                this.libraries = new List<Library>();
+                this.Add(global);
+                new Writeln("Removed " + G.AddS(count - 1, "library") + " (excluding Global library).");
+            }
+            else
+            {
+                string libraryName = libraryName2.ToLower();
+                List<Library> temp = new List<Library>();
+                bool found = false;
+                foreach (Library x in this.libraries)
                 {
-                    hit = true;
+                    if (libraryName == x.GetName())
+                    {
+                        found = true;
+                        if (IsReservedName(libraryName)) new Error("The name '" + libraryName + "' is special and cannot be closed. You may try LIBRARY<clear> instead.");                        
+                    }
+                    else
+                    {
+                        temp.Add(x);
+                    }
                 }
-                else
+                if (found == false) new Error("Library '" + libraryName + "' is not opened/loaded, and can therefore not be closed.");
+                this.libraries = temp;
+                new Writeln("Closed library '" + libraryName + "'");
+            }
+        }
+
+        private static bool IsReservedName(string libraryName)
+        {
+            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || G.Equal(libraryName, Globals.gekkoLibraryString);
+        }
+
+        public void Clear(string libraryName)
+        {
+            bool found = false;
+            for (int i = 0; i < this.libraries.Count; i++)
+            {
+                Library x = this.libraries[i];                
+                if (G.Equal(x.GetName(), libraryName))
                 {
-                    temp.Add(x);
+                    found = true;
+                    if (IsReservedName(libraryName))
+                    {
+                        this.libraries[i] = new Library(x.GetName(), null);
+                        new Writeln("Library '" + libraryName + "' is now cleared (empty).");
+                        break;
+                    }
+                    else
+                    {
+                        new Error("You cannot clear library '" + libraryName + "' loaded from a .zip file. Use LIBRARY<close> instead.");
+                    }
                 }
             }
-
-            if (hit == false) new Error("Could not find library '" + libraryName + "' for removal.");
-            this.libraries.Clear();
-            this.libraries.AddRange(temp);
-            new Writeln("Removed library '" + libraryName + "'");
+            if (!found) new Error("Could not find library '" + libraryName + "' for clearing.");
         }
     }
 
@@ -237,11 +318,26 @@ namespace Gekko
 
         private Dictionary<string, GekkoFunction> functions = new Dictionary<string, GekkoFunction>();
 
+        /// <summary>
+        /// Adds a function to the library.
+        /// </summary>
+        /// <param name="function"></param>
         public void AddFunction(GekkoFunction function)
         {
             function.libraryName = this.GetName();
             this.functions.Add(function.GetName(), function);            
         }
+
+        /// <summary>
+        /// Gets a list of function names inside the library. Does not show overloads (number of arguments), just the names proper.
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetFunctionNames()
+        {
+            List<string> ss = new List<string>(this.functions.Keys);
+            ss.Sort();
+            return ss;
+        }        
 
         /// <summary>
         /// Find a library by name, for instance argument 'f' if we are finding f() or f(2, 3). The

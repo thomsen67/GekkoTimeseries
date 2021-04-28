@@ -245,6 +245,24 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Add 's' to plural word. For instance "loaded 0 files", "loaded 1 file", "loaded 2 files", ... . 
+        /// Here, we can use "loaded " + G.AddS(i, "file").
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static string AddS(int i, string s)
+        {
+            if (i == 1) return i + " " + s;  //"1 file"
+            else
+            {
+                string s2 = s + "s";
+                if (s == "library") s2 = "libraries";
+                return i + " " + s2;        //"0 files" or "2 files" or ...
+            }
+        }
+
+        /// <summary>
         /// Adds a "0" to e.g. -.4327 so it turns into -0.4327
         /// </summary>
         /// <param name="val">Input string</param>

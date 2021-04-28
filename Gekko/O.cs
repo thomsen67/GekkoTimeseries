@@ -7312,7 +7312,7 @@ namespace Gekko
             }
         }
 
-        public class LibraryRemove
+        public class LibraryClose
         {            
             public List listItems = null;
             public void Exe()
@@ -7320,7 +7320,20 @@ namespace Gekko
                 List<string> items = O.Restrict(this.listItems, false, false, false, false);
                 foreach (string item in items)
                 {
-                    Program.functions.Remove(item);
+                    Program.functions.Close(item);
+                }
+            }
+        }
+
+        public class LibraryClear
+        {
+            public List listItems = null;
+            public void Exe()
+            {
+                List<string> items = O.Restrict(this.listItems, false, false, false, false);
+                foreach (string item in items)
+                {
+                    Program.functions.Clear(item);
                 }
             }
         }
@@ -7328,15 +7341,14 @@ namespace Gekko
         public class Library
         {
             public P p = null;
-            public IVariable fileName = null;
-            public IVariable as2 = null;
+            public List<IVariable> files = new List<IVariable>();
+            public List<IVariable> aliases = new List<IVariable>();
             public string opt_first = null;
             public string opt_last = null;
-            public string opt_remove = null;
 
             public void Exe()
             {                
-                Program.LibraryHelper(this);
+                Libraries.LoadLibrary(this);
             }
         }
 

@@ -244,7 +244,8 @@ ASTCOMPARE2;
 	ASTDOTS;
 	ASTIMPULSES;
     ASTLIBRARY;
-	ASTLIBRARYREMOVE;
+	ASTLIBRARYCLOSE;
+	ASTLIBRARYCLEAR;
 	ASTIMPOSE;
 	ASTNAMEHELPER;
 	ASTINTERPOLATE;
@@ -3150,9 +3151,12 @@ globalOpt1h:				ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)
 // LIBRARY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 													    
-library:                    LIBRARY libraryOpt1? fileNameStar (AS nameOrStar)? -> ^({token("ASTLIBRARY", ASTLIBRARY, input.LT(1).Line)} ^(ASTPLACEHOLDER libraryOpt1?) ^(ASTHANDLEFILENAME fileNameStar) ^(ASTPLACEHOLDER nameOrStar?))
-                          | LIBRARY leftAngle REMOVE RIGHTANGLE seqOfBankvarnames -> ^({token("ASTLIBRARYREMOVE", ASTLIBRARYREMOVE, input.LT(1).Line)} seqOfBankvarnames)
+library:                    LIBRARY libraryOpt1? libraryHelper (COMMA2 libraryHelper)* -> ^({token("ASTLIBRARY", ASTLIBRARY, input.LT(1).Line)} ^(ASTPLACEHOLDER libraryOpt1?) ^(ASTPLACEHOLDER libraryHelper+))
+                          | LIBRARY leftAngle CLOSE RIGHTANGLE seqOfBankvarnames -> ^({token("ASTLIBRARYCLOSE", ASTLIBRARYCLOSE, input.LT(1).Line)} seqOfBankvarnames)
+						  | LIBRARY leftAngle CLEAR RIGHTANGLE seqOfBankvarnames -> ^({token("ASTLIBRARYCLEAR", ASTLIBRARYCLEAR, input.LT(1).Line)} seqOfBankvarnames)
 						    ;
+
+libraryHelper:              fileNameStar (AS name)? -> ^(ASTPLACEHOLDER fileNameStar name?);
 
 libraryOpt1:                ISNOTQUAL
 						  | leftAngle libraryOpt1h* RIGHTANGLE -> libraryOpt1h*

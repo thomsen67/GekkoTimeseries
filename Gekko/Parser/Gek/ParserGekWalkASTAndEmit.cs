@@ -979,9 +979,16 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
-                    case "ASTLIBRARYREMOVE":
+                    case "ASTLIBRARYCLOSE":
                         {
-                            node.Code.A("O.LibraryRemove o" + Num(node) + " = new O.LibraryRemove();" + G.NL);
+                            node.Code.A("O.LibraryClose o" + Num(node) + " = new O.LibraryClose();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTLIBRARYCLEAR":
+                        {
+                            node.Code.A("O.LibraryClear o" + Num(node) + " = new O.LibraryClear();" + G.NL);
                             node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
@@ -4666,10 +4673,25 @@ namespace Gekko.Parser.Gek
                         {                            
                             node.Code.A("O.Library o" + Num(node) + " = new O.Library();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+
                             GetCodeFromAllChildren(node, node[0]);  //options
-                            //GetCodeFromAllChildren(node, node[1]);  //filename
-                            if (node[1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".fileName = " + node[1][0].Code + ";" + G.NL);
-                            if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".as2 = " + node[2][0].Code + ";" + G.NL);
+
+                            ASTNode files = node[1];
+                            foreach (ASTNode child in files.ChildrenIterator())
+                            {
+                                string s1 = child[0].Code.ToString();
+                                node.Code.A("o" + Num(node) + ".files.Add(" + s1 + ");" + G.NL);
+                                if (child.ChildrenCount() > 1)
+                                {
+                                    string s2 = child[1].Code.ToString();
+                                    node.Code.A("o" + Num(node) + ".aliases.Add(" + s2 + ");" + G.NL);
+                                }
+                                else
+                                {
+                                    node.Code.A("o" + Num(node) + ".aliases.Add(null);" + G.NL);
+                                }
+                            }                            
+                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;

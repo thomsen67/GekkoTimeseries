@@ -43,6 +43,9 @@ namespace Gekko
         public const string smpl = "§¤£";  //this line must be at top
 
         public const string globalLibraryString = "global";
+        public const string localLibraryString = "local";  //--> maybe used later
+        public const string gekkoLibraryString = "gekko";  //--> maybe used later
+
         public const string ufunctionSpecialName = "_UfunctionSpecialName";        
 
         public static string versionInternal = "";

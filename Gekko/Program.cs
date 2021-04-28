@@ -1558,58 +1558,8 @@ namespace Gekko
 
             if (nocr) G.Write(text);
             else G.Writeln(text);
-
         }
-
-        /// <summary>
-        /// Helper for the LIBRARY command. Unzips the library, extracts the function/procedure code, puts this in
-        /// a Library object for later use. Does not compile the code, this is done lazily.
-        /// </summary>
-        /// <param name="o"></param>
-        public static void LibraryHelper(O.Library o)
-        {
-            string fileName = O.ConvertToString(o.fileName);
-            string as2 = null; if (o.as2 != null) as2 = O.ConvertToString(o.as2);
-
-            string fileName2 = G.AddExtension(fileName, "." + "zip");
-            string libraryNameLower = Path.GetFileNameWithoutExtension(fileName2).ToLower();
-
-            List<string> folders = new List<string>();
-            folders.Add(Program.options.folder_command);
-            folders.Add(Program.options.folder_command1);
-            folders.Add(Program.options.folder_command2);
-            string zipFileWithPath = FindFile(fileName2, folders);  //also calls CreateFullPathAndFileName()
-            if (zipFileWithPath == null)
-            {                
-                new Error("Could not find library file: " + fileName2);
-            }            
-
-            string tempPath = GetTempGbkFolderPath();
-            if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
-            {
-                Directory.CreateDirectory(tempPath);
-            }
-            else
-            {
-                Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
-            }         
-            
-            WaitForZipRead(tempPath, zipFileWithPath);
-
-            Library library = new Library(libraryNameLower, zipFileWithPath);
-            LibraryExtractor(tempPath, library);
-            Program.functions.Add(library);            
-
-            try
-            {
-                G.DeleteFolder(tempPath);
-            }
-            catch
-            {
-                //not catastrofic if this fails
-            }
-        }
-
+        
         /// <summary>
         /// Finds all .gcm files in a folder structure, and extracts functions/procedures.
         /// </summary>
