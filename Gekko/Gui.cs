@@ -1501,7 +1501,7 @@ namespace Gekko
                     {
                         long n = long.Parse(input);
                         GekkoAction a = Program.GetGekkoAction(n);
-                        a.action();
+                        a.action(a.gao);
                     }
                 }
                 else
@@ -1928,7 +1928,7 @@ namespace Gekko
                 {
                     Program.options.print_width = widthRemember;
                 }                                
-                Action a = () =>
+                Action<GAO> a = (gao) =>
                 {
                     O.Help("i_missing_values");
                 };
@@ -1992,7 +1992,7 @@ namespace Gekko
                         DateTime dt2 = (new DirectoryInfo(fileHistory)).LastWriteTime;
                         DateTime dt = (dt1 < dt2 ? dt1 : dt2);
 
-                        Action a1 = () =>
+                        Action<GAO> a1 = (gao1) =>
                         {
                         //Snapshot, lower part of gui window
                         try
@@ -2006,7 +2006,7 @@ namespace Gekko
                             catch { }
                         };
 
-                        Action a2 = () =>
+                        Action<GAO> a2 = (gao2) =>
                         {
                         //recorded history
                         try
@@ -2016,7 +2016,7 @@ namespace Gekko
                             catch { }
                         };
 
-                        Action a3 = () =>
+                        Action<GAO> a3 = (gao3) =>
                         {
                             O.Help("restore_session");
                         };

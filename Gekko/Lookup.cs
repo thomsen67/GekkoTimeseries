@@ -1279,7 +1279,7 @@ namespace Gekko
                                                     G.Writeln("           must use <dyn> or <dyn = no> tags, or put the expression inside a", Color.Red);
                                                     G.Writeln("           'BLOCK series dyn = yes|no'.", Color.Red);
                                                     G.Writeln();
-                                                    Action a = () =>
+                                                    Action<GAO> a = (gao) =>
                                                     {
                                                         O.Help("i_dynamic_statements");
                                                     };

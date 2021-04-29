@@ -233,7 +233,7 @@ namespace Gekko
             if (this.storageMore[0].storage.Count > 0)
             {
 
-                Action a = () =>
+                Action<GAO> a = (gao) =>
                 {
                     //-------------------------------
                     //The long explanation in output tab

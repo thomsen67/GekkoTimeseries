@@ -200,17 +200,39 @@ namespace Gekko
         public GekkoDictionary<string, List<int>> lagsLeads = new GekkoDictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Used for links, if the links need to transfer some information (like a string).
+    /// </summary>
+    public class GAO
+    {
+        public string s1 = null;
+    }
+
+    /// <summary>
+    /// Used for links that do stuff.
+    /// </summary>
     public class GekkoAction
     {
-        public Action action = null;
+        public GAO gao = null;
+        public Action<GAO> action = null;
         public EGekkoActionTypes type = EGekkoActionTypes.Unknown;
         public string name = null;  //for instance the OLS name given, so that for type == ols, we can expire links with a certain name. If name = null, the link will always expire.
-        public GekkoAction(EGekkoActionTypes type, string name, Action action)
+
+        public GekkoAction(EGekkoActionTypes type, string name, Action<GAO> action, GAO gao)
         {
             this.type = type;  //can be .Unknown
-            this.name = name;  //can be null
+            this.name = name;  //can be null, used for OLS link expiry
             this.action = action;
+            this.gao = gao;    //can be null, used if we need to call an Action with arguments.
         }
+
+        public GekkoAction(EGekkoActionTypes type, string name, Action<GAO> action)
+        {
+            this.type = type;  //can be .Unknown
+            this.name = name;  //can be null, used for OLS link expiry
+            this.action = action;
+            this.gao = null;
+        }        
     }
 
     public class LinkAction
@@ -12701,7 +12723,7 @@ namespace Gekko
                         {
                             //G.WriteLink("show", "disp3:" + ts.GetName());
                             // ---------                
-                            Action a = () =>
+                            Action<GAO> a = (gao) =>
                             {                                
                                 Globals.guiHomeMainEnabled = true;                                
                                 List<string> temp = new List<string>();                                

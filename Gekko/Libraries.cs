@@ -81,7 +81,6 @@ namespace Gekko
                         hit = true;
                     }
 
-
                     List<string> functions = new List<string>();
                     List<string> procedures = new List<string>();
                     foreach (string s in library.GetFunctionNames())
@@ -90,7 +89,7 @@ namespace Gekko
                         else functions.Add(s + "()");
                     }
 
-                    Action a = () =>
+                    Action<GAO> a = (gao) =>
                     {
                         string f5 = G.GetListWithCommas(functions);
                         string p5 = G.GetListWithCommas(procedures);
@@ -98,16 +97,31 @@ namespace Gekko
                         if (functions.Count > 0 && procedures.Count == 0) s2 = " contains " + functions.Count + " functions: " + f5;
                         else if (functions.Count == 0 && procedures.Count >= 0) s2 = " contains " + procedures.Count + " procedures: " + p5;
                         else s2 = " contains " + functions.Count + " functions: " + f5 + " and " + procedures.Count + " procedures: " + p5;
-                        Action a2 = () =>
+                        Action<GAO> a2 = (gao2) =>
                         {
-                            Action<string> a3 = (string s3) =>
+                            Action<GAO> a3 = (gao3) =>
                             {
-                                new Writeln(s3);
+                                string fname = gao3.s1;
+                                if (fname.EndsWith("()")) fname = fname.Substring(0, fname.Length - "()".Length);
+                                else fname = Globals.procedure + fname;
+                                GekkoFunction f = library.GetFunction(fname, true);  //should be there
+                                new Writeln(f.code);
                             };
-                            string ff5 = null;
+                            string ff5 = null;                            
                             foreach (string s in functions)
                             {
-                                ff5 += G.GetLinkAction(s + "()", new GekkoAction(EGekkoActionTypes.Unknown, null, a3));
+                                ff5 += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
+                            }
+                            string pp5 = null;
+                            foreach (string s in procedures)
+                            {
+                                pp5 += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
+                            }
+                            using (Writeln writeln2 = new Writeln())
+                            {
+                                writeln2.MainAdd("Functions: " + ff5.Substring(0, ff5.Length - ", ".Length));
+                                writeln2.MainNewLineTight();
+                                writeln2.MainAdd("Functions: " + pp5.Substring(0, ff5.Length - ", ".Length));
                             }
                         };
                         string more2 = ". More " + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + ".";
@@ -422,7 +436,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Find a library by name, for instance argument 'f' if we are finding f() or f(2, 3). This code has to be fast, could be inside a tight loop.
+        /// Find a library by name, for instance argument 'f' if we are finding f(), or f(...) or f(..., ...). This code has to be fast, could be inside a tight loop.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>

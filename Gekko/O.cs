@@ -6763,7 +6763,7 @@ namespace Gekko
                 //See #8904327598432
                 if (onlyDatabankNotModel.Count > 0)
                 {
-                    Action a = () =>
+                    Action<GAO> a = (gao) =>
                     {
                         string s = null;
                         s += G.NL; //to avoid annoying visible blank
@@ -6783,7 +6783,7 @@ namespace Gekko
 
                 if (onlyModelNotDatabank.Count > 0)
                 {
-                    Action a = () =>
+                    Action<GAO> a = (gao) =>
                     {
                         string s = null;
                         s += G.NL; //to avoid annoying visible blank

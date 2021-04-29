@@ -400,10 +400,10 @@ namespace Gekko
                 {
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
-                    Action a = () =>
+                    Action<GAO> a = (gao) =>
                     {
                         Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", "", 0, new P());
-                    };
+                    };                    
                     tab.Set(i + 2, 6, G.GetLinkAction("Left", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
                 }
@@ -413,7 +413,7 @@ namespace Gekko
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
 
-                    Action a = () =>
+                    Action<GAO> a = (gao) =>
                     {
                         Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", "", 0, new P());
                     };
@@ -425,7 +425,7 @@ namespace Gekko
                 {
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
-                    Action a = () =>
+                    Action<GAO> a = (gao) =>
                     {
                         Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", "", 0, new P());
                     };
@@ -445,7 +445,7 @@ namespace Gekko
             string line = null;
             if (true)
             {
-                Action a = () =>
+                Action<GAO> a = (gao) =>
                 {
                     Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", "", 0, new P());
                 };
@@ -456,7 +456,7 @@ namespace Gekko
             if (true)
             {
 
-                Action a = () =>
+                Action<GAO> a = (gao) =>
                 {
                     string s = null;
 
@@ -490,7 +490,7 @@ namespace Gekko
             if (OLSRecursiveDfOk(df))
             {
                 // ---------                
-                Action a = () =>
+                Action<GAO> a = (gao) =>
                 {
                     Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_left 'Chow-test (left)' <type=boxes>;", "", 0, new P());
                 };
@@ -500,7 +500,7 @@ namespace Gekko
             if (OLSRecursiveDfOk(df))
             {
                 // ---------                
-                Action a = () =>
+                Action<GAO> a = (gao) =>
                 {
                     Program.RunGekkoCommands("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_right 'Chow-test (right)' <type=boxes>;", "", 0, new P());
                 };
