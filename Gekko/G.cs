@@ -245,21 +245,40 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Add 's' to plural word. For instance "loaded 0 files", "loaded 1 file", "loaded 2 files", ... . 
-        /// Here, we can use "loaded " + G.AddS(i, "file").
+        /// Add 's' to plural word. For instance "0 files", "1 file", "2 files", ... . 
+        /// If addIsAre is active, it will return "are 0 files", "is 1 file", "are 2 files", ...
+        /// Some words are known, like library --> libraries.
+        /// for instance "
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static string AddS(int i, string s, bool addIsAre)
+        {            
+            if (i == 1)
+            {
+                if (addIsAre) return "is " + i + " " + s;      //"is 1 file"
+                else return i + " " + s;                       //"1 file"
+            }
+            else
+            {
+                string s2 = s + "s";
+                if (s == "library") s2 = "libraries";
+                if (addIsAre) return "are " + i + " " + s2;    //"are 0 files" or "are 2 files" or ...
+                else return i + " " + s2;                      //"0 files" or "2 files" or ...
+            }
+        }
+
+        /// <summary>
+        /// Add 's' to plural word. For instance "0 files", "1 file", "2 files", ... .         
+        /// Some words are known, like library --> libraries.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="i"></param>
         /// <returns></returns>
         public static string AddS(int i, string s)
         {
-            if (i == 1) return i + " " + s;  //"1 file"
-            else
-            {
-                string s2 = s + "s";
-                if (s == "library") s2 = "libraries";
-                return i + " " + s2;        //"0 files" or "2 files" or ...
-            }
+            return AddS(i, s, false);
         }
 
         /// <summary>

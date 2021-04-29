@@ -36,9 +36,8 @@ namespace Gekko
         /// All items (loaded packages). Never unloaded, so the items list can only grow.
         /// The hierarchy list tells which packages are actually active, and in what order.
         /// </summary>
-        //private List<Library> librariesCache = new List<Library>();
-        private List<Library> libraries = new List<Library>();  //order of packages
-        private Library cache = null;
+        
+        private List<Library> libraries = new List<Library>();        
         
         /// <summary>
         /// Constructor.
@@ -66,12 +65,56 @@ namespace Gekko
             string name = null;
             if (iv != null) name = O.ConvertToString(iv);
 
+            bool hit = false;
             using (Writeln writeln = new Writeln())
-            {
-                foreach (Library library in Program.functions.GetLibraries())
+            {                
+                int counter = 0;
+                foreach (Library library in Program.libraries.GetLibraries())
                 {
-                    if (name != null && !G.Equal(library.GetName(), name)) continue;
-                    writeln.MainAdd("Library '" + library.GetName() + "' has " + G.AddS(library.GetFunctionNames().Count, "function"));
+                    counter++;
+                    if (name != null && !G.Equal(library.GetName(), name))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        hit = true;
+                    }
+
+                    if (true)
+                    {
+                        List<string> functions = new List<string>();
+                        List<string> procedures = new List<string>();
+                        foreach (string s in library.GetFunctionNames())
+                        {
+                            if (s.StartsWith(Globals.procedure)) procedures.Add(s.Substring(Globals.procedure.Length));
+                            else functions.Add(s + "()");
+                        }
+
+                        Action a = () =>
+                        {
+                            string f5 = G.GetListWithCommas(functions);
+                            string p5 = G.GetListWithCommas(procedures);
+                            string s2 = null;
+                            if (functions.Count > 0 && procedures.Count == 0) s2 = " contains these " + functions.Count + " functions: " + f5;
+                            else if (functions.Count == 0 && procedures.Count >= 0) s2 = " contains these " + procedures.Count + " procedures: " + p5;
+                            else s2 = " contains these " + functions.Count + " functions: " + f5 + " and these " + procedures.Count + " procedures: " + p5;
+                            new Writeln("Library '" + library.GetName() + "'" + s2);
+                        };
+
+                        string more = null;
+                        if (functions.Count + procedures.Count > 0)
+                        {
+                            more = " (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
+                        }
+                        writeln.MainAdd("Library '" + library.GetName() + "' with " + functions.Count + " functions and " + procedures.Count + " procedures" + more);
+                    }
+                    
+                    writeln.MainNewLineTight();
+                }
+                if (name != null && !hit)
+                {
+                    new Writeln("Could not find library '" + name + "'");
                 }
             }
         }
@@ -86,7 +129,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get a library via a name. Choose if Gekko should abort or return null if it does not exist.
+        /// Get a library via a name. Option to choose if Gekko should abort or return null if it does not exist.
         /// </summary>
         /// <param name="name2"></param>
         /// <param name="abortWithError"></param>
@@ -98,17 +141,10 @@ namespace Gekko
             string name = Globals.globalLibraryString;
             if (name2 != null) name = name2;
 
-            if (this.cache != null)
-            {
-                //check for fast return if library name is same as last time
-                if (G.Equal(this.cache.GetName(), name)) return this.cache;
-            }
-
             foreach (Library lib in this.libraries)
             {
                 if (G.Equal(lib.GetName(), name))
-                {
-                    this.cache = lib;
+                {                    
                     return lib;
                 }
             }
@@ -170,7 +206,7 @@ namespace Gekko
         /// a Library object for later use. Does not compile the code, this is done lazily.
         /// </summary>
         /// <param name="o"></param>
-        public static void LoadLibrary(O.Library o)
+        public static void LoadLibraryFromZip(O.Library o)
         {
             for (int i = 0; i < o.files.Count; i++)
             {
@@ -203,7 +239,7 @@ namespace Gekko
 
                 Library library = new Library(libraryName, fileName);
                 Program.LibraryExtractor(tempPath, library);
-                Program.functions.Add(library);
+                Program.libraries.Add(library);
 
                 try
                 {
@@ -242,13 +278,17 @@ namespace Gekko
             {
                 if (G.Equal(x.GetName(), library.GetName()))
                 {
-                    new Error("Library '" + library.GetName() + "' is already loaded.");
+                    new Error("Library '" + library.GetName() + "' is already loaded, cf. LIBRARY ?.");
                 }
             }
 
             this.libraries.Add(library);
         }
 
+        /// <summary>
+        /// Close the library, so its functions cannot be used. The library will stay in the cache, though.
+        /// </summary>
+        /// <param name="libraryName"></param>
         public void Close(string libraryName)
         {
             if (libraryName == "*")
@@ -256,8 +296,8 @@ namespace Gekko
                 int count = this.libraries.Count;  //includes 'Global'
                 Library global = this.GetLibrary(Globals.globalLibraryString, true); //cannot be non-existing
                 this.libraries = new List<Library>();
-                this.Add(global);
-                new Writeln("Removed " + G.AddS(count - 1, "library") + " (excluding Global library).");
+                this.Add(global);                
+                new Writeln("Closed " + G.AddS(count - 1, "library") + ", not including the Global library).");
             }
             else
             {                
@@ -364,9 +404,9 @@ namespace Gekko
         public List<string> GetFunctionNames()
         {
             List<string> ss = new List<string>(this.functions.Keys);
-            ss.Sort();
+            ss.Sort(StringComparer.InvariantCultureIgnoreCase);
             return ss;
-        }        
+        }
 
         /// <summary>
         /// Find a library by name, for instance argument 'f' if we are finding f() or f(2, 3). This code has to be fast, could be inside a tight loop.
@@ -375,10 +415,10 @@ namespace Gekko
         /// <returns></returns>
         public GekkoFunction GetFunction(string name, bool abortWithError)
         {
-            if (this.itemCache != null)
+            if (this.fastLookup != null)
             {
                 //fast check, will avoid dict lookup if there is a hit
-                if (G.Equal(name, itemCache.GetName())) return itemCache;
+                if (G.Equal(name, fastLookup.GetName())) return fastLookup;
             }
             GekkoFunction rv = null;
             this.functions.TryGetValue(name, out rv);
@@ -388,11 +428,11 @@ namespace Gekko
             }
             else
             {
-                this.itemCache = rv;
+                this.fastLookup = rv;
             }
             return rv;
         }
-        GekkoFunction itemCache = null;
+        GekkoFunction fastLookup = null;
     }
 
     public class GekkoFunction

@@ -1457,13 +1457,9 @@ namespace Gekko
                     if (!(ts.type == ESeriesType.ArraySuper))
                     {
                         new Error("strange error rgd. links");
-                        //throw new GekkoException();
-                    }
-
-                    //StringBuilder sb = new StringBuilder();
+                    }                    
 
                     List<string> lines = new List<string>();
-
 
                     foreach (KeyValuePair<MultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                     {

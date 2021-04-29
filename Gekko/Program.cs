@@ -1213,7 +1213,7 @@ namespace Gekko
         /// <summary>
         /// User-defined functions/procedures.
         /// </summary>
-        public static Libraries functions = new Libraries();
+        public static Libraries libraries = new Libraries();
 
         /// <summary>
         /// Helper for name aliases
@@ -18473,7 +18473,7 @@ namespace Gekko
 
         public static void InitUfunctionsAndArithmeticsAndMore()
         {
-            Program.functions = new Libraries();
+            Program.libraries = new Libraries();
             
             Globals.arithmentics[0] = (x1, x2) => x1 + x2;
             Globals.arithmentics[1] = (x1, x2) => x2 + x1;
