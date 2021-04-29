@@ -1592,7 +1592,10 @@ namespace Gekko
             string[] fileEntries = Directory.GetFiles(targetDirectory);
             foreach (string fileName in fileEntries)
             {
-                if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase)) LibraryExtractorHandleGcmFile(fileName, library);
+                if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
+                {
+                    LibraryExtractorHandleGcmFile(fileName, library);
+                }
             }
 
             // Recurse into subdirectories of this directory.
@@ -1611,7 +1614,7 @@ namespace Gekko
         {
             // ...
             // ...
-            // function ...
+            // function ...           --> or procedure
             // ...
             // ...
             // function ...
@@ -1645,8 +1648,16 @@ namespace Gekko
             List<string> functionNamesLower = new List<string>();
             for (int i = 0; i < t2.subnodes.Count(); i++)
             {
-                if (t2.subnodes[i].type == ETokenType.Word && G.Equal(t2.subnodes[i].s, "function")) //--> procedure
+                //for instance "function val f(val %x); ... ; end;"   --> function must be followed by two words at least
+                //or "procedure f val %x; ... ; end;                  --> procedure must be followed by one word at least
+                //both must be first line or follow a ";"
+                //this will guard against for instance series definitions like "function = 3;" or "procedure = 3;" (unlikely though).
+                
+                if (t2.subnodes[i].type == ETokenType.Word && (G.Equal(t2.subnodes[i].s, "function") || G.Equal(t2.subnodes[i].s, "procedure")))
                 {
+                    bool isFunction = false;
+                    if (G.Equal(t2.subnodes[i].s, "function")) isFunction = true;
+
                     TokenHelper th1 = null;
                     TokenHelper th2 = null;
                     TokenHelper th3 = null;
@@ -1655,24 +1666,30 @@ namespace Gekko
                     th3 = t2.subnodes[i].SiblingAfter(2, true);
                     bool problem = false;
                     if (th1 != null && th1.s != ";") problem = true;
-                    if (th2 == null || th2.type != ETokenType.Word) problem = true;
-                    if (th3 == null || th3.type != ETokenType.Word) problem = true;
+                    if (th2 == null || th2.type != ETokenType.Word) problem = true; //
+                    if (isFunction && (th3 == null || th3.type != ETokenType.Word)) problem = true;
 
                     if (!problem)
-                    {
-                        //Now we know that we have the pattern [";"] ["function"] [word]
-                        //this will guard against for instance series definitions like "function = 3;" or "procedure = 3;" (unlikely though).
-
+                    {                       
+                     
                         functionCounter++;
-                        TokenHelper temp2 = t2.subnodes[i].SiblingAfter(2, true);  //skips comments, newlines, etc.
-                        functionNamesLower.Add(temp2.s.ToLower());
+
+                        if (isFunction)
+                        {
+                            TokenHelper temp2 = t2.subnodes[i].SiblingAfter(2, true);  //skips comments, newlines, etc.
+                            functionNamesLower.Add(temp2.s.ToLower());
+                        }
+                        else
+                        {
+                            TokenHelper temp2 = t2.subnodes[i].SiblingAfter(1, true);  //skips comments, newlines, etc.
+                            functionNamesLower.Add(Globals.procedure + temp2.s.ToLower());
+                        }
 
                         if (functionCounter >= 2)
                         {
                             LibraryExtractorGetFunctionCode(library, i0, i, functionNamesLower[functionCounter - 2], t2.subnodes);
                             i0 = i;
                         }
-
                     }
                 }
             }
