@@ -4061,7 +4061,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Use GekkoAction class instead
+        /// Convert a GekkoAction call ino a string that will transform into a link in Gekko.
         /// </summary>
         public static string GetLinkAction(string s, GekkoAction a)
         {
@@ -4069,7 +4069,7 @@ namespace Gekko
             Globals.linkAction.Add(Globals.linkActionCounter, a);
             return s2;
         }
-
+        
         /// <summary>
         /// For writing link to screen (without line feed)
         /// </summary>

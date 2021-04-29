@@ -81,35 +81,46 @@ namespace Gekko
                         hit = true;
                     }
 
-                    if (true)
+
+                    List<string> functions = new List<string>();
+                    List<string> procedures = new List<string>();
+                    foreach (string s in library.GetFunctionNames())
                     {
-                        List<string> functions = new List<string>();
-                        List<string> procedures = new List<string>();
-                        foreach (string s in library.GetFunctionNames())
-                        {
-                            if (s.StartsWith(Globals.procedure)) procedures.Add(s.Substring(Globals.procedure.Length));
-                            else functions.Add(s + "()");
-                        }
-
-                        Action a = () =>
-                        {
-                            string f5 = G.GetListWithCommas(functions);
-                            string p5 = G.GetListWithCommas(procedures);
-                            string s2 = null;
-                            if (functions.Count > 0 && procedures.Count == 0) s2 = " contains these " + functions.Count + " functions: " + f5;
-                            else if (functions.Count == 0 && procedures.Count >= 0) s2 = " contains these " + procedures.Count + " procedures: " + p5;
-                            else s2 = " contains these " + functions.Count + " functions: " + f5 + " and these " + procedures.Count + " procedures: " + p5;
-                            new Writeln("Library '" + library.GetName() + "'" + s2);
-                        };
-
-                        string more = null;
-                        if (functions.Count + procedures.Count > 0)
-                        {
-                            more = " (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
-                        }
-                        writeln.MainAdd("Library '" + library.GetName() + "' with " + functions.Count + " functions and " + procedures.Count + " procedures" + more);
+                        if (s.StartsWith(Globals.procedure)) procedures.Add(s.Substring(Globals.procedure.Length));
+                        else functions.Add(s + "()");
                     }
-                    
+
+                    Action a = () =>
+                    {
+                        string f5 = G.GetListWithCommas(functions);
+                        string p5 = G.GetListWithCommas(procedures);
+                        string s2 = null;
+                        if (functions.Count > 0 && procedures.Count == 0) s2 = " contains " + functions.Count + " functions: " + f5;
+                        else if (functions.Count == 0 && procedures.Count >= 0) s2 = " contains " + procedures.Count + " procedures: " + p5;
+                        else s2 = " contains " + functions.Count + " functions: " + f5 + " and " + procedures.Count + " procedures: " + p5;
+                        Action a2 = () =>
+                        {
+                            Action<string> a3 = (string s3) =>
+                            {
+                                new Writeln(s3);
+                            };
+                            string ff5 = null;
+                            foreach (string s in functions)
+                            {
+                                ff5 += G.GetLinkAction(s + "()", new GekkoAction(EGekkoActionTypes.Unknown, null, a3));
+                            }
+                        };
+                        string more2 = ". More " + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + ".";
+                        new Writeln("Library '" + library.GetName() + "'" + s2 + more2);
+                    };
+
+                    string more = null;
+                    if (functions.Count + procedures.Count > 0)
+                    {
+                        more = " (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
+                    }
+                    writeln.MainAdd("Library '" + library.GetName() + "' with " + functions.Count + " functions and " + procedures.Count + " procedures" + more);
+
                     writeln.MainNewLineTight();
                 }
                 if (name != null && !hit)
@@ -194,7 +205,9 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("The function '" + functionName + "()' does not seem to exist.");
+                        string s = "function '" + functionName + "()'";
+                        if (functionName.StartsWith(Globals.procedure)) s = "procedure '" + functionName.Substring(Globals.procedure.Length) + "'";
+                        new Error("The " + s + " does not seem to exist.");
                     }
                 }
             }
@@ -424,7 +437,9 @@ namespace Gekko
             this.functions.TryGetValue(name, out rv);
             if (rv == null)
             {
-                if (abortWithError) new Error("Function name '" + name + "' not found in library '" + this.name + "'");
+                string s = "Function '" + name + "()'";
+                if (name.StartsWith(Globals.procedure)) s = "Procedure '" + name.Substring(Globals.procedure.Length) + "'";
+                if (abortWithError) new Error(s + " not found in library '" + this.name + "'");
             }
             else
             {
