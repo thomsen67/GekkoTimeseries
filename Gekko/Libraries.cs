@@ -121,7 +121,7 @@ namespace Gekko
                             {
                                 writeln2.MainAdd("Functions: " + ff5.Substring(0, ff5.Length - ", ".Length));
                                 writeln2.MainNewLineTight();
-                                writeln2.MainAdd("Functions: " + pp5.Substring(0, ff5.Length - ", ".Length));
+                                writeln2.MainAdd("Functions: " + pp5.Substring(0, pp5.Length - ", ".Length));
                             }
                         };
                         string more2 = ". More " + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, a2)) + ".";
