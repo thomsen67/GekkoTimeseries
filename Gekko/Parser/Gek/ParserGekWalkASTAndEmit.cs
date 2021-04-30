@@ -2244,26 +2244,32 @@ namespace Gekko.Parser.Gek
                                 isObjectFunction = true;
                             }
 
-                            string functionNameLower = GetFunctionName(node);
-                            if (functionNameLower == "null") functionNameLower = "null2";  //cannot have the name Functions.null(...)
-                            else if (functionNameLower == "int") functionNameLower = "int2";  //cannot have the name Functions.int(...)
+                            string functionName = GetFunctionName(node);
+                            if (functionName == "null") functionName = "null2";  //cannot have the name Functions.null(...)
+                            else if (functionName == "int") functionName = "int2";  //cannot have the name Functions.int(...)
+
+                            string libraryNameWhereTheFunctionIsCallingFrom = "null";  //the library from where the function call originates (may be null)
+                            if (w.libraryName != null)
+                            {
+                                libraryNameWhereTheFunctionIsCallingFrom = "`" + w.libraryName + "`";
+                            }
 
                             bool hasLibrary = false;
-                            string libraryNameLower = "null";
+                            string libraryName = "null";  //this is a library name 'x' originating from a 'x:f()' call.
                             string temp = GetLibraryName(node);
                             if (temp != null)
                             {
                                 hasLibrary = true;
-                                libraryNameLower = "`" + temp + "`";
+                                libraryName = "`" + temp + "`";
                             }
 
                             if (node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
                             {
-                                functionNameLower = Globals.procedure + functionNameLower;
+                                functionName = Globals.procedure + functionName;
                             }
 
                             //will always be null for ASTOBJECTFUNCTION
-                            string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionNameLower);  //also checks that the name is "sum"
+                            string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);  //also checks that the name is "sum"
 
                             if (!hasLibrary && listNames != null && listNames.Length > 0 && listNames[0] != null)
                             {
@@ -2332,7 +2338,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine(node.localInsideLoopVariablesCs);
                                 }
 
-                                if (G.Equal(functionNameLower, "sum"))
+                                if (G.Equal(functionName, "sum"))
                                 {
                                     sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Sum"));
                                     sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(" + Globals.smpl + ");" + G.NL);
@@ -2357,7 +2363,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(" + s + ")) {");
                                 }
 
-                                if (G.Equal(functionNameLower, "sum"))
+                                if (G.Equal(functionName, "sum"))
                                 {
                                     string dollarCode = null;
                                     if (node[2].Text == "ASTDOLLAR") dollarCode = node[2][1].Code.ToString();
@@ -2383,7 +2389,7 @@ namespace Gekko.Parser.Gek
                                     sb1.AppendLine("}");
                                 }
 
-                                if (G.Equal(functionNameLower, "sum"))
+                                if (G.Equal(functionName, "sum"))
                                 {
                                     //after a sum(#m, ....) function, the labelCounter must be set to 0, if this sum() function is not inside another sum() function
                                     bool b = SearchUpwardsInTree6(node.Parent);
@@ -2412,7 +2418,7 @@ namespace Gekko.Parser.Gek
                                 //Not a sum() or unfold() function that is going to be looped                                
                                 
                                 string meta = null;
-                                if (!hasLibrary && Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
+                                if (!hasLibrary && Globals.gekkoInbuiltFunctions.TryGetValue(functionName, out meta))
                                 {
                                     //Inbuilt function
 
@@ -2511,19 +2517,19 @@ namespace Gekko.Parser.Gek
 
                                     if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q")
                                     {
-                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
+                                        node.Code.A("Functions." + functionName + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(args).A("" + Globals.objFunctionPlaceholder + "").A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {
                                         //same as the other???                                        
-                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
+                                        node.Code.A("Functions." + functionName + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
                                     {
                                         //node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(", " + G.GetListWithCommas(args)).A(")");
-                                        node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + ", ").A(aa1 + aa2).A(")");
+                                        node.Code.A("Functions." + functionName).A("(" + extra + Globals.functionT1Cs + ", ").A(aa1 + aa2).A(")");
                                     }
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {
@@ -2578,15 +2584,15 @@ namespace Gekko.Parser.Gek
 
                                     if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q")
                                     {
-                                        node.Code.A(fl).A(numberOfArguments + 1).A("(").A(libraryNameLower).A(", `").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {                                        
-                                        node.Code.A(fl).A(numberOfArguments + 1).A("(").A(libraryNameLower).A(", `").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
                                     else
                                     {
-                                        node.Code.A(fl).A(numberOfArguments).A("(").A(libraryNameLower).A(", `").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1 + aa2).A(")");
+                                        node.Code.A(fl).A(numberOfArguments).A("(").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1 + aa2).A(")");
                                     }
                                     
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q" || node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
