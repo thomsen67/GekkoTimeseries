@@ -12,30 +12,34 @@ namespace Gekko
         public static int labelCounter;
 
 
-        public static void FunctionDef7()
+        public static readonly ScalarVal i27 = new ScalarVal(1d, 0);
+        public static readonly ScalarVal i28 = new ScalarVal(2d, 0);
+        public static readonly ScalarVal i29 = new ScalarVal(100d, 0);
+        public static void FunctionDef30()
         {
 
-            O.PrepareUfunction(3, "f1");
+            O.PrepareUfunction(4, "f");
 
-            O.Add3_UfunctionSpecialName("p1", "f1", (GekkoSmpl smpl, P p, bool q8, GekkoArg functionarg_xf7dke8cj_4_func, GekkoArg functionarg_xf7dke8cj_5_func, GekkoArg functionarg_xf7dke8cj_6_func) =>
+            O.Add4_UfunctionSpecialName(null, "f", (GekkoSmpl smpl, P p, bool q31, GekkoArg functionarg_xf7dke8cj_23_func, GekkoArg functionarg_xf7dke8cj_24_func, GekkoArg functionarg_xf7dke8cj_25_func, GekkoArg functionarg_xf7dke8cj_26_func) =>
 
 
             {
-                IVariable functionarg_xf7dke8cj_4 = O.TypeCheck_date(functionarg_xf7dke8cj_4_func, smpl, 1);
-                IVariable functionarg_xf7dke8cj_5 = O.TypeCheck_date(functionarg_xf7dke8cj_5_func, smpl, 2);
-                IVariable functionarg_xf7dke8cj_6 = O.TypeCheck_string(functionarg_xf7dke8cj_6_func.f1(smpl), 3);
+                IVariable functionarg_xf7dke8cj_23 = O.TypeCheck_date(functionarg_xf7dke8cj_23_func, smpl, 1);
+                IVariable functionarg_xf7dke8cj_24 = O.TypeCheck_date(functionarg_xf7dke8cj_24_func, smpl, 2);
+                IVariable functionarg_xf7dke8cj_25 = O.TypeCheck_val(functionarg_xf7dke8cj_25_func.f1(smpl), 3);
+                IVariable functionarg_xf7dke8cj_26 = O.TypeCheck_val(functionarg_xf7dke8cj_26_func.f1(smpl), 4);
 
                 Databank local0 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f1"); p.SetLastFileSentToANTLR(O.LastText("f1")); p.Deeper();
+                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
                 try
                 {
 
 
-                    p.SetText(@"¤6");
+                    p.SetText(@"¤1");
 
 
                     //[[commandSpecial]]1
-                    return O.TypeCheck_string(O.Add(smpl, O.HandleString(new ScalarString(@"p1_f1_")), functionarg_xf7dke8cj_6), 0);
+                    return O.TypeCheck_val(O.Add(smpl, O.Multiply(smpl, i29, functionarg_xf7dke8cj_25), functionarg_xf7dke8cj_26), 0);
 
                     //[[commandEnd]]1
 
@@ -49,44 +53,62 @@ namespace Gekko
                 }
             });
 
-        }
+            O.PrepareUfunction(3, "f");
 
-        public static void FunctionDef13()
-        {
-
-            O.PrepareUfunction(4, "f1");
-
-            O.Add4_UfunctionSpecialName("p1", "f1", (GekkoSmpl smpl, P p, bool q14, GekkoArg functionarg_xf7dke8cj_9_func, GekkoArg functionarg_xf7dke8cj_10_func, GekkoArg functionarg_xf7dke8cj_11_func, GekkoArg functionarg_xf7dke8cj_12_func) =>
+            O.Add3_UfunctionSpecialName(null, "f", (GekkoSmpl smpl, P p, bool q31, GekkoArg functionarg_xf7dke8cj_23_func, GekkoArg functionarg_xf7dke8cj_24_func, GekkoArg functionarg_xf7dke8cj_25_func) =>
 
 
             {
-                IVariable functionarg_xf7dke8cj_9 = O.TypeCheck_date(functionarg_xf7dke8cj_9_func, smpl, 1);
-                IVariable functionarg_xf7dke8cj_10 = O.TypeCheck_date(functionarg_xf7dke8cj_10_func, smpl, 2);
-                IVariable functionarg_xf7dke8cj_11 = O.TypeCheck_string(functionarg_xf7dke8cj_11_func.f1(smpl), 3);
-                IVariable functionarg_xf7dke8cj_12 = O.TypeCheck_string(functionarg_xf7dke8cj_12_func.f1(smpl), 4);
 
-                Databank local2 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg2 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f1"); p.SetLastFileSentToANTLR(O.LastText("f1")); p.Deeper();
-                try
+                if (q31)
                 {
 
-
-                    p.SetText(@"¤8");
-
-
-                    //[[commandSpecial]]3
-                    return O.TypeCheck_string(O.Add(smpl, O.Add(smpl, O.HandleString(new ScalarString(@"p1_f1_")), functionarg_xf7dke8cj_11), functionarg_xf7dke8cj_12), 0);
-
-                    //[[commandEnd]]3
-
-
-                    return null;
+                    List<bool> questions32 = new List<bool> { q31 };
+                    List<IVariable> defaultValueCodes33 = new List<IVariable> { i28 };
+                    List<string> types34 = new List<string> { "val" };
+                    List<IVariable> labelCodes35 = new List<IVariable> { O.HandleString(new ScalarString(@"x2")) };
+                    List<IVariable> promptResults36 = O.Prompt(questions32, defaultValueCodes33, types34, labelCodes35);
+                    return O.FunctionLookupNew4(null, null, "f")(smpl, p, false, functionarg_xf7dke8cj_23_func, functionarg_xf7dke8cj_24_func, functionarg_xf7dke8cj_25_func, new GekkoArg((spml37) => promptResults36[0], (spml37) => null));
                 }
-                catch { p.Deeper(); throw; }
-                finally
+
+                else
+
                 {
-                    Program.databanks.local = local2; Program.databanks.localGlobal = lg2; p.RemoveLast(); ;
+
+                    return O.FunctionLookupNew4(null, null, "f")(smpl, p, false, functionarg_xf7dke8cj_23_func, functionarg_xf7dke8cj_24_func, functionarg_xf7dke8cj_25_func, new GekkoArg((spml37) => i28, (spml37) => null));
                 }
+
+
+                return null;
+            });
+
+            O.PrepareUfunction(2, "f");
+
+            O.Add2_UfunctionSpecialName(null, "f", (GekkoSmpl smpl, P p, bool q31, GekkoArg functionarg_xf7dke8cj_23_func, GekkoArg functionarg_xf7dke8cj_24_func) =>
+
+
+            {
+
+                if (q31)
+                {
+
+                    List<bool> questions38 = new List<bool> { q31, q31 };
+                    List<IVariable> defaultValueCodes39 = new List<IVariable> { i27, i28 };
+                    List<string> types40 = new List<string> { "val", "val" };
+                    List<IVariable> labelCodes41 = new List<IVariable> { O.HandleString(new ScalarString(@"x1")), O.HandleString(new ScalarString(@"x2")) };
+                    List<IVariable> promptResults42 = O.Prompt(questions38, defaultValueCodes39, types40, labelCodes41);
+                    return O.FunctionLookupNew4(null, null, "f")(smpl, p, false, functionarg_xf7dke8cj_23_func, functionarg_xf7dke8cj_24_func, new GekkoArg((spml43) => promptResults42[0], (spml43) => null), new GekkoArg((spml44) => promptResults42[1], (spml44) => null));
+                }
+
+                else
+
+                {
+
+                    return O.FunctionLookupNew4(null, null, "f")(smpl, p, false, functionarg_xf7dke8cj_23_func, functionarg_xf7dke8cj_24_func, new GekkoArg((spml43) => i27, (spml43) => null), new GekkoArg((spml44) => i28, (spml44) => null));
+                }
+
+
+                return null;
             });
 
         }
@@ -96,24 +118,15 @@ namespace Gekko
         {
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-            p.SetText(@"¤8");
+            p.SetText(@"¤1");
 
-            FunctionDef7();
+            FunctionDef30();
 
 
             //[[commandEnd]]0
-
-
-            p.SetText(@"¤8");
-
-            FunctionDef13();
-
-
-            //[[commandEnd]]2
 
 
 
         }
     }
 }
-

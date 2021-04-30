@@ -45,7 +45,8 @@ namespace Gekko
         public const string localLibraryString = "Local";  //--> maybe used later
         public const string gekkoLibraryString = "Gekko";  //--> maybe used later
 
-        public const string ufunctionSpecialName = "_UfunctionSpecialName";        
+        public const string functionSpecialName1 = "_UfunctionSpecialName";
+        public const string functionSpecialName2 = "O.FunctionLookupNew";
 
         public static string versionInternal = "";
 
