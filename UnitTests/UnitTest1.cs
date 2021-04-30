@@ -13063,6 +13063,22 @@ namespace UnitTests
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("library global;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" reserved "));
+
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");            
+            I("library p1 as pp1;");
+            FAIL("library p1;");  //because it is the same zip file.
+
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+            I("library p1;");
+            FAIL("library \\Sub\\p1;");  //fail because same name
+
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+            I("library p1;");
+            I("library \\Sub\\p1 as pp1;");  //ok, even though the zip has the same name.
+
         }
 
         [TestMethod]

@@ -235,7 +235,7 @@ namespace Gekko
         public static void LoadLibraryFromZip(O.Library o)
         {
             for (int i = 0; i < o.files.Count; i++)
-            {
+            {                
                 string fileName3 = O.ConvertToString(o.files[i]);
                 string fileName2 = G.AddExtension(fileName3, "." + "zip");
                 string libraryName = Path.GetFileNameWithoutExtension(fileName2);
@@ -251,26 +251,20 @@ namespace Gekko
                     new Error("Could not find library file: " + fileName2);
                 }
 
-                Library hit = null;
-                foreach (Library x in Program.libraries.libraries)
-                {
-                    if (G.Equal(x.GetFileNameWithPath(), fileName))
-                    {
-                        hit = x;
-                        break;
-                    }
-                }
+                Library hit = CheckCache(fileName);
 
                 Library library = null;
                 if (hit != null)
                 {
                     //found in cache, has been loaded before
                     library = hit;
+                    //it may be stored in the .libraryCache under another name than the name part of the zip file (if LIBRARY ... AS ... has been used). 
+                    //It is not legal to open the same zip file as two different libraries, so there should be no dangers here.
+                    //When setting this name, it is changed both in .library and .libraryCache, since it is the same object.
+                    library.SetName(libraryName);  
                 }
                 else
                 {
-
-
                     string tempPath = Program.GetTempGbkFolderPath();
                     if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
                     {
@@ -282,10 +276,8 @@ namespace Gekko
                     }
 
                     Program.WaitForZipRead(tempPath, fileName);
-
                     library = new Library(libraryName, fileName);
                     Program.LibraryExtractor(tempPath, library);
-                    Program.libraries.Add(library);
 
                     try
                     {
@@ -304,7 +296,20 @@ namespace Gekko
                 new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(count, "function") + ". Library path: " + fileName);
             }
         }
-        
+
+        private static Library CheckCache(string fileName)
+        {
+            Library hit = null;
+            foreach (Library x in Program.libraries.libraryCache)
+            {
+                if (G.Equal(x.GetFileNameWithPath(), fileName))
+                {
+                    hit = x;
+                    break;
+                }
+            }
+            return hit;
+        }
 
         /// <summary>
         /// Add a library/package to Gekko. Packages are generally only added, not removed (until
@@ -327,12 +332,20 @@ namespace Gekko
             {
                 if (G.Equal(x.GetName(), library.GetName()))
                 {
-                    new Error("Library '" + library.GetName() + "' is already loaded, cf. LIBRARY ?.");
+                    new Error("There is already a library with the name '" + library.GetName() + "', cf. LIBRARY ?.");
+                }
+                if (G.Equal(x.GetFileNameWithPath(), library.GetFileNameWithPath()))
+                {
+                    using (Error error = new Error())
+                    {
+                        error.MainAdd("The existing library '" + x.GetName() + "' also represents the file '" + library.GetFileNameWithPath() + "', and the same library .zip file cannot be loaded/opened two times");
+                    }
                 }
             }
 
             this.libraries.Add(library);
-            this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
+            Library hit = CheckCache(library.GetFileNameWithPath());
+            if (hit == null) this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
 
         }
 
@@ -411,12 +424,7 @@ namespace Gekko
         /// Filename of zip. Can be null, for the global library.
         /// </summary>
         private string fileNameWithPath = null;
-
-        /// <summary>
-        /// The different functions of the library.
-        /// </summary>
-        /// 
-
+                
         /// <summary>
         /// Create a new package/library.
         /// </summary>
@@ -437,6 +445,11 @@ namespace Gekko
         public string GetName()
         {
             return this.name;
+        }
+
+        public void SetName(string s)
+        {
+            this.name = s;
         }
 
         public string GetFileNameWithPath()
