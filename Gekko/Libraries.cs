@@ -182,12 +182,13 @@ namespace Gekko
         /// <summary>
         /// Get a function from the loaded libraries/packages. If libraryName == null, Gekko will search for the function,
         /// in the list of libraries (first opened first). If libraryName != null, only this particular library will be searched
-        /// for the function. 
+        /// for the function. When libraryName == null, and callingLibraryName != null, the callingLibraryName will be searched
+        /// first, so that functions in the same library have priority.
         /// We are obtaining a GekkoFunction of a particular name, and the GekkoFunction contains all overloads inside.
         /// </summary>
         /// <param name="functionName"></param>
         /// <returns></returns>
-        public GekkoFunction GetFunction(string libraryName, string functionName)
+        public GekkoFunction GetFunction(string callingLibraryName, string libraryName, string functionName)
         {            
             GekkoFunction rv = null;
 
@@ -198,10 +199,29 @@ namespace Gekko
             }
             else
             {
-                foreach (Library thisLib in  this.libraries)
+                if (callingLibraryName == null)
                 {
-                    rv = thisLib.GetFunction(functionName, false);
-                    if (rv != null) break;
+                    foreach (Library thisLib in this.libraries)
+                    {
+                        rv = thisLib.GetFunction(functionName, false);
+                        if (rv != null) break;
+                    }
+                }
+                else
+                {
+                    //first we try the calling library
+                    Library callingLibrary = this.GetLibrary(callingLibraryName, true);  //cannot give an error, must exist
+                    rv = callingLibrary.GetFunction(functionName, false);
+                    if (rv == null)
+                    {
+                        //then we search the rest normally
+                        foreach (Library thisLib2 in this.libraries)
+                        {
+                            if (thisLib2 == callingLibrary) continue;  //skip this, we have tested it, and the function does not exist.
+                            rv = thisLib2.GetFunction(functionName, false);
+                            if (rv != null) break;
+                        }
+                    }
                 }
 
                 if (rv == null)
