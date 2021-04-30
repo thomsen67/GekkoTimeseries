@@ -33,12 +33,15 @@ namespace Gekko
     public class Libraries
     {
         /// <summary>
-        /// All items (loaded packages). Never unloaded, so the items list can only grow.
-        /// The hierarchy list tells which packages are actually active, and in what order.
-        /// </summary>
-        
-        private List<Library> libraries = new List<Library>();        
-        
+        /// Active libraries. There are also non-active libraries in .libraryCache.
+        /// </summary>        
+        private List<Library> libraries = new List<Library>();
+
+        /// <summary>
+        /// All historically loaded libraries. Active libraries are in .libraries.
+        /// </summary>        
+        private List<Library> libraryCache = new List<Library>();
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -248,37 +251,60 @@ namespace Gekko
                     new Error("Could not find library file: " + fileName2);
                 }
 
-                string tempPath = Program.GetTempGbkFolderPath();
-                if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
+                Library hit = null;
+                foreach (Library x in Program.libraries.libraries)
                 {
-                    Directory.CreateDirectory(tempPath);
+                    if (G.Equal(x.GetFileNameWithPath(), fileName))
+                    {
+                        hit = x;
+                        break;
+                    }
+                }
+
+                Library library = null;
+                if (hit != null)
+                {
+                    //found in cache, has been loaded before
+                    library = hit;
                 }
                 else
                 {
-                    Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
+
+
+                    string tempPath = Program.GetTempGbkFolderPath();
+                    if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
+                    {
+                        Directory.CreateDirectory(tempPath);
+                    }
+                    else
+                    {
+                        Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
+                    }
+
+                    Program.WaitForZipRead(tempPath, fileName);
+
+                    library = new Library(libraryName, fileName);
+                    Program.LibraryExtractor(tempPath, library);
+                    Program.libraries.Add(library);
+
+                    try
+                    {
+                        G.DeleteFolder(tempPath);
+                    }
+                    catch
+                    {
+                        //not catastrofic if this fails
+                    }
                 }
 
-                Program.WaitForZipRead(tempPath, fileName);
-
-                Library library = new Library(libraryName, fileName);
-                Program.LibraryExtractor(tempPath, library);
                 Program.libraries.Add(library);
-
-                try
-                {
-                    G.DeleteFolder(tempPath);
-                }
-                catch
-                {
-                    //not catastrofic if this fails
-                }
 
                 int count = library.GetFunctionNames().Count;
 
                 new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(count, "function") + ". Library path: " + fileName);
             }
         }
-
+        
 
         /// <summary>
         /// Add a library/package to Gekko. Packages are generally only added, not removed (until
@@ -306,6 +332,8 @@ namespace Gekko
             }
 
             this.libraries.Add(library);
+            this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
+
         }
 
         /// <summary>
@@ -395,8 +423,11 @@ namespace Gekko
         /// <param name="name"></param>
         public Library(string name, string fileNameWithPath)
         {
-            this.name = name;
-            this.fileNameWithPath = fileNameWithPath;
+            //this.name = name;
+            //this.fileNameWithPath = fileNameWithPath;
+            if (name != null) this.name = name.Trim();
+            if (fileNameWithPath != null) this.fileNameWithPath = fileNameWithPath.Trim();
+
         }
 
         /// <summary>
@@ -406,6 +437,11 @@ namespace Gekko
         public string GetName()
         {
             return this.name;
+        }
+
+        public string GetFileNameWithPath()
+        {
+            return this.fileNameWithPath;
         }
 
         private GekkoDictionary<string, GekkoFunction> functions = new GekkoDictionary<string, GekkoFunction>(StringComparer.OrdinalIgnoreCase);
