@@ -29,7 +29,6 @@ using System.Windows;
 using System.Threading;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-//using System.Windows.Media.FontFamily;
 
 
 namespace Gekko

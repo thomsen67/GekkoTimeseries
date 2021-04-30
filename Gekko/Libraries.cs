@@ -305,7 +305,7 @@ namespace Gekko
 
                     Program.WaitForZipRead(tempPath, fileNameWithPath);
                     library = new Library(libraryName, fileNameWithPath);
-                    Program.LibraryExtractor(tempPath, library);
+                    library.LibraryExtractor(tempPath);
 
                     try
                     {
@@ -417,6 +417,8 @@ namespace Gekko
         /// Filename of zip. Can be null, for the global library.
         /// </summary>
         private string fileNameWithPath = null;
+
+        GekkoFunction fastLookup = null;
                 
         /// <summary>
         /// Create a new package/library.
@@ -498,8 +500,150 @@ namespace Gekko
                 this.fastLookup = rv;
             }
             return rv;
+        }        
+
+        /// <summary>
+        /// Finds all .gcm files in a folder structure, and extracts functions/procedures.
+        /// </summary>
+        /// <param name="targetDirectory"></param>
+        public void LibraryExtractor(string targetDirectory)
+        {
+            // Process the list of files found in the directory.
+            string[] fileEntries = Directory.GetFiles(targetDirectory);
+            foreach (string fileName in fileEntries)
+            {
+                if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.LibraryExtractorHandleGcmFile(fileName);
+                }
+            }
+
+            // Recurse into subdirectories of this directory.
+            string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+            foreach (string subdirectory in subdirectoryEntries)
+            {
+                this.LibraryExtractor(subdirectory);
+            }
         }
-        GekkoFunction fastLookup = null;
+
+        /// <summary>
+        /// Extract function/procedure code as text.
+        /// </summary>
+        /// <param name="file"></param>
+        private void LibraryExtractorHandleGcmFile(string file)
+        {
+            // ...
+            // ...
+            // function ...           --> or procedure
+            // ...
+            // ...
+            // function ...
+            // ...
+            // ...
+
+            // will be cut like this:
+
+            //=========================================
+            // ...
+            // ...
+            // function ...                                functionNames[0], functionCounter = 1
+            // ...
+            // ...
+            //=========================================
+            // function ...                                functionNames[1], functionCounter = 2
+            // ...
+            // ...
+            //=========================================
+
+            //It basically cuts before second "function" and so on.
+
+            string s = Program.GetTextFromFileWithWait(file);
+            int fat = 5;
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };
+            TokenHelper t2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(s, tags1, tags2, null, null);
+
+            int functionCounter = 0;
+            int i0 = 0;
+            List<string> functionNamesLower = new List<string>();
+            for (int i = 0; i < t2.subnodes.Count(); i++)
+            {
+                //for instance "function val f(val %x); ... ; end;"   --> function must be followed by two words at least
+                //or "procedure f val %x; ... ; end;                  --> procedure must be followed by one word at least
+                //both must be first line or follow a ";"
+                //this will guard against for instance series definitions like "function = 3;" or "procedure = 3;" (unlikely though).
+
+                if (t2.subnodes[i].type == ETokenType.Word && (G.Equal(t2.subnodes[i].s, "function") || G.Equal(t2.subnodes[i].s, "procedure")))
+                {
+                    bool isFunction = false;
+                    if (G.Equal(t2.subnodes[i].s, "function")) isFunction = true;
+
+                    TokenHelper th1 = null;
+                    TokenHelper th2 = null;
+                    TokenHelper th3 = null;
+                    th1 = t2.subnodes[i].SiblingBefore(1, true);
+                    th2 = t2.subnodes[i].SiblingAfter(1, true);
+                    th3 = t2.subnodes[i].SiblingAfter(2, true);
+                    bool problem = false;
+                    if (th1 != null && th1.s != ";") problem = true;
+                    if (th2 == null || th2.type != ETokenType.Word) problem = true; //
+                    if (isFunction && (th3 == null || th3.type != ETokenType.Word)) problem = true;
+
+                    if (!problem)
+                    {
+
+                        functionCounter++;
+
+                        if (isFunction)
+                        {
+                            TokenHelper temp2 = t2.subnodes[i].SiblingAfter(2, true);  //skips comments, newlines, etc.
+                            functionNamesLower.Add(temp2.s.ToLower());
+                        }
+                        else
+                        {
+                            TokenHelper temp2 = t2.subnodes[i].SiblingAfter(1, true);  //skips comments, newlines, etc.
+                            functionNamesLower.Add(Globals.procedure + temp2.s.ToLower());
+                        }
+
+                        if (functionCounter >= 2)
+                        {
+                            this.LibraryExtractorGetFunctionCode(i0, i, functionNamesLower[functionCounter - 2], t2.subnodes);
+                            i0 = i;
+                        }
+                    }
+                }
+            }
+
+            if (functionCounter > 0) this.LibraryExtractorGetFunctionCode(i0, t2.subnodes.Count(), functionNamesLower[functionNamesLower.Count - 1], t2.subnodes);  //get the rest
+        }
+
+        /// <summary>
+        /// Extracts the code (as text) corresponding to one function/procedure definition. Puts it into the corresponding library object.
+        /// Starts at token i0 (included), and ends 1 token before token i (so i is excluded).
+        /// </summary>
+        /// <param name="library"></param>
+        /// <param name="i0"></param>
+        /// <param name="i"></param>
+        /// <param name="th"></param>
+        /// <param name="t"></param>
+        private void LibraryExtractorGetFunctionCode(int i0, int i, string functionNameLower, TokenList t)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i2 = i0; i2 < i; i2++)
+            {
+                sb.Append(t[i2].ToString());
+            }
+
+            GekkoFunction function = null;
+            function = this.GetFunction(functionNameLower, false);
+            if (function == null)
+            {
+                function = new GekkoFunction(functionNameLower);
+                this.AddFunction(function);
+            }
+            function.code += sb.ToString();
+        }
+
     }
 
     public class GekkoFunction

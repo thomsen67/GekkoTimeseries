@@ -5300,6 +5300,10 @@ namespace Gekko
         /// <returns></returns>
         public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> FunctionLookupNew2(string library, string name)
         {
+            qwerty
+            //WE need something that identifies calling lib1 --> library lib2; prt f(), where f() calls ff(), and when ff() is called,
+            //it must know that it is called from a lib1 function.
+            
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> rv = null;
             GekkoFunction f = Program.libraries.GetFunction(library, name);
