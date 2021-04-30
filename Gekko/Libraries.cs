@@ -246,13 +246,40 @@ namespace Gekko
                 folders.Add(Program.options.folder_command);
                 folders.Add(Program.options.folder_command1);
                 folders.Add(Program.options.folder_command2);
-                string fileName = Program.FindFile(fileName2, folders);  //also calls CreateFullPathAndFileName()
-                if (fileName == null)
+                string fileNameWithPath = Program.FindFile(fileName2, folders);  //also calls CreateFullPathAndFileName()
+                if (fileNameWithPath == null)
                 {
                     new Error("Could not find library file: " + fileName2);
                 }
 
-                Library hit = this.CheckCache(fileName);
+
+                // library p1; library p2; library p3;   installed = p1, p2, p3     libraries = p1, p2, p3
+                // library <remove> p2;                  installed = p1, p2, p3     libraries = p1, p3
+                // library p2;                           installed = p1, p2, p3     libraries = p1, p3, p2            
+
+                if (libraryName == null)
+                {
+                    new Error("Library name cannot be null");  //probably cannot happen?
+                }
+
+                foreach (Library x in this.libraries)
+                {
+                    if (G.Equal(x.GetName(), libraryName))
+                    {
+                        new Error("There is already a library with the name '" + libraryName + "', cf. LIBRARY ?.");
+                    }
+                    if (G.Equal(x.GetFileNameWithPath(), fileNameWithPath))
+                    {
+                        using (Error error = new Error())
+                        {
+                            error.MainAdd("The existing library '" + x.GetName() + "' also represents the file '" + fileNameWithPath + "', and the same library .zip file cannot be loaded/opened two times");
+                        }
+                    }
+                }
+
+                //We know that the zip file name is not in .libraries, but it could be in cache.
+                //If so, no need to process the zip file, just take the cache object.
+                Library hit = this.CheckCache(fileNameWithPath);
 
                 Library library = null;
                 if (hit != null)
@@ -276,8 +303,8 @@ namespace Gekko
                         Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
                     }
 
-                    Program.WaitForZipRead(tempPath, fileName);
-                    library = new Library(libraryName, fileName);
+                    Program.WaitForZipRead(tempPath, fileNameWithPath);
+                    library = new Library(libraryName, fileNameWithPath);
                     Program.LibraryExtractor(tempPath, library);
 
                     try
@@ -288,15 +315,16 @@ namespace Gekko
                     {
                         //not catastrofic if this fails
                     }
-                }
 
-                this.AddLibrary(library);
+                    //all files loaded from .zip end up here, and the cache only grows (cannot shrink).
+                    this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
+                }                    
+
+                this.libraries.Add(library);                
 
                 int count = library.GetFunctionNames().Count;
-
                 //TODO TODO: use Q() to print funcs/procs separately.
-
-                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(count, "function") + ". Library path: " + fileName);
+                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(count, "function") + ". Library path: " + fileNameWithPath);
             }
         }
 
@@ -312,50 +340,7 @@ namespace Gekko
                 }
             }
             return hit;
-        }
-
-        /// <summary>
-        /// Add a library/package to Gekko. 
-        /// This method is much like adding it to the .library list directly, but
-        /// the method also handles the cache.
-        /// </summary>
-        /// <param name="library"></param>
-        public void AddLibrary(Library library)
-        {
-            // library p1; library p2; library p3;   installed = p1, p2, p3     libraries = p1, p2, p3
-            // library <remove> p2;                  installed = p1, p2, p3     libraries = p1, p3
-            // library p2;                           installed = p1, p2, p3     libraries = p1, p3, p2            
-
-            if (library.GetName() == null)
-            {
-                new Error("Library name cannot be null");  //probably cannot happen?
-            }
-
-            foreach (Library x in this.libraries)
-            {
-                if (G.Equal(x.GetName(), library.GetName()))
-                {
-                    new Error("There is already a library with the name '" + library.GetName() + "', cf. LIBRARY ?.");
-                }
-                if (G.Equal(x.GetFileNameWithPath(), library.GetFileNameWithPath()))
-                {
-                    using (Error error = new Error())
-                    {
-                        error.MainAdd("The existing library '" + x.GetName() + "' also represents the file '" + library.GetFileNameWithPath() + "', and the same library .zip file cannot be loaded/opened two times");
-                    }
-                }
-            }
-
-            this.libraries.Add(library);
-
-            if (library.GetFileNameWithPath() != null)
-            {
-                //do not add to cache if it is the Global lib, or another lib not from a .zip file.
-                Library hit = this.CheckCache(library.GetFileNameWithPath());
-                if (hit == null) this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
-            }
-
-        }
+        }        
 
         /// <summary>
         /// Close the library, so its functions cannot be used. The library will stay in the cache, though.
