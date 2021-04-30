@@ -47,7 +47,8 @@ namespace Gekko
         /// </summary>
         public Libraries()
         {
-            this.Add(new Library(Globals.globalLibraryString, null));
+            //Is always born with an empty Global library
+            this.libraries.Add(new Library(Globals.globalLibraryString, null));
         }
 
         /// <summary>
@@ -232,10 +233,10 @@ namespace Gekko
         /// a Library object for later use. Does not compile the code, this is done lazily.
         /// </summary>
         /// <param name="o"></param>
-        public static void LoadLibraryFromZip(O.Library o)
+        public void LoadLibraryFromZip(O.Library o)
         {
             for (int i = 0; i < o.files.Count; i++)
-            {                
+            {
                 string fileName3 = O.ConvertToString(o.files[i]);
                 string fileName2 = G.AddExtension(fileName3, "." + "zip");
                 string libraryName = Path.GetFileNameWithoutExtension(fileName2);
@@ -251,7 +252,7 @@ namespace Gekko
                     new Error("Could not find library file: " + fileName2);
                 }
 
-                Library hit = CheckCache(fileName);
+                Library hit = this.CheckCache(fileName);
 
                 Library library = null;
                 if (hit != null)
@@ -261,7 +262,7 @@ namespace Gekko
                     //it may be stored in the .libraryCache under another name than the name part of the zip file (if LIBRARY ... AS ... has been used). 
                     //It is not legal to open the same zip file as two different libraries, so there should be no dangers here.
                     //When setting this name, it is changed both in .library and .libraryCache, since it is the same object.
-                    library.SetName(libraryName);  
+                    library.SetName(libraryName);
                 }
                 else
                 {
@@ -289,18 +290,20 @@ namespace Gekko
                     }
                 }
 
-                Program.libraries.Add(library);
+                this.AddLibrary(library);
 
                 int count = library.GetFunctionNames().Count;
+
+                //TODO TODO: use Q() to print funcs/procs separately.
 
                 new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(count, "function") + ". Library path: " + fileName);
             }
         }
 
-        private static Library CheckCache(string fileName)
+        private Library CheckCache(string fileName)
         {
             Library hit = null;
-            foreach (Library x in Program.libraries.libraryCache)
+            foreach (Library x in this.libraryCache)
             {
                 if (G.Equal(x.GetFileNameWithPath(), fileName))
                 {
@@ -312,12 +315,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Add a library/package to Gekko. Packages are generally only added, not removed (until
-        /// RESET/RESTART). A library contains functions/methods, often stored in a zip-file.
-        /// If the library is already there (loaded), the method is ignored.        /// 
+        /// Add a library/package to Gekko. 
+        /// This method is much like adding it to the .library list directly, but
+        /// the method also handles the cache.
         /// </summary>
         /// <param name="library"></param>
-        public void Add(Library library)
+        public void AddLibrary(Library library)
         {
             // library p1; library p2; library p3;   installed = p1, p2, p3     libraries = p1, p2, p3
             // library <remove> p2;                  installed = p1, p2, p3     libraries = p1, p3
@@ -344,8 +347,13 @@ namespace Gekko
             }
 
             this.libraries.Add(library);
-            Library hit = CheckCache(library.GetFileNameWithPath());
-            if (hit == null) this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
+
+            if (library.GetFileNameWithPath() != null)
+            {
+                //do not add to cache if it is the Global lib, or another lib not from a .zip file.
+                Library hit = this.CheckCache(library.GetFileNameWithPath());
+                if (hit == null) this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
+            }
 
         }
 
@@ -353,14 +361,14 @@ namespace Gekko
         /// Close the library, so its functions cannot be used. The library will stay in the cache, though.
         /// </summary>
         /// <param name="libraryName"></param>
-        public void Close(string libraryName)
+        public void CloseLibrary(string libraryName)
         {
             if (libraryName == "*")
             {
                 int count = this.libraries.Count;  //includes 'Global'
                 Library global = this.GetLibrary(Globals.globalLibraryString, true); //cannot be non-existing
                 this.libraries = new List<Library>();
-                this.Add(global);                
+                this.libraries.Add(global);                
                 new Writeln("Closed " + G.AddS(count - 1, "library") + ", not including the Global library).");
             }
             else
@@ -385,7 +393,7 @@ namespace Gekko
             }
         }        
 
-        public void Clear(string libraryName)
+        public void ClearLibrary(string libraryName)
         {
             bool found = false;
             for (int i = 0; i < this.libraries.Count; i++)

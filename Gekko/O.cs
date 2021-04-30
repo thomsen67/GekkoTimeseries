@@ -7290,7 +7290,7 @@ namespace Gekko
                 List<string> items = O.Restrict(this.listItems, false, false, false, false);
                 foreach (string item in items)
                 {
-                    Program.libraries.Close(item);
+                    Program.libraries.CloseLibrary(item);
                 }
             }
         }
@@ -7303,7 +7303,7 @@ namespace Gekko
                 List<string> items = O.Restrict(this.listItems, false, false, false, false);
                 foreach (string item in items)
                 {
-                    Program.libraries.Clear(item);
+                    Program.libraries.ClearLibrary(item);
                 }
             }
         }
@@ -7318,7 +7318,7 @@ namespace Gekko
 
             public void Exe()
             {                
-                Libraries.LoadLibraryFromZip(this);
+                Program.libraries.LoadLibraryFromZip(this);
             }
 
             public static void Q()

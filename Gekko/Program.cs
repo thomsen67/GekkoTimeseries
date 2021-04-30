@@ -1235,7 +1235,7 @@ namespace Gekko
         /// <summary>
         /// User-defined functions/procedures.
         /// </summary>
-        public static Libraries libraries = new Libraries();
+        public static Libraries libraries = null;  //is initialized somewhere else, no need to do it here.
 
         /// <summary>
         /// Helper for name aliases
