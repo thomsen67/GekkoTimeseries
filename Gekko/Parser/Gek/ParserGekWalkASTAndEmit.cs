@@ -506,6 +506,22 @@ namespace Gekko.Parser.Gek
                 node.commandLinesCounter = node.Parent.commandLinesCounter + s;  //default, may be overridden if new command is encountered.               
             }
 
+            if (absoluteDepth == 1 && w.libraryName != null)
+            {
+                //a command at the first indentation level
+                if (node.Text == "ASTFUNCTIONDEF2" || node.Text == "ASTPROCEDUREDEF")
+                {
+                    //good
+                }
+                else
+                {
+                    using (Error error = new Error())
+                    {
+                        error.MainAdd("ERROR!!");
+                    }
+                }
+            }
+
             //HACK #438543
             if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
             {
@@ -521,14 +537,7 @@ namespace Gekko.Parser.Gek
                 w.commandLinesCounter++;  //becomes 0 first time here (starts at -1)
                 node.commandLinesCounter = w.commandLinesCounter.ToString(); //used for the O(node)-method, so that o0, o1, o2 numbers do not suddenly change after for instance a FOR.
                 w.expressionCounter = -1;  //for labels in PRT elements
-            }
-            
-            if (relativeDepth == 1)
-            {
-                //see at #2384328423
-                //node.Code.A(G.NL + Globals.commandStart + Num(node) + G.NL);
-            }
-
+            }            
 
             //Before sub-nodes
             switch (node.Text)
@@ -569,7 +578,7 @@ namespace Gekko.Parser.Gek
                     {
                         if (SearchUpwardsInTree8(node) != null)
                         {
-                            G.Writeln2("***ERROR: Function definition inside function definition is not allowed");
+                            new Error("Function definition inside function definition is not allowed");
                             throw new GekkoException();
                         }
                         string returnType = node[0].Text;

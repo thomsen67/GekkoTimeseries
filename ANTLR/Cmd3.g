@@ -61,6 +61,7 @@ tokens {
     ASTDECOMPSELECT;
 	ASTFILENAMESTRING;
 	ASTBLOCKOPTION;
+	ASTBLOCKSTATEMENTS;
 	ASTNAKEDLISTITEM;
 	ASTNAKEDLIST;
 	ASTL1;
@@ -3090,7 +3091,7 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 // BLOCK
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({token("ASTBLOCK", ASTBLOCK, input.LT(1).Line)} ^(ASTPLACEHOLDER blockOpt1?) ^(ASTPLACEHOLDER functionStatements));
+block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({token("ASTBLOCK", ASTBLOCK, input.LT(1).Line)} ^(ASTPLACEHOLDER blockOpt1?) ^(ASTBLOCKSTATEMENTS functionStatements));
 
 blockOpt1:                  blockOpt1h (COMMA2 blockOpt1h)* -> blockOpt1h+;
 

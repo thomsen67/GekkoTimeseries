@@ -13041,6 +13041,29 @@ namespace UnitTests
             FAIL("%y2 = p2:f1('a', 'b');");
 
             // ------------------------------------------------------------
+            // calling function from own library has priority
+            // ------------------------------------------------------------  
+
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+            I("library p4, p5;");
+            I("%s = f1();");  //will find f1() only in p5. It points to f2(), which is normally first found in p4. But it uses the version from same lib, p5.            
+            _AssertScalarString(First(), "%s", "p5");
+
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+            I("library p5;");
+            I("function string f2(); return 'Global'; end;");
+            I("%s = f1();");  //will find f1() only in p5. It points to f2(), which is normally first found in Global. But it uses the version from same lib, p5.
+            _AssertScalarString(First(), "%s", "p5");            
+
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+            I("library p4, p5;");
+            I("%s = f2();");  //will find f2() in p4 first.
+            _AssertScalarString(First(), "%s", "p4");
+
+            // ------------------------------------------------------------
             // errors
             // ------------------------------------------------------------  
 
