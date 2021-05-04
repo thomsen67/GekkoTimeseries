@@ -48,7 +48,7 @@ namespace Gekko
         public Libraries()
         {
             //Is always born with an empty Global library
-            this.libraries.Add(new Library(Globals.globalLibraryString, null));
+            this.libraries.Add(new Library(Globals.globalLibraryString, null, new DateTime(0l)));
         }
 
         /// <summary>
@@ -272,7 +272,6 @@ namespace Gekko
                     new Error("Could not find library file: " + fileName2);
                 }
 
-
                 // library p1; library p2; library p3;   installed = p1, p2, p3     libraries = p1, p2, p3
                 // library <remove> p2;                  installed = p1, p2, p3     libraries = p1, p3
                 // library p2;                           installed = p1, p2, p3     libraries = p1, p3, p2            
@@ -297,9 +296,21 @@ namespace Gekko
                     }
                 }
 
+                DateTime stamp = File.GetLastWriteTime(fileNameWithPath);                
+
                 //We know that the zip file name is not in .libraries, but it could be in cache.
                 //If so, no need to process the zip file, just take the cache object.
                 Library hit = this.CheckCache(fileNameWithPath);
+
+                if (hit != null && hit.GetStamp().Ticks != 0l && stamp.CompareTo(hit.GetStamp()) != 0)
+                {
+                    //if .Tics == 0l, it is the Global library.
+                    //if not, we compare the stamp from the .zip file with the stored stamp.
+                    //if different, we need to reload the .zip (because it has been altered).
+                    //so we just remove it from cache, and sets hit = null.
+                    hit = null;
+                    this.RemoveFromCache(fileNameWithPath);  //further down, the updated .zip file will be put into the cache, so the old version needs to be removed first.
+                }
 
                 Library library = null;
                 if (hit != null)
@@ -324,7 +335,7 @@ namespace Gekko
                     }
 
                     Program.WaitForZipRead(tempPath, fileNameWithPath);
-                    library = new Library(libraryName, fileNameWithPath);
+                    library = new Library(libraryName, fileNameWithPath, stamp);
                     library.LibraryExtractor(tempPath);
 
                     try
@@ -348,6 +359,11 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Find a Library object from cache.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private Library CheckCache(string fileName)
         {
             Library hit = null;
@@ -360,7 +376,37 @@ namespace Gekko
                 }
             }
             return hit;
-        }        
+        }
+
+        /// <summary>
+        /// Remove the lib file from cache. Only call if CheckCache() returns not-null.
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void RemoveFromCache(string fileName)
+        {
+            bool hit = false;
+            List<Library> temp = new List<Library>();
+            foreach (Library x in this.libraryCache)
+            {
+                if (G.Equal(x.GetFileNameWithPath(), fileName))
+                {
+                    hit = true;
+                }
+                else
+                {
+                    temp.Add(x);
+                }
+            }
+
+            if (hit == false)
+            {
+                new Error("Internal error #7899342y34357, could not remove from cache");
+            }
+
+            this.libraryCache = temp;
+
+            return;
+        }
 
         /// <summary>
         /// Close the library, so its functions cannot be used. The library will stay in the cache, though.
@@ -409,7 +455,7 @@ namespace Gekko
                     found = true;
                     if (IsReservedName(libraryName))
                     {
-                        this.libraries[i] = new Library(x.GetName(), null);
+                        this.libraries[i] = new Library(x.GetName(), null, new DateTime(0l));  //can only be done for the Global lib.
                         new Writeln("Library '" + libraryName + "' is now cleared (empty).");
                         break;
                     }
@@ -438,19 +484,24 @@ namespace Gekko
         /// </summary>
         private string fileNameWithPath = null;
 
+        /// <summary>
+        /// Stamp: when the file was written.
+        /// </summary>
+        private DateTime stamp = new DateTime(0l);  //null
+
         GekkoFunction fastLookup = null;
                 
         /// <summary>
         /// Create a new package/library.
         /// </summary>
         /// <param name="name"></param>
-        public Library(string name, string fileNameWithPath)
+        public Library(string name, string fileNameWithPath, DateTime stamp)
         {
             //this.name = name;
             //this.fileNameWithPath = fileNameWithPath;
             if (name != null) this.name = name.Trim();
             if (fileNameWithPath != null) this.fileNameWithPath = fileNameWithPath.Trim();
-
+            this.stamp = stamp;
         }
 
         /// <summary>
@@ -470,6 +521,11 @@ namespace Gekko
         public string GetFileNameWithPath()
         {
             return this.fileNameWithPath;
+        }
+
+        public DateTime GetStamp()
+        {
+            return this.stamp;
         }
 
         private GekkoDictionary<string, GekkoFunction> functions = new GekkoDictionary<string, GekkoFunction>(StringComparer.OrdinalIgnoreCase);
