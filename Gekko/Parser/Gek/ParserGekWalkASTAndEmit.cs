@@ -517,7 +517,7 @@ namespace Gekko.Parser.Gek
                 {
                     using (Error error = new Error())
                     {
-                        error.MainAdd("ERROR!!");
+                        error.MainAdd("You can only put functions and procedures inside libraries, not normal statements.");
                     }
                 }
             }

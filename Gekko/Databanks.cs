@@ -170,7 +170,6 @@ namespace Gekko
                 if (openType == EOpenType.Normal || openType == EOpenType.Last)
                 {
                     new Error("The 'Work' databank cannot be opened or closed (it is always open).");
-                    //throw new GekkoException();
                 }
                 else if (openType == EOpenType.First)
                 {
@@ -190,7 +189,6 @@ namespace Gekko
                 if (openType == EOpenType.Normal)
                 {
                     new Error("The '" + Globals.Ref + "' databank cannot be opened or closed (it is always open).");
-                    //throw new GekkoException();
                 }
                 else if (openType == EOpenType.First)
                 {
@@ -199,7 +197,6 @@ namespace Gekko
                 else if (openType == EOpenType.Last)
                 {
                     new Error("You cannot use OPEN<last> with the '" + Globals.Ref + "' databank.");
-                    //throw new GekkoException();
                 }
                 else if (openType == EOpenType.Edit)
                 {
@@ -208,28 +205,23 @@ namespace Gekko
                 else if (openType == EOpenType.Ref)
                 {
                     new Error("You cannot use OPEN<ref> with the '" + Globals.Ref + "' databank.");
-                    //throw new GekkoException();
                 }
             }
             else if (G.Equal(name, Globals.First))
             {
                 new Error("The databank name 'First' is reserved and cannot be used.");
-                //throw new GekkoException();
             }
             else if (G.Equal(name, Globals.All))
             {
                 new Error("The databank name 'All' is reserved and cannot be used.");
-                //throw new GekkoException();
             }
             else if (G.Equal(name, Globals.Local))
             {
                 new Error("The databank name 'Local' is reserved and cannot be used.");
-                //throw new GekkoException();
             }
             else if (G.Equal(name, Globals.Global))
             {
                 new Error("The databank name 'Global' is reserved and cannot be used.");
-                //throw new GekkoException();
             }
 
             //string name = databank.name;
@@ -305,8 +297,7 @@ namespace Gekko
             }
             else if (openType == EOpenType.Ref)
             {
-                new Error("OPEN <ref> not allowed.");
-                //throw new GekkoException();                
+                new Error("OPEN <ref> not allowed.");        
             }
             return rv;
         }
@@ -338,7 +329,6 @@ namespace Gekko
             else if (openType == EOpenType.Ref)
             {
                 new Error("OPEN <ref> not allowed.");
-                //throw new GekkoException();
             }
             else if (ShouldPutBankLast(openType, openPosition))
             {

@@ -7544,14 +7544,12 @@ namespace Gekko
                 {
                     create = true;
                 }
-
-                //hlp.openFileNames = this.openFileNames;
+                
                 hlp.openFileNames = new List<List<string>>();
 
                 if (openFileNamesAs != null && openFileNames.list.Count != openFileNamesAs.list.Count)
                 {
-                    new Error("Provided " + openFileNames.list.Count + " filenames, but got only " + openFileNamesAs.list.Count + " alias (AS) names");
-                    //throw new GekkoException();
+                    new Error("Provided " + openFileNames.list.Count + " filenames, but got only " + openFileNamesAs.list.Count + " alias (AS) names");                    
                 }
 
                 for (int i = 0; i < openFileNames.list.Count; i++)
@@ -7580,7 +7578,6 @@ namespace Gekko
                 if (this.opt_gdx == "yes") hlp.Type = EDataFormat.Gdx;
                 if (this.opt_px == "yes") hlp.Type = EDataFormat.Px;
                 if (this.opt_cols == "yes") hlp.Orientation = "cols";
-                //if (this.as2 != null) hlp.As = this.as2;
 
                 hlp.gdxopt = this.opt_gdxopt;
 
@@ -7593,12 +7590,10 @@ namespace Gekko
                 if (posCounter > 1)
                 {
                     new Error("You are using > 1 of first/last/pos/ref designations inside <>-field");
-                    //throw new GekkoException();
                 }
                 if (G.Equal(opt_edit, "yes") && posCounter > 0)
                 {
-                    new Error("You cannot mix 'edit' with first/last/pos/ref designations inside <>-field");
-                    //throw new GekkoException();
+                    new Error("You cannot mix 'edit' with first/last/pos/ref designations inside <>-field");                    
                 }
                 if (G.Equal(opt_first, "yes"))
                 {
@@ -7615,9 +7610,8 @@ namespace Gekko
                 }
                 if (G.Equal(opt_ref, "yes"))
                 {
-                    new Error("OPEN<ref> is not allowed in Gekko 3.0, please use READ<ref> or IMPORT<ref> instead");
-                    //throw new GekkoException();
-                    //hlp.openType = EOpenType.Ref;
+                    new Error("OPEN<ref> is not allowed in Gekko 3.0, please use READ<ref> or IMPORT<ref> instead");                    
+                    hlp.openType = EOpenType.Ref;                    
                 }
                 if (G.Equal(opt_sec, "yes"))
                 {
@@ -7629,7 +7623,6 @@ namespace Gekko
                     if (G.ConvertToInt(out hlp.openTypePosition, opt_pos) == false)
                     {
                         new Error("OPEN<pos=...> should be integer value");
-                        //throw new GekkoException();
                     }
                 }
 

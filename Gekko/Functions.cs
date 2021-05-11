@@ -786,6 +786,18 @@ namespace Gekko
             return Globals.scalarVal0;
         }
 
+        public static IVariable islibraryloaded(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            string s1 = O.ConvertToString(x1);
+            if (G.Equal(s1, Globals.globalLibraryString)) return Globals.scalarVal1;  //always open
+
+            foreach (Library lib in Program.libraries.GetLibraries())
+            {                
+                if (G.Equal(lib.GetName(), s1)) return Globals.scalarVal1;
+            }
+            return Globals.scalarVal0;
+        }
+
         public static IVariable concat(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //same as %s1 + %s2 anyway.
