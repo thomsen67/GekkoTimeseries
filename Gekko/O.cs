@@ -5576,15 +5576,18 @@ namespace Gekko
             }
             else
             {
-                P p = new P();
-                string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(f.code);
-                string commandLinesFlat = Program.HandleGekkoCommands(text0);
-                Parser.ParseHelper ph = new Parser.ParseHelper();
-                ph.commandsText = commandLinesFlat;
-                ph.libraryName = f.libraryName;
-                Parser.ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
-                ch.commandsText = commandLinesFlat;
-                Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                foreach (GekkoFunctionCode gfc in f.code)
+                {
+                    P p = new P();
+                    string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(gfc.code);
+                    string commandLinesFlat = Program.HandleGekkoCommands(text0);
+                    Parser.ParseHelper ph = new Parser.ParseHelper();
+                    ph.commandsText = commandLinesFlat;
+                    ph.libraryName = f.libraryName;
+                    Parser.ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
+                    ch.commandsText = commandLinesFlat;
+                    Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);                    
+                }
                 f.hasBeenCompiled = true;
             }
         }

@@ -98,7 +98,10 @@ namespace Gekko
                             if (fname.EndsWith("()")) fname = fname.Substring(0, fname.Length - "()".Length);
                             else fname = Globals.procedure + fname;
                             GekkoFunction f = library.GetFunction(fname, true);  //should be there
-                            new Writeln(f.code);
+                            foreach (GekkoFunctionCode gfc in f.code)
+                            {
+                                new Writeln(gfc.code);
+                            }
                         };
 
                         string ff5 = null;
@@ -718,12 +721,20 @@ namespace Gekko
                 this.AddFunction(function);
             }
 
-            int offset = t[i0].line;
-            function.code += G.NL;
-            function.code += Globals.libraryZipfileIndicator + file + "¤" + offset + G.NL;
-            function.code += sb.ToString();
+            GekkoFunctionCode gfc = new GekkoFunctionCode();
+            gfc.code = sb.ToString();
+            gfc.fileNameWithPath = file;
+            gfc.line= t[i0].line;
+            function.code.Add(gfc);
         }
 
+    }
+
+    public class GekkoFunctionCode
+    {
+        public string fileNameWithPath = null;
+        public int line = -12345;
+        public string code = null;
     }
 
     public class GekkoFunction
@@ -737,7 +748,7 @@ namespace Gekko
         public string libraryName = null;  //where the function is stored
         public bool hasBeenCompiled = false;
 
-        public string code = null;  //may contain code from several places, snippets of f(), f(...), f(..., ...)
+        public List<GekkoFunctionCode> code = new List<GekkoFunctionCode>();  //may contain code from several places, snippets of f(), f(...), f(..., ...)
         // ---------------------------------    
         public Func<GekkoSmpl, P, bool, IVariable> function0 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, IVariable> function1 = null;
