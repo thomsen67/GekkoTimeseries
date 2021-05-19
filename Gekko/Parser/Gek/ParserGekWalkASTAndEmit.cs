@@ -5403,6 +5403,7 @@ namespace Gekko.Parser.Gek
             string s = null;            
             if (functionName != null)
             {
+                //See also this: #08975389245253
                 s = "p.lastFileSentToANTLR = O.LastText(`" + functionName + "`, @`" + fileName + "`); p.SetLastFileSentToANTLR(O.LastText(`" + functionName + "`, @`" + fileName + "`)); p.Deeper();";
             }
             return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); " + s + G.NL + "try {" + G.NL;

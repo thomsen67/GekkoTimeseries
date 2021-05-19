@@ -98,8 +98,9 @@ namespace Gekko
                             if (fname.EndsWith("()")) fname = fname.Substring(0, fname.Length - "()".Length);
                             else fname = Globals.procedure + fname;
                             GekkoFunction f = library.GetFunction(fname, true);  //should be there
-                            foreach (GekkoFunctionCode gfc in f.code)
+                            foreach (GekkoFunctionCode gfc in f.overloads)
                             {
+                                //See also this: #08975389245253
                                 new Writeln(gfc.code);
                             }
                         };
@@ -349,7 +350,7 @@ namespace Gekko
 
                     Program.WaitForZipRead(tempPath, fileNameWithPath);
                     library = new Library(libraryName, fileNameWithPath, stamp);
-                    library.LibraryExtractor(tempPath, fileNameWithPath);
+                    library.LibraryExtractor(tempPath, tempPath, fileNameWithPath);
 
                     try
                     {
@@ -580,10 +581,10 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// Finds all .gcm files in a folder structure, and extracts functions/procedures.
+        /// Finds all .gcm files in a folder structure, and extracts functions/procedures. Is recursive.
         /// </summary>
         /// <param name="targetDirectory"></param>
-        public void LibraryExtractor(string targetDirectory, string zipFileName)
+        public void LibraryExtractor(string targetDirectory, string originalDirectory, string zipFileName)
         {
             // Process the list of files found in the directory.
             string[] fileEntries = Directory.GetFiles(targetDirectory);
@@ -591,7 +592,7 @@ namespace Gekko
             {
                 if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.LibraryExtractorHandleGcmFile(fileName, targetDirectory, zipFileName);
+                    this.LibraryExtractorHandleGcmFile(fileName, originalDirectory, zipFileName);
                 }
             }
 
@@ -599,7 +600,7 @@ namespace Gekko
             string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
             foreach (string subdirectory in subdirectoryEntries)
             {
-                this.LibraryExtractor(subdirectory, zipFileName);
+                this.LibraryExtractor(subdirectory, originalDirectory, zipFileName);
             }
         }
 
@@ -725,7 +726,7 @@ namespace Gekko
             gfc.code = sb.ToString();
             gfc.fileNameWithPath = file;
             gfc.line= t[i0].line;
-            function.code.Add(gfc);
+            function.overloads.Add(gfc);  //See also this: #08975389245253
         }
 
     }
@@ -748,7 +749,7 @@ namespace Gekko
         public string libraryName = null;  //where the function is stored
         public bool hasBeenCompiled = false;
 
-        public List<GekkoFunctionCode> code = new List<GekkoFunctionCode>();  //may contain code from several places, snippets of f(), f(...), f(..., ...)
+        public List<GekkoFunctionCode> overloads = new List<GekkoFunctionCode>();  //may contain code from several places, snippets of f(), f(...), f(..., ...)
         // ---------------------------------    
         public Func<GekkoSmpl, P, bool, IVariable> function0 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, IVariable> function1 = null;

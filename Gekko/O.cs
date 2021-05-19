@@ -5251,7 +5251,7 @@ namespace Gekko
         {
             if (functionName.Contains(Globals.procedure)) functionName = "PROCEDURE " + functionName.Replace(Globals.procedure, "");
             else functionName = "FUNCTION " + functionName;
-            return functionName; // + " (" + fileName + ")";
+            return functionName;// + " (" + fileName + ")";
         }
 
         /// <summary>
@@ -5575,15 +5575,17 @@ namespace Gekko
                 //do not compile
             }
             else
-            {
-                foreach (GekkoFunctionCode gfc in f.code)
+            {                
+                foreach (GekkoFunctionCode gfc in f.overloads)
                 {
+                    //See also this: #08975389245253
                     P p = new P();
                     string text0 = Program.HandleGekkoCommandsSpecialCheatCommandsOnDeveloperComputer(gfc.code);
                     string commandLinesFlat = Program.HandleGekkoCommands(text0);
                     Parser.ParseHelper ph = new Parser.ParseHelper();
                     ph.commandsText = commandLinesFlat;
                     ph.libraryName = f.libraryName;
+                    ph.fileName = gfc.fileNameWithPath + "*" + gfc.line;  //the "*" is illegal as filename character. The line is used as offset. If this snippet fails in its own line 4, this may mean line 13 in the original file.
                     Parser.ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
                     ch.commandsText = commandLinesFlat;
                     Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);                    
