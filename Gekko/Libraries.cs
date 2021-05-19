@@ -33,12 +33,13 @@ namespace Gekko
     public class Libraries
     {
         /// <summary>
-        /// Active libraries. There are also non-active libraries in .libraryCache.
+        /// Active libraries (excluding the Glbobal library). There are also non-active libraries in .libraryCache.
         /// </summary>        
-        private List<Library> libraries = new List<Library>();
+        private List<Library> libraries = new List<Library>();        
+        private Library globalLibrary = new Library(Globals.globalLibraryString, null, new DateTime(0l));
 
         /// <summary>
-        /// All historically loaded libraries. Active libraries are in .libraries.
+        /// All historically loaded libraries. Active (non-Global) libraries are in .libraries.
         /// </summary>        
         private List<Library> libraryCache = new List<Library>();
 
@@ -46,9 +47,7 @@ namespace Gekko
         /// Constructor.
         /// </summary>
         public Libraries()
-        {
-            //Is always born with an empty Global library
-            this.libraries.Add(new Library(Globals.globalLibraryString, null, new DateTime(0l)));
+        {                     
         }
 
         /// <summary>
@@ -75,7 +74,8 @@ namespace Gekko
                 writeln.MainAdd("Libraries:");
                 writeln.MainNewLineTight();
                 int counter = 0;
-                foreach (Library library in Program.libraries.GetLibraries())
+                
+                foreach (Library library in Program.libraries.GetLibrariesIncludingGlobal())
                 {
                     counter++;
                     if (name != null && !G.Equal(library.GetName(), name))
@@ -87,16 +87,11 @@ namespace Gekko
                         hit = true;
                     }
 
-                    List<string> functions = new List<string>();
-                    List<string> procedures = new List<string>();
-                    foreach (string s in library.GetFunctionNames())
-                    {
-                        if (s.StartsWith(Globals.procedure)) procedures.Add(s.Substring(Globals.procedure.Length));
-                        else functions.Add(s + "()");
-                    }
+                    List<string> functions, procedures;
+                    QHelper(library, out functions, out procedures);
 
                     Action<GAO> a = (gao) =>
-                    {                        
+                    {
                         Action<GAO> a3 = (gao3) =>
                         {
                             string fname = gao3.s1;
@@ -144,29 +139,43 @@ namespace Gekko
             }
         }
 
+        private static void QHelper(Library library, out List<string> functions, out List<string> procedures)
+        {
+            functions = new List<string>();
+            procedures = new List<string>();
+            foreach (string s in library.GetFunctionNames())
+            {
+                if (s.StartsWith(Globals.procedure)) procedures.Add(s.Substring(Globals.procedure.Length));
+                else functions.Add(s + "()");
+            }
+        }
+
         /// <summary>
-        /// Returns a list of libraries. Do not alter the list: it points directly to the real list.
+        /// Returns a list of libraries. Includes the Global library as the last element.
         /// </summary>
         /// <returns></returns>
-        public List<Library> GetLibraries()
+        public List<Library> GetLibrariesIncludingGlobal()
         {
-            return this.libraries;
+            List<Library> temp = new List<Library>();
+            temp.AddRange(this.libraries);
+            temp.Add(this.globalLibrary);
+            return temp;
         }
 
         /// <summary>
         /// Get a library via a name. Option to choose if Gekko should abort or return null if it does not exist.
         /// </summary>
-        /// <param name="name2"></param>
+        /// <param name="name"></param>
         /// <param name="abortWithError"></param>
         /// <returns></returns>
-        public Library GetLibrary(string name2, bool abortWithError)
+        public Library GetLibrary(string name, bool abortWithError)
         {
-            //if library name == null, it is understood as "global".
-            Library rv = null;
-            string name = Globals.globalLibraryString;
-            if (name2 != null) name = name2;
+            //By convention, calling with null means the Global library. This is the default place
+            //for functions/procedures.
+            
+            if (name == null) return this.globalLibrary;
 
-            foreach (Library lib in this.libraries)
+            foreach (Library lib in this.GetLibrariesIncludingGlobal())
             {
                 if (G.Equal(lib.GetName(), name))
                 {                    
@@ -194,6 +203,7 @@ namespace Gekko
 
             if (libraryName != null)
             {
+                //explicit calling, like lib1:f1().
                 Library thisLib = this.GetLibrary(libraryName, true);
                 rv = thisLib.GetFunction(functionName, true);
             }
@@ -201,7 +211,7 @@ namespace Gekko
             {
                 if (callingLibraryName == null)
                 {
-                    foreach (Library thisLib in this.libraries)
+                    foreach (Library thisLib in this.GetLibrariesIncludingGlobal())
                     {
                         rv = thisLib.GetFunction(functionName, false);
                         if (rv != null) break;
@@ -215,7 +225,7 @@ namespace Gekko
                     if (rv == null)
                     {
                         //then we search the rest normally
-                        foreach (Library thisLib2 in this.libraries)
+                        foreach (Library thisLib2 in this.GetLibrariesIncludingGlobal())
                         {
                             if (thisLib2 == callingLibrary) continue;  //skip this, we have tested it, and the function does not exist.
                             rv = thisLib2.GetFunction(functionName, false);
@@ -336,7 +346,7 @@ namespace Gekko
 
                     Program.WaitForZipRead(tempPath, fileNameWithPath);
                     library = new Library(libraryName, fileNameWithPath, stamp);
-                    library.LibraryExtractor(tempPath);
+                    library.LibraryExtractor(tempPath, fileNameWithPath);
 
                     try
                     {
@@ -351,11 +361,10 @@ namespace Gekko
                     this.libraryCache.Add(library);  //if a lib is closed and reopned, this can be done fast.
                 }                    
 
-                this.libraries.Add(library);                
-
-                int count = library.GetFunctionNames().Count;
-                //TODO TODO: use Q() to print funcs/procs separately.
-                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(count, "function") + ". Library path: " + fileNameWithPath);
+                this.libraries.Add(library);
+                List<string> functions, procedures;
+                QHelper(library, out functions, out procedures);
+                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + " and " + G.AddS(procedures.Count, "procedure")+". Library path: " + fileNameWithPath);
             }
         }
 
@@ -414,24 +423,24 @@ namespace Gekko
         /// <param name="libraryName"></param>
         public void CloseLibrary(string libraryName)
         {
+            if (IsReservedName(libraryName)) new Error("The name '" + libraryName + "' is special and cannot be closed. You may try LIBRARY<clear> instead.");
+
             if (libraryName == "*")
             {
-                int count = this.libraries.Count;  //includes 'Global'
-                Library global = this.GetLibrary(Globals.globalLibraryString, true); //cannot be non-existing
+                int count = this.libraries.Count;  //excludes 'Global'                
                 this.libraries = new List<Library>();
-                this.libraries.Add(global);                
-                new Writeln("Closed " + G.AddS(count - 1, "library") + ", not including the Global library).");
+                //the Global library is not touched.
+                new Writeln("Closed " + G.AddS(count, "library") + ", not including the Global library).");
             }
             else
             {                
                 List<Library> temp = new List<Library>();
                 bool found = false;
-                foreach (Library x in this.libraries)
+                foreach (Library x in this.libraries)  //excludes Global
                 {
                     if (G.Equal(x.GetName(), libraryName))
                     {
                         found = true;
-                        if (IsReservedName(libraryName)) new Error("The name '" + libraryName + "' is special and cannot be closed. You may try LIBRARY<clear> instead.");                        
                     }
                     else
                     {
@@ -442,31 +451,20 @@ namespace Gekko
                 this.libraries = temp;
                 new Writeln("Closed library '" + libraryName + "'");
             }
-        }        
+        }
 
         public void ClearLibrary(string libraryName)
         {
-            bool found = false;
-            for (int i = 0; i < this.libraries.Count; i++)
+            if (G.Equal(libraryName, Globals.globalLibraryString))
             {
-                Library x = this.libraries[i];                
-                if (G.Equal(x.GetName(), libraryName))
-                {
-                    found = true;
-                    if (IsReservedName(libraryName))
-                    {
-                        this.libraries[i] = new Library(x.GetName(), null, new DateTime(0l));  //can only be done for the Global lib.
-                        new Writeln("Library '" + libraryName + "' is now cleared (empty).");
-                        break;
-                    }
-                    else
-                    {
-                        new Error("You cannot clear library '" + libraryName + "' loaded from a .zip file. Use LIBRARY<close> instead.");
-                    }
-                }
+                this.globalLibrary = new Library(Globals.globalLibraryString, null, new DateTime(0l));
             }
-            if (!found) new Error("Could not find library '" + libraryName + "' for clearing.");
+            else
+            {
+                new Error("You can only clear 'Global' (the global library)");
+            }
         }
+
     }
 
     /// <summary>
@@ -582,7 +580,7 @@ namespace Gekko
         /// Finds all .gcm files in a folder structure, and extracts functions/procedures.
         /// </summary>
         /// <param name="targetDirectory"></param>
-        public void LibraryExtractor(string targetDirectory)
+        public void LibraryExtractor(string targetDirectory, string zipFileName)
         {
             // Process the list of files found in the directory.
             string[] fileEntries = Directory.GetFiles(targetDirectory);
@@ -590,7 +588,7 @@ namespace Gekko
             {
                 if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.LibraryExtractorHandleGcmFile(fileName);
+                    this.LibraryExtractorHandleGcmFile(fileName, targetDirectory, zipFileName);
                 }
             }
 
@@ -598,7 +596,7 @@ namespace Gekko
             string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
             foreach (string subdirectory in subdirectoryEntries)
             {
-                this.LibraryExtractor(subdirectory);
+                this.LibraryExtractor(subdirectory, zipFileName);
             }
         }
 
@@ -606,7 +604,7 @@ namespace Gekko
         /// Extract function/procedure code as text.
         /// </summary>
         /// <param name="file"></param>
-        private void LibraryExtractorHandleGcmFile(string file)
+        private void LibraryExtractorHandleGcmFile(string file, string targetDirectory, string zipFileName)
         {
             // ...
             // ...
@@ -632,6 +630,8 @@ namespace Gekko
             //=========================================
 
             //It basically cuts before second "function" and so on.
+
+            string pathToFileInsideZip = zipFileName + file.Replace(targetDirectory, "");
 
             string s = Program.GetTextFromFileWithWait(file);
             int fat = 5;
@@ -683,14 +683,14 @@ namespace Gekko
 
                         if (functionCounter >= 2)
                         {
-                            this.LibraryExtractorGetFunctionCode(i0, i, functionNamesLower[functionCounter - 2], t2.subnodes);
+                            this.LibraryExtractorGetFunctionCode(i0, i, functionNamesLower[functionCounter - 2], t2.subnodes, pathToFileInsideZip);
                             i0 = i;
                         }
                     }
                 }
             }
 
-            if (functionCounter > 0) this.LibraryExtractorGetFunctionCode(i0, t2.subnodes.Count(), functionNamesLower[functionNamesLower.Count - 1], t2.subnodes);  //get the rest
+            if (functionCounter > 0) this.LibraryExtractorGetFunctionCode(i0, t2.subnodes.Count(), functionNamesLower[functionNamesLower.Count - 1], t2.subnodes, pathToFileInsideZip);  //get the rest
         }
 
         /// <summary>
@@ -702,7 +702,7 @@ namespace Gekko
         /// <param name="i"></param>
         /// <param name="th"></param>
         /// <param name="t"></param>
-        private void LibraryExtractorGetFunctionCode(int i0, int i, string functionNameLower, TokenList t)
+        private void LibraryExtractorGetFunctionCode(int i0, int i, string functionNameLower, TokenList t, string file)
         {
             StringBuilder sb = new StringBuilder();
             for (int i2 = i0; i2 < i; i2++)
@@ -717,6 +717,10 @@ namespace Gekko
                 function = new GekkoFunction(functionNameLower);
                 this.AddFunction(function);
             }
+
+            int offset = t[i0].line;
+            function.code += G.NL;
+            function.code += Globals.libraryZipfileIndicator + file + "¤" + offset + G.NL;
             function.code += sb.ToString();
         }
 

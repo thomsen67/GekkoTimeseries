@@ -2082,7 +2082,7 @@ namespace Gekko.Parser.Gek
                             //Version with all parameters, also optional parameters
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
                             w.headerCs.AppendLine("O.Add" + numberOfParameters + Globals.functionSpecialName1 + "(" + libraryName + ", `" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
-                            w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
+                            w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower, w.fileNameContainingParsedCode) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);                            
 
                             //for instance, f(x1, x2, x3, x4=..., x5=...)
                             //here we have 5 parameters, of which 2 are optional
@@ -4851,7 +4851,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTRUN":
                         {                            
-                            node.Code.A(LocalCode1(Num(node), null)); //see LocalCode2
+                            node.Code.A(LocalCode1(Num(node), null, null)); //see LocalCode2
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                             //HMMM is this right:
                             node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
@@ -5398,12 +5398,12 @@ namespace Gekko.Parser.Gek
             throw new GekkoException();
         }
 
-        private static string LocalCode1(string num, string functionName)
+        private static string LocalCode1(string num, string functionName, string fileName)
         {
-            string s = null;
+            string s = null;            
             if (functionName != null)
             {
-                s = "p.lastFileSentToANTLR = O.LastText(`" + functionName + "`); p.SetLastFileSentToANTLR(O.LastText(`" + functionName + "`)); p.Deeper();";
+                s = "p.lastFileSentToANTLR = O.LastText(`" + functionName + "`, @`" + fileName + "`); p.SetLastFileSentToANTLR(O.LastText(`" + functionName + "`, @`" + fileName + "`)); p.Deeper();";
             }
             return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); " + s + G.NL + "try {" + G.NL;
         }

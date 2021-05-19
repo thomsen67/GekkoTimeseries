@@ -789,9 +789,7 @@ namespace Gekko
         public static IVariable islibraryloaded(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(x1);
-            if (G.Equal(s1, Globals.globalLibraryString)) return Globals.scalarVal1;  //always open
-
-            foreach (Library lib in Program.libraries.GetLibraries())
+            foreach (Library lib in Program.libraries.GetLibrariesIncludingGlobal())
             {                
                 if (G.Equal(lib.GetName(), s1)) return Globals.scalarVal1;
             }

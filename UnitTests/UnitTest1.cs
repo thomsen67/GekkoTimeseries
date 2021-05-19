@@ -13022,6 +13022,18 @@ namespace UnitTests
             I("%y3 = f2('a', 'b');");
             _AssertScalarString(First(), "%y3", "p1_f2_ab");
 
+            //Test that Global lib is really alway last in the list of libs.
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+            I("function string f1(string %x1); return 'global_f1_' + %x1; end;");
+            I("%y1 = f1('a');");
+            _AssertScalarString(First(), "%y1", "global_f1_a");
+            I("library p1;");
+            I("%y2 = f1('a');");
+            _AssertScalarString(First(), "%y2", "p1_f1_a");
+            I("%y3 = global:f1('a');");
+            _AssertScalarString(First(), "%y3", "global_f1_a");
+
             // ------------------------------------------------------------
             // colon and remove
             // ------------------------------------------------------------   
@@ -13102,6 +13114,14 @@ namespace UnitTests
             I("library p1;");
             I("library \\Sub\\p1 as pp1;");  //ok, even though the zip has the same name.
 
+            I("reset;");            
+            FAIL("function val abs(val %x); return 1; end;"); //error: already exists as in-built
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+            I("library p6;");
+            I("%y1 = abs(-100);");
+            _AssertScalarVal(First(), "%y1", 100d);  //will take in-built
+            FAIL("%y2 = p6:abs(-100);");  //error: already exists as in-built
         }
 
         [TestMethod]

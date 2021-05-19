@@ -5245,13 +5245,13 @@ namespace Gekko
         /// <summary>
         /// Used for Gekko user-defined functions.
         /// </summary>
-        /// <param name="s"></param>
+        /// <param name="functionName"></param>
         /// <returns></returns>
-        public static string LastText(string s)
+        public static string LastText(string functionName, string fileName)
         {
-            if (s.Contains(Globals.procedure)) s = "PROCEDURE " + s.Replace(Globals.procedure, "");
-            else s = "FUNCTION " + s;
-            return s;
+            if (functionName.Contains(Globals.procedure)) functionName = "PROCEDURE " + functionName.Replace(Globals.procedure, "");
+            else functionName = "FUNCTION " + functionName;
+            return functionName; // + " (" + fileName + ")";
         }
 
         /// <summary>
@@ -5584,9 +5584,7 @@ namespace Gekko
                 ph.libraryName = f.libraryName;
                 Parser.ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
                 ch.commandsText = commandLinesFlat;
-                //ch.code = ch.code.Replace(Globals.ufunctionSpecialName + "(" + Globals.QT + Globals.libraryPlaceholder + Globals.QT + ", ", Globals.ufunctionSpecialName + "(" + Globals.QT + f.packageName + Globals.QT + ", ");
-                //ch.code = ch.code.Replace(Globals.libraryPlaceholder, f.libraryName);
-                Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                 f.hasBeenCompiled = true;
             }
         }

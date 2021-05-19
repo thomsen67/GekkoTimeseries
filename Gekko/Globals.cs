@@ -386,6 +386,8 @@ namespace Gekko
         public static string listLoopInternalName = "listloop_";
         public static string listLoopMovedStuff = "listloopMovedStuff_";
 
+        public const string libraryZipfileIndicator = "//[zipfile]: ";
+
         public static string printNaNIndicator = "M";  //= AREMOS, could be "NaN" instead
 
         public static readonly string QT = "\"";  //QT = " (single quote)               

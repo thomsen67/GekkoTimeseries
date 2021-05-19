@@ -30,7 +30,7 @@ namespace Gekko
                 IVariable functionarg_xf7dke8cj_26 = O.TypeCheck_val(functionarg_xf7dke8cj_26_func.f1(smpl), 4);
 
                 Databank local0 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
+                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f", ""); p.SetLastFileSentToANTLR(O.LastText("f", "")); p.Deeper();
                 try
                 {
 
