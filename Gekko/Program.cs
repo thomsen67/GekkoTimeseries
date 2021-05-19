@@ -18570,12 +18570,12 @@ namespace Gekko
                         if (ln <= 0)
                         {
                             //this should not happen any more, after fix regarding token line numbers (2/9 2012)
-                            text = "*** ERROR: " + "Running file '" + fileCalled5 + "', line [unknown]";
+                            text = "*** ERROR: " + "Running file " + fileCalled5 + ", line [unknown]";
                             commandText5 = "";
                         }
                         else
                         {
-                            text = "*** ERROR: " + "Running file '" + fileCalled5 + "', line " + ln;
+                            text = "*** ERROR: " + "Running file " + fileCalled5 + ", line " + ln;
                             commandText5 = commandLines5[ln - 1];
                         }
                         WriteErrorMessage(ln, commandText5, text, fileCalled5);

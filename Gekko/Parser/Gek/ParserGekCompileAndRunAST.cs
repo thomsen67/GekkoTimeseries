@@ -233,7 +233,7 @@ namespace Gekko.Parser.Gek
                         else
                         {
                             //file
-                            text = s2 + xx + " file '" + originalFileName + "', line " + lineNumber3;
+                            text = s2 + xx + " file " + originalFileName + ", line " + lineNumber3;
                         }
 
                         Program.WriteErrorMessage(lineNumber, problemLine, text, originalFileName);

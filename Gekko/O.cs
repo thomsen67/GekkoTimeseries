@@ -5251,7 +5251,7 @@ namespace Gekko
         {
             if (functionName.Contains(Globals.procedure)) functionName = "PROCEDURE " + functionName.Replace(Globals.procedure, "");
             else functionName = "FUNCTION " + functionName;
-            return functionName;// + " (" + fileName + ")";
+            return functionName + ", " + fileName + "";
         }
 
         /// <summary>
