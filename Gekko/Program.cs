@@ -8681,7 +8681,8 @@ namespace Gekko
         }
         
         /// <summary>
-        /// Splits result from parser on '¤' so that filename and linenumber are extracted
+        /// Splits result from parser on (optional) '*' and '¤', so that filename and linenumber are extracted.
+        /// For instance: file1.gcm*23¤5 becomes 'file1.gcm' and 28.
         /// </summary>
         /// <param name="originalFileName"></param>
         /// <param name="lineNumber"></param>
@@ -8690,9 +8691,18 @@ namespace Gekko
         {
             string[] split = s.Split('¤');
             originalFileName = split[0];
+            
             string lineNumber2 = split[1];
             lineNumber = int.Parse(lineNumber2);  //1-based it seems
-        }        
+
+            string[] split2 = originalFileName.Split('*');
+            if (split2.Length == 2)
+            {
+                originalFileName = split2[0];
+                int lineNumber3 = int.Parse(split2[1]);  //we are sure that this parses
+                lineNumber += lineNumber3 - 1;  //we deduct one here
+            }
+        }
 
         /// <summary>
         /// The "old" DECOMP method. Will be obsolete.

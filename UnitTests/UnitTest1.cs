@@ -13139,8 +13139,13 @@ namespace UnitTests
             FAIL("run lib1;");
             string c1 = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib1.gcm line 3 calling -->"));
-            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm*101 line 2 calling -->"));
-            Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm*1 (run-time error in line 32)"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm line 102 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm (run-time error in line 32)"));
+            if (false)
+            {
+                Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm*101 line 2 calling -->"));
+                Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm*1 (run-time error in line 32)"));
+            }
 
             // -------------------------------
 
@@ -13150,8 +13155,13 @@ namespace UnitTests
             FAIL("run lib2;");
             c1 = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib2.gcm line 3 calling -->"));
-            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm*71 line 2 calling -->"));
-            Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm*1 (run-time error in line 12)"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm line 72 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm (run-time error in line 12)"));
+            if (false)
+            {
+                Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm*71 line 2 calling -->"));
+                Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm*1 (run-time error in line 12)"));
+            }
 
 
 
@@ -13164,11 +13174,20 @@ namespace UnitTests
             Globals.unitTestScreenOutput = new StringBuilder();
             FAIL("run lib3;");
             c1 = Globals.unitTestScreenOutput.ToString();
-            Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*1 line 12 pos 8"));
-            Assert.IsTrue(c1.Contains(@"Running file FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*101, line 2"));
+            Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm line 12 pos 8"));
+            Assert.IsTrue(c1.Contains(@"Running file FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm, line 102"));
             Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib3.gcm line 3 calling -->"));
-            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*101 (run-time error in line 2)"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm (run-time error in line 102)"));
+
+            if (false)
+            {
+                Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*1 line 12 pos 8"));
+                Assert.IsTrue(c1.Contains(@"Running file FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*101, line 2"));
+                Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
+                Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib3.gcm line 3 calling -->"));
+                Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*101 (run-time error in line 2)"));
+            }
 
             // -------------------------------
 

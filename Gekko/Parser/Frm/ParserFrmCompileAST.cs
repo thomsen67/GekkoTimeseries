@@ -992,13 +992,7 @@ namespace Gekko.Parser.Frm
 
         public static void HandleModelLexerErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
-            if (Globals.threadIsInProcessOfAborting) return;
-            if (false && ph.fileName == null && ph.commandsText == null)
-            {
-                //NO: this will show for instance a stray '?' in the model file
-                //ignore, probably an error dublet
-                return;
-            }
+            if (Globals.threadIsInProcessOfAborting) return;            
             Program.StopPipeAndMute(2);
             int number = 0;
             foreach (string s in errors)
@@ -1016,6 +1010,7 @@ namespace Gekko.Parser.Frm
                 int lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
                 int lineNo = lineNumber + 1;  //1-based
                 int positionNo = int.Parse(ss[1]) + 1;  //1-based
+                string fileName = ph.fileName;
 
                 string errorMessage = ss[3];
 
@@ -1048,7 +1043,7 @@ namespace Gekko.Parser.Frm
                 {
                     if (ph.isOneLinerFromGui == false)
                     {
-                        string fn = ph.fileName;
+                        string fn = fileName;
                         if (fn == null || fn == "")
                         {
                             G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);

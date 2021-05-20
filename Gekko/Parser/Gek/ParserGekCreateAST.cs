@@ -536,9 +536,11 @@ namespace Gekko.Parser.Gek
 
                 string[] ss = s.Split(Globals.parserErrorSeparator);
                 int lineNumber = -12345;
+                string fileName = null;
                 try
                 {
                     lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                    fileName = ph.fileName;
                 }
                 catch (Exception e)
                 {
@@ -592,7 +594,7 @@ namespace Gekko.Parser.Gek
                     if (ph.isOneLinerFromGui == false)
                     {
                         {
-                            string fn = ph.fileName;
+                            string fn = fileName;
                             if (fn == null || fn == "")
                             {
                                 G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
@@ -672,12 +674,12 @@ namespace Gekko.Parser.Gek
                 }
                 else G.Writeln();
 
-
                 string[] ss = s.Split(Globals.parserErrorSeparator);
                 int lineNumber = 0;
                 int lineNo = 0;
                 int positionNo = 0;
                 string errorMessage = "General error";
+                string fileName = null;
 
                 try
                 {
@@ -685,6 +687,7 @@ namespace Gekko.Parser.Gek
                     lineNo = lineNumber + 1;  //1-based
                     positionNo = int.Parse(ss[1]) + 1;  //1-based                               
                     errorMessage = ss[3];
+                    fileName = ph.fileName;
                 }
                 catch
                 {
@@ -775,7 +778,7 @@ namespace Gekko.Parser.Gek
                     {
                         if (ph.isOneLinerFromGui == false)
                         {
-                            string fn = ph.fileName;
+                            string fn = fileName;
                             string extra = "";
                             if (lineNo >= 1 && positionNo > 0)
                             {

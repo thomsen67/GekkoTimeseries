@@ -251,6 +251,7 @@ namespace Gekko.Parser.Frm
                 int lineNo = 0;
                 int positionNo = 0;
                 string errorMessage = "General error";
+                string fileName = null;
 
                 try
                 {
@@ -258,6 +259,7 @@ namespace Gekko.Parser.Frm
                     lineNo = lineNumber + 1;  //1-based
                     positionNo = int.Parse(ss[1]) + 1;  //1-based
                     errorMessage = ss[3];
+                    fileName = ph.fileName;
                 }
                 catch
                 {
@@ -298,7 +300,7 @@ namespace Gekko.Parser.Frm
                     {
                         if (ph.isOneLinerFromGui == false)
                         {
-                            string fn = ph.fileName;
+                            string fn = fileName;
                             string extra = "";
                             if (lineNo >= 1 && positionNo > 0)
                             {
