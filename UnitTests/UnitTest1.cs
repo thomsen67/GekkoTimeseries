@@ -13125,6 +13125,54 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_StackTrace3()
+        {
+            //libraries, offsetting line-numbers in these
+
+            //------------------------------------            
+            // run-time errors:
+            //------------------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("run lib1;");
+            string c1 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib1.gcm line 3 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm*101 line 2 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm*1 (run-time error in line 32)"));
+
+            // -------------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("run lib2;");
+            c1 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib2.gcm line 3 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\sub1\sub2\file2.gcm*71 line 2 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION f, c:\Thomas\Gekko\regres\StackTrace\lib_runtime.zip\file1.gcm*1 (run-time error in line 12)"));
+
+
+
+            //------------------------------------            
+            // syntax errors:
+            //------------------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("run lib3;");
+            c1 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*1 line 12 pos 8"));
+            Assert.IsTrue(c1.Contains(@"Running file FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*101, line 2"));
+            Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
+            Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib3.gcm line 3 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*101 (run-time error in line 2)"));
+
+        }
+
+    [TestMethod]
         public void _Test_StackTrace2()
         {
             if (false)
