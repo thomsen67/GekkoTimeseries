@@ -541,6 +541,7 @@ namespace Gekko.Parser.Gek
                 {
                     lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
                     fileName = ph.fileName;
+                    Program.CorrectLineNumber(ref fileName, ref lineNumber);
                 }
                 catch (Exception e)
                 {
@@ -675,19 +676,20 @@ namespace Gekko.Parser.Gek
                 else G.Writeln();
 
                 string[] ss = s.Split(Globals.parserErrorSeparator);
+                int lineNumberTemp = 0;
                 int lineNumber = 0;
-                int lineNo = 0;
                 int positionNo = 0;
                 string errorMessage = "General error";
                 string fileName = null;
 
                 try
                 {
-                    lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1                
-                    lineNo = lineNumber + 1;  //1-based
+                    lineNumberTemp = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1                
+                    lineNumber = lineNumberTemp + 1;  //1-based
                     positionNo = int.Parse(ss[1]) + 1;  //1-based                               
                     errorMessage = ss[3];
                     fileName = ph.fileName;
+                    Program.CorrectLineNumber(ref fileName, ref lineNumber);
                 }
                 catch
                 {
@@ -743,7 +745,7 @@ namespace Gekko.Parser.Gek
                 }
 
 
-                if (lineNo > inputFileLines.Count)
+                if (lineNumber > inputFileLines.Count)
                 {
                     {
                         G.Writeln("*** ERROR: " + errorMessage);
@@ -754,9 +756,9 @@ namespace Gekko.Parser.Gek
                 string line = "";
                 int firstWordPosInLine = -12345;
                 bool previousLineProbablyCulprit = false;
-                if (lineNo > 0)
+                if (lineNumber > 0)
                 {
-                    line = inputFileLines[lineNo - 1];
+                    line = inputFileLines[lineNumber - 1];
                     firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
                 }
 
@@ -768,7 +770,7 @@ namespace Gekko.Parser.Gek
                         previousLineProbablyCulprit = true;
                     }
 
-                    if (ph.isOneLinerFromGui == true && lineNo != 1)
+                    if (ph.isOneLinerFromGui == true && lineNumber != 1)
                     {
                         G.Writeln("*** ERROR: Parsing this line:");
                         G.Writeln("    " + G.ReplaceGlueSymbols(inputFileLines[0]), Color.Blue);
@@ -780,9 +782,9 @@ namespace Gekko.Parser.Gek
                         {
                             string fn = fileName;
                             string extra = "";
-                            if (lineNo >= 1 && positionNo > 0)
+                            if (lineNumber >= 1 && positionNo > 0)
                             {
-                                extra = " line " + lineNo + " pos " + positionNo;
+                                extra = " line " + lineNumber + " pos " + positionNo;
                             }
 
                             if (fn == null || fn == "")
@@ -811,7 +813,7 @@ namespace Gekko.Parser.Gek
                             if (lineTemp != null && lineTemp != "")
                             {
                                 lineTemp2.Add(lineTemp);  //used for suggestions later on
-                                lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNo, 4) + "]:");
+                                lineTemp2Numbers.Add("    " + "[" + G.IntFormat(lineNumber, 4) + "]:");
                             }
 
                             lineTemp = G.ReplaceGlueSymbols(lineTemp);
@@ -824,14 +826,14 @@ namespace Gekko.Parser.Gek
                             try { line1 = lineTemp.Substring(positionNo - 1, 1); } catch { };
                             try { line2 = lineTemp.Substring(positionNo - 1 + 1); } catch { };
 
-                            if (previousLineProbablyCulprit && lineNo > 1)
+                            if (previousLineProbablyCulprit && lineNumber > 1)
                             {
-                                G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
-                                string lineBefore = inputFileLines[lineNo - 1 - 1];
-                                G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
+                                G.Writeln("    " + "Line " + (lineNumber - 1) + " may be the real cause of the problem");
+                                string lineBefore = inputFileLines[lineNumber - 1 - 1];
+                                G.Writeln("    " + "[" + G.IntFormat(lineNumber - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
                             }
 
-                            G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + line0, Color.Blue);
+                            G.Write("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + line0, Color.Blue);
                             G.Write(line1, Color.Red);
                             G.Writeln(line2, Color.Blue);
 

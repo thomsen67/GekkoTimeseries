@@ -519,7 +519,9 @@ namespace Gekko
         public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
         public static List<Func<GekkoSmpl, IVariable>> expressions = null;  //used for x[#i] kind of equations
                 
-        public static char parserErrorSeparator = '¤';
+        public static char parserErrorSeparator = '¤';  //5 places: (1) model lex, (2) model syntax, (3) gcm lex, (4) gcm syntax, (5) run-time error
+        public static char parserErrorSeparator2 = '*';  //in filenames like file1.gcm*13, this means that there is a line offset of 13 lines (used in libraries lazy loading)
+
         public static char parserExpressionSeparator = '¤';
         public static string lagIndicator = "¤";
         public static string leftParenthesisIndicator = "[";

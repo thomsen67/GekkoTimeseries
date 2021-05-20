@@ -8689,13 +8689,18 @@ namespace Gekko
         /// <param name="s"></param>
         public static void SplitCommandBeingExecuted(out string originalFileName, out int lineNumber, string s)
         {
-            string[] split = s.Split('¤');
+            string[] split = s.Split(Globals.parserErrorSeparator);
             originalFileName = split[0];
-            
+
             string lineNumber2 = split[1];
             lineNumber = int.Parse(lineNumber2);  //1-based it seems
 
-            string[] split2 = originalFileName.Split('*');
+            CorrectLineNumber(ref originalFileName, ref lineNumber);
+        }
+
+        public static void CorrectLineNumber(ref string originalFileName, ref int lineNumber)
+        {
+            string[] split2 = originalFileName.Split(Globals.parserErrorSeparator2);
             if (split2.Length == 2)
             {
                 originalFileName = split2[0];
