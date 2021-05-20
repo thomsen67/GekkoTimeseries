@@ -13170,6 +13170,19 @@ namespace UnitTests
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib3.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*101 (run-time error in line 2)"));
 
+            // -------------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            FAIL("run lib4;");
+            c1 = Globals.unitTestScreenOutput.ToString();
+            Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm*1 line 12 pos 8"));
+            Assert.IsTrue(c1.Contains(@"Running file FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm*71, line 2"));
+            Assert.IsTrue(c1.Contains(@"Call stack: Command line calling -->"));
+            Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib4.gcm line 3 calling -->"));
+            Assert.IsTrue(c1.Contains(@"FUNCTION g, c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm*71 (run-time error in line 2)"));
+
         }
 
     [TestMethod]
