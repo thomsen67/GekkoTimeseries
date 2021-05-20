@@ -8700,11 +8700,13 @@ namespace Gekko
 
         public static void CorrectLineNumber(ref string originalFileName, ref int lineNumber)
         {
+            if (originalFileName == null) return;
             string[] split2 = originalFileName.Split(Globals.parserErrorSeparator2);
             if (split2.Length == 2)
             {
                 originalFileName = split2[0];
-                int lineNumber3 = int.Parse(split2[1]);  //we are sure that this parses
+                int lineNumber3 = 1;
+                int.TryParse(split2[1], out lineNumber3);  //we are sure that this parses
                 lineNumber += lineNumber3 - 1;  //we deduct one here
             }
         }

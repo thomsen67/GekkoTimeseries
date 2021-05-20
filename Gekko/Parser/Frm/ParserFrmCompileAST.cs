@@ -1007,21 +1007,22 @@ namespace Gekko.Parser.Frm
                 else G.Writeln();
 
                 string[] ss = s.Split(Globals.parserErrorSeparator);
-                int lineNumber = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
-                int lineNo = lineNumber + 1;  //1-based
+                int lineNumberTemp = int.Parse(ss[0]) - 1;  //seems 1-based before subtract 1
+                int lineNumber = lineNumberTemp + 1;  //1-based
                 int positionNo = int.Parse(ss[1]) + 1;  //1-based
                 string fileName = ph.fileName;
+                Program.CorrectLineNumber(ref fileName, ref lineNumber);  //this has NO effect, just calling the method to keed these things together!
 
                 string errorMessage = ss[3];
 
                 errorMessage = errorMessage.Replace(@"'\\r\\n'", "<newline>");  //easier to understand
 
-                if (lineNo > inputFileLines.Count)
+                if (lineNumber > inputFileLines.Count)
                 {
                     new Error(errorMessage, false);
                     continue;  //doesn't give meaning
                 }
-                string line = inputFileLines[lineNo - 1];
+                string line = inputFileLines[lineNumber - 1];
                 int firstWordPosInLine = line.Length - line.TrimStart().Length + 1;
 
                 bool previousLineProbablyCulprit = false;
@@ -1033,7 +1034,7 @@ namespace Gekko.Parser.Frm
 
                 string paranthesesError = "";
 
-                if (ph.isOneLinerFromGui == true && lineNo != 1)
+                if (ph.isOneLinerFromGui == true && lineNumber != 1)
                 {
                     G.Writeln("*** ERROR: Parsing this line:");
                     G.Writeln("    " + G.ReplaceGlueSymbols(inputFileLines[0]), Color.Blue);
@@ -1046,11 +1047,11 @@ namespace Gekko.Parser.Frm
                         string fn = fileName;
                         if (fn == null || fn == "")
                         {
-                            G.Writeln("*** ERROR: Parsing user input block, line " + lineNo + " pos " + positionNo);
+                            G.Writeln("*** ERROR: Parsing user input block, line " + lineNumber + " pos " + positionNo);
                         }
                         else
                         {
-                            G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNo + " pos " + positionNo);
+                            G.Writeln("*** ERROR: Parsing file: " + fn + " line " + lineNumber + " pos " + positionNo);
                         }
 
                         string e2 = errorMessage.Replace("Der blev udløst en undtagelse af typen ", "");
@@ -1067,14 +1068,14 @@ namespace Gekko.Parser.Frm
                     string line1 = lineTemp.Substring(positionNo - 1, 1);
                     string line2 = lineTemp.Substring(positionNo - 1 + 1);
 
-                    if (previousLineProbablyCulprit && lineNo > 1)
+                    if (previousLineProbablyCulprit && lineNumber > 1)
                     {
-                        G.Writeln("    " + "Line " + (lineNo - 1) + " may be the real cause of the problem");
-                        string lineBefore = inputFileLines[lineNo - 1 - 1];
-                        G.Writeln("    " + "[" + G.IntFormat(lineNo - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
+                        G.Writeln("    " + "Line " + (lineNumber - 1) + " may be the real cause of the problem");
+                        string lineBefore = inputFileLines[lineNumber - 1 - 1];
+                        G.Writeln("    " + "[" + G.IntFormat(lineNumber - 1, 4) + "]:" + "   " + G.ReplaceGlueSymbols(lineBefore), Color.Blue);
                     }
 
-                    G.Write("    " + "[" + G.IntFormat(lineNo, 4) + "]:" + "   " + G.ReplaceGlueSymbols(line0), Color.Blue);
+                    G.Write("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + G.ReplaceGlueSymbols(line0), Color.Blue);
                     G.Write(G.ReplaceGlueSymbols(line1), Color.Red);
                     G.Writeln(G.ReplaceGlueSymbols(line2), Color.Blue);
 
