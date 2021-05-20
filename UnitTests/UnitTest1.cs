@@ -13420,7 +13420,7 @@ namespace UnitTests
             I("RESET;");
             Globals.unitTestScreenOutput = new StringBuilder();
             Globals.errorHelper = "3";
-            FAIL("RUN x1;");
+            FAIL("RUN x1;"); 
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #3" + G.NL
