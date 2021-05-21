@@ -439,6 +439,7 @@ namespace Gekko
             
             if (track) MessageBox.Show("10");
 
+            //Clean up once every 7 days
             bool cleanup = false;
             bool makeNewFile = false;
             string file = System.Windows.Forms.Application.LocalUserAppDataPath + "\\GekkoTimeStamp.txt";
@@ -449,7 +450,7 @@ namespace Gekko
                     DirectoryInfo di = new DirectoryInfo(file);
                     DateTime dt = di.LastWriteTime;
                     double days = (DateTime.Now - dt).TotalDays;
-                    if (days < 0 || days > 2d)  //we get cleanup if invalid time, or > 2 days gone (or stamp file is missing)
+                    if (days < 0 || days > 7d)  //we get cleanup if invalid time, or > 7 days gone (or stamp file is missing)
                     {
                         cleanup = true;
                         makeNewFile = true;

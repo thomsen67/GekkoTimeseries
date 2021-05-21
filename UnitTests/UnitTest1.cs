@@ -12969,159 +12969,180 @@ namespace UnitTests
             // p2     x          x                x          x
             // p3                x                          
 
+            for (int i = 0; i < 2; i++)
+            {
 
-            // ------------------------------------------------------------
-            // normal function
-            // ------------------------------------------------------------                                    
-            I("reset;");
-            I("function val f(val %x); return %x + 100; end;");
-            I("%y = f(2);");            
-            _AssertScalarVal(First(), "%y", 102d);
-            I("library <clear> global;");
-            FAIL("%y = f(2);");
+                // ------------------------------------------------------------
+                // normal function
+                // ------------------------------------------------------------                                    
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("function val f(val %x); return %x + 100; end;");
+                I("%y = f(2);");
+                _AssertScalarVal(First(), "%y", 102d);
+                I("library <clear> global;");
+                FAIL("%y = f(2);");
 
-            // ------------------------------------------------------------
-            // simple
-            // ------------------------------------------------------------                                    
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p1;");
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "p1_f1_a");
-            I("%y2 = f1('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p1_f1_ab");
+                // ------------------------------------------------------------
+                // simple
+                // ------------------------------------------------------------                                    
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p1;");
+                I("%y1 = f1('a');");
+                _AssertScalarString(First(), "%y1", "p1_f1_a");
+                I("%y2 = f1('a', 'b');");
+                _AssertScalarString(First(), "%y2", "p1_f1_ab");
 
-            // ------------------------------------------------------------
-            // masking1
-            // ------------------------------------------------------------            
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p1;");
-            I("library p2;");  //p1 will be first
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "p1_f1_a");
-            I("%y2 = f1('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p1_f1_ab");
+                // ------------------------------------------------------------
+                // masking1
+                // ------------------------------------------------------------            
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p1;");
+                I("library p2;");  //p1 will be first
+                I("%y1 = f1('a');");
+                _AssertScalarString(First(), "%y1", "p1_f1_a");
+                I("%y2 = f1('a', 'b');");
+                _AssertScalarString(First(), "%y2", "p1_f1_ab");
 
-            // ------------------------------------------------------------
-            // masking2
-            // ------------------------------------------------------------            
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p3;");
-            I("library p1;");
-            //p3 will be first, but only has f1(... , ...), not f1(...) or any f2.
-            //        f1(...)    f1(..., ...)     f2(...)    f2(..., ...)            
-            // p3                x                         
-            // p1     x          x                x          x   
-            I("%y1 = f1('a', 'b');");
-            _AssertScalarString(First(), "%y1", "p3_f1_ab");
-            FAIL("%y2 = f1('a');");  //finds f1 in p3, but not overload with 1 argument. Will not use p1:f().
-            I("%y2 = f2('a');");
-            _AssertScalarString(First(), "%y2", "p1_f2_a");
-            I("%y3 = f2('a', 'b');");
-            _AssertScalarString(First(), "%y3", "p1_f2_ab");
+                // ------------------------------------------------------------
+                // masking2
+                // ------------------------------------------------------------            
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p3;");
+                I("library p1;");
+                //p3 will be first, but only has f1(... , ...), not f1(...) or any f2.
+                //        f1(...)    f1(..., ...)     f2(...)    f2(..., ...)            
+                // p3                x                         
+                // p1     x          x                x          x   
+                I("%y1 = f1('a', 'b');");
+                _AssertScalarString(First(), "%y1", "p3_f1_ab");
+                FAIL("%y2 = f1('a');");  //finds f1 in p3, but not overload with 1 argument. Will not use p1:f().
+                I("%y2 = f2('a');");
+                _AssertScalarString(First(), "%y2", "p1_f2_a");
+                I("%y3 = f2('a', 'b');");
+                _AssertScalarString(First(), "%y3", "p1_f2_ab");
 
-            //Test that Global lib is really alway last in the list of libs.
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("function string f1(string %x1); return 'global_f1_' + %x1; end;");
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "global_f1_a");
-            I("library p1;");
-            I("%y2 = f1('a');");
-            _AssertScalarString(First(), "%y2", "p1_f1_a");
-            I("%y3 = global:f1('a');");
-            _AssertScalarString(First(), "%y3", "global_f1_a");
+                //Test that Global lib is really alway last in the list of libs.
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("function string f1(string %x1); return 'global_f1_' + %x1; end;");
+                I("%y1 = f1('a');");
+                _AssertScalarString(First(), "%y1", "global_f1_a");
+                I("library p1;");
+                I("%y2 = f1('a');");
+                _AssertScalarString(First(), "%y2", "p1_f1_a");
+                I("%y3 = global:f1('a');");
+                _AssertScalarString(First(), "%y3", "global_f1_a");
 
-            // ------------------------------------------------------------
-            // colon and remove
-            // ------------------------------------------------------------   
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p2;");
-            I("library p1;");  //p2 will be first
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "p2_f1_a");
-            I("%y2 = f1('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p2_f1_ab");
-            I("%y2 = p1:f1('a', 'b');");
-            _AssertScalarString(First(), "%y2", "p1_f1_ab"); //without colon, it is be p2_f1_a (see above)                       
-            I("library <close> p2;");  //now p1 is first
-            I("%y1 = f1('a');");
-            _AssertScalarString(First(), "%y1", "p1_f1_a");
-            FAIL("%y2 = p2:f1('a', 'b');");
+                // ------------------------------------------------------------
+                // colon and remove
+                // ------------------------------------------------------------   
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p2;");
+                I("library p1;");  //p2 will be first
+                I("%y1 = f1('a');");
+                _AssertScalarString(First(), "%y1", "p2_f1_a");
+                I("%y2 = f1('a', 'b');");
+                _AssertScalarString(First(), "%y2", "p2_f1_ab");
+                I("%y2 = p1:f1('a', 'b');");
+                _AssertScalarString(First(), "%y2", "p1_f1_ab"); //without colon, it is be p2_f1_a (see above)                       
+                I("library <close> p2;");  //now p1 is first
+                I("%y1 = f1('a');");
+                _AssertScalarString(First(), "%y1", "p1_f1_a");
+                FAIL("%y2 = p2:f1('a', 'b');");
 
-            // ------------------------------------------------------------
-            // calling function from own library has priority
-            // ------------------------------------------------------------  
+                // ------------------------------------------------------------
+                // calling function from own library has priority
+                // ------------------------------------------------------------  
 
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p4, p5;");
-            I("%s = f1();");  //will find f1() only in p5. It points to f2(), which is normally first found in p4. But it uses the version from same lib, p5.            
-            _AssertScalarString(First(), "%s", "p5");
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p4, p5;");
+                I("%s = f1();");  //will find f1() only in p5. It points to f2(), which is normally first found in p4. But it uses the version from same lib, p5.            
+                _AssertScalarString(First(), "%s", "p5");
 
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p5;");
-            I("function string f2(); return 'Global'; end;");
-            I("%s = f1();");  //will find f1() only in p5. It points to f2(), which is normally first found in Global. But it uses the version from same lib, p5.
-            _AssertScalarString(First(), "%s", "p5");            
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p5;");
+                I("function string f2(); return 'Global'; end;");
+                I("%s = f1();");  //will find f1() only in p5. It points to f2(), which is normally first found in Global. But it uses the version from same lib, p5.
+                _AssertScalarString(First(), "%s", "p5");
 
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p4, p5;");
-            I("%s = f2();");  //will find f2() in p4 first.
-            _AssertScalarString(First(), "%s", "p4");
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p4, p5;");
+                I("%s = f2();");  //will find f2() in p4 first.
+                _AssertScalarString(First(), "%s", "p4");
 
-            // ------------------------------------------------------------
-            // errors
-            // ------------------------------------------------------------  
+                // ------------------------------------------------------------
+                // errors
+                // ------------------------------------------------------------  
 
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            FAIL("library notexisting;");
-            I("library p1;");
-            FAIL("library p1;");
-            I("reset;");
-            I("library p1;");
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                FAIL("library notexisting;");
+                I("library p1;");
+                FAIL("library p1;");
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("library p1;");
 
-            // -----------------------------------------------------------------------------
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p1 as p1;");  //also checks as.
-            FAIL("library <close> p2;");
-            FAIL("library <clear> p1;");
-            FAIL("library <clear> p2;");
-            FAIL("library <close> global;");
-            Globals.unitTestScreenOutput = new StringBuilder();
-            FAIL("library global;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" reserved "));
+                // -----------------------------------------------------------------------------
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p1 as p1;");  //also checks as.
+                FAIL("library <close> p2;");
+                FAIL("library <clear> p1;");
+                FAIL("library <clear> p2;");
+                FAIL("library <close> global;");
+                Globals.unitTestScreenOutput = new StringBuilder();
+                FAIL("library global;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" reserved "));
 
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");            
-            I("library p1 as pp1;");
-            FAIL("library p1;");  //because it is the same zip file.
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p1 as pp1;");
+                FAIL("library p1;");  //because it is the same zip file.
 
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p1;");
-            FAIL("library \\Sub\\p1;");  //fail because same name
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p1;");
+                FAIL("library \\Sub\\p1;");  //fail because same name
 
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p1;");
-            I("library \\Sub\\p1 as pp1;");  //ok, even though the zip has the same name.
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p1;");
+                I("library \\Sub\\p1 as pp1;");  //ok, even though the zip has the same name.
 
-            I("reset;");            
-            FAIL("function val abs(val %x); return 1; end;"); //error: already exists as in-built
-            I("reset;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-            I("library p6;");
-            I("%y1 = abs(-100);");
-            _AssertScalarVal(First(), "%y1", 100d);  //will take in-built
-            FAIL("%y2 = p6:abs(-100);");  //error: already exists as in-built
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                FAIL("function val abs(val %x); return 1; end;"); //error: already exists as in-built
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library p6;");
+                I("%y1 = abs(-100);");
+                _AssertScalarVal(First(), "%y1", 100d);  //will take in-built
+                FAIL("%y2 = p6:abs(-100);");  //error: already exists as in-built
+
+            }
         }
 
         [TestMethod]
