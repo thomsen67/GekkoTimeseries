@@ -96,6 +96,8 @@ namespace Gekko
         public bool interface_table_operators = true;
         public int interface_zoom = 100;
         // ---
+        public bool library_cache = true;  //if using cache on file or not        
+        // ---
         public string menu_startfile = "menu.html";
         // ---
         public bool model_cache = true;  //if using cache on file or not        
@@ -346,6 +348,7 @@ namespace Gekko
             Add("INTERFACE SUGGESTIONS", Globals.xnameOrString, "none", "option");
             Add("INTERFACE TABLE OPERATORS", Globals.xbool);
             Add("INTERFACE ZOOM", Globals.xint);
+            Add("LIBRARY CACHE", Globals.xbool);
             Add("MENU STARTFILE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("MODEL CACHE", Globals.xbool);
             Add("MODEL CACHE MAX", Globals.xint);            

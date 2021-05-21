@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using ProtoBuf;
+using ProtoBuf.Meta;
 
 namespace Gekko
 {
@@ -338,27 +340,96 @@ namespace Gekko
                 }
                 else
                 {
-                    string tempPath = Program.GetTempGbkFolderPath();
-                    if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
+                    //not found in RAM cache.
+                    //now we try the disk cache.                    
+
+                    string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
+                    string modelHash = Program.GetMD5Hash(s); //Pretty unlikely that two different libs could produce the same hash.
+                    modelHash = modelHash.Trim();  //probably not necessarydependentsHash);
+                    string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + modelHash + ".lib";
+
+                    bool loadedFromProtobuf = false;
+
+                    if (Program.options.library_cache == true)
                     {
-                        Directory.CreateDirectory(tempPath);
+                        if (File.Exists(mdlFileNameAndPath))
+                        {
+                            try
+                            {
+                                DateTime dt1 = DateTime.Now;
+                                using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, Program.GekkoFileReadOrWrite.Read))
+                                {
+                                    library = Serializer.Deserialize<Library>(fs);
+                                    loadedFromProtobuf = true;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                if (G.IsUnitTesting())
+                                {
+                                    throw;
+                                }
+                                else
+                                {
+                                    //do nothing, we then have to parse the file
+                                    loadedFromProtobuf = false;
+                                }
+                            }
+                        }
                     }
                     else
                     {
-                        Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
+                        loadedFromProtobuf = false;
                     }
 
-                    Program.WaitForZipRead(tempPath, fileNameWithPath);
-                    library = new Library(libraryName, fileNameWithPath, stamp);
-                    library.LibraryExtractor(tempPath, tempPath, fileNameWithPath);
-
-                    try
+                    if (loadedFromProtobuf)
                     {
-                        G.DeleteFolder(tempPath);
+                        //do nothing, also no writing of .lib file of course
                     }
-                    catch
+                    else
                     {
-                        //not catastrofic if this fails
+                        //We have to parse it
+
+                        string tempPath = Program.GetTempGbkFolderPath();
+                        if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
+                        {
+                            Directory.CreateDirectory(tempPath);
+                        }
+                        else
+                        {
+                            Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
+                        }
+
+                        Program.WaitForZipRead(tempPath, fileNameWithPath);
+                        library = new Library(libraryName, fileNameWithPath, stamp);
+                        library.LibraryExtractor(tempPath, tempPath, fileNameWithPath);
+
+                        try
+                        {
+                            G.DeleteFolder(tempPath);
+                        }
+                        catch
+                        {
+                            //not catastrofic if this fails
+                        }                        
+
+                        try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                        {                            
+                            //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                            RuntimeTypeModel serializer = TypeModel.Create();
+                            serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                            // ----- SERIALIZE                    
+                            string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + modelHash + ".lib";
+                            string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                            {
+                                serializer.Serialize(fs, library);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            //do nothing, not the end of the world if it fails
+                        }
                     }
 
                     //all files loaded from .zip end up here, and the cache only grows (cannot shrink).

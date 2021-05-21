@@ -11533,11 +11533,22 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Gets a text file as a C# string. Handles UTF8/ANSI encodeing, too.
+        /// Gets a text file as a C# string. Handles UTF8/ANSI encoding.
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
         public static string GetTextFromFileWithWait(string filename)
+        {
+            return GetTempGbkFolderPath(filename, true);
+        }
+
+        /// <summary>
+        /// Gets a text file as a C# string. Can handle UTF8/ANSI encoding, too. If slow == false, there will be
+        /// no UTF8 check, and the file is read fast as binary.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static string GetTextFromFileWithWait(string filename, bool slow)
         {
             //Encoding encoding = Encoding.Default;
             String original = String.Empty;
@@ -11555,7 +11566,7 @@ namespace Gekko
             bool utf8checker = false;
             using (FileStream fs = WaitForFileStream(filename, GekkoFileReadOrWrite.Read))
             {
-                utf8checker = Utf8Checker.IsUtf8(fs);  //NOTE: tastes the file: this may be slow on very large files. So avoid GetTextFromFileWithWait() on databank reading etc. //previously, sr.CurrentEncoding was used, but it is not precise enough to detect UTF8 without BOM mark at start (TextPad for instance)
+                if (slow) utf8checker = Utf8Checker.IsUtf8(fs);  //NOTE: tastes the file: this may be slow on very large files. So avoid GetTextFromFileWithWait() on databank reading etc. //previously, sr.CurrentEncoding was used, but it is not precise enough to detect UTF8 without BOM mark at start (TextPad for instance)
                 fs.Position = 0;  //to rewind
                 Encoding encoding = Encoding.Default;
                 if (utf8checker) encoding = Encoding.UTF8;
@@ -11566,28 +11577,34 @@ namespace Gekko
                     sr.Close();
                 }
             }
-
-            string s = null;
-
-            if (utf8checker)
+            
+            if (slow)
             {
-                s = original;
+                string s = null;
+                if (utf8checker)
+                {
+                    s = original;
+                }
+                else
+                {
+                    //Convert bytes from ANSI to UTF8
+                    byte[] encBytes = current.GetBytes(original);  //'current' will always be equal to 'encoding' I guess, but just for safety
+                    byte[] utf8Bytes = Encoding.Convert(current, Encoding.UTF8, encBytes);
+                    s = Encoding.UTF8.GetString(utf8Bytes);
+                }
+
+                s = s.Replace(Convert.ToChar(160).ToString(), " ");  //non-breaking space
+                s = s.Replace(Convert.ToChar(173).ToString(), "");  //soft hyphen
+
+                //the code below is probably too dangerous: what about newlines etc.??
+                //s = Regex.Replace(s, @"[^\u0000-\u001F]+", string.Empty);  //see http://stackoverflow.com/questions/123336/how-can-you-strip-non-ascii-characters-from-a-string-in-c, here we use 0-1F, that is: 0-31
+
+                return s;
             }
             else
             {
-                //Convert bytes from ANSI to UTF8
-                byte[] encBytes = current.GetBytes(original);  //'current' will always be equal to 'encoding' I guess, but just for safety
-                byte[] utf8Bytes = Encoding.Convert(current, Encoding.UTF8, encBytes);
-                s = Encoding.UTF8.GetString(utf8Bytes);
-            }
-
-            s = s.Replace(Convert.ToChar(160).ToString(), " ");  //non-breaking space
-            s = s.Replace(Convert.ToChar(173).ToString(), "");  //soft hyphen
-
-            //the code below is probably too dangerous: what about newlines etc.??
-            //s = Regex.Replace(s, @"[^\u0000-\u001F]+", string.Empty);  //see http://stackoverflow.com/questions/123336/how-can-you-strip-non-ascii-characters-from-a-string-in-c, here we use 0-1F, that is: 0-31
-
-            return s;
+                return original;
+            }            
         }             
 
         /// <summary>
