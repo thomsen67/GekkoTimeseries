@@ -183,6 +183,7 @@ namespace Gekko
         {
             //When we get here, we are typically at a line that has just breaked.
 
+            ETabs tab = ETabs.Main;
             string marginFirst = "";
             int lineWidth = Program.options.print_width;
             bool mustAlsoPrintOnScreen = false;
@@ -211,6 +212,7 @@ namespace Gekko
                 lineWidth = w.lineWidth;
                 mustAlsoPrintOnScreen = w.mustAlsoPrintToScreen;
                 marginFirst = w.indent;
+                tab = w.tab;
             }
 
             string margin = G.Blanks(marginFirst.Length);
@@ -219,6 +221,13 @@ namespace Gekko
             //The message in main tab
             //-------------------------------
             this.ConsolidateLines("main");
+
+            if (tab == ETabs.Output)
+            {
+                Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
+                O.Cls("output");
+            }
+
             for (int ii = 0; ii < this.storageMain.Count; ii++)
             {
                 string m = marginFirst;
@@ -227,7 +236,7 @@ namespace Gekko
                     m = margin;
                     //color = Color.Empty;
                 }
-                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, lineWidth, color, ETabs.Main, this.type, mustAlsoPrintOnScreen);
+                WrapHelper(this.storageMain[ii].linesAtStart, 1, m, margin, this.storageMain[ii].consolidated, lineWidth, color, tab, this.type, mustAlsoPrintOnScreen);
             }
 
             if (this.storageMore[0].storage.Count > 0)
@@ -556,6 +565,7 @@ namespace Gekko
     /// </summary>
     public class Writeln : Wrap
     {
+        public ETabs tab = ETabs.Main;  //main or ouput
         public string indent = "";
         public Color color = Color.Empty;
         public int lineWidth = Program.options.print_width;  //-12345 for null, int.MaxValue for no limits
@@ -575,9 +585,9 @@ namespace Gekko
         /// <param name="lineWidth">Use -12345 to indicate null, or int.MaxValue for no limits</param>
         /// <param name="color">use Color.Empty to indicate null</param>
         /// <param name="mustAlsoWriteToScreen">true if it will print to screen even when piping</param>
-        public Writeln(string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen) : base(EWrapType.Writeln)
+        public Writeln(string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen, ETabs tab) : base(EWrapType.Writeln)
         {
-            Helper(indent, lineWidth, color, mustAlsoWriteToScreen);
+            Helper(indent, lineWidth, color, mustAlsoWriteToScreen, tab);
         }
 
         /// <summary>
@@ -597,18 +607,19 @@ namespace Gekko
         /// <param name="s"></param>
         /// <param name="lineWidth">Use -12345 to indicate null, , or int.MaxValue for no limits</param>
         /// <param name="color">use Color.Empty to indicate null</param>
-        public Writeln(string s, string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen) : base(EWrapType.Writeln)
+        public Writeln(string s, string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen, ETabs tab) : base(EWrapType.Writeln)
         {
-            Helper(indent, lineWidth, color, mustAlsoWriteToScreen);
+            Helper(indent, lineWidth, color, mustAlsoWriteToScreen, tab);
             this.MainAdd(s);
             this.Exe1();
         }
 
-        private void Helper(string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen)
+        private void Helper(string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen, ETabs tab)
         {
             if (lineWidth != -12345) this.lineWidth = lineWidth;
             if (color != Color.Empty) this.color = color;
-            if (indent != "") this.indent = indent;
+            if (!string.IsNullOrEmpty(indent)) this.indent = indent;
+            this.tab = tab;
             this.mustAlsoPrintToScreen = mustAlsoWriteToScreen;
         }
     }

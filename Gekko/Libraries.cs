@@ -100,10 +100,15 @@ namespace Gekko
                             if (fname.EndsWith("()")) fname = fname.Substring(0, fname.Length - "()".Length);
                             else fname = Globals.procedure + fname;
                             GekkoFunction f = library.GetFunction(fname, true);  //should be there
-                            foreach (GekkoFunctionCode gfc in f.overloads)
+
+                            using (Writeln w = new Writeln("", -12345, System.Drawing.Color.Empty, false, ETabs.Output))
                             {
-                                //See also this: #08975389245253
-                                new Writeln(gfc.code);
+                                foreach (GekkoFunctionCode gfc in f.overloads)
+                                {
+                                    //See also this: #08975389245253                                
+                                    w.MainAdd(gfc.code);
+                                    w.MainNewLine();
+                                }
                             }
                         };
 

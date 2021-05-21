@@ -18778,7 +18778,7 @@ namespace Gekko
                         new Error("Table file failed: " + tablefile, false);
                     }
 
-                    using (var w = new Writeln("    ", int.MaxValue, Color.Gray, true))
+                    using (var w = new Writeln("    ", int.MaxValue, Color.Gray, true, ETabs.Main))
                     {
                         foreach (StackHelper sh in stackLines)
                         {
