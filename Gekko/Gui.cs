@@ -738,11 +738,13 @@ namespace Gekko
 
         private static void DeleteTemporaryFilesFromLastSession()
         {
+            //TODO: Do this same way as Flush(), cf. #8073589432059875
+
             string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
             try
             {
                 if (!Directory.Exists(path)) return;
-                G.DeleteFolder(path, "mdl");
+                G.DeleteFolder(path, false);
             }
             catch (Exception e)
             {

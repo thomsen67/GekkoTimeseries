@@ -2821,7 +2821,7 @@ namespace Gekko
             if (folder != "")
             {
                 string outputPath = Globals.localTempFilesLocation + "\\" + "menufilesconversion";
-                G.DeleteFolder(outputPath);
+                G.DeleteFolder(outputPath, true);
                 Directory.CreateDirectory(outputPath);
 
                 Globals.convertMenuCounter = 0;

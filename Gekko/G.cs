@@ -3797,23 +3797,39 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Delete an entire folder, with omit.
+        /// Delete an entire folder, with omit.        /// 
+        /// If total == true, BEWARE that you are pointing to the RIGHT folder always. Otherwise,
+        /// a lot may be damaged.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="omitType"></param>
-        public static void DeleteFolder(string s, string omitType)
+        public static void DeleteFolder(string s, string omitType, bool total)
         {
+            if (omitType != null && total) new Error("DeleteFolder() wrong mix");
             if (!Directory.Exists(s)) return;
             DeleteFolderHelper(new DirectoryInfo(s), omitType);
+            if (total)
+            {
+                try
+                {
+                    Directory.Delete(s);
+                }
+                catch
+                {
+                    //we may survive if this fails
+                }
+            }
         }
 
         /// <summary>
-        /// Delete an entire folder.
+        /// Delete an entire folder. 
+        /// If total == true, BEWARE that you are pointing to the RIGHT folder always. Otherwise,
+        /// a lot may be damaged.
         /// </summary>
         /// <param name="s"></param>
-        public static void DeleteFolder(string s)
+        public static void DeleteFolder(string s, bool total)
         {
-            DeleteFolder(s, null);
+            DeleteFolder(s, null, total);
         }
 
         /// <summary>
@@ -3842,17 +3858,23 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper for deleting folders.
+        /// Helper for deleting folders. Total to also delete structure.
         /// </summary>
         /// <param name="directoryInfo"></param>
         /// <param name="omitType"></param>
-        //Seems it does not delete the folders, but only their content
         private static void DeleteFolderHelper(DirectoryInfo directoryInfo, string omitType)
         {
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
                 if (omitType != null && G.Equal("." + omitType, file.Extension)) continue;  //skip it
-                file.Delete();  //hmm probably best not to use WaitForFileDelete() here, exceptions are typically caught in a wrapper on this method, and not critical if it fails (used for cleanup)
+                try
+                {
+                    file.Delete();  //hmm probably best not to use WaitForFileDelete() here, exceptions are typically caught in a wrapper on this method, and not critical if it fails (used for cleanup)
+                }
+                catch
+                {
+                    //we may survive if this fails
+                }
             }
             foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
             {

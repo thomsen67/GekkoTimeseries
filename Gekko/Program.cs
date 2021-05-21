@@ -659,7 +659,7 @@ namespace Gekko
             this.tempFolder = Globals.localTempFilesLocation + "\\" + "gekkotempfiles_" + Program.RandomInt(11111111, 99999999);
             if (Directory.Exists(this.tempFolder))
             {
-                G.DeleteFolder(this.tempFolder);
+                G.DeleteFolder(this.tempFolder, true);
             }
             Directory.CreateDirectory(this.tempFolder);
             this.zipFileAndFolder = Program.CreateFullPathAndFileName(zipFileName);
@@ -668,7 +668,7 @@ namespace Gekko
         public void ZipAndCleanup()
         {
             Program.WaitForZipWrite(this.tempFolder, this.zipFileAndFolder);
-            G.DeleteFolder(this.tempFolder);
+            G.DeleteFolder(this.tempFolder, true);
         }
     }
 
@@ -10420,7 +10420,7 @@ namespace Gekko
 
             string outputPath = Globals.localTempFilesLocation + "\\" + "tabtotextconversion";
 
-            G.DeleteFolder(outputPath);
+            G.DeleteFolder(outputPath, true);
             Directory.CreateDirectory(outputPath);
 
             Globals.convertTabToTextCounter = 0;
@@ -10569,7 +10569,7 @@ namespace Gekko
             {
                 string outputPath = Globals.localTempFilesLocation + "\\" + "tabfilesconversion";
 
-                G.DeleteFolder(outputPath);
+                G.DeleteFolder(outputPath, true);
                 Directory.CreateDirectory(outputPath);
 
                 Globals.convertTableCounter = 0;
@@ -11539,7 +11539,7 @@ namespace Gekko
         /// <returns></returns>
         public static string GetTextFromFileWithWait(string filename)
         {
-            return GetTempGbkFolderPath(filename, true);
+            return GetTextFromFileWithWait(filename, true);
         }
 
         /// <summary>
@@ -18827,12 +18827,13 @@ namespace Gekko
 
         public static void Flush()
         {
-            G.DeleteFolder(Globals.localTempFilesLocation);
+            //See also #8073589432059875
+            G.DeleteFolder(Globals.localTempFilesLocation, true);
+            Directory.CreateDirectory(Globals.localTempFilesLocation);
             G.Writeln();
             G.Writeln("Temporary folder was flushed:");
             G.Writeln("  " + Globals.localTempFilesLocation);
-        }        
-
+        }
         
         public static List<string> GetDatabankInfo(StampTypes type)
         {
@@ -25887,7 +25888,7 @@ namespace Gekko
         private static void ResidualCheck(string checkType, bool dlog, bool split)
         {
             string outputPath = Globals.localTempFilesLocation + "\\" + "residualcheck";
-            G.DeleteFolder(outputPath);
+            G.DeleteFolder(outputPath, true);
             Directory.CreateDirectory(outputPath);
 
             //This code is not high-performant, but oh well...

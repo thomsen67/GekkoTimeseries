@@ -314,7 +314,7 @@ namespace Gekko
 
                 DateTime stamp = File.GetLastWriteTime(fileNameWithPath);                
 
-                //We know that the zip file name is not in .libraries, but it could be in cache.
+                //We know that the zip file name is not in .libraries, but it could be in ram cache.
                 //If so, no need to process the zip file, just take the cache object.
                 Library hit = this.CheckCache(fileNameWithPath);
 
@@ -340,16 +340,16 @@ namespace Gekko
                 }
                 else
                 {
-                    //not found in RAM cache.
-                    //now we try the disk cache.                    
-
+                    //Not found in RAM cache.
+                    //Now we try the disk cache.                    
+                    //We only allow a match if it is BOTH the same bytes in the file, AND the filepath + alias is the same.
+                    //This makes file references easier, less to think about. So two identical libs may be parsed two times if the are in two different file locations (or a different alias is used)
                     string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
-                    string modelHash = Program.GetMD5Hash(s); //Pretty unlikely that two different libs could produce the same hash.
+                    string ss = s + G.NL + "Filename: " + fileNameWithPath + "Alias: " + libraryName;
+                    string modelHash = Program.GetMD5Hash(ss); //Pretty unlikely that two different libs could produce the same hash.
                     modelHash = modelHash.Trim();  //probably not necessarydependentsHash);
-                    string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + modelHash + ".lib";
-
+                    string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "lib" + "_" + modelHash + ".mdl";
                     bool loadedFromProtobuf = false;
-
                     if (Program.options.library_cache == true)
                     {
                         if (File.Exists(mdlFileNameAndPath))
@@ -406,7 +406,7 @@ namespace Gekko
 
                         try
                         {
-                            G.DeleteFolder(tempPath);
+                            G.DeleteFolder(tempPath, true);
                         }
                         catch
                         {
@@ -419,7 +419,7 @@ namespace Gekko
                             RuntimeTypeModel serializer = TypeModel.Create();
                             serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                             // ----- SERIALIZE                    
-                            string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + modelHash + ".lib";
+                            string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + modelHash + ".mdl";
                             string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
                             using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
                             {
@@ -539,39 +539,54 @@ namespace Gekko
                 new Error("You can only clear 'Global' (the global library)");
             }
         }
-
     }
+
 
     /// <summary>
     /// All the functions 'f', 'g', etc. for this package
     /// </summary>
+    [ProtoContract]
     public class Library
     {
+
         /// <summary>
         /// Name of the library, like in LIBRARY mylib;
-        /// </summary>
+        /// </summary>        
+        [ProtoMember(1)]
         private string name = null;
 
         /// <summary>
         /// Filename of zip. Can be null, for the global library.
         /// </summary>
+        [ProtoMember(2)]
         private string fileNameWithPath = null;
 
+        [ProtoMember(3)]
+        private GekkoDictionary<string, GekkoFunction> functions = new GekkoDictionary<string, GekkoFunction>(StringComparer.OrdinalIgnoreCase);
+        
         /// <summary>
-        /// Stamp: when the file was written.
+        /// Stamp: when the file was written. Do not protobuf.
         /// </summary>
         private DateTime stamp = new DateTime(0l);  //null
 
+        /// <summary>
+        /// Do not protobuf.
+        /// </summary>
         GekkoFunction fastLookup = null;
-                
+
+        /// <summary>
+        /// Only for protobuf
+        /// </summary>
+        public Library()
+        {
+        }
+
         /// <summary>
         /// Create a new package/library.
         /// </summary>
         /// <param name="name"></param>
         public Library(string name, string fileNameWithPath, DateTime stamp)
-        {
-            //this.name = name;
-            //this.fileNameWithPath = fileNameWithPath;
+        {            
             if (name != null) this.name = name.Trim();
             if (fileNameWithPath != null) this.fileNameWithPath = fileNameWithPath.Trim();
             this.stamp = stamp;
@@ -600,9 +615,7 @@ namespace Gekko
         {
             return this.stamp;
         }
-
-        private GekkoDictionary<string, GekkoFunction> functions = new GekkoDictionary<string, GekkoFunction>(StringComparer.OrdinalIgnoreCase);
-
+        
         /// <summary>
         /// Adds a function to the library.
         /// </summary>
@@ -799,28 +812,43 @@ namespace Gekko
             gfc.line= t[i0].line;
             function.overloads.Add(gfc);  //See also this: #08975389245253
         }
-
     }
 
+    [ProtoContract]
     public class GekkoFunctionCode
     {
+        [ProtoMember(1)]
         public string fileNameWithPath = null;
+
+        [ProtoMember(2)]
         public int line = -12345;
+
+        [ProtoMember(3)]
         public string code = null;
+
+        /// <summary>
+        /// Only for protobuf.
+        /// </summary>
+        public GekkoFunctionCode()
+        {
+        }
     }
 
+    [ProtoContract]
     public class GekkoFunction
     {
-        public GekkoFunction(string name)
-        {
-            this.name = name;
-        }
-
+        [ProtoMember(1)]
         private string name = null; //for instance 'f'
-        public string libraryName = null;  //where the function is stored
+
+        [ProtoMember(2)]
+        public string libraryName = null;  //name of the lib where the function is stored
+
+        [ProtoMember(3)]
+        public List<GekkoFunctionCode> overloads = new List<GekkoFunctionCode>();  //may contain code from several places, snippets of f(), f(...), f(..., ...)
+
+        //Do not protobuf
         public bool hasBeenCompiled = false;
 
-        public List<GekkoFunctionCode> overloads = new List<GekkoFunctionCode>();  //may contain code from several places, snippets of f(), f(...), f(..., ...)
         // ---------------------------------    
         public Func<GekkoSmpl, P, bool, IVariable> function0 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, IVariable> function1 = null;
@@ -836,7 +864,19 @@ namespace Gekko
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function11 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function12 = null;
         public Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> function13 = null;
-        
+
+        /// <summary>
+        /// Only for protobuf.
+        /// </summary>
+        public GekkoFunction()
+        {
+        }
+
+        public GekkoFunction(string name)
+        {
+            this.name = name;
+        }
+
         /// <summary>
         /// Name of function, irrespective of overloads.
         /// </summary>
