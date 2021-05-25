@@ -2184,7 +2184,7 @@ namespace Gekko
                         var temp = Stringlist.GetListOfStringsFromListOfIvariables(indexes);
                         if (temp != null)
                         {
-                            new Error("Could not understand index " + this.name + "[" + G.GetListWithCommas(temp) + "]");
+                            new Error("Could not understand index " + this.name + "[" + Stringlist.GetListWithCommas(temp) + "]");
                         }
                         else
                         {
@@ -2349,7 +2349,7 @@ namespace Gekko
                         else
                         {
                             //#07549843254
-                            new Error("Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + G.GetListWithCommas(keys) + "]. You may change the settings with the following option: OPTION databank create auto = yes;.");                      
+                            new Error("Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + Stringlist.GetListWithCommas(keys) + "]. You may change the settings with the following option: OPTION databank create auto = yes;.");                      
                         }
 
                         if (rhsIsTimeless)

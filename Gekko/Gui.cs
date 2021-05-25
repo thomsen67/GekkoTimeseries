@@ -1399,7 +1399,7 @@ namespace Gekko
                     Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPageOutput;
                     O.Cls("output");
                     string s = Globals.linkContainer[long.Parse(input)].s;
-                    List<string> ss = G.ExtractLinesFromText(s);
+                    List<string> ss = Stringlist.ExtractLinesFromText(s);
                     foreach (string s2 in ss)
                     {
                         G.Writeln(s2, ETabs.Output);
@@ -1981,11 +1981,11 @@ namespace Gekko
                 if (File.Exists(fileSnapshot) && File.Exists(fileHistory))
                 {
                     List<string> ss1 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(fileSnapshot), false);  //just to remove blank lines at top/bottom (not in middle), not to remove any [[RunGekkoIniFile]]
-                    string s1 = G.ExtractTextFromLines(ss1).ToString();
+                    string s1 = Stringlist.ExtractTextFromLines(ss1).ToString();
                     Globals.sessionMemorySnapshot = s1;
 
                     List<string> ss2 = GetCleanedCommandMemory(Program.GetTextFromFileWithWait(fileHistory), true);
-                    string s2 = G.ExtractTextFromLines(ss2).ToString();
+                    string s2 = Stringlist.ExtractTextFromLines(ss2).ToString();
                     Globals.sessionMemoryHistory = s2;
 
                     if (!string.IsNullOrWhiteSpace(Globals.sessionMemorySnapshot) || !string.IsNullOrWhiteSpace(Globals.sessionMemoryHistory))
@@ -2920,7 +2920,7 @@ namespace Gekko
             w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
             w.textBox1.FontSize = 11;
             w.Title = "Command history since last clearing of workspace";
-            w.textBox1.Text = G.ExtractTextFromLines(ss2).ToString();
+            w.textBox1.Text = Stringlist.ExtractTextFromLines(ss2).ToString();
             w.ShowDialog();
         }
 
@@ -2930,7 +2930,7 @@ namespace Gekko
         /// <returns></returns>
         public static List<string> GetCleanedCommandMemory(string s2, bool removeBlanksInMiddle)
         {
-            List<string> ss = G.ExtractLinesFromText(s2);
+            List<string> ss = Stringlist.ExtractLinesFromText(s2);
 
             int c1 = 0;
             for (int i = 0; i < ss.Count; i++)

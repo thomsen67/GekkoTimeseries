@@ -2319,7 +2319,7 @@ namespace Gekko
 
                 string tab = ",";
                 //string file = Program.options.folder_working + "\\s56b.TAB";
-                List<string> lines = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
+                List<string> lines = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
                 int counter = 0;
                 foreach (string line2 in lines)
                 {
@@ -2690,7 +2690,7 @@ namespace Gekko
 
             string title = null;
 
-            List<string> lines = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
+            List<string> lines = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
             int counter = 0;
 
             string path = "";

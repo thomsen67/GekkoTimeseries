@@ -1272,13 +1272,13 @@ namespace Gekko
 
         public static string HandleModelFilesGams(string input)
         {
-            List<string> lines = G.ExtractLinesFromText(input);
+            List<string> lines = Stringlist.ExtractLinesFromText(input);
             return GetModelHashGams(lines);
         }
 
         private static string GetModelHashGams(List<string> lines)
         {
-            string trueHash = Program.GetMD5Hash(G.ExtractTextFromLines(lines).ToString()); //Pretty unlikely that two different gams files could produce the same hash.
+            string trueHash = Program.GetMD5Hash(Stringlist.ExtractTextFromLines(lines).ToString()); //Pretty unlikely that two different gams files could produce the same hash.
             trueHash = trueHash.Trim();  //probably not necessary
             return trueHash;
         }

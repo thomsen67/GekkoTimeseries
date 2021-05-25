@@ -276,7 +276,7 @@ namespace Gekko
             GekkoDictionary<string, List<Tuple<string, string>>> doc = new GekkoDictionary<string, List<Tuple<string, string>>>(StringComparer.OrdinalIgnoreCase);
             string dokFileName = Program.options.folder_working + "\\" + settings_dok_filename;
             string dok2 = Program.GetTextFromFileWithWait(dokFileName);
-            List<string> dok = G.ExtractLinesFromText(dok2);
+            List<string> dok = Stringlist.ExtractLinesFromText(dok2);
             for (int i = 0; i < dok.Count; i++)
             {
                 string line = dok[i].Trim();
@@ -303,7 +303,7 @@ namespace Gekko
 
             GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + settings_est_filename);
-            List<string> lines = G.ExtractLinesFromText(est);
+            List<string> lines = Stringlist.ExtractLinesFromText(est);
             int listI = -12345;
             for (int i = 0; i < lines.Count; i++)
             {

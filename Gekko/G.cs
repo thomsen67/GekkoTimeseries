@@ -2235,61 +2235,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>
-        /// Removes empty lines in a list of strings
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static List<string> RemoveEmptyLines(List<string> s)
-        {
-            List<string> xx = new List<string>();
-            foreach (string s2 in s)
-            {
-                if (s2.Trim() == "") continue;
-                xx.Add(s2);
-            }
-            return xx;
-        }
-
-        /// <summary>
-        /// Transforms a list of strings into a string
-        /// </summary>
-        /// <param name="linesInput"></param>
-        /// <returns></returns>
-        public static StringBuilder ExtractTextFromLines(List<string> linesInput)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (string line in linesInput)
-            {
-                sb.AppendLine(line);
-            }
-            return sb;
-        }
-
-        /// <summary>
-        /// Transform a string into a list of strings
-        /// </summary>
-        /// <param name="textInput"></param>
-        /// <returns></returns>
-        public static List<string> ExtractLinesFromText(string textInput)
-        {
-            StringReader inputFileStringReader = new StringReader(textInput);
-            List<string> output = new List<string>();
-            while (true)
-            {
-                string aLine = inputFileStringReader.ReadLine();
-                if (aLine != null)
-                {
-                    output.Add(aLine);
-                }
-                else
-                {
-                    break;
-                }
-            }
-            return output;
-        }
-
+        
         /// <summary>
         /// Helper method for file access (writing)
         /// </summary>
@@ -2933,7 +2879,7 @@ namespace Gekko
 
             if (precise)
             {
-                var ss2 = G.ExtractLinesFromText(s);
+                var ss2 = Stringlist.ExtractLinesFromText(s);
                 return ss2.Count;
             } else
             {
@@ -3132,7 +3078,7 @@ namespace Gekko
                 Program.options.print_width = int.MaxValue;
                 try
                 {
-                    List<string> lines = G.ExtractLinesFromText(sb.ToString());
+                    List<string> lines = Stringlist.ExtractLinesFromText(sb.ToString());
                     foreach (string s2 in lines)
                     {
                         G.Writeln(s2);
@@ -3882,6 +3828,30 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Convert from "f", and from "procedure__g". 
+        /// With type == 1, we return "f()" or "g".
+        /// With type == 2, we return "function f()" or "procedure g".
+        /// With type == 3, we return "'f()'" or "'g'".
+        /// With type == 4, we return "function 'f()'" or "procedure 'g'".
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string FromLibraryToFunctionProcedureName(string s, int type)
+        {
+            if (type < 1 || type > 4) new Error("Wrong type");
+            string ss = null;
+            if (s.StartsWith(Globals.procedure)) ss = s.Substring(Globals.procedure.Length);
+            else ss = s + "()";
+            if (type == 3 || type == 4) ss = "'" + ss + "'";
+            if (type == 2 || type == 4)
+            {
+                if (s.StartsWith(Globals.procedure)) ss = "procedure " + ss;
+                else ss = "function " + ss;
+            }
+            return ss;
+        }
+
 
         /// <summary>
         /// Calendar function.
@@ -3987,36 +3957,7 @@ namespace Gekko
             }
             if (!nocr) G.Writeln();
             return;
-        }
-
-        /// <summary>
-        /// Transform a list of strings to a comma-separated string
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public static string GetListWithCommas(List<string> list) 
-        {
-            if (list == null) return null;
-            StringBuilder sb = new StringBuilder();            
-            for (int i = 0; i < list.Count; i++)
-            {
-                string s = list[i];                                                
-                sb.Append(s);
-                if (i < list.Count - 1) sb.Append(", ");
-            }
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Overload
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public static string GetListWithCommas(string[] list)
-        {
-            if (list == null) return null;
-            return GetListWithCommas(new List<string>(list));
-        }
+        }        
         
         /// <summary>
         /// For writing output to screen

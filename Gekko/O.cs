@@ -2591,7 +2591,7 @@ namespace Gekko
                 //%x or #x
                 if (indexes != null)
                 {
-                    new Error("Name like " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " not allowed");
+                    new Error("Name like " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " not allowed");
                     //throw new GekkoException();
                 }
                 else
@@ -2976,7 +2976,7 @@ namespace Gekko
                 //%x or #x
                 if (indexes != null)
                 {
-                    new Error("Name like " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " not allowed");
+                    new Error("Name like " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " not allowed");
                     //throw new GekkoException();
                 }
                 else
@@ -3009,7 +3009,7 @@ namespace Gekko
 
                     if (iv2 == null)
                     {
-                        new Error("Array-series " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " does not exist");
+                        new Error("Array-series " + nameWithFreq + "[" + Stringlist.GetListWithCommas(indexes) + "]" + " does not exist");
                         //throw new GekkoException();
                     }
                     else
@@ -3902,7 +3902,7 @@ namespace Gekko
             if (index != null && index.Length > 0)
             {
                 s += "[";
-                s += G.GetListWithCommas(index);
+                s += Stringlist.GetListWithCommas(index);
                 s += "]";
             }
             return s;
@@ -5248,10 +5248,8 @@ namespace Gekko
         /// <param name="functionName"></param>
         /// <returns></returns>
         public static string LastText(string functionName, string fileName)
-        {
-            if (functionName.Contains(Globals.procedure)) functionName = "PROCEDURE " + functionName.Replace(Globals.procedure, "");
-            else functionName = "FUNCTION " + functionName;
-            return functionName + ", " + fileName + "";
+        {            
+            return G.FromLibraryToFunctionProcedureName(functionName, 4) + ", " + fileName + "";
         }
 
         /// <summary>
@@ -5560,7 +5558,7 @@ namespace Gekko
                 if (f.function11 != null) v.Add("9");
                 if (f.function12 != null) v.Add("10");
                 if (f.function13 != null) v.Add("11");
-                error.MoreAdd("Function '" + name + "' from library '" + f.libraryName + "' has variants with the following number of arguments: " + G.GetListWithCommas(v));
+                error.MoreAdd("Function '" + name + "' from library '" + f.libraryName + "' has variants with the following number of arguments: " + Stringlist.GetListWithCommas(v));
             }
         }
 
@@ -8307,7 +8305,7 @@ namespace Gekko
                         if (names.Count > 0)
                         {
                             G.Writeln();
-                            G.Writeln(G.GetListWithCommas(names));
+                            G.Writeln(Stringlist.GetListWithCommas(names));
                         }
                     }
 
@@ -9515,7 +9513,7 @@ namespace Gekko
             public string fileName = null;
             public void Exe()
             {                
-                Globals.r_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName));
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName));
             }
         }
 
@@ -9675,7 +9673,7 @@ namespace Gekko
                 if (G.Equal(opt_aremos, "yes")) extension = ".cmd";
                 string zfilename = Program.CreateFullPathAndFileName(G.AddExtension(this.fileName, extension));
                 string xx = Program.GetTextFromFileWithWait(zfilename);
-                List<string> xxx = G.ExtractLinesFromText(xx);                
+                List<string> xxx = Stringlist.ExtractLinesFromText(xx);                
                 if (zfilename.ToLower().EndsWith(".cmd") || zfilename.ToLower().EndsWith("." + Globals.extensionCommand)) 
                     zfilename = zfilename.Substring(0, zfilename.Length - 4);
                 string zz = zfilename + "_translate." + Globals.extensionCommand;

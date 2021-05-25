@@ -1435,7 +1435,7 @@ namespace Gekko
                 if (Globals.errorMemory != null)
                 {
                     s += G.NL + G.NL + "---------------------------------------------------------------------" + G.NL;
-                    List<string> xx = G.ExtractLinesFromText(Globals.errorMemory.ToString());
+                    List<string> xx = Stringlist.ExtractLinesFromText(Globals.errorMemory.ToString());
                     for (int i = 0; i < xx.Count; i++)
                     {
                         if (i > 30) continue;  //so that we don't accidentally get 100's of lines from user output pasted in. The intention is to only get a copy of messages since last error message.
@@ -1715,7 +1715,7 @@ namespace Gekko
             }
 
             string input = GetTextFromFileWithWait(fullFileNameAndPath);
-            List<string> lines = G.ExtractLinesFromText(input);
+            List<string> lines = Stringlist.ExtractLinesFromText(input);
 
             //#98045298375
             TableLight matrix = new TableLight();  //1-based coords. Could perhaps design a more lightweight version of cells for this if memory or speed becomes an issue. Perhaps with basic cell stuff, and then a field pointing to object with alignment etc. Or use inheritance.
@@ -3489,7 +3489,7 @@ namespace Gekko
                     using (Error e = new Error())
                     {
                         e.MainAdd("The databank version " + databankVersion + " is unknown to this Gekko version (" + Globals.gekkoVersion + ").");
-                        e.MainAdd("Known databank versions: " + G.GetListWithCommas(Globals.tsdxVersions) + ".");
+                        e.MainAdd("Known databank versions: " + Stringlist.GetListWithCommas(Globals.tsdxVersions) + ".");
                         e.MainAdd("The databank seems to have been written by Gekko version " + gekkoVersion + ".");
                         e.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
                     }                    
@@ -5045,7 +5045,7 @@ namespace Gekko
 
             List<string> dates = new List<string>();
 
-            List<string> lines2 = G.ExtractLinesFromText(pxLinesText);
+            List<string> lines2 = Stringlist.ExtractLinesFromText(pxLinesText);
             pxLinesText = null;  //clearing it
 
             List<string> codesHeader = new List<string>();
@@ -6529,7 +6529,7 @@ namespace Gekko
             if (fileName.Contains("tablecode." + Globals.defaultCommandFileExtension))
             {
                 string s = GetTextFromFileWithWait(fileName);
-                List<string> ss = G.ExtractLinesFromText(s);
+                List<string> ss = Stringlist.ExtractLinesFromText(s);
                 s2 = ss[2];
                 s2 = s2.Replace(Globals.tableConverterText3, "");                
             }
@@ -7083,13 +7083,13 @@ namespace Gekko
             lines2.Add("  write(`-------------------`, filename, append=TRUE)");
             lines2.Add("}");
             lines2.Add(def2);
-            string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
+            string f = Stringlist.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
 
             if (o.fileName != null)
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                Globals.r_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
                 Program.ROrPythonExport(o.names, o.opt_target, 0);
             }
             else
@@ -7179,7 +7179,7 @@ namespace Gekko
             //Old way --> r.StartInfo.Arguments = " CMD BATCH --no-save " + Globals.QT + RFileName + Globals.QT + " " + Globals.QT + RFileName + ".txt" + Globals.QT;
                         
             string s = Program.GetTextFromFileWithWait(RExportFileName);
-            List<string> lines = G.ExtractLinesFromText(s);
+            List<string> lines = Stringlist.ExtractLinesFromText(s);
             MatrixFromROrPythonToGekko(lines, 0);            
         }
 
@@ -7322,12 +7322,12 @@ namespace Gekko
             lines2.Add(@"  f.close()");
             //-------
             lines2.Add(def2);
-            string f = G.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
+            string f = Stringlist.ExtractTextFromLines(lines2).ToString().Replace("`", Globals.QT);
             
             if (true)
             {
                 Globals.python_fileContent = null;
-                Globals.python_fileContent = G.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
+                Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
                 Program.ROrPythonExport(o.names, o.opt_target, 1);
             }
 
@@ -7403,7 +7403,7 @@ namespace Gekko
             G.Writeln("------ Python end ------");
             
             string s = Program.GetTextFromFileWithWait(pythonExportFileName);
-            List<string> lines = G.ExtractLinesFromText(s);
+            List<string> lines = Stringlist.ExtractLinesFromText(s);
             MatrixFromROrPythonToGekko(lines, 1);                        
         }
 
@@ -7578,7 +7578,7 @@ namespace Gekko
 
                             Series ts = new Series(o.t1.freq, varName);
                             string s = Program.GetTextFromFileWithWait(file);
-                            List<string> lines = G.ExtractLinesFromText(s);
+                            List<string> lines = Stringlist.ExtractLinesFromText(s);
                             foreach (string line in lines)
                             {
                                 if (line.TrimStart().ToLower().StartsWith("date")) continue;
@@ -9903,7 +9903,7 @@ namespace Gekko
         public static string HandleModelFiles(string input, ModelCommentsHelper modelCommentsHelper)
         {
             //As a side-effect, Program.model.modelGekko.varlist is filled with stuff after VARLIST$
-            List<string> lines = G.ExtractLinesFromText(input);
+            List<string> lines = Stringlist.ExtractLinesFromText(input);
             List<string> linesNew = HandleModelFiles(lines, modelCommentsHelper);  //after this, there is no varlist stuff in linesNew
             GetModelHashAndInfo(linesNew, modelCommentsHelper); //does some rough removing of comments, empty lines etc.
             Globals.modelFileLines = linesNew;
@@ -10067,7 +10067,7 @@ namespace Gekko
 
         public static string HandleGekkoCommands(string input)
         {
-            List<string> lines = G.ExtractLinesFromText(input);
+            List<string> lines = Stringlist.ExtractLinesFromText(input);
 
             List<string> linesNew = null;
             linesNew = HandleGekkoCommandsGlueSymbols(lines);
@@ -12227,7 +12227,7 @@ namespace Gekko
         {
             string note = null;
 
-            string s2 = "[" + G.GetListWithCommas(ts.meta.domains) + "]";
+            string s2 = "[" + Stringlist.GetListWithCommas(ts.meta.domains) + "]";
             if (s2 == "[]") s2 = null;
 
             bool isTimeless = ts.type == ESeriesType.Timeless;
@@ -12464,7 +12464,7 @@ namespace Gekko
             {
                 if (elements[i].Count > 0)
                 {
-                    G.Writeln("Dimension " + (i + 1) + " (" + domains[i] + elements[i].Count + " elements): " + G.GetListWithCommas(elements[i]));
+                    G.Writeln("Dimension " + (i + 1) + " (" + domains[i] + elements[i].Count + " elements): " + Stringlist.GetListWithCommas(elements[i]));
                 }
             }
 
@@ -12940,7 +12940,7 @@ namespace Gekko
                         if (found)
                         {
                             //List<string> yy = m3;
-                            string xx = G.ReplaceTurtle(G.GetListWithCommas(eqVarsGams.equationVariables)).Replace(", residual___", "");
+                            string xx = G.ReplaceTurtle(Stringlist.GetListWithCommas(eqVarsGams.equationVariables)).Replace(", residual___", "");
 
                             string bool1 = "";
                             string bool2 = "";
@@ -13768,7 +13768,7 @@ namespace Gekko
                             //Remove bank, which is always "First:" anyway
                             ss = G.Chop_RemoveBank(ss);
                         }
-                        new Error("The variables " + G.GetListWithCommas(temp) + " are all " + command3 + " to " + ss);
+                        new Error("The variables " + Stringlist.GetListWithCommas(temp) + " are all " + command3 + " to " + ss);
                         //throw new GekkoException();
                     }
                     else
@@ -14333,7 +14333,7 @@ namespace Gekko
             }
             else if(a1.Count < 100)
             {
-                G.Writeln2("list #" + m + " = " + G.GetListWithCommas(a1) + "  (" + a1.Count + " elements)");
+                G.Writeln2("list #" + m + " = " + Stringlist.GetListWithCommas(a1) + "  (" + a1.Count + " elements)");
             }
             else
             {
@@ -19087,7 +19087,7 @@ namespace Gekko
                     IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.Can);
                 }
 
-                G.Writeln2("Created: " + G.GetListWithCommas(vars));
+                G.Writeln2("Created: " + Stringlist.GetListWithCommas(vars));
                    
                 
             }

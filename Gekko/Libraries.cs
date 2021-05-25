@@ -73,7 +73,11 @@ namespace Gekko
             bool hit = false;
             using (Writeln writeln = new Writeln())
             {
+                writeln.MainAdd("---------------------------------------------------------------");
+                writeln.MainNewLineTight();
                 writeln.MainAdd("Libraries:");
+                writeln.MainNewLineTight();
+                writeln.MainAdd("---------------------------------------------------------------");
                 writeln.MainNewLineTight();
                 int counter = 0;
                 
@@ -105,8 +109,35 @@ namespace Gekko
                             {
                                 foreach (GekkoFunctionCode gfc in f.overloads)
                                 {
-                                    //See also this: #08975389245253                                
-                                    w.MainAdd(gfc.code);
+                                    List<string> xx = Stringlist.ExtractLinesFromText(gfc.code);
+                                    if (xx.Count > 1000)
+                                    {
+                                        List<string> temp = new List<string>();
+                                        for (int i = 0; i < 900; i++)
+                                        {
+                                            temp.Add(xx[i]);
+                                        }
+                                        temp.Add("");
+                                        temp.Add("---------------------------------------------------------------------");                                        
+                                        temp.Add("...");
+                                        temp.Add("...");
+                                        temp.Add("File has " + xx.Count + " lines and has been truncated here");
+                                        temp.Add("...");
+                                        temp.Add("...");
+                                        temp.Add("---------------------------------------------------------------------");
+                                        temp.Add("");
+                                        for (int i = xx.Count - 20; i < xx.Count; i++)
+                                        {
+                                            temp.Add(xx[i]);
+                                        }
+                                        xx = temp;
+                                    }
+                                    StringBuilder code = Stringlist.ExtractTextFromLines(xx);
+                                                                        
+                                    //See also this: #08975389245253     
+                                    w.MainAdd("//[file = " + gfc.fileNameWithPath + " line " + gfc.line + "]");
+                                    w.MainNewLineTight();
+                                    w.MainAdd(code.ToString());
                                     w.MainNewLine();
                                 }
                             }
@@ -124,14 +155,23 @@ namespace Gekko
                         }
                         using (Writeln writeln2 = new Writeln())
                         {
+                            writeln2.MainAdd("---------------------------------------------------------------");
+                            writeln2.MainNewLineTight();
                             writeln2.MainAdd("Library '" + library.GetName() + "':");
+                            writeln2.MainNewLineTight();
+                            writeln2.MainAdd("---------------------------------------------------------------");
                             writeln2.MainNewLineTight();
                             if (functions.Count > 0)
                             {
                                 writeln2.MainAdd(G.AddS(functions.Count, "function") + ": " + ff5.Substring(0, ff5.Length - ", ".Length));
                                 writeln2.MainNewLineTight();
                             }
-                            if (procedures.Count > 0) writeln2.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + pp5.Substring(0, pp5.Length - ", ".Length));
+                            if (procedures.Count > 0)
+                            {
+                                writeln2.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + pp5.Substring(0, pp5.Length - ", ".Length));
+                                writeln2.MainNewLineTight();
+                            }
+                            writeln2.MainAdd("---------------------------------------------------------------");
                         }
                     };
 
@@ -143,10 +183,13 @@ namespace Gekko
                     writeln.MainAdd("'" + library.GetName() + "' with " + G.AddS(functions.Count, "function") + " and " + G.AddS(procedures.Count, "procedure") + more);
                     writeln.MainNewLineTight();
                 }
+                writeln.MainNewLineTight();
                 if (name != null && !hit)
                 {
-                    new Writeln("Could not find library '" + name + "'");
+                    writeln.MainAdd("--> could not find library '" + name + "'");
+                    writeln.MainNewLineTight();
                 }
+                writeln.MainAdd("---------------------------------------------------------------");                
             }
         }
 
@@ -156,8 +199,8 @@ namespace Gekko
             procedures = new List<string>();
             foreach (string s in library.GetFunctionNames())
             {
-                if (s.StartsWith(Globals.procedure)) procedures.Add(s.Substring(Globals.procedure.Length));
-                else functions.Add(s + "()");
+                if (s.StartsWith(Globals.procedure)) procedures.Add(G.FromLibraryToFunctionProcedureName(s, 1));
+                else functions.Add(G.FromLibraryToFunctionProcedureName(s, 1));
             }
         }
 
@@ -260,9 +303,7 @@ namespace Gekko
                     }
                     else
                     {
-                        string s = "function '" + functionName + "()'";
-                        if (functionName.StartsWith(Globals.procedure)) s = "procedure '" + functionName.Substring(Globals.procedure.Length) + "'";
-                        new Error("The " + s + " does not seem to exist.");
+                        new Error("The " + G.FromLibraryToFunctionProcedureName(functionName, 4) + " does not seem to exist.");
                     }
                 }
             }
@@ -657,10 +698,8 @@ namespace Gekko
             GekkoFunction rv = null;
             this.functions.TryGetValue(name, out rv);
             if (rv == null)
-            {
-                string s = "Function '" + name + "()'";
-                if (name.StartsWith(Globals.procedure)) s = "Procedure '" + name.Substring(Globals.procedure.Length) + "'";
-                if (abortWithError) new Error(s + " not found in library '" + this.name + "'");
+            {                
+                if (abortWithError) new Error("Problem: " + G.FromLibraryToFunctionProcedureName(name, 4) + " not found in library '" + this.name + "'");
             }
             else
             {

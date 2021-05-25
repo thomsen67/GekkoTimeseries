@@ -2519,17 +2519,14 @@ namespace Gekko.Parser.Gek
                                     if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q")
                                     {
                                         node.Code.A("Functions." + functionName + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
-                                        //node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(args).A("" + Globals.objFunctionPlaceholder + "").A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {
                                         //same as the other???                                        
                                         node.Code.A("Functions." + functionName + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
-                                        //node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
-                                    {
-                                        //node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(", " + G.GetListWithCommas(args)).A(")");
+                                    {                                        
                                         node.Code.A("Functions." + functionName).A("(" + extra + Globals.functionT1Cs + ", ").A(aa1 + aa2).A(")");
                                     }
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
@@ -2980,7 +2977,7 @@ namespace Gekko.Parser.Gek
                                 }                                
                                 else
                                 {                                    
-                                    node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + G.GetListWithCommas(ix) + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");                                        
+                                    node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + Stringlist.GetListWithCommas(ix) + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + Stringlist.GetListWithCommas(ixr) + ")");                                        
                                  
                                     //this alternative code is only done for x[a] type of variables, not x.f() etc.
 
@@ -5281,8 +5278,8 @@ namespace Gekko.Parser.Gek
 
         private static void FunctionHelper10(List<string> args, out string aa1, out string aa2)
         {
-            aa1 = G.GetListWithCommas(args.GetRange(0, 2));
-            aa2 = G.GetListWithCommas(args.GetRange(2, args.Count - 2));
+            aa1 = Stringlist.GetListWithCommas(args.GetRange(0, 2));
+            aa2 = Stringlist.GetListWithCommas(args.GetRange(2, args.Count - 2));
             if (args.Count - 2 > 0) aa2 = ", " + aa2;
         }
         

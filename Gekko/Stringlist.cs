@@ -15,6 +15,92 @@ namespace Gekko
     public static class Stringlist
     {
         /// <summary>
+        /// Transform a string into a list of strings
+        /// </summary>
+        /// <param name="textInput"></param>
+        /// <returns></returns>
+        public static List<string> ExtractLinesFromText(string textInput)
+        {
+            StringReader inputFileStringReader = new StringReader(textInput);
+            List<string> output = new List<string>();
+            while (true)
+            {
+                string aLine = inputFileStringReader.ReadLine();
+                if (aLine != null)
+                {
+                    output.Add(aLine);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Transforms a list of strings into a string
+        /// </summary>
+        /// <param name="linesInput"></param>
+        /// <returns></returns>
+        public static StringBuilder ExtractTextFromLines(List<string> linesInput)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (string line in linesInput)
+            {
+                sb.AppendLine(line);
+            }
+            return sb;
+        }
+
+        /// <summary>
+        /// Transform a list of strings to a comma-separated string
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static string GetListWithCommas(List<string> list)
+        {
+            if (list == null) return null;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < list.Count; i++)
+            {
+                string s = list[i];
+                sb.Append(s);
+                if (i < list.Count - 1) sb.Append(", ");
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static string GetListWithCommas(string[] list)
+        {
+            if (list == null) return null;
+            return GetListWithCommas(new List<string>(list));
+        }
+
+        /// <summary>
+        /// Removes empty lines in a list of strings
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static List<string> RemoveEmptyLines(List<string> s)
+        {
+            List<string> xx = new List<string>();
+            foreach (string s2 in s)
+            {
+                if (s2.Trim() == "") continue;
+                xx.Add(s2);
+            }
+            return xx;
+        }
+
+
+
+        /// <summary>
         /// Reads a file of string lines into a list of strings
         /// </summary>
         /// <param name="inputFile"></param>

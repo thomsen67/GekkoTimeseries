@@ -254,7 +254,7 @@ namespace Gekko.Parser.Gek
             //
             //Both are out of RAM on 16000 lines
             //
-            List<string> lines = G.ExtractLinesFromText(csCode);
+            List<string> lines = Stringlist.ExtractLinesFromText(csCode);
             int nGoal = lines.Count;  //check that no lines are forgotten
             int nExtra = 0;
             List<string> tempHelperForMethodsCs = new List<string>();  //temp storage  
@@ -367,8 +367,8 @@ namespace Gekko.Parser.Gek
                 //throw new GekkoException();
             }
 
-            csCode = G.ExtractTextFromLines(mainCs).ToString();
-            csMethods = G.ExtractTextFromLines(methodsCs).ToString();
+            csCode = Stringlist.ExtractTextFromLines(mainCs).ToString();
+            csMethods = Stringlist.ExtractTextFromLines(methodsCs).ToString();
 
             // -------------------------------------
             // -------------------------------------
