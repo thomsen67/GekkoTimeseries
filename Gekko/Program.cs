@@ -7628,7 +7628,7 @@ namespace Gekko
             {
                 if (o.opt_param.ToLower().Contains("saa"))
                 {
-                    new Note("For 'saa' type, you need 'force=totals'");
+                    new Note("For 'saa' type, you need 'force=totals'"); 
                 }
             }
         }
