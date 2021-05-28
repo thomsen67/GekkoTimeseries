@@ -358,12 +358,40 @@ End Function
 Public Sub Gekko_Get()
   Dim cells As Variant  
   cells = CreateObject(""Gekcel.COMLibrary"").Gekko_Get()
+  cells = Handle_Cells(cells)
   nrows = UBound(cells, 1) - LBound(cells, 1) + 1
   ncols = UBound(cells, 2) - LBound(cells, 2) + 1
   Set rValues = Application.Range(""A1:A1"").Resize(nrows, ncols)
   rValues.ClearContents
   rValues.Value = cells
 End Sub
+
+'Get data from a Gekko databank into a 2D array of Excel cells (rows = variables, cols = periods)
+'Example: mark an area of cells where you want to put the data (at least 2x2, but should probably be larger)
+'While the area is selected, type this: =Gekko_GetGroup(""demo""; ""a""; ""2020""; ""2025""; """"; """"; ""x1""; ""x2"")
+'Instead of finishing with [Enter], use [Ctrl]+[Shift]+[Enter]. This way, it is used as an array formula, and the
+'formula will be shown with {}-curlies in Excel.
+'Parameters:
+'databank (string): State the .gbk databank, for instance ""demo"" or ""c:\data\demo.gbk""
+'freq (string):     State the frequency of the variables, for instance ""q""
+'per1 (string):     Starting period, for instance ""2020q1""
+'per2 (string):     Ending period, for instance ""2021q3""
+'operator (string): Gekko operators, for instance ""p"" for percent growth, or ""n p"" for both levels and percent growth.
+'options (string):  Not used yet
+'names (string):    Names of timeseries, for instance ""x1, x2, x3"". You may also use ""x1""; ""x2""; ""x3"" instead.
+Public Function Gekko_GetGroup(databank As String, freq As String, per1 As String, per2 As String, operator As String, options As String, ParamArray names() As Variant) As Variant
+  args = "": comma = ""
+  For Each name In names: args = args & comma & name: comma = "", "": Next name
+  Gekko ""read "" & databank & "";""
+  Gekko ""option freq = "" & freq & "";""
+  Gekko ""time "" & per1 & "" "" & per2 & "";""
+  Gekko ""sheet <"" & operator &""> "" & args & "";""
+  Dim cells As Variant
+  cells = CreateObject(""Gekcel.COMLibrary"").Gekko_Get()
+  cells(0, 0) = """"
+  cells = Handle_Cells(cells)
+  Gekko_GetGroup = cells
+End Function
 
 Public Sub Gekko_Put()
   nrows = Range(""A1"").SpecialCells(xlCellTypeLastCell).Row
@@ -390,6 +418,17 @@ Public Sub Gekko_Demo()
   Gekko ""compare file=compare.txt;""
   Gekko ""edit compare.txt;""
 End Sub
+
+'Handles NaN values in Excel
+Private Function Handle_Cells(ByRef cells As Variant)
+  For i = LBound(cells, 1) To UBound(cells, 1)
+    For j = LBound(cells, 2) To UBound(cells, 2)
+      'NaN values from Gekko get represented as -1.#IND in Excel, therefore this.
+      If InStr(CStr(cells(i, j)), ""#IND"") <> 0 Then cells(i, j) = CVErr(xlErrNA)
+    Next j
+  Next i
+  Handle_Cells = cells
+End Function
 
 ";
 
