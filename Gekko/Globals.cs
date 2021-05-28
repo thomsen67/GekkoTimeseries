@@ -49,9 +49,7 @@ namespace Gekko
         public const string functionSpecialName2 = "O.FunctionLookupNew";
 
         public static string versionInternal = "";
-
-        public static bool bugStack = false;
-
+        
         public static bool fixPxProblem = true;
 
         public static bool if_old_helper = false;
@@ -62,7 +60,6 @@ namespace Gekko
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
 
         public static bool oldcontrol = true;
-        public static bool oldcontrol2 = false;
 
         public static ItemHandler itemHandler = null;  //hack
 

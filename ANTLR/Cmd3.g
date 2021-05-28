@@ -4103,7 +4103,7 @@ leftAngleNo2:	            LEFTANGLESIMPLE;  // <
 rightParen:                 RIGHTPAREN (GLUE!)?;
 
 leftBracketNoGlue:          LEFTBRACKET;
-leftBracketNoGlueWild:      LEFTBRACKETWILD;
+//leftBracketNoGlueWild:      LEFTBRACKETWILD;
 
 identDigit:                 identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
 identDigitHelper:		    ident                 //for instance ab27
@@ -5306,7 +5306,7 @@ RIGHTCURLY:                 '}';
 LEFTPAREN:                  '(';
 RIGHTPAREN:                 ')';
 LEFTBRACKETGLUE:            '[_[';
-LEFTBRACKETWILD:            '[¨[';  //indicates that this is probably a wildcard, not a 1x1 matrix
+//LEFTBRACKETWILD:            '[¨[';  //indicates that this is probably a wildcard, not a 1x1 matrix
 LEFTBRACKET:                '[';
 RIGHTBRACKET:               ']';
 

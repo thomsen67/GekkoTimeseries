@@ -3553,13 +3553,13 @@ namespace Gekko
             s = s.Replace(Globals.symbolGlueChar6a, "["); //--> is this necessary?
             s = s.Replace(Globals.symbolGlueChar7, "[");
             s = s.Replace(Globals.symbolGlueChar1.ToString(), "");  //must be after symbolGlueChar7
+            
+            //the following are probably obsolete in Gekko 3.0
             s = Regex.Replace(s, "s___er", "ser", RegexOptions.IgnoreCase);  //#098275432874
             s = Regex.Replace(s, "s___eries", "series", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____er", "ser", RegexOptions.IgnoreCase);
             s = Regex.Replace(s, "s____eries", "series", RegexOptions.IgnoreCase);
-
-            //s = s.Remove(
-            //lengthDiff = length - s.Length;
+            
             return s;
         }        
         

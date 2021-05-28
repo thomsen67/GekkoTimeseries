@@ -10715,6 +10715,15 @@ namespace Gekko
         /// <returns></returns>
         private static List<string> HandleGekkoCommandsGlueSymbols(List<string> inputFileLines)
         {
+            // ----------- NOTE ---------------------------------
+            // Some of these glue symbols are probably not necessary
+            // anymore and should be removed. For instance, are the
+            // glue symbols added to non-quoted wildcards really
+            // necessary, or are all wildcards in Gekko 3.0 inside
+            // quotes anyway?
+            // Fix this for a Gekko 4.0 version.
+            // --------------------------------------------------
+
             List<string> inputFileLines2 = new List<string>();
             int lineCounter = 0;
             foreach (string line in inputFileLines)
@@ -10749,8 +10758,6 @@ namespace Gekko
                 //
                 // For "<m d>" kind of options, we use a special kind of marker ('<<<' instead of '<') to indicate that it is
                 // an "<ident ident..." type.
-                //List<char> glued1 = new List<char> { ')', ']', '}', Globals.symbolMemvar, Globals.symbolList };
-                //List<char> glued2 = new List<char> { '(', '[', '{', Globals.symbolMemvar, Globals.symbolList };
                 List<char> glued3 = new List<char> { '|', '\\' };  //note special rules for '.', see glued3a
                 List<char> glued3a = new List<char> { '=', '+', '-', '/', '*', '^', '(', '{', '[', '<', '>', ',', ':', ' ' };  // "=.12", "+.12", "-.12" etc.
                 List<char> glued4 = new List<char> { '@' };  //only checked if no blank right of this
@@ -10860,10 +10867,6 @@ namespace Gekko
                         else if (c1 == Globals.symbolScalar && c2 == '(') glue = true;
                         else if (c1 == Globals.symbolScalar && c2 == '{') glue = true;
 
-                        //else if (c1 == Globals.symbolDollar[0] && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
-                        //else if (c1 == Globals.symbolDollar[0] && c2 == '(') glue = true;
-                        //else if (c1 == Globals.symbolDollar[0] && c2 == '{') glue = true;
-
                         else if (c1 == Globals.symbolCollection && G.IsLetterOrDigitOrUnderscore(c2)) glue = true;
                         else if (c1 == Globals.symbolCollection && c2 == '(') glue = true;
                         else if (c1 == Globals.symbolCollection && c2 == '{') glue = true;
@@ -10902,32 +10905,7 @@ namespace Gekko
                         }
                     }
 
-                    // -------------------------------------------------------------
-                    // Handle stand-alone [a*b*c*d] that may look like a 1x1 matrix
-                    // -------------------------------------------------------------
-                    if (c2 == '[')
-                    {
-                        int iRight = -12345;
-
-                        for (int ii = i + 1; ii < lineNewVersion.Length; ii++)
-                        {
-                            if (lineNewVersion[ii] == ']')
-                            {
-                                iRight = ii;
-                                break;
-                            }
-                        }
-                        if (iRight != -12345)
-                        {
-                            string inside = lineNewVersion.Substring(i + 1, iRight - i - 1);
-                            if (CheckIfLooksLikeWildcard(inside))
-                            {
-                                sb.Append(Globals.symbolGlueChar7);
-                                continue;
-                            }
-                        }
-                    }
-
+                    
                     // -------------------------------------------------------------
                     // Handle @
                     // -------------------------------------------------------------
