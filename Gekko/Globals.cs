@@ -58,9 +58,7 @@ namespace Gekko
 
         //Must be near the top of Globals.cs
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
-
-        public static bool oldcontrol = true;
-
+        
         public static ItemHandler itemHandler = null;  //hack
 
         public static bool decompSubstitute = false;

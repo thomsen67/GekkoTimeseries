@@ -1352,7 +1352,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //See also #980752345
                                 string listName = GetSimpleHashName(child[0][0]);                                
-                                if (Globals.oldcontrol && listName != null)
+                                if (listName != null)
                                 {
                                     TwoStrings two = SearchUpwardsInTree2(node, listName);
                                     if (two != null)
@@ -1383,7 +1383,7 @@ namespace Gekko.Parser.Gek
                             {
                                 string listName = GetSimpleHashName(node[0]);
                                 
-                                if (Globals.oldcontrol && listName != null)
+                                if (listName != null)
                                 {
                                     TwoStrings two= SearchUpwardsInTree2(node, listName);
                                     if (two != null)
@@ -1407,7 +1407,6 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     node.Code.CA(s);
-                                    //node.Code.CA(Globals.reportInterior1 + s + ", " + "0" + ", " + Globals.labelCounter + Globals.reportInterior2);
                                 }
                             }
                             else
@@ -1589,7 +1588,7 @@ namespace Gekko.Parser.Gek
                             string listName = GetSimpleHashName(child);
                             string internalName = null;
                             string internalFunction = null;
-                            if (Globals.oldcontrol && listName != null)
+                            if (listName != null)
                             {
                                 TwoStrings two = SearchUpwardsInTree2(node, listName);
                                 if (two != null)
@@ -1633,9 +1632,9 @@ namespace Gekko.Parser.Gek
                                 code1 = MaybeControlledSet777(node[1], code1);
                                 code2 = MaybeControlledSet777(node[2], code2);
                             }
-                            
+
                             if (op == "ASTIFOPERATOR4")  //"<"
-                            {                                
+                            {
                                 node.Code.A("O.StrictlySmallerThan(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR6")  //"<="
@@ -1660,11 +1659,8 @@ namespace Gekko.Parser.Gek
                             }
                             else if (op == "ASTIFOPERATOR7") //"in"
                             {
-                                if (Globals.oldcontrol)
-                                {
-                                    code1 = MaybeControlledSet777(node[1], code1);
-                                    code2 = MaybeControlledSet777(node[2], code2);
-                                }
+                                code1 = MaybeControlledSet777(node[1], code1);
+                                code2 = MaybeControlledSet777(node[2], code2);
                                 node.Code.A("O.In(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                         }
@@ -1966,7 +1962,7 @@ namespace Gekko.Parser.Gek
                         {
                             StringBuilder sb = new StringBuilder();
 
-                            int numberOfDates = 2;
+                            int numberOfDates_constant = 2;
 
                             string returnTypeLower = node[0].Text.ToLower();
                             string functionNameLower = node[1][0].Text.ToLower();
@@ -1978,8 +1974,7 @@ namespace Gekko.Parser.Gek
                             {
                                 functionNameLower = Globals.procedure + functionNameLower;
                             }
-
-                            //int numberOfArguments = node[2][0].ChildrenCount() + node[2].ChildrenCount() - 1;
+                            
                             int numberOfParameters = node.functionDef.Count;
                             
                             string internalName = "FunctionDef" + ++Globals.counter;
@@ -1987,8 +1982,6 @@ namespace Gekko.Parser.Gek
                             GetCodeFromAllChildren(node[3]);  //it is a placeholder node that does not get code
 
                             sb.AppendLine(internalName + "();" + G.NL);
-
-                            //string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
                             
                             string typeChecks = null;
 
@@ -2001,11 +1994,11 @@ namespace Gekko.Parser.Gek
                             {
                                 for (int i = 2; i < numberOfParameters; i++)
                                 {
-                                    if (node[2]?[i - numberOfDates]?[2]?[0] != null) node.functionDef[i].labelCode = node[2][i - numberOfDates][2][0].Code.ToString();
-                                    if (node[2]?[i - numberOfDates]?[3]?[0] != null) node.functionDef[i].defaultValueCode = node[2][i - numberOfDates][3][0].Code.ToString();
+                                    if (node[2]?[i - numberOfDates_constant]?[2]?[0] != null) node.functionDef[i].labelCode = node[2][i - numberOfDates_constant][2][0].Code.ToString();
+                                    if (node[2]?[i - numberOfDates_constant]?[3]?[0] != null) node.functionDef[i].defaultValueCode = node[2][i - numberOfDates_constant][3][0].Code.ToString();
                                 }
 
-                                for (int i = numberOfDates; i < numberOfParameters; i++)
+                                for (int i = numberOfDates_constant; i < numberOfParameters; i++)
                                 {
                                     if (node.functionDef[i].defaultValueCode == null)
                                     {
@@ -2086,11 +2079,8 @@ namespace Gekko.Parser.Gek
                                     //j=0 -->add 1
                                     //j=1 -->add 0
 
-                                    //int xxx = numberOfParameters - j - 1;
                                     int xxx = numberOfParameters - (numberOfParametersCutOff - j - 1) - 1;
-
                                     string defaultValueCode = node.functionDef[xxx].defaultValueCode;
-                                    
                                     int jjj = numberOfParameters - i - 1 + j;
 
                                     string defaultValueCode2 = node.functionDef[jjj].defaultValueCode;
@@ -2104,7 +2094,7 @@ namespace Gekko.Parser.Gek
                                         types += ", ";
                                         questions += ", ";
                                     }
-                                    
+
                                     defaultValueCodes += defaultValueCode;
                                     labelCodes += labelCode;
                                     types += "`" + type.Replace("`", "\\`") + "`";
@@ -2112,20 +2102,17 @@ namespace Gekko.Parser.Gek
 
                                     int n = ++Globals.counter;
 
-                                    if (true)
+                                    if (G.Equal(type, "name"))
                                     {
-                                        if (G.Equal(type, "name"))
-                                        {
-                                            prompts += ", new GekkoArg((spml" + n + ") => null, (spml" + n + ") => " +promptResultsName + "[" + j + "])";
-                                            prompts2 += ", new GekkoArg((spml" + n + ") => null, (spml" + n + ") => " + defaultValueCode2 + ")";  //simple version, just normal overload
-                                        }
-                                        else
-                                        {
-                                            prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
-                                            prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode2 + ", (spml" + n + ") => null)";  //simple version, just normal overload
-                                        }
-                                    }                                    
-                                }                                
+                                        prompts += ", new GekkoArg((spml" + n + ") => null, (spml" + n + ") => " + promptResultsName + "[" + j + "])";
+                                        prompts2 += ", new GekkoArg((spml" + n + ") => null, (spml" + n + ") => " + defaultValueCode2 + ")";  //simple version, just normal overload
+                                    }
+                                    else
+                                    {
+                                        prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
+                                        prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode2 + ", (spml" + n + ") => null)";  //simple version, just normal overload
+                                    }
+                                }                        
                                                                 
                                 string defaultValues = null;
 
@@ -2274,8 +2261,8 @@ namespace Gekko.Parser.Gek
                                 if (node.listLoopAnchor == null)
                                 {
                                     new Error("Internal error #98973422");
-                                    //throw new GekkoException();
                                 }
+
                                 //method def:
 
                                 string iv = "GekkoSmpl, IVariable";
@@ -2446,20 +2433,17 @@ namespace Gekko.Parser.Gek
                                         //args += ", null, null";
                                         args.Add("null");
                                         args.Add("null");
-                                        //args += ", new ScalarDate(smpl.t1), new ScalarDate(smpl.t2)";
                                     }
                                     else
                                     {
                                         for (int i = 0; i < node[1].ChildrenCount(); i++)
                                         {
-                                            //FunctionHelper3(node[1], lagIndex, lagIndexOffset, args, i);
                                             args.Add(node[1][i].Code.ToString());
                                         }
                                     }
 
                                     for (int i = 2; i < node.ChildrenCount(); i++)
                                     {
-                                        //FunctionHelper3(node, lagIndex, lagIndexOffset, args, i);
                                         args.Add(node[i].Code.ToString());
                                     }
 
@@ -2504,7 +2488,6 @@ namespace Gekko.Parser.Gek
 
                                     if (node[1] == null || node[1].ChildrenCount() == 0)
                                     {
-                                        //args += ", null, null";
                                         args.Add("null");
                                         args.Add("null");
                                     }
@@ -2525,8 +2508,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         FunctionHelper2(node, args, i);
                                     }
-
-                                    //int numberOfArguments = 2 + node.ChildrenCount() - 2;
+                                    
                                     int numberOfArguments = args.Count;
 
                                     //TODO TODO TODO
@@ -2725,18 +2707,17 @@ namespace Gekko.Parser.Gek
                             string ivTempVar = SearchUpwardsInTree4(node);  //checks if left-hand side
 
                             //isLhs is true if the indexer is on the left-hand side, and is the last indexer.
-                            //For instance #m[2][3] = 'a' -----> here the [3] indexer will get "true"
-                            //string isLhs = "false";
-                            //if (node.Parent.Text == "ASTLEFTSIDE") isLhs = "true";
-
+                            //For instance #m[2][3] = 'a' -----> here the [3] indexer will get "true"                            
                             //LIGHTFIXME, isRhs
 
                             bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree5(node.Parent));
                             if (node[1].Text == "ASTDOT")
+                            {
                                 reportInterior = false;  //never for #x.??? type indexing
+                            }
                             
-                            string indexes = null;  //DELETE THESE SOON!!!
-                            string indexesReport = null;  //DELETE THESE SOON!!!
+                            string indexes = null;
+                            string indexesReport = null;  //DELETE THIS SOON!!! Seems it has no use.
 
                             List<string> ix = new List<string>(); for (int i = 0; i < node[1].ChildrenCount(); i++) ix.Add(null);
                             List<string> ixr = new List<string>(); for (int i = 0; i < node[1].ChildrenCount(); i++) ixr.Add(null);
@@ -2751,7 +2732,7 @@ namespace Gekko.Parser.Gek
                                     string listName = GetSimpleHashName(child[0][0]);
                                     string internalName = null;
                                     string internalFunction = null;
-                                    if (Globals.oldcontrol && listName != null)
+                                    if (listName != null)
                                     {
                                         TwoStrings two = SearchUpwardsInTree2(node, listName);
                                         if (two != null)
@@ -2759,11 +2740,9 @@ namespace Gekko.Parser.Gek
                                             internalName = two.s1;
                                             internalFunction = two.s2;
                                         }
-
                                     }
 
-                                    bool xxx = ReportHelperIsSum(internalName, internalFunction); //a controlled #x, bounded by sum
-                                    //xxx = false;
+                                    bool isSum = ReportHelperIsSum(internalName, internalFunction); //a controlled #x, bounded by sum
 
                                     if (internalName != null)
                                     {
@@ -2772,9 +2751,8 @@ namespace Gekko.Parser.Gek
                                             string s = "O.AddSpecial(" + Globals.smpl + ", " + internalName + ", " + child[0][1].Code + ", false)";
                                             indexes += s;
                                             ix[i] = s;
-                                            if (reportInterior && !xxx)
-                                            {
-                                                //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
+                                            if (reportInterior && !isSum)
+                                            {                                                
                                                 indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                                 ixr[i] = Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                             }
@@ -2784,9 +2762,8 @@ namespace Gekko.Parser.Gek
                                             string s = "O.AddSpecial(" + Globals.smpl + ", " + internalName + ", " + child[0][1].Code + ", true)";
                                             indexes += s;
                                             ix[i] = s;
-                                            if (reportInterior && !xxx)
+                                            if (reportInterior && !isSum)
                                             {
-                                                //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                                 indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                                 ixr[i] = Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                             }
@@ -2797,9 +2774,8 @@ namespace Gekko.Parser.Gek
                                         string s = node[1][i].Code.ToString();
                                         indexes += s;
                                         ix[i] = s;
-                                        if (reportInterior && !xxx)
+                                        if (reportInterior && !isSum)
                                         {
-                                            //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                             indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                             ixr[i] = Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                         }
@@ -2807,7 +2783,7 @@ namespace Gekko.Parser.Gek
                                     if (i < node[1].ChildrenCount() - 1)
                                     {
                                         indexes += ", ";
-                                        if (reportInterior && !xxx)
+                                        if (reportInterior && !isSum)
                                         {
                                             indexesReport += ", ";
                                         }
@@ -2819,7 +2795,7 @@ namespace Gekko.Parser.Gek
                                     string listName = GetSimpleHashName(child[0]);
                                     string internalName = null;
                                     string internalFunction = null;
-                                    if (Globals.oldcontrol && listName != null)                                    
+                                    if (listName != null)                                    
                                     {
                                         TwoStrings two = SearchUpwardsInTree2(node, listName);
                                         if (two != null)
@@ -2837,8 +2813,8 @@ namespace Gekko.Parser.Gek
                                                                   
                                     if (reportInterior)
                                     {
-                                        bool xxx = ReportHelperIsSum(internalName, internalFunction);
-                                        if (xxx)
+                                        bool isSum2 = ReportHelperIsSum(internalName, internalFunction);
+                                        if (isSum2)
                                         {
                                             indexesReport += s;
                                             ixr[i] = s;
@@ -2846,7 +2822,6 @@ namespace Gekko.Parser.Gek
                                         else
                                         {
                                             //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
-                                            //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
 
                                             string temp = ReportLabelHelper(child);
                                             if (temp != null)
@@ -2899,14 +2874,14 @@ namespace Gekko.Parser.Gek
                                 }                                
                             }
 
-                            if (ivTempVar == null)
+                            if (ivTempVar == null)  
                             {
+                                //it is a right-hand side variable
+
                                 if (indexesReport == null) indexesReport = indexes;                                
 
                                 if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTION_Q" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED_Q")
-                                {
-                                    //asdfg added [0]
-                                    //string functionNameLower = node[1][0][0][0].Text.ToLower();
+                                {                                    
                                     string functionNameLower = node[1][0][0][0][0].Text.ToLower();
 
                                     bool isInbuilt = false;

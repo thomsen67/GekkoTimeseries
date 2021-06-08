@@ -44,14 +44,14 @@ namespace Gekko
         Timeless, //for series type timeless
     }
 
-    //                 name        meta        dataArray     dimensions      dimensionsArray
+    //                 name        meta        dataArray     dimensions      dimensionsStorage
     // ---------------------------------------------------------------------------------------------
-    // Normal             x           x                x             0               null
-    // Light           null        null          small x             0               null
-    // Timeless           x           x              1 x             0               null
-    // ArraySuper         x           x             null             n                  x    
+    // Normal           yes         yes              yes             0                 no
+    // Light             no          no            small             0                 no
+    // Timeless         yes         yes            1 x 1             0                 no
+    // ArraySuper       yes         yes               no             n                yes    
     // ---------------------------------------------------------------------------------------------
-    // ArraySub has no name, else like Normal
+    // Array sub-series has no name, else is like Normal
     //
 
     /// <summary>

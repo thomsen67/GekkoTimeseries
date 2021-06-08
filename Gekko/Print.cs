@@ -1772,7 +1772,6 @@ namespace Gekko
 
                 //foreach recorded call of {} or [], via RecordLabel()
 
-
                 int counter = -1;
                 foreach (O.RecordedPieces piece in labelRecordedPieces)  //foreach RecordLabel()
                 {
@@ -1788,7 +1787,6 @@ namespace Gekko
                     int ii1 = int.Parse(w4[0]);
                     int ii2 = int.Parse(w4[1]);
 
-
                     bool skip = false;
                     if (i1 != ii1)
                     {
@@ -1796,8 +1794,7 @@ namespace Gekko
                         //TODO: what about multiline PRT expressions??
                         skip = true;
                     }
-
-                    //if (y.iv.Type() == EVariableType.Date || y.iv.Type() == EVariableType.String || y.iv.Type() == EVariableType.Val)
+                    
                     if (piece.iv.Type() == EVariableType.String)
                     {
                         //good
@@ -1834,7 +1831,6 @@ namespace Gekko
                         u = u + s6;
                     }
                     string result2 = G.ReplaceGlueSymbols(u);
-                    //G.Writeln2("===> " + result2);
 
                     // ----------------------------------------------
                     // NOTE: The string[] result is outside the loop of recorded pieces
@@ -1847,11 +1843,9 @@ namespace Gekko
                     // ----------------------------------------------
 
                     if (counter % nn == nn - 1)
-                    //if (counter % nn == 0)
                     {
                         lbl.Add(result2);
                     }
-
                 }
             }
 

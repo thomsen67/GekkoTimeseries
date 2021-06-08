@@ -1275,7 +1275,7 @@ namespace Gekko
                                                         }
                                                         else
                                                         {
-                                                            d.cellsRef[name].SetData(t2, x_before);
+                                                            d.cellsRef[name].SetData(t2, x_before);  // for j != 0, x_before is from Ref bank.
                                                         }
 
                                                         if (j == 0)
@@ -1938,9 +1938,6 @@ namespace Gekko
                 if (decompOptions2.link[parentI].varnames.Count != decompDatasSupremeClone.Count)
                 {
                     new Error("The number of variables and equations do not match. For istance, in DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is, it must be defined over one or more sets with 2 elements in all).");
-
-
-                    //throw new GekkoException();
                 }
                 for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
                 {

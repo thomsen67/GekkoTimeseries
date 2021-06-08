@@ -418,33 +418,27 @@ namespace Gekko
             if (GekkoTime.Observations(allFreqsHelper.t1Annual, allFreqsHelper.t2Annual) < 1)
             {
                 new Error("Start period must be <= end period");
-                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.Q, t1, t2, ref allFreqsHelper.t1Quarterly, ref allFreqsHelper.t2Quarterly);
             if (GekkoTime.Observations(allFreqsHelper.t1Quarterly, allFreqsHelper.t2Quarterly) < 1)
             {
                 new Error("Start period must be <= end period");
-                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.M, t1, t2, ref allFreqsHelper.t1Monthly, ref allFreqsHelper.t2Monthly);
             if (GekkoTime.Observations(allFreqsHelper.t1Monthly, allFreqsHelper.t2Monthly) < 1)
             {
                 new Error("Start period must be <= end period");
-                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.D, t1, t2, ref allFreqsHelper.t1Daily, ref allFreqsHelper.t2Daily);
             if (GekkoTime.Observations(allFreqsHelper.t1Daily, allFreqsHelper.t2Daily) < 1)
             {
                 new Error("Start period must be <= end period");
-                //throw new GekkoException();
             }
             GekkoTime.ConvertFreqs(EFreq.U, t1, t2, ref allFreqsHelper.t1Undated, ref allFreqsHelper.t2Undated);
             if (GekkoTime.Observations(allFreqsHelper.t1Undated, allFreqsHelper.t2Undated) < 1)
             {
                 new Error("Start period must be <= end period");
-                //throw new GekkoException();
             }
-
             return allFreqsHelper;
         }
 

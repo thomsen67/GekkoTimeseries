@@ -449,16 +449,13 @@ namespace Gekko
         public GekkoTime t0 = GekkoTime.tNull;  //start of the period for which the expressions are calculated (<= t1)
         public GekkoTime t1 = GekkoTime.tNull;  //start of real sample, should normally not be lagged (then sumt() etc. will be wrong)
         public GekkoTime t2 = GekkoTime.tNull;  //end of real sample, should normally not be leaded (then sumt() etc. will be wrong)
-        public GekkoTime t3 = GekkoTime.tNull;  //end of the period for which the expressions are calculated (>= t2) 
-        public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight       
-        //public int gekkoErrorI = 0;
+        public GekkoTime t3 = GekkoTime.tNull;  //end of the period for which the expressions are calculated (>= t2)         
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank, will only apply to series (vars without sigils)
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
-        //public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
-        //public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
-        public P p;
         public assignmantTypeLhs lhsAssignmentType = assignmantTypeLhs.Inactive;
+        public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight 
+        public P p;
 
         public GekkoSmpl()
         {
@@ -13367,7 +13364,6 @@ namespace Gekko
             if (type == EWildcardSearchType.Write)
             {
                 allowBankRhs = true;
-                //if (!Globals.UNITTESTFOLLOWUP_important) allowBankRhs = false;  //would be nice if it could be true  
             }
             
             List<string> rhs = O.Restrict(names1, allowBankRhs, true, true, true);
@@ -13447,7 +13443,6 @@ namespace Gekko
                         if (bankLhs != null)
                         {
                             new Error("You cannot combine '***' with bank, frequency or index.");
-                            //throw new GekkoException();
                         }
                         bankLhs = "*";
                         nameLhs = "**";
@@ -13509,7 +13504,7 @@ namespace Gekko
                     }
                     else
                     {
-                        db_banks = Search(bankLhs, listOfAllOpenBanks);
+                        db_banks = MatchWildcard(bankLhs, listOfAllOpenBanks);
                     }
 
                     foreach (string db_bank in db_banks)
@@ -13557,7 +13552,6 @@ namespace Gekko
             if (reportError && lhsUnfolded.Count == 0)
             {
                 new Error("" + command + " wildcard/range did not match any variables");
-                //throw new GekkoException();
             }
 
             // ------------------------------------------------------------
@@ -13906,7 +13900,6 @@ namespace Gekko
             if (wildcardName.Contains("."))
             {
                 new Error("Wildcards contains a '.' --> please use '!' to indicate frequency");
-                //throw new GekkoException();
             }
 
             //For each matching databank
@@ -13924,7 +13917,6 @@ namespace Gekko
                 if (wildcardFreq != null)
                 {
                     new Error("You cannot combine '**' wildcard with frequency");
-                    //throw new GekkoException();
                 }
                 foreach (string s in allVariablesInBank)
                 {
@@ -13944,7 +13936,7 @@ namespace Gekko
                     name3a += Globals.freqIndicator + wildcardFreq;
                 }
 
-                List<string> matched = Search(name3a, allVariablesInBank);
+                List<string> matched = MatchWildcard(name3a, allVariablesInBank);
 
                 foreach (string match in matched)
                 {
@@ -13998,12 +13990,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Wrapper for the central SearchFromTo() method.
+        /// Matches wildcards like a*b?c
         /// </summary>
         /// <param name="wild1"></param>
         /// <param name="stringsThatCanBeMatched"></param>
         /// <returns></returns>
-        public static List<string> Search(string wild1, List<string> stringsThatCanBeMatched)
+        public static List<string> MatchWildcard(string wild1, List<string> stringsThatCanBeMatched)
         {
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
             //Sorted at the end

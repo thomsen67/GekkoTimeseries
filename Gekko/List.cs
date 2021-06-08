@@ -120,7 +120,7 @@ namespace Gekko
                     if (s5.Contains("?") || s5.Contains("*"))
                     {
                         //Wildcard: return a list of those
-                        List<string> found = Program.Search(s5, new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(this.list.ToArray()))); //the list items are sorted, not like a dict                        
+                        List<string> found = Program.MatchWildcard(s5, new List<string>(Stringlist.GetListOfStringsFromListOfIvariables(this.list.ToArray()))); //the list items are sorted, not like a dict                        
                         return new List(found);
                     }
                     else
