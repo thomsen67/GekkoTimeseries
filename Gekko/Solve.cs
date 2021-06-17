@@ -2099,11 +2099,9 @@ namespace Gekko
                 System.Array.Copy(b, Program.model.modelGekko.bOld, b.Length);  //seems quite fast -- and simplifies damping etc.
                 bool probing1Variable = true;  //does not seem to give any significant speedup... hmm
                 if (varId == -12345) probing1Variable = false;  //if the var name is not found
-
                 for (int i = 0; i < int.MaxValue; i++)
                 {
                     IterMemory iterMemory = null;
-
                     iterCounter++;
                     Program.model.modelGekko.simulateResults[1] = 0;
 
@@ -2117,9 +2115,6 @@ namespace Gekko
                         catch (Exception e)
                         {
                             new Error("Out of memory -- please run for fewer years with option 'dump'. The dump option is quite memory-intensive, since it remembers all intermediate simulation values.");
-
-
-                            //throw new GekkoException();
                         }
                         System.Array.Copy(b, iterMemory.bBefore, b.Length);
                     }

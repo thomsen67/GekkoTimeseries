@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <PropertyGroup>
-    <BuildDocFx>false</BuildDocFx>
+    <!--  BuildDocFx>false</BuildDocFx>  -->
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
@@ -651,11 +651,11 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\docfx.console.2.56.6\build\docfx.console.targets" Condition="Exists('..\packages\docfx.console.2.56.6\build\docfx.console.targets')" />
+  <Import Project="..\packages\docfx.console.2.58.0\build\docfx.console.targets" Condition="Exists('..\packages\docfx.console.2.58.0\build\docfx.console.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\docfx.console.2.56.6\build\docfx.console.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\docfx.console.2.56.6\build\docfx.console.targets'))" />
+    <Error Condition="!Exists('..\packages\docfx.console.2.58.0\build\docfx.console.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\docfx.console.2.58.0\build\docfx.console.targets'))" />
   </Target>
 </Project>

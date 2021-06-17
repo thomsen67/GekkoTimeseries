@@ -2713,9 +2713,6 @@ namespace Gekko
         /// <summary>
         /// Get Gekko version as string
         /// </summary>
-        /// <param name="version"></param>
-        /// <param name="patch"></param>
-        /// <returns></returns>
         public static string PrintVersion(string version, bool patch)
         {
             string start = "";
