@@ -103,7 +103,12 @@ namespace Gekko.Parser.Gek
             
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
             Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmitUnfold(root);
+
+            ///qwerty
+            //Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit2(root, 0, 0, textInput, wh2, p);
+            //Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit3(root, 0, 0, textInput, wh2, p);            
             Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
+
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
 
             //PrintAST2(root, 0);
