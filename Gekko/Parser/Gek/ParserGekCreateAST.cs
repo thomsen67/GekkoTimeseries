@@ -102,7 +102,7 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
             
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK START");
-            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmitUnfold(root);
+            Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmitUnfold(root, 0);
 
             ///qwerty
             //Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit2(root, 0, 0, textInput, wh2, p);

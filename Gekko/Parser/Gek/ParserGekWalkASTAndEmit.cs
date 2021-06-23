@@ -183,7 +183,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        public static void WalkASTAndEmitUnfold(ASTNode node)
+        public static void WalkASTAndEmitUnfold(ASTNode node, int depth)
         {
             //before subnodes
             //locates x[#m] or x[#m+...] or x[#m-...], or same for curlies         
@@ -197,10 +197,151 @@ namespace Gekko.Parser.Gek
             //Also locates listfiles via ASTBANKVARNAME2. For instance #(listfile m) or #(listfile {'m'})
             //the former will work with sum(), unfold() etc.
 
+            WalkAstAndEmitUnfoldBefore(node);
+
+            foreach (ASTNode child in node.ChildrenIterator())
+            {
+                WalkASTAndEmitUnfold(child, depth + 1);
+            }
+            //after subnodes
+
+            WalkAstAndEmitUnfoldAfter(node);
+        }
+
+        private static void WalkAstAndEmitUnfoldAfter(ASTNode node)
+        {
+            if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
+            {
+
+                if (node.Text == "ASTASSIGNMENT" || node.Text == "ASTEVAL")  //#p24234oi34
+                {
+                    //augment SearchUpwardsInTree2() in normal Walker so that it also checks
+                    //if it is a left-side looper
+                    //what about ser x[#i] = 1 + sum(#i, x[#i]) + x[#i], sum should fail. must use alias. or allow it??
+                    //int i = node.freeIndexedListsLeftSide.Count;
+
+                    //ok to just reassign, we are not going to add to any of these dictionaries anyway
+
+                    if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, TwoStrings>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string s in node.freeIndexedLists.Keys)
+                    {
+                        //these are for an unfold function
+                        node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, "unfold"));
+                    }
+                }
+                else if (node.Text == "ASTPRTELEMENT")
+                {
+                    if (node[0].Text == "ASTEXPRESSION")
+                    {
+
+                        List<string> xx = new List<string>();
+                        foreach (string ss in node.freeIndexedLists.Keys)
+                        {
+                            xx.Add(ss);
+                        }
+                        xx.Sort(StringComparer.OrdinalIgnoreCase);
+
+                        //here: unfolding 1 list (#m)
+
+                        //    ASTPRTELEMENT
+                        // 0    ASTEXPRESSION
+                        // 1      ASTFUNCTION    <----------- our insert begins here
+                        // 1a       ASTPLACEHOLDER    asdfg new node
+                        // 2          ASTIDENT                          
+                        // 3            unfold
+                        // 2a         ASTPLACEHOLDER  <-- normally contains an ident with library name
+                        // 3a       ASTSPECIALARGS
+                        // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF and LISTDEFITEM node is inserted here, and the ASTBANKVARNAME nodes are subnodes
+                        // 5          ASTPLACEHOLDER
+                        // 6          ASTVARNAME
+                        // 7            ASTPLACEHOLDER
+                        // 8              ASTHASH
+                        // 9            ASTPLACEHOLDER
+                        //10              ASTNAME
+                        //11                ASTIDENT
+                        //12                  m
+                        //13            ASTPLACEHOLDER
+                        //        AST ----------------> orignial code after ASTEXPRESSION comes here
+
+                        ASTNode n0 = new ASTNode("ASTEXPRESSION", true);
+                        ASTNode n1 = new ASTNode("ASTFUNCTION", true);
+                        //asdfg new node:
+                        ASTNode n1a = new ASTNode("ASTPLACEHOLDER", true);
+                        ASTNode n2 = new ASTNode("ASTIDENT", true);
+                        //asdfg new node:
+                        ASTNode n2a = new ASTNode("ASTPLACEHOLDER", true);
+                        ASTNode n3 = new ASTNode("unfold", true);
+                        ASTNode n3a = new ASTNode("ASTSPECIALARGSDEF", true);
+
+                        n0.Add(n1);
+                        if (false)
+                        {
+                            n1.Add(n2);
+                        }
+                        else
+                        {
+                            //asdfg rewiring
+                            n1.Add(n1a);
+                            n1a.Add(n2);
+                            n1a.Add(n2a);
+                        }
+                        n2.Add(n3);
+                        n1.Add(n3a);
+
+                        ASTNode list = new ASTNode("ASTLISTDEF", true);
+
+                        for (int i = 0; i < xx.Count; i++)
+                        {
+                            ASTNode listDefItem = new ASTNode("LISTDEFITEM", true);  //ZXCVB
+                            ASTNode n4 = new ASTNode("ASTBANKVARNAME", true);
+                            ASTNode n5 = new ASTNode("ASTPLACEHOLDER", true);
+                            ASTNode n6 = new ASTNode("ASTVARNAME", true);
+                            ASTNode n7 = new ASTNode("ASTPLACEHOLDER", true);
+                            ASTNode n8 = new ASTNode("ASTHASH", true);
+                            ASTNode n9 = new ASTNode("ASTPLACEHOLDER", true);
+                            ASTNode n10 = new ASTNode("ASTNAME", true);
+                            ASTNode n11 = new ASTNode("ASTIDENT", true);
+                            ASTNode n12 = new ASTNode(xx[i], true);
+                            ASTNode n13 = new ASTNode("ASTPLACEHOLDER", true);
+                            listDefItem.Add(n4); //ZXCVB
+                            n4.Add(n5);
+                            n4.Add(n6);
+                            n6.Add(n7);
+                            n7.Add(n8);
+                            n6.Add(n9);
+                            n9.Add(n10);
+                            n10.Add(n11);
+                            n11.Add(n12);
+                            n6.Add(n13);
+                            if (xx.Count == 1)
+                            {
+                                n1.Add(n4);  //ZXCVB
+                            }
+                            else
+                            {
+                                list.Add(listDefItem); //ZXCVB
+                            }
+                        }
+
+                        if (xx.Count > 1)
+                        {
+                            n1.Add(list);
+                        }
+
+                        n1.Add(node[0][0]);  //original code goes to arg 2 of unfold function: unfold(#m, ...[here]...)
+                        node.RemoveLast();
+                        node.Add(n0);
+                    }
+                }
+            }
+        }
+
+        private static void WalkAstAndEmitUnfoldBefore(ASTNode node)
+        {
             if (node.Text == "ASTBANKVARNAME2")
             {
                 //listfile
-                
+
                 ASTNode name = node[1][1][0];
                 ASTNode placeholder = node[1][1];
 
@@ -294,7 +435,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     string s2 = GetSimpleName(node2[2]);
                                     if (G.Equal(s, s2))
-                                    {                                        
+                                    {
                                         goto Label;
                                     }
                                 }
@@ -302,7 +443,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     string s2 = GetSimpleName(node2[2][0]);
                                     if (G.Equal(s, s2))
-                                    {                                     
+                                    {
                                         goto Label;
                                     }
                                 }
@@ -322,7 +463,7 @@ namespace Gekko.Parser.Gek
                             }
                             else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2")))  //Note: we cannot have both of these in the same tree, they are always separate
                             {
-                                
+
                                 ASTNode tmp = node2;
                                 if (node2.Text == "ASTLEFTSIDE")
                                 {
@@ -336,141 +477,10 @@ namespace Gekko.Parser.Gek
                                 if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                                 if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
                             }
-                            
+
                             node2 = node2.Parent;
                         }
-                        Label: node2 = node2;
-                    }
-                }
-            }
-
-            foreach (ASTNode child in node.ChildrenIterator())
-            {
-                WalkASTAndEmitUnfold(child);
-            }
-            //after subnodes
-
-            if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
-            {
-
-                if (node.Text == "ASTASSIGNMENT" || node.Text == "ASTEVAL")  //#p24234oi34
-                {
-                    //augment SearchUpwardsInTree2() in normal Walker so that it also checks
-                    //if it is a left-side looper
-                    //what about ser x[#i] = 1 + sum(#i, x[#i]) + x[#i], sum should fail. must use alias. or allow it??
-                    //int i = node.freeIndexedListsLeftSide.Count;
-
-                    //ok to just reassign, we are not going to add to any of these dictionaries anyway
-
-                    if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, TwoStrings>(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in node.freeIndexedLists.Keys)
-                    {
-                        //these are for an unfold function
-                        node.listLoopAnchor.Add(s, new TwoStrings(Globals.listLoopInternalName + s + ++Globals.counter, "unfold"));
-                    }
-                }
-                else if (node.Text == "ASTPRTELEMENT")
-                {
-                    if (node[0].Text == "ASTEXPRESSION")
-                    {
-
-                        List<string> xx = new List<string>();
-                        foreach (string ss in node.freeIndexedLists.Keys)
-                        {
-                            xx.Add(ss);
-                        }
-                        xx.Sort(StringComparer.OrdinalIgnoreCase);
-
-                        //here: unfolding 1 list (#m)
-
-                        //    ASTPRTELEMENT
-                        // 0    ASTEXPRESSION
-                        // 1      ASTFUNCTION    <----------- our insert begins here
-                        // 1a       ASTPLACEHOLDER    asdfg new node
-                        // 2          ASTIDENT                          
-                        // 3            unfold
-                        // 2a         ASTPLACEHOLDER  <-- normally contains an ident with library name
-                        // 3a       ASTSPECIALARGS
-                        // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF and LISTDEFITEM node is inserted here, and the ASTBANKVARNAME nodes are subnodes
-                        // 5          ASTPLACEHOLDER
-                        // 6          ASTVARNAME
-                        // 7            ASTPLACEHOLDER
-                        // 8              ASTHASH
-                        // 9            ASTPLACEHOLDER
-                        //10              ASTNAME
-                        //11                ASTIDENT
-                        //12                  m
-                        //13            ASTPLACEHOLDER
-                        //        AST ----------------> orignial code after ASTEXPRESSION comes here
-
-                        ASTNode n0 = new ASTNode("ASTEXPRESSION", true);
-                        ASTNode n1 = new ASTNode("ASTFUNCTION", true);
-                        //asdfg new node:
-                        ASTNode n1a = new ASTNode("ASTPLACEHOLDER", true);
-                        ASTNode n2 = new ASTNode("ASTIDENT", true);
-                        //asdfg new node:
-                        ASTNode n2a = new ASTNode("ASTPLACEHOLDER", true);
-                        ASTNode n3 = new ASTNode("unfold", true);
-                        ASTNode n3a = new ASTNode("ASTSPECIALARGSDEF", true);
-
-                        n0.Add(n1);
-                        if (false)
-                        {
-                            n1.Add(n2);                            
-                        }
-                        else
-                        {
-                            //asdfg rewiring
-                            n1.Add(n1a);
-                            n1a.Add(n2);
-                            n1a.Add(n2a);
-                        }
-                        n2.Add(n3);
-                        n1.Add(n3a);
-
-                        ASTNode list = new ASTNode("ASTLISTDEF", true);                        
-
-                        for (int i = 0; i < xx.Count; i++)
-                        {
-                            ASTNode listDefItem = new ASTNode("LISTDEFITEM", true);  //ZXCVB
-                            ASTNode n4 = new ASTNode("ASTBANKVARNAME", true);
-                            ASTNode n5 = new ASTNode("ASTPLACEHOLDER", true);
-                            ASTNode n6 = new ASTNode("ASTVARNAME", true);
-                            ASTNode n7 = new ASTNode("ASTPLACEHOLDER", true);
-                            ASTNode n8 = new ASTNode("ASTHASH", true);
-                            ASTNode n9 = new ASTNode("ASTPLACEHOLDER", true);
-                            ASTNode n10 = new ASTNode("ASTNAME", true);
-                            ASTNode n11 = new ASTNode("ASTIDENT", true);
-                            ASTNode n12 = new ASTNode(xx[i], true);
-                            ASTNode n13 = new ASTNode("ASTPLACEHOLDER", true);
-                            listDefItem.Add(n4); //ZXCVB
-                            n4.Add(n5);
-                            n4.Add(n6);
-                            n6.Add(n7);
-                            n7.Add(n8);
-                            n6.Add(n9);
-                            n9.Add(n10);
-                            n10.Add(n11);
-                            n11.Add(n12);
-                            n6.Add(n13);
-                            if (xx.Count == 1)
-                            {
-                                n1.Add(n4);  //ZXCVB
-                            }
-                            else
-                            {
-                                list.Add(listDefItem); //ZXCVB
-                            }
-                        }
-
-                        if (xx.Count > 1)
-                        {
-                            n1.Add(list);
-                        }
-
-                        n1.Add(node[0][0]);  //original code goes to arg 2 of unfold function: unfold(#m, ...[here]...)
-                        node.RemoveLast();
-                        node.Add(n0);
+                    Label: node2 = node2;
                     }
                 }
             }
@@ -573,7 +583,7 @@ namespace Gekko.Parser.Gek
                 w.expressionCounter = -1;  //for labels in PRT elements
             }
 
-            WalkBeforeSubnodes(node, w);
+            WalkASTAndEmitBefore(node, w);
 
             foreach (ASTNode child in node.ChildrenIterator())
             {
@@ -629,10 +639,8 @@ namespace Gekko.Parser.Gek
             else
             {
                 //After sub-nodes  
-                WalkAfterSubnodes(node, w);
-                
+                WalkASTAndEmitAfter(node, w);                
             }  //end of switch on node.Text AFTER sub-nodes are done
-
 
             bool isGoto = false;
             if (w.wh != null && w.wh.isGotoOrTarget) isGoto = true;
@@ -690,7 +698,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void WalkBeforeSubnodes(ASTNode node, W w)
+        private static void WalkASTAndEmitBefore(ASTNode node, W w)
         {
             //Before sub-nodes
             switch (node.Text)
@@ -801,7 +809,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void WalkAfterSubnodes(ASTNode node, W w)
+        private static void WalkASTAndEmitAfter(ASTNode node, W w)
         {
             switch (node.Text)
             {
