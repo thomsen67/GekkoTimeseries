@@ -4217,9 +4217,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else givenLabel = G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1]);
                             }
-                            node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
-
-                            
+                            node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code                                                       
 
                             string freelists = null;
                             if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
@@ -4245,14 +4243,13 @@ namespace Gekko.Parser.Gek
                             ASTNode labelInHyphens = node.GetChild("ASTGEKKOLABEL");
                             if (labelInHyphens != null)
                             {
-                                label5 = "O.ConvertToString(" + labelInHyphens[0].Code + ")";
+                                label5 = "O.ConvertToString(" + labelInHyphens[0].Code + ")";                                
                             }
+                            label5 = label5.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.                            
 
                             node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() {" + label5 + "};" + G.NL);
-                            if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.
-                                                                                               //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
-
-                            //node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
+                            if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.                            
+                                                        
                             node.Code.A("" + Globals.smpl + " = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); " + Globals.smpl + ".t0 = " + Globals.smpl + ".t0.Add(-2);" + G.NL);
 
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
