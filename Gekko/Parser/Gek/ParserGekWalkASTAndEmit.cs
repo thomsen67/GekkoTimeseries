@@ -501,45 +501,7 @@ namespace Gekko.Parser.Gek
                     WalkASTSimple(child, depth + 1, ref line);
                 }
             }
-        }
-
-        public static void WalkASTAndEmit2(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
-        {
-            //before
-            G.Writeln(G.Blanks(absoluteDepth) + node.Text);
-
-            foreach (ASTNode child in node.ChildrenIterator())
-            {
-                WalkASTAndEmit2(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p);
-            }
-
-            //after
-        }
-
-        public static void WalkASTAndEmit3(ASTNode root, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
-        {
-            
-            Stack<ASTNode> stack = new Stack<ASTNode>();
-            stack.Push(root);
-
-            while (stack.Count > 0)
-            {
-                ASTNode node = stack.Pop();
-
-                //before
-
-                G.Writeln(G.Blanks(absoluteDepth) + node.Text);
-
-                foreach (ASTNode child in node.ChildrenIterator())
-                {
-                    stack.Push(child);
-                }
-            }            
-            
-        }
-
-
-
+        }        
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {
