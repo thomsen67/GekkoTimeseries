@@ -379,8 +379,8 @@ End Sub
 'operator (string): Gekko operators, for instance ""p"" for percent growth, or ""n p"" for both levels and percent growth.
 'options (string):  Not used yet
 'names (string):    Names of timeseries, for instance ""x1, x2, x3"" (or: ""x1""; ""x2""; ""x3""). Wildcards also possible, ""{'a*b?c'}"" for the a*b?c wildcard.
-Public Function Gekko_GetGroup(databank As String, freq As String, per1 As String, per2 As String, operator As String, options As String, ParamArray names() As Variant) As Variant
-  args = """"
+Public Function Gekko_GetGroup(databank As String, freq As String, per1 As String, per2 As String, operator As String, options As String, ParamArray names() As Variant) As Variant  
+  args = """": comma = """"
   For Each name In names: args = args & comma & name: comma = "", "": Next name
   Gekko ""read "" & databank & "";""
   Gekko ""option freq = "" & freq & "";""
