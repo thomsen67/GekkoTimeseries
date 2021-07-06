@@ -9690,7 +9690,7 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_gekko20, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30.Translate(xx);
+                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(xx);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9703,7 +9703,7 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_remove, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30.Remove(xx);
+                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Remove(xx);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9716,7 +9716,7 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_move, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30.Move(xx);
+                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Move(xx);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {

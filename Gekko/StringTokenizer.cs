@@ -298,26 +298,24 @@ namespace Gekko
             return !HasNoChildren();
         }
 
+        /// <summary>
+        /// Remove all contents of subnodes (setting them blank)
+        /// </summary>
         public void Clear()
         {
             this.s = "";
             this.leftblanks = 0;
             this.subnodes = null;
         }
-
-        //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
-        //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
-
+        
         /// <summary>
         /// Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
         /// Note that the commas are preserved as the second part of the tuple.
         /// The last item (or the 1 item if there is only 1) will have null as second part of tuple.
         /// </summary>
         /// <returns></returns>           
-
         public List<TokenHelperComma> SplitCommas(bool firstLast)
         {
-
             if (this.subnodes == null) return null;
             List<TokenHelperComma> temp = new List<TokenHelperComma>();
             TokenList temp2 = new TokenList();
@@ -446,6 +444,10 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Return for instance "line 3 pos 4" as a string
+        /// </summary>
+        /// <returns></returns>
         public string LineAndPosText()
         {
             return "line " + this.line + " pos " + this.column;
@@ -481,6 +483,10 @@ namespace Gekko
             return i1Start + j;
         }
 
+        /// <summary>
+        /// This  must be used if you are deleting, reordering, adding subnodes.
+        /// Keeps track of the id numbers. 
+        /// </summary>
         public void OrganizeSubnodes()
         {
             //temp is an empty node (.s == null) with subnodes
@@ -497,7 +503,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Jump to previous/later tokens
+        /// Simple jump to previous/later tokens. May return null.
         /// </summary>
         /// <param name="offset"></param>
         /// <returns></returns>
@@ -529,31 +535,7 @@ namespace Gekko
             }
             TokenHelper rv = new TokenHelper(rv2, null);
             return rv;
-        }
-
-        public void Flatten(TokenHelper rv)
-        {
-            //Note: the return value is actually the argument, where the tokens are put into!
-
-            if (rv.subnodes == null) rv.subnodes = new TokenList();
-
-            //All subnodes of node are flattend
-            if (this.HasNoChildren())
-            {
-                //not a sub-node
-                rv.subnodes.storage.Add(this);
-            }
-            else
-            {
-                //an empty node with children
-                foreach (TokenHelper child in this.subnodes.storage)
-                {
-                    child.Flatten(rv);
-                }
-            }
-
-        }
-
+        }        
 
         /// <summary>
         /// Trimmed version of ToString()
@@ -611,6 +593,8 @@ namespace Gekko
         }
     }
 
+    // =============================================================================================
+
     /// <summary>
     /// StringTokenizer tokenized string (or stream) into tokens.
     /// </summary>
@@ -644,22 +628,82 @@ namespace Gekko
         // ====================== helper functions =====================================
         // =============================================================================
 
+        /// <summary>
+        /// Get string of position i, may return null.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public static string GetS(List<TokenHelper> line, int i)
         {
             if (i < 0 || i >= line.Count) return null;
             return line[i].s;
         }
 
+        /// <summary>
+        /// Get number of leftblanks at position i. Returns 0 if out of range.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static int GetLeftblanks(List<TokenHelper> line, int i)
+        {
+            if (i < 0 || i >= line.Count) return 0;
+            return line[i].leftblanks;
+        }        
+
+        /// <summary>
+        /// Erase all contents at postion i, including blanks and subnodes if any. 
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="i"></param>
+        public static void SetNull(List<TokenHelper> line, int i)
+        {
+            line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null;
+        }
+
+        /// <summary>
+        /// Get the ETokenType type at position i. Returns EtokenType.Null if out of range.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static ETokenType GetType(List<TokenHelper> line, int i)
+        {
+            if (i < 0 || i >= line.Count) return ETokenType.Null;
+            return line[i].type;
+        }
+
+        /// <summary>
+        /// Search for a string
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static int FindS(List<TokenHelper> line, string s)
         {
             return FindS(line, 0, s);
         }
 
+        /// <summary>
+        /// Search for a string
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="start"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static int FindS(List<TokenHelper> line, int start, string s)
         {
             return FindS(line, start, new string[] { s });
         }
 
+        /// <summary>
+        /// Search for strings
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="start"></param>
+        /// <param name="ss"></param>
+        /// <returns></returns>
         public static int FindS(List<TokenHelper> line, int start, string[] ss)
         {
             int rv = -12345;
@@ -677,16 +721,37 @@ namespace Gekko
             return rv;
         }        
 
+        /// <summary>
+        /// Check for string equality of node i.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="i"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool Equal(List<TokenHelper> line, int i, string s)
         {
             return G.Equal(GetS(line, i), s);
         }
 
+        /// <summary>
+        /// Check for string equality of node i, where we can use a list of strings.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="i"></param>
+        /// <param name="ss"></param>
+        /// <returns></returns>
         public static bool Equal(List<TokenHelper> line, int i, List<string> ss)
         {
             return G.Equal(GetS(line, i), ss) != null;
         }
 
+        /// <summary>
+        /// Get text as string, including left-blanks. Takes an interval.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="a1"></param>
+        /// <param name="a2"></param>
+        /// <returns></returns>
         public static string GetTextFromLeftBlanksTokens(List<TokenHelper> a, int a1, int a2)
         {
             string s2 = null;
@@ -698,6 +763,11 @@ namespace Gekko
             return s2;
         }
 
+        /// <summary>
+        /// Only used for stand-alone equation browser. Maybe move this to that method?
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         public static Tuple<int, int> FindOptionFieldInSeriesAssignment(List<TokenHelper> line)
         {
             //not completely bulletproof, for instance "COMMAND <...> .... file = xx;" will fail, where command is a user-defined procedure
