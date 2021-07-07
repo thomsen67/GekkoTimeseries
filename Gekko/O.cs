@@ -9685,8 +9685,6 @@ namespace Gekko
                 if (G.Equal(opt_gekko18, "yes"))
                 {
                     new Error("The translator from Gekko 1.8 to 2.0 is no longer available for Gekko 3.1.x. Please use Gekko 3.0 or 2.x.x to do this.");
-
-                    //throw new GekkoException();
                 }
                 else if (G.Equal(opt_gekko20, "yes"))
                 {

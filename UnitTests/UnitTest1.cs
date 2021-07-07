@@ -7230,6 +7230,118 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Translate()
+        {            
+            T("ser x = 1; //abc",
+              "x = 1; //abc");
+
+            T("series x /* abc */= 1;",
+              "x /* abc */= 1;");
+
+            T("series<%t1 %t2>x = 1;",
+              "x <%t1 %t2> = 1;");
+
+            T("val x = 1;",
+              "%x = 1;");
+
+            T("date x = 2001q1;",
+              "%x = 2001q1;");
+            
+            T("string x = 'a';", 
+              "%x = 'a';");
+
+            T("name x = 'a';",
+              "%x = 'a';");
+
+            T("list x = a, b, c;",
+              "#x = a, b, c;");
+
+            T("matrix x = [1, 2 || 3, 4];",
+              "#x = [1, 2 ; 3, 4];");
+
+            //paths
+
+            T(@"read data\%x\%y;",
+              @"read data\{%x}\{%y};");
+
+            //interpolate
+
+            T(@"tell ' abc ';",  //just testing integrity
+              @"tell ' abc ';");
+
+            T(@"tell '%x %y';",
+              @"tell '{%x} {%y}';");
+
+            T(@"tell '%x%y';",
+              @"tell '{%x}{%y}';");
+
+            T(@"tell 'a%x%y|b';",
+              @"tell 'a{%x}{%y}b';");
+
+            T(@"tell '{%x} {%y}';",
+              @"tell '{%x} {%y}';");
+
+            T(@"tell '{%x}{%y}';",
+              @"tell '{%x}{%y}';");
+
+            T(@"tell 'a{%x}{%y}|b';",
+              @"tell 'a{%x}{%y}b';");
+
+            T(@"tell 'a ~%x';",
+              @"tell 'a %x';");
+
+            T(@"tell 'a ~%x~%y';",
+              @"tell 'a %x%y';");
+
+            if (false)
+            {
+
+                //SERIES command:
+                //In 2.4, for string/name %x. On lhs, 2.4 can use either %x or {%x} no matter if 
+                //%x is string, name or nameloop. In 3.0, it must be {%x} on lhs. On rhs, 2.4
+                //can use {%x} always, but may use %x if name or nameloop. This must always be
+                //translated as {%x}, unless date or string. If type is uncertain, do not translate
+                //%x into {%x} on rhs.
+
+                T("series %x = 1;",
+                  "{%x} = 1;");
+
+                T("series %x[%t] = 1;",  //only {} on first %-var.
+                  "{%x}[%t] = 1;");
+
+                T("series %x[%t + 1] = 1;",  //only {} on first %-var.
+                  "{%x}[%t + 1] = 1;");
+
+                T("series y = %x;",  //%x could be scalar
+                  "y = %x;");
+
+                T("name x = 'a'; series y = %x;",  //has {} because %x is NAME 
+                  "%x = 'a'; y = {%x};");
+
+                T("name x = 'a'; series y = {%x};",  //check that this is not --> {{%x}}
+                  "%x = 'a'; y = {%x};");
+
+                T("for x = a, b; series y = % x; end;", //must add {}, because %x is NAMELOOP
+                  "for string %x = a, b; y = {%x}; end;");
+
+            }
+
+        }
+
+        /// <summary>
+        /// For translate testing from 2.4 to 3.0. Also tests that the "target" 3.0 code can parse, so we do not need to test that all the time.
+        /// Testing that 2.4 code can parse must be done manually.
+        /// </summary>
+        /// <param name="code_2_4"></param>
+        /// <param name="code_3_0"></param>
+        private static void T(string code_2_4, string code_3_0)
+        {              
+            if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
+            string translated = Translate_2_4_to_3_0.Translate(code_2_4);
+            Assert.AreEqual(translated, code_3_0);
+        }        
+
+        [TestMethod]
         public void _Test_Count()
         {
             //==================== COUNT ===========================================
@@ -7240,7 +7352,6 @@ namespace UnitTests
             I("count f*;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 631 "));
         }
-
 
         [TestMethod]
         public void _Test_Index()

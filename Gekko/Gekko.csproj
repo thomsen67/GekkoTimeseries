@@ -416,6 +416,7 @@
     <Compile Include="GuiGraph.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Translate_2_4_to_3_0.cs" />
     <Compile Include="Wrap.cs" />
     <EmbeddedResource Include="GuiDialogMakeBatfile.resx">
       <SubType>Designer</SubType>

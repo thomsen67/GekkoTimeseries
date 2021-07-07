@@ -171,7 +171,44 @@ namespace Gekko.Parser.Gek
             }
 
             return ch2;
-        }        
+        }
+
+        /// <summary>
+        /// Method to quick test if a string of Gekko 3.0 command(s) is legal syntax (parses ok in ANTLR). Nothing is executed.
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public static bool IsValid3_0Syntax(string commands)
+        {
+            bool ok = true;
+            string s2a = Program.HandleGekkoCommands(commands);
+            string textInput = s2a + "\r\n" + "\r\n"; //newlines for ease of use of ANTLR
+            ANTLRStringStream input = new ANTLRStringStream(textInput);
+            Cmd3Parser parser3 = null;
+            Cmd3Lexer lexer3 = new Cmd3Lexer(input);
+            CommonTokenStream tokens3 = new CommonTokenStream(lexer3);
+            parser3 = new Cmd3Parser(tokens3);
+            Cmd3Parser.start_return r3 = null;
+
+            try
+            {
+                r3 = parser3.start();  //may crash due to lexer
+            }
+            catch
+            {
+                ok = false;
+            }
+
+            if (ok)
+            {
+                if (parser3.GetErrors().Count > 0)
+                {
+                    ok = false;
+                }
+            }
+
+            return ok;
+        }
 
         private static int FindEndMarker(List<string> lines, int i, GekkoDictionary<string, string> controlVars, List<string> markers)
         {
