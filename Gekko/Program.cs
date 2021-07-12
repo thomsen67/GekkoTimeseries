@@ -13336,25 +13336,25 @@ namespace Gekko
             {
                 command = "RENAME";
                 command2 = "rename";
-                command2 = "renamed";
+                command3 = "renamed";
             }
             else if (type == EWildcardSearchType.Search)
             {
                 command = "Search";
                 command2 = "search";
-                command2 = "searched";
+                command3 = "searched";
             }
             else if (type == EWildcardSearchType.Write)
             {
                 command = "WRITE";
                 command2 = "write";
-                command2 = "wrote";
+                command3 = "wrote";
             }
             else if (type == EWildcardSearchType.Delete)
             {
                 command = "DELETE";
                 command2 = "delete";
-                command2 = "deleted";
+                command3 = "deleted";
             }
 
             List<ToFrom> outputs = new List<ToFrom>();

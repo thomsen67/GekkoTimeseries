@@ -7293,6 +7293,162 @@ namespace UnitTests
             T(@"tell 'a ~%x~%y';",
               @"tell 'a %x%y';");
 
+            //Use {} or not: -------------------
+                        
+            T("analyze #m;",
+              "analyze {#m};");
+
+            T("checkoff %x;",
+              "checkoff {%x};");
+            T("checkoff #m;",
+              "checkoff {#m};");
+                        
+            T("clip #m;",
+              "clip {#m};");
+
+            T("close %x;",
+              "close {%x};");
+            T("close #m;",
+              "close {#m};");
+
+            T("compare %x;",
+              "compare {%x};");
+            T("compare #m;",
+              "compare {#m};");
+
+            T("copy %x to %xx;",
+              "copy {%x} to {%xx};");
+            T("copy #m to #mm;",
+              "copy {#m} to {#mm};");
+
+            T("create %x;",
+              "create {%x};");
+            T("create #m;",
+              "create {#m};");
+
+            T("delete %x;",
+              "delete {%x};");
+            T("delete #m;",
+              "delete {#m};");
+
+            T("disp %x;",
+              "disp {%x};");
+            T("disp #m;",
+              "disp {#m};");
+
+            T("doc %x label = 'a';",
+              "doc {%x} label = 'a';");
+            T("doc #m label = 'a';",
+              "doc {#m} label = 'a';");
+
+            T("endo %x;",
+              "endo {%x};");
+            T("endo #m;",
+              "endo {#m};");
+
+            T("exo %x;",
+              "exo {%x};");
+            T("exo #m;",
+              "exo {#m};");
+
+            T("export <%t1 %t2> %x file = %y;",
+              "export <%t1 %t2> {%x} file = %y;");
+            T("export <%t1 %t2> #m file = %y;",
+              "export <%t1 %t2> {#m} file = %y;");
+
+            T("findmissingdata %x;",
+              "findmissingdata {%x};");
+            T("findmissingdata #m;",
+              "findmissingdata {#m};");
+
+            T("for i = a, %s, #m; end;",
+              "for string %i = a, {%s}, {#m}; end;");
+
+            T("if(%x[2020] == %x[2021]); end;",  //only %x with indexer
+              "if({%x}[2020] == {%x}[2021]); end;");
+
+            T("if(#m[2] == #m[3]); end;",
+              "if(#m[2] == #m[3]); end;");
+
+            T("itershow %x;",
+              "itershow {%x};");
+            T("itershow #m;",
+              "itershow {#m};");
+
+            T("list m = a, %x, #m, b;",
+              "#m = a, {%x}, {#m}, b;");
+            T("list m = a, {%x}, {#m}, b;",
+              "#m = a, {%x}, {#m}, b;");
+            T("list m = a;",
+              "#m = a,;");
+            T("list m = piece(%s,2,2);",
+              "#m = (substring(%s,2,2),);");
+            T("list m = {piece(%s,2,2)};",
+              "#m = (substring(%s,2,2),);");
+            T("list m = #m[a*b];",
+              "#m = #m['a*b'];");
+            T("list m = #m[a1..a3];",
+              "#m = #m['a1'..'a3'];");
+            T("list m = #m['a*b'];",
+              "#m = #m['a*b'];");
+            T("list m = #m['a1'..'a3'];",
+              "#m = #m['a1'..'a3'];");
+
+            T("ols #m;",
+              "ols {#m};");
+
+            T("mulprt #m;",
+              "mulprt {#m};");
+
+            T("rebase %x 2001 2002;",
+              "rebase {%x} 2001 2002;");
+            T("rebase #m 2001 2002;",
+              "rebase {#m} 2001 2002;");
+
+            T("rename %x as %xx;",
+              "rename {%x} as {%xx};");
+            T("rename #m as #mm;",
+              "rename {#m} as {#mm};");
+
+            T("series %s = 1;",
+              "series {%s} = 1; ");
+            T("series #m = 1;",
+              "series {#m} = 1; ");
+            T("for i = a, b; series %i = %i + 1; end;",
+              "for string %i = a, b; series {%i} = {%i} + 1; end;");
+
+            T("sheet #m;",
+              "sheet {#m};");
+
+            T("show #m;",
+              "prt #m;");
+
+            T("smooth %x = %xx linear;",
+              "smooth {%x} = {%xx} linear;");
+            T("smooth #m = #mm linear;",
+              "smooth {#m} = {#mm} linear;");
+
+            T("splice %x = %xx 2000 %xxx;",
+              "splice {%x} = {%xx} 2000 {%xxx};");
+            T("splice #m = #mm 2000 #mmm;",
+              "splice {#m} = {#mm} 2000 {#mmmm};");
+
+            T("truncate %x;",
+              "truncate {%x};");
+            T("truncate #m;",
+              "truncate {#m};");
+
+            T("plot #m;",
+              "plot {#m};");
+
+            T("prt #m;",
+              "prt {#m};");
+
+            
+            //write
+
+            //x12a
+
             if (false)
             {
 
