@@ -7443,9 +7443,27 @@ namespace UnitTests
 
             T("prt #m;",
               "prt {#m};");
+            T("prt %x;",
+              "prt %x;");  //could be val
+            T("name x = 'a'; prt %x;",
+              "%x = 'a'; prt {%x};");  //if %x must be upgraded, it  must be a NAME, FORNAME or FORNULL. Since PRT cannot be used for strings anyway (TELL for that), this is not very risky.
+            T("for x = a, b; prt %x; end;",
+              "for string %x = a, b; prt {%x}; end;");
+            T("for name x = a, b; prt %x; end;",
+              "for string %x = a, b; prt {%x}; end;");
+            T("for string x = a, b; prt {%x}; end;",
+              "for string %x = a, b; prt {%x}; end;");
+            T("p #m;",
+              "p {#m};");
+            T("pri #m;",
+              "pri {#m};");
+            T("print #m;",
+              "print {#m};");
 
-            
-            //write
+            T("write <%t1 %t2> %x file = %y;",
+              "write <%t1 %t2> {%x} file = %y;");
+            T("write <%t1 %t2> #m file = %y;",
+              "write <%t1 %t2> {#m} file = %y;");
 
             //x12a
 
