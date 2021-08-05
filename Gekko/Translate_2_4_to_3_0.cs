@@ -174,7 +174,7 @@ namespace Gekko
 
                 try
                 {
-                    //[0] --> .length()
+                    //¤001 [0] --> .length()
                     if (line[i + 0].leftblanks == 0 && line[i + 0].s == "[" && line[i + 1].s == "0" && line[i + 2].s == "]")
                     {
                         line[i + 0].leftblanks = 0;
@@ -189,7 +189,7 @@ namespace Gekko
 
                 try
                 {
-                    //  %x\ --> {%x}\ for path
+                    // ¤002 %x\ --> {%x}\ for path
                     if (line[i + 0].s == "%" && line[i + 1].type == ETokenType.Word && line[i + 2].s == "\\")
                     {
                         line[i + 0].s = "";
@@ -205,7 +205,7 @@ namespace Gekko
                 }
                 catch { };
 
-                //quotes, interpolate. Stuff like 'a%x%y|z ~%x {%y}' --> 'a{%x}{%y}z %x {%y}'
+                //¤003 quotes, interpolate. Stuff like 'a%x%y|z ~%x {%y}' --> 'a{%x}{%y}z %x {%y}'
                 if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
                 {
                     string ss = line[i].s;
@@ -249,7 +249,7 @@ namespace Gekko
                     line[i].s = ss2;
                 }
 
-                
+                // ¤004
                 if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "+" && line[i + 1].leftblanks == 0)
                 {
                     //list operator 1
@@ -270,21 +270,25 @@ namespace Gekko
                     line[i + 1].s = "";
                 }
                 else if (StringTokenizer.GetS(line, i) == "|" && StringTokenizer.GetS(line, i + 1) == "|" && line[i + 1].leftblanks == 0)
-                {                    
+                {
+                    //¤005
                     line[i].s = ";";  //... || ...  --> ... ; ...
                     line[i + 1].s = "";
                 }
 
                 if (StringTokenizer.Equal(line, i, "avgt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤006
                     AddComment(line, "avgt(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
                 }
                 else if (StringTokenizer.Equal(line, i, "difference") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤007
                     line[i].s = "except";
                 }
                 else if (StringTokenizer.Equal(line, i, "endswith") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤008
                     AddComment(line, "endswith() is case-insensitive in Gekko 3.0");
                 }
                 else if (StringTokenizer.Equal(line, i, "fromseries") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
@@ -293,43 +297,53 @@ namespace Gekko
                 }
                 else if (StringTokenizer.Equal(line, i, "hpfilter") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤009
                     AddComment(line, "hpfilter(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
                 }
                 else if (StringTokenizer.Equal(line, i, "pack") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤010
                     AddComment(line, "pack(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
                 }
                 else if (StringTokenizer.Equal(line, i, "piece") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤11
                     line[i].s = "substring";
                 }
                 else if (StringTokenizer.Equal(line, i, "replace") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤012
                     AddComment(line, "replace() is case-insensitive in Gekko 3.0");
                 }
                 else if (StringTokenizer.Equal(line, i, "search") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤013
                     line[i].s = "index";
                 }
                 else if (StringTokenizer.Equal(line, i, "startswith") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤014
                     AddComment(line, "startswith() is case-insensitive in Gekko 3.0");
                 }
                 else if (StringTokenizer.Equal(line, i, "strip") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤015
                     line[i].s = "replace";
                     AddComment(line, "strip(%x) is now replace(%x, '')");
                 }
                 else if (StringTokenizer.Equal(line, i, "sumt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤016
                     AddComment(line, "sumt(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
                 }
                 else if (StringTokenizer.Equal(line, i, "trim") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤017
                     line[i].s = "strip";
                 }                
                 else if (StringTokenizer.Equal(line, i, "unpack") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
+                    //¤018
                     AddComment(line, "unpack(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
                 }                                
             }
@@ -347,11 +361,12 @@ namespace Gekko
 
             if (G.Equal(line[pos].s, "compare"))
             {
+                //¤019
                 AddComment(line, "COMPARE has changed syntax, see the help files");
             }
             else if (G.Equal(line[pos].s, "collapse"))
             {
-
+                //¤020
                 for (int i = 0; i < line.Count; i++)
                 {
                     if (G.Equal(line[i].s, "."))
@@ -370,7 +385,7 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "create"))
             {
-
+                //¤021
                 for (int i = 0; i < line.Count; i++)
                 {
                     if (G.Equal(line[i].s, "hpfilter") || G.Equal(line[i].s, "unpack"))
@@ -386,6 +401,7 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "date"))
             {
+                //¤022
                 string name = line[pos + 1].s;
 
                 if (StringTokenizer.Equal(line, 2, "="))
@@ -397,11 +413,13 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "download"))
             {
+                //¤023
                 AddComment(line, "DOWNLOAD requires quotes around the URL");
             }
 
             else if (G.Equal(line[pos].s, "export"))
             {
+                //¤024
                 AddComment(line, "For EXPORT without dates, use EXPORT<all>");
             }
 
@@ -409,7 +427,6 @@ namespace Gekko
             {
 
             }
-
 
             else if (G.Equal(line[pos].s, "if"))
             {
@@ -425,11 +442,13 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "import"))
             {
+                //¤024
                 AddComment(line, "For IMPORT without dates, use IMPORT<all>");
             }
 
             else if (G.Equal(line[pos].s, "index"))
             {
+                //¤025
                 TokenHelper last = line[line.Count - 2];  //remember semicolon
 
                 if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
@@ -450,7 +469,7 @@ namespace Gekko
 
                 if (!list)
                 {
-
+                    //¤026
                     int eq = StringTokenizer.FindS(line, "=");
 
                     if (eq == 2)
@@ -481,6 +500,7 @@ namespace Gekko
                 //remove list<direct>
                 if (line.Count > 3 && line[1].s == "<" && G.Equal(line[2].s, "direct") && line[3].s == ">")
                 {
+                    //¤027
                     line.RemoveAt(1);
                     line.RemoveAt(1);
                     line.RemoveAt(1);
@@ -488,241 +508,12 @@ namespace Gekko
 
                 //so much is changed here that we have to run this one manually first
                 HandleExpressionsRecursive(line, line);
-                
-                List<TokenHelper> l1 = new List<TokenHelper>();
-                List<TokenHelper> l2 = new List<TokenHelper>();
-                List<TokenHelper> l3 = new List<TokenHelper>();
 
-                string result1 = "";
-                string result2 = "";
-                string result3 = "";
-
-                int i1 = StringTokenizer.FindS(line, "=");
-                if (i1 > -12345)
-                {
-                    for (int i = 0; i <= i1; i++) l1.Add(line[i]);
-                    int i2 = StringTokenizer.FindS(line, i1 + 1, new string[] { "prefix", "suffix", "trim", "sort", "strip" });
-                    if (i2 != -12345)
-                    {
-                        for (int i = i1 + 1; i < i2; i++) l2.Add(line[i]);
-                        for (int i = i2; i < line.Count; i++) l3.Add(line[i]);
-                    }
-                    else
-                    {
-                        for (int i = i1 + 1; i < line.Count - 1; i++) l2.Add(line[i]);
-                        if (StringTokenizer.GetS(line, line.Count - 1) == ";")
-                        {
-                            //should be so
-                            l3.Add(line[line.Count - 1]);
-                        }
-                        else
-                        {
-                            //hmmm?
-                            l2.Add(line[line.Count - 1]);
-                        }
-                    }
-
-                    //l1, l2, l3 have been done
-
-                    List<string> items = new List<string>();
-                    List<string> itemsExtra = new List<string>();
-                    string s = "";
-                    string sExtra = "";
-                    foreach (TokenHelper item in l2)
-                    {
-                        if (item.s == ",")
-                        {
-                            int count = s.TakeWhile(Char.IsWhiteSpace).Count();
-                            items.Add(s.Trim());
-                            itemsExtra.Add(sExtra + G.Blanks(count));
-                            s = "";
-                            sExtra = "";
-                        }
-                        else
-                        {
-                            if (item.type == ETokenType.EOL || item.type == ETokenType.EOF || item.type == ETokenType.Comment)
-                            {
-                                sExtra += item.ToString();
-                            }
-                            else
-                            {
-                                s += item.ToString();
-                            }
-                        }
-                    }
-                    items.Add(s);  //last item
-                    itemsExtra.Add(sExtra);
-
-                    //items are elements from l2
-
-                    //test if items are simple
-                    bool simple = true;
-                    foreach (string s3 in items)
-                    {
-                        string s2 = s3.Trim();
-                        bool curly = false;
-                        for (int ic = 0; ic < s2.Length; ic++)
-                        {
-                            if (s2[ic] == '{') curly = true;
-                            if (curly || G.IsLetterOrDigitOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
-                            {
-                                //ok
-                            }
-                            else
-                            {
-                                simple = false;  //could break here but never mind
-                            }
-                            if (s2[ic] == '}') curly = false;
-                        }
-                    }
-
-                    //doing result1 here
-                    if (list)
-                    {
-                        if (StringTokenizer.Equal(l1, 1, "listfile"))
-                        {
-                            //list listfile m = ...  --> #(listfile m) = ... 
-                            result1 = "#(listfile " + l1[2] + ") = ";
-                        }
-                        else
-                        {
-                            for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
-                            result1 = "#" + result1.TrimStart();
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < l1.Count; i++) result1 += l1[i].ToString();
-                    }
-
-                    //do result3 here
-                    int iSpecial = -12345;
-                    for (int i = 0; i < l3.Count; i++)
-                    {
-                        int j = l3.Count - 1;
-                        if (l3[i].s == "prefix")
-                        {
-                            iSpecial = i;
-                            j = StringTokenizer.FindS(l3, "suffix");
-                            int j0 = j;
-                            if (j == -12345) j = l3.Count - 1;
-                            l3[i].leftblanks = 0;
-                            l3[i].s = "." + l3[i].s + "(";
-                            l3[i + 1].s = "";
-                            l3[j].s = ")" + l3[j].s;
-
-                            if (j0 != -12345)
-                            {
-                                l3[j].leftblanks = 0;
-                                l3[j].s = "." + l3[j].s + "(";
-                                if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
-                                l3[j + 1].s = "";
-                                l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
-                            }
-                        }
-                        else if (l3[i].s == "suffix")
-                        {
-                            iSpecial = i;
-                            j = StringTokenizer.FindS(l3, "prefix");
-                            int j0 = j;
-                            if (j == -12345) j = l3.Count - 1;
-                            l3[i].leftblanks = 0;
-                            l3[i].s = "." + l3[i].s + "(";
-                            l3[i + 1].s = "";
-                            l3[j].s = ")" + l3[j].s;
-
-                            if (j0 != -12345)
-                            {
-                                l3[j].leftblanks = 0;
-                                l3[j].s = "." + l3[j].s + "(";
-                                if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
-                                l3[j + 1].s = "";
-                                l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
-                            }
-                        }
-                        else if (l3[i].s == "trim")
-                        {
-                            iSpecial = i;
-                            l3[i].leftblanks = 0;
-                            l3[i].s = "." + "unique" + "(";
-                            l3[j].s = ")" + l3[j].s;
-                        }
-                        else if (l3[i].s == "sort")
-                        {
-                            iSpecial = i;
-                            l3[i].leftblanks = 0;
-                            l3[i].s = "." + l3[i].s + "(";
-                            l3[j].s = ")" + l3[j].s;
-                        }
-                        else if (l3[i].s == "strip")
-                        {
-                            iSpecial = i;
-                            l3[i].leftblanks = 0;
-                            l3[i].s = "." + "replaceinside" + "(";
-                            l3[i + 1].s = "";
-                            l3[j].s = ", '')" + l3[j].s;
-                        }
-                    }
-                    for (int i = 0; i < l3.Count; i++)
-                    {
-                        result3 += l3[i].ToString();
-                    }
-
-                    if ((simple || isParallel) && result3.Trim() == ";")  //no prefix etc.
-                    {
-                        if (items.Count == 1 && G.IsSimpleToken(items[0].Trim()))  //test of issimple... probably superfluous
-                        {
-                            //one-element list like list m = a;
-                            result2 = itemsExtra[0] + "(" + "'" + items[0].Trim() + "',)";
-                        }
-                        else
-                        {
-                            bool first = true;
-                            for (int ij = 0; ij < items.Count; ij++)
-                            {
-                                string s2 = items[ij];
-                                if (!first) result2 += ",";
-                                result2 += itemsExtra[ij] + s2;
-                                first = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        bool first = true;
-                        for (int ij = 0; ij < items.Count; ij++)
-                        {
-                            string s2 = items[ij];
-                            if (!first) result2 += "+";
-                            if (G.IsSimpleToken(s2.Trim()))
-                            {
-                                result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";
-                            }
-                            else result2 += itemsExtra[ij] + s2;
-                            first = false;
-                        }
-                    }
-
-                    for (int i = 1; i < line.Count; i++)
-                    {
-                        line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null;
-
-                    }
-                    line[0].leftblanks = 0;
-
-
-                    if (result3.Trim() == ";")
-                    {
-                        line[0].s = result1 + result2 + result3;
-                    }
-                    else
-                    {
-                        line[0].s = result1 + " (" + result2.TrimStart(new char[] { ' ' }) + ")" + result3;
-                    }
-                }
+                HandleCommandNameListElements(line, list, isParallel);
             }
             else if (G.Equal(line[pos].s, "matrix"))
             {
+                //¤029
                 line[pos].meta.commandName = "matrix";
 
                 string name = line[pos + 1].s;
@@ -737,18 +528,16 @@ namespace Gekko
             else if (G.Equal(line[pos].s, "p") || G.Equal(line[pos].s, "prt") || G.Equal(line[pos].s, "pri") || G.Equal(line[pos].s, "print") || G.Equal(line[pos].s, "show"))
             {
                 //Also renames SHOW --> PRT
-
                 line[pos].meta.commandName = "prt";
-
-                line[pos].s = "prt";
+                //¤030
+                if (G.Equal(line[pos].s, "show")) line[pos].s = "prt";  //don't change for the PRT variants
                 string name = line[pos + 1].s;
-
                 //TODO: add list syntax ()...
             }
 
-
             else if (line[pos].subnodes != null && line[pos].subnodes[0].s == "(")
             {
+                //¤031
                 //(series x1, series x2) = laspchain(...) --> x1 = laspchain(...).p; x2 = laspchain(...).q;
                 //0   1   2 3   4    5 6 1     2
 
@@ -774,164 +563,13 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "ser") || G.Equal(line[pos].s, "series"))
             {
-                line[pos].meta.commandName = "series";
-
-                //SER x = y; ok
-                //SER x = x[-1] + 1; --> <dynamic>
-                //SER y = 1, 2 rep 3, 3 rep * -> parenteses
-                //SER y = 1 rep *; --> 1
-                //SER y[2000] = ... --> ok
-                //SER %m = ... --> {%m}
-                //SER %m|x = ... --> {%m}x
-                //SER x = x[-1] + ... --> <dynamic>
-
-                int lb = line[pos].leftblanks;
-
-                line[pos].s = ""; line[pos + 1].leftblanks = 0;
-
-                int ii = 1;
-                var o = FindOptionField(line);
-                if (o.Item1 != -12345) ii = o.Item2 + 1;  //for instance the '=' series <2010 2020> x = 
-
-                int op_i = -12345;
-                op_i = StringTokenizer.FindS(line, ii, new string[] { "=", "^", "%", "+", "*", "#" });  //cannot match series #m = ... or series <2010 2020> #m = ...
-
-                if (op_i != -12345)
-                {
-                    if (op_i == 3)
-                    {
-                        if (line[1].s == "#" && line[2].type == ETokenType.Word)
-                        {
-                            //series #m = --> series {#m} = ...
-                            line[1].s = "{" + line[1].s;
-                            line[2].s += "}";
-                        }
-                        else if (line[1].s == "%" && line[2].type == ETokenType.Word)
-                        {
-                            //series %m = --> series {%m} = ...
-                            line[1].s = "{" + line[1].s;
-                            line[2].s += "}";
-                        }
-                    }
-                    else
-                    {
-                        //series %i|x = ... --> series {%x}x = ...
-                        if (line[1].s == "%" && line[2].type == ETokenType.Word && line[3].s == "|")
-                        {
-                            line[1].s = "{" + line[1].s;
-                            line[2].s += "}";
-                            line[3].s = ""; line[3].leftblanks = 0;
-                        }
-                    }
-
-                    int itemp = StringTokenizer.FindS(line, op_i + 1, "=");
-                    if (itemp == -12345)
-                    {
-                        //there is not an '=' following, so it is the last equals sign (or other operator)
-                        //x%y = will not have % replaced with %=
-                        //problem: x%y % 3 will be wrong
-                        if (line[op_i].s == "^") line[op_i].s = "^=";
-                        else if (line[op_i].s == "%") line[op_i].s = "%=";
-                        else if (line[op_i].s == "+") line[op_i].s = "+=";
-                        else if (line[op_i].s == "*") line[op_i].s = "*=";
-                        else if (line[op_i].s == "#") line[op_i].s = "#=";
-                    }
-                    else
-                    {
-                        op_i = itemp;
-                    }
-
-
-                    if (true)
-                    {
-                        try
-                        {
-                            string name = null;
-                            for (int i = ii; i < op_i; i++) name += line[i].ToString();
-                            name = name.Trim();
-                            string rhs = null;
-                            for (int i = op_i + 1; i < line.Count; i++) rhs += line[i].ToString();
-                            rhs = rhs.Trim();
-
-                            //if (name == "ua_s")
-                            //{
-                            //}
-
-                            int start = rhs.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase);
-
-                            while (start >= 0)
-                            {
-                                if (start - 1 >= 0 && (G.IsLetterOrDigitOrUnderscore(rhs[start - 1]) || rhs[start - 1] == '}' || rhs[start - 1] == '|' || rhs[start - 1] == '%'))
-                                {
-                                    //ignore
-                                }
-                                else
-                                {
-                                    if (rhs[start + name.Length - 1 + 1] == '.' || (rhs[start + name.Length - 1 + 1] == '[' && rhs[start + name.Length - 1 + 2] == '-'))
-                                    {
-                                        //lhs is seen on rhs --> use <dynamic> for safety
-                                        //will have no effect on y = y + 1, only on y = y[-1] + 1, or lag functions, y[2010] etc.
-                                        AddToOptionField(line, 1, "dyn");
-                                        AddComment(line, "Note: <dyn> added");
-                                        break;
-                                    }
-                                }
-                                start = rhs.IndexOf(name, start + 1, StringComparison.OrdinalIgnoreCase);
-                            }
-                        }
-                        catch { };
-                    }
-
-                    bool comma = false;
-                    for (int iii = op_i + 1; iii < line.Count; iii++)
-                    {
-                        if (line[iii].s == ",")
-                        {
-                            comma = true;
-                            break;
-                        }
-                    }
-
-                    if (comma)
-                    {
-                        //comma in real input, not inside function etc.
-                        line[op_i].s += " (";
-                        line[line.Count - 1].s = ")" + line[line.Count - 1].s;
-                    }
-                    else
-                    {
-                        //handle rep, there is no comma
-                        for (int iii = op_i + 1; iii < line.Count; iii++)
-                        {
-                            if (G.Equal(line[iii].s, "rep") && G.Equal(line[iii + 1].s, "*"))
-                            {
-                                line[iii].s = "";
-                                line[iii + 1].s = "";
-                                line[iii + 1].leftblanks = 0;
-                            }
-                        }
-                    }
-                    if (line.Count > 1 && line[0].s == "" && line[0].subnodes == null)
-                    {
-                        line[0].leftblanks = 0;
-                        if (line[1].subnodes != null)
-                        {
-                            line[1].subnodes[0].leftblanks = 0;
-                        }
-                        else
-                        {
-                            line[1].leftblanks = 0;
-                        }
-                    }
-                }
-
-                //move the option field
-                MoveOptionField(line, lb);
+                HandleCommandNameSeries(line, pos);
 
             }
 
             else if (G.Equal(line[pos].s, "val"))
             {
+                //¤022
                 string name = line[pos + 1].s;
 
                 if (StringTokenizer.Equal(line, 2, "="))
@@ -943,6 +581,7 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "name") || G.Equal(line[pos].s, "string"))
             {
+                //¤022
                 string name = line[pos + 1].s;
 
                 if (StringTokenizer.Equal(line, 2, "="))
@@ -955,6 +594,401 @@ namespace Gekko
             SetLineStartRecursive(line, line);
 
 
+        }
+
+        private static void HandleCommandNameSeries(List<TokenHelper> line, int pos)
+        {
+            //¤032
+
+            line[pos].meta.commandName = "series";
+
+            //SER x = y; ok
+            //SER x = x[-1] + 1; --> <dynamic>
+            //SER y = 1, 2 rep 3, 3 rep * -> parenteses
+            //SER y = 1 rep *; --> 1
+            //SER y[2000] = ... --> ok
+            //SER %m = ... --> {%m}
+            //SER %m|x = ... --> {%m}x
+            //SER x = x[-1] + ... --> <dynamic>
+
+            int lb = line[pos].leftblanks;
+
+            line[pos].s = ""; line[pos + 1].leftblanks = 0;
+
+            int ii = 1;
+            var o = FindOptionField(line);
+            if (o.Item1 != -12345) ii = o.Item2 + 1;  //for instance the '=' series <2010 2020> x = 
+
+            int op_i = -12345;
+            op_i = StringTokenizer.FindS(line, ii, new string[] { "=", "^", "%", "+", "*", "#" });  //cannot match series #m = ... or series <2010 2020> #m = ...
+
+            if (op_i != -12345)
+            {
+                if (op_i == 3)
+                {
+                    if (line[1].s == "#" && line[2].type == ETokenType.Word)
+                    {
+                        //series #m = --> series {#m} = ...
+                        line[1].s = "{" + line[1].s;
+                        line[2].s += "}";
+                    }
+                    else if (line[1].s == "%" && line[2].type == ETokenType.Word)
+                    {
+                        //series %m = --> series {%m} = ...
+                        line[1].s = "{" + line[1].s;
+                        line[2].s += "}";
+                    }
+                }
+                else
+                {
+                    //series %i|x = ... --> series {%x}x = ...
+                    if (line[1].s == "%" && line[2].type == ETokenType.Word && line[3].s == "|")
+                    {
+                        line[1].s = "{" + line[1].s;
+                        line[2].s += "}";
+                        line[3].s = ""; line[3].leftblanks = 0;
+                    }
+                }
+
+                int itemp = StringTokenizer.FindS(line, op_i + 1, "=");
+                if (itemp == -12345)
+                {
+                    //there is not an '=' following, so it is the last equals sign (or other operator)
+                    //x%y = will not have % replaced with %=
+                    //problem: x%y % 3 will be wrong
+                    if (line[op_i].s == "^") line[op_i].s = "^=";
+                    else if (line[op_i].s == "%") line[op_i].s = "%=";
+                    else if (line[op_i].s == "+") line[op_i].s = "+=";
+                    else if (line[op_i].s == "*") line[op_i].s = "*=";
+                    else if (line[op_i].s == "#") line[op_i].s = "#=";
+                }
+                else
+                {
+                    op_i = itemp;
+                }
+
+
+                if (true)
+                {
+                    try
+                    {
+                        string name = null;
+                        for (int i = ii; i < op_i; i++) name += line[i].ToString();
+                        name = name.Trim();
+                        string rhs = null;
+                        for (int i = op_i + 1; i < line.Count; i++) rhs += line[i].ToString();
+                        rhs = rhs.Trim();
+
+                        //if (name == "ua_s")
+                        //{
+                        //}
+
+                        int start = rhs.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase);
+
+                        while (start >= 0)
+                        {
+                            if (start - 1 >= 0 && (G.IsLetterOrDigitOrUnderscore(rhs[start - 1]) || rhs[start - 1] == '}' || rhs[start - 1] == '|' || rhs[start - 1] == '%'))
+                            {
+                                //ignore
+                            }
+                            else
+                            {
+                                if (rhs[start + name.Length - 1 + 1] == '.' || (rhs[start + name.Length - 1 + 1] == '[' && rhs[start + name.Length - 1 + 2] == '-'))
+                                {
+                                    //lhs is seen on rhs --> use <dynamic> for safety
+                                    //will have no effect on y = y + 1, only on y = y[-1] + 1, or lag functions, y[2010] etc.
+                                    AddToOptionField(line, 1, "dyn");
+                                    AddComment(line, "Note: <dyn> added");
+                                    break;
+                                }
+                            }
+                            start = rhs.IndexOf(name, start + 1, StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+                    catch { };
+                }
+
+                bool comma = false;
+                for (int iii = op_i + 1; iii < line.Count; iii++)
+                {
+                    if (line[iii].s == ",")
+                    {
+                        comma = true;
+                        break;
+                    }
+                }
+
+                if (comma)
+                {
+                    //comma in real input, not inside function etc.
+                    line[op_i].s += " (";
+                    line[line.Count - 1].s = ")" + line[line.Count - 1].s;
+                }
+                else
+                {
+                    //handle rep, there is no comma
+                    for (int iii = op_i + 1; iii < line.Count; iii++)
+                    {
+                        if (G.Equal(line[iii].s, "rep") && G.Equal(line[iii + 1].s, "*"))
+                        {
+                            line[iii].s = "";
+                            line[iii + 1].s = "";
+                            line[iii + 1].leftblanks = 0;
+                        }
+                    }
+                }
+                if (line.Count > 1 && line[0].s == "" && line[0].subnodes == null)
+                {
+                    line[0].leftblanks = 0;
+                    if (line[1].subnodes != null)
+                    {
+                        line[1].subnodes[0].leftblanks = 0;
+                    }
+                    else
+                    {
+                        line[1].leftblanks = 0;
+                    }
+                }
+            }
+
+            //move the option field
+            MoveOptionField(line, lb);
+        }
+
+        private static void HandleCommandNameListElements(List<TokenHelper> line, bool list, bool isParallel)
+        {
+            //¤028
+            List<TokenHelper> l1 = new List<TokenHelper>();
+            List<TokenHelper> l2 = new List<TokenHelper>();
+            List<TokenHelper> l3 = new List<TokenHelper>();
+
+            string result1 = "";
+            string result2 = "";
+            string result3 = "";
+
+            int i1 = StringTokenizer.FindS(line, "=");
+            if (i1 > -12345)
+            {
+                for (int i = 0; i <= i1; i++) l1.Add(line[i]);
+                int i2 = StringTokenizer.FindS(line, i1 + 1, new string[] { "prefix", "suffix", "trim", "sort", "strip" });
+                if (i2 != -12345)
+                {
+                    for (int i = i1 + 1; i < i2; i++) l2.Add(line[i]);
+                    for (int i = i2; i < line.Count; i++) l3.Add(line[i]);
+                }
+                else
+                {
+                    for (int i = i1 + 1; i < line.Count - 1; i++) l2.Add(line[i]);
+                    if (StringTokenizer.GetS(line, line.Count - 1) == ";")
+                    {
+                        //should be so
+                        l3.Add(line[line.Count - 1]);
+                    }
+                    else
+                    {
+                        //hmmm?
+                        l2.Add(line[line.Count - 1]);
+                    }
+                }
+
+                //l1, l2, l3 have been done
+
+                List<string> items = new List<string>();
+                List<string> itemsExtra = new List<string>();
+                string s = "";
+                string sExtra = "";
+                foreach (TokenHelper item in l2)
+                {
+                    if (item.s == ",")
+                    {
+                        int count = s.TakeWhile(Char.IsWhiteSpace).Count();
+                        items.Add(s.Trim());
+                        itemsExtra.Add(sExtra + G.Blanks(count));
+                        s = "";
+                        sExtra = "";
+                    }
+                    else
+                    {
+                        if (item.type == ETokenType.EOL || item.type == ETokenType.EOF || item.type == ETokenType.Comment)
+                        {
+                            sExtra += item.ToString();
+                        }
+                        else
+                        {
+                            s += item.ToString();
+                        }
+                    }
+                }
+                items.Add(s);  //last item
+                itemsExtra.Add(sExtra);
+
+                //items are elements from l2
+
+                //test if items are simple
+                bool simple = true;
+                foreach (string s3 in items)
+                {
+                    string s2 = s3.Trim();
+                    bool curly = false;
+                    for (int ic = 0; ic < s2.Length; ic++)
+                    {
+                        if (s2[ic] == '{') curly = true;
+                        if (curly || G.IsLetterOrDigitOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
+                        {
+                            //ok
+                        }
+                        else
+                        {
+                            simple = false;  //could break here but never mind
+                        }
+                        if (s2[ic] == '}') curly = false;
+                    }
+                }
+
+                //doing result1 here
+                if (list)
+                {
+                    if (StringTokenizer.Equal(l1, 1, "listfile"))
+                    {
+                        //list listfile m = ...  --> #(listfile m) = ... 
+                        result1 = "#(listfile " + l1[2] + ") = ";
+                    }
+                    else
+                    {
+                        for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
+                        result1 = "#" + result1.TrimStart();
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < l1.Count; i++) result1 += l1[i].ToString();
+                }
+
+                //do result3 here
+                int iSpecial = -12345;
+                for (int i = 0; i < l3.Count; i++)
+                {
+                    int j = l3.Count - 1;
+                    if (l3[i].s == "prefix")
+                    {
+                        iSpecial = i;
+                        j = StringTokenizer.FindS(l3, "suffix");
+                        int j0 = j;
+                        if (j == -12345) j = l3.Count - 1;
+                        l3[i].leftblanks = 0;
+                        l3[i].s = "." + l3[i].s + "(";
+                        l3[i + 1].s = "";
+                        l3[j].s = ")" + l3[j].s;
+
+                        if (j0 != -12345)
+                        {
+                            l3[j].leftblanks = 0;
+                            l3[j].s = "." + l3[j].s + "(";
+                            if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
+                            l3[j + 1].s = "";
+                            l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
+                        }
+                    }
+                    else if (l3[i].s == "suffix")
+                    {
+                        iSpecial = i;
+                        j = StringTokenizer.FindS(l3, "prefix");
+                        int j0 = j;
+                        if (j == -12345) j = l3.Count - 1;
+                        l3[i].leftblanks = 0;
+                        l3[i].s = "." + l3[i].s + "(";
+                        l3[i + 1].s = "";
+                        l3[j].s = ")" + l3[j].s;
+
+                        if (j0 != -12345)
+                        {
+                            l3[j].leftblanks = 0;
+                            l3[j].s = "." + l3[j].s + "(";
+                            if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
+                            l3[j + 1].s = "";
+                            l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
+                        }
+                    }
+                    else if (l3[i].s == "trim")
+                    {
+                        iSpecial = i;
+                        l3[i].leftblanks = 0;
+                        l3[i].s = "." + "unique" + "(";
+                        l3[j].s = ")" + l3[j].s;
+                    }
+                    else if (l3[i].s == "sort")
+                    {
+                        iSpecial = i;
+                        l3[i].leftblanks = 0;
+                        l3[i].s = "." + l3[i].s + "(";
+                        l3[j].s = ")" + l3[j].s;
+                    }
+                    else if (l3[i].s == "strip")
+                    {
+                        iSpecial = i;
+                        l3[i].leftblanks = 0;
+                        l3[i].s = "." + "replaceinside" + "(";
+                        l3[i + 1].s = "";
+                        l3[j].s = ", '')" + l3[j].s;
+                    }
+                }
+                for (int i = 0; i < l3.Count; i++)
+                {
+                    result3 += l3[i].ToString();
+                }
+
+                if ((simple || isParallel) && result3.Trim() == ";")  //no prefix etc.
+                {
+                    if (items.Count == 1 && G.IsSimpleToken(items[0].Trim()))  //test of issimple... probably superfluous
+                    {
+                        //one-element list like list m = a;
+                        result2 = itemsExtra[0] + "(" + "'" + items[0].Trim() + "',)";
+                    }
+                    else
+                    {
+                        bool first = true;
+                        for (int ij = 0; ij < items.Count; ij++)
+                        {
+                            string s2 = items[ij];
+                            if (!first) result2 += ",";
+                            result2 += itemsExtra[ij] + s2;
+                            first = false;
+                        }
+                    }
+                }
+                else
+                {
+                    bool first = true;
+                    for (int ij = 0; ij < items.Count; ij++)
+                    {
+                        string s2 = items[ij];
+                        if (!first) result2 += "+";
+                        if (G.IsSimpleToken(s2.Trim()))
+                        {
+                            result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";
+                        }
+                        else result2 += itemsExtra[ij] + s2;
+                        first = false;
+                    }
+                }
+
+                for (int i = 1; i < line.Count; i++)
+                {
+                    line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null;
+
+                }
+                line[0].leftblanks = 0;
+
+
+                if (result3.Trim() == ";")
+                {
+                    line[0].s = result1 + result2 + result3;
+                }
+                else
+                {
+                    line[0].s = result1 + " (" + result2.TrimStart(new char[] { ' ' }) + ")" + result3;
+                }
+            }
         }
 
         /// <summary>
