@@ -7465,7 +7465,10 @@ namespace UnitTests
             T("write <%t1 %t2> #m file = %y;",
               "write <%t1 %t2> {#m} file = %y;");
 
-            //x12a
+            T("x12a <param = %p> %x;",
+              "x12a <param = %p> {%x};");
+            T("x12a <param = %p> #m;",
+              "x12a <param = %p> {#m};");
 
             if (false)
             {
