@@ -10065,10 +10065,8 @@ namespace Gekko
         public static string HandleGekkoCommands(string input)
         {
             List<string> lines = Stringlist.ExtractLinesFromText(input);
-
             List<string> linesNew = null;
             linesNew = HandleGekkoCommandsGlueSymbols(lines);
-
             Globals.cmdFileLines = linesNew;  //used if there is a lexer error
             StringBuilder sb = new StringBuilder();
             foreach (string line in linesNew)
