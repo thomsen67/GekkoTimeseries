@@ -7512,7 +7512,8 @@ namespace UnitTests
         /// <param name="code_2_4"></param>
         /// <param name="code_3_0"></param>
         private static void T(string code_2_4, string code_3_0)
-        {              
+        {
+            if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid2_4Syntax(code_2_4)) throw new GekkoException();
             if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
             string translated = Translate_2_4_to_3_0.Translate(code_2_4);
             Assert.AreEqual(translated, code_3_0);

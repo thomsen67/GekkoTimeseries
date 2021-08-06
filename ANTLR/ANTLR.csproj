@@ -130,6 +130,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cmd2Lexer.cs" />
+    <Compile Include="Cmd2Parser.cs" />
     <Compile Include="Cmd3Lexer.cs" />
     <Compile Include="Cmd3Parser.cs" />
     <Compile Include="ModelLexer.cs" />
