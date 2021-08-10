@@ -9,15 +9,20 @@ namespace Gekko
     public class Translate_2_4_to_3_0
     {
 
-        //public static GekkoDictionary<string, string> listMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        //public static GekkoDictionary<string, string> matrixMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        //public static GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        
 
         //This class translates from Gekko 2.0 to 3.0
 
+        public class Info
+        {
+            public GekkoDictionary<string, string> collectionMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);            
+            public GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
         public static string Translate(string input)
         {
-            
+            Info info = new Info();
+
             string txt = input;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
@@ -120,8 +125,8 @@ namespace Gekko
                 //Records names of assigns, lists and matrices     
                 try
                 {
-                    HandleCommandName(line);
-                    HandleExpressionsRecursive(line, line);
+                    HandleCommandName(line, info);
+                    HandleExpressionsRecursive(line, line, info);
                 }
                 catch
                 {
@@ -161,16 +166,16 @@ namespace Gekko
         /// </summary>
         /// <param name="line"></param>
         /// <param name="topline"></param>
-        public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline)
+        public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline, Info info)
         {
 
             for (int i = 0; i < line.Count; i++)
             {
                 if (line[i].HasChildren())
                 {
-                    HandleExpressionsRecursive(line[i].subnodes.storage, topline);
+                    HandleExpressionsRecursive(line[i].subnodes.storage, topline, info);
                     continue;
-                }
+                }                
 
                 try
                 {
@@ -345,15 +350,127 @@ namespace Gekko
                 {
                     //¤018
                     AddComment(line, "unpack(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
-                }                                
+                }
+
+                
+                try
+                {
+                    bool upgrade = false;
+                    bool neverUpgrade = false;
+                    bool overriding = false;
+                    string var = null;
+                    int type = 0;  //1 is scalar, 2 is collection
+
+                    List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
+                    TokenHelper start = line[i];
+                    if (nesting.Count > 0) start = nesting[nesting.Count - 1];  //uppermost token
+
+                    if (line[i + 0].s == "%" && line[i + 1].type == ETokenType.Word)
+                    {
+                        var = "%" + line[i + 1].s;
+                        type = 1;
+                    }
+                    else if (line[i + 0].s == "#" && line[i + 1].type == ETokenType.Word)
+                    {
+                        var = "#" + line[i + 1].s;
+                        type = 2;
+                    }
+
+                    if (type != 0)
+                    {
+
+                        //handle different commands.
+                        List<string> typeMinusPlus = new List<string>() { "analyze", "clip", "ols", "prt", "sheet", "plot", "mulprt", "gmulprt" };
+                        List<string> typePlusPlus = new List<string>() { "checkoff", "close", "compare", "copy", "create", "delete", "disp", "doc", "endo", "exo", "export", "findmissingdata", "import", "itershow", "rebase", "read", "rename", "smooth", "splice", "truncate", "write", "x12a" };
+                        if (type == 1)
+                        {
+                            if (typePlusPlus.Contains(start.meta.commandName)) upgrade = true;
+                        }
+                        else if (type == 2)
+                        {
+                            if (typeMinusPlus.Contains(start.meta.commandName)) upgrade = true;
+                            if (typePlusPlus.Contains(start.meta.commandName)) upgrade = true;
+                        }
+
+                        if (start.meta.commandName == "series")
+                        {
+
+                        }
+
+                        // --------------------------------------------------
+                        // -- now we do the neverUpgrade --------------------
+                        // --------------------------------------------------
+
+                            //Do not upgrade something like prt <color = %s> ... ;                        
+                            int i1 = start.Search(i, new List<string>() { "<" }, true);
+                        int i2 = start.Search(i, new List<string>() { ">" });
+                        if (i1 == 1 && i2 > i)
+                        {
+                            //there is a < at pos 1 when going left, and a > when going right.
+                            //then pretty sure we are inside local options.
+                            neverUpgrade = true;
+                        }
+
+                        //never upgrade for option, list, matrix, show
+                        if (start.meta.commandName == "option" || start.meta.commandName == "matrix" || start.meta.commandName == "show" || start.meta.commandName == "list") neverUpgrade = true;
+                                               
+                        //something like PLOT x, y, z file = %x; should never upgrade %x.
+                        int ii1 = start.Search(i, new List<string>() { "=" }, true);
+                        if (ii1 != -12345)
+                        {
+                            List<string> xx = new List<string>() { "series", "val", "date", "string", "name", "list", "matrix", "collapse", "for", "if", "interpolate", "ols", "smooth", "splice" };
+                            if (xx.Contains(start.meta.commandName))
+                            {
+                                //do nothing for these, where "=" occurs naturally as a non-option.
+                            }
+                            else
+                            {
+                                neverUpgrade = true;
+                            }
+                        }                        
+
+                        //Override: if %x is known to be NAME type, or FOR name x = ...   or FOR x = ..., 
+                        //it must always be upgraded.
+                            string scalar = null; info.scalarMemory.TryGetValue(var, out scalar);
+                        if (scalar == "name" || scalar == "forname")
+                        {
+                            overriding = true;
+                        }
+
+                    }
+
+                    //at the end
+                    if (neverUpgrade) upgrade = false;
+                    if (overriding) upgrade = true;
+
+                    //make sure that %s or #m inside curlies are NEVER ever upgraded                                                
+                    foreach (TokenHelper th in nesting)
+                    {
+                        //never upgrade if already inside {}, like {#m}. Also covers expression inside {}.
+                        if (th.s == "{")
+                        {
+                            upgrade = false;
+                            break;
+                        }
+                    }
+
+                    if(upgrade)
+                    {
+                        //upgrade
+                        line[i + 1].s = "{" + line[i + 1].s + "}";
+                    }
+
+                }
+                catch { }
             }
         }
+
 
         /// <summary>
         /// Stuff here only looks at one sentence, does not go inside any recursive (), [] or {}.
         /// </summary>
         /// <param name="line"></param>
-        public static void HandleCommandName(List<TokenHelper> line)
+        public static void HandleCommandName(List<TokenHelper> line, Info info)
         {
             int pos = 0;
 
@@ -403,6 +520,7 @@ namespace Gekko
             {
                 //¤022
                 string name = line[pos + 1].s;
+                if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "date");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
@@ -463,7 +581,11 @@ namespace Gekko
             else if (G.Equal(line[pos].s, "list") || G.Equal(line[pos].s, "for"))  //NOTE: for must have been done above
             {
                 bool list = false;
-                if (G.Equal(line[pos].s, "list")) list = true;
+                if (G.Equal(line[pos].s, "list"))
+                {
+                    list = true;
+                    if (!info.collectionMemory.ContainsKey("#" + line[pos + 1].s)) info.collectionMemory.Add("#" + line[pos + 1].s, "list");
+                }                
 
                 bool isParallel = false;
 
@@ -477,7 +599,8 @@ namespace Gekko
                         //either FOR s = a, b, c...
                         string type = "string";
                         string name = line[pos + 1].s;
-                        line[pos + 1].s = type + " " + "%" + name;
+                        line[pos + 1].s = type + " " + "%" + name;                        
+                        if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "forname");                        
 
                         while (true)
                         {
@@ -487,14 +610,24 @@ namespace Gekko
                             type = "string";
                             name = line[eq - 1].s;
                             line[eq - 1].s = type + " " + "%" + name;
+                            if (G.Equal(line[eq - 2].s, "string"))
+                            {
+                                if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "forstring");
+                            }
+                            else
+                            {
+                                if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "forname");
+                            }
                         }
                     }
                     else
                     {
                         //or     FOR date d = 100...
-                        line[pos + 2].s = "%" + line[pos + 2].s;
+                        string type = line[pos + 1].s.ToLower();
+                        string name = line[pos + 2].s;
+                        if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "for" + type);
+                        line[pos + 2].s = "%" + line[pos + 2].s;                        
                     }
-
                 }
 
                 //remove list<direct>
@@ -507,30 +640,36 @@ namespace Gekko
                 }
 
                 //so much is changed here that we have to run this one manually first
-                HandleExpressionsRecursive(line, line);
+                HandleExpressionsRecursive(line, line, info);
 
-                HandleCommandNameListElements(line, list, isParallel);
+                HandleCommandNameListElements(line, list, isParallel);                
             }
+
             else if (G.Equal(line[pos].s, "matrix"))
             {
                 //¤029
                 line[pos].meta.commandName = "matrix";
 
                 string name = line[pos + 1].s;
+                if (!info.collectionMemory.ContainsKey("#" + name)) info.collectionMemory.Add("#" + name, "matrix");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
                     line[pos].s = "#";
                     line[pos + 1].leftblanks = 0;
                 }
-            }
+            }            
 
             else if (G.Equal(line[pos].s, "p") || G.Equal(line[pos].s, "prt") || G.Equal(line[pos].s, "pri") || G.Equal(line[pos].s, "print") || G.Equal(line[pos].s, "show"))
             {
                 //Also renames SHOW --> PRT
                 line[pos].meta.commandName = "prt";
                 //¤030
-                if (G.Equal(line[pos].s, "show")) line[pos].s = "prt";  //don't change for the PRT variants
+                if (G.Equal(line[pos].s, "show"))
+                {
+                    line[pos].s = "prt";  //don't change for the PRT variants
+                    line[pos].meta.commandName = "show";
+                }
                 string name = line[pos + 1].s;
                 //TODO: add list syntax ()...
             }
@@ -564,13 +703,13 @@ namespace Gekko
             else if (G.Equal(line[pos].s, "ser") || G.Equal(line[pos].s, "series"))
             {
                 HandleCommandNameSeries(line, pos);
-
             }
 
             else if (G.Equal(line[pos].s, "val"))
             {
                 //¤022
                 string name = line[pos + 1].s;
+                if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "val");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
@@ -583,6 +722,15 @@ namespace Gekko
             {
                 //¤022
                 string name = line[pos + 1].s;
+
+                if (G.Equal(line[pos].s, "name"))
+                {
+                    if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "name");
+                }
+                else
+                {
+                    if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "string");
+                }
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {

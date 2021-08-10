@@ -7231,70 +7231,13 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Translate()
-        {            
-            T("ser x = 1; //abc",
-              "x = 1; //abc");
-
-            T("series x /* abc */= 1;",
-              "x /* abc */= 1;");
-
-            T("series<%t1 %t2>x = 1;",
-              "x <%t1 %t2> = 1;");
-
-            T("val x = 1;",
-              "%x = 1;");
-
-            T("date x = 2001q1;",
-              "%x = 2001q1;");
-            
-            T("string x = 'a';", 
-              "%x = 'a';");
-
-            T("name x = 'a';",
-              "%x = 'a';");
-
-            T("list x = a, b, c;",
-              "#x = a, b, c;");
-
-            T("matrix x = [1, 2 || 3, 4];",
-              "#x = [1, 2 ; 3, 4];");
-
-            //paths
-
-            T(@"read data\%x\%y;",
-              @"read data\{%x}\{%y};");
-
-            //interpolate
-
-            T(@"tell ' abc ';",  //just testing integrity
-              @"tell ' abc ';");
-
-            T(@"tell '%x %y';",
-              @"tell '{%x} {%y}';");
-
-            T(@"tell '%x%y';",
-              @"tell '{%x}{%y}';");
-
-            T(@"tell 'a%x%y|b';",
-              @"tell 'a{%x}{%y}b';");
-
-            T(@"tell '{%x} {%y}';",
-              @"tell '{%x} {%y}';");
-
-            T(@"tell '{%x}{%y}';",
-              @"tell '{%x}{%y}';");
-
-            T(@"tell 'a{%x}{%y}|b';",
-              @"tell 'a{%x}{%y}b';");
-
-            T(@"tell 'a ~%x';",
-              @"tell 'a %x';");
-
-            T(@"tell 'a ~%x~%y';",
-              @"tell 'a %x%y';");
+        {
 
             //Use {} or not: -------------------
-                        
+
+            T("analyze 1+(a+b[c{d+#e}f]);",
+              "analyze {#m};");
+
             T("analyze #m;",
               "analyze {#m};");
 
@@ -7469,6 +7412,68 @@ namespace UnitTests
               "x12a <param = %p> {%x};");
             T("x12a <param = %p> #m;",
               "x12a <param = %p> {#m};");
+
+            T("ser x = 1; //abc",
+              "x = 1; //abc");
+
+            T("series x /* abc */= 1;",
+              "x /* abc */= 1;");
+
+            T("series<%t1 %t2>x = 1;",
+              "x <%t1 %t2> = 1;");
+
+            T("val x = 1;",
+              "%x = 1;");
+
+            T("date x = 2001q1;",
+              "%x = 2001q1;");
+
+            T("string x = 'a';",
+              "%x = 'a';");
+
+            T("name x = 'a';",
+              "%x = 'a';");
+
+            T("list x = a, b, c;",
+              "#x = a, b, c;");
+
+            T("matrix x = [1, 2 || 3, 4];",
+              "#x = [1, 2 ; 3, 4];");
+
+            //paths
+
+            T(@"read data\%x\%y;",
+              @"read data\{%x}\{%y};");
+
+            //interpolate
+
+            T(@"tell ' abc ';",  //just testing integrity
+              @"tell ' abc ';");
+
+            T(@"tell '%x %y';",
+              @"tell '{%x} {%y}';");
+
+            T(@"tell '%x%y';",
+              @"tell '{%x}{%y}';");
+
+            T(@"tell 'a%x%y|b';",
+              @"tell 'a{%x}{%y}b';");
+
+            T(@"tell '{%x} {%y}';",
+              @"tell '{%x} {%y}';");
+
+            T(@"tell '{%x}{%y}';",
+              @"tell '{%x}{%y}';");
+
+            T(@"tell 'a{%x}{%y}|b';",
+              @"tell 'a{%x}{%y}b';");
+
+            T(@"tell 'a ~%x';",
+              @"tell 'a %x';");
+
+            T(@"tell 'a ~%x~%y';",
+              @"tell 'a %x%y';");
+
 
             if (false)
             {

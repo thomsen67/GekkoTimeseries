@@ -461,26 +461,63 @@ namespace Gekko
         /// <returns></returns>
         public int Search(int i1Start, List<string> ss)
         {
-            int j = -12345;
-            for (j = 0; j < int.MaxValue; j++)
+            return Search(i1Start, ss, false);
+        }
+
+        /// <summary>
+        /// Searches for specific strings
+        /// </summary>
+        /// <param name="i1Start"></param>
+        /// <param name="ss"></param>
+        /// <returns></returns>
+        public int Search(int i1Start, List<string> ss, bool reverse)
+        {
+            if (reverse == false)
             {
-                bool ok = true;
-                for (int i = 0; i < ss.Count; i++)
+                int j = -12345;
+                for (j = 0; j < int.MaxValue; j++)
                 {
-                    TokenHelper xx = this.Offset(i1Start + j + i);
-                    if (xx == null)
+                    bool ok = true;
+                    for (int i = 0; i < ss.Count; i++)
                     {
-                        return -12345;  //end of tokens
+                        TokenHelper xx = this.Offset(i1Start + j);
+                        if (xx == null)
+                        {
+                            return -12345;  //end of tokens
+                        }
+                        if (!G.Equal(xx.s, ss[i]))
+                        {
+                            ok = false;
+                            break;
+                        }
                     }
-                    if (!G.Equal(xx.s, ss[i]))
-                    {
-                        ok = false;
-                        break;
-                    }
+                    if (ok) break;
                 }
-                if (ok) break;
+                return i1Start + j;
             }
-            return i1Start + j;
+            else
+            {
+                int j = -12345;
+                for (j = 0; j < int.MaxValue; j++)
+                {
+                    bool ok = true;
+                    for (int i = 0; i < ss.Count; i++)
+                    {
+                        TokenHelper xx = this.Offset(i1Start - j);
+                        if (xx == null)
+                        {
+                            return -12345;  //start of tokens
+                        }
+                        if (!G.Equal(xx.s, ss[i]))
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok) break;
+                }
+                return i1Start - j;
+            }
         }
 
         /// <summary>
@@ -782,6 +819,31 @@ namespace Gekko
             if (i4 < i1) return new Tuple<int, int>(-12345, -12345);  //in that case, no option field has been found (example: y = x $ (i<1 and j>3))
             //so now we are sure that there is a bracket <...>, with no '=' before.            
             return new Tuple<int, int>(i1, i2);
+        }
+
+        /// <summary>
+        /// Gets the nesting structure. For instance if we are at "d+e" in 1+(a+b[c{d+e}f]), it
+        /// will return the list "{", "[", "(", because it is inside the deepest {} part.
+        /// Returns an empty list if there is no nesting structure.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        public static List<TokenHelper> GetNesting(List<TokenHelper> tokens)
+        {            
+            List<TokenHelper> nesting = new List<TokenHelper>();
+            while (true)
+            {
+                if (tokens != null && tokens.Count > 0 && (tokens[0].s == "(" || tokens[0].s == "[" || tokens[0].s == "{"))
+                {
+                    nesting.Add(tokens[0]);
+                    tokens = tokens[0].parent.parent.subnodes.storage;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return nesting;
         }
 
         // =============================================================================
