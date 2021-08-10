@@ -364,6 +364,10 @@ namespace Gekko
                     List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
                     TokenHelper start = line[i];
                     if (nesting.Count > 0) start = nesting[nesting.Count - 1];  //uppermost token
+                    //start is not necessarily the first token at this level
+                    string commandName = start.parent.subnodes[0].meta.commandName;
+
+
 
                     if (line[i + 0].s == "%" && line[i + 1].type == ETokenType.Word)
                     {
@@ -378,31 +382,56 @@ namespace Gekko
 
                     if (type != 0)
                     {
-
+                        //is a %- or #-variable
                         //handle different commands.
                         List<string> typeMinusPlus = new List<string>() { "analyze", "clip", "ols", "prt", "sheet", "plot", "mulprt", "gmulprt" };
                         List<string> typePlusPlus = new List<string>() { "checkoff", "close", "compare", "copy", "create", "delete", "disp", "doc", "endo", "exo", "export", "findmissingdata", "import", "itershow", "rebase", "read", "rename", "smooth", "splice", "truncate", "write", "x12a" };
                         if (type == 1)
                         {
-                            if (typePlusPlus.Contains(start.meta.commandName)) upgrade = true;
+                            if (typePlusPlus.Contains(commandName)) upgrade = true;
                         }
                         else if (type == 2)
                         {
-                            if (typeMinusPlus.Contains(start.meta.commandName)) upgrade = true;
-                            if (typePlusPlus.Contains(start.meta.commandName)) upgrade = true;
+                            if (typeMinusPlus.Contains(commandName)) upgrade = true;
+                            if (typePlusPlus.Contains(commandName)) upgrade = true;
                         }
 
-                        if (start.meta.commandName == "series")
+                        if (commandName == "series")
                         {
+                            //conversion from for instance * into *= has been done already in translation.
+                            int j1 = start.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, true);
+                            int j2 = start.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" });
+                            if (j1 != -12345 && j2 == -12345)
+                            {
+                                //we are on rhs
+                                if (type == 2) upgrade = true;  //stuff like y = #m, or maybe it covers y = #m[2] stuff.
+                            }
+                            else if (j1 == -12345 && j2 != -12345)
+                            {
+                                //we are on lhs
+                                bool good = true;
+                                foreach (TokenHelper th in nesting)
+                                {                                    
+                                    if (th.s == "[")
+                                    {
+                                        good = false;
+                                    }
+                                }
 
+                                if (good)
+                                {
+                                    //we will not upgrade %t in y[%t] = ... .
+                                    upgrade = true;
+                                }                                
+                            }
                         }
 
                         // --------------------------------------------------
                         // -- now we do the neverUpgrade --------------------
-                        // --------------------------------------------------
-
-                            //Do not upgrade something like prt <color = %s> ... ;                        
-                            int i1 = start.Search(i, new List<string>() { "<" }, true);
+                        // --------------------------------------------------                                                
+                        
+                        //Do not upgrade something like prt <color = %s> ... ;                        
+                        int i1 = start.Search(i, new List<string>() { "<" }, true);
                         int i2 = start.Search(i, new List<string>() { ">" });
                         if (i1 == 1 && i2 > i)
                         {
@@ -412,14 +441,14 @@ namespace Gekko
                         }
 
                         //never upgrade for option, list, matrix, show
-                        if (start.meta.commandName == "option" || start.meta.commandName == "matrix" || start.meta.commandName == "show" || start.meta.commandName == "list") neverUpgrade = true;
+                        if (commandName == "option" || commandName == "matrix" || commandName == "show" || commandName == "list") neverUpgrade = true;
                                                
                         //something like PLOT x, y, z file = %x; should never upgrade %x.
                         int ii1 = start.Search(i, new List<string>() { "=" }, true);
                         if (ii1 != -12345)
                         {
                             List<string> xx = new List<string>() { "series", "val", "date", "string", "name", "list", "matrix", "collapse", "for", "if", "interpolate", "ols", "smooth", "splice" };
-                            if (xx.Contains(start.meta.commandName))
+                            if (xx.Contains(commandName))
                             {
                                 //do nothing for these, where "=" occurs naturally as a non-option.
                             }
@@ -427,11 +456,28 @@ namespace Gekko
                             {
                                 neverUpgrade = true;
                             }
-                        }                        
+                        }
+
+                        //never upgrade a known val or date
+                        string scalar = null; info.scalarMemory.TryGetValue(var, out scalar);
+                        if (scalar == "val" || scalar == "date")
+                        {
+                            neverUpgrade = true;
+                        }
+
+                        //never upgrade a known matrix
+                        string collection = null; info.collectionMemory.TryGetValue(var, out collection);
+                        if (collection == "matrix")
+                        {
+                            neverUpgrade = true;
+                        }
+
+                        // -------------------------------------------
+                        // -- Overriding -----------------------------
+                        // -------------------------------------------
 
                         //Override: if %x is known to be NAME type, or FOR name x = ...   or FOR x = ..., 
-                        //it must always be upgraded.
-                            string scalar = null; info.scalarMemory.TryGetValue(var, out scalar);
+                        //it must always be upgraded.                        
                         if (scalar == "name" || scalar == "forname")
                         {
                             overriding = true;
@@ -454,10 +500,11 @@ namespace Gekko
                         }
                     }
 
-                    if(upgrade)
+                    if (upgrade)
                     {
                         //upgrade
-                        line[i + 1].s = "{" + line[i + 1].s + "}";
+                        line[i + 0].s = "{" + line[i + 0].s;
+                        line[i + 1].s = line[i + 1].s + "}";                        
                     }
 
                 }
@@ -472,16 +519,16 @@ namespace Gekko
         /// <param name="line"></param>
         public static void HandleCommandName(List<TokenHelper> line, Info info)
         {
-            int pos = 0;
+            int pos0 = 0;
 
-            line[pos].meta.commandName = line[pos].s.ToLower();  //right most of the time, exceptions P, PRI, PRT, ...
+            line[pos0].meta.commandName = line[pos0].s.ToLower();  //right most of the time, exceptions P, PRI, PRT, ...
 
-            if (G.Equal(line[pos].s, "compare"))
+            if (G.Equal(line[pos0].s, "compare"))
             {
                 //¤019
                 AddComment(line, "COMPARE has changed syntax, see the help files");
             }
-            else if (G.Equal(line[pos].s, "collapse"))
+            else if (G.Equal(line[pos0].s, "collapse"))
             {
                 //¤020
                 for (int i = 0; i < line.Count; i++)
@@ -493,14 +540,14 @@ namespace Gekko
                 }
             }
 
-            else if (G.Equal(line[pos].s, "copy"))
+            else if (G.Equal(line[pos0].s, "copy"))
             {
                 //from/to --> frombank/tobank
                 //Must use COPY {#m}, not COPY #m
             }
 
 
-            else if (G.Equal(line[pos].s, "create"))
+            else if (G.Equal(line[pos0].s, "create"))
             {
                 //¤021
                 for (int i = 0; i < line.Count; i++)
@@ -516,37 +563,37 @@ namespace Gekko
                 }
             }
 
-            else if (G.Equal(line[pos].s, "date"))
+            else if (G.Equal(line[pos0].s, "date"))
             {
                 //¤022
-                string name = line[pos + 1].s;
+                string name = line[pos0 + 1].s;
                 if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "date");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos].s = "%";
-                    line[pos + 1].leftblanks = 0;
+                    line[pos0].s = "%";
+                    line[pos0 + 1].leftblanks = 0;
                 }
             }
 
-            else if (G.Equal(line[pos].s, "download"))
+            else if (G.Equal(line[pos0].s, "download"))
             {
                 //¤023
                 AddComment(line, "DOWNLOAD requires quotes around the URL");
             }
 
-            else if (G.Equal(line[pos].s, "export"))
+            else if (G.Equal(line[pos0].s, "export"))
             {
                 //¤024
                 AddComment(line, "For EXPORT without dates, use EXPORT<all>");
             }
 
-            else if (G.Equal(line[pos].s, "function"))
+            else if (G.Equal(line[pos0].s, "function"))
             {
 
             }
 
-            else if (G.Equal(line[pos].s, "if"))
+            else if (G.Equal(line[pos0].s, "if"))
             {
                 //line[pos].s = "if";
 
@@ -558,13 +605,13 @@ namespace Gekko
                 //}
             }
 
-            else if (G.Equal(line[pos].s, "import"))
+            else if (G.Equal(line[pos0].s, "import"))
             {
                 //¤024
                 AddComment(line, "For IMPORT without dates, use IMPORT<all>");
             }
 
-            else if (G.Equal(line[pos].s, "index"))
+            else if (G.Equal(line[pos0].s, "index"))
             {
                 //¤025
                 TokenHelper last = line[line.Count - 2];  //remember semicolon
@@ -578,13 +625,13 @@ namespace Gekko
 
             }
 
-            else if (G.Equal(line[pos].s, "list") || G.Equal(line[pos].s, "for"))  //NOTE: for must have been done above
+            else if (G.Equal(line[pos0].s, "list") || G.Equal(line[pos0].s, "for"))  //NOTE: for must have been done above
             {
                 bool list = false;
-                if (G.Equal(line[pos].s, "list"))
+                if (G.Equal(line[pos0].s, "list"))
                 {
                     list = true;
-                    if (!info.collectionMemory.ContainsKey("#" + line[pos + 1].s)) info.collectionMemory.Add("#" + line[pos + 1].s, "list");
+                    if (!info.collectionMemory.ContainsKey("#" + line[pos0 + 1].s)) info.collectionMemory.Add("#" + line[pos0 + 1].s, "list");
                 }                
 
                 bool isParallel = false;
@@ -598,8 +645,8 @@ namespace Gekko
                     {
                         //either FOR s = a, b, c...
                         string type = "string";
-                        string name = line[pos + 1].s;
-                        line[pos + 1].s = type + " " + "%" + name;                        
+                        string name = line[pos0 + 1].s;
+                        line[pos0 + 1].s = type + " " + "%" + name;                        
                         if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "forname");                        
 
                         while (true)
@@ -623,10 +670,10 @@ namespace Gekko
                     else
                     {
                         //or     FOR date d = 100...
-                        string type = line[pos + 1].s.ToLower();
-                        string name = line[pos + 2].s;
+                        string type = line[pos0 + 1].s.ToLower();
+                        string name = line[pos0 + 2].s;
                         if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "for" + type);
-                        line[pos + 2].s = "%" + line[pos + 2].s;                        
+                        line[pos0 + 2].s = "%" + line[pos0 + 2].s;                        
                     }
                 }
 
@@ -645,36 +692,36 @@ namespace Gekko
                 HandleCommandNameListElements(line, list, isParallel);                
             }
 
-            else if (G.Equal(line[pos].s, "matrix"))
+            else if (G.Equal(line[pos0].s, "matrix"))
             {
                 //¤029
-                line[pos].meta.commandName = "matrix";
+                line[pos0].meta.commandName = "matrix";
 
-                string name = line[pos + 1].s;
+                string name = line[pos0 + 1].s;
                 if (!info.collectionMemory.ContainsKey("#" + name)) info.collectionMemory.Add("#" + name, "matrix");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos].s = "#";
-                    line[pos + 1].leftblanks = 0;
+                    line[pos0].s = "#";
+                    line[pos0 + 1].leftblanks = 0;
                 }
             }            
 
-            else if (G.Equal(line[pos].s, "p") || G.Equal(line[pos].s, "prt") || G.Equal(line[pos].s, "pri") || G.Equal(line[pos].s, "print") || G.Equal(line[pos].s, "show"))
+            else if (G.Equal(line[pos0].s, "p") || G.Equal(line[pos0].s, "prt") || G.Equal(line[pos0].s, "pri") || G.Equal(line[pos0].s, "print") || G.Equal(line[pos0].s, "show"))
             {
                 //Also renames SHOW --> PRT
-                line[pos].meta.commandName = "prt";
+                line[pos0].meta.commandName = "prt";
                 //¤030
-                if (G.Equal(line[pos].s, "show"))
+                if (G.Equal(line[pos0].s, "show"))
                 {
-                    line[pos].s = "prt";  //don't change for the PRT variants
-                    line[pos].meta.commandName = "show";
+                    line[pos0].s = "prt";  //don't change for the PRT variants
+                    line[pos0].meta.commandName = "show";
                 }
-                string name = line[pos + 1].s;
+                string name = line[pos0 + 1].s;
                 //TODO: add list syntax ()...
             }
 
-            else if (line[pos].subnodes != null && line[pos].subnodes[0].s == "(")
+            else if (line[pos0].subnodes != null && line[pos0].subnodes[0].s == "(")
             {
                 //¤031
                 //(series x1, series x2) = laspchain(...) --> x1 = laspchain(...).p; x2 = laspchain(...).q;
@@ -685,11 +732,11 @@ namespace Gekko
                     string s = null;
                     for (int i = 2; i < line.Count; i++) s += line[i].ToString();
                     s = s.Trim(); if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
-                    int j = StringTokenizer.FindS(line[pos].subnodes.storage, ",");
+                    int j = StringTokenizer.FindS(line[pos0].subnodes.storage, ",");
                     string s1 = null;
                     string s2 = null;
-                    for (int i = 2; i < j; i++) s1 += line[pos].subnodes[i].ToString(); s1 = s1.Trim();
-                    for (int i = j + 2; i < line[pos].subnodes.Count() - 1; i++) s2 += line[pos].subnodes[i].ToString(); s2 = s2.Trim();
+                    for (int i = 2; i < j; i++) s1 += line[pos0].subnodes[i].ToString(); s1 = s1.Trim();
+                    for (int i = j + 2; i < line[pos0].subnodes.Count() - 1; i++) s2 += line[pos0].subnodes[i].ToString(); s2 = s2.Trim();
                     for (int i = 0; i < line.Count; i++)
                     {
                         line[i].s = ""; line[i].leftblanks = 0;
@@ -700,30 +747,30 @@ namespace Gekko
                 }
             }
 
-            else if (G.Equal(line[pos].s, "ser") || G.Equal(line[pos].s, "series"))
+            else if (G.Equal(line[pos0].s, "ser") || G.Equal(line[pos0].s, "series"))
             {
-                HandleCommandNameSeries(line, pos);
+                HandleCommandNameSeries(line, pos0);
             }
 
-            else if (G.Equal(line[pos].s, "val"))
+            else if (G.Equal(line[pos0].s, "val"))
             {
                 //¤022
-                string name = line[pos + 1].s;
+                string name = line[pos0 + 1].s;
                 if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "val");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos].s = "%";
-                    line[pos + 1].leftblanks = 0;
+                    line[pos0].s = "%";
+                    line[pos0 + 1].leftblanks = 0;
                 }
             }
 
-            else if (G.Equal(line[pos].s, "name") || G.Equal(line[pos].s, "string"))
+            else if (G.Equal(line[pos0].s, "name") || G.Equal(line[pos0].s, "string"))
             {
                 //¤022
-                string name = line[pos + 1].s;
+                string name = line[pos0 + 1].s;
 
-                if (G.Equal(line[pos].s, "name"))
+                if (G.Equal(line[pos0].s, "name"))
                 {
                     if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "name");
                 }
@@ -734,8 +781,8 @@ namespace Gekko
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos].s = "%";
-                    line[pos + 1].leftblanks = 0;
+                    line[pos0].s = "%";
+                    line[pos0 + 1].leftblanks = 0;
                 }
             }
 

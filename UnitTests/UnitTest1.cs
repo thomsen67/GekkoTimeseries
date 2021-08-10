@@ -7234,65 +7234,64 @@ namespace UnitTests
         {
 
             //Use {} or not: -------------------
+            
+            //T("analyze #m;",
+            //  "analyze {#m};");
 
-            T("analyze 1+(a+b[c{d+#e}f]);",
-              "analyze {#m};");
-
-            T("analyze #m;",
-              "analyze {#m};");
-
-            T("checkoff %x;",
-              "checkoff {%x};");
-            T("checkoff #m;",
-              "checkoff {#m};");
+            //T("checkoff %x;",
+            //  "checkoff {%x};");
+            //T("checkoff #m;",
+            //  "checkoff {#m};");
                         
-            T("clip #m;",
-              "clip {#m};");
+            //T("clip #m;",
+            //  "clip {#m};");
 
-            T("close %x;",
-              "close {%x};");
-            T("close #m;",
-              "close {#m};");
+            //T("close %x;",
+            //  "close {%x};");
+            //T("close #m;",
+            //  "close {#m};");
 
-            T("compare %x;",
-              "compare {%x};");
-            T("compare #m;",
-              "compare {#m};");
+            //T("compare %x;",
+            //  "compare {%x}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
+            //T("compare #m;",
+            //  "compare {#m}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
 
-            T("copy %x to %xx;",
-              "copy {%x} to {%xx};");
-            T("copy #m to #mm;",
-              "copy {#m} to {#mm};");
+            //T("copy %x to %xx;",
+            //  "copy {%x} to {%xx};");
+            //T("copy #m to #mm;",
+            //  "copy {#m} to {#mm};");
 
-            T("create %x;",
-              "create {%x};");
-            T("create #m;",
-              "create {#m};");
+            //T("create %x;",
+            //  "create {%x};");
+            //T("create #m;",
+            //  "create {#m};");
 
-            T("delete %x;",
-              "delete {%x};");
-            T("delete #m;",
-              "delete {#m};");
+            //T("delete %x;",
+            //  "delete {%x};");
+            //T("delete #m;",
+            //  "delete {#m};");
 
-            T("disp %x;",
-              "disp {%x};");
-            T("disp #m;",
-              "disp {#m};");
+            //T("disp %x;",
+            //  "disp {%x};");
+            //T("disp #m;",
+            //  "disp {#m};");
 
-            T("doc %x label = 'a';",
-              "doc {%x} label = 'a';");
-            T("doc #m label = 'a';",
-              "doc {#m} label = 'a';");
+            //T("doc %x label = 'a';",
+            //  "doc {%x} label = 'a';");
+            //T("doc #m label = 'a';",
+            //  "doc {#m} label = 'a';");
 
-            T("endo %x;",
-              "endo {%x};");
-            T("endo #m;",
-              "endo {#m};");
+            //T("endo %x;",
+            //  "endo {%x};");
+            //T("endo #m;",
+            //  "endo {#m};");
 
-            T("exo %x;",
-              "exo {%x};");
-            T("exo #m;",
-              "exo {#m};");
+            //T("exo %x;",
+            //  "exo {%x};");
+            //T("exo #m;",
+            //  "exo {#m};");
+
+            --->here
 
             T("export <%t1 %t2> %x file = %y;",
               "export <%t1 %t2> {%x} file = %y;");
