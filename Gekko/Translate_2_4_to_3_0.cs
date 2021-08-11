@@ -365,9 +365,8 @@ namespace Gekko
                     TokenHelper start = line[i];
                     if (nesting.Count > 0) start = nesting[nesting.Count - 1];  //uppermost token
                     //start is not necessarily the first token at this level
-                    string commandName = start.parent.subnodes[0].meta.commandName;
-
-
+                    TokenHelper supreme = start.parent.subnodes[0];
+                    string commandName = supreme.meta.commandName;
 
                     if (line[i + 0].s == "%" && line[i + 1].type == ETokenType.Word)
                     {
@@ -399,8 +398,8 @@ namespace Gekko
                         if (commandName == "series")
                         {
                             //conversion from for instance * into *= has been done already in translation.
-                            int j1 = start.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, true);
-                            int j2 = start.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" });
+                            int j1 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, true);
+                            int j2 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" });
                             if (j1 != -12345 && j2 == -12345)
                             {
                                 //we are on rhs
@@ -431,8 +430,8 @@ namespace Gekko
                         // --------------------------------------------------                                                
                         
                         //Do not upgrade something like prt <color = %s> ... ;                        
-                        int i1 = start.Search(i, new List<string>() { "<" }, true);
-                        int i2 = start.Search(i, new List<string>() { ">" });
+                        int i1 = supreme.Search(i, new List<string>() { "<" }, true);
+                        int i2 = supreme.Search(i, new List<string>() { ">" });
                         if (i1 == 1 && i2 > i)
                         {
                             //there is a < at pos 1 when going left, and a > when going right.
@@ -444,7 +443,7 @@ namespace Gekko
                         if (commandName == "option" || commandName == "matrix" || commandName == "show" || commandName == "list") neverUpgrade = true;
                                                
                         //something like PLOT x, y, z file = %x; should never upgrade %x.
-                        int ii1 = start.Search(i, new List<string>() { "=" }, true);
+                        int ii1 = supreme.Search(i, new List<string>() { "=" }, true);
                         if (ii1 != -12345)
                         {
                             List<string> xx = new List<string>() { "series", "val", "date", "string", "name", "list", "matrix", "collapse", "for", "if", "interpolate", "ols", "smooth", "splice" };
@@ -1014,32 +1013,12 @@ namespace Gekko
                         }
                     }
                 }
-                items.Add(s);  //last item
+                items.Add(s.Trim());  //last item
                 itemsExtra.Add(sExtra);
-
+                //The following is a BIG HACK to handle blanks for the last element.
+                if (itemsExtra.Count > 1 && itemsExtra[itemsExtra.Count - 1] == "" && itemsExtra[itemsExtra.Count - 2].Length > 0) itemsExtra[itemsExtra.Count - 1] = " ";
+                                
                 //items are elements from l2
-
-                //test if items are simple
-                bool simple = true;
-                foreach (string s3 in items)
-                {
-                    string s2 = s3.Trim();
-                    bool curly = false;
-                    for (int ic = 0; ic < s2.Length; ic++)
-                    {
-                        if (s2[ic] == '{') curly = true;
-                        if (curly || G.IsLetterOrDigitOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
-                        {
-                            //ok
-                        }
-                        else
-                        {
-                            simple = false;  //could break here but never mind
-                        }
-                        if (s2[ic] == '}') curly = false;
-                    }
-                }
-
                 //doing result1 here
                 if (list)
                 {
@@ -1132,12 +1111,33 @@ namespace Gekko
                     result3 += l3[i].ToString();
                 }
 
-                if ((simple || isParallel) && result3.Trim() == ";")  //no prefix etc.
+                //test if simple. Simple is stuff like a, b, c5, 0d, 1, 2, #s, #m.
+                
+                bool simple = true;
+                for (int ij = 0; ij < items.Count; ij++)
                 {
-                    if (items.Count == 1 && G.IsSimpleToken(items[0].Trim()))  //test of issimple... probably superfluous
+                    string s7 = items[ij];
+                    bool first = true;
+                    foreach (char c in s7)
                     {
-                        //one-element list like list m = a;
-                        result2 = itemsExtra[0] + "(" + "'" + items[0].Trim() + "',)";
+                        if (G.IsLetterOrDigitOrUnderscore(c) || (first && (c == '%' || c == '#')))
+                        {
+                            //good
+                        }
+                        else
+                        {
+                            simple = false;
+                        }
+                        first = false;
+                    }
+                }
+
+                if (isParallel || (simple && result3.Trim() == ";"))  //no prefix etc.
+                {
+                    if (items.Count == 1)  //test of issimple... probably superfluous
+                    {
+                        //one-element list like list m = a;                        
+                        result2 = itemsExtra[0] + UpgradeString(items[0]) + ",";
                     }
                     else
                     {
@@ -1146,7 +1146,7 @@ namespace Gekko
                         {
                             string s2 = items[ij];
                             if (!first) result2 += ",";
-                            result2 += itemsExtra[ij] + s2;
+                            result2 += itemsExtra[ij] + UpgradeString(s2);
                             first = false;
                         }
                     }
@@ -1158,11 +1158,14 @@ namespace Gekko
                     {
                         string s2 = items[ij];
                         if (!first) result2 += "+";
-                        if (G.IsSimpleToken(s2.Trim()))
+                        if (IsVerySimple(s2.Trim()))
                         {
-                            result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";
+                            result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";  //a becomes ('a',)
                         }
-                        else result2 += itemsExtra[ij] + s2;
+                        else
+                        {
+                            result2 += itemsExtra[ij] + s2;  //stuff like %s or #m.
+                        }
                         first = false;
                     }
                 }
@@ -1183,7 +1186,42 @@ namespace Gekko
                 {
                     line[0].s = result1 + " (" + result2.TrimStart(new char[] { ' ' }) + ")" + result3;
                 }
+
+                if(isParallel) AddComment(line, "Parallel loops may not be translated properly, including missing {}-curlies on elements");
             }
+        }
+
+        /// <summary>
+        /// Transforms %x --> {%x} and #m --> {#m}
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private static string UpgradeString(string s)
+        {
+            string s5 = s.Trim();
+            if (!s5.Contains(" ") && (s5.StartsWith("%") || s5.StartsWith("#"))) s5 = "{" + s5 + "}";
+            return s5;
+        }
+
+        /// <summary>
+        /// Must be like a38, f16, var2, _var3, x_y, 007. Will also trim the string first, just in case. 
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <param name="allowFreqIndicator"></param>
+        /// <returns></returns>
+        private static bool IsVerySimple(string varName2)
+        {
+            if (varName2 == null) return false;
+            string varName = varName2.Trim();
+            foreach (char c in varName)
+            {
+                if (G.IsLetterOrDigitOrUnderscore(c))  //also allows 007.
+                {
+                    //good
+                }
+                else return false;
+            }
+            return true;
         }
 
         /// <summary>

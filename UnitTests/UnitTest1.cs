@@ -7234,7 +7234,7 @@ namespace UnitTests
         {
 
             //Use {} or not: -------------------
-            
+
             //T("analyze #m;",
             //  "analyze {#m};");
 
@@ -7242,7 +7242,7 @@ namespace UnitTests
             //  "checkoff {%x};");
             //T("checkoff #m;",
             //  "checkoff {#m};");
-                        
+
             //T("clip #m;",
             //  "clip {#m};");
 
@@ -7289,36 +7289,34 @@ namespace UnitTests
             //T("exo %x;",
             //  "exo {%x};");
             //T("exo #m;",
-            //  "exo {#m};");
+            //  "exo {#m};");        
 
-            --->here
+            //T("export <%t1 %t2> %x file = %y;",
+            //  "export <%t1 %t2> {%x} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+            //T("export <%t1 %t2> #m file = %y;",
+            //  "export <%t1 %t2> {#m} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
 
-            T("export <%t1 %t2> %x file = %y;",
-              "export <%t1 %t2> {%x} file = %y;");
-            T("export <%t1 %t2> #m file = %y;",
-              "export <%t1 %t2> {#m} file = %y;");
+            //T("findmissingdata %x;",
+            //  "findmissingdata {%x};");
+            //T("findmissingdata #m;",
+            //  "findmissingdata {#m};");
 
-            T("findmissingdata %x;",
-              "findmissingdata {%x};");
-            T("findmissingdata #m;",
-              "findmissingdata {#m};");
+            //T("for i = a, %s, #m; end;",
+            //  "for string %i = a, {%s}, {#m}; end;");
 
-            T("for i = a, %s, #m; end;",
-              "for string %i = a, {%s}, {#m}; end;");
+            //T("for i = a, %s, #m  j = a2, %s2, #m2; end;",
+            //  "for string %i = a, {%s}, #m  string %j = a2, {%s2}, {#m2}; /* TRANSLATE: Parallel loops may not be translated properly, including missing {}-curlies on elements */ end;", true);            
+                        
+            //T("if(#m[2] == #m[3]); end;",
+            //  "if(#m[2] == #m[3]); end;");
 
-            T("if(%x[2020] == %x[2021]); end;",  //only %x with indexer
-              "if({%x}[2020] == {%x}[2021]); end;");
+            //T("itershow %x;",
+            //  "itershow {%x};");
+            //T("itershow #m;",
+            //  "itershow {#m};");
 
-            T("if(#m[2] == #m[3]); end;",
-              "if(#m[2] == #m[3]); end;");
-
-            T("itershow %x;",
-              "itershow {%x};");
-            T("itershow #m;",
-              "itershow {#m};");
-
-            T("list m = a, %x, #m, b;",
-              "#m = a, {%x}, {#m}, b;");
+            //T("list m = a, %x, #m, b;",
+            //  "#m = a, {%x}, {#m}, b;");
             T("list m = a, {%x}, {#m}, b;",
               "#m = a, {%x}, {#m}, b;");
             T("list m = a;",
@@ -7511,17 +7509,22 @@ namespace UnitTests
 
         /// <summary>
         /// For translate testing from 2.4 to 3.0. Also tests that the "target" 3.0 code can parse, so we do not need to test that all the time.
-        /// Testing that 2.4 code can parse must be done manually.
+        /// Testing that 2.4 code can parse must be done manually. Last param is if code can be illegal to parse.
         /// </summary>
         /// <param name="code_2_4"></param>
         /// <param name="code_3_0"></param>
-        private static void T(string code_2_4, string code_3_0)
+        private static void T(string code_2_4, string code_3_0, bool allow)
         {
             if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid2_4Syntax(code_2_4)) throw new GekkoException();
-            if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
+            if (!allow && !Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
             string translated = Translate_2_4_to_3_0.Translate(code_2_4);
             Assert.AreEqual(translated, code_3_0);
-        }        
+        }
+
+        private static void T(string code_2_4, string code_3_0)
+        {
+            T(code_2_4, code_3_0, false);
+        }
 
         [TestMethod]
         public void _Test_Count()
