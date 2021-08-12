@@ -118,6 +118,23 @@ namespace Gekko
                 }
             }
 
+            //We have to reorganize...
+            int counter2 = -1;
+            foreach (List<TokenHelper> line in statements)
+            {
+                TokenHelper topnode = new TokenHelper();
+                topnode.artificialTopNode = true;
+                topnode.type = ETokenType.Unknown;
+                topnode.subnodes = new TokenList();
+                foreach (TokenHelper x in line)
+                {
+                    counter2++;
+                    topnode.subnodes.storage.Add(x);
+                    x.id = counter2;
+                    x.parent = topnode;
+                }
+            }
+
             foreach (List<TokenHelper> line in statements)
             {
                 //Takes care of the first part of the line,
@@ -360,6 +377,7 @@ namespace Gekko
                     bool overriding = false;
                     string var = null;
                     int type = 0;  //1 is scalar, 2 is collection
+                    bool isLhs = false; //token is between start and a "="                   
 
                     List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
                     TokenHelper start = line[i];
@@ -378,11 +396,18 @@ namespace Gekko
                         var = "#" + line[i + 1].s;
                         type = 2;
                     }
+                    
+                    if (supreme.Search(i, new List<string>() { "=" }, true, true) == -12345 && supreme.Search(i, new List<string>() { "=" }, false, true) != -12345)
+                    {
+                        //we are on lhs of a "="
+                        isLhs = true;
+                    }
 
                     if (type != 0)
                     {
                         //is a %- or #-variable
-                        //handle different commands.
+                        //handle different commands.                        
+                        
                         List<string> typeMinusPlus = new List<string>() { "analyze", "clip", "ols", "prt", "sheet", "plot", "mulprt", "gmulprt" };
                         List<string> typePlusPlus = new List<string>() { "checkoff", "close", "compare", "copy", "create", "delete", "disp", "doc", "endo", "exo", "export", "findmissingdata", "import", "itershow", "rebase", "read", "rename", "smooth", "splice", "truncate", "write", "x12a" };
                         if (type == 1)
@@ -398,8 +423,8 @@ namespace Gekko
                         if (commandName == "series")
                         {
                             //conversion from for instance * into *= has been done already in translation.
-                            int j1 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, true);
-                            int j2 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" });
+                            int j1 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, true, true);
+                            int j2 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, false, true);
                             if (j1 != -12345 && j2 == -12345)
                             {
                                 //we are on rhs
@@ -430,8 +455,8 @@ namespace Gekko
                         // --------------------------------------------------                                                
                         
                         //Do not upgrade something like prt <color = %s> ... ;                        
-                        int i1 = supreme.Search(i, new List<string>() { "<" }, true);
-                        int i2 = supreme.Search(i, new List<string>() { ">" });
+                        int i1 = supreme.Search(i, new List<string>() { "<" }, true, false);
+                        int i2 = supreme.Search(i, new List<string>() { ">" }, false, false);
                         if (i1 == 1 && i2 > i)
                         {
                             //there is a < at pos 1 when going left, and a > when going right.
@@ -443,7 +468,7 @@ namespace Gekko
                         if (commandName == "option" || commandName == "matrix" || commandName == "show" || commandName == "list") neverUpgrade = true;
                                                
                         //something like PLOT x, y, z file = %x; should never upgrade %x.
-                        int ii1 = supreme.Search(i, new List<string>() { "=" }, true);
+                        int ii1 = supreme.Search(i, new List<string>() { "=" }, true, true);
                         if (ii1 != -12345)
                         {
                             List<string> xx = new List<string>() { "series", "val", "date", "string", "name", "list", "matrix", "collapse", "for", "if", "interpolate", "ols", "smooth", "splice" };
@@ -471,6 +496,18 @@ namespace Gekko
                             neverUpgrade = true;
                         }
 
+                        bool lhsSpecial = false;
+                        if (isLhs)
+                        {
+                            if (commandName == "string" || commandName == "name" || commandName == "val" || commandName == "date" || commandName == "for")
+                            {
+                                //never upgrade something like string %s = ... 
+                                //also not for %i = ...
+                                neverUpgrade = true;
+                                lhsSpecial = true;
+                            }
+                        }
+
                         // -------------------------------------------
                         // -- Overriding -----------------------------
                         // -------------------------------------------
@@ -479,8 +516,10 @@ namespace Gekko
                         //it must always be upgraded.                        
                         if (scalar == "name" || scalar == "forname")
                         {
-                            overriding = true;
+                            if(!lhsSpecial) overriding = true;
                         }
+
+
 
                     }
 
@@ -669,10 +708,11 @@ namespace Gekko
                     else
                     {
                         //or     FOR date d = 100...
-                        string type = line[pos0 + 1].s.ToLower();
+                        string type = line[pos0 + 1].s.ToLower();                        
                         string name = line[pos0 + 2].s;
                         if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "for" + type);
-                        line[pos0 + 2].s = "%" + line[pos0 + 2].s;                        
+                        line[pos0 + 2].s = "%" + line[pos0 + 2].s;
+                        if (G.Equal(line[pos0 + 1].s, "name")) line[pos0 + 1].s = "string";
                     }
                 }
 

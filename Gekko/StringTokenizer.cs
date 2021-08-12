@@ -451,37 +451,44 @@ namespace Gekko
         public string LineAndPosText()
         {
             return "line " + this.line + " pos " + this.column;
-        }
+        }        
 
         /// <summary>
-        /// Searches for specific strings
+        /// Searches for specific strings. Note, it will skip anything that looks like a &lt;...> option field.
+        /// Beware: method may fail if math %lt; or > are used, for instance in IF-statements.
         /// </summary>
         /// <param name="i1Start"></param>
         /// <param name="ss"></param>
         /// <returns></returns>
-        public int Search(int i1Start, List<string> ss)
+        public int Search(int i1Start, List<string> ss, bool reverse, bool skipOptionField)
         {
-            return Search(i1Start, ss, false);
-        }
-
-        /// <summary>
-        /// Searches for specific strings
-        /// </summary>
-        /// <param name="i1Start"></param>
-        /// <param name="ss"></param>
-        /// <returns></returns>
-        public int Search(int i1Start, List<string> ss, bool reverse)
-        {
+            bool optionFieldIgnore = false;
             for (int j = 0; j < int.MaxValue; j++)
-            {
+            {                
                 int jj = j;
                 if (reverse) jj = -j;
                 int o5 = i1Start + jj;
                 TokenHelper xx = this.Offset(o5);
                 if (xx == null) return -12345;
-                for (int i = 0; i < ss.Count; i++)
+                if (skipOptionField)
                 {
-                    if (G.Equal(xx.s, ss[i])) return o5;
+                    if (reverse)
+                    {
+                        if (xx.s == ">") optionFieldIgnore = true;
+                        if (xx.s == "<") optionFieldIgnore = false;
+                    }
+                    else
+                    {
+                        if (xx.s == "<") optionFieldIgnore = true;
+                        if (xx.s == ">") optionFieldIgnore = false;
+                    }
+                }
+                if (!optionFieldIgnore)
+                {
+                    for (int i = 0; i < ss.Count; i++)
+                    {
+                        if (G.Equal(xx.s, ss[i])) return o5;
+                    }
                 }
             }
             return -12345;  //will never happen

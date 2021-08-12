@@ -7235,94 +7235,94 @@ namespace UnitTests
 
             //Use {} or not: -------------------
 
-            //T("analyze #m;",
-            //  "analyze {#m};");
+            T("analyze #m;",
+              "analyze {#m};");
 
-            //T("checkoff %x;",
-            //  "checkoff {%x};");
-            //T("checkoff #m;",
-            //  "checkoff {#m};");
+            T("checkoff %x;",
+              "checkoff {%x};");
+            T("checkoff #m;",
+              "checkoff {#m};");
 
-            //T("clip #m;",
-            //  "clip {#m};");
+            T("clip #m;",
+              "clip {#m};");
 
-            //T("close %x;",
-            //  "close {%x};");
-            //T("close #m;",
-            //  "close {#m};");
+            T("close %x;",
+              "close {%x};");
+            T("close #m;",
+              "close {#m};");
 
-            //T("compare %x;",
-            //  "compare {%x}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
-            //T("compare #m;",
-            //  "compare {#m}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
+            T("compare %x;",
+              "compare {%x}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
+            T("compare #m;",
+              "compare {#m}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
 
-            //T("copy %x to %xx;",
-            //  "copy {%x} to {%xx};");
-            //T("copy #m to #mm;",
-            //  "copy {#m} to {#mm};");
+            T("copy %x to %xx;",
+              "copy {%x} to {%xx};");
+            T("copy #m to #mm;",
+              "copy {#m} to {#mm};");
 
-            //T("create %x;",
-            //  "create {%x};");
-            //T("create #m;",
-            //  "create {#m};");
+            T("create %x;",
+              "create {%x};");
+            T("create #m;",
+              "create {#m};");
 
-            //T("delete %x;",
-            //  "delete {%x};");
-            //T("delete #m;",
-            //  "delete {#m};");
+            T("delete %x;",
+              "delete {%x};");
+            T("delete #m;",
+              "delete {#m};");
 
-            //T("disp %x;",
-            //  "disp {%x};");
-            //T("disp #m;",
-            //  "disp {#m};");
+            T("disp %x;",
+              "disp {%x};");
+            T("disp #m;",
+              "disp {#m};");
 
-            //T("doc %x label = 'a';",
-            //  "doc {%x} label = 'a';");
-            //T("doc #m label = 'a';",
-            //  "doc {#m} label = 'a';");
+            T("doc %x label = 'a';",
+              "doc {%x} label = 'a';");
+            T("doc #m label = 'a';",
+              "doc {#m} label = 'a';");
 
-            //T("endo %x;",
-            //  "endo {%x};");
-            //T("endo #m;",
-            //  "endo {#m};");
+            T("endo %x;",
+              "endo {%x};");
+            T("endo #m;",
+              "endo {#m};");
 
-            //T("exo %x;",
-            //  "exo {%x};");
-            //T("exo #m;",
-            //  "exo {#m};");        
+            T("exo %x;",
+              "exo {%x};");
+            T("exo #m;",
+              "exo {#m};");
 
-            //T("export <%t1 %t2> %x file = %y;",
-            //  "export <%t1 %t2> {%x} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
-            //T("export <%t1 %t2> #m file = %y;",
-            //  "export <%t1 %t2> {#m} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+            T("export <%t1 %t2> %x file = %y;",
+              "export <%t1 %t2> {%x} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+            T("export <%t1 %t2> #m file = %y;",
+              "export <%t1 %t2> {#m} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
 
-            //T("findmissingdata %x;",
-            //  "findmissingdata {%x};");
-            //T("findmissingdata #m;",
-            //  "findmissingdata {#m};");
+            T("findmissingdata %x;",
+              "findmissingdata {%x};");
+            T("findmissingdata #m;",
+              "findmissingdata {#m};");
 
-            //T("for i = a, %s, #m; end;",
-            //  "for string %i = a, {%s}, {#m}; end;");
+            T("for i = a, %s, #m; end;",
+              "for string %i = a, {%s}, {#m}; end;");
 
-            //T("for i = a, %s, #m  j = a2, %s2, #m2; end;",
-            //  "for string %i = a, {%s}, #m  string %j = a2, {%s2}, {#m2}; /* TRANSLATE: Parallel loops may not be translated properly, including missing {}-curlies on elements */ end;", true);            
+            T("for i = a, %s, #m  j = a2, %s2, #m2; end;",
+              "for string %i = a, {%s}, #m  string %j = a2, {%s2}, {#m2}; /* TRANSLATE: Parallel loops may not be translated properly, including missing {}-curlies on elements */ end;", true);
 
-            //T("if(#m[2] == #m[3]); end;",
-            //  "if(#m[2] == #m[3]); end;");
+            T("if(#m[2] == #m[3]); end;",
+              "if(#m[2] == #m[3]); end;");
 
-            //T("itershow %x;",
-            //  "itershow {%x};");
-            //T("itershow #m;",
-            //  "itershow {#m};");
+            T("itershow %x;",
+              "itershow {%x};");
+            T("itershow #m;",
+              "itershow {#m};");
 
-            //T("list m = a, %x, #m, b;",
-            //  "#m = a, {%x}, {#m}, b;");
-            //T("list m = a, {%x}, {#m}, b;",
-            //  "#m = a, {%x}, {#m}, b;");
-            //T("list m = a;",
-            //  "#m =a,;");
-            //T("list m = piece(%s,2,2);",
-            //  "#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.
+            T("list m = a, %x, #m, b;",
+              "#m = a, {%x}, {#m}, b;");
+            T("list m = a, {%x}, {#m}, b;",
+              "#m = a, {%x}, {#m}, b;");
+            T("list m = a;",
+              "#m =a,;");
+            T("list m = piece(%s,2,2);",
+              "#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.
 
             if (false)
             {
@@ -7339,57 +7339,57 @@ namespace UnitTests
                   "#m = #m['a1'..'a3'];");
             }
 
-            //T("ols y = #m;",
-            //  "ols y = {#m};");
-            //T("ols y = a, b, c;",
-            //  "ols y = a, b, c;");
+            T("ols y = #m;",
+              "ols y = {#m};");
+            T("ols y = a, b, c;",
+              "ols y = a, b, c;");
 
-            //T("mulprt #m;",
-            //  "mulprt {#m};");
+            T("mulprt #m;",
+              "mulprt {#m};");
 
-            //T("rebase %x 2001 2002;",
-            //  "rebase {%x} 2001 2002;");
-            //T("rebase #m 2001 2002;",
-            //  "rebase {#m} 2001 2002;");
+            T("rebase %x 2001 2002;",
+              "rebase {%x} 2001 2002;");
+            T("rebase #m 2001 2002;",
+              "rebase {#m} 2001 2002;");
 
-            //T("rename %x as %xx;",
-            //  "rename {%x} as {%xx};");
-            //T("rename #m as #mm;",
-            //  "rename {#m} as {#mm};");
+            T("rename %x as %xx;",
+              "rename {%x} as {%xx};");
+            T("rename #m as #mm;",
+              "rename {#m} as {#mm};");
 
-            //T("series %s = 1;",
-            //  "{%s} = 1;");
-            //T("series #m = 1;",
-            //  "{#m} = 1;");
-            //T("for i = a, b; series %i = %i + 1; end;",
-            //  "for string %i = a, b;{%i} = {%i} + 1; end;");
+            T("series %s = 1;",
+              "{%s} = 1;");
+            T("series #m = 1;",
+              "{#m} = 1;");
+            T("for i = a, b; series %i = %i + 1; end;",
+              "for string %i = a, b;{%i} = {%i} + 1; end;");
 
-            //T("sheet #m;",
-            //  "sheet {#m};");
+            T("sheet #m;",
+              "sheet {#m};");
 
-            //T("show #m;",
-            //  "prt #m;");
+            T("show #m;",
+              "prt #m;");
 
-            //T("smooth %x = %xx linear;",
-            //  "smooth {%x} = {%xx} linear;");
-            //T("smooth #m = #mm linear;",
-            //  "smooth {#m} = {#mm} linear;");
+            T("smooth %x = %xx linear;",
+              "smooth {%x} = {%xx} linear;");
+            T("smooth #m = #mm linear;",
+              "smooth {#m} = {#mm} linear;");
 
-            //T("splice %x = %xx 2000 %xxx;",
-            //  "splice {%x} = {%xx} 2000 {%xxx};");            
+            T("splice %x = %xx 2000 %xxx;",
+              "splice {%x} = {%xx} 2000 {%xxx};");
 
-            //T("truncate %x;",
-            //  "truncate {%x};");
-            //T("truncate #m;",
-            //  "truncate {#m};");
+            T("truncate %x;",
+              "truncate {%x};");
+            T("truncate #m;",
+              "truncate {#m};");
 
-            //T("plot #m;",
-            //  "plot {#m};");
+            T("plot #m;",
+              "plot {#m};");
 
-            //T("prt #m;",
-            //  "prt {#m};");
-            //T("prt %x;",
-            //  "prt %x;");  //could be val
+            T("prt #m;",
+              "prt {#m};");
+            T("prt %x;",
+              "prt %x;");  //could be val
             T("name x = 'a'; prt %x;",
               "%x = 'a'; prt {%x};");  //if %x must be upgraded, it  must be a NAME, FORNAME or FORNULL. Since PRT cannot be used for strings anyway (TELL for that), this is not very risky.
             T("for x = a, b; prt %x; end;",

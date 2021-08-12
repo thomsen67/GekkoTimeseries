@@ -350,7 +350,7 @@ namespace Gekko
 
             List<string> eqsign = new List<string>() { "=", "e", "=" };
 
-            int iEqual = tok.Search(i1Start, eqsign);
+            int iEqual = tok.Search(i1Start, eqsign, false, false);
 
             if (iEqual == -12345)
             {
@@ -360,7 +360,7 @@ namespace Gekko
 
             int i1End = iEqual - 1;
             int i2Start = i1End + eqsign.Count + 1;
-            int iSemi = tok.Search(i2Start, new List<string>() { ";" });
+            int iSemi = tok.Search(i2Start, new List<string>() { ";" }, false, false);
 
             if (iSemi == -12345)
             {
