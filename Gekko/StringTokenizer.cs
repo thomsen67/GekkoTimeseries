@@ -472,52 +472,19 @@ namespace Gekko
         /// <returns></returns>
         public int Search(int i1Start, List<string> ss, bool reverse)
         {
-            if (reverse == false)
+            for (int j = 0; j < int.MaxValue; j++)
             {
-                int j = -12345;
-                for (j = 0; j < int.MaxValue; j++)
+                int jj = j;
+                if (reverse) jj = -j;
+                int o5 = i1Start + jj;
+                TokenHelper xx = this.Offset(o5);
+                if (xx == null) return -12345;
+                for (int i = 0; i < ss.Count; i++)
                 {
-                    bool ok = true;
-                    for (int i = 0; i < ss.Count; i++)
-                    {
-                        TokenHelper xx = this.Offset(i1Start + j);
-                        if (xx == null)
-                        {
-                            return -12345;  //end of tokens
-                        }
-                        if (!G.Equal(xx.s, ss[i]))
-                        {
-                            ok = false;
-                            break;
-                        }
-                    }
-                    if (ok) break;
+                    if (G.Equal(xx.s, ss[i])) return o5;
                 }
-                return i1Start + j;
             }
-            else
-            {
-                int j = -12345;
-                for (j = 0; j < int.MaxValue; j++)
-                {
-                    bool ok = true;
-                    for (int i = 0; i < ss.Count; i++)
-                    {
-                        TokenHelper xx = this.Offset(i1Start - j);
-                        if (xx == null)
-                        {
-                            return -12345;  //start of tokens
-                        }
-                        if (!G.Equal(xx.s, ss[i]))
-                        {
-                            ok = false;
-                            break;
-                        }
-                    }
-                    if (ok) break;
-                }
-                return i1Start - j;
-            }
+            return -12345;  //will never happen
         }
 
         /// <summary>

@@ -7306,7 +7306,7 @@ namespace UnitTests
 
             //T("for i = a, %s, #m  j = a2, %s2, #m2; end;",
             //  "for string %i = a, {%s}, #m  string %j = a2, {%s2}, {#m2}; /* TRANSLATE: Parallel loops may not be translated properly, including missing {}-curlies on elements */ end;", true);            
-                        
+
             //T("if(#m[2] == #m[3]); end;",
             //  "if(#m[2] == #m[3]); end;");
 
@@ -7317,74 +7317,79 @@ namespace UnitTests
 
             //T("list m = a, %x, #m, b;",
             //  "#m = a, {%x}, {#m}, b;");
-            T("list m = a, {%x}, {#m}, b;",
-              "#m = a, {%x}, {#m}, b;");
-            T("list m = a;",
-              "#m = a,;");
-            T("list m = piece(%s,2,2);",
-              "#m = (substring(%s,2,2),);");
-            T("list m = {piece(%s,2,2)};",
-              "#m = (substring(%s,2,2),);");
-            T("list m = #m[a*b];",
-              "#m = #m['a*b'];");
-            T("list m = #m[a1..a3];",
-              "#m = #m['a1'..'a3'];");
-            T("list m = #m['a*b'];",
-              "#m = #m['a*b'];");
-            T("list m = #m['a1'..'a3'];",
-              "#m = #m['a1'..'a3'];");
+            //T("list m = a, {%x}, {#m}, b;",
+            //  "#m = a, {%x}, {#m}, b;");
+            //T("list m = a;",
+            //  "#m =a,;");
+            //T("list m = piece(%s,2,2);",
+            //  "#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.
 
-            T("ols #m;",
-              "ols {#m};");
+            if (false)
+            {
+                //!!! follow up
+                //!!! follow up
+                //!!! follow up
+                T("list m = #m[a*b];",
+                  "#m = #m['a*b'];");
+                T("list m = #m[a1..a3];",
+                  "#m = #m['a1'..'a3'];");
+                T("list m = #m['a*b'];",
+                  "#m = #m['a*b'];");
+                T("list m = #m['a1'..'a3'];",
+                  "#m = #m['a1'..'a3'];");
+            }
 
-            T("mulprt #m;",
-              "mulprt {#m};");
+            //T("ols y = #m;",
+            //  "ols y = {#m};");
+            //T("ols y = a, b, c;",
+            //  "ols y = a, b, c;");
 
-            T("rebase %x 2001 2002;",
-              "rebase {%x} 2001 2002;");
-            T("rebase #m 2001 2002;",
-              "rebase {#m} 2001 2002;");
+            //T("mulprt #m;",
+            //  "mulprt {#m};");
 
-            T("rename %x as %xx;",
-              "rename {%x} as {%xx};");
-            T("rename #m as #mm;",
-              "rename {#m} as {#mm};");
+            //T("rebase %x 2001 2002;",
+            //  "rebase {%x} 2001 2002;");
+            //T("rebase #m 2001 2002;",
+            //  "rebase {#m} 2001 2002;");
 
-            T("series %s = 1;",
-              "series {%s} = 1; ");
-            T("series #m = 1;",
-              "series {#m} = 1; ");
-            T("for i = a, b; series %i = %i + 1; end;",
-              "for string %i = a, b; series {%i} = {%i} + 1; end;");
+            //T("rename %x as %xx;",
+            //  "rename {%x} as {%xx};");
+            //T("rename #m as #mm;",
+            //  "rename {#m} as {#mm};");
 
-            T("sheet #m;",
-              "sheet {#m};");
+            //T("series %s = 1;",
+            //  "{%s} = 1;");
+            //T("series #m = 1;",
+            //  "{#m} = 1;");
+            //T("for i = a, b; series %i = %i + 1; end;",
+            //  "for string %i = a, b;{%i} = {%i} + 1; end;");
 
-            T("show #m;",
-              "prt #m;");
+            //T("sheet #m;",
+            //  "sheet {#m};");
 
-            T("smooth %x = %xx linear;",
-              "smooth {%x} = {%xx} linear;");
-            T("smooth #m = #mm linear;",
-              "smooth {#m} = {#mm} linear;");
+            //T("show #m;",
+            //  "prt #m;");
 
-            T("splice %x = %xx 2000 %xxx;",
-              "splice {%x} = {%xx} 2000 {%xxx};");
-            T("splice #m = #mm 2000 #mmm;",
-              "splice {#m} = {#mm} 2000 {#mmmm};");
+            //T("smooth %x = %xx linear;",
+            //  "smooth {%x} = {%xx} linear;");
+            //T("smooth #m = #mm linear;",
+            //  "smooth {#m} = {#mm} linear;");
 
-            T("truncate %x;",
-              "truncate {%x};");
-            T("truncate #m;",
-              "truncate {#m};");
+            //T("splice %x = %xx 2000 %xxx;",
+            //  "splice {%x} = {%xx} 2000 {%xxx};");            
 
-            T("plot #m;",
-              "plot {#m};");
+            //T("truncate %x;",
+            //  "truncate {%x};");
+            //T("truncate #m;",
+            //  "truncate {#m};");
 
-            T("prt #m;",
-              "prt {#m};");
-            T("prt %x;",
-              "prt %x;");  //could be val
+            //T("plot #m;",
+            //  "plot {#m};");
+
+            //T("prt #m;",
+            //  "prt {#m};");
+            //T("prt %x;",
+            //  "prt %x;");  //could be val
             T("name x = 'a'; prt %x;",
               "%x = 'a'; prt {%x};");  //if %x must be upgraded, it  must be a NAME, FORNAME or FORNULL. Since PRT cannot be used for strings anyway (TELL for that), this is not very risky.
             T("for x = a, b; prt %x; end;",

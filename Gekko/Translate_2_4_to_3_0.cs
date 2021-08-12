@@ -818,31 +818,31 @@ namespace Gekko
 
             if (op_i != -12345)
             {
-                if (op_i == 3)
-                {
-                    if (line[1].s == "#" && line[2].type == ETokenType.Word)
-                    {
-                        //series #m = --> series {#m} = ...
-                        line[1].s = "{" + line[1].s;
-                        line[2].s += "}";
-                    }
-                    else if (line[1].s == "%" && line[2].type == ETokenType.Word)
-                    {
-                        //series %m = --> series {%m} = ...
-                        line[1].s = "{" + line[1].s;
-                        line[2].s += "}";
-                    }
-                }
-                else
-                {
-                    //series %i|x = ... --> series {%x}x = ...
-                    if (line[1].s == "%" && line[2].type == ETokenType.Word && line[3].s == "|")
-                    {
-                        line[1].s = "{" + line[1].s;
-                        line[2].s += "}";
-                        line[3].s = ""; line[3].leftblanks = 0;
-                    }
-                }
+                //if (op_i == 3)
+                //{
+                //    if (line[1].s == "#" && line[2].type == ETokenType.Word)
+                //    {
+                //        //series #m = --> series {#m} = ...
+                //        line[1].s = "{" + line[1].s;
+                //        line[2].s += "}";
+                //    }
+                //    else if (line[1].s == "%" && line[2].type == ETokenType.Word)
+                //    {
+                //        //series %m = --> series {%m} = ...
+                //        line[1].s = "{" + line[1].s;
+                //        line[2].s += "}";
+                //    }
+                //}
+                //else
+                //{
+                //    //series %i|x = ... --> series {%x}x = ...
+                //    if (line[1].s == "%" && line[2].type == ETokenType.Word && line[3].s == "|")
+                //    {
+                //        line[1].s = "{" + line[1].s;
+                //        line[2].s += "}";
+                //        line[3].s = ""; line[3].leftblanks = 0;
+                //    }
+                //}
 
                 int itemp = StringTokenizer.FindS(line, op_i + 1, "=");
                 if (itemp == -12345)
@@ -1117,6 +1117,10 @@ namespace Gekko
                 for (int ij = 0; ij < items.Count; ij++)
                 {
                     string s7 = items[ij];
+                    if (s7.StartsWith("{") && s7.EndsWith("}"))
+                    {
+                        s7 = s7.Substring(1, s7.Length - 2);
+                    }
                     bool first = true;
                     foreach (char c in s7)
                     {
@@ -1153,20 +1157,28 @@ namespace Gekko
                 }
                 else
                 {
-                    bool first = true;
-                    for (int ij = 0; ij < items.Count; ij++)
+                    //--> dont do this: it will pollute all the functions etc. that return a list not a string.
+                    //if (items.Count == 1)  //test of issimple... probably superfluous
+                    //{
+                    //    result2 = "(" + itemsExtra[0] + items[0] + ",)";
+                    //}
+                    //else
                     {
-                        string s2 = items[ij];
-                        if (!first) result2 += "+";
-                        if (IsVerySimple(s2.Trim()))
+                        bool first = true;
+                        for (int ij = 0; ij < items.Count; ij++)
                         {
-                            result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";  //a becomes ('a',)
+                            string s2 = items[ij];
+                            if (!first) result2 += "+";
+                            if (IsVerySimple(s2.Trim()))
+                            {
+                                result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";  //a becomes ('a',)
+                            }
+                            else
+                            {
+                                result2 += itemsExtra[ij] + s2;  //stuff like %s or #m.
+                            }
+                            first = false;
                         }
-                        else
-                        {
-                            result2 += itemsExtra[ij] + s2;  //stuff like %s or #m.
-                        }
-                        first = false;
                     }
                 }
 
