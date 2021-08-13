@@ -192,7 +192,22 @@ namespace Gekko
                 {
                     HandleExpressionsRecursive(line[i].subnodes.storage, topline, info);
                     continue;
-                }                
+                }
+
+                try
+                {
+                    //¤034 [a*b?c] --> {'a*b?c}, #m[a*b?c] --> #m['a*b?c'].
+                    if (line[i + 0].leftblanks == 0 && line[i + 0].s == "[" && line[i + 1].s == "0" && line[i + 2].s == "]")
+                    {
+                        line[i + 0].leftblanks = 0;
+                        line[i + 0].s = ".length()";
+                        line[i + 1].s = "";
+                        line[i + 1].leftblanks = 0;
+                        line[i + 2].s = "";
+                        line[i + 2].leftblanks = 0;
+                    }
+                }
+                catch { };
 
                 try
                 {

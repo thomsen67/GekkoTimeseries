@@ -7309,6 +7309,9 @@ namespace UnitTests
 
             T("if(#m[2] == #m[3]); end;",
               "if(#m[2] == #m[3]); end;");
+            
+            T("index ref:f* mylist;",
+              "index <showbank=no showfreq=no> ref:f* to #mylist;");
 
             T("itershow %x;",
               "itershow {%x};");
@@ -7477,38 +7480,42 @@ namespace UnitTests
               @"tell 'a %x%y';");
 
 
-            if (false)
-            {
+            //SERIES command:
+            //In 2.4, for string/name %x. On lhs, 2.4 can use either %x or {%x} no matter if 
+            //%x is string, name or nameloop. In 3.0, it must be {%x} on lhs. On rhs, 2.4
+            //can use {%x} always, but may use %x if name or nameloop. This must always be
+            //translated as {%x}, unless date or string. If type is uncertain, do not translate
+            //%x into {%x} on rhs.
 
-                //SERIES command:
-                //In 2.4, for string/name %x. On lhs, 2.4 can use either %x or {%x} no matter if 
-                //%x is string, name or nameloop. In 3.0, it must be {%x} on lhs. On rhs, 2.4
-                //can use {%x} always, but may use %x if name or nameloop. This must always be
-                //translated as {%x}, unless date or string. If type is uncertain, do not translate
-                //%x into {%x} on rhs.
+            T("series %x = 1;",
+              "{%x} = 1;");
 
-                T("series %x = 1;",
-                  "{%x} = 1;");
+            T("series %x[%t] = 1;",  //only {} on first %-var.
+              "{%x}[%t] = 1;");
 
-                T("series %x[%t] = 1;",  //only {} on first %-var.
-                  "{%x}[%t] = 1;");
+            T("series %x[%t + 1] = 1;",  //only {} on first %-var.
+              "{%x}[%t + 1] = 1;");
 
-                T("series %x[%t + 1] = 1;",  //only {} on first %-var.
-                  "{%x}[%t + 1] = 1;");
+            T("series y = %x;",  //%x could be scalar
+              "y = %x;");
 
-                T("series y = %x;",  //%x could be scalar
-                  "y = %x;");
+            T("name x = 'a'; series y = %x;",  //has {} because %x is NAME 
+              "%x = 'a';y = {%x};");
 
-                T("name x = 'a'; series y = %x;",  //has {} because %x is NAME 
-                  "%x = 'a'; y = {%x};");
+            T("name x = 'a'; series y = {%x};",  //check that this is not --> {{%x}}
+              "%x = 'a';y = {%x};");
 
-                T("name x = 'a'; series y = {%x};",  //check that this is not --> {{%x}}
-                  "%x = 'a'; y = {%x};");
+            T("for x = a, b; series y = %x; end;", //must add {}, because %x is NAMELOOP
+              "for string %x = a, b;y = {%x}; end;");
 
-                T("for x = a, b; series y = % x; end;", //must add {}, because %x is NAMELOOP
-                  "for string %x = a, b; y = {%x}; end;");
+            T("SERIES x = x[-1] + 1;",
+              "x <dyn> = x[-1] + 1; /* TRANSLATE: Note: <dyn> added */");
 
-            }
+            T("series x = x.1 + 1;",
+              "x <dyn> = x.1 + 1; /* TRANSLATE: Note: <dyn> added */");
+
+            T("series {%x} = {%x}[-1] + 1;",
+              " {%x} <dyn> = {%x}[-1] + 1; /* TRANSLATE: Note: <dyn> added */");
 
         }
 
