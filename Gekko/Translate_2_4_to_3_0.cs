@@ -197,14 +197,40 @@ namespace Gekko
                 try
                 {
                     //¤034 [a*b?c] --> {'a*b?c}, #m[a*b?c] --> #m['a*b?c'].
-                    if (line[i + 0].leftblanks == 0 && line[i + 0].s == "[" && line[i + 1].s == "0" && line[i + 2].s == "]")
+                    if (line[0].s == "[")
                     {
-                        line[i + 0].leftblanks = 0;
-                        line[i + 0].s = ".length()";
-                        line[i + 1].s = "";
-                        line[i + 1].leftblanks = 0;
-                        line[i + 2].s = "";
-                        line[i + 2].leftblanks = 0;
+                        TokenHelper parent = line[0].parent;
+                        if (parent != null)
+                        {
+                            if (line[0].leftblanks == 0)
+                            {
+                                TokenHelper previous = parent.SiblingBefore(1, true);
+                                if (previous != null)
+                                {
+                                    char c = previous.s[previous.s.Length - 1];
+                                    if (c == '}' || G.IsLetterOrDigitOrUnderscore(c))
+                                    {
+                                        //something like abc[...] or {%s}[...] with no blanks between
+                                        bool good = true;
+                                        string s = StringTokenizer.GetTextFromLeftBlanksTokens(line, 1, line.Count - 2);
+                                        for (int i7 = 0; i7 < s.Length; i7++)
+                                        {
+                                            char c7 = s[i7];
+                                            if (G.IsLetterOrDigitOrUnderscore(c7) || c7 == '*' || c7 == '?')
+                                            {
+                                                //good
+                                            }
+                                            else good = false;
+                                        }
+                                        if (good)
+                                        {
+                                            line[1].s = "'" + line[1].s;
+                                            line[line.Count - 2].s = line[line.Count - 2].s + "'";
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 catch { };

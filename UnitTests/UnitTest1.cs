@@ -7233,7 +7233,22 @@ namespace UnitTests
         public void _Test_Translate()
         {
 
-            //Use {} or not: -------------------
+            if (true)
+            {
+                //!!! follow up
+                //!!! follow up
+                //!!! follow up
+                T("list m = #m[a*b];",
+                  "#m =#m['a*b'];");
+                T("list m = #m[a1..a3];",
+                  "#m = #m['a1'..'a3'];");
+                T("list m = #m['a*b'];",
+                  "#m = #m['a*b'];");
+                T("list m = #m['a1'..'a3'];",
+                  "#m = #m['a1'..'a3'];");
+            }
+
+
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7325,22 +7340,7 @@ namespace UnitTests
             T("list m = a;",
               "#m =a,;");
             T("list m = piece(%s,2,2);",
-              "#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.
-
-            if (false)
-            {
-                //!!! follow up
-                //!!! follow up
-                //!!! follow up
-                T("list m = #m[a*b];",
-                  "#m = #m['a*b'];");
-                T("list m = #m[a1..a3];",
-                  "#m = #m['a1'..'a3'];");
-                T("list m = #m['a*b'];",
-                  "#m = #m['a*b'];");
-                T("list m = #m['a1'..'a3'];",
-                  "#m = #m['a1'..'a3'];");
-            }
+              "#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.            
 
             T("ols y = #m;",
               "ols y = {#m};");
