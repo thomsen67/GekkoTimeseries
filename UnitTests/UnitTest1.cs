@@ -7235,17 +7235,15 @@ namespace UnitTests
 
             if (true)
             {
-                //!!! follow up
-                //!!! follow up
-                //!!! follow up
+
                 T("list m = #m[a*b];",
                   "#m =#m['a*b'];");
                 T("list m = #m[a1..a3];",
-                  "#m = #m['a1'..'a3'];");
+                  "#m =#m['a1'..'a3'];");
                 T("list m = #m['a*b'];",
-                  "#m = #m['a*b'];");
+                  "#m =#m['a*b'];");
                 T("list m = #m['a1'..'a3'];",
-                  "#m = #m['a1'..'a3'];");
+                  "#m =#m['a1'..'a3'];");
             }
 
 

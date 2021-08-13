@@ -185,9 +185,19 @@ namespace Gekko
         /// <param name="topline"></param>
         public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline, Info info)
         {
-
+            TokenHelper supreme = null;
+            string commandName = "";
             for (int i = 0; i < line.Count; i++)
             {
+
+                List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
+                TokenHelper start = line[i];
+                if (nesting.Count > 0) start = nesting[nesting.Count - 1];  //uppermost token
+                                                                            //start is not necessarily the first token at this level
+
+                if (start.parent != null) supreme = start.parent.subnodes[0];
+                if (commandName == "" && supreme != null) commandName = supreme.meta.commandName;
+
                 if (line[i].HasChildren())
                 {
                     HandleExpressionsRecursive(line[i].subnodes.storage, topline, info);
@@ -200,34 +210,91 @@ namespace Gekko
                     if (line[0].s == "[")
                     {
                         TokenHelper parent = line[0].parent;
-                        if (parent != null)
+                        TokenHelper previous = parent.SiblingBefore(1, false);
+                        int blanks = line[0].leftblanks;
+                        char c = previous.s[previous.s.Length - 1];
+                        bool seemsAfterVariable = false;
+                        if (c == '}' || G.IsLetterOrDigitOrUnderscore(c)) seemsAfterVariable = true;
+                        bool looksLikeWildcard = true;
+                        string s = StringTokenizer.GetTextFromLeftBlanksTokens(line, 1, line.Count - 2);
+                        for (int i7 = 0; i7 < s.Length; i7++)
                         {
-                            if (line[0].leftblanks == 0)
+                            char c7 = s[i7];
+                            if (G.IsLetterOrDigitOrUnderscore(c7) || c7 == '*' || c7 == '?')
                             {
-                                TokenHelper previous = parent.SiblingBefore(1, true);
-                                if (previous != null)
+                                //good
+                            }
+                            else looksLikeWildcard = false;
+                        }
+                        if (!(s.Contains("*") || s.Contains("?"))) looksLikeWildcard = false; //#m[3] should not be #m['3']
+                        bool looksLikeRange = false;
+                        if (s.Contains("..") && !s.Contains("'")) looksLikeRange = true;
+                        bool prtLike = false;
+                        if (commandName == "prt" || commandName == "plot" || commandName == "sheet" || commandName == "clip" || commandName == "mulprt" || commandName == "gmulprt") prtLike = true;
+                        int dots = -12345;
+                        for (int jj = 1; jj < line.Count; jj++)
+                        {
+                            if (line[jj - 1].s == "." && line[jj].s == "." && line[jj].leftblanks == 0)
+                            {
+                                dots = jj - 1;
+                                break;
+                            }
+                        }
+
+                        // ============
+
+                        if ((blanks == 0 && seemsAfterVariable))
+                        {
+                            //something like abc[...] or {%s}[...] with no blanks between
+
+                            if (looksLikeWildcard)
+                            {
+                                line[0].s = "['";
+                                line[line.Count - 1].s = "']";
+                            }
+                            else if (looksLikeRange)
+                            {
+                                //abc[a..z] --> abc['a'..'z']
+                                line[0].s = "['";
+                                line[line.Count - 1].s = "']";
+                                line[dots].s = "'" + line[dots].s;
+                                line[dots + 1].s = line[dots + 1].s + "'";
+                            }
+                        }
+                        else
+                        {
+                            if (prtLike)
+                            {
+                                //prt [a*b] --> prt {'a*b'}
+                                if (looksLikeWildcard)
                                 {
-                                    char c = previous.s[previous.s.Length - 1];
-                                    if (c == '}' || G.IsLetterOrDigitOrUnderscore(c))
-                                    {
-                                        //something like abc[...] or {%s}[...] with no blanks between
-                                        bool good = true;
-                                        string s = StringTokenizer.GetTextFromLeftBlanksTokens(line, 1, line.Count - 2);
-                                        for (int i7 = 0; i7 < s.Length; i7++)
-                                        {
-                                            char c7 = s[i7];
-                                            if (G.IsLetterOrDigitOrUnderscore(c7) || c7 == '*' || c7 == '?')
-                                            {
-                                                //good
-                                            }
-                                            else good = false;
-                                        }
-                                        if (good)
-                                        {
-                                            line[1].s = "'" + line[1].s;
-                                            line[line.Count - 2].s = line[line.Count - 2].s + "'";
-                                        }
-                                    }
+                                    line[0].s = "{'";
+                                    line[line.Count - 1].s = "'}";
+                                }
+                                else if (looksLikeRange)
+                                {
+                                    //prt [a..z] --> prt {'a'..'z'}
+                                    line[0].s = "{'";
+                                    line[line.Count - 1].s = "'}";
+                                    line[dots].s = "'" + line[dots].s;
+                                    line[dots + 1].s = line[dots + 1].s + "'";
+                                }
+                            }
+                            else
+                            {
+                                //list m = [a*b] --> #m = ['a*b'].
+                                if (looksLikeWildcard)
+                                {
+                                    line[0].s = "['";
+                                    line[line.Count - 1].s = "']";
+                                }
+                                else if (looksLikeRange)
+                                {
+                                    //list m = [a..z] --> #m = ['a'..'z']
+                                    line[0].s = "['";
+                                    line[line.Count - 1].s = "']";
+                                    line[dots].s = "'" + line[dots].s;
+                                    line[dots + 1].s = line[dots + 1].s + "'";
                                 }
                             }
                         }
@@ -419,13 +486,7 @@ namespace Gekko
                     string var = null;
                     int type = 0;  //1 is scalar, 2 is collection
                     bool isLhs = false; //token is between start and a "="                   
-
-                    List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
-                    TokenHelper start = line[i];
-                    if (nesting.Count > 0) start = nesting[nesting.Count - 1];  //uppermost token
-                    //start is not necessarily the first token at this level
-                    TokenHelper supreme = start.parent.subnodes[0];
-                    string commandName = supreme.meta.commandName;
+                                        
 
                     if (line[i + 0].s == "%" && line[i + 1].type == ETokenType.Word)
                     {
