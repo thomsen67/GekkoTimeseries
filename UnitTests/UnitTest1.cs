@@ -7233,20 +7233,7 @@ namespace UnitTests
         public void _Test_Translate()
         {
 
-            if (true)
-            {
-
-                T("list m = #m[a*b];",
-                  "#m =#m['a*b'];");
-                T("list m = #m[a1..a3];",
-                  "#m =#m['a1'..'a3'];");
-                T("list m = #m['a*b'];",
-                  "#m =#m['a*b'];");
-                T("list m = #m['a1'..'a3'];",
-                  "#m =#m['a1'..'a3'];");
-            }
-
-
+            
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7263,6 +7250,9 @@ namespace UnitTests
               "close {%x};");
             T("close #m;",
               "close {#m};");
+
+            T("COLLAPSE fY.a = qbank:fY.q first;",
+              "COLLAPSE fY!a = qbank:fY!q first;");
 
             T("compare %x;",
               "compare {%x}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
@@ -7326,6 +7316,9 @@ namespace UnitTests
             T("index ref:f* mylist;",
               "index <showbank=no showfreq=no> ref:f* to #mylist;");
 
+            T("INTERPOLATE qbank:fY.q = abank:fY.a prorate;",
+              "INTERPOLATE qbank:fY!q = abank:fY!a prorate;");
+
             T("itershow %x;",
               "itershow {%x};");
             T("itershow #m;",
@@ -7339,6 +7332,16 @@ namespace UnitTests
               "#m =a,;");
             T("list m = piece(%s,2,2);",
               "#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.            
+            T("list m = #m[a*b];",
+              "#m =#m['a*b'];");
+            T("list m = #m[a1..a3];",
+              "#m =#m['a1'..'a3'];");
+            T("list m = #m['a*b'];",
+              "#m =#m['a*b'];");
+            T("list m = #m['a1'..'a3'];",
+              "#m =#m['a1'..'a3'];");
+            T("list m = #m &+ #m;",
+              "#m =#m || #m;");
 
             T("ols y = #m;",
               "ols y = {#m};");

@@ -206,7 +206,8 @@ namespace Gekko
 
                 try
                 {
-                    //¤034 [a*b?c] --> {'a*b?c}, #m[a*b?c] --> #m['a*b?c'].
+                    //¤034 
+                    //[a*b?c] --> {'a*b?c}, #m[a*b?c] --> #m['a*b?c'].
                     if (line[0].s == "[")
                     {
                         TokenHelper parent = line[0].parent;
@@ -668,7 +669,7 @@ namespace Gekko
                 //¤019
                 AddComment(line, "COMPARE has changed syntax, see the help files");
             }
-            else if (G.Equal(line[pos0].s, "collapse"))
+            else if (G.Equal(line[pos0].s, "collapse") || G.Equal(line[pos0].s, "interpolate"))
             {
                 //¤020
                 for (int i = 0; i < line.Count; i++)
