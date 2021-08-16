@@ -7232,8 +7232,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
+            T("string s = 'a'; series y = avg(%s);",
+              "%s = 'a'; y = avg({%s});");
 
-            
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7373,6 +7374,7 @@ namespace UnitTests
               "{#m} = 1;");
             T("for i = a, b; series %i = %i + 1; end;",
               "for string %i = a, b;{%i} = {%i} + 1; end;");
+            
 
             T("sheet #m;",
               "sheet {#m};");

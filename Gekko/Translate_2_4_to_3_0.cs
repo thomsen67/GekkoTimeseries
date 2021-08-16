@@ -405,7 +405,7 @@ namespace Gekko
                     //¤005
                     line[i].s = ";";  //... || ...  --> ... ; ...
                     line[i + 1].s = "";
-                }
+                }                
 
                 if (StringTokenizer.Equal(line, i, "avgt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
@@ -552,6 +552,22 @@ namespace Gekko
                                 }                                
                             }
                         }
+
+                        try
+                        {
+                            TokenHelper parent = line[i + 0].parent;
+                            if (!parent.artificialTopNode)
+                            {
+                                if (parent.subnodes[0].s == "(")
+                                {
+                                    TokenHelper before = parent.SiblingBefore();
+                                    if (before != null && G.Equal(before.s, "avg"))
+                                    {
+                                        upgrade = true;
+                                    }
+                                }
+                            }
+                        } catch { }
 
                         // --------------------------------------------------
                         // -- now we do the neverUpgrade --------------------
