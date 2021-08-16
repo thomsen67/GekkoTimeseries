@@ -7343,6 +7343,12 @@ namespace UnitTests
             T("list m = #m &+ #m;",
               "#m =#m || #m;");
 
+            T("option interface databank swap = yes;",
+              "//option interface databank swap = yes; /* TRANSLATE: Option obsolete */");
+
+            T("option interface Table printcodes = yes;",
+              "option interface Table operators = yes;");
+            
             T("ols y = #m;",
               "ols y = {#m};");
             T("ols y = a, b, c;",

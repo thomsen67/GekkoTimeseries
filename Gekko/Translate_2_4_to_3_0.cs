@@ -669,6 +669,7 @@ namespace Gekko
                 //¤019
                 AddComment(line, "COMPARE has changed syntax, see the help files");
             }
+
             else if (G.Equal(line[pos0].s, "collapse") || G.Equal(line[pos0].s, "interpolate"))
             {
                 //¤020
@@ -773,7 +774,7 @@ namespace Gekko
                 {
                     list = true;
                     if (!info.collectionMemory.ContainsKey("#" + line[pos0 + 1].s)) info.collectionMemory.Add("#" + line[pos0 + 1].s, "list");
-                }                
+                }
 
                 bool isParallel = false;
 
@@ -787,8 +788,8 @@ namespace Gekko
                         //either FOR s = a, b, c...
                         string type = "string";
                         string name = line[pos0 + 1].s;
-                        line[pos0 + 1].s = type + " " + "%" + name;                        
-                        if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "forname");                        
+                        line[pos0 + 1].s = type + " " + "%" + name;
+                        if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "forname");
 
                         while (true)
                         {
@@ -811,7 +812,7 @@ namespace Gekko
                     else
                     {
                         //or     FOR date d = 100...
-                        string type = line[pos0 + 1].s.ToLower();                        
+                        string type = line[pos0 + 1].s.ToLower();
                         string name = line[pos0 + 2].s;
                         if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "for" + type);
                         line[pos0 + 2].s = "%" + line[pos0 + 2].s;
@@ -831,7 +832,7 @@ namespace Gekko
                 //so much is changed here that we have to run this one manually first
                 HandleExpressionsRecursive(line, line, info);
 
-                HandleCommandNameListElements(line, list, isParallel);                
+                HandleCommandNameListElements(line, list, isParallel);
             }
 
             else if (G.Equal(line[pos0].s, "matrix"))
@@ -847,7 +848,152 @@ namespace Gekko
                     line[pos0].s = "#";
                     line[pos0 + 1].leftblanks = 0;
                 }
-            }            
+            }
+
+            else if (G.Equal(line[pos0].s, "option"))
+            {
+                //option bugfix download = yes; --> remvoed
+                //option bugfix px = yes; --> removed
+                //option databank compare tabs = 1.0; --> removed, see COMPAre
+                //option databank compare trel = 0.0001; --> removed, see COMPARE
+                //option databank create message = yes; --> remvoed
+                //option databank logic = default; --> remvoed
+                //option importexport = no; --> removed
+                //option interface databank swap = no; --> removed
+                //option interface table printcodes = yes; --> "operators"
+                //option library file = [empty]; --> removed
+                //option plot new = yes; --> removed
+                //option print filewidth = 130; --> removed
+                //option series array ignoremissing = no; --> note that new options regarding this
+
+                try {
+                    if (G.Equal(line[pos0 + 1].s, "bugfix") && G.Equal(line[pos0 + 2].s, "download"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                } catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "bugfix") && G.Equal(line[pos0 + 2].s, "px"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "databank") && G.Equal(line[pos0 + 2].s, "compare") && G.Equal(line[pos0 + 3].s, "tabs"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete, use COMPARE command");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "databank") && G.Equal(line[pos0 + 2].s, "compare") && G.Equal(line[pos0 + 3].s, "trel"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete, use COMPARE command");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "databank") && G.Equal(line[pos0 + 2].s, "create") && G.Equal(line[pos0 + 3].s, "message"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option not implemented in Gekko 3.0 yet");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "databank") && G.Equal(line[pos0 + 2].s, "logic"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "importexport"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "interface") && G.Equal(line[pos0 + 2].s, "databank") && G.Equal(line[pos0 + 3].s, "swap"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "interface") && G.Equal(line[pos0 + 2].s, "table") && G.Equal(line[pos0 + 3].s, "printcodes"))
+                    {
+                        line[pos0 + 3].s = "operators";
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "library") && G.Equal(line[pos0 + 2].s, "file"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "plot") && G.Equal(line[pos0 + 2].s, "new"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "print") && G.Equal(line[pos0 + 2].s, "filewidth"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Option obsolete");
+                    }
+                }
+                catch { }
+
+                try
+                {
+                    if (G.Equal(line[pos0 + 1].s, "series") && G.Equal(line[pos0 + 2].s, "array") && G.Equal(line[pos0 + 2].s, "ignoremissing"))
+                    {
+                        line[pos0].s = "//" + line[pos0].s;
+                        AddComment(line, "Use 'option series array calc/print/table missing = ...' instead");
+                    }
+                }
+                catch { }
+
+            }
 
             else if (G.Equal(line[pos0].s, "p") || G.Equal(line[pos0].s, "prt") || G.Equal(line[pos0].s, "pri") || G.Equal(line[pos0].s, "print") || G.Equal(line[pos0].s, "show"))
             {
