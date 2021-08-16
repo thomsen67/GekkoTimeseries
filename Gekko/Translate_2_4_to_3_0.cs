@@ -118,8 +118,7 @@ namespace Gekko
                 }
             }
 
-            //We have to reorganize...
-            int counter2 = -1;
+            //We have to reorganize... (#807508925428903)            
             foreach (List<TokenHelper> line in statements)
             {
                 TokenHelper topnode = new TokenHelper();
@@ -127,12 +126,10 @@ namespace Gekko
                 topnode.type = ETokenType.Unknown;
                 topnode.subnodes = new TokenList();
                 foreach (TokenHelper x in line)
-                {
-                    counter2++;
-                    topnode.subnodes.storage.Add(x);
-                    x.id = counter2;
-                    x.parent = topnode;
+                {                    
+                    topnode.subnodes.storage.Add(x);                    
                 }
+                topnode.OrganizeSubnodes(); //must do this manually
             }
 
             foreach (List<TokenHelper> line in statements)
@@ -380,6 +377,21 @@ namespace Gekko
                     line[i].s = ss2;
                 }
 
+                //¤0038
+
+                try
+                {
+                    if (line[0].s == "(")
+                    {
+                        TokenHelper before = line[0].parent.SiblingBefore();
+                        if ((before.s == "%" || before.s == "#") && line[0].leftblanks == 0)
+                        {
+                            //¤0039 stuff like %(a%b)
+                            AddComment(line, "In general, expressions like %(...) or #(...) are better written with {}-curlies. For instance, %(a%b) can be written as %a{%b}.");
+                        }
+                    }
+                } catch { }
+
                 // ¤004
                 if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "+" && line[i + 1].leftblanks == 0)
                 {
@@ -424,7 +436,7 @@ namespace Gekko
                 }
                 else if (StringTokenizer.Equal(line, i, "fromseries") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
-                    //TODO: if fromseries('x', ...) or fromseries(%x, ...) --> fromseries(x, ...) or fromseries({%x}, ...) 
+                    AddComment(line, "The first argument in fromseries() must be a series, not a string. Use x instead of 'x' and {%x} instead of %x.");
                 }
                 else if (StringTokenizer.Equal(line, i, "hpfilter") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
@@ -560,9 +572,10 @@ namespace Gekko
                             {
                                 if (parent.subnodes[0].s == "(")
                                 {
+                                    //¤0036
                                     TokenHelper before = parent.SiblingBefore();
-                                    if (before != null && G.Equal(before.s, "avg"))
-                                    {
+                                    if (before != null && (G.Equal(before.s, "avg") || G.Equal(before.s, "sum")))
+                                    {                                        
                                         upgrade = true;
                                     }
                                 }
@@ -748,7 +761,12 @@ namespace Gekko
 
             else if (G.Equal(line[pos0].s, "function"))
             {
+                AddComment(line, "Note: you may need to adjust the syntax, cf. FUNCTION.");
+            }
 
+            else if (G.Equal(line[pos0].s, "procedure"))
+            {
+                AddComment(line, "Note: you may need to adjust the syntax, cf. PROCEDURE.");
             }
 
             else if (G.Equal(line[pos0].s, "if"))
@@ -847,7 +865,6 @@ namespace Gekko
 
                 //so much is changed here that we have to run this one manually first
                 HandleExpressionsRecursive(line, line, info);
-
                 HandleCommandNameListElements(line, list, isParallel);
             }
 
@@ -1176,11 +1193,7 @@ namespace Gekko
                         name = name.Trim();
                         string rhs = null;
                         for (int i = op_i + 1; i < line.Count; i++) rhs += line[i].ToString();
-                        rhs = rhs.Trim();
-
-                        //if (name == "ua_s")
-                        //{
-                        //}
+                        rhs = rhs.Trim();                        
 
                         int start = rhs.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase);
 
@@ -1248,6 +1261,50 @@ namespace Gekko
                         line[1].leftblanks = 0;
                     }
                 }
+
+                try
+                {
+                    if (op_i != -12345)
+                    {
+                        bool ok = true;
+                        int last = -12345;
+                        for (int i9 = op_i + 1; i9 < line.Count; i9++)
+                        {
+                            if (line[i9].s == ";")
+                            {
+                                //good
+                            }
+                            else if (line[i9].s == "-")
+                            {
+                                //good
+                            }
+                            else if (line[i9].type == ETokenType.Number)
+                            {
+                                //good
+                                last = i9;
+                            }
+                            else if (line[i9].type == ETokenType.EOL || line[i9].type == ETokenType.Comment || line[i9].type == ETokenType.WhiteSpace)
+                            {
+                                //ok
+                            }
+                            else ok = false;
+                        }
+                        if (ok && last != -12345)
+                        {
+                            for (int i9 = op_i + 1; i9 < line.Count; i9++)
+                            {
+                                if (line[i9].type == ETokenType.Number)
+                                {
+                                    if (i9 != last)
+                                    {
+                                        line[i9].s = line[i9].s + ",";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch { }
+
             }
 
             //move the option field

@@ -111,6 +111,17 @@ namespace Gekko
                 }
             }
 
+            //TODO
+            //TODO
+            //TODO
+            //TODO
+            //TODO Maybe we need to reorganize with OrganizeSubnodes(), cf. #807508925428903
+            //TODO
+            //TODO
+            //TODO
+            //TODO
+            //TODO
+
             foreach (List<TokenHelper> line in temp)
             {
                 //Takes care of the first part of the line,

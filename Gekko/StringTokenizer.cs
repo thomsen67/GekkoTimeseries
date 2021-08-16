@@ -314,14 +314,14 @@ namespace Gekko
         /// The last item (or the 1 item if there is only 1) will have null as second part of tuple.
         /// </summary>
         /// <returns></returns>           
-        public List<TokenHelperComma> SplitCommas(bool firstLast)
+        public List<TokenHelperComma> SplitCommas(bool omitParentheses)
         {
             if (this.subnodes == null) return null;
             List<TokenHelperComma> temp = new List<TokenHelperComma>();
             TokenList temp2 = new TokenList();
             TokenHelper previousComma = null;
             int d = 0;
-            if (firstLast) d = 1;
+            if (omitParentheses) d = 1;
             for (int i = 0 + d; i < this.subnodes.storage.Count - d; i++)  //omit the parentheses
             {
                 if (this.subnodes[i].s == ",")
