@@ -1535,7 +1535,7 @@ namespace Gekko
                     if (items.Count == 1)  //test of issimple... probably superfluous
                     {
                         //one-element list like list m = a;                        
-                        result2 = itemsExtra[0] + UpgradeString(items[0]) + ",";
+                        result2 = itemsExtra[0] + UpgradeString(items[0], line) + ",";
                     }
                     else
                     {
@@ -1544,7 +1544,7 @@ namespace Gekko
                         {
                             string s2 = items[ij];
                             if (!first) result2 += ",";
-                            result2 += itemsExtra[ij] + UpgradeString(s2);
+                            result2 += itemsExtra[ij] + UpgradeString(s2, line);
                             first = false;
                         }
                     }
@@ -1578,19 +1578,18 @@ namespace Gekko
 
                 for (int i = 1; i < line.Count; i++)
                 {
-                    line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null;
-
+                    if (!line[i].s.Contains(" /* TRANSLATE: "))
+                    {
+                        //hack to avoid a comment being zapped
+                        line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null;
+                    }                  
                 }
                 line[0].leftblanks = 0;
 
 
                 if (result3.Trim() == ";")
                 {
-                    line[0].s = result1 + result2 + result3;
-                    if (line[0].s.Contains("'"))
-                    {
-                        AddComment(line, "One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');.");
-                    }
+                    line[0].s = result1 + result2 + result3;                    
                 }
                 else
                 {
@@ -1606,7 +1605,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        private static string UpgradeString(string s)
+        private static string UpgradeString(string s, List<TokenHelper> line)
         {
             string s5 = s.Trim();
             if (s5.StartsWith("'") && s5.EndsWith("'"))
@@ -1625,7 +1624,11 @@ namespace Gekko
                     }
                 }
                 if (good) return s6;
-                else return s5;
+                else
+                {                    
+                    AddComment(line, "One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');.");                    
+                    return s5;
+                }
             }            
             if (!s5.Contains(" ") && (s5.StartsWith("%") || s5.StartsWith("#"))) s5 = "{" + s5 + "}";
             return s5;

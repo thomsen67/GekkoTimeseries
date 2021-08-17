@@ -7350,8 +7350,10 @@ namespace UnitTests
               "#m =#m['a1'..'a3'];");
             T("list m = #m &+ #m;",
               "#m =#m || #m;");
-            T("list c = '007', '2g', 'ab', e, 'a b';",
+            T("list c = '007', '2g', 'ab', e;",
               "#c = 007, 2g, ab, e;");
+            T("list c = '007', '2g', 'ab', e, 'a b';",
+              "#c = 007, 2g, ab, e, 'a b'; /* TRANSLATE: One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');. */", true);
 
             T("option interface databank swap = yes;",
               "//option interface databank swap = yes; /* TRANSLATE: Option obsolete */");
@@ -7553,14 +7555,14 @@ namespace UnitTests
 
         /// <summary>
         /// For translate testing from 2.4 to 3.0. Also tests that the "target" 3.0 code can parse, so we do not need to test that all the time.
-        /// Testing that 2.4 code can parse must be done manually. Last param is if code can be illegal to parse.
+        /// Testing that 2.4 code can parse must be done manually. Last param is if 3.0 code can be illegal to parse.
         /// </summary>
         /// <param name="code_2_4"></param>
         /// <param name="code_3_0"></param>
-        private static void T(string code_2_4, string code_3_0, bool allow)
+        private static void T(string code_2_4, string code_3_0, bool allowIllegal3_0Syntax)
         {
             if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid2_4Syntax(code_2_4)) throw new GekkoException();
-            if (!allow && !Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
+            if (!allowIllegal3_0Syntax && !Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
             string translated = Translate_2_4_to_3_0.Translate(code_2_4);
             Assert.AreEqual(translated, code_3_0);
         }
