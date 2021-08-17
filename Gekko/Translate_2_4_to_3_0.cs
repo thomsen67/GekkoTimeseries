@@ -333,52 +333,54 @@ namespace Gekko
                 }
                 catch { };
 
-                //¤003 quotes, interpolate. Stuff like 'a%x%y|z ~%x {%y}' --> 'a{%x}{%y}z %x {%y}'
-                if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
+                try
                 {
-                    string ss = line[i].s;
-                    string ss2 = "";                
-                    for (int ci = 0; ci < ss.Length; ci++)
+                    //¤003 quotes, interpolate. Stuff like 'a%x%y|z ~%x {%y}' --> 'a{%x}{%y}z %x {%y}'
+                    if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
                     {
-                        bool curly = false;
-                        bool tilde = false;
-                        if (ci > 0 && ss[ci - 1] == '{') curly = true;  //a % with a { before
-                        if (ci > 0 && ss[ci - 1] == '~') tilde = true;  //a % with a ~ before                        
-                        if (ss[ci] == '%' && !curly && !tilde)
+                        string ss = line[i].s;
+                        string ss2 = "";
+                        for (int ci = 0; ci < ss.Length; ci++)
                         {
-                            ss2 += '{';
-                            ss2 += '%'; ci++;
-                            //ss2 += ss[ci]; ci++;
-                            for (int cii = ci; cii < ss.Length; cii++)
+                            bool curly = false;
+                            bool tilde = false;
+                            if (ci > 0 && ss[ci - 1] == '{') curly = true;  //a % with a { before
+                            if (ci > 0 && ss[ci - 1] == '~') tilde = true;  //a % with a ~ before                        
+                            if (ss[ci] == '%' && !curly && !tilde)
                             {
-                                if (G.IsLetterOrDigitOrUnderscore(ss[cii]))
+                                ss2 += '{';
+                                ss2 += '%'; ci++;
+                                //ss2 += ss[ci]; ci++;
+                                for (int cii = ci; cii < ss.Length; cii++)
                                 {
-                                    //good
-                                    ss2 += ss[cii];
-                                }
-                                else
-                                {
-                                    ss2 += '}';
-                                    ci = cii - 1;
-                                    goto Flag1;
+                                    if (G.IsLetterOrDigitOrUnderscore(ss[cii]))
+                                    {
+                                        //good
+                                        ss2 += ss[cii];
+                                    }
+                                    else
+                                    {
+                                        ss2 += '}';
+                                        ci = cii - 1;
+                                        goto Flag1;
+                                    }
                                 }
                             }
+                            if (ss[ci] == '|' || ss[ci] == '~')
+                            {
+                                //skip
+                            }
+                            else
+                            {
+                                ss2 += ss[ci];
+                            }
+                        Flag1:;
                         }
-                        if (ss[ci] == '|' || ss[ci] == '~')
-                        {
-                            //skip
-                        }
-                        else
-                        {
-                            ss2 += ss[ci];
-                        }
-                    Flag1:;
+                        line[i].s = ss2;
                     }
-                    line[i].s = ss2;
-                }
+                } catch { }
 
                 //¤0038
-
                 try
                 {
                     if (line[0].s == "(")
@@ -393,104 +395,115 @@ namespace Gekko
                 } catch { }
 
                 // ¤004
-                if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "+" && line[i + 1].leftblanks == 0)
+                try
                 {
-                    //list operator 1
-                    line[i].s = "||";  //#a &+ #b --> #a || #b
-                    line[i + 1].s = "";
+                    if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "+" && line[i + 1].leftblanks == 0)
+                    {
+                        //list operator 1
+                        line[i].s = "||";  //#a &+ #b --> #a || #b
+                        line[i + 1].s = "";
 
-                }
-                else if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "*" && line[i + 1].leftblanks == 0)
-                {
-                    //list operator 2
-                    line[i].s = "&&";  //#a &* #b --> #a && #b
-                    line[i + 1].s = "";
-                }
-                else if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "-" && line[i + 1].leftblanks == 0)
-                {
-                    //list operator 3
-                    line[i].s = "-";  //#a &- #b --> #a - #b
-                    line[i + 1].s = "";
-                }
-                else if (StringTokenizer.GetS(line, i) == "|" && StringTokenizer.GetS(line, i + 1) == "|" && line[i + 1].leftblanks == 0)
-                {
-                    //¤005
-                    line[i].s = ";";  //... || ...  --> ... ; ...
-                    line[i + 1].s = "";
-                }                
+                    }
+                    else if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "*" && line[i + 1].leftblanks == 0)
+                    {
+                        //list operator 2
+                        line[i].s = "&&";  //#a &* #b --> #a && #b
+                        line[i + 1].s = "";
+                    }
+                    else if (StringTokenizer.GetS(line, i) == "&" && StringTokenizer.GetS(line, i + 1) == "-" && line[i + 1].leftblanks == 0)
+                    {
+                        //list operator 3
+                        line[i].s = "-";  //#a &- #b --> #a - #b
+                        line[i + 1].s = "";
+                    }
+                    else if (StringTokenizer.GetS(line, i) == "|" && StringTokenizer.GetS(line, i + 1) == "|" && line[i + 1].leftblanks == 0)
+                    {
+                        //¤005
+                        line[i].s = ";";  //... || ...  --> ... ; ...
+                        line[i + 1].s = "";
+                    }
 
-                if (StringTokenizer.Equal(line, i, "avgt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤006
-                    AddComment(line, "avgt(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
-                }
-                else if (StringTokenizer.Equal(line, i, "difference") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤007
-                    line[i].s = "except";
-                }
-                else if (StringTokenizer.Equal(line, i, "endswith") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤008
-                    AddComment(line, "endswith() is case-insensitive in Gekko 3.0");
-                }
-                else if (StringTokenizer.Equal(line, i, "fromseries") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    AddComment(line, "The first argument in fromseries() must be a series, not a string. Use x instead of 'x' and {%x} instead of %x.");
-                }
-                else if (StringTokenizer.Equal(line, i, "hpfilter") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤009
-                    AddComment(line, "hpfilter(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
-                }
-                else if (StringTokenizer.Equal(line, i, "pack") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤010
-                    AddComment(line, "pack(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
-                }
-                else if (StringTokenizer.Equal(line, i, "piece") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤11
-                    line[i].s = "substring";
-                }
-                else if (StringTokenizer.Equal(line, i, "replace") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤012
-                    AddComment(line, "replace() is case-insensitive in Gekko 3.0");
-                }
-                else if (StringTokenizer.Equal(line, i, "search") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤013
-                    line[i].s = "index";
-                }
-                else if (StringTokenizer.Equal(line, i, "startswith") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤014
-                    AddComment(line, "startswith() is case-insensitive in Gekko 3.0");
-                }
-                else if (StringTokenizer.Equal(line, i, "strip") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤015
-                    line[i].s = "replace";
-                    AddComment(line, "strip(%x) is now replace(%x, '')");
-                }
-                else if (StringTokenizer.Equal(line, i, "sumt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤016
-                    AddComment(line, "sumt(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
-                }
-                else if (StringTokenizer.Equal(line, i, "trim") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤017
-                    line[i].s = "strip";
-                }                
-                else if (StringTokenizer.Equal(line, i, "unpack") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
-                {
-                    //¤018
-                    AddComment(line, "unpack(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
-                }
+                    if (StringTokenizer.Equal(line, i, "avgt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤006
+                        AddComment(line, "avgt(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "difference") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤007
+                        line[i].s = "except";
+                    }
+                    else if (StringTokenizer.Equal(line, i, "endswith") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤008
+                        AddComment(line, "endswith() is case-insensitive in Gekko 3.0");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "fromseries") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        AddComment(line, "The first argument in fromseries() must be a series, not a string. Use x instead of 'x' and {%x} instead of %x.");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "hpfilter") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤009
+                        AddComment(line, "hpfilter(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "pack") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤010
+                        AddComment(line, "pack(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "piece") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤11
+                        line[i].s = "substring";
+                    }
+                    else if (StringTokenizer.Equal(line, i, "replace") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤012
+                        AddComment(line, "replace() is case-insensitive in Gekko 3.0");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "search") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤013
+                        line[i].s = "index";
+                    }
+                    else if (StringTokenizer.Equal(line, i, "startswith") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤014
+                        AddComment(line, "startswith() is case-insensitive in Gekko 3.0");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "strip") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤015
+                        line[i].s = "replace";
+                        AddComment(line, "strip(%x) is now replace(%x, '')");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "sumt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤016
+                        AddComment(line, "sumt(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
+                    }
+                    else if (StringTokenizer.Equal(line, i, "trim") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤017
+                        line[i].s = "strip";
+                    }
+                    else if (StringTokenizer.Equal(line, i, "unpack") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                    {
+                        //¤018
+                        AddComment(line, "unpack(): if local time is given, use <%t1, %t2> syntax with <>-brackets");
+                    }
+                } catch { }
 
-                
+                try
+                {
+                    //all {i} --> {%i}
+                    if (line[i + 0].s == "{" && line[i + 1].type == ETokenType.Word)
+                    {                        
+                        line[i + 1].s = "%" + line[i + 1].s;
+                    }
+                } catch { }
+
                 try
                 {
                     bool upgrade = false;
@@ -510,8 +523,8 @@ namespace Gekko
                     {
                         var = "#" + line[i + 1].s;
                         type = 2;
-                    }
-                    
+                    }                    
+
                     if (supreme.Search(i, new List<string>() { "=" }, true, true) == -12345 && supreme.Search(i, new List<string>() { "=" }, false, true) != -12345)
                     {
                         //we are on lhs of a "="
@@ -757,6 +770,19 @@ namespace Gekko
             {
                 //¤024
                 AddComment(line, "For EXPORT without dates, use EXPORT<all>");
+                try
+                {
+                    Tuple<int, int> tup = FindOptionField(line);
+                    if (tup.Item1 != -12345 && tup.Item2 != -12345)
+                    {
+                        for (int i11 = tup.Item1; i11 <= tup.Item2; i11++)
+                        {
+                            if (line[i11].s == "ser") line[i11].s = "flat";  //¤0040
+                            else if (line[i11].s == "series") line[i11].s = "gcm";  //¤0040
+                        }
+                    }
+                }
+                catch { }
             }
 
             else if (G.Equal(line[pos0].s, "function"))
@@ -785,6 +811,18 @@ namespace Gekko
             {
                 //¤024
                 AddComment(line, "For IMPORT without dates, use IMPORT<all>");
+                try
+                {
+                    Tuple<int, int> tup = FindOptionField(line);
+                    if (tup.Item1 != -12345 && tup.Item2 != -12345)
+                    {
+                        for (int i11 = tup.Item1; i11 <= tup.Item2; i11++)
+                        {
+                            if (line[i11].s == "ser") line[i11].s = "flat";  //¤0040
+                        }
+                    }
+                }
+                catch { }
             }
 
             else if (G.Equal(line[pos0].s, "index"))
@@ -899,13 +937,15 @@ namespace Gekko
                 //option print filewidth = 130; --> removed
                 //option series array ignoremissing = no; --> note that new options regarding this
 
-                try {
+                try
+                {
                     if (G.Equal(line[pos0 + 1].s, "bugfix") && G.Equal(line[pos0 + 2].s, "download"))
                     {
                         line[pos0].s = "//" + line[pos0].s;
                         AddComment(line, "Option obsolete");
                     }
-                } catch { }
+                }
+                catch { }
 
                 try
                 {
@@ -1675,6 +1715,11 @@ namespace Gekko
             return line;
         }
 
+        /// <summary>
+        /// Searches for &lt; and >. Returns the indexes corresponding to these.
+        /// </summary>
+        /// <param name="line2"></param>
+        /// <returns></returns>
         private static Tuple<int, int> FindOptionField(List<TokenHelper> line2)
         {
             List<TokenHelper> line = GetCommandLine(line2);

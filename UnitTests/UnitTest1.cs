@@ -7297,6 +7297,11 @@ namespace UnitTests
             T("export <%t1 %t2> #m file = %y;",
               "export <%t1 %t2> {#m} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
 
+            //T("export<2020 2020 ser> xx.txt;",  --> hmm not legal in 2.4
+            //  "export<2020 2020 flat> xx.txt; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+            T("export<2020 2020 series> xx.txt;",
+              "export<2020 2020 gcm> xx.txt; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+
             T("findmissingdata %x;",
               "findmissingdata {%x};");
             T("findmissingdata #m;",
@@ -7310,7 +7315,12 @@ namespace UnitTests
 
             T("if(#m[2] == #m[3]); end;",
               "if(#m[2] == #m[3]); end;");
-            
+
+            T("import<ser> xx.txt;",
+              "import<flat> xx.txt; /* TRANSLATE: For IMPORT without dates, use IMPORT<all> */");
+            T("import<2020 2020 ser> xx.txt;",
+              "import<2020 2020 flat> xx.txt; /* TRANSLATE: For IMPORT without dates, use IMPORT<all> */");
+
             T("index ref:f* mylist;",
               "index <showbank=no showfreq=no> ref:f* to #mylist;");
 
@@ -7533,6 +7543,9 @@ namespace UnitTests
 
             T("series {%x} = {%x}[-1] + 1;",
               " {%x} <dyn> = {%x}[-1] + 1; /* TRANSLATE: Note: <dyn> added */");
+
+            T("series {i} = {j} + {i}x + x{j} + a{j}b;",
+              "{%i} = {%j} + {%i}x + x{%j} + a{%j}b;");
 
         }
 
