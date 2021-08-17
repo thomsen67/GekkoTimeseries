@@ -1509,17 +1509,18 @@ namespace Gekko
                 bool simple = true;
                 for (int ij = 0; ij < items.Count; ij++)
                 {
-                    string s7 = items[ij];
+                    string s7 = items[ij].Trim();
+                    if (s7.StartsWith("'") && s7.EndsWith("'")) continue;
                     if (s7.StartsWith("{") && s7.EndsWith("}"))
                     {
                         s7 = s7.Substring(1, s7.Length - 2);
-                    }
+                    }                    
                     bool first = true;
                     foreach (char c in s7)
                     {
                         if (G.IsLetterOrDigitOrUnderscore(c) || (first && (c == '%' || c == '#')))
                         {
-                            //good
+                            //good: a, b, 007, a38, 7z, %i, #i, 'xx'
                         }
                         else
                         {
@@ -1586,6 +1587,10 @@ namespace Gekko
                 if (result3.Trim() == ";")
                 {
                     line[0].s = result1 + result2 + result3;
+                    if (line[0].s.Contains("'"))
+                    {
+                        AddComment(line, "One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');.");
+                    }
                 }
                 else
                 {
@@ -1604,6 +1609,24 @@ namespace Gekko
         private static string UpgradeString(string s)
         {
             string s5 = s.Trim();
+            if (s5.StartsWith("'") && s5.EndsWith("'"))
+            {
+                string s6 = s5.Substring(1, s5.Length - 2);
+                bool good = true;
+                foreach (char c in s6)
+                {
+                    if(G.IsLetterOrDigitOrUnderscore(c))
+                    {
+                        //good
+                    }
+                    else
+                    {
+                        good = false;
+                    }
+                }
+                if (good) return s6;
+                else return s5;
+            }            
             if (!s5.Contains(" ") && (s5.StartsWith("%") || s5.StartsWith("#"))) s5 = "{" + s5 + "}";
             return s5;
         }

@@ -7350,6 +7350,8 @@ namespace UnitTests
               "#m =#m['a1'..'a3'];");
             T("list m = #m &+ #m;",
               "#m =#m || #m;");
+            T("list c = '007', '2g', 'ab', e, 'a b';",
+              "#c = 007, 2g, ab, e;");
 
             T("option interface databank swap = yes;",
               "//option interface databank swap = yes; /* TRANSLATE: Option obsolete */");
