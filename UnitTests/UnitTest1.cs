@@ -7231,9 +7231,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Translate()
-        {
-            T("series y = 0.2 1 -2 3e-3;",
-              "y = 0.2, 1, -2, 3e-3;");
+        {           
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7379,6 +7377,12 @@ namespace UnitTests
               "y = sum({#m});");
             T("series y = sum(#i, x[#i]);",
               "y = sum({#i}, x[#i]);");        // ---------> this is wrong, but known wrong!
+            T("series y = 0.2, M, 1, -2, 3e-3;",
+              "y = 0.2, m(), 1, -2, 3e-3;");
+            T("series y = 0.2 M 1 -2 3e-3;",
+              "y = 0.2, m(), 1, -2, 3e-3;");
+            T("series y = m + 1;",  //just checking
+              "y = m + 1;");
 
             T("sheet #m;",
               "sheet {#m};");

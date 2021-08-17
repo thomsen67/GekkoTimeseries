@@ -1139,32 +1139,7 @@ namespace Gekko
             op_i = StringTokenizer.FindS(line, ii, new string[] { "=", "^", "%", "+", "*", "#" });  //cannot match series #m = ... or series <2010 2020> #m = ...
 
             if (op_i != -12345)
-            {
-                //if (op_i == 3)
-                //{
-                //    if (line[1].s == "#" && line[2].type == ETokenType.Word)
-                //    {
-                //        //series #m = --> series {#m} = ...
-                //        line[1].s = "{" + line[1].s;
-                //        line[2].s += "}";
-                //    }
-                //    else if (line[1].s == "%" && line[2].type == ETokenType.Word)
-                //    {
-                //        //series %m = --> series {%m} = ...
-                //        line[1].s = "{" + line[1].s;
-                //        line[2].s += "}";
-                //    }
-                //}
-                //else
-                //{
-                //    //series %i|x = ... --> series {%x}x = ...
-                //    if (line[1].s == "%" && line[2].type == ETokenType.Word && line[3].s == "|")
-                //    {
-                //        line[1].s = "{" + line[1].s;
-                //        line[2].s += "}";
-                //        line[3].s = ""; line[3].leftblanks = 0;
-                //    }
-                //}
+            {               
 
                 int itemp = StringTokenizer.FindS(line, op_i + 1, "=");
                 if (itemp == -12345)
@@ -1183,7 +1158,7 @@ namespace Gekko
                     op_i = itemp;
                 }
 
-
+                //dynamic <dyn>
                 if (true)
                 {
                     try
@@ -1232,22 +1207,32 @@ namespace Gekko
 
                 if (comma)
                 {
-                    //comma in real input, not inside function etc.
-                    line[op_i].s += " (";
-                    line[line.Count - 1].s = ")" + line[line.Count - 1].s;
+                    try
+                    {
+                        //comma in real input, not inside function etc. --> no need to set parentheses
+                        //line[op_i].s += " (";
+                        //line[line.Count - 1].s = ")" + line[line.Count - 1].s;
+                        for (int iii = op_i + 1; iii < line.Count; iii++)
+                        {
+                            if (G.Equal(line[iii].s, "m")) line[iii].s = "m()";
+                        }
+                    } catch { }
                 }
                 else
                 {
                     //handle rep, there is no comma
-                    for (int iii = op_i + 1; iii < line.Count; iii++)
+                    try
                     {
-                        if (G.Equal(line[iii].s, "rep") && G.Equal(line[iii + 1].s, "*"))
+                        for (int iii = op_i + 1; iii < line.Count; iii++)
                         {
-                            line[iii].s = "";
-                            line[iii + 1].s = "";
-                            line[iii + 1].leftblanks = 0;
+                            if (G.Equal(line[iii].s, "rep") && G.Equal(line[iii + 1].s, "*"))
+                            {
+                                line[iii].s = "";
+                                line[iii + 1].s = "";
+                                line[iii + 1].leftblanks = 0;
+                            }
                         }
-                    }
+                    } catch { }
                 }
                 if (line.Count > 1 && line[0].s == "" && line[0].subnodes == null)
                 {
@@ -1264,6 +1249,7 @@ namespace Gekko
 
                 try
                 {
+                    //stuff like series x = 1 m 1e7 -2
                     if (op_i != -12345)
                     {
                         bool ok = true;
@@ -1275,6 +1261,10 @@ namespace Gekko
                                 //good
                             }
                             else if (line[i9].s == "-")
+                            {
+                                //good
+                            }
+                            else if (G.Equal(line[i9].s, "m"))
                             {
                                 //good
                             }
@@ -1293,8 +1283,9 @@ namespace Gekko
                         {
                             for (int i9 = op_i + 1; i9 < line.Count; i9++)
                             {
-                                if (line[i9].type == ETokenType.Number)
+                                if (line[i9].type == ETokenType.Number || G.Equal(line[i9].s, "m"))
                                 {
+                                    if (G.Equal(line[i9].s, "m")) line[i9].s = "m()";
                                     if (i9 != last)
                                     {
                                         line[i9].s = line[i9].s + ",";
