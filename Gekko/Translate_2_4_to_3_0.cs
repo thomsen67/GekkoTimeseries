@@ -159,7 +159,10 @@ namespace Gekko
                 rv.Append(sb);
             }
 
-            return rv.ToString();
+            string output = rv.ToString();
+            output = output.Replace("|{", "{").Replace("}|", "}");  //not x|{%i}|y. Probably no {...}|| or ||{...}, would not make sense
+
+            return output;
         }
 
         public static void SetLineStartRecursive(List<TokenHelper> line, List<TokenHelper> pointer)
@@ -1827,12 +1830,14 @@ namespace Gekko
             string folder = @"c:\Thomas\Desktop\gekko\testing\Translate";
             WalkInfo wi = new WalkInfo();
             WalkFolderHelper(new DirectoryInfo(folder), wi);
+            new Writeln("All lines = " + wi.lines + ", error lines = " + wi.errorLines + " ratio = " + (double)wi.errorLines / (double)wi.lines);
         }
 
         
         public static void WalkFolderHelper(DirectoryInfo directoryInfo, WalkInfo wi)
         {
-            if (wi.storage.Count > 6) return;
+            int max = int.MaxValue;
+            if (wi.storage.Count >= max) return;
             Info info = new Info();
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
@@ -1854,13 +1859,31 @@ namespace Gekko
                     foreach (string line in lines)
                     {
                         counter++;
+                        wi.lines++;
                         if (line == null || line.Trim() == "")
                         {
                             output.Add("");
                             continue;
                         }
-                         
+
                         string translated = Translate(line, info);
+                        //string translated = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(line);
+
+                        if (true)
+                        {
+                            if (translated.Trim().ToLower().StartsWith("for ") || translated.Trim().ToLower().StartsWith("for(") || translated.Trim().ToLower().StartsWith("if ") || translated.Trim().ToLower().StartsWith("if("))
+                            {
+                                if (!translated.Trim().ToLower().EndsWith("end;"))
+                                {
+                                    translated = translated + " end;";
+                                }
+                            }
+                            else if (translated.Trim().ToLower() == "end;" || translated.Trim().ToLower() == "else;")
+                            {
+                                translated = "// " + translated;
+                            }
+                        }
+                        
                         string start = "    ";
                         try
                         {
@@ -1868,19 +1891,24 @@ namespace Gekko
                             {
                                 start = "!!! ";
                                 errorCounter++;
+                                wi.errorLines++;
                             }
                         }
                         catch { }
-                        output.Add(translated);
+                        output.Add(start + translated);
                     }
                     
                     string name = Path.GetFileNameWithoutExtension(file.FullName);
                     string path = Path.GetDirectoryName(file.FullName);
                     string newFile = path + "\\" + name + ".tcm";
                     File.WriteAllText(newFile, Stringlist.ExtractTextFromLines(output).ToString());
-                    string ss = G.IntFormat(errorCounter, 4).Replace(" ", "´") + "/" + G.IntFormat(counter, 4).Replace(" ", "´") + " = " + file.FullName;
-                    new Writeln(ss);
-                    wi.storage.Add(ss);                    
+                    string ss = G.IntFormat(wi.storage.Count, 4).Replace(" ", "0") + " " + G.IntFormat(errorCounter, 4) + "/" + G.IntFormat(counter, 4) + " = " + file.FullName;
+                    using (var w = new Writeln())
+                    {
+                        w.MainAdd(ss);
+                    }
+                    wi.storage.Add(ss);
+                    if (wi.storage.Count >= max) return;
                 }
                 catch
                 {
@@ -1894,9 +1922,11 @@ namespace Gekko
         }
 
         public class WalkInfo
-        {
-            public List<string> omits = new List<string>() { "fra_excel" };  //must not be null            
+        {            
+            public List<string> omits = new List<string>() { "fra_excel", "uadam" };  //must not be null            
             public List<string> storage = new List<string>();
+            public int lines = 0;
+            public int errorLines = 0;
         }
 
 
