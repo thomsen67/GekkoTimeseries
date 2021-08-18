@@ -16,7 +16,7 @@ namespace Gekko
             public GekkoDictionary<string, string> collectionMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);            
             public GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             public bool useGlobalBankForNonSeries = true;
-            public bool keepValDateStringListMatrix = false;
+            public bool keepTypes = false;
             public int globalCounter = 0;
         }
 
@@ -1109,7 +1109,7 @@ namespace Gekko
 
             else if (G.Equal(line[pos0].s, "ser") || G.Equal(line[pos0].s, "series"))
             {
-                HandleCommandNameSeries(line, pos0);
+                HandleCommandNameSeries(line, pos0, info);
             }
 
             else if (G.Equal(line[pos0].s, "val"))
@@ -1154,7 +1154,7 @@ namespace Gekko
         {
             //see also #09835324985
             string extra = null;
-            if (info.keepValDateStringListMatrix) extra = line[pos0].s + " ";
+            if (info.keepTypes) extra = line[pos0].s + " ";
             if (info.useGlobalBankForNonSeries)
             {
                 line[pos0].s = extra + "global:" + sigil;
@@ -1163,9 +1163,11 @@ namespace Gekko
             else line[pos0].s = extra + sigil;
         }
 
-        private static void HandleCommandNameSeries(List<TokenHelper> line, int pos)
+        private static void HandleCommandNameSeries(List<TokenHelper> line, int pos, Info info)
         {
             //¤032
+
+            string seriesString = line[0].s;  //series or SERIES or ser etc.
 
             line[pos].meta.commandName = "series";
 
@@ -1351,6 +1353,11 @@ namespace Gekko
 
             //move the option field
             MoveOptionField(line, lb);
+
+            if (info.keepTypes)
+            {
+                line[0].s = seriesString + " " + line[0].s;
+            }
         }
 
         private static void HandleCommandNameListElements(List<TokenHelper> line, bool list, bool isParallel, Info info)
@@ -1427,7 +1434,7 @@ namespace Gekko
                 if (list)
                 {
                     string extra = null;
-                    if (info.keepValDateStringListMatrix) extra = l1[0].s + " ";
+                    if (info.keepTypes) extra = l1[0].s + " ";
 
                     if (StringTokenizer.Equal(l1, 1, "listfile"))
                     {

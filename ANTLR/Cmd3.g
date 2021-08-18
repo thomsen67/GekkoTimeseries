@@ -57,6 +57,7 @@ tokens {
 	ASTOPT_STRING_DUMPOPTIONS;
 	ASTOPT_STRING_DATEFORMAT;
 	ASTOPT_STRING_DATETYPE;
+	ASTOPT_STRING_KEEPTYPES;
 	ASTL0;
     ASTDECOMPSELECT;
 	ASTFILENAMESTRING;
@@ -1135,6 +1136,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	KEEPTYPES      = 'KEEPTYPES'     ;
 	PREDICT      = 'PREDICT'     ;
     FIND      = 'FIND'     ;
 	PYTHON      = 'PYTHON'     ;
@@ -1773,6 +1775,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+										d.Add("keeptypes"               , KEEPTYPES  );
 										d.Add("predict"               , PREDICT  );
                                         d.Add("find"               , FIND  );
 										d.Add("python"               , PYTHON  );
@@ -3822,6 +3825,7 @@ translateOpt1h:             GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 ye
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
 						  | MOVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MOVE yesNo?)  //not shown in documentation etc.
 						  | REMOVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_REMOVE yesNo?)  //not shown in documentation etc.
+						  | KEEPTYPES (EQUAL yesNo)? -> ^(ASTOPT_STRING_KEEPTYPES yesNo?)  //for 2.0 translation
 						  ;	
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4185,6 +4189,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  KEEPTYPES|
   PREDICT|
   FIND|
   PYTHON|
