@@ -1562,19 +1562,27 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (Globals.runningOnTTComputer && text == "arrow")
+            if (Globals.runningOnTTComputer)
             {
-                //while (true)
-                //{
-                //    var codeToEval = Console.ReadLine();
-                //    var result = await CSharpScript.EvaluateAsync(codeToEval);
-                //    Console.WriteLine(result);
-                //}
+                if (text == "arrow")
+                {
+                    //while (true)
+                    //{
+                    //    var codeToEval = Console.ReadLine();
+                    //    var result = await CSharpScript.EvaluateAsync(codeToEval);
+                    //    Console.WriteLine(result);
+                    //}
 
-                //Arrow.Run();
-
+                    //Arrow.Run();
+                    return;
+                }
+                else if (text == "test")
+                {
+                    Translate_2_4_to_3_0.TestTranslation();
+                    return;
+                }
+                
             }
-
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }        

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Gekko
 {
@@ -18,6 +19,7 @@ namespace Gekko
             public bool useGlobalBankForNonSeries = true;
             public bool keepTypes = false;
             public int globalCounter = 0;
+            
         }
 
         public static string Translate(string input, Info info)
@@ -1816,5 +1818,87 @@ namespace Gekko
                 line.Insert(ii.Item2, new TokenHelper(leftblanks, s));
             }
         }
+
+        /// <summary>
+        /// test how the translation performs (internal use)
+        /// </summary>
+        public static void TestTranslation()
+        {
+            string folder = @"c:\Thomas\Desktop\gekko\testing\Translate";
+            WalkInfo wi = new WalkInfo();
+            WalkFolderHelper(new DirectoryInfo(folder), wi);
+        }
+
+        
+        public static void WalkFolderHelper(DirectoryInfo directoryInfo, WalkInfo wi)
+        {
+            if (wi.storage.Count > 6) return;
+            Info info = new Info();
+            foreach (FileInfo file in directoryInfo.GetFiles())
+            {
+                bool skip = false;
+                foreach (string s in wi.omits)
+                {
+                    if (file.FullName.ToLower().Contains(s)) skip = true;
+                }
+                if (file.Extension.ToLower() != ".gcm") skip = true;
+                if (skip) continue;
+                                
+                try
+                {
+                    string linesString = Program.GetTextFromFileWithWait(file.FullName);
+                    List<string> lines = Stringlist.ExtractLinesFromText(linesString);
+                    int counter = 0;
+                    int errorCounter = 0;
+                    List<string> output = new List<string>();
+                    foreach (string line in lines)
+                    {
+                        counter++;
+                        if (line == null || line.Trim() == "")
+                        {
+                            output.Add("");
+                            continue;
+                        }
+                         
+                        string translated = Translate(line, info);
+                        string start = "    ";
+                        try
+                        {
+                            if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(translated))
+                            {
+                                start = "!!! ";
+                                errorCounter++;
+                            }
+                        }
+                        catch { }
+                        output.Add(translated);
+                    }
+                    
+                    string name = Path.GetFileNameWithoutExtension(file.FullName);
+                    string path = Path.GetDirectoryName(file.FullName);
+                    string newFile = path + "\\" + name + ".tcm";
+                    File.WriteAllText(newFile, Stringlist.ExtractTextFromLines(output).ToString());
+                    string ss = G.IntFormat(errorCounter, 4).Replace(" ", "´") + "/" + G.IntFormat(counter, 4).Replace(" ", "´") + " = " + file.FullName;
+                    new Writeln(ss);
+                    wi.storage.Add(ss);                    
+                }
+                catch
+                {
+                    //we may survive if this fails
+                }                
+            }
+            foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
+            {
+                WalkFolderHelper(subfolder, wi);
+            }
+        }
+
+        public class WalkInfo
+        {
+            public List<string> omits = new List<string>() { "fra_excel" };  //must not be null            
+            public List<string> storage = new List<string>();
+        }
+
+
     }
 }
