@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 namespace Gekko
 {
     public class Translate_2_4_to_3_0
-    {
-
-        
+    {              
 
         //This class translates from Gekko 2.0 to 3.0
 
@@ -17,12 +15,13 @@ namespace Gekko
         {
             public GekkoDictionary<string, string> collectionMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);            
             public GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            public bool useGlobalBankForNonSeries = true;
+            public bool keepValDateStringListMatrix = false;
+            public int globalCounter = 0;
         }
 
-        public static string Translate(string input)
-        {
-            Info info = new Info();
-
+        public static string Translate(string input, Info info)
+        {            
             string txt = input;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
@@ -602,7 +601,7 @@ namespace Gekko
                         //Do not upgrade something like prt <color = %s> ... ;                        
                         int i1 = supreme.Search(i, new List<string>() { "<" }, true, false);
                         int i2 = supreme.Search(i, new List<string>() { ">" }, false, false);
-                        if (i1 == 1 && i2 > i)
+                        if (i1 <= 2 && i2 > i)  //<= 2 because the option field may have been moved to the right
                         {
                             //there is a < at pos 1 when going left, and a > when going right.
                             //then pretty sure we are inside local options.
@@ -749,13 +748,13 @@ namespace Gekko
 
             else if (G.Equal(line[pos0].s, "date"))
             {
-                //¤022
+                //¤022 ¤041
                 string name = line[pos0 + 1].s;
                 if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "date");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos0].s = "%";
+                    HandleCommandNameLeftSide(line, pos0, "%", info);
                     line[pos0 + 1].leftblanks = 0;
                 }
             }
@@ -903,7 +902,7 @@ namespace Gekko
 
                 //so much is changed here that we have to run this one manually first
                 HandleExpressionsRecursive(line, line, info);
-                HandleCommandNameListElements(line, list, isParallel);
+                HandleCommandNameListElements(line, list, isParallel, info);
             }
 
             else if (G.Equal(line[pos0].s, "matrix"))
@@ -916,7 +915,7 @@ namespace Gekko
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos0].s = "#";
+                    HandleCommandNameLeftSide(line, pos0, "#", info);
                     line[pos0 + 1].leftblanks = 0;
                 }
             }
@@ -1115,20 +1114,20 @@ namespace Gekko
 
             else if (G.Equal(line[pos0].s, "val"))
             {
-                //¤022
+                //¤022 ¤041
                 string name = line[pos0 + 1].s;
                 if (!info.scalarMemory.ContainsKey("%" + name)) info.scalarMemory.Add("%" + name, "val");
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos0].s = "%";
+                    HandleCommandNameLeftSide(line, pos0, "%", info);
                     line[pos0 + 1].leftblanks = 0;
                 }
             }
 
             else if (G.Equal(line[pos0].s, "name") || G.Equal(line[pos0].s, "string"))
             {
-                //¤022
+                //¤022 ¤041
                 string name = line[pos0 + 1].s;
 
                 if (G.Equal(line[pos0].s, "name"))
@@ -1142,14 +1141,26 @@ namespace Gekko
 
                 if (StringTokenizer.Equal(line, 2, "="))
                 {
-                    line[pos0].s = "%";
+                    HandleCommandNameLeftSide(line, pos0, "%", info);
                     line[pos0 + 1].leftblanks = 0;
                 }
             }
 
             SetLineStartRecursive(line, line);
 
+        }
 
+        private static void HandleCommandNameLeftSide(List<TokenHelper> line, int pos0, string sigil, Info info)
+        {
+            //see also #09835324985
+            string extra = null;
+            if (info.keepValDateStringListMatrix) extra = line[pos0].s + " ";
+            if (info.useGlobalBankForNonSeries)
+            {
+                line[pos0].s = extra + "global:" + sigil;
+                info.globalCounter++;
+            }
+            else line[pos0].s = extra + sigil;
         }
 
         private static void HandleCommandNameSeries(List<TokenHelper> line, int pos)
@@ -1342,7 +1353,7 @@ namespace Gekko
             MoveOptionField(line, lb);
         }
 
-        private static void HandleCommandNameListElements(List<TokenHelper> line, bool list, bool isParallel)
+        private static void HandleCommandNameListElements(List<TokenHelper> line, bool list, bool isParallel, Info info)
         {
             //¤028
             List<TokenHelper> l1 = new List<TokenHelper>();
@@ -1415,15 +1426,24 @@ namespace Gekko
                 //doing result1 here
                 if (list)
                 {
+                    string extra = null;
+                    if (info.keepValDateStringListMatrix) extra = l1[0].s + " ";
+
                     if (StringTokenizer.Equal(l1, 1, "listfile"))
                     {
                         //list listfile m = ...  --> #(listfile m) = ... 
-                        result1 = "#(listfile " + l1[2] + ") = ";
+                        result1 = extra + "#(listfile " + l1[2] + ") = ";
                     }
                     else
                     {
                         for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
-                        result1 = "#" + result1.TrimStart();
+                        //see also #09835324985                        
+                        if (info.useGlobalBankForNonSeries)
+                        {
+                            result1 = extra + "global:" + "#" + result1.TrimStart();
+                            info.globalCounter++;
+                        }
+                        else result1 = extra + "#" + result1;
                     }
                 }
                 else
@@ -1712,6 +1732,12 @@ namespace Gekko
 
                     }
                 }
+
+                //kind of hacky
+                line[0].parent.subnodes.storage.Clear();
+                line[0].parent.subnodes.storage.AddRange(line);
+                line[0].parent.OrganizeSubnodes();  //because a lot has been moved around
+
             }
         }                
 

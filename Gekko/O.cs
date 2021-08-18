@@ -9662,6 +9662,7 @@ namespace Gekko
             public string opt_aremos = null;
             public string opt_move = null;
             public string opt_remove = null;
+            public string opt_keeptypes = null;
             public void Exe()
             {
                 if (opt_aremos == null && opt_gekko18 == null && opt_gekko20 == null && opt_move == null && opt_remove == null)
@@ -9672,8 +9673,8 @@ namespace Gekko
                 string extension = ".gcm";
                 if (G.Equal(opt_aremos, "yes")) extension = ".cmd";
                 string zfilename = Program.CreateFullPathAndFileName(G.AddExtension(this.fileName, extension));
-                string xx = Program.GetTextFromFileWithWait(zfilename);
-                List<string> xxx = Stringlist.ExtractLinesFromText(xx);                
+                string originalCode = Program.GetTextFromFileWithWait(zfilename);
+                List<string> xxx = Stringlist.ExtractLinesFromText(originalCode);                
                 if (zfilename.ToLower().EndsWith(".cmd") || zfilename.ToLower().EndsWith("." + Globals.extensionCommand)) 
                     zfilename = zfilename.Substring(0, zfilename.Length - 4);
                 string zz = zfilename + "_translate." + Globals.extensionCommand;
@@ -9688,7 +9689,18 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_gekko20, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(xx);
+                    Translate_2_4_to_3_0.Info info = new Translate_2_4_to_3_0.Info();
+                    if (G.Equal(opt_keeptypes, "yes")) info.keepValDateStringListMatrix = true;
+                    bool isNew = true;
+                    string ss = null;
+                    if (isNew)
+                    {                        
+                        ss = Translate_2_4_to_3_0.Translate(originalCode, info);
+                    }
+                    else
+                    {
+                        ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(originalCode);
+                    }
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9696,12 +9708,27 @@ namespace Gekko
                         sw.Flush();
                         sw.Close();
                     }
-                    G.Writeln2("Translated file into: " + zz);
-                    G.Writeln("Translate comments: see /* TRANSLATE: .... */");
+                    Writeln w = new Writeln();
+                    w.MainAdd("Translated file into: " + zz);
+                    w.MainNewLineTight();
+                    w.MainAdd("Translate comments: see /* TRANSLATE: .... */");                    
+                    if (isNew)
+                    {
+                        if (info.useGlobalBankForNonSeries && info.globalCounter > 0)
+                        {
+                            w.MainNewLineTight();
+                            w.MainAdd("Note: The translator added " + info.globalCounter + " 'Global:' bank indicators on the left-hand side of non-series statements.");
+                            w.MoreAdd("In Gekko 3.0 and above, vals, dates, strings, lists and matrices all live in databanks.");
+                            w.MoreAdd("Therefore, 'Global:' is added to all such statements, so that these variables are ");
+                            w.MoreAdd("put into the Global databank (for instance, 'VAL x = 100;' will become 'Global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
+                            w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
+                            w.MoreAdd("Some of these 'Global:' bank indicators may be unnecessary, but better safe than sorry.");
+                        }
+                    }
                 }
                 else if (G.Equal(opt_remove, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Remove(xx);
+                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Remove(originalCode);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9714,7 +9741,7 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_move, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Move(xx);
+                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Move(originalCode);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9727,7 +9754,7 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_aremos, "yes"))
                 {
-                    string ss = Translator_AREMOS_Gekko30.Translate(xx);
+                    string ss = Translator_AREMOS_Gekko30.Translate(originalCode);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {

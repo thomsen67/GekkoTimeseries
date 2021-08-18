@@ -7333,27 +7333,27 @@ namespace UnitTests
               "itershow {#m};");
 
             T("list m = a, %x, #m, b;",
-              "#m = a, {%x}, {#m}, b;");
+              "global:#m = a, {%x}, {#m}, b;");
             T("list m = a, {%x}, {#m}, b;",
-              "#m = a, {%x}, {#m}, b;");
+              "global:#m = a, {%x}, {#m}, b;");
             T("list m = a;",
-              "#m =a,;");
+              "global:#m =a,;");
             T("list m = piece(%s,2,2);",
-              "#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.            
+              "global:#m =substring(%s,2,2);");  //this is actually a wrong translation since the rhs is a string.            
             T("list m = #m[a*b];",
-              "#m =#m['a*b'];");
+              "global:#m =#m['a*b'];");
             T("list m = #m[a1..a3];",
-              "#m =#m['a1'..'a3'];");
+              "global:#m =#m['a1'..'a3'];");
             T("list m = #m['a*b'];",
-              "#m =#m['a*b'];");
+              "global:#m =#m['a*b'];");
             T("list m = #m['a1'..'a3'];",
-              "#m =#m['a1'..'a3'];");
+              "global:#m =#m['a1'..'a3'];");
             T("list m = #m &+ #m;",
-              "#m =#m || #m;");
+              "global:#m =#m || #m;");
             T("list c = '007', '2g', 'ab', e;",
-              "#c = 007, 2g, ab, e;");
+              "global:#c = 007, 2g, ab, e;");
             T("list c = '007', '2g', 'ab', e, 'a b';",
-              "#c = 007, 2g, ab, e, 'a b'; /* TRANSLATE: One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');. */", true);
+              "global:#c = 007, 2g, ab, e, 'a b'; /* TRANSLATE: One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');. */", true);
 
             T("option interface databank swap = yes;",
               "//option interface databank swap = yes; /* TRANSLATE: Option obsolete */");
@@ -7425,7 +7425,7 @@ namespace UnitTests
             T("prt %x;",
               "prt %x;");  //could be val
             T("name x = 'a'; prt %x;",
-              "%x = 'a'; prt {%x};");  //if %x must be upgraded, it  must be a NAME, FORNAME or FORNULL. Since PRT cannot be used for strings anyway (TELL for that), this is not very risky.
+              "global:%x = 'a'; prt {%x};");  //if %x must be upgraded, it  must be a NAME, FORNAME or FORNULL. Since PRT cannot be used for strings anyway (TELL for that), this is not very risky.
             T("for x = a, b; prt %x; end;",
               "for string %x = a, b; prt {%x}; end;");
             T("for name x = a, b; prt %x; end;",
@@ -7459,22 +7459,22 @@ namespace UnitTests
               "x <%t1 %t2> = 1;");
 
             T("val x = 1;",
-              "%x = 1;");
+              "global:%x = 1;");
 
             T("date x = 2001q1;",
-              "%x = 2001q1;");
+              "global:%x = 2001q1;");
 
             T("string x = 'a';",
-              "%x = 'a';");
+              "global:%x = 'a';");
 
             T("name x = 'a';",
-              "%x = 'a';");
+              "global:%x = 'a';");
 
             T("list x = a, b, c;",
-              "#x = a, b, c;");
+              "global:#x = a, b, c;");
 
             T("matrix x = [1, 2 || 3, 4];",
-              "#x = [1, 2 ; 3, 4];");
+              "global:#x = [1, 2 ; 3, 4];");
 
             //paths
 
@@ -7531,10 +7531,10 @@ namespace UnitTests
               "y = %x;");
 
             T("name x = 'a'; series y = %x;",  //has {} because %x is NAME 
-              "%x = 'a';y = {%x};");
+              "global:%x = 'a';y = {%x};");
 
             T("name x = 'a'; series y = {%x};",  //check that this is not --> {{%x}}
-              "%x = 'a';y = {%x};");
+              "global:%x = 'a';y = {%x};");
 
             T("for x = a, b; series y = %x; end;", //must add {}, because %x is NAMELOOP
               "for string %x = a, b;y = {%x}; end;");
@@ -7563,7 +7563,8 @@ namespace UnitTests
         {
             if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid2_4Syntax(code_2_4)) throw new GekkoException();
             if (!allowIllegal3_0Syntax && !Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(code_3_0)) throw new GekkoException();
-            string translated = Translate_2_4_to_3_0.Translate(code_2_4);
+            Translate_2_4_to_3_0.Info info = new Translate_2_4_to_3_0.Info();
+            string translated = Translate_2_4_to_3_0.Translate(code_2_4, info);
             Assert.AreEqual(translated, code_3_0);
         }
 
