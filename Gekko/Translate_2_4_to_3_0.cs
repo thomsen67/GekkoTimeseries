@@ -412,7 +412,12 @@ namespace Gekko
                         TokenHelper before = line[0].parent.SiblingBefore();
                         if ((before.s == "%" || before.s == "#") && line[0].leftblanks == 0)
                         {
-                            //¤0039 stuff like %(a%b)
+                            //¤0039 stuff like %(a%b), but not #(listfile ...).
+                            bool good = true;
+                            for (int i7 = 0; i7 < line.Count; i7++)
+                            {
+                                if (G.Equal(line[i7].s, "listfile")) good = false;
+                            }
                             AddComment(line, "In general, expressions like %(...) or #(...) are better written with {}-curlies. For instance, %(a%b) can be written as %a{%b}.");
                         }
                     }
@@ -798,6 +803,12 @@ namespace Gekko
                     HandleCommandNameLeftSide(line, pos0, "%", info);
                     line[pos0 + 1].leftblanks = 0;
                 }
+
+                if (StringTokenizer.Equal(line, pos0 + 1, "?"))
+                {
+                    line[pos0].s = "";
+                    line[pos0 + 1].s = "prt ";
+                }
             }
 
             else if (G.Equal(line[pos0].s, "download"))
@@ -944,6 +955,15 @@ namespace Gekko
                 //so much is changed here that we have to run this one manually first
                 HandleExpressionsRecursive(line, line, info);
                 HandleCommandNameListElements(line, list, isParallel, info);
+
+                if (list)
+                {
+                    if (StringTokenizer.Equal(line, pos0 + 1, "?"))
+                    {
+                        line[pos0].s = "";
+                        line[pos0 + 1].s = "prt ";
+                    }
+                }
             }
 
             else if (G.Equal(line[pos0].s, "matrix"))
@@ -958,6 +978,12 @@ namespace Gekko
                 {
                     HandleCommandNameLeftSide(line, pos0, "#", info);
                     line[pos0 + 1].leftblanks = 0;
+                }
+
+                if (StringTokenizer.Equal(line, pos0 + 1, "?"))
+                {
+                    line[pos0].s = "";
+                    line[pos0 + 1].s = "prt ";
                 }
             }
 
@@ -1164,6 +1190,12 @@ namespace Gekko
                     HandleCommandNameLeftSide(line, pos0, "%", info);
                     line[pos0 + 1].leftblanks = 0;
                 }
+
+                if (StringTokenizer.Equal(line, pos0 + 1, "?"))
+                {
+                    line[pos0].s = "";
+                    line[pos0 + 1].s = "prt ";
+                }
             }
 
             else if (G.Equal(line[pos0].s, "name") || G.Equal(line[pos0].s, "string"))
@@ -1184,6 +1216,12 @@ namespace Gekko
                 {
                     HandleCommandNameLeftSide(line, pos0, "%", info);
                     line[pos0 + 1].leftblanks = 0;
+                }
+
+                if (StringTokenizer.Equal(line, pos0 + 1, "?"))
+                {
+                    line[pos0].s = "";
+                    line[pos0 + 1].s = "prt ";
                 }
             }
 
@@ -1945,6 +1983,13 @@ namespace Gekko
                         w.MainAdd(ss);
                     }
                     wi.storage.Add(ss);
+
+                    if (errorCounter > 20)
+                    {
+                        //G.DeleteFolder(@"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\", true);
+                        File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + G.IntFormat(errorCounter, 4).Replace(" ", "0") + name + ".tcm", true);
+                    }
+
                     if (wi.storage.Count >= max) return;
                 }
                 catch

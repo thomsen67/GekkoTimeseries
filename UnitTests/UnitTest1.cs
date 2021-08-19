@@ -7231,7 +7231,19 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Translate()
-        {           
+        {
+
+            T("date?%d;",
+              "prt %d;");
+            T("val?%d;",
+              "prt %d;");
+            T("string?%d;",
+              "prt %d;");
+            T("list?#d;",
+              "prt #d;");
+            T("matrix?#d;",
+              "prt #d;");
+
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7554,6 +7566,16 @@ namespace UnitTests
             T("export [*] file = xx;",
               "export {'*'} file = xx; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
 
+            T("date?%d;",
+              "prt %d;");
+            T("val?%d;",
+              "prt %d;");
+            T("string?%d;",
+              "prt %d;");
+            T("list?#d;",
+              "prt #d;");
+            T("matrix?#%d;",
+              "prt #d;");
         }
 
         /// <summary>
