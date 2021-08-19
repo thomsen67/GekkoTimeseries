@@ -152,7 +152,13 @@ namespace Gekko
             foreach (List<TokenHelper> line in statements)
             {
                 StringBuilder sb = new StringBuilder();
+                List<TokenHelper> reorderTokens = new List<TokenHelper>();
                 foreach (TokenHelper tok in line)
+                {
+                    if (tok.s.Contains("/* TRANSLATE:")) reorderTokens.Add(tok);
+                    else sb.Append(tok.ToString());
+                }
+                foreach (TokenHelper tok in reorderTokens)
                 {
                     sb.Append(tok.ToString());
                 }
@@ -1984,7 +1990,7 @@ namespace Gekko
                     }
                     wi.storage.Add(ss);
 
-                    if (errorCounter > 20)
+                    if (errorCounter > 10)
                     {
                         //G.DeleteFolder(@"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\", true);
                         File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + G.IntFormat(errorCounter, 4).Replace(" ", "0") + name + ".tcm", true);

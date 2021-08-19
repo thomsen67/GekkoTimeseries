@@ -7232,6 +7232,22 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
+            T(@"LIST L7200 = #(LISTfile 'g:\datopGek\abase\erhverv69') prefix=L7200;",
+                @"#L7200 = #(LISTfile 'g:\datopGek\abase\erhverv69') prefix=L7200;");
+
+            T("SERIES %a:%b = %a:%b + {%a}:%b + %a:{%b} + {%a}:{%b};",
+                "{%a}:{%b} = {%a}:{%b} + {%a}:{%b} + {%a}:{%b} + {%a}:{%b};");
+            T("SERIES {%a}:%b = 1;",
+                "{%a}:{%b} = 1;");
+            T("SERIES %a:{%b} = 1;",
+                "{%a}:{%b} = 1;");
+            T("SERIES {%a}:{%b} = 1;",
+                "{%a}:{%b} = 1;");
+
+            T(@"list m = #(listfile 'g:\datopgek\x.lst') SORT ;",
+                "");
+            T(@"index * listfile b:\SKmm.lst;",
+                @"index * to #(listfile b:\SKmm.lst);");
 
             T("date?%d;",
               "prt %d;");
@@ -7243,7 +7259,6 @@ namespace UnitTests
               "prt #d;");
             T("matrix?#d;",
               "prt #d;");
-
 
             T("analyze #m;",
               "analyze {#m};");
