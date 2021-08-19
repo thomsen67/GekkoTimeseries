@@ -143,7 +143,7 @@ namespace Gekko
                     HandleCommandName(line, info);
                     HandleExpressionsRecursive(line, line, info);
                 }
-                catch
+                catch (Exception e)
                 {
                     new Error("The translator crashed unexpectedly on line " + line[0].line + ". You may try commenting out that line with //");
                 }
@@ -186,18 +186,38 @@ namespace Gekko
         /// <param name="topline"></param>
         public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline, Info info)
         {
+            List<string> typeMinusPlus = new List<string>() { "analyze", "clip", "ols", "prt", "sheet", "plot", "mulprt", "gmulprt" };
+            List<string> typePlusPlus = new List<string>() { "checkoff", "close", "compare", "copy", "create", "delete", "disp", "doc", "endo", "exo", "export", "findmissingdata", "import", "itershow", "rebase", "read", "rename", "smooth", "splice", "truncate", "write", "x12a" };
+
             TokenHelper supreme = null;
             List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
             string commandName = "";
             for (int i = 0; i < line.Count; i++)
             {
+                int ii = i;
                 
-                TokenHelper start = line[i];
-                if (nesting.Count > 0) start = nesting[nesting.Count - 1];  //uppermost token
-                                                                            //start is not necessarily the first token at this level
+                if (nesting.Count == 0)
+                {                    
+                    try
+                    {
+                        supreme = line[i].parent.subnodes[0];
+                    } catch { }
+                }
+                else
+                {
+                    try
+                    {
+                        //either the token from the highgest command line, or a "(", "[", "{" from a sub-line just under the command line                    
+                        supreme = nesting[nesting.Count - 1].parent.parent.subnodes[0];
+                    } catch { }
+                    ii = nesting[nesting.Count - 1].parent.id;
+                }
 
-                if (start.parent != null) supreme = start.parent.subnodes[0];
-                if (commandName == "" && supreme != null) commandName = supreme.meta.commandName;
+                if (commandName == "" && supreme != null)
+                {
+                    //some of the last nodes may be without .parent (comments etc.). This is a hack to handle it.
+                    commandName = supreme.meta.commandName;
+                }
 
                 if (line[i].HasChildren())
                 {
@@ -231,8 +251,8 @@ namespace Gekko
                         if (!(s.Contains("*") || s.Contains("?"))) looksLikeWildcard = false; //#m[3] should not be #m['3']
                         bool looksLikeRange = false;
                         if (s.Contains("..") && !s.Contains("'")) looksLikeRange = true;
-                        bool prtLike = false;
-                        if (commandName == "prt" || commandName == "plot" || commandName == "sheet" || commandName == "clip" || commandName == "mulprt" || commandName == "gmulprt") prtLike = true;
+                        bool mustBeCurly = false;
+                        if (typeMinusPlus.Contains(commandName.ToLower()) || typePlusPlus.Contains(commandName.ToLower())) mustBeCurly = true;
                         int dots = -12345;
                         for (int jj = 1; jj < line.Count; jj++)
                         {
@@ -245,7 +265,7 @@ namespace Gekko
 
                         // ============
 
-                        if ((blanks == 0 && seemsAfterVariable))
+                        if (blanks == 0 && seemsAfterVariable)
                         {
                             //something like abc[...] or {%s}[...] with no blanks between
 
@@ -265,7 +285,7 @@ namespace Gekko
                         }
                         else
                         {
-                            if (prtLike)
+                            if (mustBeCurly)
                             {
                                 //prt [a*b] --> prt {'a*b'}
                                 if (looksLikeWildcard)
@@ -529,7 +549,7 @@ namespace Gekko
                         type = 2;
                     }                    
 
-                    if (supreme.Search(i, new List<string>() { "=" }, true, true) == -12345 && supreme.Search(i, new List<string>() { "=" }, false, true) != -12345)
+                    if (supreme.Search(ii, new List<string>() { "=" }, true, true) == -12345 && supreme.Search(ii, new List<string>() { "=" }, false, true) != -12345)
                     {
                         //we are on lhs of a "="
                         isLhs = true;
@@ -539,9 +559,7 @@ namespace Gekko
                     {
                         //is a %- or #-variable
                         //handle different commands.                        
-                        
-                        List<string> typeMinusPlus = new List<string>() { "analyze", "clip", "ols", "prt", "sheet", "plot", "mulprt", "gmulprt" };
-                        List<string> typePlusPlus = new List<string>() { "checkoff", "close", "compare", "copy", "create", "delete", "disp", "doc", "endo", "exo", "export", "findmissingdata", "import", "itershow", "rebase", "read", "rename", "smooth", "splice", "truncate", "write", "x12a" };
+                                                
                         if (type == 1)
                         {
                             if (typePlusPlus.Contains(commandName)) upgrade = true;
@@ -555,8 +573,8 @@ namespace Gekko
                         if (commandName == "series")
                         {
                             //conversion from for instance * into *= has been done already in translation.
-                            int j1 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, true, true);
-                            int j2 = supreme.Search(i, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, false, true);
+                            int j1 = supreme.Search(ii, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, true, true);
+                            int j2 = supreme.Search(ii, new List<string>() { "=", "^=", "%=", "+=", "*=", "#=" }, false, true);
                             if (j1 != -12345 && j2 == -12345)
                             {
                                 //we are on rhs
@@ -604,8 +622,8 @@ namespace Gekko
                         // --------------------------------------------------                                                
                         
                         //Do not upgrade something like prt <color = %s> ... ;                        
-                        int i1 = supreme.Search(i, new List<string>() { "<" }, true, false);
-                        int i2 = supreme.Search(i, new List<string>() { ">" }, false, false);
+                        int i1 = supreme.Search(ii, new List<string>() { "<" }, true, false);
+                        int i2 = supreme.Search(ii, new List<string>() { ">" }, false, false);
                         if (i1 <= 2 && i2 > i)  //<= 2 because the option field may have been moved to the right
                         {
                             //there is a < at pos 1 when going left, and a > when going right.
@@ -617,7 +635,7 @@ namespace Gekko
                         if (commandName == "option" || commandName == "matrix" || commandName == "show" || commandName == "list") neverUpgrade = true;
                                                
                         //something like PLOT x, y, z file = %x; should never upgrade %x.
-                        int ii1 = supreme.Search(i, new List<string>() { "=" }, true, true);
+                        int ii1 = supreme.Search(ii, new List<string>() { "=" }, true, true);
                         if (ii1 != -12345)
                         {
                             List<string> xx = new List<string>() { "series", "val", "date", "string", "name", "list", "matrix", "collapse", "for", "if", "interpolate", "ols", "smooth", "splice" };
@@ -668,31 +686,40 @@ namespace Gekko
                             if(!lhsSpecial) overriding = true;
                         }
 
+                        //at the end
+                        if (neverUpgrade) upgrade = false;
+                        if (overriding) upgrade = true;
 
-
-                    }
-
-                    //at the end
-                    if (neverUpgrade) upgrade = false;
-                    if (overriding) upgrade = true;
-
-                    //make sure that %s or #m inside curlies are NEVER ever upgraded                                                
-                    foreach (TokenHelper th in nesting)
-                    {
-                        //never upgrade if already inside {}, like {#m}. Also covers expression inside {}.
-                        if (th.s == "{")
+                        //make sure that %s or #m inside curlies are NEVER ever upgraded                                                
+                        foreach (TokenHelper th in nesting)
                         {
-                            upgrade = false;
-                            break;
+                            //never upgrade if already inside {}, like {#m}. Also covers expression inside {}.
+                            if (th.s == "{")
+                            {
+                                upgrade = false;
+                                break;
+                            }
                         }
-                    }
 
-                    if (upgrade)
-                    {
-                        //upgrade
-                        line[i + 0].s = "{" + line[i + 0].s;
-                        line[i + 1].s = line[i + 1].s + "}";                        
-                    }
+                        //make sure that  #m inside [] are NEVER ever upgraded                                                
+                        foreach (TokenHelper th in nesting)
+                        {
+                            //never upgrade if already inside [], like sum(#i, x[#i]). Also covers expression inside {}.
+                            if (th.s == "[")
+                            {
+                                upgrade = false;
+                                break;
+                            }
+                        }
+
+                        if (upgrade)
+                        {
+                            //upgrade
+                            line[i + 0].s = "{" + line[i + 0].s;
+                            line[i + 1].s = line[i + 1].s + "}";
+                        }
+
+                    }                   
 
                 }
                 catch { }
