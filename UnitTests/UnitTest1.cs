@@ -7231,13 +7231,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Translate()
-        {
-
-            //T("export [*];",
-            //  "export {'*'};");
-
-            //T("export ['*'];",
-            //  "export {'*'};");
+        {           
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7301,8 +7295,7 @@ namespace UnitTests
             T("export <%t1 %t2> %x file = %y;",
               "export <%t1 %t2> {%x} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
             T("export <%t1 %t2> #m file = %y;",
-              "export <%t1 %t2> {#m} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
-
+              "export <%t1 %t2> {#m} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");            
             //T("export<2020 2020 ser> xx.txt;",  --> hmm not legal in 2.4
             //  "export<2020 2020 flat> xx.txt; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
             T("export<2020 2020 series> xx.txt;",
@@ -7556,6 +7549,10 @@ namespace UnitTests
 
             T("series {i} = {j} + {i}x + x{j} + a{j}b;",
               "{%i} = {%j} + {%i}x + x{%j} + a{%j}b;");
+
+            //handling of [*] wildcards
+            T("export [*] file = xx;",
+              "export {'*'} file = xx; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
 
         }
 
