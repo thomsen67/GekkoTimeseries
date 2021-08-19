@@ -187,11 +187,11 @@ namespace Gekko
         public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline, Info info)
         {
             TokenHelper supreme = null;
+            List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
             string commandName = "";
             for (int i = 0; i < line.Count; i++)
             {
-
-                List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
+                
                 TokenHelper start = line[i];
                 if (nesting.Count > 0) start = nesting[nesting.Count - 1];  //uppermost token
                                                                             //start is not necessarily the first token at this level
@@ -216,7 +216,7 @@ namespace Gekko
                         int blanks = line[0].leftblanks;
                         char c = previous.s[previous.s.Length - 1];
                         bool seemsAfterVariable = false;
-                        if (c == '}' || G.IsLetterOrDigitOrUnderscore(c)) seemsAfterVariable = true;
+                        if (c == '}' || G.IsLetterOrDigitOrUnderscore(c)) seemsAfterVariable = true;  //does not test glue
                         bool looksLikeWildcard = true;
                         string s = StringTokenizer.GetTextFromLeftBlanksTokens(line, 1, line.Count - 2);
                         for (int i7 = 0; i7 < s.Length; i7++)
@@ -732,6 +732,15 @@ namespace Gekko
             {
                 //from/to --> frombank/tobank
                 //Must use COPY {#m}, not COPY #m
+                Tuple<int, int> tup = FindOptionField(line);
+                if (tup.Item1 != -12345 && tup.Item2 != -12345)
+                {
+                    for (int i11 = tup.Item1 + 1; i11 < tup.Item2; i11++)
+                    {
+                        if (G.Equal(line[i11].s, "from") && line[i11 + 1].s == "=") line[i11].s = "frombank";
+                        else if (G.Equal(line[i11].s, "to") && line[i11 + 1].s == "=") line[i11].s = "tobank";
+                    }
+                }
             }
 
 
@@ -781,8 +790,8 @@ namespace Gekko
                     {
                         for (int i11 = tup.Item1; i11 <= tup.Item2; i11++)
                         {
-                            if (line[i11].s == "ser") line[i11].s = "flat";  //¤0040
-                            else if (line[i11].s == "series") line[i11].s = "gcm";  //¤0040
+                            if (G.Equal(line[i11].s, "ser")) line[i11].s = "flat";  //¤0040
+                            else if (G.Equal(line[i11].s,  "series")) line[i11].s = "gcm";  //¤0040
                         }
                     }
                 }
@@ -822,7 +831,7 @@ namespace Gekko
                     {
                         for (int i11 = tup.Item1; i11 <= tup.Item2; i11++)
                         {
-                            if (line[i11].s == "ser") line[i11].s = "flat";  //¤0040
+                            if (G.Equal(line[i11].s, "ser")) line[i11].s = "flat";  //¤0040
                         }
                     }
                 }
@@ -1868,17 +1877,18 @@ namespace Gekko
 
                         string translated = Translate(line, info);
                         //string translated = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(line);
+                        //string translated = line;
 
                         if (true)
                         {
                             if (translated.Trim().ToLower().StartsWith("for ") || translated.Trim().ToLower().StartsWith("for(") || translated.Trim().ToLower().StartsWith("if ") || translated.Trim().ToLower().StartsWith("if("))
                             {
-                                if (!translated.Trim().ToLower().EndsWith("end;"))
+                                if (!(translated.Trim().ToLower().EndsWith("end;") || translated.Trim().ToLower().EndsWith("end ;")))
                                 {
                                     translated = translated + " end;";
                                 }
                             }
-                            else if (translated.Trim().ToLower() == "end;" || translated.Trim().ToLower() == "else;")
+                            else if (translated.Trim().ToLower() == "end;" || translated.Trim().ToLower() == "else;" || translated.Trim().ToLower() == "end ;" || translated.Trim().ToLower() == "else ;")
                             {
                                 translated = "// " + translated;
                             }

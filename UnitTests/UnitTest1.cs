@@ -7231,7 +7231,13 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Translate()
-        {           
+        {
+
+            //T("export [*];",
+            //  "export {'*'};");
+
+            //T("export ['*'];",
+            //  "export {'*'};");
 
             T("analyze #m;",
               "analyze {#m};");
