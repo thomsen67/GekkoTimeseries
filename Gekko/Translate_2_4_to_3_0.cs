@@ -1452,15 +1452,28 @@ namespace Gekko
             List<TokenHelper> l2 = new List<TokenHelper>();
             List<TokenHelper> l3 = new List<TokenHelper>();
 
+            List<TokenHelper> comments = new List<TokenHelper>();
+            foreach (TokenHelper th in line)
+            {
+                if (th.s.Contains(" /* TRANSLATE: "))
+                {
+                    TokenHelper th2 = new TokenHelper(th.s);
+                    comments.Add(th2);
+                    th.s = "";
+                }
+            }
+
             string result1 = "";
             string result2 = "";
             string result3 = "";
+
+            string[] keywords = new string[] { "prefix", "suffix", "trim", "sort", "strip" };
 
             int i1 = StringTokenizer.FindS(line, "=");
             if (i1 > -12345)
             {
                 for (int i = 0; i <= i1; i++) l1.Add(line[i]);
-                int i2 = StringTokenizer.FindS(line, i1 + 1, new string[] { "prefix", "suffix", "trim", "sort", "strip" });
+                int i2 = StringTokenizer.FindS(line, i1 + 1, keywords);
                 if (i2 != -12345)
                 {
                     for (int i = i1 + 1; i < i2; i++) l2.Add(line[i]);
@@ -1548,7 +1561,7 @@ namespace Gekko
                 for (int i = 0; i < l3.Count; i++)
                 {
                     int j = l3.Count - 1;
-                    if (l3[i].s == "prefix")
+                    if (l3[i].s.ToLower() == "prefix")
                     {
                         iSpecial = i;
                         j = StringTokenizer.FindS(l3, "suffix");
@@ -1568,7 +1581,7 @@ namespace Gekko
                             l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
                         }
                     }
-                    else if (l3[i].s == "suffix")
+                    else if (l3[i].s.ToLower() == "suffix")
                     {
                         iSpecial = i;
                         j = StringTokenizer.FindS(l3, "prefix");
@@ -1588,21 +1601,21 @@ namespace Gekko
                             l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
                         }
                     }
-                    else if (l3[i].s == "trim")
+                    else if (l3[i].s.ToLower() == "trim")
                     {
                         iSpecial = i;
                         l3[i].leftblanks = 0;
                         l3[i].s = "." + "unique" + "(";
                         l3[j].s = ")" + l3[j].s;
                     }
-                    else if (l3[i].s == "sort")
+                    else if (l3[i].s.ToLower() == "sort")
                     {
                         iSpecial = i;
                         l3[i].leftblanks = 0;
                         l3[i].s = "." + l3[i].s + "(";
                         l3[j].s = ")" + l3[j].s;
                     }
-                    else if (l3[i].s == "strip")
+                    else if (l3[i].s.ToLower() == "strip")
                     {
                         iSpecial = i;
                         l3[i].leftblanks = 0;
@@ -1613,7 +1626,18 @@ namespace Gekko
                 }
                 for (int i = 0; i < l3.Count; i++)
                 {
-                    result3 += l3[i].ToString();
+                    string s11 = null;
+                    if (keywords.Contains(l3[i].ToString().ToLower()) || !G.IsIdentTranslate(l3[i].ToString()))
+                    {
+                        //do not touch keywords like prefix, suffix, etc.
+                        //do not touch anything like %x, {%x} etc.
+                        s11 = l3[i].ToString();
+                    }
+                    else
+                    {                    
+                        s11 = "'" + l3[i].ToString() + "'";  //add plings
+                    }
+                    result3 += s11;
                 }
 
                 //test if simple. Simple is stuff like a, b, c5, 0d, 1, 2, #s, #m.
@@ -1709,6 +1733,11 @@ namespace Gekko
                 }
 
                 if(isParallel) AddComment(line, "Parallel loops may not be translated properly, including missing {}-curlies on elements");
+            }
+
+            foreach (TokenHelper th in comments)
+            {
+                line.Add(th);  //get them in again
             }
         }
 
