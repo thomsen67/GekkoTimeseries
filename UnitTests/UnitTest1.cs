@@ -7232,33 +7232,33 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
-            T(@"LIST L7200 = #(LISTfile 'g:\datopGek\abase\erhverv69') prefix=L7200;",
-                @"#L7200 = #(LISTfile 'g:\datopGek\abase\erhverv69') prefix=L7200;");
+            //T(@"LIST L7200 = #(LISTfile 'g:\datopGek\abase\erhverv69') prefix=L7200;",
+            //    @"#L7200 = #(LISTfile 'g:\datopGek\abase\erhverv69') prefix=L7200;");
 
-            T("SERIES %a:%b = %a:%b + {%a}:%b + %a:{%b} + {%a}:{%b};",
-                "{%a}:{%b} = {%a}:{%b} + {%a}:{%b} + {%a}:{%b} + {%a}:{%b};");
-            T("SERIES {%a}:%b = 1;",
-                "{%a}:{%b} = 1;");
-            T("SERIES %a:{%b} = 1;",
-                "{%a}:{%b} = 1;");
-            T("SERIES {%a}:{%b} = 1;",
-                "{%a}:{%b} = 1;");
+            //T("SERIES %a:%b = %a:%b + {%a}:%b + %a:{%b} + {%a}:{%b};",
+            //    "{%a}:{%b} = {%a}:{%b} + {%a}:{%b} + {%a}:{%b} + {%a}:{%b};");
+            //T("SERIES {%a}:%b = 1;",
+            //    "{%a}:{%b} = 1;");
+            //T("SERIES %a:{%b} = 1;",
+            //    "{%a}:{%b} = 1;");
+            //T("SERIES {%a}:{%b} = 1;",
+            //    "{%a}:{%b} = 1;");
 
-            T(@"list m = #(listfile 'g:\datopgek\x.lst') SORT ;",
-                "");
-            T(@"index * listfile b:\SKmm.lst;",
-                @"index * to #(listfile b:\SKmm.lst);");
+            //T(@"list m = #(listfile 'g:\datopgek\x.lst') SORT ;",
+            //    "");
+            //T(@"index * listfile b:\SKmm.lst;",
+            //    @"index * to #(listfile b:\SKmm.lst);");
 
-            T("date?%d;",
-              "prt %d;");
-            T("val?%d;",
-              "prt %d;");
-            T("string?%d;",
-              "prt %d;");
-            T("list?#d;",
-              "prt #d;");
-            T("matrix?#d;",
-              "prt #d;");
+            //T("date?%d;",
+            //  "prt %d;");
+            //T("val?%d;",
+            //  "prt %d;");
+            //T("string?%d;",
+            //  "prt %d;");
+            //T("list?#d;",
+            //  "prt #d;");
+            //T("matrix?#d;",
+            //  "prt #d;");
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7580,17 +7580,7 @@ namespace UnitTests
             //handling of [*] wildcards
             T("export [*] file = xx;",
               "export {'*'} file = xx; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
-
-            T("date?%d;",
-              "prt %d;");
-            T("val?%d;",
-              "prt %d;");
-            T("string?%d;",
-              "prt %d;");
-            T("list?#d;",
-              "prt #d;");
-            T("matrix?#%d;",
-              "prt #d;");
+                        
         }
 
         /// <summary>

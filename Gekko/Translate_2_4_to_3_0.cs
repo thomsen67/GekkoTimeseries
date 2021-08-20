@@ -424,8 +424,7 @@ namespace Gekko
                             {
                                 if (G.Equal(line[i7].s, "listfile")) good = false;
                             }
-                            //if (good)
-                            AddComment(line, "In general, expressions like %(...) or #(...) are better written with {}-curlies. For instance, %(a%b) can be written as %a{%b}.");
+                            if (good) AddComment(line, "In general, expressions like %(...) or #(...) are better written with {}-curlies. For instance, %(a%b) can be written as %a{%b}.");
                         }
                     }
                 } catch { }
