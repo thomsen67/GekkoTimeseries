@@ -547,7 +547,7 @@ namespace Gekko
                     string var = null;
                     int type = 0;  //1 is scalar, 2 is collection
                     bool isLhs = false; //token is between start and a "="                   
-                                        
+
 
                     if (line[i + 0].s == "%" && line[i + 1].type == ETokenType.Word)
                     {
@@ -558,7 +558,7 @@ namespace Gekko
                     {
                         var = "#" + line[i + 1].s;
                         type = 2;
-                    }                    
+                    }
 
                     if (supreme.Search(ii, new List<string>() { "=" }, true, true) == -12345 && supreme.Search(ii, new List<string>() { "=" }, false, true) != -12345)
                     {
@@ -570,7 +570,7 @@ namespace Gekko
                     {
                         //is a %- or #-variable
                         //handle different commands.                        
-                                                
+
                         if (type == 1)
                         {
                             if (typePlusPlus.Contains(commandName)) upgrade = true;
@@ -596,7 +596,7 @@ namespace Gekko
                                 //we are on lhs
                                 bool good = true;
                                 foreach (TokenHelper th in nesting)
-                                {                                    
+                                {
                                     if (th.s == "[")
                                     {
                                         good = false;
@@ -607,7 +607,7 @@ namespace Gekko
                                 {
                                     //we will not upgrade %t in y[%t] = ... .
                                     upgrade = true;
-                                }                                
+                                }
                             }
                         }
 
@@ -621,17 +621,18 @@ namespace Gekko
                                     //¤0036
                                     TokenHelper before = parent.SiblingBefore();
                                     if (before != null && (G.Equal(before.s, "avg") || G.Equal(before.s, "sum")))
-                                    {                                        
+                                    {
                                         upgrade = true;
                                     }
                                 }
                             }
-                        } catch { }
+                        }
+                        catch { }
 
                         // --------------------------------------------------
                         // -- now we do the neverUpgrade --------------------
                         // --------------------------------------------------                                                
-                        
+
                         //Do not upgrade something like prt <color = %s> ... ;                        
                         int i1 = supreme.Search(ii, new List<string>() { "<" }, true, false);
                         int i2 = supreme.Search(ii, new List<string>() { ">" }, false, false);
@@ -644,7 +645,7 @@ namespace Gekko
 
                         //never upgrade for option, list, matrix, show
                         if (commandName == "option" || commandName == "matrix" || commandName == "show" || commandName == "list") neverUpgrade = true;
-                                               
+
                         //something like PLOT x, y, z file = %x; should never upgrade %x.
                         int ii1 = supreme.Search(ii, new List<string>() { "=" }, true, true);
                         if (ii1 != -12345)
@@ -694,8 +695,34 @@ namespace Gekko
                         //it must always be upgraded.                        
                         if (scalar == "name" || scalar == "forname")
                         {
-                            if(!lhsSpecial) overriding = true;
+                            if (!lhsSpecial) overriding = true;
                         }
+
+
+                        try
+                        {
+                            if (type == 1)
+                            {
+                                if (G.IsIdentTranslate(line[i + 1].s) && line[i + 2].s == ":")
+                                {
+                                    overriding = true;  //something like ....%x:....
+                                }
+                            }
+                        }
+                        catch { }
+
+                        try
+                        {
+                            if (line[i - 1].s == ":")
+                            {
+                                overriding = true;  //something like ....:%x....  or ....:#x....
+                            }
+                        }
+                        catch { }
+
+                        // =====================
+                        // =====================
+                        // =====================
 
                         //at the end
                         if (neverUpgrade) upgrade = false;
@@ -729,9 +756,7 @@ namespace Gekko
                             line[i + 0].s = "{" + line[i + 0].s;
                             line[i + 1].s = line[i + 1].s + "}";
                         }
-
-                    }                   
-
+                    }
                 }
                 catch { }
             }
@@ -884,12 +909,29 @@ namespace Gekko
 
             else if (G.Equal(line[pos0].s, "index"))
             {
-                //¤025
                 TokenHelper last = line[line.Count - 2];  //remember semicolon
-
-                if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
+                int i5 = -12345;
+                for (int i = 0; i < line.Count; i++)
                 {
-                    last.s = "to #" + last.s;
+                    if (G.Equal(line[i].s, "listfile"))
+                    {
+                        i5 = i;
+                        break;
+                    }
+                }
+
+                if (i5 == -12345)
+                {
+                    //¤025                    
+                    if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
+                    {
+                        last.s = "to #" + last.s;
+                    }
+                }
+                else
+                {
+                    line[i5].s = "to #(" + line[i5].s;
+                    last.s = last.s + ")";
                 }
 
                 AddToOptionField(line, 1, "showbank=no showfreq=no"); //Gekko 2.2 never shows banks? Certainly never freqs.
