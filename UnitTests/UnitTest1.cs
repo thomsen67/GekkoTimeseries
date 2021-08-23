@@ -7232,9 +7232,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
-            
+            //T("list mspm_x = #import suffix=_x%xx;",
+            //  "global:#mspm_x = (#import).suffix('_x{%xx}');");
 
-           
             T("analyze #m;",
               "analyze {#m};");
 

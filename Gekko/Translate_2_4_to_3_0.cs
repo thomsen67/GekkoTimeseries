@@ -1780,15 +1780,22 @@ namespace Gekko
                 for (int i = 0; i < l3.Count; i++)
                 {
                     string s11 = null;
-                    if (keywords.Contains(l3[i].ToString().ToLower()) || !G.IsIdentTranslate(l3[i].ToString()))
+                    if (false)
                     {
-                        //do not touch keywords like prefix, suffix, etc.
-                        //do not touch anything like %x, {%x} etc.
-                        s11 = l3[i].ToString();
+
                     }
                     else
-                    {                    
-                        s11 = "'" + l3[i].ToString() + "'";  //add plings
+                    {
+                        if (keywords.Contains(l3[i].ToString().ToLower()) || !G.IsIdentTranslate(l3[i].ToString()))
+                        {
+                            //do not touch keywords like prefix, suffix, etc.
+                            //do not touch anything like %x, {%x} etc.
+                            s11 = l3[i].ToString();
+                        }
+                        else
+                        {
+                            s11 = "'" + l3[i].ToString() + "'";  //add plings
+                        }
                     }
                     result3 += s11;
                 }
