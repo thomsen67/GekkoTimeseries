@@ -1853,8 +1853,16 @@ namespace Gekko
                 {
                     if (items.Count == 1)  //test of issimple... probably superfluous
                     {
-                        //one-element list like list m = a;                        
-                        result2 = itemsExtra[0] + UpgradeString(items[0], line) + ",";
+                        //one-element list like list m = a;   
+                        if (items[0].StartsWith("#"))
+                        {
+                            //do not translate list m = #mm --> #m = {#mm},;
+                            result2 = itemsExtra[0] + items[0];
+                        }
+                        else
+                        {
+                            result2 = itemsExtra[0] + UpgradeString(items[0], line) + ",";
+                        }
                     }
                     else
                     {
@@ -2123,103 +2131,175 @@ namespace Gekko
             WalkInfo wi = new WalkInfo();
             WalkFolderHelper(new DirectoryInfo(folder), wi);
             new Writeln("All lines = " + wi.lines + ", error lines = " + wi.errorLines + " ratio = " + (double)wi.errorLines / (double)wi.lines);
-            new Writeln("Files = " + wi.filesCounter + ", bad files = " + wi.badFilesCounter);
+            new Writeln("Files = " + wi.filesCounter + ", bad files = " + wi.badFilesCounter + ", whole bad files = " + wi.wholeBadFilesCounter);
         }
         
         public static void WalkFolderHelper(DirectoryInfo directoryInfo, WalkInfo wi)
-        {            
-            int max = int.MaxValue;
-            if (wi.storage.Count >= max) return;
-            Info info = new Info();
-            foreach (FileInfo file in directoryInfo.GetFiles())
-            {
-                bool skip = false;
-                foreach (string s in wi.omits)
+        {
+            if (true)
+            {                
+                Info info = new Info();
+                foreach (FileInfo file in directoryInfo.GetFiles())
                 {
-                    if (file.FullName.ToLower().Contains(s)) skip = true;
-                }
-                if (file.Extension.ToLower() != ".gcm") skip = true;
-                if (skip) continue;
-                                
-                try
-                {                    
-                    string linesString = Program.GetTextFromFileWithWait(file.FullName);
-                    List<string> lines = Stringlist.ExtractLinesFromText(linesString);
-                    int counter = 0;
-                    int errorCounter = 0;
-                    List<string> output = new List<string>();
-                    foreach (string line in lines)
+                    bool skip = false;
+                    foreach (string s in wi.omits)
                     {
-                        counter++;
-                        wi.lines++;
-                        if (line == null || line.Trim() == "")
-                        {
-                            output.Add("");
-                            continue;
-                        }
+                        if (file.FullName.ToLower().Contains(s)) skip = true;
+                    }
+                    if (file.Extension.ToLower() != ".gcm") skip = true;
+                    if (skip) continue;
 
-                        string translated = Translate(line, info);
-                        //string translated = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(line);
-                        //string translated = line;
-
-                        if (true)
+                    try
+                    {
+                        string linesString = Program.GetTextFromFileWithWait(file.FullName);
+                        string name = Path.GetFileNameWithoutExtension(file.FullName);
+                        string path = Path.GetDirectoryName(file.FullName);
+                        string newFile = path + "\\" + name + ".tcm";                        
+                        string ss = G.IntFormat(wi.storage.Count, 4).Replace(" ", "0") + " " + file.FullName;
+                        using (var w = new Writeln())
                         {
-                            if (translated.Trim().ToLower().StartsWith("for ") || translated.Trim().ToLower().StartsWith("for(") || translated.Trim().ToLower().StartsWith("if ") || translated.Trim().ToLower().StartsWith("if("))
-                            {
-                                if (!(translated.Trim().ToLower().EndsWith("end;") || translated.Trim().ToLower().EndsWith("end ;")))
-                                {
-                                    translated = translated + " end;";
-                                }
-                            }
-                            else if (translated.Trim().ToLower() == "end;" || translated.Trim().ToLower() == "else;" || translated.Trim().ToLower() == "end ;" || translated.Trim().ToLower() == "else ;")
-                            {
-                                translated = "// " + translated;
-                            }
+                            w.MainAdd(ss);
                         }
-                        
-                        string start = "    ";
+                        string wholeBad = "z_";
+                        string translated2 = Translate(linesString, info);
+                        File.WriteAllText(newFile, translated2);
                         try
                         {
-                            if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(translated))
+                            if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(translated2))
                             {
-                                start = "!!! ";
-                                errorCounter++;
-                                wi.errorLines++;
+                                wi.wholeBadFilesCounter++;
+                                wholeBad = "b_";
+                                File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + wholeBad + name + ".tcm", true);
+                            }
+                        }
+                        catch
+                        {
+                            wi.wholeBadFilesCounter++;
+                            wholeBad = "b_";
+                            File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + wholeBad + name + ".tcm", true);
+                        } 
+                        wi.filesCounter++;                        
+                    }
+                    catch
+                    {
+                        //we may survive if this fails
+                    }
+                }
+                foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
+                {
+                    WalkFolderHelper(subfolder, wi);
+                }
+            }
+            else
+            {
+                int max = int.MaxValue;
+                if (wi.storage.Count >= max) return;
+                Info info = new Info();
+                foreach (FileInfo file in directoryInfo.GetFiles())
+                {
+                    bool skip = false;
+                    foreach (string s in wi.omits)
+                    {
+                        if (file.FullName.ToLower().Contains(s)) skip = true;
+                    }
+                    if (file.Extension.ToLower() != ".gcm") skip = true;
+                    if (skip) continue;
+
+                    try
+                    {
+                        string linesString = Program.GetTextFromFileWithWait(file.FullName);
+                        List<string> lines = Stringlist.ExtractLinesFromText(linesString);
+                        int counter = 0;
+                        int errorCounter = 0;
+                        List<string> output = new List<string>();
+                        foreach (string line in lines)
+                        {
+                            counter++;
+                            wi.lines++;
+                            if (line == null || line.Trim() == "")
+                            {
+                                output.Add("");
+                                continue;
+                            }
+
+                            string translated = Translate(line, info);
+                            //string translated = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(line);
+                            //string translated = line;
+
+
+                            if (true)
+                            {
+                                if (translated.Trim().ToLower().StartsWith("for ") || translated.Trim().ToLower().StartsWith("for(") || translated.Trim().ToLower().StartsWith("if ") || translated.Trim().ToLower().StartsWith("if("))
+                                {
+                                    if (!(translated.Trim().ToLower().EndsWith("end;") || translated.Trim().ToLower().EndsWith("end ;")))
+                                    {
+                                        translated = translated + " end;";
+                                    }
+                                }
+                                else if (translated.Trim().ToLower() == "end;" || translated.Trim().ToLower() == "else;" || translated.Trim().ToLower() == "end ;" || translated.Trim().ToLower() == "else ;")
+                                {
+                                    translated = "// " + translated;
+                                }
+                            }
+
+                            string start = "    ";
+                            try
+                            {
+                                if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(translated))
+                                {
+                                    start = "!!! ";
+                                    errorCounter++;
+                                    wi.errorLines++;
+                                }
+                            }
+                            catch { }
+                            output.Add(start + translated);
+                        }
+
+                        string name = Path.GetFileNameWithoutExtension(file.FullName);
+                        string path = Path.GetDirectoryName(file.FullName);
+                        string newFile = path + "\\" + name + ".tcm";
+                        File.WriteAllText(newFile, Stringlist.ExtractTextFromLines(output).ToString());
+                        string ss = G.IntFormat(wi.storage.Count, 4).Replace(" ", "0") + " " + G.IntFormat(errorCounter, 4) + "/" + G.IntFormat(counter, 4) + " = " + file.FullName;
+                        using (var w = new Writeln())
+                        {
+                            w.MainAdd(ss);
+                        }
+                        wi.storage.Add(ss);
+
+                        string wholeBad = "z_";
+                        string translated2 = Translate(linesString, info);
+                        try
+                        {
+                            if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(translated2))
+                            {
+                                wi.wholeBadFilesCounter++;
+                                wholeBad = "b_";
                             }
                         }
                         catch { }
-                        output.Add(start + translated);
-                    }
-                    
-                    string name = Path.GetFileNameWithoutExtension(file.FullName);
-                    string path = Path.GetDirectoryName(file.FullName);
-                    string newFile = path + "\\" + name + ".tcm";
-                    File.WriteAllText(newFile, Stringlist.ExtractTextFromLines(output).ToString());
-                    string ss = G.IntFormat(wi.storage.Count, 4).Replace(" ", "0") + " " + G.IntFormat(errorCounter, 4) + "/" + G.IntFormat(counter, 4) + " = " + file.FullName;
-                    using (var w = new Writeln())
-                    {
-                        w.MainAdd(ss);
-                    }
-                    wi.storage.Add(ss);
 
-                    wi.filesCounter++;
-                    if (errorCounter > 1)
-                    {
-                        //G.DeleteFolder(@"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\", true);
-                        File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + G.IntFormat(errorCounter, 4).Replace(" ", "0") + name + ".tcm", true);
-                        wi.badFilesCounter++;
-                    }
 
-                    if (wi.storage.Count >= max) return;
+                        wi.filesCounter++;
+                        if (errorCounter > 1)
+                        {
+                            //G.DeleteFolder(@"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\", true);
+                            File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + wholeBad + G.IntFormat(errorCounter, 4).Replace(" ", "0") + name + ".tcm", true);
+                            wi.badFilesCounter++;
+                        }
+
+
+                        if (wi.storage.Count >= max) return;
+                    }
+                    catch
+                    {
+                        //we may survive if this fails
+                    }
                 }
-                catch
+                foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
                 {
-                    //we may survive if this fails
-                }                
-            }
-            foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
-            {
-                WalkFolderHelper(subfolder, wi);
+                    WalkFolderHelper(subfolder, wi);
+                }
             }
         }
 
@@ -2231,6 +2311,7 @@ namespace Gekko
             public int errorLines = 0;
             public int filesCounter = 0;
             public int badFilesCounter = 0;
+            public int wholeBadFilesCounter = 0;
         }
 
 

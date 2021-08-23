@@ -7232,22 +7232,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
-            //T("delete[*];",   --> not legal...
-            //  "delete{'*'};");
 
-            T("list m = #import strip = x;",
-              "global:#m = (#import).replaceinside('x', '');");
-            T("list m = #import strip = %x;",
-              "global:#m = (#import).replaceinside(%x, '');");
-
-            T("list m = #import prefix = x suffix = y;",
-              "global:#m = (#import).prefix('x').suffix('y');");
-            T("list m = #import prefix = %x suffix = %y;",
-              "global:#m = (#import).prefix(%x).suffix(%y);");
-            T("list m = #import prefix = a%x suffix = b%y;",
-              "global:#m = (#import).prefix('a%x').suffix('b%y');", true);  //illegal, but never mind...
             
-
             T("analyze #m;",
               "analyze {#m};");
 
@@ -7589,6 +7575,13 @@ namespace UnitTests
               @"global:#m = (#(listfile 'g:\datopgek\x.lst')).SORT();");
             T(@"index * listfile b:\SKmm.lst;",
                 @"index <showbank=no showfreq=no> * to #(listfile b:\SKmm.lst);");
+            T("list m = #mm;",
+              "global:#m =#mm;");
+            T("list m = %s;",
+              "global:#m ={%s},;");
+            T("list m = a;",
+              "global:#m =a,;");
+
 
             T("date?%d;",
               "prt %d;");
@@ -7649,6 +7642,21 @@ namespace UnitTests
 
             T("list x = null;",
               "global:#x =list();");
+
+            //T("delete[*];",   --> not legal...
+            //  "delete{'*'};");
+
+            T("list m = #import strip = x;",
+              "global:#m = (#import).replaceinside('x', '');");
+            T("list m = #import strip = %x;",
+              "global:#m = (#import).replaceinside(%x, '');");
+
+            T("list m = #import prefix = x suffix = y;",
+              "global:#m = (#import).prefix('x').suffix('y');");
+            T("list m = #import prefix = %x suffix = %y;",
+              "global:#m = (#import).prefix(%x).suffix(%y);");
+            T("list m = #import prefix = a%x suffix = b%y;",
+              "global:#m = (#import).prefix('a%x').suffix('b%y');", true);  //illegal, but never mind...
 
 
         }
