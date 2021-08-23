@@ -243,6 +243,7 @@ namespace Gekko
                         char c = previous.s[previous.s.Length - 1];
                         bool seemsAfterVariable = false;
                         if (c == '}' || G.IsLetterOrDigitOrUnderscore(c)) seemsAfterVariable = true;  //does not test glue
+                        if (previous.id == 0) seemsAfterVariable = false;  //something like delete[*]
                         bool looksLikeWildcard = true;
                         string s = StringTokenizer.GetTextFromLeftBlanksTokens(line, 1, line.Count - 2);
                         for (int i7 = 0; i7 < s.Length; i7++)
@@ -424,7 +425,7 @@ namespace Gekko
                             {
                                 if (G.Equal(line[i7].s, "listfile")) good = false;
                             }
-                            if (good) AddComment(line, "In general, expressions like %(...) or #(...) are better written with {}-curlies. For instance, %(a%b) can be written as %a{%b}.");
+                            //if (good) AddComment(line, "In general, expressions like %(...) or #(...) are better written with {}-curlies. For instance, %(a%b) can be written as %a{%b}.");
                         }
                     }
                 } catch { }
@@ -1777,27 +1778,49 @@ namespace Gekko
                         l3[j].s = ", '')" + l3[j].s;
                     }
                 }
-                for (int i = 0; i < l3.Count; i++)
-                {
-                    string s11 = null;
-                    if (false)
-                    {
 
-                    }
-                    else
-                    {
-                        if (keywords.Contains(l3[i].ToString().ToLower()) || !G.IsIdentTranslate(l3[i].ToString()))
+                if (true)
+                {
+                    bool omitQuotes = false;
+                    for (int i = 0; i < l3.Count; i++)
+                    {                       
+
+                        string ss = l3[i].ToStringTrim();
+
+                        if (ss.StartsWith(")") || ss.StartsWith(","))
                         {
-                            //do not touch keywords like prefix, suffix, etc.
-                            //do not touch anything like %x, {%x} etc.
-                            s11 = l3[i].ToString();
+                            if (!omitQuotes) ss = "'" + ss;
+                            omitQuotes = false;
                         }
-                        else
+
+                        if (ss.EndsWith("("))  //for instance "prefix("
                         {
-                            s11 = "'" + l3[i].ToString() + "'";  //add plings
+                            string scout = null;
+                            for (int ii = i + 1; ii < l3.Count; ii++)
+                            {
+                                if (l3[ii].ToStringTrim() == "") continue;
+                                scout = l3[ii].ToStringTrim();
+                                break;
+                            }
+
+                            if (scout.StartsWith("%") || scout.StartsWith("'") || scout.Contains(")")) omitQuotes = true;
+                            if (!omitQuotes) ss = ss + "'";
                         }
+                        
+
+                        //if (keywords.Contains(ss.ToLower()) || !G.IsIdentTranslate(ss))
+                        //{
+                        //    //do not touch keywords like prefix, suffix, etc.
+                        //    //do not touch anything like %x, {%x} etc.
+                        //    s11 = ss;
+                        //}
+                        //else
+                        //{
+                        //    s11 = "'" + ss + "'";  //add plings
+                        //}
+
+                        result3 += ss;
                     }
-                    result3 += s11;
                 }
 
                 //test if simple. Simple is stuff like a, b, c5, 0d, 1, 2, #s, #m.
@@ -2100,11 +2123,11 @@ namespace Gekko
             WalkInfo wi = new WalkInfo();
             WalkFolderHelper(new DirectoryInfo(folder), wi);
             new Writeln("All lines = " + wi.lines + ", error lines = " + wi.errorLines + " ratio = " + (double)wi.errorLines / (double)wi.lines);
+            new Writeln("Files = " + wi.filesCounter + ", bad files = " + wi.badFilesCounter);
         }
-
         
         public static void WalkFolderHelper(DirectoryInfo directoryInfo, WalkInfo wi)
-        {
+        {            
             int max = int.MaxValue;
             if (wi.storage.Count >= max) return;
             Info info = new Info();
@@ -2119,7 +2142,7 @@ namespace Gekko
                 if (skip) continue;
                                 
                 try
-                {
+                {                    
                     string linesString = Program.GetTextFromFileWithWait(file.FullName);
                     List<string> lines = Stringlist.ExtractLinesFromText(linesString);
                     int counter = 0;
@@ -2179,10 +2202,12 @@ namespace Gekko
                     }
                     wi.storage.Add(ss);
 
-                    if (errorCounter > 10)
+                    wi.filesCounter++;
+                    if (errorCounter > 1)
                     {
                         //G.DeleteFolder(@"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\", true);
                         File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + G.IntFormat(errorCounter, 4).Replace(" ", "0") + name + ".tcm", true);
+                        wi.badFilesCounter++;
                     }
 
                     if (wi.storage.Count >= max) return;
@@ -2204,6 +2229,8 @@ namespace Gekko
             public List<string> storage = new List<string>();
             public int lines = 0;
             public int errorLines = 0;
+            public int filesCounter = 0;
+            public int badFilesCounter = 0;
         }
 
 

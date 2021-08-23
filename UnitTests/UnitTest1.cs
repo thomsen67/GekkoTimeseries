@@ -7232,8 +7232,21 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
-            //T("list mspm_x = #import suffix=_x%xx;",
-            //  "global:#mspm_x = (#import).suffix('_x{%xx}');");
+            //T("delete[*];",   --> not legal...
+            //  "delete{'*'};");
+
+            T("list m = #import strip = x;",
+              "global:#m = (#import).replaceinside('x', '');");
+            T("list m = #import strip = %x;",
+              "global:#m = (#import).replaceinside(%x, '');");
+
+            T("list m = #import prefix = x suffix = y;",
+              "global:#m = (#import).prefix('x').suffix('y');");
+            T("list m = #import prefix = %x suffix = %y;",
+              "global:#m = (#import).prefix(%x).suffix(%y);");
+            T("list m = #import prefix = a%x suffix = b%y;",
+              "global:#m = (#import).prefix('a%x').suffix('b%y');", true);  //illegal, but never mind...
+            
 
             T("analyze #m;",
               "analyze {#m};");
@@ -7573,7 +7586,7 @@ namespace UnitTests
                 "prt {%i}:{#j};");
 
             T(@"list m = #(listfile 'g:\datopgek\x.lst') SORT ;",
-              @"global:#m = (#(listfile 'g:\datopgek\x.lst')).SORT( );");
+              @"global:#m = (#(listfile 'g:\datopgek\x.lst')).SORT();");
             T(@"index * listfile b:\SKmm.lst;",
                 @"index <showbank=no showfreq=no> * to #(listfile b:\SKmm.lst);");
 
