@@ -7233,6 +7233,8 @@ namespace UnitTests
         public void _Test_Translate()
         {
             
+
+           
             T("analyze #m;",
               "analyze {#m};");
 
@@ -7293,13 +7295,13 @@ namespace UnitTests
               "exo {#m};");
 
             T("export <%t1 %t2> %x file = %y;",
-              "export <%t1 %t2> {%x} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+              "export <%t1 %t2> {%x} file = %y;");
             T("export <%t1 %t2> #m file = %y;",
-              "export <%t1 %t2> {#m} file = %y; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");            
+              "export <%t1 %t2> {#m} file = %y;");            
             //T("export<2020 2020 ser> xx.txt;",  --> hmm not legal in 2.4
-            //  "export<2020 2020 flat> xx.txt; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+            //  "export<2020 2020 flat> xx.txt;");
             T("export<2020 2020 series> xx.txt;",
-              "export<2020 2020 gcm> xx.txt; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+              "export<2020 2020 gcm> xx.txt;");
 
             T("findmissingdata %x;",
               "findmissingdata {%x};");
@@ -7316,9 +7318,9 @@ namespace UnitTests
               "if(#m[2] == #m[3]); end;");
 
             T("import<ser> xx.txt;",
-              "import<flat> xx.txt; /* TRANSLATE: For IMPORT without dates, use IMPORT<all> */");
+              "import<flat all> xx.txt;");
             T("import<2020 2020 ser> xx.txt;",
-              "import<2020 2020 flat> xx.txt; /* TRANSLATE: For IMPORT without dates, use IMPORT<all> */");
+              "import<2020 2020 flat> xx.txt;");
 
             T("index ref:f* mylist;",
               "index <showbank=no showfreq=no> ref:f* to #mylist;");
@@ -7552,7 +7554,7 @@ namespace UnitTests
 
             //handling of [*] wildcards
             T("export [*] file = xx;",
-              "export {'*'} file = xx; /* TRANSLATE: For EXPORT without dates, use EXPORT<all> */");
+              "export<all> {'*'} file = xx;");
 
             T(@"LIST L7200 = #(LISTfile 'g:\datopGek\abase\erhverv69') prefix=L7200;",
               @"global:#L7200 = (#(LISTfile 'g:\datopGek\abase\erhverv69')).prefix('L7200');");
@@ -7585,6 +7587,55 @@ namespace UnitTests
               "prt #d;");
             T("matrix?#d;",
               "prt #d;");
+
+
+            T("export xx;",
+              "export<all> xx;");
+            T("export<> xx;",
+              "export< all> xx;");
+            T("export<csv caps> xx;",
+              "export<csv caps all> xx;");
+            T("export<caps = yes> xx;",
+              "export<caps = yes all> xx;");
+            T("export<2001 2002> xx;",
+              "export<2001 2002> xx;");
+            T("export<2001 2002 csv caps> xx;",
+              "export<2001 2002 csv caps> xx;");
+            T("export<2001 2002 caps = yes> xx;",
+              "export<2001 2002 caps = yes> xx;");
+            T("export<%t1 %t2> xx;",
+              "export<%t1 %t2> xx;");
+            T("export<%t1 %t2 csv caps> xx;",
+              "export<%t1 %t2 csv caps> xx;");
+            T("export<%t1 %t2 caps = yes> xx;",
+              "export<%t1 %t2 caps = yes> xx;");
+
+            T("import xx;",
+              "import<all> xx;");
+            T("import<> xx;",
+              "import< all> xx;");
+            T("import<csv cols> xx;",
+              "import<csv cols all> xx;");
+            T("import<cols = yes> xx;",
+              "import<cols = yes all> xx;");
+            T("import<2001 2002> xx;",
+              "import<2001 2002> xx;");
+            T("import<2001 2002 csv cols> xx;",
+              "import<2001 2002 csv cols> xx;");
+            T("import<2001 2002 cols = yes> xx;",
+              "import<2001 2002 cols = yes> xx;");
+            T("import<%t1 %t2> xx;",
+              "import<%t1 %t2> xx;");
+            T("import<%t1 %t2 csv cols> xx;",
+              "import<%t1 %t2 csv cols> xx;");
+            T("import<%t1 %t2 cols = yes> xx;",
+              "import<%t1 %t2 cols = yes> xx;");
+
+            T("string s = 'a{s}b';",
+            "global:%s = 'a{%s}b';");
+
+            T("list x = null;",
+              "global:#x =list();");
 
 
         }

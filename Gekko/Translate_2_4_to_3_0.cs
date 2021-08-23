@@ -537,6 +537,40 @@ namespace Gekko
                     {                        
                         line[i + 1].s = "%" + line[i + 1].s;
                     }
+                    if (line[i + 0].type == ETokenType.QuotedString && line[i + 0].s.StartsWith("'") && line[i + 0].s.EndsWith("'"))
+                    {                        
+                        if (line[i + 0].s.Contains("{"))
+                        {
+                            //hack because I was lazy... (avoids replacing {%x})
+                            line[i + 0].s = line[i + 0].s.Replace("{a", "{%a");
+                            line[i + 0].s = line[i + 0].s.Replace("{b", "{%b");
+                            line[i + 0].s = line[i + 0].s.Replace("{c", "{%c");
+                            line[i + 0].s = line[i + 0].s.Replace("{d", "{%d");
+                            line[i + 0].s = line[i + 0].s.Replace("{e", "{%e");
+                            line[i + 0].s = line[i + 0].s.Replace("{f", "{%f");
+                            line[i + 0].s = line[i + 0].s.Replace("{g", "{%g");
+                            line[i + 0].s = line[i + 0].s.Replace("{h", "{%h");
+                            line[i + 0].s = line[i + 0].s.Replace("{i", "{%i");
+                            line[i + 0].s = line[i + 0].s.Replace("{j", "{%j");
+                            line[i + 0].s = line[i + 0].s.Replace("{k", "{%k");
+                            line[i + 0].s = line[i + 0].s.Replace("{l", "{%l");
+                            line[i + 0].s = line[i + 0].s.Replace("{m", "{%m");
+                            line[i + 0].s = line[i + 0].s.Replace("{n", "{%n");
+                            line[i + 0].s = line[i + 0].s.Replace("{o", "{%o");
+                            line[i + 0].s = line[i + 0].s.Replace("{p", "{%p");
+                            line[i + 0].s = line[i + 0].s.Replace("{q", "{%q");
+                            line[i + 0].s = line[i + 0].s.Replace("{r", "{%r");
+                            line[i + 0].s = line[i + 0].s.Replace("{s", "{%s");
+                            line[i + 0].s = line[i + 0].s.Replace("{t", "{%t");
+                            line[i + 0].s = line[i + 0].s.Replace("{u", "{%u");
+                            line[i + 0].s = line[i + 0].s.Replace("{v", "{%v");
+                            line[i + 0].s = line[i + 0].s.Replace("{w", "{%w");
+                            line[i + 0].s = line[i + 0].s.Replace("{x", "{%x");
+                            line[i + 0].s = line[i + 0].s.Replace("{y", "{%y");
+                            line[i + 0].s = line[i + 0].s.Replace("{z", "{%z");
+
+                        }
+                    }
                 } catch { }
 
                 try
@@ -851,18 +885,25 @@ namespace Gekko
             else if (G.Equal(line[pos0].s, "export"))
             {
                 //¤024
-                AddComment(line, "For EXPORT without dates, use EXPORT<all>");
+                //AddComment(line, "For EXPORT without dates, use EXPORT<all>");
                 try
                 {
+                    bool dates = true;
                     Tuple<int, int> tup = FindOptionField(line);
                     if (tup.Item1 != -12345 && tup.Item2 != -12345)
                     {
                         for (int i11 = tup.Item1; i11 <= tup.Item2; i11++)
                         {
                             if (G.Equal(line[i11].s, "ser")) line[i11].s = "flat";  //¤0040
-                            else if (G.Equal(line[i11].s,  "series")) line[i11].s = "gcm";  //¤0040
+                            else if (G.Equal(line[i11].s, "series")) line[i11].s = "gcm";  //¤0040                            
                         }
                     }
+                }
+                catch { }
+
+                try
+                {                    
+                    HandleImportExportAll(line);
                 }
                 catch { }
             }
@@ -892,7 +933,7 @@ namespace Gekko
             else if (G.Equal(line[pos0].s, "import"))
             {
                 //¤024
-                AddComment(line, "For IMPORT without dates, use IMPORT<all>");
+                //AddComment(line, "For IMPORT without dates, use IMPORT<all>");
                 try
                 {
                     Tuple<int, int> tup = FindOptionField(line);
@@ -903,6 +944,12 @@ namespace Gekko
                             if (G.Equal(line[i11].s, "ser")) line[i11].s = "flat";  //¤0040
                         }
                     }
+                }
+                catch { }
+
+                try
+                {
+                    HandleImportExportAll(line);
                 }
                 catch { }
             }
@@ -1010,6 +1057,14 @@ namespace Gekko
                     {
                         line[pos0].s = "";
                         line[pos0 + 1].s = "prt ";
+                    }
+                    else if (line[pos0].s.ToLower().Contains("null"))
+                    {
+                        //hacky...
+                        line[pos0].s = G.Replace(line[pos0].s, "null ,", "list()", StringComparison.OrdinalIgnoreCase, 1);
+                        line[pos0].s = G.Replace(line[pos0].s, "null,", "list()", StringComparison.OrdinalIgnoreCase, 1);
+                        line[pos0].s = G.Replace(line[pos0].s, "null", "list()", StringComparison.OrdinalIgnoreCase, 1);
+
                     }
                 }
             }
@@ -1275,6 +1330,62 @@ namespace Gekko
 
             SetLineStartRecursive(line, line);
 
+        }
+
+        private static void HandleImportExportAll(List<TokenHelper> line)
+        {
+            bool? dates = null;
+            Tuple<int, int> tup = FindOptionField(line);            
+            if (tup.Item1 != -12345 && tup.Item2 != -12345)
+            {
+                if (tup.Item2 - tup.Item1 - 1 < 2)
+                {
+                    dates = false;
+                }
+                else
+                {
+                    dates = true;  //possibly...
+                    int datesCounter = 0;
+                    TokenHelper token1 = null;
+                    TokenHelper token2 = null;
+                    for (int i11 = tup.Item1 + 1; i11 <= tup.Item2 - 1; i11++)
+                    {
+                        datesCounter++;
+                        if (datesCounter == 1)
+                        {
+                            token1 = line[i11];
+                        }
+                        else if (datesCounter == 2)
+                        {
+                            token2 = line[i11];
+                            if (G.IsIdentTranslate(token1.ToStringTrim()) && (G.IsIdentTranslate(token2.ToStringTrim()) || token2.ToStringTrim() == "="))
+                            {
+                                //something like <opt1 opt2 ...> or <opt1 = ...>. Cannot be dates.
+                                //remember 2020 or 2020q1 are not idents, neither %t1.
+                                dates = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                dates = false;
+            }
+
+            if (dates == false)
+            {
+                //We must add a <all>. Done in a hacky way.
+                if (tup.Item1 == -12345 && tup.Item2 == -12345)
+                {
+                    line[0].s = line[0].s + "<all>";
+                }
+                else
+                {
+                    line[tup.Item2 - 1].s = line[tup.Item2 - 1].s + " all";
+                }
+            }
         }
 
         private static void HandleCommandNameLeftSide(List<TokenHelper> line, int pos0, string sigil, Info info)
