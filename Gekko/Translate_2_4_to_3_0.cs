@@ -758,6 +758,41 @@ namespace Gekko
                         }
                         catch { }
 
+                        try
+                        {
+                            if (type == 1)
+                            {
+                                if (line[i].leftblanks == 0)
+                                {
+                                    string before1 = null;
+                                    string before2 = null;
+                                    int glue = 0;
+                                    try { before1 = line[i - 1].s; } catch { }
+                                    try { before2 = line[i - 2].s; } catch { }
+                                    try { glue = line[i - 1].leftblanks; } catch { }
+                                    if (before1 == "|" && before2 == "|")
+                                    {
+                                        //do nothing, could be [1||%x]
+                                    }
+                                    else
+                                    {
+                                        string x = before1;  //a%s --> "a"
+                                        if (glue == 0 && before1 == "|") x = before2;  //a|%s --> "a"
+                                        char c = x[x.Length - 1];
+                                        if (G.IsLetterOrDigitOrUnderscoreOrExclamation(c) || c == '}')
+                                        {
+                                            //  a%s
+                                            //  a|%s
+                                            //  }%s
+                                            //  }|%s
+                                            overriding = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch { }
+
                         // =====================
                         // =====================
                         // =====================
@@ -1717,7 +1752,18 @@ namespace Gekko
                     if (StringTokenizer.Equal(l1, 1, "listfile"))
                     {
                         //list listfile m = ...  --> #(listfile m) = ... 
-                        result1 = extra + "#(listfile " + l1[2] + ") = ";
+                        result1 = extra + "#(listfile ";
+
+                        int counter = 0;
+                        foreach (TokenHelper th in l1)
+                        {
+                            counter++;
+                            if (counter > 2)
+                            {
+                                if (th.s == "=") result1 += ") =";
+                                else result1 += th.ToString();
+                            }
+                        }
                     }
                     else
                     {

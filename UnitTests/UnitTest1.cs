@@ -7232,7 +7232,6 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
-
             
             T("analyze #m;",
               "analyze {#m};");
@@ -7411,13 +7410,11 @@ namespace UnitTests
             T("for i = a, b; for j = c, d; series x1%i%j|x = x1%i%j|x; end; end;",
               "for string %i = a, b; for string %j = c, d;x1{%i}{%j}x = x1{%i}{%j}x; end; end;");
             T("for val i = 1 to 2; for val j = 1 to 2; series x%i%j|x = x%i%j|x; end; end;",
-              "for val %i = 1 to 2; for val %j = 1 to 2; series x{%i}{%j}x = x{%i}{%j}x; end; end;");
+              "for val %i =1 to 2; for val %j =1 to 2;x{%i}{%j}x = x{%i}{%j}x; end; end;");
             T("for val i = 1 to 2; for val j = 1 to 2; series x1%i%j|x = x1%i%j|x; end; end;",
-              "for val %i = 1 to 2; for val j = 1 to 2; series x1{%i}{%j}x = x1{%i}{%j}x; end; end;");
-
-            //Here, we use that %p is glued to a letter on the left. (Could also be digit or underscore).
+              "for val %i =1 to 2; for val %j =1 to 2;x1{%i}{%j}x = x1{%i}{%j}x; end; end;");
             T("FOR val p = 17 to 70 by 1; SERIES Uw%p = Uadam:U%p - ((1 - Uadam:kuspu%p)*Uadam:Usp%p - Uadam:Qpfp%p); END;",
-              "FOR val %p = 17 to 70 by 1; SERIES Uw{%p} = Uadam:U{%p} - ((1 - Uadam:kuspu{%p})*Uadam:Usp{%p} - Uadam:Qpfp{%p}); END;");
+              "FOR val %p =17 to 70 by 1;Uw{%p} = Uadam:U{%p} - ((1 - Uadam:kuspu{%p})*Uadam:Usp{%p} - Uadam:Qpfp{%p}); END;");
 
             T("sheet #m;",
               "sheet {#m};");
@@ -7614,8 +7611,7 @@ namespace UnitTests
               "prt #d;");
             T("matrix?#d;",
               "prt #d;");
-
-
+            
             T("export xx;",
               "export<all> xx;");
             T("export<> xx;",
@@ -7677,7 +7673,14 @@ namespace UnitTests
             T("list m = #import prefix = %x suffix = %y;",
               "global:#m = (#import).prefix(%x).suffix(%y);");
             T("list m = #import prefix = a%x suffix = b%y;",
-              "global:#m = (#import).prefix('a%x').suffix('b%y');", true);  //illegal, but never mind...
+              "global:#m = (#import).prefix('a{%x}').suffix('b{%y}');");
+
+            T(@"list listfile m = a, b;",
+              @"#(listfile  m) = a, b;");
+            T(@"list listfile 'c:\x1\x2.lst' = a, b;",
+              @"#(listfile  'c:\x1\x2.lst') = a, b;");
+            T(@"list listfile c:\x1\x2.lst = a, b;",
+              @"#(listfile  c:\x1\x2.lst) = a, b;");
 
 
         }
