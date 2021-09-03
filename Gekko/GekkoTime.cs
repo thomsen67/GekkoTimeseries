@@ -443,12 +443,12 @@ namespace Gekko
                     else return GekkoTime.tNull;
                 }
             }
-            else if (s.Contains("d") || s.Contains("d"))  //must be before 'm'
+            else if (s.Contains("d") || s.Contains("D"))  //must be before 'm'
             {
                 try
                 {
                     string[] temp1 = s.Split(new char[] { 'm', 'M' });  //2019m12d24
-                    string[] temp2 = temp1[1].Split(new char[] { 'd', 'd' });
+                    string[] temp2 = temp1[1].Split(new char[] { 'd', 'D' });
                     int y1 = G.findYear(int.Parse(temp1[0]));
                     int m1 = int.Parse(temp2[0]);
                     if (m1 < 1 || m1 > 12)

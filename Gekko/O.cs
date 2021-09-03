@@ -6114,13 +6114,14 @@ namespace Gekko
         {
             if (x.Type() != EVariableType.Series)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = O.ConvertToSeries(x); //ConvertToTimeSeries() is more complicated
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "SERIES");                    
+                    TypeErrorString(position, "series", type);                    
                 }
             }
             else
@@ -6138,16 +6139,17 @@ namespace Gekko
         /// <param name="position"></param>
         /// <returns></returns>
         public static IVariable TypeCheck_val(IVariable x, int position)
-        {
+        {            
             if (x.Type() != EVariableType.Val)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = new ScalarVal(O.ConvertToVal(x));
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "VAL");                    
+                    TypeErrorString(position, "val", type);                    
                 }
             }
             return x;
@@ -6163,13 +6165,14 @@ namespace Gekko
         {
             if (x.Type() != EVariableType.String)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = new ScalarString(O.ConvertToString(x));
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "STRING");
+                    TypeErrorString(position, "string", type);
                 }
             }
             return x;
@@ -6186,17 +6189,18 @@ namespace Gekko
             if (x == null)
             {
                 //hmmm, x == null??
-                TypeErrorString(position, "NAME");                
+                TypeErrorString(position, "name", "null");
             }
             if (x.Type() != EVariableType.String)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = new ScalarString(O.ConvertToString(x));
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "NAME");                    
+                    TypeErrorString(position, "name", type);                    
                 }
             }
             return x;
@@ -6244,6 +6248,7 @@ namespace Gekko
         {
             if (x.Type() != EVariableType.Date)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = new ScalarDate(O.ConvertToDate(x));
@@ -6251,7 +6256,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "DATE");
+                    TypeErrorString(position, "date", type);
                 }
             }
             return x;
@@ -6267,13 +6272,14 @@ namespace Gekko
         {
             if (x.Type() != EVariableType.List)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = new List(O.ConvertToList(x));
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "LIST");                    
+                    TypeErrorString(position, "list", type);                    
                 }
             }
             else
@@ -6293,13 +6299,14 @@ namespace Gekko
         {            
             if (x.Type() != EVariableType.Matrix)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = O.ConvertToMatrix(x);
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "MATRIX");                    
+                    TypeErrorString(position, "matrix", type);                    
                 }
             }
             else
@@ -6315,29 +6322,29 @@ namespace Gekko
         /// <param name="position"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static void TypeErrorString(int position, string type)
+        private static void TypeErrorString(int position, string type, string inputType)
         {            
             if (position == -1)
             {
-                new Error("The right-hand side should be " + type + " type");
+                new Error("The type of the right-hand side is " + inputType + " type, but should be " + type + " type");
             }
             else if (position == 0)
             {
-                new Error("The return type should be " + type + " type");
+                new Error("The type is " + inputType + " type, but should be " + type + " type");
             }
             else if (position == 1)
             {
-                new Error("The start date %t1 in a f(<%t1 %t2>, ...) call should be " + type + " type");
+                new Error("The start date %t1 in a f(<%t1 %t2>, ...) call is " + inputType + " type, but should be " + type + " type");
             }
             else if (position == 2)
             {
-                new Error("The end date %t2 in a f(<%t1 %t2>, ...) call should be " + type + " type");
+                new Error("The end date %t2 in a f(<%t1 %t2>, ...) call is " + inputType + " type, but should be " + type + " type");
             }
             else  //3 or larger, corresponding to argument 1 and so on. However, using UFCS, position = 3 is the variable before dot, and position = 4, 5, 6... are the first, second etc. arguments inside the parenthesis.
             {
                 using (Error e = new Error())
                 {
-                    e.MainAdd("Argument #" + (position - 2) + " should be " + type + " type.");                    
+                    e.MainAdd("Argument #" + (position - 2) + " is " + inputType + " type, but should be " + type + " type");
                     e.MoreAdd("When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.");
                 }                
             }
@@ -6353,13 +6360,14 @@ namespace Gekko
         {
             if (x.Type() != EVariableType.Map)
             {
+                string type = G.GetTypeString(x);
                 try
                 {
                     x = O.ConvertToMap(x);
                 }
                 catch (Exception e)
                 {
-                    TypeErrorString(position, "MAP");
+                    TypeErrorString(position, "map", type);
                 }
             }
             else

@@ -671,11 +671,14 @@ namespace Gekko
                         //Do not upgrade something like prt <color = %s> ... ;                        
                         int i1 = supreme.Search(ii, new List<string>() { "<" }, true, false);
                         int i2 = supreme.Search(ii, new List<string>() { ">" }, false, false);
-                        if (i1 <= 2 && i2 > i)  //<= 2 because the option field may have been moved to the right
+                        if (i1 != -12345 && i2 != -12345)
                         {
-                            //there is a < at pos 1 when going left, and a > when going right.
-                            //then pretty sure we are inside local options.
-                            neverUpgrade = true;
+                            if (i1 < i && i2 > i)  //we are inside <...> . It COULD be an IF(...<...  or ...>...) but oh well
+                            {
+                                //there is a < at pos 1 when going left, and a > when going right.
+                                //then pretty sure we are inside local options.
+                                neverUpgrade = true;
+                            }
                         }
 
                         //never upgrade for option, list, matrix, show
@@ -808,7 +811,18 @@ namespace Gekko
 
             line[pos0].meta.commandName = line[pos0].s.ToLower();  //right most of the time, exceptions P, PRI, PRT, ...
 
-            if (G.Equal(line[pos0].s, "compare"))
+            if (G.Equal(line[pos0].s, "accept"))
+            {
+                try
+                {
+                    string sigil = "%";
+                    if (G.Equal(line[pos0 + 1].s, "list")) sigil = "#";
+                    line[pos0 + 2].s = sigil + line[pos0 + 2].s;
+                }
+                catch { }
+            }
+
+            else if (G.Equal(line[pos0].s, "compare"))
             {
                 //¤019
                 AddComment(line, "COMPARE has changed syntax, see the help files");
@@ -973,7 +987,7 @@ namespace Gekko
                     //¤025                    
                     if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
                     {
-                        last.s = "to #" + last.s;
+                        last.s = "to global:#" + last.s;
                     }
                 }
                 else
@@ -1088,6 +1102,18 @@ namespace Gekko
                 {
                     line[pos0].s = "";
                     line[pos0 + 1].s = "prt ";
+                }
+            }
+
+            else if (G.Equal(line[pos0].s, "open"))
+            {
+                Tuple<int, int> tup = FindOptionField(line);
+                if (tup.Item1 != -12345 && tup.Item2 != -12345)
+                {
+                    for (int i11 = tup.Item1 + 1; i11 < tup.Item2; i11++)
+                    {
+                        if (G.Equal(line[i11].s, "sec")) line[i11].s = "pos=2";
+                    }
                 }
             }
 
@@ -2132,13 +2158,29 @@ namespace Gekko
             WalkFolderHelper(new DirectoryInfo(folder), wi);
             new Writeln("All lines = " + wi.lines + ", error lines = " + wi.errorLines + " ratio = " + (double)wi.errorLines / (double)wi.lines);
             new Writeln("Files = " + wi.filesCounter + ", bad files = " + wi.badFilesCounter + ", whole bad files = " + wi.wholeBadFilesCounter);
+            if (wi.docs.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (List<string> doc in wi.docs)
+                {
+                    foreach (string s in doc)
+                    {
+                        sb.Append(s + ";");
+                    }
+                    sb.AppendLine();
+                }
+                File.WriteAllText(folder + "\\translate.csv", sb.ToString());
+            }
         }
         
         public static void WalkFolderHelper(DirectoryInfo directoryInfo, WalkInfo wi)
         {
             if (true)
-            {                
+            {
+                int max = int.MaxValue;
+                if (wi.filesCounter >= max) return;
                 Info info = new Info();
+                info.keepTypes = true;
                 foreach (FileInfo file in directoryInfo.GetFiles())
                 {
                     bool skip = false;
@@ -2148,6 +2190,8 @@ namespace Gekko
                     }
                     if (file.Extension.ToLower() != ".gcm") skip = true;
                     if (skip) continue;
+
+                    List<string> doc = new List<string>();
 
                     try
                     {
@@ -2162,23 +2206,40 @@ namespace Gekko
                         }
                         string wholeBad = "z_";
                         string translated2 = Translate(linesString, info);
-                        File.WriteAllText(newFile, translated2);
+                        
                         try
                         {
                             if (!Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(translated2))
                             {
                                 wi.wholeBadFilesCounter++;
                                 wholeBad = "b_";
-                                File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + wholeBad + name + ".tcm", true);
+                                //File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + wholeBad + name + ".tcm", true);
                             }
                         }
                         catch
                         {
                             wi.wholeBadFilesCounter++;
                             wholeBad = "b_";
-                            File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + wholeBad + name + ".tcm", true);
-                        } 
-                        wi.filesCounter++;                        
+                            //File.Copy(newFile, @"c:\Thomas\Desktop\gekko\testing\TranslateLog\Files\" + wholeBad + name + ".tcm", true);
+                        }
+                        finally
+                        {
+                            if (wholeBad == "b_")
+                                File.WriteAllText(newFile + "_failing", translated2);
+                            else
+                                File.WriteAllText(newFile, translated2);
+                            wi.filesCounter++;
+                            int kb = (int)(file.Length);
+                            doc.Add(wi.filesCounter.ToString());
+                            string file2 = newFile.Replace(@"c:\Thomas\Desktop\gekko\testing\Translate\", "");
+                            doc.Add(file2);
+                            if (wholeBad == "b_")
+                                doc.Add("FAILING");
+                            else
+                                doc.Add("ok");
+                            doc.Add(kb.ToString());
+                            wi.docs.Add(doc);
+                        }                                       
                     }
                     catch
                     {
@@ -2304,14 +2365,15 @@ namespace Gekko
         }
 
         public class WalkInfo
-        {            
-            public List<string> omits = new List<string>() { "fra_excel", "uadam" };  //must not be null            
+        {
+            public List<string> omits = new List<string>(); // { "fra_excel", "uadam" };  //must not be null            
             public List<string> storage = new List<string>();
             public int lines = 0;
             public int errorLines = 0;
             public int filesCounter = 0;
             public int badFilesCounter = 0;
             public int wholeBadFilesCounter = 0;
+            public List<List<string>> docs = new List<List<string>>();
         }
 
 

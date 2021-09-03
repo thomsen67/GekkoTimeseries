@@ -6274,7 +6274,6 @@ namespace Gekko
 
                 try
                 {
-                    //ch.code = ch.code.Replace(Globals.libraryPlaceholder, Globals.globalLibraryString);
                     Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                 }
                 catch (Exception e)
@@ -7455,6 +7454,12 @@ namespace Gekko
         public static void X12a(Gekko.O.X12a o)
         {
             List<string> listItems = O.Restrict(o.names, true, false, true, false);
+            string parameters = o.opt_param;
+            if (parameters == null)
+            {
+                //emulates AREMOS 100%
+                parameters = "save=(d10, d11, saa) mode=mult sigmalim=(1.50,2.50) seasonalma=msr force=totals";
+            }
 
             //TODO: implement for array-series. For array-series x, produce x_saa etc. Or how is it done
             //
@@ -7487,9 +7492,7 @@ namespace Gekko
                     if (G.isNumericalError(v))
                     {
                         new Error("Missing value in '" + ts.name + "', period " + G.FromDateToString(t));
-                        //throw new GekkoException();
                     }
-                    //data += t.super + " " + t.sub + " " + v.ToString() + G.NL;
                     data += v.ToString() + G.NL;
                 }
                 //Create data files
@@ -7517,7 +7520,7 @@ namespace Gekko
             s2 += "period = " + GetFreqNumbers(o.t1.freq) + G.NL;  //4 or 12
             s2 += "}" + G.NL;
 
-            s2 += "x11{ " + o.opt_param + " }" + G.NL;
+            s2 += "x11{ " + parameters + " }" + G.NL;
 
             //Create tempX12aFile.spc
             using (FileStream fs = WaitForFileStream(spcFileName, GekkoFileReadOrWrite.Write))
@@ -7626,14 +7629,17 @@ namespace Gekko
 
             if (first)
             {
-                G.Writeln2("Did not produce any adjusted timeseries. See more info in the tempX12aFile...");
-                G.Writeln("files here: " + Globals.localTempFilesLocation);
+                new Writeln("The X12A component did not produce any adjusted timeseries. See more info/logging in the tempX12aFile... files here: " + Globals.localTempFilesLocation);
             }
-            if (!(o.opt_param.ToLower().Contains("totals") && o.opt_param.ToLower().Contains("force")))
+
+            if (parameters != null)
             {
-                if (o.opt_param.ToLower().Contains("saa"))
+                if (!(parameters.ToLower().Contains("totals") && parameters.ToLower().Contains("force")))
                 {
-                    new Note("For 'saa' type, you need 'force=totals'"); 
+                    if (parameters.ToLower().Contains("saa"))
+                    {
+                        new Note("For 'saa' type, you need the parameter 'force=totals'");
+                    }
                 }
             }
         }

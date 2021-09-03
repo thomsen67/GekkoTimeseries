@@ -7237,6 +7237,9 @@ namespace UnitTests
             T("analyze #m;",
               "analyze {#m};");
 
+            T("accept string i 'Text';",
+              "accept string %i 'Text';");
+
             T("checkoff %x;",
               "checkoff {%x};");
             T("checkoff #m;",
@@ -7322,7 +7325,7 @@ namespace UnitTests
               "import<2020 2020 flat> xx.txt;");
 
             T("index ref:f* mylist;",
-              "index <showbank=no showfreq=no> ref:f* to #mylist;");
+              "index <showbank=no showfreq=no> ref:f* to global:#mylist;");
 
             T("INTERPOLATE qbank:fY.q = abank:fY.a prorate;",
               "INTERPOLATE qbank:fY!q = abank:fY!a prorate;");
@@ -7369,6 +7372,9 @@ namespace UnitTests
             T("mulprt #m;",
               "mulprt {#m};");
 
+            T("open<sec>xx;",
+              "open<pos=2>xx;");
+
             T("rebase %x 2001 2002;",
               "rebase {%x} 2001 2002;");
             T("rebase #m 2001 2002;",
@@ -7397,6 +7403,8 @@ namespace UnitTests
               "y = 0.2, m(), 1, -2, 3e-3;");
             T("series y = m + 1;",  //just checking
               "y = m + 1;");
+            T("SERIES <%per3 %per2> {i}_il = 0 rep*;",
+              " {%i}_il <%per3 %per2> = 0 ;");
 
             T("sheet #m;",
               "sheet {#m};");
