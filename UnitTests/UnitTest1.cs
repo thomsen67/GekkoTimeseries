@@ -7406,6 +7406,19 @@ namespace UnitTests
             T("SERIES <%per3 %per2> {i}_il = 0 rep*;",
               " {%i}_il <%per3 %per2> = 0 ;");
 
+            T("for i = a, b; for j = c, d; series x%i%j|x = x%i%j|x; end; end;",
+              "for string %i = a, b; for string %j = c, d;x{%i}{%j}x = x{%i}{%j}x; end; end;");
+            T("for i = a, b; for j = c, d; series x1%i%j|x = x1%i%j|x; end; end;",
+              "for string %i = a, b; for string %j = c, d;x1{%i}{%j}x = x1{%i}{%j}x; end; end;");
+            T("for val i = 1 to 2; for val j = 1 to 2; series x%i%j|x = x%i%j|x; end; end;",
+              "for val %i = 1 to 2; for val %j = 1 to 2; series x{%i}{%j}x = x{%i}{%j}x; end; end;");
+            T("for val i = 1 to 2; for val j = 1 to 2; series x1%i%j|x = x1%i%j|x; end; end;",
+              "for val %i = 1 to 2; for val j = 1 to 2; series x1{%i}{%j}x = x1{%i}{%j}x; end; end;");
+
+            //Here, we use that %p is glued to a letter on the left. (Could also be digit or underscore).
+            T("FOR val p = 17 to 70 by 1; SERIES Uw%p = Uadam:U%p - ((1 - Uadam:kuspu%p)*Uadam:Usp%p - Uadam:Qpfp%p); END;",
+              "FOR val %p = 17 to 70 by 1; SERIES Uw{%p} = Uadam:U{%p} - ((1 - Uadam:kuspu{%p})*Uadam:Usp{%p} - Uadam:Qpfp{%p}); END;");
+
             T("sheet #m;",
               "sheet {#m};");
 
