@@ -7232,7 +7232,13 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Translate()
         {
-            
+            //se ras2008_2015.gcm
+
+            T("FOR i =#arbstyr,#Udenfor,#Memo ; FOR j =#koen; SERIES %i|99|%j = 0 rep * ; FOR k =#alder00099;  SERIES %i|99|%j = %i|99|%j + RASinput:%i|%k|%j; END; END; END;", 
+                "");
+            T("FOR i =#arbstyr,#Udenfor,#Memo ; FOR j =#koen; FOR k =#alder00099;  SERIES %i = %i + RASinput:%i; END; END;",
+                "");
+
             T("analyze #m;",
               "analyze {#m};");
 
