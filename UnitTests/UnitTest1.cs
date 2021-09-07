@@ -7314,7 +7314,7 @@ namespace UnitTests
               "for string %i = a, {%s}, {#m}; end;");
 
             T("for i = a, %s, #m  j = a2, %s2, #m2; end;",
-              "for string %i = a, {%s}, #m  string %j = a2, {%s2}, {#m2}; /* TRANSLATE: Parallel loops may not be translated properly, including missing {}-curlies on elements */ end;", true);
+              "for string %i = a, {%s}, #m  string %j = a2, {%s2}, {#m2}; end;", true);
 
             T("if(#m[2] == #m[3]); end;",
               "if(#m[2] == #m[3]); end;");

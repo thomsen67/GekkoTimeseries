@@ -16328,10 +16328,16 @@ namespace Gekko
                 if (o.list2 == null)
                 {
                     o.list2 = new List();
-                    for (int i = 0; i < o.list1.list.Count; i++)
-                    {
-                        o.list2.Add(new ScalarString("First:*"));  //for instance: EXPORT <csv> fx*, fy*, where we will "simulate" an EXPORT <csv> fx*, fy* TO first:*, first:*
-                    }
+
+                    // TT: It used to be done like below, but that introduced errors when for instance doing EXPORT <csv> fx*, fy*, where we will "simulate" an EXPORT <csv> fx*, fy* TO first:*, first:*. Now there is only 1 first:*.
+                    //for (int i = 0; i < o.list1.list.Count; i++)
+                    //{
+                    //    o.list2.Add(new ScalarString("First:*"));
+                    //}
+
+                    o.list2.Add(new ScalarString("First:*"));
+
+
                 }
                 list = SearchFromTo(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write, null);
             }            
