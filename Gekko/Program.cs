@@ -1583,6 +1583,11 @@ namespace Gekko
                 }
                 
             }
+            if (text.Trim().ToLower() == "insert gekopdat3")
+            {
+                Translate_2_4_to_3_0.Insert();
+                return;
+            }
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }        
