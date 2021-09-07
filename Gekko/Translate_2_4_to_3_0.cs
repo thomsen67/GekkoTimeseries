@@ -2199,25 +2199,31 @@ namespace Gekko
         /// </summary>
         public static void TestTranslation()
         {
-            //string folder = @"c:\Thomas\Desktop\gekko\testing\Translate";
+
+            //string fname = @"c:\Thomas\Desktop\gekko\testing\Translate\05banker\afledte.tcm";            
+            //string contents = Program.GetTextFromFileWithWait(fname);
+            //string fname2 = fname + "_bitness";
+            //using (FileStream fs = Program.WaitForFileStream(fname2, Program.GekkoFileReadOrWrite.Write))
+            //using (StreamWriter file = G.GekkoStreamWriter(fs))
+            //{
+            //    file.Write(contents);
+            //}
+            //return;
+
             string folder = @"c:\Thomas\Desktop\gekko\testing\Translate";
             WalkInfo wi = new WalkInfo();
             WalkFolderHelper(new DirectoryInfo(folder), wi);
             new Writeln("All lines = " + wi.lines + ", error lines = " + wi.errorLines + " ratio = " + (double)wi.errorLines / (double)wi.lines);
             new Writeln("Files = " + wi.filesCounter + ", bad files = " + wi.badFilesCounter + ", whole bad files = " + wi.wholeBadFilesCounter);
-            if (wi.docs.Count > 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (List<string> doc in wi.docs)
-                {
-                    foreach (string s in doc)
-                    {
-                        sb.Append(s + ";");
-                    }
-                    sb.AppendLine();
-                }
-                File.WriteAllText(folder + "\\translate.csv", sb.ToString());
-            }
+            
+
+            //StringBuilder sb = new StringBuilder();
+            //foreach (string s in wi.storage)
+            //{
+            //    sb.AppendLine(s);
+            //}
+            //File.WriteAllText(@"c:\tools\abc123.txt", sb.ToString());
+
         }
 
         public static void WalkFolderHelper(DirectoryInfo directoryInfo, WalkInfo wi)
@@ -2235,9 +2241,10 @@ namespace Gekko
 
                     bool missing1line = false;
                     bool good = false;
+                    string translated2 = null;
                     try
                     {
-                        string translated2 = Program.GetTextFromFileWithWait(file.FullName.Replace(".gcm", ".tcm").Replace(".GCM", ".tcm"));
+                        translated2 = Program.GetTextFromFileWithWait(file.FullName.Replace(".gcm", ".ucm").Replace(".GCM", ".ucm"));
                         if (!translated2.Contains("++++ TTH check ++++")) missing1line = true;
                         if (Gekko.Parser.Gek.ParserGekCreateAST.IsValid3_0Syntax(translated2))
                         {
@@ -2250,7 +2257,11 @@ namespace Gekko
                     finally
                     {
                         bool skip2 = false;
+                        if (wi.filesCounter == 54) skip2 = true;
                         if (wi.filesCounter == 91) skip2 = true;
+                        if (wi.filesCounter == 120) skip2 = true;
+                        if (wi.filesCounter == 121) skip2 = true;
+                        if (wi.filesCounter == 122) skip2 = true;
                         if (wi.filesCounter == 251) skip2 = true;
                         if (wi.filesCounter == 252) skip2 = true;
                         if (wi.filesCounter == 253) skip2 = true;
@@ -2279,6 +2290,7 @@ namespace Gekko
                         if (wi.filesCounter == 388) skip2 = true;
                         if (wi.filesCounter == 389) skip2 = true;
                         if (wi.filesCounter == 392) skip2 = true;
+                        if (wi.filesCounter == 407) skip2 = true;
                         if (wi.filesCounter == 426) skip2 = true;
                         if (wi.filesCounter == 429) skip2 = true;
                         if (wi.filesCounter == 437) skip2 = true;
@@ -2292,6 +2304,7 @@ namespace Gekko
                         if (wi.filesCounter == 598) skip2 = true;
                         if (wi.filesCounter == 599) skip2 = true;
                         if (wi.filesCounter == 600) skip2 = true;
+                        if (wi.filesCounter == 652) skip2 = true;
                         if (wi.filesCounter == 705) skip2 = true;
                         if (wi.filesCounter == 706) skip2 = true;
                         if (wi.filesCounter == 707) skip2 = true;
@@ -2306,10 +2319,30 @@ namespace Gekko
                         if (skip2) good = true;
 
                         string missing = "";
-                        if (missing1line) missing = "-----> !!!!! ";
+                        if (missing1line && !skip2) missing = "-----> !!!!! ";
                         string s = "     ";
                         if (!good) s = " BAD ";                        
                         new Writeln(". " + missing + G.IntFormat(wi.filesCounter, 5) + s + file.FullName);
+
+                        //if (!skip2)
+                        //{
+                        //    using (FileStream fs = Program.WaitForFileStream(file.FullName.Replace(".gcm", ".ucm").Replace(".GCM", ".ucm"), Program.GekkoFileReadOrWrite.Write))
+                        //    using (StreamWriter file2 = G.GekkoStreamWriter(fs))
+                        //    {
+                        //        file2.Write(G.Replace(translated2, @"g:\datopgek", @"{root()}", StringComparison.OrdinalIgnoreCase, int.MaxValue));
+                        //    }                            
+                        //}
+
+                        //if (translated2 != null)
+                        //{
+                        //    List<string> lines = Stringlist.ExtractLinesFromText(translated2);
+                        //    foreach(string line in lines)
+                        //    {
+                        //        if (line.ToLower().Contains("datopgek")) new Writeln(line);
+                        //    }                            
+                        //}
+
+                        //wi.storage
                     }
                 }
 
@@ -2596,6 +2629,7 @@ namespace Gekko
             public int badFilesCounter = 0;
             public int wholeBadFilesCounter = 0;
             public List<List<string>> docs = new List<List<string>>();
+            public bool replaceDatopgek = false;
         }
 
 
