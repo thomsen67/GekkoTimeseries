@@ -2714,6 +2714,41 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void _Test_PrintOfSumWithListInside()
+        {
+            I("reset; time 2001 2003;");
+            I("a = 10;");
+            I("b = 20;");
+            I("xa = 1;");
+            I("xb = 2;");
+            I("ac = -100;");
+            I("ad = -200;");
+            I("bc = -300;");
+            I("bd = -400;");
+            I("xac = 100;");
+            I("xad = 200;");
+            I("xbc = 300;");
+            I("xbd = 400;");            
+            I("#i = a, b;");
+            I("#j = c, d;");
+            I("y0 = sum({#i});");
+            _AssertSeries(First(), "y0!a", 2001, 30d, sharedDelta);
+            I("y1 = sum(x{#i});");
+            _AssertSeries(First(), "y1!a", 2001, 3d, sharedDelta);
+            I("y2 = sum(x{#i}{#j});");
+            _AssertSeries(First(), "y2!a", 2001, 1000d, sharedDelta);
+            I("y3 = sum({#i}{#j});");
+            _AssertSeries(First(), "y3!a", 2001, -1000d, sharedDelta);
+            I("series xx = series(2);");
+            I("xx[a, c] = 100;");
+            I("xx[a, d] = 200;");
+            I("xx[b, c] = 300;");
+            I("xx[b, d] = 400;");
+            I("y4 = sum(xx[#i, #j]);");
+            _AssertSeries(First(), "y4!a", 2001, 1000d, sharedDelta);
+
+        }
 
         [TestMethod]
         public void _Test_AgeLag()

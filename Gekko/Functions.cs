@@ -8,6 +8,12 @@ using System.IO;
 namespace Gekko
 {
 
+    public class RootHelper
+    {
+        public string rootFileName = null;
+        public List<string> roots = new List<string>();
+    }
+
     public class Functions
     {
         //NOTE:
@@ -4642,29 +4648,50 @@ namespace Gekko
 
             //!!!HMMM, what folder??
 
-            string root = WalkFolderHelper(new DirectoryInfo(startFolder));
-            if (root == null)
-            {
-                new Error("Could not find " + rootFileName + " file in the folder '" + startFolder + "' or any parent folders above that folder");
-                return null; //will never return anything anyway
-            }
-            else return new ScalarString(root);
+            RootHelper rootHelper = new RootHelper();
+            rootHelper.rootFileName = rootFileName;
+            HELPER_root(new DirectoryInfo(startFolder), rootHelper);
 
-            string WalkFolderHelper(DirectoryInfo directoryInfo)
+            if (rootHelper.roots.Count == 0)
             {
-                foreach (FileInfo file in directoryInfo.GetFiles())
+                new Error("Could not find a " + rootFileName + " file in the folder '" + startFolder + "' or any parent folders");
+            }
+            else if (rootHelper.roots.Count == 1)
+            {
+                return new ScalarString(rootHelper.roots[0]);
+            }
+            else
+            {
+                using (Error error = new Error())
                 {
-                    if (G.Equal(file.Name, rootFileName))
+                    error.MainAdd("When searching for a " + rootFileName + " file in the folder '" + startFolder + "' or any parent folders, several files were found. This is illegal, since it is bound to produce confusion and perhaps errors. The found files are the following:");
+                    error.MainNewLineTight();
+                    int counter = 0;
+                    foreach (string s in rootHelper.roots)
                     {
-                        return directoryInfo.FullName;
+                        counter++;
+                        error.MainAdd("File #" + counter + " of " + rootHelper.roots.Count + ": " + s);
+                        error.MainNewLineTight();
                     }
                 }
-                DirectoryInfo parent = directoryInfo.Parent;
-                if (parent == null) return null;
-                return WalkFolderHelper(parent);
             }
+            return null;  //because of errors we never get here
         }
 
+        private static void HELPER_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
+        {
+            foreach (FileInfo file in directoryInfo.GetFiles())
+            {
+                if (G.Equal(file.Name.Trim(), rootHelper.rootFileName.Trim()))
+                {
+                    rootHelper.roots.Add(file.FullName.Trim());
+                    break;  //no need to carry on, cannot have dublets
+                }
+            }
+            DirectoryInfo parent = directoryInfo.Parent;
+            if (parent == null) return;
+            HELPER_root(parent, rootHelper);
+        }
 
 
         //public static IVariable checkroot(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -4684,38 +4711,6 @@ namespace Gekko
         //        }
         //    }
         //}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
