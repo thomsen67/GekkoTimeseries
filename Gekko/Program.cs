@@ -1583,7 +1583,7 @@ namespace Gekko
                 }
                 
             }
-            if (text.Trim().ToLower() == "insert gekopdat3")
+            if (text.Trim().ToLower() == "datopgek3_agh7xvslke3jfhqp")
             {
                 Translate_2_4_to_3_0.Insert();
                 return;
@@ -2332,7 +2332,8 @@ namespace Gekko
         /// <param name="create"></param>
         public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create)
         {
-            //open = true if called with OPEN command                      
+            //open = true if called with OPEN command              
+
 
             int n = 1;
             List<int> list = new List<int>();
@@ -2395,6 +2396,11 @@ namespace Gekko
                 }
 
                 string originalFileName = file;
+
+                if (Globals.pink && originalFileName != null && (originalFileName.ToLower().Contains("g:\\datopgek\\") || originalFileName.ToLower().Contains("g:/datopgek/")))
+                {
+                    Globals.datopgek_errors.Add("OPEN/READ/IMPORT of this file: " + originalFileName);
+                }
 
                 bool isGbk = true;
                 //bool isProtobuf = false;
@@ -3212,8 +3218,13 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = G.AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-            //TableLight inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);            
+            //TableLight inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);  
                         
+            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            {
+                Globals.datopgek_errors.Add("SHEET<import> used this file: " + fileName);
+            }
+
             EDataFormat fileType = EDataFormat.Xlsx;
             if (G.Equal(o.opt_xls, "yes")) fileType = EDataFormat.Xls;
             else if (G.Equal(o.opt_xlsx, "yes")) fileType = EDataFormat.Xlsx;
@@ -11632,6 +11643,12 @@ namespace Gekko
                 Program.SelectFile(Globals.extensionCommand, ref fileName, ref cancel);
             }
             if (cancel) return;
+
+            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            {
+                Globals.datopgek_errors.Add("Running this command file: " + fileName);
+            }
+
             RunHelper(o);
         }        
                 
@@ -15164,6 +15181,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank2);
                 fileName = FindFile(fileName, folders);                
             }
+
             return fileName;
         }
 
@@ -16364,6 +16382,12 @@ namespace Gekko
 
             string fileName = o.fileName;
             fileName = G.StripQuotes(fileName);
+
+            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            {
+                Globals.datopgek_errors.Add("WRITE/EXPORT of this file: " + fileName);
+            }
+
             bool isCaps = true; if (G.Equal(o.opt_caps, "no")) isCaps = false;
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
@@ -16894,6 +16918,19 @@ namespace Gekko
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
 
             string pathAndFileNameResultingFile = pathAndFilename;
+
+            if (Globals.pink)
+            {
+                if (pathAndFileNameResultingFile != null && (pathAndFileNameResultingFile.ToLower().Contains("g:\\datopgek3\\") || pathAndFileNameResultingFile.ToLower().Contains("g:/datopgek3/")))
+                {
+                    bool hit = false;
+                    foreach (string s in Globals.datopgek_banks)
+                    {
+                        if (G.Equal(s, pathAndFileNameResultingFile)) hit = true;
+                    }
+                    if (!hit) Globals.datopgek_banks.Add(pathAndFileNameResultingFile);
+                }
+            }
 
             int count = 0;
 

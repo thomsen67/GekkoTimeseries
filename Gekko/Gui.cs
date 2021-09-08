@@ -134,7 +134,7 @@ namespace Gekko
             this.textBoxMainTabUpper.TabStop = false;
             this.textBoxMainTabUpper.Text = "";
             this.textBoxMainTabUpper.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyDown);
-            this.textBoxMainTabUpper.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);
+            this.textBoxMainTabUpper.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);            
 
             Panel panelMainTabUpper = new Panel();
             panelMainTabUpper.BackColor= System.Drawing.SystemColors.Window;
@@ -184,8 +184,11 @@ namespace Gekko
             //1.4.9 stuff
             version = G.PrintVersion(version, false);
 
-            this.Text = "Gekko " + version;
-            this.Name = "Gekko " + version;
+            string pink = "";
+            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION]";
+
+            this.Text = "Gekko " + version + pink;
+            this.Name = "Gekko " + version + pink;
 
             green = Image.FromFile(Application.StartupPath + "\\images\\green.png");
             yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");            
@@ -1681,7 +1684,9 @@ namespace Gekko
             Globals.numberOfWarnings = 0;
             Globals.numberOfSkippedLines = 0;
             Program.AbortingReset();
-            Globals.errorMemory = null;  //so that it is not recording all the time.            
+            Globals.errorMemory = null;  //so that it is not recording all the time.   
+            if (Globals.pink) Globals.datopgek_errors = new List<string>();
+            if (Globals.pink) Globals.datopgek_banks = new List<string>();
 
             if (newUserInput)
             {
@@ -1885,6 +1890,40 @@ namespace Gekko
                 }
                 p.ReportToRunStatus(true);
                 Gui.PrintTotalErrors(p);
+                if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
+                {
+                    using (Warning warning = new Warning())
+                    {
+                        warning.MainAdd("-----------------------------------------------------------");
+                        warning.MainNewLineTight();
+                        warning.MainAdd("The run contained some access to files on g:\\datopgek:");
+                        warning.MainNewLineTight();
+                        foreach (string s in Globals.datopgek_errors)
+                        {
+                            warning.MainAdd("- " + s);
+                            warning.MainNewLineTight();
+                        }
+                        warning.MainAdd("-----------------------------------------------------------");
+                        warning.MainNewLineTight();
+                    }
+                }
+
+                if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
+                {
+                    using (Note note = new Note())
+                    {                        
+                        note.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the same databank on g:\\datopgek\\... .");
+                        note.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
+
+                        note.MainNewLine();
+                        foreach (string s in Globals.datopgek_banks)
+                        {
+                            string ss = s.Replace("g:\\datopgek3", "g:\\datopgek").Replace("g:/datopgek3", "g:/datopgek");
+                            note.MainAdd("read <first> '" + s + "'; read <ref> '" + ss + "'; compare <1980 2021>; edit compare_databanks.txt;");
+                            note.MainNewLine();
+                        }                        
+                    }
+                }
             }
         }
 

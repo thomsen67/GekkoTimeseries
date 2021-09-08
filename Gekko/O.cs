@@ -2446,6 +2446,12 @@ namespace Gekko
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             fileName = G.AddExtension(fileName, "." + "lst");
+                        
+            if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
+            {
+                Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
+            }
+
             List<string> folders = new List<string>();
             string fileNameTemp = Program.FindFile(fileName, folders);
             if (fileNameTemp == null)
@@ -3310,6 +3316,11 @@ namespace Gekko
 
             file = G.AddExtension(file, "." + "lst");
             string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
+
+            if (Globals.pink && pathAndFilename != null && (pathAndFilename.ToLower().Contains("g:\\datopgek\\") || pathAndFilename.ToLower().Contains("g:/datopgek/")))
+            {
+                Globals.datopgek_errors.Add("Writing this listfile: " + pathAndFilename);
+            }
 
             List rhs_list = rhs as List;
             if (rhs_list == null)
@@ -7492,9 +7503,6 @@ namespace Gekko
                     G.Writeln2("There were no open databanks to close (Work and " + Globals.Ref + " cannot be closed)");
                 }
             }
-
-
-
         }
 
         public class Open

@@ -39,6 +39,10 @@ namespace Gekko
     /// </summary>
     public class Globals
     {
+        public static bool pink = true;
+        public static List<string> datopgek_errors = null;
+        public static List<string> datopgek_banks = null;
+
         public const string smpl = "§¤£";  //this line must be at top
 
         public const string globalLibraryString = "Global";

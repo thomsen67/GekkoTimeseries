@@ -228,8 +228,8 @@ namespace Gekko
             this.textBoxMainTabLower.VisibleChanged += new System.EventHandler(this.textBox2_VisibleChanged);
             this.textBoxMainTabLower.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyDown);
             this.textBoxMainTabLower.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox2_KeyPress);
-            this.textBoxMainTabLower.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);
-            
+            this.textBoxMainTabLower.MouseDown += new System.Windows.Forms.MouseEventHandler(this.richTextBox1_MouseDown);            
+
             // 
             // contextMenuStrip1
             // 

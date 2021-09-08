@@ -2231,13 +2231,11 @@ namespace Gekko
 
         public static void Insert()
         {
+            //kaldes med tell'datopgek3_agh7xvslke3jfhqp';
+
             string temp = @"g:\dateopgek_temp";
             string g3 = @"g:\datopgek3";
-            string ext = ".gcm_gek2";
-
-            //remove this!!
-            temp = @"c:\Thomas\Desktop\gekko\testing\COUNTDOWN\datopgek_temp";
-            g3 = @"c:\Thomas\Desktop\gekko\testing\COUNTDOWN\datopgek3";
+            string ext = ".gcm_gek2";            
 
             string logfile = Program.options.folder_working + "\\insert_log.txt";
 
@@ -2253,6 +2251,7 @@ namespace Gekko
 
             new Writeln("From directory: " + temp);
             new Writeln("To directory: " + g3);
+            new Writeln("Insert started... ");
 
             List<string> log = new List<string>();
             List<string> files = GetList();
@@ -2286,7 +2285,7 @@ namespace Gekko
                     bad++;
                 }
             }
-
+            new Writeln("... insert ended");
             new Writeln("There are " + files.Count + " translated files. " + good + " files were copied successfully, with " + bad + " errors.");
             new Writeln("The old files are renamed from *.gcm til *" + ext + ".");
             new Writeln("Remember to insert a root.ini at the root of the new system.");
@@ -2362,12 +2361,12 @@ namespace Gekko
 @"05banker\Sywp\datop_gl.gcm",
 @"05banker\Sywp\datop_r.gcm",
 @"05banker\Sywp\datop_r2_t2.1.3.gcm",
-@"05banker\TyÃ¦ndringer nov17\tilobk.gcm",
-@"05banker\TyÃ¦ndringer nov17\tjkobk.gcm",
-@"05banker\TyÃ¦ndringer nov17\Tyer.bak.gcm",
-@"05banker\TyÃ¦ndringer nov17\Tyer.gcm",
-@"05banker\TyÃ¦ndringer nov17\tytilbage.bak.gcm",
-@"05banker\TyÃ¦ndringer nov17\tytilbage.gcm",
+@"05banker\Tyændringer nov17\tilobk.gcm",
+@"05banker\Tyændringer nov17\tjkobk.gcm",
+@"05banker\Tyændringer nov17\Tyer.bak.gcm",
+@"05banker\Tyændringer nov17\Tyer.gcm",
+@"05banker\Tyændringer nov17\tytilbage.bak.gcm",
+@"05banker\Tyændringer nov17\tytilbage.gcm",
 @"abase\abase_cq.gcm",
 @"abase\abase_hq.gcm",
 @"abase\abase_q.gcm",
@@ -2512,9 +2511,9 @@ namespace Gekko
 @"divbanker\slog\pwbse.gcm",
 @"divbanker\slog\slog.gcm",
 @"divbanker\statslaan\datarev.gcm",
-@"divbanker\TilbagefÃ¸rsel\Datatjek1947_2017.gcm",
-@"divbanker\TilbagefÃ¸rsel\DIVBKNY.gcm",
-@"divbanker\TilbagefÃ¸rsel\rettelser_i_obk.gcm",
+@"divbanker\Tilbageførsel\Datatjek1947_2017.gcm",
+@"divbanker\Tilbageførsel\DIVBKNY.gcm",
+@"divbanker\Tilbageførsel\rettelser_i_obk.gcm",
 @"divbanker\udlandsgald\dntal\datop.gcm",
 @"divbanker\udlandsgald\dntal\datopkox.gcm",
 @"divbanker\vardipapir\datarev.gcm",
