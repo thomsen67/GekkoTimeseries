@@ -41,7 +41,7 @@ using System.Timers;
 namespace Gekko
 {
 
-    public delegate void SetTextDelegate(System.Windows.Forms.Control ctrl, string text);    
+    public delegate void SetTextDelegate(System.Windows.Forms.Control ctrl, string text);
 
     public partial class Gui : Form
     {
@@ -63,7 +63,7 @@ namespace Gekko
             }
             base.Dispose(disposing);
         }
-        
+
         public P p;
 
         public Image red = null;
@@ -73,7 +73,7 @@ namespace Gekko
         public Image target = null;
 
         public RichTextBoxEx textBoxMainTabUpper = new RichTextBoxEx();
-        public RichTextBoxEx textBoxOutputTab = new RichTextBoxEx();        
+        public RichTextBoxEx textBoxOutputTab = new RichTextBoxEx();
 
         // worker thread
         Thread threadWorkerThread;
@@ -106,9 +106,9 @@ namespace Gekko
         public static Gui gui;
 
         public Gui()
-        {            
+        {
             this.textBoxMainTabUpper = new RichTextBoxEx();
-            
+
             this.splitContainerMainTab = new SplitContainerFix();
 
             InitializeComponent();
@@ -134,10 +134,10 @@ namespace Gekko
             this.textBoxMainTabUpper.TabStop = false;
             this.textBoxMainTabUpper.Text = "";
             this.textBoxMainTabUpper.KeyDown += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyDown);
-            this.textBoxMainTabUpper.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);            
+            this.textBoxMainTabUpper.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox777_KeyUp);
 
             Panel panelMainTabUpper = new Panel();
-            panelMainTabUpper.BackColor= System.Drawing.SystemColors.Window;
+            panelMainTabUpper.BackColor = System.Drawing.SystemColors.Window;
             panelMainTabUpper.Dock = DockStyle.Fill;
             panelMainTabUpper.Padding = new Padding(Globals.guiTextPaddingLeft, Globals.guiTextPaddingVertical, 0, Globals.guiTextPaddingVertical);
             panelMainTabUpper.Controls.Add(this.textBoxMainTabUpper);
@@ -167,7 +167,7 @@ namespace Gekko
             panelOutputTab.BackColor = System.Drawing.SystemColors.Window;
             panelOutputTab.Dock = DockStyle.Fill;
             panelOutputTab.Padding = new Padding(Globals.guiTextPaddingLeft, Globals.guiTextPaddingVertical, 0, Globals.guiTextPaddingVertical);
-            panelOutputTab.Controls.Add(this.textBoxOutputTab);            
+            panelOutputTab.Controls.Add(this.textBoxOutputTab);
             this.tabPageOutput.Controls.Add(panelOutputTab);
 
 
@@ -191,13 +191,13 @@ namespace Gekko
             this.Name = "Gekko " + version + pink;
 
             green = Image.FromFile(Application.StartupPath + "\\images\\green.png");
-            yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");            
+            yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");
             red = Image.FromFile(Application.StartupPath + "\\images\\red.png");
             target = Image.FromFile(Application.StartupPath + "\\images\\target.png");
 
             this.textBoxMainTabUpper.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxMainTabUpper_LinkClicked);
             this.textBoxOutputTab.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxOutputTab_LinkClicked);
-            
+
         }
 
         static void CrashHandler(object sender, UnhandledExceptionEventArgs args)
@@ -213,11 +213,11 @@ namespace Gekko
         ///
         [STAThread]
         public static void Main(string[] args)
-        {            
+        {
             //Code to handle unexpected crashes, for instance after hibernation
             AppDomain currentDomain = AppDomain.CurrentDomain;
-            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);            
-            
+            currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
+
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
             string folder = null;
@@ -305,10 +305,10 @@ namespace Gekko
                 Globals.runningOnTTComputer = true;  //for some debugging                
                 G.WritelnGray("DEBUGGING: Seems to be running on TT computer -- some debugging is switched on");
             }
-            
+
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
-            
+
             G.WriteDirs("small", false);
 
             if (Globals.gekkoVersion == "3.1.12" || Globals.gekkoVersion == "3.1.13" || Globals.gekkoVersion == "3.1.14")
@@ -332,9 +332,9 @@ namespace Gekko
                     note.MoreAdd("present in the first-position (typically: Work) databank.");
                     note.MoreNewLine();
                     note.MoreAdd("Whether to use mixed-mode or alternate between sim- and data-mode is basically a question of taste, and perhaps habit.");
-                }                
+                }
             }
-            
+
             Program.CreateLocalCopyHelpChm();
             CrossThreadStuff.Zoom();
 
@@ -358,7 +358,7 @@ namespace Gekko
                 //works as if it was an inputted command line from the GUI  
                 //must be after run of possible ini files (bug fixed 14.6 2019)
                 this.StartThread(Globals.gekkoExeParameters, true);
-            }            
+            }
         }
 
         private void RunGekkoTabToTextStuff(string folder)
@@ -402,7 +402,7 @@ namespace Gekko
                 string fileName = null;
 
                 fileName = e.Filename;
-                
+
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("+++ WARNING: An internal Gekko config file could not be read.");
                 sb.AppendLine("These user settings files are used to store window positions, ");
@@ -432,14 +432,14 @@ namespace Gekko
             if (track) MessageBox.Show("8");
             gui = new Gui();
             if (track) MessageBox.Show("9");
-                        
+
             gui.textBoxOutputTab.Text = "";
             gui.textBoxOutputTab.AppendText("This window is used to show output from the main window, when \n");
             gui.textBoxOutputTab.AppendText("this output is large in volume, or the details may not be of \n");
             gui.textBoxOutputTab.AppendText("crucial interest to the user. When relevant, this kind of extra \n");
             gui.textBoxOutputTab.AppendText("output will be accessible via a clickable link in the main window. \n");
-            gui.textBoxOutputTab.AppendText("\n");            
-            
+            gui.textBoxOutputTab.AppendText("\n");
+
             if (track) MessageBox.Show("10");
 
             //Clean up once every 7 days
@@ -526,7 +526,7 @@ namespace Gekko
             string s1 = G.GetWorkingFolder();
             if (track) MessageBox.Show("14");
             string s2 = G.GetProgramDir();
-            if (track) MessageBox.Show("15");            
+            if (track) MessageBox.Show("15");
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             if (track) MessageBox.Show("15.1");
             if (folder == null)
@@ -548,7 +548,7 @@ namespace Gekko
                         //var s10 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming);
                         string s11 = e.InnerException.Message;
                         MessageBox.Show("Gekko: The user settings file seems corrupted. Working folder set to desktop folder: " + desktop + "\n\nYou may consider deleting the user settings file, cf. this message:\n" + s11);
-                        Program.options.folder_working = desktop; 
+                        Program.options.folder_working = desktop;
                     }
                 }
             }
@@ -578,7 +578,7 @@ namespace Gekko
                     //MessageBox.Show(e.Message);
                     Program.options.folder_working = desktop;
                 }
-                
+
                 GuiReadOnlyHelper(track);
                 if (track) MessageBox.Show("16.7");
                 if (exc == false) break;
@@ -590,11 +590,11 @@ namespace Gekko
             if (track) MessageBox.Show("20");
             Program.databanks.storage.Clear();  //just in case
             Program.databanks.storage.Add(work);
-            Program.databanks.storage.Add(base2);            
+            Program.databanks.storage.Add(base2);
             if (track) MessageBox.Show("21");
 
             Program.GetStartingPeriod();
-            
+
             Globals.globalPeriodTimeSpans.data.Clear();  //just for safety
             Globals.globalPeriodTimeSpans.data.Add(new GekkoTimeSpan(Globals.globalPeriodStart, Globals.globalPeriodEnd));  //starts out with same TimeSpan as Time period
 
@@ -612,7 +612,7 @@ namespace Gekko
             if (track) MessageBox.Show("27");
 
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
-            
+
             if (noini != null && noini == "true")
             {
                 Globals.noini = true;  //has to be put in here, to be fetched later on by GuiAutoExecStuff
@@ -630,7 +630,7 @@ namespace Gekko
                 throw;
             }
             finally  //makes sure usersettings are always saved no matter what (for instance chosen working folder etc.)
-            {                
+            {
                 Globals.applicationIsInProcessOfDying = true;
                 //#3452345523
                 //Maybe just here, and not in EXIT and altF4.
@@ -639,7 +639,7 @@ namespace Gekko
                 int w = -12345;
                 int b = -12345;
                 Program.MaybeWriteOpenDatabanks(ref w, ref b);  //w and b are not used
-                
+
                 if (track) MessageBox.Show("28");
                 if (Globals.pipeFileHelper.pipeFile != null)
                 {
@@ -1040,7 +1040,7 @@ namespace Gekko
             //gui.textBox2.Focus();
         }
 
-        
+
         private void radioButton1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
@@ -1146,7 +1146,7 @@ namespace Gekko
             else if (e.Control && e.KeyCode == Keys.O)
             {
                 CrossThreadStuff.SetTab("output", true);
-            }            
+            }
             else if (e.Control && e.KeyCode == Keys.U)
             {
                 CrossThreadStuff.SetTab("menu", true);
@@ -1242,10 +1242,10 @@ namespace Gekko
                                       int pixelY)
         {
             using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
-            {                
+            {
                 unitX = pixelX / (g.DpiX / 96);
                 unitY = pixelY / (g.DpiY / 96);
-            }            
+            }
         }
 
         //found on the net, works much better than moving caret (--> flicker)
@@ -1267,7 +1267,7 @@ namespace Gekko
         private void textBoxOutputTab_LinkClicked(object sender, System.Windows.Forms.LinkClickedEventArgs e)
         {
             LinkClicked(e, ETabs.Output);
-        }        
+        }
 
         private static void LinkClicked(System.Windows.Forms.LinkClickedEventArgs e, ETabs tab)
         {
@@ -1411,7 +1411,7 @@ namespace Gekko
                 else if (type == "undosim")
                 {
                     if (!G.Equal(Globals.undoSim.id.ToString(), input))
-                    {                        
+                    {
                         new Error("You can only undo the last simulation, not previous ones", false);
                         return;
                     }
@@ -1425,7 +1425,7 @@ namespace Gekko
                 else if (type == "packsim")
                 {
                     if (!G.Equal(Globals.packSim.id.ToString(), input))
-                    {                        
+                    {
                         new Error("You can only pack the last simulation, not previous ones", false);
                         return;
                     }
@@ -1463,7 +1463,7 @@ namespace Gekko
                     if (!(ts.type == ESeriesType.ArraySuper))
                     {
                         new Error("strange error rgd. links");
-                    }                    
+                    }
 
                     List<string> lines = new List<string>();
 
@@ -1524,7 +1524,7 @@ namespace Gekko
             }
         }
 
-        
+
 
         [STAThread]
         public void toolStripButton1_Click(object sender, EventArgs e)
@@ -1566,7 +1566,7 @@ namespace Gekko
             }
         }
 
-        
+
 
         public void toolStripButton2_Click(object sender, EventArgs e)
         {
@@ -1575,7 +1575,7 @@ namespace Gekko
                 if (Program.guiBrowseNumber >= Program.guiBrowseHistory.Count) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 0];
                 Program.guiBrowseNumber += 0;  //1 will be added later, when calling "disp". Net result: 1.
-                if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var)) || ( Program.HasGamsEquation(var)))
+                if ((Program.model.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var)) || (Program.HasGamsEquation(var)))
                 {
                     List<string> temp = new List<string>();
                     temp.Add(var);
@@ -1655,7 +1655,7 @@ namespace Gekko
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-                CrossThreadStuff.Blink();
+            CrossThreadStuff.Blink();
         }
 
         public void StartThread(string gekkoCommands, bool newUserInput)
@@ -1666,7 +1666,7 @@ namespace Gekko
 
             Globals.bugfixMissing1 = new List<string>();
             Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            
+
             //Blinking icon when running a command
             //Not active/blinking when Gekko is idle
             Globals.guiTimerCounter = 0;
@@ -1716,7 +1716,7 @@ namespace Gekko
             gui.threadWorkerThread.SetApartmentState(ApartmentState.STA);
             gui.threadWorkerThread.CurrentCulture = CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
             gui.threadWorkerThread.Start();
-        }       
+        }
 
         // Stop Thread button is pressed
         private void btnStopThread_Click(object sender, System.EventArgs e)
@@ -1745,7 +1745,7 @@ namespace Gekko
             longProcess = new LongProcess(threadEventStopThread, threadEventThreadStopped, this);
 
             string commandLine = longProcess.gekkoGui.threadInput;
-            
+
             try
             {
                 longProcess.Run(p);
@@ -1910,22 +1910,34 @@ namespace Gekko
 
                 if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
                 {
-                    using (Note note = new Note())
-                    {                        
-                        note.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the same databank on g:\\datopgek\\... .");
-                        note.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
+                    using (Note txt = new Note())
+                    {
+                        txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the same databank on g:\\datopgek\\... .");
+                        txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
+                    }
 
-                        note.MainNewLine();
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("// ----- Gekko code start -----");
+                        txt.MainNewLine();
                         foreach (string s in Globals.datopgek_banks)
                         {
-                            string ss = s.Replace("g:\\datopgek3", "g:\\datopgek").Replace("g:/datopgek3", "g:/datopgek");
-                            note.MainAdd("read <first> '" + s + "'; read <ref> '" + ss + "'; compare <1980 2021>; edit compare_databanks.txt;");
-                            note.MainNewLine();
-                        }                        
+                            string ss = s.Replace("g:\\datopgek3", "g:\\datopgek").Replace("g:/datopgek3", "g:/datopgek");                            
+                            txt.MainAdd("read <first> '" + s + "';");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("read <ref> '" + ss + "';");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("compare <1980 2021>;");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("edit compare_databanks.txt;");
+                            txt.MainNewLine();
+                        }
+                        txt.MainAdd("// ----- Gekko code end -------");
+                        txt.MainNewLineTight();
                     }
                 }
             }
-        }
+        }   
 
         public static void PrintTotalErrors(P p)
         {
