@@ -314,7 +314,7 @@ namespace Gekko
             if (Globals.gekkoVersion == "3.1.12" || Globals.gekkoVersion == "3.1.13" || Globals.gekkoVersion == "3.1.14")
             {
                 using (Note note = new Note())
-                {
+                    {
                     note.MainAdd("Starting with the Gekko 3.1.12 version, the default {a{MODE¤mode.htm}a} of Gekko is changed to 'mixed'.");
                     note.MainAdd("This is the most general mode, and the change should have no concequences for existing Gekko 3.x programs.");
                     note.MainAdd("Per default, the status bar at the bottom of the main window is now yellow because of this change.");

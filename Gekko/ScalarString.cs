@@ -271,7 +271,10 @@ namespace Gekko
                     }                    
                 case EVariableType.List:
                     {
-                        new Error("Adding a list and scalar with %s + #x is no longer legal. Please use #x.prefix(%s) instead.");
+                        using (Error txt = new Error())
+                        {                            
+                            List.ScalarAndListErrorMessage(txt, true);
+                        }
                         return null;
                     }
                 case EVariableType.Series:
@@ -297,7 +300,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
             }
-        }
+        }        
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {

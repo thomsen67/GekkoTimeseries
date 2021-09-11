@@ -2233,7 +2233,7 @@ namespace Gekko
         {
             //kaldes med tell'datopgek3_agh7xvslke3jfhqp';
 
-            string temp = @"g:\dateopgek_temp";
+            string temp = @"g:\datopgek_temp";
             string g3 = @"g:\datopgek3";
             string ext = ".gcm_gek2";            
 

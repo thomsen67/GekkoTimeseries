@@ -170,6 +170,14 @@ namespace Gekko
                     {
                         return Operators.StringVal.Add((ScalarString)input, this, true);
                     }
+                case EVariableType.List:
+                    {
+                        using (Error txt = new Error())
+                        {
+                            List.ScalarAndListErrorMessage(txt, false);
+                        }
+                        return null;
+                    }
                 case EVariableType.Matrix:
                     {
                         new Error("You cannot add a MATRIX and a SCALAR."); return null;
@@ -177,8 +185,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        new Error("Variable conversion error."); return null;
-                        //throw new GekkoException();
+                        new Error("Variable conversion error."); return null;                        
                     }
             }
         }

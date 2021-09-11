@@ -282,7 +282,24 @@ namespace Gekko
                 case EVariableType.Val:
                 case EVariableType.Date:
                     {
-                        new Error("Adding a list and scalar with #x + %s is no longer legal. Please use #x.suffix(%s) instead.");                        
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("Adding a list and a scalar with the '+' operator like for instance #x + %y is not legal.");
+                            txt.MainAdd("If you want to append a scalar to a list, you may use for instance #z = #x.append(%y);.");                            
+                            if (x.Type() == EVariableType.String)
+                            {
+                                txt.MainAdd("For scalar strings, another possibility is to use a {a{naked list¤i_naked_list.htm}a} definintion with comma: #z = {#x}, {%y}; or #z = {#x}, a;.");
+                                txt.MainAdd("The latter example appends the string 'a' to the list.");
+                            }
+                            //
+                            txt.MoreAdd("In general, you may use the append() function, for instance #z = #x.append(%y);.");
+                            txt.MoreAdd("These can be nested, like for instance #z = #x.append(%y1).append(%y2);.");
+                            txt.MoreAdd("Note: to prepend a scalar to a list, you can use #x.prepend(%y).");
+                            txt.MoreAdd("Another possibility is for instance #z = #x + (%y,);, putting the %y variable into a 1-element list definition.");                            
+                            txt.MoreNewLine();                            
+                            //
+                            ListAndScalarErrorMessage(txt);
+                        }
                     }
                     break;
                 default:
@@ -293,6 +310,48 @@ namespace Gekko
             }
 
             return Functions.extend(smpl, null, null, this, x);
+        }
+
+        /// <summary>
+        /// An error message shown when adding for instance #x + %y
+        /// </summary>
+        /// <param name="txt"></param>
+        public static void ListAndScalarErrorMessage(Error txt)
+        {
+            txt.MoreAdd("Regarding scalar strings: in Gekko 2.x it was possible to write for instance #x + %y on the right-hand side of a list definition,");
+            txt.MoreAdd("and have the string appended to the list. This is disallowed in Gekko 3.x, because it is potentially confusing and error-prone.");
+            txt.MoreAdd("Consider #y = 'a' + #x + 'b';. In Gekko 2.x, the #z list would contain 'a' as the first element, then the elements of #x,");
+            txt.MoreAdd("and finally 'b' as the last element. Now imagine that we want to move 'b' to be added before the elements of #x. This would");
+            txt.MoreAdd("correspond to #y = 'a' + 'b' + #x;, but the 'a' + 'b' part of this would be evaluated first and would return 'ab', since adding strings generally works");
+            txt.MoreAdd("that way in Gekko, and hence the first element of #y would become 'ab'. There is no way out if this problem, and it could");
+            txt.MoreAdd("easily produce hard-to-catch bugs. But then couldn't at least #y = #x + 'a' + 'b'; be legal, appending first 'a' and then 'b' to the list #x?");
+            txt.MoreAdd("But this could easily produce other kinds of bugs, for instance if the user first writes #y = #x + (%s1 + %s2);,");
+            txt.MoreAdd("adding the concatenated string to the list, but afterwards deletes the parentheses because they seems superfluous.");
+            txt.MoreAdd("Because of these kinds of potential bugs, in Gekko 3.x you cannot add a list and a scalar using the '+' operator.");
+        }
+
+        /// <summary>
+        /// An error message shown when adding for instance %y + #x
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <param name="isString"></param>
+        public static void ScalarAndListErrorMessage(Error txt, bool isString)
+        {
+            txt.MainAdd("Adding a scalar and a list with the '+' operator like for instance %y + #x is not legal.");
+            txt.MainAdd("If you want to prepend a scalar to a list, you may use for instance #z = #x.prepend(%y);.");
+            if (isString)
+            {
+                txt.MainAdd("For scalar strings, another possibility is to use a {a{naked list¤i_naked_list.htm}a} definintion with comma: #z = {%y}, {#x}; or #z = a, {#x}.");
+                txt.MainAdd("The latter example prepends the string 'a' to the list.");
+            }
+            //
+            txt.MoreAdd("In general, you may use the prepend() function, for instance #z = #x.prepend(%y);.");
+            txt.MoreAdd("These can be nested, like for instance #z = #x.prepend(%y2).prepend(%y1);, beware of the inversed insertion order.");
+            txt.MoreAdd("Note: to append a scalar to a list, you can use #x.append(%y).");
+            txt.MoreAdd("Another possibility is for instance #z = (%y,) + #x;, putting the %y variable into a 1-element list definition.");
+            //
+            txt.MoreNewLine();
+            List.ListAndScalarErrorMessage(txt);
         }
 
         public IVariable Concat(GekkoSmpl smpl, IVariable x)

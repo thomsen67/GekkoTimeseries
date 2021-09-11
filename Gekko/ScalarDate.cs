@@ -100,11 +100,18 @@ namespace Gekko
                 case EVariableType.String:
                     {
                         return Operators.StringDate.Add((ScalarString)x, this, true);
-                    }                  
+                    }
+                case EVariableType.List :
+                    {
+                        using (Error txt = new Error())
+                        {
+                            List.ScalarAndListErrorMessage(txt, false);
+                        }
+                        return null;
+                    }
                 default:
                     {
                         new Error("Type error regarding add"); return null;
-                        //throw new GekkoException();
                     }
             }
         }
