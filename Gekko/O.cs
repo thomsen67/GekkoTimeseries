@@ -9707,16 +9707,10 @@ namespace Gekko
                 {
                     Translate_2_4_to_3_0.Info info = new Translate_2_4_to_3_0.Info();
                     if (G.Equal(opt_keeptypes, "yes")) info.keepTypes = true;
-                    bool isNew = true;
-                    string ss = null;
-                    if (isNew)
-                    {                        
-                        ss = Translate_2_4_to_3_0.Translate(originalCode, info);
-                    }
-                    else
-                    {
-                        ss = Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE.Translate(originalCode);
-                    }
+
+                    string ss = Translate_2_4_to_3_0.Translate(originalCode, info);
+
+
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9730,20 +9724,17 @@ namespace Gekko
                         w.MainAdd("Translated file into: " + zz);
                         w.MainNewLineTight();
                         w.MainAdd("Translate comments: see /* TRANSLATE: .... */");
-                        if (isNew)
+                        if (info.useGlobalBankForNonSeries && info.globalCounter > 0)
                         {
-                            if (info.useGlobalBankForNonSeries && info.globalCounter > 0)
-                            {
-                                w.MainNewLineTight();
-                                w.MainAdd("Note: The translator added " + info.globalCounter + " 'Global:' bank indicators on the left-hand side of non-series statements.");
-                                w.MoreAdd("In Gekko 3.0 and above, vals, dates, strings, lists and matrices all live in databanks.");
-                                w.MoreAdd("Therefore, 'Global:' is added to all such statements, so that these variables are ");
-                                w.MoreAdd("put into the Global databank (for instance, 'VAL x = 100;' will become 'Global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
-                                w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
-                                w.MoreAdd("Some of these 'Global:' bank indicators may be unnecessary, but better safe than sorry.");
-                            }
+                            w.MainNewLineTight();
+                            w.MainAdd("Note: The translator added " + info.globalCounter + " 'Global:' bank indicators on the left-hand side of non-series statements.");
+                            w.MoreAdd("In Gekko 3.0 and above, vals, dates, strings, lists and matrices all live in databanks.");
+                            w.MoreAdd("Therefore, 'Global:' is added to all such statements, so that these variables are ");
+                            w.MoreAdd("put into the Global databank (for instance, 'VAL x = 100;' will become 'Global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
+                            w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
+                            w.MoreAdd("Some of these 'Global:' bank indicators may be unnecessary, but better safe than sorry.");
                         }
-                    }                    
+                    }
                 }
                 else if (G.Equal(opt_remove, "yes"))
                 {
