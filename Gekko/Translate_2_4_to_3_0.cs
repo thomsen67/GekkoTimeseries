@@ -1517,6 +1517,7 @@ namespace Gekko
                     try
                     {
                         string name = null;
+
                         for (int i = ii; i < op_i; i++) name += line[i].ToString();
                         name = name.Trim();
                         string rhs = null;

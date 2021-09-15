@@ -347,7 +347,7 @@ namespace Gekko
                 }
                 if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
                 {
-                    AddComment(topline, "Note that ##x in Gekko is %{%x} or #{%x}");
+                    AddComment(topline, "Note that ##x in Gekko is written %{%x} or #{%x}");
                 }
 
                 if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
@@ -843,6 +843,50 @@ namespace Gekko
                     optionField = true;
                 }
 
+                if (true)
+                {
+                    try
+                    {
+                        int ii = 1; //skip series
+                        Tuple<int, int> tup = FindOptionField(line);
+                        if (tup.Item1 != -12345) ii = tup.Item2 + 1;
+                        
+                        int op_i = FindS(line, "=");
+
+                        string name = null;
+                        for (int i5 = ii; i5 < op_i; i5++) name += line[i5].ToString();
+                        name = name.Trim();
+
+                        string rhs = null;
+                        for (int i5 = op_i + 1; i5 < line.Count; i5++) rhs += line[i5].ToString();
+                        rhs = rhs.Trim();
+
+                        int start = rhs.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase);
+
+                        while (start >= 0)
+                        {
+                            if (start - 1 >= 0 && (G.IsLetterOrDigitOrUnderscore(rhs[start - 1]) || rhs[start - 1] == '|' || rhs[start - 1] == '#'))
+                            {
+                                //ignore
+                            }
+                            else
+                            {
+                                if (rhs[start + name.Length - 1 + 1] == '.' || (rhs[start + name.Length - 1 + 1] == '[' && rhs[start + name.Length - 1 + 2] == '-'))
+                                {
+                                    //lhs is seen on rhs --> use <dynamic> for safety
+                                    //will have no effect on y = y + 1, only on y = y[-1] + 1, or lag functions, y[2010] etc.
+                                    AddToOptionField(line, 1, "dyn");
+                                    AddComment(line, "Note: <dyn> added");
+                                    break;
+                                }
+                            }
+                            start = rhs.IndexOf(name, start + 1, StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+                    catch { };
+                }
+
+
                 if (optionField)
                 {                    
                 }
@@ -852,7 +896,7 @@ namespace Gekko
                     line[pos + 1].leftblanks = 0;
                 }
 
-                Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.MoveOptionField(line, lb);
+                Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE.MoveOptionField(line, lb);
             }
 
             else if (G.Equal(line[pos].s, FromTo("set", "set")) != null)
@@ -1156,9 +1200,9 @@ namespace Gekko
         }
     }
 
-    
-    class Translator_Gekko20_Gekko30_OLD_REMOVE_SOON
-    {        
+
+    class Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE
+    {
         //This class translates from Gekko 2.0 to 3.0
 
         public static string Translate(string input)
@@ -1175,7 +1219,7 @@ namespace Gekko
             var tags2 = new List<string>() { "//" };
 
             TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
-                        
+
             int counter = 0;
 
             StringBuilder rv = new StringBuilder();
@@ -1292,7 +1336,7 @@ namespace Gekko
         }
 
         public static string Move(string input)  //for translate<move>
-        {            
+        {
             string txt = input;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
@@ -1313,14 +1357,14 @@ namespace Gekko
                     statement = new List<TokenHelper>();
                 }
             }
-            statements2.Add(statement);            
+            statements2.Add(statement);
 
             foreach (List<TokenHelper> line in statements2)
             {
-                  
+
                 try
                 {
-                    HandleMove(line);                    
+                    HandleMove(line);
                 }
                 catch
                 {
@@ -1423,7 +1467,7 @@ namespace Gekko
         }
 
         public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline)
-        {            
+        {
 
             for (int i = 0; i < line.Count; i++)
             {
@@ -1462,7 +1506,7 @@ namespace Gekko
                     }
                 }
                 catch { };
-                
+
                 //quotes, interpolate                
                 if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
                 {
@@ -1559,7 +1603,7 @@ namespace Gekko
                 }
 
             }
-        }                
+        }
 
         public static void HandleCommandName(List<TokenHelper> line)
         {
@@ -1619,7 +1663,7 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "export"))
             {
-                AddComment(line, "For EXPORT without dates, use EXPORT<all>");                
+                AddComment(line, "For EXPORT without dates, use EXPORT<all>");
             }
 
             else if (G.Equal(line[pos].s, "function"))
@@ -1667,7 +1711,7 @@ namespace Gekko
 
                 if (!list)
                 {
-                    
+
                     int eq = FindS(line, "=");
 
                     if (eq == 2)
@@ -1702,7 +1746,7 @@ namespace Gekko
                     line.RemoveAt(1);
                     line.RemoveAt(1);
                 }
-                
+
                 //so much is changed here that we have to run this one manually first
                 HandleExpressionsRecursive(line, line);
 
@@ -1776,13 +1820,13 @@ namespace Gekko
 
                     //test if items are simple
                     bool simple = true;
-                    foreach(string s3 in items)
+                    foreach (string s3 in items)
                     {
                         string s2 = s3.Trim();
-                        bool curly = false;                        
+                        bool curly = false;
                         for (int ic = 0; ic < s2.Length; ic++)
-                        {                            
-                            if (s2[ic] == '{') curly = true;                            
+                        {
+                            if (s2[ic] == '{') curly = true;
                             if (curly || G.IsLetterOrDigitOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
                             {
                                 //ok
@@ -1898,7 +1942,7 @@ namespace Gekko
                         {
                             bool first = true;
                             for (int ij = 0; ij < items.Count; ij++)
-                            {                                
+                            {
                                 string s2 = items[ij];
                                 if (!first) result2 += ",";
                                 result2 += itemsExtra[ij] + s2;
@@ -1924,8 +1968,8 @@ namespace Gekko
 
                     for (int i = 1; i < line.Count; i++)
                     {
-                        line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null; 
-                        
+                        line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null;
+
                     }
                     line[0].leftblanks = 0;
 
@@ -1941,7 +1985,7 @@ namespace Gekko
                 }
             }
 
-            
+
 
             else if (G.Equal(line[pos].s, FromTo("mat", "matrix")) != null)
             {
@@ -2176,16 +2220,16 @@ namespace Gekko
             }
 
             SetLineStartRecursive(line, line);
-            
+
 
         }
 
         public static void HandleMove(List<TokenHelper> line)
         {
             int pos = 0;
-            
+
             if (true)
-            {               
+            {
                 //move the option field
                 MoveOptionField(line, -12345); //signals that it is for translate<move>
             }
@@ -2219,7 +2263,7 @@ namespace Gekko
             op_1 = FindS(line, 0, new string[] { "<" });
             if (op_1 != -12345) op_2 = FindS(line, op_1, new string[] { ">" });
             if (op_2 != -12345) op_3 = FindS(line, op_2, new string[] { "=" });
-            
+
             if (op_1 == -12345 || op_2 == -12345 || op_3 == -12345)
             {
                 //do nothing
@@ -2230,7 +2274,7 @@ namespace Gekko
                 //now we have ... < ... > ... = ...                    
                 //                1     2     3
                 //we need to move the stuff between 2 and 3 to before 1.
-                List <TokenHelper> clone = new List<TokenHelper>();
+                List<TokenHelper> clone = new List<TokenHelper>();
                 clone.AddRange(line);
                 line.Clear();
 
@@ -2263,13 +2307,13 @@ namespace Gekko
         /// </summary>
         /// <param name="line"></param>
         public static void RemoveParentheses(List<TokenHelper> line)
-        {               
+        {
             int op_1 = FindS(line, 0, new string[] { "=" });
             if (op_1 != -12345)
             {
                 if (FindS(line, op_1 + 1, new string[] { "=" }) != -12345) return;  //this would be strange
                 if (line[op_1 + 1].SubnodesType() == "(")
-                {                        
+                {
                     if (AreAllItemsSimpleNumbers(line[op_1 + 1].SplitCommas(true)))
                     {
                         //more than 1 items, and alle are simple numbers
@@ -2325,7 +2369,7 @@ namespace Gekko
                 }
             }
             return rv;
-        }        
+        }
 
         private static void AddComment(List<TokenHelper> line, string s)
         {
@@ -2342,7 +2386,7 @@ namespace Gekko
             }
             if (ok) line.Add(th);  //avoid dublets
         }
-        
+
 
         private static bool Equal(List<TokenHelper> line, int i, string s)
         {
@@ -2358,7 +2402,7 @@ namespace Gekko
         {
             if (i < 0 || i >= line.Count) return null;
             return line[i].s;
-        }        
+        }
 
         private static int GetLeftblanks(List<TokenHelper> line, int i)
         {
@@ -2380,7 +2424,7 @@ namespace Gekko
         private static bool LineStartsWithWord(List<TokenHelper> line)
         {
             return line[0].type == ETokenType.Word;
-        }        
+        }
 
         private static List<TokenHelper> GetCommandLine(List<TokenHelper> line)
         {
@@ -2442,6 +2486,6 @@ namespace Gekko
                 s3.Add(s);
             }
             return s3;
-        }        
+        }
     }
 }

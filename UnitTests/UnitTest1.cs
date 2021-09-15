@@ -2717,6 +2717,18 @@ namespace UnitTests
         [TestMethod]
         public void _Test_PrintOfSumWithListInside()
         {
+            //All these sums are implicit: not explicit over #i like sum(#i, x{#i}) etc.
+            //
+            //    y = sum(x{#i}{#j})     --> sum((#i, #j), x{#i}{#j}) 
+            //    y = sum(x[#i, #j])     --> sum((#i, #j), x[#i, #j]) 
+            //NO: y{#i} = sum(x{#i}{#j})
+            //NO: y = sum(sum(x{#i}{#j}))
+            //NO: y = sum(#i, sum(x{#i}{#j}))
+            //NO: y = sum(sum(#i, x{#i}{#j}))
+
+            //
+            //printing should also only work for prt sum(x{#i}{#j}), not if inside another sum().
+
             I("reset; time 2001 2003;");
             I("a = 10;");
             I("b = 20;");
@@ -2745,8 +2757,25 @@ namespace UnitTests
             I("xx[a, d] = 200;");
             I("xx[b, c] = 300;");
             I("xx[b, d] = 400;");
-            I("y4 = sum(xx[#i, #j]);");
+            I("y4 = sum(xx[#i, #j]);");  //this should perhaps not work... ?
             _AssertSeries(First(), "y4!a", 2001, 1000d, sharedDelta);
+
+            Gekko.Table table = null;
+
+            //Testing print of these sums
+            I("prt sum({#i});");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum({#i});");
+            Assert.AreEqual(table.Get(2, 2).number,  30d);
+            return;
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx[b, y]");
+
+            I("prt sum(x{#i});");
+            I("prt sum(x{#i}{#j});");
+            I("prt sum({#i}{#j});");            
+            I("prt sum(xx[#i, #j]);");
 
         }
 

@@ -9715,7 +9715,7 @@ namespace Gekko
                     }
                     else
                     {
-                        ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Translate(originalCode);
+                        ss = Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE.Translate(originalCode);
                     }
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -9747,7 +9747,7 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_remove, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Remove(originalCode);
+                    string ss = Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE.Remove(originalCode);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9760,7 +9760,7 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_move, "yes"))
                 {
-                    string ss = Translator_Gekko20_Gekko30_OLD_REMOVE_SOON.Move(originalCode);
+                    string ss = Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE.Move(originalCode);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
@@ -9783,7 +9783,7 @@ namespace Gekko
                     }
                     G.Writeln2("Translated file into: " + zz);
                     G.Writeln("Translate comments: see /* TRANSLATE: .... */");
-                    G.Writeln("Note that <dyn> is not automatically set in SERIES (like in the Gekko 2.0 translator).");
+                    //G.Writeln("Note that <dyn> is not automatically set in SERIES (like in the Gekko 2.0 translator).");
                 }
                 else
                 {
