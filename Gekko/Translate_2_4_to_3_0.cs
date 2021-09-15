@@ -1023,6 +1023,7 @@ namespace Gekko
                     if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
                     {
                         last.s = "to global:#" + last.s;
+                        info.globalCounter++;
                     }
                 }
                 else

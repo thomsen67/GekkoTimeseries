@@ -9727,12 +9727,12 @@ namespace Gekko
                         if (info.useGlobalBankForNonSeries && info.globalCounter > 0)
                         {
                             w.MainNewLineTight();
-                            w.MainAdd("Note: The translator added " + info.globalCounter + " 'Global:' bank indicators on the left-hand side of non-series statements.");
+                            w.MainAdd("Note: The translator added " + info.globalCounter + " 'global:' bank indicators on the left-hand side of non-series statements (or in INDEX).");
                             w.MoreAdd("In Gekko 3.0 and above, vals, dates, strings, lists and matrices all live in databanks.");
-                            w.MoreAdd("Therefore, 'Global:' is added to all such statements, so that these variables are ");
-                            w.MoreAdd("put into the Global databank (for instance, 'VAL x = 100;' will become 'Global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
+                            w.MoreAdd("Therefore, 'global:' is added to all such statements, so that these variables are ");
+                            w.MoreAdd("put into the Global databank (for instance, 'VAL x = 100;' will become 'global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
                             w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
-                            w.MoreAdd("Some of these 'Global:' bank indicators may be unnecessary, but better safe than sorry.");
+                            w.MoreAdd("Some of these 'global:' bank indicators may be unnecessary, but better safe than sorry.");
                         }
                     }
                 }
@@ -9772,9 +9772,24 @@ namespace Gekko
                         sw.Flush();
                         sw.Close();
                     }
-                    G.Writeln2("Translated file into: " + zz);
-                    G.Writeln("Translate comments: see /* TRANSLATE: .... */");
-                    //G.Writeln("Note that <dyn> is not automatically set in SERIES (like in the Gekko 2.0 translator).");
+                    
+                    using (var w = new Writeln())
+                    {
+                        w.MainAdd("Translated file into: " + zz);
+                        w.MainNewLineTight();
+                        w.MainAdd("Translate comments: see /* TRANSLATE: .... */");
+                        if (Translator_AREMOS_Gekko30.globalBankCounter > 0)
+                        {
+                            w.MainNewLineTight();
+                            w.MainAdd("Note: The translator added " + Translator_AREMOS_Gekko30.globalBankCounter + " 'global:' bank indicators on the left-hand side of ASSIGN/LIST/MATRIX commands (or in INDEX).");
+                            w.MoreAdd("In Gekko 3.0 and above, vals, dates, strings, lists and matrices all live in databanks.");
+                            w.MoreAdd("Therefore, 'global:' is added to all such statements, so that these variables are ");
+                            w.MoreAdd("put into the Global databank (for instance, 'assign x value 100;' will become 'global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
+                            w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
+                            w.MoreAdd("Some of these 'global:' bank indicators may be unnecessary, but better safe than sorry.");
+                        }
+                    }
+
                 }
                 else
                 {

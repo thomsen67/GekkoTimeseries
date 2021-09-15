@@ -11,15 +11,16 @@ namespace Gekko
         public static GekkoDictionary<string, string> listMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static GekkoDictionary<string, string> matrixMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public static int globalBankCounter = 0;
 
         //This class translates from AREMOS to Gekko 3.0
 
         public static string Translate(string input)
-        {
-
+        {            
             listMemory.Clear();
             matrixMemory.Clear();
             scalarMemory.Clear();
+            globalBankCounter = 0;
 
             string txt = input;            
             var tags2 = new List<string>() { "!" };
@@ -531,7 +532,9 @@ namespace Gekko
                 string name = line[pos + 1].s;
                 if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
                 line[pos].meta.commandName = "assign";
-                line[pos].s = "%";
+                line[pos].s = "global:%";
+                globalBankCounter++;
+
                 line[pos + 1].leftblanks = 0;
                 List<string> x = new List<string>();
                 x.Add("bank");
@@ -723,6 +726,7 @@ namespace Gekko
                 {
                     if (!listMemory.ContainsKey(last.s)) listMemory.Add(last.s, "");
                     last.s = "to global:#" + last.s;
+                    globalBankCounter++;
                     end = line.Count - 3;
                 }
                 else
@@ -755,7 +759,8 @@ namespace Gekko
 
                 if (Equal(line, 2, "="))
                 {
-                    line[pos].s = "#";
+                    line[pos].s = "global:#";
+                    globalBankCounter++;
                     line[pos + 1].leftblanks = 0;
                 }
                 else if (Equal(line, 1, "listfile") && Equal(line, 3, "="))
@@ -774,6 +779,7 @@ namespace Gekko
                 if (Equal(line, 2, "="))
                 {
                     line[pos].s = "#";
+                    globalBankCounter++;
                     line[pos + 1].leftblanks = 0;
                 }
             }
