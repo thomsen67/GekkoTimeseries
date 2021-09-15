@@ -9713,7 +9713,7 @@ namespace Gekko
 
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                    {
+                    {                        
                         sw.Write(ss);
                         sw.Flush();
                         sw.Close();
@@ -9768,6 +9768,7 @@ namespace Gekko
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
+                        if (Globals.runningOnTTComputer) sw.WriteLine("// +++++ TTH check +++++");
                         sw.Write(ss);
                         sw.Flush();
                         sw.Close();
