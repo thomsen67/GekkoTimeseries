@@ -5257,11 +5257,15 @@ namespace Gekko
                                     new Error("Could not convert '" + temp2 + "' into a number");
                                 }
                             }
-                            if (ii + holes[ii] + jj * totalDatesIncludingHoles >= data.Length)
+
+                            int holesii = 0;
+                            if (holes != null) holesii = holes[ii];
+
+                            if (ii + holesii + jj * totalDatesIncludingHoles >= data.Length)
                             {
                                 new Error("More than " + data.Length + " (= " + codesCombi.Count + " x " + totalDatesIncludingHoles + ") numbers found in data section");
                             }
-                            data[ii + holes[ii] + jj * totalDatesIncludingHoles] = value;  //ii is date, jj is variable
+                            data[ii + holesii + jj * totalDatesIncludingHoles] = value;  //ii is date, jj is variable
                             
                             //ii counts dates as they are. If dates are 2021m1d7, 2020m2d8, 2020m2d11, 2020m2d12
                             //ii will be 0, 1, 2, 3 here.
