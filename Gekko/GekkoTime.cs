@@ -318,16 +318,34 @@ namespace Gekko
             return dt;
         }
 
+        /// <summary>
+        /// Converts from a string like "2020q2" or "2020m04d02" to a GekkoTime struct. Trailing "a" or "a1" or "u" or "u1" allowed. A string like "98" will be understood as 1998. Using "k" for quarters is not allowed, see overloads.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static GekkoTime FromStringToGekkoTime(string s)
         {
             return FromStringToGekkoTime(s, false);
         }
 
+        /// <summary>
+        /// Converts from a string like "2020q2" or "2020k2" or "2020m04d02" to a GekkoTime struct. Trailing "a" or "a1" or "u" or "u1" allowed. A string like "98" will be understood as 1998.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="allowKForQuarters"></param>
+        /// <returns></returns>
         public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuarters)
         {
             return FromStringToGekkoTime(s, allowKForQuarters, true);
         }
 
+        /// <summary>
+        /// Converts from a string like "2020q2" or "2020k2" or "2020m04d02" to a GekkoTime struct. Trailing "a" or "a1" or "u" or "u1" allowed. A string like "98" will be understood as 1998.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="allowKForQuarters"></param>
+        /// <param name="reportError"></param>
+        /// <returns></returns>
         public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuarters, bool reportError)
         {
             //To do the reverse: see G.FromDateToString()   
@@ -599,6 +617,13 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Finds the number of observations that a time range t1 to t2 spans. If t1 = 2020 and t2 = 2022, it will return 3. So note that it is the difference + 1.
+        /// The method *can* return 0 or a negative number! If both GekkoTimes are null, 0 is returned. If one but not the other is null, an error is issued.
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <returns></returns>
         public static int Observations(GekkoTime t1, GekkoTime t2)
         {
             //========================================================================================================
@@ -606,11 +631,19 @@ namespace Gekko
             //========================================================================================================
 
             //BEWARE: Can return 0 or a negative number!
-            //Also checks that freqs are the same
+            //Also checks that freqs are the same and are not null.
+            //Returns 0 if both are null.
+
             if (t1.freq != t2.freq)
             {
                 new Error("Frequency mismatch: " + G.GetFreqPretty(t1.freq) + " vs. " + G.GetFreqPretty(t2.freq));
             }
+
+            if ((t1.IsNull() && !t2.IsNull()) || ((!t1.IsNull() && t2.IsNull())))
+            {
+                new Error("Trying to compute the number of observations between two dates, where one is null and the other is not null.");
+            }
+
             EFreq efreq = t1.freq;
 
             if (efreq == EFreq.D)

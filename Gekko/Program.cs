@@ -5062,6 +5062,9 @@ namespace Gekko
             bool hyphenFound = false;
             bool underscoreFound = false;
 
+            List<int> holes = null;  //!! important that it starts out as null !!
+            int totalDatesIncludingHoles = -12345;  //including holes
+
             GekkoTime gt_start = GekkoTime.tNull;
             GekkoTime gt_end = GekkoTime.tNull;
             string freq = "a";
@@ -5085,7 +5088,7 @@ namespace Gekko
 
             List<string> codesCombi = null;
             List<string> valuesCombi = null;
-            int state = 0;  //DATA=1, CODES("tid")=2, CODES(...)=3, VALUES(...)=4
+            
             StringBuilder lineHelper = new StringBuilder();
             double[] data = null;
             int ii = 0;
@@ -5109,6 +5112,7 @@ namespace Gekko
             long allCounter = 0;
             long allCounter2 = 0;
 
+            int state = 0;  //DATA=1, CODES("tid")=2, CODES(...)=3, VALUES(...)=4
             foreach (string line2 in lines2)
             {
                 lineCounter++;
@@ -5183,10 +5187,14 @@ namespace Gekko
 
                 if (state == 1)
                 {
-                    //state=1                            
+                    //state=1, handle the data and convert it from strings to real numbers (double)                      
 
                     if (firstLine)
                     {
+                        int totalHoles = 0;
+                        if (holes != null) totalHoles = holes[holes.Count - 1];
+                        totalDatesIncludingHoles = dates.Count + totalHoles;
+
                         codesCombi = new List<string>();
                         valuesCombi = new List<string>();
 
@@ -5199,17 +5207,20 @@ namespace Gekko
 
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
                         WalkPxCombinations(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound, ref underscoreFound);
-                        data = G.CreateArrayDouble(codesCombi.Count * dates.Count, double.NaN);  //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
+
+                        //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
+                        //also handles holes in dates, for instance for daily observations if there is no data for weekends
+                        
+                        data = G.CreateArrayDouble(codesCombi.Count * totalDatesIncludingHoles, double.NaN);
                     }
 
                     string s = line;
 
                     int sstate = 1;
                     int lastStart = 0;
-                    //int counter = 0;
+
                     for (int i5 = 0; i5 < s.Length; i5++)
-                    {
-                        
+                    {                        
                         char c = s[i5];
                         if ((c == ' ' || i5 == s.Length - 1) && sstate == 1)
                         {
@@ -5219,7 +5230,7 @@ namespace Gekko
                                 add = 1;
                             }
                             string temp2 = s.Substring(lastStart, i5 - lastStart + add).Trim();
-                            //counter++;
+                            
                             allCounter2++;
                             
                             double value = double.NaN;
@@ -5244,16 +5255,22 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("Could not convert '" + temp2 + "' into a number");
-                                    //throw new GekkoException();
                                 }
                             }
-                            if (ii + jj * dates.Count >= data.Length)
+                            if (ii + holes[ii] + jj * totalDatesIncludingHoles >= data.Length)
                             {
-                                new Error("More than " + data.Length + " numbers found in data section");
-                                //throw new GekkoException();
+                                new Error("More than " + data.Length + " (= " + codesCombi.Count + " x " + totalDatesIncludingHoles + ") numbers found in data section");
                             }
-                            data[ii + jj * dates.Count] = value;  //i is date, j is variable
+                            data[ii + holes[ii] + jj * totalDatesIncludingHoles] = value;  //ii is date, jj is variable
+                            
+                            //ii counts dates as they are. If dates are 2021m1d7, 2020m2d8, 2020m2d11, 2020m2d12
+                            //ii will be 0, 1, 2, 3 here.
+                            //but holes[] will be (0, 0, 2, 2), so ii + holes[ii] becomes (0, 1, 4, 5).
+                            //in data[] we will get (data, data, NaN, NaN, data, data), where the 4
+                            //numbers are put in.
+
                             ii++;
+
                             if (ii > dates.Count - 1)
                             {
                                 ii = 0;
@@ -5281,6 +5298,10 @@ namespace Gekko
                 {
                     //Reading dates from CODES("tid")
                     //This will only be run once
+
+                    //========================================================================================================
+                    //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                    //========================================================================================================
 
                     string s = lineHelper.ToString();
                     if (s.StartsWith(codeTimeString, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString.Length);
@@ -5346,21 +5367,45 @@ namespace Gekko
 
                     if (obs != dates.Count)
                     {
+                        //========================================================================================================
+                        //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                        //========================================================================================================
+
                         //Guards against holes in the date sequence
                         //Note that gt_start and gt_end may be changed with datesRestrict below. Hmmm?
 
                         if (freq == "d")
                         {
+                            holes = new List<int>();
+                            holes.Add(0); //to get started
+                            GekkoTime gt_before = GekkoTime.tNull;
+                            string date_before = null;
                             //we have to read it the slow way (because of holes)
 
+                            //consider there are n dates. For date[i], in the data array that contains raw data, it needs
+                            //to be offset by holes[i] positions.
+
+                            int sumOfAdjust = 0;
+                            foreach (string date in dates)
+                            {
+                                GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true);
+                                if (!gt_before.IsNull())
+                                {
+                                    int adjust = GekkoTime.Observations(gt_before, gt) - 2;  //0 if consequtive
+                                    if (adjust < 0)
+                                    {
+                                        new Error("It seems the date '" + date_before + "' is not before the following date: '" + date + "'");
+                                    }
+                                    sumOfAdjust += adjust;
+                                    holes.Add(sumOfAdjust);
+                                }
+                                gt_before = gt;
+                            }
                         }
                         else
                         {
                             using (Error txt = new Error())
-                            {
-                                //========================================================================================================
-                                //                          FREQUENCY LOCATION, indicates where to implement more frequencies
-                                //========================================================================================================
+                            {                                
                                 txt.MainAdd("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);
                                 txt.MainAdd("For non-daily frequencies, 'holes' in the periods are not allowed, like missing years, quarters or months.");
                             }
@@ -5369,7 +5414,7 @@ namespace Gekko
                 }
                 else if (state == 3)
                 {
-                    //state=3
+                    //state=3, handle the codes (names of dimensions)
                     //For instance:
                     //
                     //  CODES("ydelse, k?n og alder")="TOT","NET","LDP","LKT","AKI","ADP","AKT","MEN","KVR","U25","O25","O30","O40","O50","O60";
@@ -5424,7 +5469,8 @@ namespace Gekko
                 }
                 else if (state == 4)
                 {
-                    //state=4
+                    //state=4, put the strings into the values array
+
                     string line5 = lineHelper.ToString();
                     int i = line5.IndexOf("=");
                     if (i < 0)

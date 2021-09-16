@@ -3430,6 +3430,7 @@ namespace Gekko
         /// <param name="t2"></param>
         public static void CheckLegalPeriod(GekkoTime t1, GekkoTime t2)
         {
+            if (t1.IsNull() || t2.IsNull()) return;  //we accept this
             int n = GekkoTime.Observations(t1, t2);
             if (n < 1)
             {
