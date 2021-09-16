@@ -5062,7 +5062,10 @@ namespace Gekko
             bool hyphenFound = false;
             bool underscoreFound = false;
 
+            GekkoTime gt_start = GekkoTime.tNull;
+            GekkoTime gt_end = GekkoTime.tNull;
             string freq = "a";
+            int obs = -12345; //number of observations
 
             List<string> dates = new List<string>();
 
@@ -5276,6 +5279,9 @@ namespace Gekko
                 }
                 else if (state == 2)
                 {
+                    //Reading dates from CODES("tid")
+                    //This will only be run once
+
                     string s = lineHelper.ToString();
                     if (s.StartsWith(codeTimeString, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString.Length);
                     else if (s.StartsWith(codeTimeString2, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString2.Length);
@@ -5320,6 +5326,45 @@ namespace Gekko
                             freq = "d";  //2020m3d15
                         }
                         dates.Add(s3);
+                    }
+
+                    if (dates.Count == 0)
+                    {
+                        new Error("No time dimension found in px file");
+                        //throw new GekkoException();
+                    }
+
+                    gt_start = GekkoTime.FromStringToGekkoTime(dates[0], true);
+                    gt_end = GekkoTime.FromStringToGekkoTime(dates[dates.Count - 1], true);
+
+                    if (gt_start.freq != gt_end.freq)
+                    {
+                        new Error("Frequency mismatch problem in px file");
+                    }
+
+                    obs = GekkoTime.Observations(gt_start, gt_end);
+
+                    if (obs != dates.Count)
+                    {
+                        //Guards against holes in the date sequence
+                        //Note that gt_start and gt_end may be changed with datesRestrict below. Hmmm?
+
+                        if (freq == "d")
+                        {
+                            //we have to read it the slow way (because of holes)
+
+                        }
+                        else
+                        {
+                            using (Error txt = new Error())
+                            {
+                                //========================================================================================================
+                                //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                                //========================================================================================================
+                                txt.MainAdd("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);
+                                txt.MainAdd("For non-daily frequencies, 'holes' in the periods are not allowed, like missing years, quarters or months.");
+                            }
+                        }
                     }
                 }
                 else if (state == 3)
@@ -5427,13 +5472,8 @@ namespace Gekko
 
             }  //for each line
 
-            if (dates.Count == 0)
-            {
-                new Error("No time dimension found in px file");
-                //throw new GekkoException();
-            }
-
-            G.Writeln("    All data read, now putting into series");
+            
+            G.Writeln("    All data read and prepared, now putting into series");
 
             if (isArray)
             {
@@ -5441,13 +5481,12 @@ namespace Gekko
 
                 int dimensionsWithoutTime = codes.Count;
 
-                //put in the array-timeseries ghost
+                //put in the array-timeseries container
                 string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
-                Series tsGhost = new Series(G.ConvertFreq(freq), varNameWithFreq);
-                tsGhost.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
-                //Databank databank = Program.databanks.GetFirst();
-                databank.AddIVariableWithOverwrite(tsGhost.name, tsGhost);
-                tsGhost.SetDirty(true);
+                Series tsArray = new Series(G.ConvertFreq(freq), varNameWithFreq);
+                tsArray.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
+                databank.AddIVariableWithOverwrite(tsArray.name, tsArray);
+                tsArray.SetDirty(true);
 
                 for (int j = 0; j < codesCombi.Count; j++)
                 {
@@ -5459,40 +5498,7 @@ namespace Gekko
                     ts.meta.source = source;
                     ts.meta.stamp = Globals.dateStamp;                    
                     ts.SetDirty(true);
-
-                    GekkoTime gt_start = GekkoTime.FromStringToGekkoTime(dates[0], true);
-                    GekkoTime gt_end = GekkoTime.FromStringToGekkoTime(dates[dates.Count - 1], true);
-
-                    if (gt_start.freq != gt_end.freq)
-                    {
-                        new Error("Frequency mismatch problem in px file");
-                    }
-
-                    int obs = GekkoTime.Observations(gt_start, gt_end);
-
-                    if (obs != dates.Count)
-                    {
-                        //Guards against holes in the date sequence
-                        //Note that gt_start and gt_end may be changed with datesRestrict below. Hmmm?
-
-                        if (freq == "d")
-                        {
-                            //we have to read it the slow way (because of holes)
-
-                        }
-                        else
-                        {
-                            using (Error txt = new Error())
-                            {
-                                //========================================================================================================
-                                //                          FREQUENCY LOCATION, indicates where to implement more frequencies
-                                //========================================================================================================
-                                txt.MainAdd("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);
-                                txt.MainAdd("For non-daily frequencies, 'holes' in the periods are not allowed, like missing years, quarters or months.");
-                            }
-                        }
-                    }
-
+                    
                     int offset = 0;                                        
 
                     ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
@@ -5510,7 +5516,7 @@ namespace Gekko
                         split2[i] = split[2 * i + 2];
                     }
 
-                    tsGhost.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(split2, tsGhost), ts);
+                    tsArray.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(split2, tsArray), ts);
                 }
             }
 
@@ -5536,27 +5542,7 @@ namespace Gekko
                     }
 
                     if (true)  
-                    {
-
-                        GekkoTime gt_start = GekkoTime.FromStringToGekkoTime(dates[0], true);
-                        GekkoTime gt_end = GekkoTime.FromStringToGekkoTime(dates[dates.Count - 1], true);
-
-                        if (gt_start.freq != gt_end.freq)
-                        {
-                            new Error("Frequency mismatch problem in px file. The first date in the px file seems to have another frequency (" + G.GetFreqPretty(gt_start.freq) + ") than the last date (" + G.GetFreqPretty(gt_end.freq) + ")");
-                            //throw new GekkoException();
-                        }
-
-                        int obs = GekkoTime.Observations(gt_start, gt_end);
-
-                        if (obs != dates.Count)
-                        {
-                            //Guards against holes in the date sequence
-                            //Note that gt_start and gt_end may be changed with datesRestrict below
-                            new Error("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
-                            //throw new GekkoException();
-                        }
-
+                    {                        
                         int offset = 0;                                               
 
                         ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
