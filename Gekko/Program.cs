@@ -5466,7 +5466,6 @@ namespace Gekko
                     if (gt_start.freq != gt_end.freq)
                     {
                         new Error("Frequency mismatch problem in px file");
-                        //throw new GekkoException();
                     }
 
                     int obs = GekkoTime.Observations(gt_start, gt_end);
@@ -5481,8 +5480,17 @@ namespace Gekko
                             //we have to read it the slow way (because of holes)
 
                         }
-
-                        new Error("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);                        
+                        else
+                        {
+                            using (Error txt = new Error())
+                            {
+                                //========================================================================================================
+                                //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                                //========================================================================================================
+                                txt.MainAdd("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);
+                                txt.MainAdd("For non-daily frequencies, 'holes' in the periods are not allowed, like missing years, quarters or months.");
+                            }
+                        }
                     }
 
                     int offset = 0;                                        
@@ -5527,7 +5535,7 @@ namespace Gekko
                         ts.SetDirty(true);
                     }
 
-                    if (true)  //can be switched off
+                    if (true)  
                     {
 
                         GekkoTime gt_start = GekkoTime.FromStringToGekkoTime(dates[0], true);
@@ -5535,11 +5543,13 @@ namespace Gekko
 
                         if (gt_start.freq != gt_end.freq)
                         {
-                            new Error("Frequency mismatch problem in px file. The first date in the px file seems to have another frequency than the last date");
+                            new Error("Frequency mismatch problem in px file. The first date in the px file seems to have another frequency (" + G.GetFreqPretty(gt_start.freq) + ") than the last date (" + G.GetFreqPretty(gt_end.freq) + ")");
                             //throw new GekkoException();
                         }
 
-                        if (GekkoTime.Observations(gt_start, gt_end) != dates.Count)
+                        int obs = GekkoTime.Observations(gt_start, gt_end);
+
+                        if (obs != dates.Count)
                         {
                             //Guards against holes in the date sequence
                             //Note that gt_start and gt_end may be changed with datesRestrict below
@@ -5547,9 +5557,7 @@ namespace Gekko
                             //throw new GekkoException();
                         }
 
-                        int offset = 0;
-                        
-                        int obs = GekkoTime.Observations(gt_start, gt_end);
+                        int offset = 0;                                               
 
                         ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
                         ts.Trim();  //to save ram
@@ -5562,10 +5570,8 @@ namespace Gekko
 
                     //put in the timeseries
                     string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
-                    //Databank databank = Program.databanks.GetFirst();
                     databank.AddIVariableWithOverwrite(ts.name, ts);
                     ts.SetDirty(true);
-
                 }
             }
 

@@ -3376,7 +3376,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get current frequency as pretty string
+        /// Convert EFreq to pretty string like "Annual", "Quarterly" etc.
         /// </summary>
         /// <returns></returns>
         public static string GetFreqPretty()
@@ -3385,7 +3385,7 @@ namespace Gekko
         }
                
         /// <summary>
-        /// Convert EFreq to pretty string
+        /// Convert EFreq to pretty string like "Annual", "Quarterly" etc.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
