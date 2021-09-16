@@ -8111,6 +8111,15 @@ namespace UnitTests
                        
         }
 
+        [TestMethod]
+        public void _Test_PxReading()
+        {
+            //a px files with holes on saturday/sundays
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px\';");
+            I("read <px> dailydata.px;");
+            _AssertSeries(First(), "dnprnd", EFreq.D, 2021, 1, 4, 1d, sharedDelta);
+        }
 
         [TestMethod]
         public void _Test_DownloadDst()

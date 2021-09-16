@@ -732,13 +732,13 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, FromTo("for", "for")) != null || G.Equal(line[pos].s, FromTo("lis", "list")) != null)
             {
-                bool list = G.Equal(line[pos].s, FromTo("lis", "list")) != null;
+                bool isList = G.Equal(line[pos].s, FromTo("lis", "list")) != null;
                                
                 int pos0 = 0;
 
                 string name = line[pos + 1].s;
 
-                if (list)
+                if (isList)
                 {
                     line[pos].meta.commandName = "list";
                     if (!listMemory.ContainsKey(name)) listMemory.Add(name, "");
@@ -750,11 +750,25 @@ namespace Gekko
 
                 bool isParallel = false;
 
-                if (!list)
-                {                    
-                    int eq = StringTokenizer.FindS(line, "=");
+                bool hasNoTo = true;
 
-                    if (eq == 2)
+                if (!isList)
+                {                    
+                    int eq = StringTokenizer.FindS(line, "=");                                        
+
+                    if (eq != -12345)
+                    {
+                        for (int i = eq; i < line.Count; i++)
+                        {
+                            if (line[i].s == "to")
+                            {
+                                hasNoTo = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasNoTo)
                     {
                         //either FOR s = a, b, c...
                         string type = "string";                        
@@ -774,17 +788,17 @@ namespace Gekko
                     }
                     else
                     {
-                        //or     FOR date d = 100...
-                        string type = line[pos0 + 1].s.ToLower();
-                        name = line[pos0 + 2].s;
-                        if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
-                        line[pos0 + 2].s = "%" + line[pos0 + 2].s;
+                        //FOR                       
+                        string type = "val";
+                        line[pos0 + 1].s = type + " " + "%" + name;
+                        if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");                        
+                        AddComment(line, "Maybe date type?");
                     }
-                }                
-                                
-                HandleCommandNameListElements(line, list, isParallel);
+                }                                      
+                
+                if(hasNoTo) HandleCommandNameListElements(line, isList, isParallel);
 
-                if (list)
+                if (isList)
                 {
                     if (line[pos0].s.ToLower().Contains("null"))
                     {
@@ -795,42 +809,8 @@ namespace Gekko
 
                     }
                 }
-
-
-                                                                                                                           
-
-                //bool hasTo = false;
-                //for (int ii = 1; ii < line.Count; ii++)
-                //{
-                //    if (Equal(line, ii, "to") && line[ii].leftblanks > 0)
-                //    {
-                //        hasTo = true; break;
-                //    }
-                //}
-
-                //int equal = 0;
-                //for (int ii = 1; ii < line.Count; ii++)
-                //{
-                //    if (Equal(line, ii, "="))
-                //    {
-                //        equal++;
-                //    }
-                //}
-
-                //string t = "string";
-                //if (hasTo) t = "val";  //could be date...
-                //line[pos + 1].s = t + " " + "%" + line[pos + 1].s;
-                //line[pos].meta.commandName = "for";
-                //line[pos].s = "for";
-                //if (hasTo) AddComment(line, "Check that val type is ok (could be date)");
-                ////else AddComment(line, "Check that string type is ok");
-                //if (equal > 1)
-                //{
-                //    AddComment(line, "This seems to be a parallel FOR loop. Beware: only the first part of this FOR statement is translated properly.");
-                //}                
-                                
-                //bool isParallel = equal > 1;
-                //HandleCommandNameListElements(line, list, isParallel);
+                                                                                                                                                          
+                
             }
 
             else if (G.Equal(line[pos].s, FromTo("ma", "matrix")) != null)
@@ -1129,8 +1109,7 @@ namespace Gekko
 
 
         private static void HandleCommandNameListElements(List<TokenHelper> line, bool list, bool isParallel)
-        {
-            //¤028
+        {            
             List<TokenHelper> l1 = new List<TokenHelper>();
             List<TokenHelper> l2 = new List<TokenHelper>();
             List<TokenHelper> l3 = new List<TokenHelper>();
@@ -1217,21 +1196,20 @@ namespace Gekko
                     string extra = null;
                     //if (info.keepTypes) extra = l1[0].s + " ";
 
-                    if (StringTokenizer.Equal(l1, 1, "listfile"))
+                    bool isListfile = false;
+                    foreach (TokenHelper th in l1)
                     {
-                        //list listfile m = ...  --> #(listfile m) = ... 
-                        result1 = extra + "#(listfile ";
-
-                        int counter = 0;
-                        foreach (TokenHelper th in l1)
+                        if (th.s == "listfile")
                         {
-                            counter++;
-                            if (counter > 2)
-                            {
-                                if (th.s == "=") result1 += ") =";
-                                else result1 += th.ToString();
-                            }
+                            isListfile = true;
+                            break;
                         }
+                    }
+
+                    if (isListfile)
+                    {
+                        //do nothing
+                        for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
                     }
                     else
                     {
@@ -1359,27 +1337,29 @@ namespace Gekko
                 //test if simple. Simple is stuff like a, b, c5, 0d, 1, 2, #s, #m.
 
                 bool simple = true;
-                for (int ij = 0; ij < items.Count; ij++)
-                {
-                    string s7 = items[ij].Trim();
-                    if (s7.StartsWith("'") && s7.EndsWith("'")) continue;
-                    
-                    bool first = true;
-                    foreach (char c in s7)
-                    {
-                        if (G.IsLetterOrDigitOrUnderscore(c) || (first && (c == '#')))
-                        {
-                            //good: a, b, 007, a38, 7z, %i, #i, 'xx'
-                        }
-                        else
-                        {
-                            simple = false;
-                        }
-                        first = false;
-                    }
-                }
+                if (l3.Count > 0) simple = false;
 
-                if (isParallel || (simple && result3.Trim() == ";"))  //no prefix etc.
+                //for (int ij = 0; ij < items.Count; ij++)
+                //{
+                //    string s7 = items[ij].Trim();
+                //    if (s7.StartsWith("'") && s7.EndsWith("'")) continue;
+                    
+                //    bool first = true;
+                //    foreach (char c in s7)
+                //    {
+                //        if (G.IsLetterOrDigitOrUnderscore(c) || (first && (c == '#')))
+                //        {
+                //            //good: a, b, 007, a38, 7z, %i, #i, 'xx'
+                //        }
+                //        else
+                //        {
+                //            simple = false;
+                //        }
+                //        first = false;
+                //    }
+                //}
+
+                if (true || isParallel || simple)  //no prefix etc.
                 {
                     if (items.Count == 1)  //test of issimple... probably superfluous
                     {
@@ -1406,32 +1386,32 @@ namespace Gekko
                         }
                     }
                 }
-                else
-                {
-                    //--> dont do this: it will pollute all the functions etc. that return a list not a string.
-                    //if (items.Count == 1)  //test of issimple... probably superfluous
-                    //{
-                    //    result2 = "(" + itemsExtra[0] + items[0] + ",)";
-                    //}
-                    //else
-                    {
-                        bool first = true;
-                        for (int ij = 0; ij < items.Count; ij++)
-                        {
-                            string s2 = items[ij];
-                            if (!first) result2 += "+";
-                            if (IsVerySimple(s2.Trim()))
-                            {
-                                result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";  //a becomes ('a',)
-                            }
-                            else
-                            {
-                                result2 += itemsExtra[ij] + s2;  //stuff like %s or #m.
-                            }
-                            first = false;
-                        }
-                    }
-                }
+                //else
+                //{
+                //    //--> dont do this: it will pollute all the functions etc. that return a list not a string.
+                //    //if (items.Count == 1)  //test of issimple... probably superfluous
+                //    //{
+                //    //    result2 = "(" + itemsExtra[0] + items[0] + ",)";
+                //    //}
+                //    //else
+                //    {
+                //        bool first = true;
+                //        for (int ij = 0; ij < items.Count; ij++)
+                //        {
+                //            string s2 = items[ij];
+                //            if (!first) result2 += "+";
+                //            if (IsVerySimple(s2.Trim()))
+                //            {
+                //                result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";  //a becomes ('a',)
+                //            }
+                //            else
+                //            {
+                //                result2 += itemsExtra[ij] + s2;  //stuff like %s or #m.
+                //            }
+                //            first = false;
+                //        }
+                //    }
+                //}
 
                 for (int i = 1; i < line.Count; i++)
                 {
@@ -1444,14 +1424,14 @@ namespace Gekko
                 line[0].leftblanks = 0;
 
 
-                if (result3.Trim() == ";")
+                if (true || simple)
                 {
                     line[0].s = result1 + result2 + result3;
                 }
-                else
-                {
-                    line[0].s = result1 + " (" + result2.TrimStart(new char[] { ' ' }) + ")" + result3;
-                }
+                //else
+                //{
+                //    line[0].s = result1 + " (" + result2.TrimStart(new char[] { ' ' }) + ")" + result3;
+                //}
 
                 //if(isParallel) AddComment(line, "Parallel loops may not be translated properly, including missing {}-curlies on elements");
             }

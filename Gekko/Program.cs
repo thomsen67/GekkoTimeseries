@@ -5305,15 +5305,19 @@ namespace Gekko
 
                         if (s3.IndexOf("m", StringComparison.OrdinalIgnoreCase) != -1)
                         {
-                            freq = "m";
+                            freq = "m"; //2020m3
                         }
                         if (s3.IndexOf("k", StringComparison.OrdinalIgnoreCase) != -1)
                         {
-                            freq = "q";
+                            freq = "q"; //2020k1
                         }
                         if (s3.IndexOf("q", StringComparison.OrdinalIgnoreCase) != -1)
                         {
-                            freq = "q";
+                            freq = "q"; //2020q1
+                        }
+                        if (s3.IndexOf("m", StringComparison.OrdinalIgnoreCase) != -1 && s3.IndexOf("d", StringComparison.OrdinalIgnoreCase) != -1)
+                        {
+                            freq = "d";  //2020m3d15
                         }
                         dates.Add(s3);
                     }
@@ -5465,17 +5469,23 @@ namespace Gekko
                         //throw new GekkoException();
                     }
 
-                    if (GekkoTime.Observations(gt_start, gt_end) != dates.Count)
+                    int obs = GekkoTime.Observations(gt_start, gt_end);
+
+                    if (obs != dates.Count)
                     {
                         //Guards against holes in the date sequence
-                        //Note that gt_start and gt_end may be changed with datesRestrict below
-                        new Error("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
-                        //throw new GekkoException();
+                        //Note that gt_start and gt_end may be changed with datesRestrict below. Hmmm?
+
+                        if (freq == "d")
+                        {
+                            //we have to read it the slow way (because of holes)
+
+                        }
+
+                        new Error("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);                        
                     }
 
-                    int offset = 0;
-
-                    int obs = GekkoTime.Observations(gt_start, gt_end);
+                    int offset = 0;                                        
 
                     ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
                     ts.Trim();  //to save ram
@@ -5525,7 +5535,7 @@ namespace Gekko
 
                         if (gt_start.freq != gt_end.freq)
                         {
-                            new Error("Frequency mismatch problem in px file");
+                            new Error("Frequency mismatch problem in px file. The first date in the px file seems to have another frequency than the last date");
                             //throw new GekkoException();
                         }
 
