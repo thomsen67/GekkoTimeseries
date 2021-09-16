@@ -8109,22 +8109,13 @@ namespace UnitTests
             I("%s = 'https://api.jobindsats.dk/v1/data/Y36C01/json?';");
             I("DOWNLOAD <key = %key> %s input.json dump = output.json;");
                        
-        }
-
-        [TestMethod]
-        public void _Test_PxReading()
-        {
-            //a px files with holes on saturday/sundays
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px\';");
-            I("read <px> dailydata.px;");
-            _AssertSeries(First(), "dnprnd", EFreq.D, 2021, 1, 4, 1d, sharedDelta);
-        }
+        }        
 
         [TestMethod]
         public void _Test_DownloadDst()
         {
             Databank work = First();
+
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank.json;");
@@ -20569,29 +20560,7 @@ print(df2)
             I("#m = %s.split(',', 0, 0);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c", "", "d", " ", " e" }));
         }
-
-
-        [TestMethod]
-        public void _Test_PxFormat()
-        {
-            //Just running the files checks that the number of found data values corresponds to
-            //the dimension spans.
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px';");
-            
-            //I("read <px> nasf;");  //something wrong with count
-
-            I("read <px> aardata;");
-            I("read <px> data;");
-            I("read <px> nabp117m;");
-            I("read <px> nabb117m;");
-            I("read <px> n;");
-            I("read <px> prod01;");
-            I("read <px> d;");
-            I("read <px> pxfile;");            
-            I("read <px> data2;");
-        }
-
+        
         [TestMethod]
         public void _Test_Databanks()
         {
@@ -23183,7 +23152,6 @@ print(df2)
         public void _Test_PxRead()
         {
 
-
             // ----------------------------- testing px reading ---------------------
             // this downloads the px:             //I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json dump = data;");
             // Note varegruppe instead of VAREGR
@@ -23216,6 +23184,66 @@ print(df2)
             _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_BC!m", EFreq.M, 2017, 3, 119.9d, sharedDelta);
             _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_10001!m", EFreq.M, 2017, 3, 106.5d, sharedDelta);
 
+            // --------------------------------------------------------
+            // DAILY OBSERVATIONS
+            // --------------------------------------------------------
+
+            //a px files with holes on saturday/sundays
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px\';");
+            I("read <px> dailydata.px;");
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 4, 1d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 5, 2d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 6, 3d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 7, 4d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 8, 5d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 9, double.NaN, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 10, double.NaN, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 11, 6d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 12, 7d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 13, 8d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 14, 9d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 1, 15, 0d, sharedDelta);
+            // ----
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 2, 0d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 3, 1d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 5, double.NaN, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 6, 2d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 7, 3d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 8, 4d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 9, 5d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 10, 6d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 11, double.NaN, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 12, double.NaN, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 13, 7d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 14, 8d, sharedDelta);
+            _AssertSeries(First(), "DNPRND_instrument_UR_balance_P!d", EFreq.D, 2021, 9, 15, 9d, sharedDelta);
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px\';");
+            I("read <px> dailydata2.px;");
+            _AssertSeries(First(), "dOdC1_alder_IALT_koen_TOT!d", EFreq.D, 2007, 1, 1, 147d, sharedDelta);
+            _AssertSeries(First(), "dOdC1_alder_IALT_koen_TOT!d", EFreq.D, 2021, 8, 22, 126d, sharedDelta);
+
+            // ----------------------------------
+            // Some superficial tests
+            // ----------------------------------
+
+            //Just running the files checks that the number of found data values corresponds to
+            //the dimension spans.
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px';");
+            //I("read <px> nasf;");  //something wrong with count
+            I("read <px> aardata;");
+            I("read <px> data;");
+            I("read <px> nabp117m;");
+            I("read <px> nabb117m;");
+            I("read <px> n;");
+            I("read <px> prod01;");
+            I("read <px> d;");
+            I("read <px> pxfile;");
+            I("read <px> data2;");
         }
 
 

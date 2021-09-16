@@ -5107,10 +5107,7 @@ namespace Gekko
             G.Writeln2("Starting to read " + lines2.Count + " data lines from data file");
 
             GekkoTime gt0 = GekkoTime.tNull;
-            GekkoTime gt1 = GekkoTime.tNull;
-
-            long allCounter = 0;
-            long allCounter2 = 0;
+            GekkoTime gt1 = GekkoTime.tNull;            
 
             int state = 0;  //DATA=1, CODES("tid")=2, CODES(...)=3, VALUES(...)=4
             foreach (string line2 in lines2)
@@ -5231,8 +5228,6 @@ namespace Gekko
                             }
                             string temp2 = s.Substring(lastStart, i5 - lastStart + add).Trim();
                             
-                            allCounter2++;
-                            
                             double value = double.NaN;
 
                             if (temp2 == "")
@@ -5275,7 +5270,7 @@ namespace Gekko
 
                             ii++;
 
-                            if (ii > dates.Count - 1)
+                            if (ii > dates.Count - 1)  //do NOT include holes here!
                             {
                                 ii = 0;
                                 jj++;
@@ -5356,7 +5351,6 @@ namespace Gekko
                     if (dates.Count == 0)
                     {
                         new Error("No time dimension found in px file");
-                        //throw new GekkoException();
                     }
 
                     gt_start = GekkoTime.FromStringToGekkoTime(dates[0], true);
@@ -5410,7 +5404,7 @@ namespace Gekko
                         {
                             using (Error txt = new Error())
                             {                                
-                                txt.MainAdd("Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);
+                                txt.MainAdd("Expected " + dates.Count + " observations between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);
                                 txt.MainAdd("For non-daily frequencies, 'holes' in the periods are not allowed, like missing years, quarters or months.");
                             }
                         }
@@ -5551,9 +5545,8 @@ namespace Gekko
                     
                     int offset = 0;                                        
 
-                    ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
-                    ts.Trim();  //to save ram
-                    allCounter += obs;
+                    ts.SetDataSequence(gt_start, gt_end, data, j * totalDatesIncludingHoles + offset);  //the last is the offset
+                    ts.Trim();  //to save ram                    
                     if (gt0.IsNull()) gt0 = gt_start;
                     if (gt1.IsNull()) gt1 = gt_end;
                     if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
@@ -5595,9 +5588,8 @@ namespace Gekko
                     {                        
                         int offset = 0;                                               
 
-                        ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
+                        ts.SetDataSequence(gt_start, gt_end, data, j * totalDatesIncludingHoles + offset);  //the last is the offset
                         ts.Trim();  //to save ram
-                        allCounter += obs;
                         if (gt0.IsNull()) gt0 = gt_start;
                         if (gt1.IsNull()) gt1 = gt_end;
                         if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
@@ -5631,14 +5623,7 @@ namespace Gekko
             vars = codesCombi.Count;
             perStart = gt0;
             perEnd = gt1;
-
-            if (data.LongLength != allCounter2)
-            {
-                //See not in constrution of data array
-                new Warning(downloadOrImport + " " + allCounter2 + " numbers, expected " + data.LongLength + "." + "Please review the resulting timeseries carefully!");
-                if (Globals.runningOnTTComputer || (G.IsUnitTesting() && !Globals.excelDna)) throw new GekkoException();
-            }            
-
+            
             if (hyphenFound)
             {
                 //Only for !isArray
