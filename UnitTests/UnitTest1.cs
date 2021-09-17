@@ -2717,7 +2717,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_PrintOfSumWithListInside()
         {
-            //All these sums are implicit: not explicit over #i like sum(#i, x{#i}) etc.
+            //All these sums are implicit: not explicit over #i like sum(#i, x{#i}) etc. 
             //
             //    y = sum(x{#i}{#j})     --> sum((#i, #j), x{#i}{#j}) 
             //    y = sum(x[#i, #j])     --> sum((#i, #j), x[#i, #j]) 
