@@ -5063,6 +5063,7 @@ namespace Gekko
             bool underscoreFound = false;
 
             List<int> holes = null;  //!! important that it starts out as null !!
+            List<int> holesForWarningMessage = null;
             int totalDatesIncludingHoles = -12345;  //including holes
 
             GekkoTime gt_start = GekkoTime.tNull;
@@ -5207,7 +5208,7 @@ namespace Gekko
 
                         //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                         //also handles holes in dates, for instance for daily observations if there is no data for weekends
-                        
+
                         data = G.CreateArrayDouble(codesCombi.Count * totalDatesIncludingHoles, double.NaN);
                     }
 
@@ -5217,7 +5218,7 @@ namespace Gekko
                     int lastStart = 0;
 
                     for (int i5 = 0; i5 < s.Length; i5++)
-                    {                        
+                    {
                         char c = s[i5];
                         if ((c == ' ' || i5 == s.Length - 1) && sstate == 1)
                         {
@@ -5227,7 +5228,7 @@ namespace Gekko
                                 add = 1;
                             }
                             string temp2 = s.Substring(lastStart, i5 - lastStart + add).Trim();
-                            
+
                             double value = double.NaN;
 
                             if (temp2 == "")
@@ -5261,7 +5262,7 @@ namespace Gekko
                                 new Error("More than " + data.Length + " (= " + codesCombi.Count + " x " + totalDatesIncludingHoles + ") numbers found in data section");
                             }
                             data[ii + holesii + jj * totalDatesIncludingHoles] = value;  //ii is date, jj is variable
-                            
+
                             //ii counts dates as they are. If dates are 2021m1d7, 2020m2d8, 2020m2d11, 2020m2d12
                             //ii will be 0, 1, 2, 3 here.
                             //but holes[] will be (0, 0, 2, 2), so ii + holes[ii] becomes (0, 1, 4, 5).
@@ -5372,41 +5373,33 @@ namespace Gekko
                         //Guards against holes in the date sequence
                         //Note that gt_start and gt_end may be changed with datesRestrict below. Hmmm?
 
-                        if (freq == "d")
+                        holes = new List<int>();
+                        holes.Add(0); //to get started
+                        holesForWarningMessage = new List<int>();  //will not get value for first observation
+
+                        GekkoTime gt_before = GekkoTime.tNull;
+                        string date_before = null;
+                        //we have to read it the slow way (because of holes)
+
+                        //consider there are n dates. For date[i], in the data array that contains raw data, it needs
+                        //to be offset by holes[i] positions.
+
+                        int sumOfAdjust = 0;
+                        foreach (string date in dates)
                         {
-                            holes = new List<int>();
-                            holes.Add(0); //to get started
-                            GekkoTime gt_before = GekkoTime.tNull;
-                            string date_before = null;
-                            //we have to read it the slow way (because of holes)
-
-                            //consider there are n dates. For date[i], in the data array that contains raw data, it needs
-                            //to be offset by holes[i] positions.
-
-                            int sumOfAdjust = 0;
-                            foreach (string date in dates)
+                            GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true);
+                            if (!gt_before.IsNull())
                             {
-                                GekkoTime gt = GekkoTime.FromStringToGekkoTime(date, true);
-                                if (!gt_before.IsNull())
+                                int gap = GekkoTime.Observations(gt_before, gt) - 1;  //1 if consequtive
+                                if (gap < 1)
                                 {
-                                    int adjust = GekkoTime.Observations(gt_before, gt) - 2;  //0 if consequtive
-                                    if (adjust < 0)
-                                    {
-                                        new Error("It seems the date '" + date_before + "' is not before the following date: '" + date + "'");
-                                    }
-                                    sumOfAdjust += adjust;
-                                    holes.Add(sumOfAdjust);
+                                    new Error("It seems the date '" + date_before + "' is not before the following date: '" + date + "'");
                                 }
-                                gt_before = gt;
+                                sumOfAdjust += gap - 1;
+                                holes.Add(sumOfAdjust);
+                                holesForWarningMessage.Add(gap);
                             }
-                        }
-                        else
-                        {
-                            using (Error txt = new Error())
-                            {                                
-                                txt.MainAdd("Expected " + dates.Count + " observations between " + dates[0] + " and " + dates[dates.Count - 1] + ", but got " + obs);
-                                txt.MainAdd("For non-daily frequencies, 'holes' in the periods are not allowed, like missing years, quarters or months.");
-                            }
+                            gt_before = gt;
                         }
                     }
                 }
@@ -5431,7 +5424,7 @@ namespace Gekko
 
                     string s = line777.Substring(i + 1);
                     //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
-                    
+
                     string[] ss = null;
                     if (Globals.fixPxProblem)
                     {
@@ -5635,7 +5628,32 @@ namespace Gekko
                 //Only for !isArray
                 new Warning("Underscores ('_') in names have been removed");
             }
-            
+
+            if (holes != null)
+            {
+                using (Warning txt = new Warning())
+                {
+                    txt.MainAdd("There are gaps in the data: for some of the observations, there is a gap > 1 between the date of the observation and the previous date that contains data");
+
+                    if (holesForWarningMessage != null)
+                    {
+                        txt.MoreAdd("The following dates have gap > 1 between the date and the previous date that contains data:");
+                        txt.MoreNewLine();
+
+                        GekkoTime gt = gt_start;
+                        for (int i = 0; i < holesForWarningMessage.Count; i++)
+                        {
+                            //holesForWarningMessage[0] is the SECOND date in the dates.
+                            gt = gt.Add(holesForWarningMessage[i]);  //in the first iteration (i = 0), gt will be the SECOND date of the data
+                            if (holesForWarningMessage[i] > 1)
+                            {
+                                txt.MoreAdd(gt.ToString() + " = " + holesForWarningMessage[i]);
+                                txt.MoreNewLineTight();
+                            }                            
+                        }                        
+                    }
+                }
+            }            
         }        
 
         /// <summary>
