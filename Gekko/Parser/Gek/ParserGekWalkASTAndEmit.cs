@@ -340,7 +340,7 @@ namespace Gekko.Parser.Gek
         {
             if (node.Text == "ASTBANKVARNAME2")
             {
-                //listfile
+                //handles a listfile
 
                 ASTNode name = node[1][1][0];
                 ASTNode placeholder = node[1][1];
@@ -411,24 +411,39 @@ namespace Gekko.Parser.Gek
             }
             else if (node.Text == "ASTBANKVARNAME")  //p24234oi33
             {
+                //a variable name like x or x!q or %x or #x
                 string s = GetSimpleName(node);
-
                 if (s != null && s[0] == Globals.symbolCollection)
                 {
+                    //here we are sure the variable name starts with '#'
                     string listnameWithoutSigil = s.Substring(1);
-                    //naked #m: ...[#m] or ...{#m} or #m1[#m]
-                    //also ...[#m+...] and [#m-...] is supported
-                    bool isIn = node.Parent.Text == "ASTCOMPARE" && node.Number == 1 && node.Parent[0][0].Text == "ASTIFOPERATOR7";
-                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number == 1) || ((node.Parent.Text == "ASTPLUS" || node.Parent.Text == "ASTMINUS") && (node.Parent.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Parent.Text == "ASTCURLY")) || isIn)
+                    bool isInSpecialOperator = node.Parent.Text == "ASTCOMPARE" && node.Number == 1 && node.Parent[0][0].Text == "ASTIFOPERATOR7";
+                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number == 1) || ((node.Parent.Text == "ASTPLUS" || node.Parent.Text == "ASTMINUS") && (node.Parent.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Parent.Text == "ASTCURLY")) || isInSpecialOperator)
                     {
                         //ASTPLUS/MINUS: see also #980752345
-                        //#m is inside a x[#m], or inside a x{#m} or is a #m1[#m] conditional
+                        //Checks that #i is one of these:
+                        //#i is inside a x[#i]
+                        //#i is inside a x{#i} -- could also be stand alone {#i}                        
+                        //#i is a x[#i+1] or x[#i-1] or the like
+                        //#i is a x{#i+1} or x{#i-1} or the like
+                        //#i is a #i2[#i] conditional
+                        //#i is used like $(#i in #i2)
+                        //
+                        //Now look to see if #i is controlled by a sum(#i, ...). Also checks for unfold(#i, ...) but that should not be possible unless the user really types it explicitly
+                        //If it is not controlled by sum(#i, ...), the following takes place if the #i is one of these:
+                        //- appears on LHS
+                        //- is a prt/plot/sheet element
+                        //If so, freeIndexedLists will get augmented by #i. For LHS this means unrolling eqs, and for PRT etc. it means several columns.
+
+                        //Problem: sum({#i}) will not make the parent-looker stop, and therefore it will find PRTELEMENT in a PRT.
+                        //So if no insides of any sum() function would trigger any freeIndexedLists, it would work...
+
                         ASTNode node2 = node.Parent.Parent;
-                        //Assign it to ASTPRTELEMENT, unless it is assigned to sum(#m,...) or unfold(#m,...)
+
                         while (true)
                         {
                             if (node2 == null || node2.Text == null) break;
-                            //asdfg added [0] to test for "sum" and "unfold"
+                            //aadded [0] to test for "sum" and "unfold"
                             if ((node2.Text == "ASTFUNCTION" || node2.Text == "ASTFUNCTION_Q") && (G.Equal(node2[0][0][0].Text, "sum") || G.Equal(node2[0][0][0].Text, "unfold")))
                             {
                                 if (node2[2].Text == "ASTBANKVARNAME")
@@ -450,12 +465,10 @@ namespace Gekko.Parser.Gek
                                 else if (node2[2].Text == "ASTLISTDEF")
                                 {
                                     foreach (ASTNode node3 in node2[2].ChildrenIterator())
-                                    {
-                                        //string s2 = GetSimpleName(node3);
+                                    {                                        
                                         string s2 = GetSimpleName(node3[0]);  //ZXCVB
                                         if (G.Equal(s, s2))
-                                        {
-                                            //node2 = node2.Parent;
+                                        {                                            
                                             goto Label;
                                         }
                                     }
@@ -463,7 +476,6 @@ namespace Gekko.Parser.Gek
                             }
                             else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2")))  //Note: we cannot have both of these in the same tree, they are always separate
                             {
-
                                 ASTNode tmp = node2;
                                 if (node2.Text == "ASTLEFTSIDE")
                                 {
@@ -2417,7 +2429,7 @@ namespace Gekko.Parser.Gek
 
                             if (G.Equal(functionName, "sum"))
                             {
-                                //after a sum(#m, ....) function, the labelCounter must be set to 0, if this sum() function is not inside another sum() function
+                                //after a sum(#i, ....) function, the labelCounter must be set to 0, if this sum() function is not inside another sum() function
                                 bool b = SearchUpwardsInTree6(node.Parent);
                                 if (!b)
                                 {

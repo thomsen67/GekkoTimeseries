@@ -327,7 +327,9 @@ namespace Gekko
             txt.MoreAdd("easily produce hard-to-catch bugs. But then couldn't at least #y = #x + 'a' + 'b'; be legal, appending first 'a' and then 'b' to the list #x?");
             txt.MoreAdd("But this could easily produce other kinds of bugs, for instance if the user first writes #y = #x + (%s1 + %s2);,");
             txt.MoreAdd("adding the concatenated string to the list, but afterwards deletes the parentheses because they seems superfluous.");
-            txt.MoreAdd("Because of these kinds of potential bugs, in Gekko 3.x you cannot add a list and a scalar using the '+' operator.");
+            txt.MoreAdd("Because of these kinds of potential bugs, in Gekko 3.x you cannot add a list and a scalar using the '+' operator (you ");
+            txt.MoreAdd("can, however, use the '-' operator to remove a string from a list of strings).");
+
         }
 
         /// <summary>
