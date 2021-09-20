@@ -198,8 +198,7 @@ namespace Gekko
                 //bool isSeries = G.Equal(line[0].s, FromTo("ser", "series")) != null;
 
                 // ------------- start of real stuff ---------------------------
-
-                
+                                
                 SetCurliesAroundNakedHash(line, i, topline[0].meta.commandName);
                 
                 if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == 0 && GetType(line, i + 1) == ETokenType.Word)
@@ -408,10 +407,7 @@ namespace Gekko
                     {
                         SetNull(line, i); ;  //last token is just before the ';', for instance ...+a%s|;
                     }
-                }
-
-                
-                
+                }                
             }
         }
 
