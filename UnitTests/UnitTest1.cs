@@ -2781,7 +2781,7 @@ namespace UnitTests
             I("prt sum({#i}{#j});");
             table = Globals.lastPrtOrMulprtTable;            
             Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "sum({#i}{#j})");
-            Assert.AreEqual(table.Get(3, 2).number, -1000d);
+            Assert.AreEqual(table.Get(3, 2).number, -1000d); 
 
 
         }
