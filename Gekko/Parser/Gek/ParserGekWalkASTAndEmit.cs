@@ -435,55 +435,76 @@ namespace Gekko.Parser.Gek
                         //- is a prt/plot/sheet element
                         //If so, freeIndexedLists will get augmented by #i. For LHS this means unrolling eqs, and for PRT etc. it means several columns.
 
-                        //Problem: sum({#i}) will not make the parent-looker stop, and therefore it will find PRTELEMENT in a PRT.
-                        //So if no insides of any sum() function would trigger any freeIndexedLists, it would work...
+                        //To handle PRT sum({#i}) or PRT sum(x{#i}), we could look at the first argument and check whether it is
+                        //either #i OR #i $ ... OR (#i, #j).
 
-                                               
-                        
-                        //If #i in x[#i] is not controlled from a parent sum(#i, ...) function
-
-
-
-
+                        //Regarding uncontrolled sets.
+                        //If the set is inside a normal sum() function, it does not count as uncontrolled.
+                        //A normal sum() function is a non-controlled sum function.
+                        //A controlled sum() function is a sum() with exactly 2 argumetns, where
+                        //  the first argument is either #i OR #i $ ... OR (#i, #j).
+                                                                                                                                                   
 
                         if (true)
                         {
                             //This is almost completely identical to the code here: #lakhf8akjaf
 
+                            bool isControlled = false;
+                            bool isInsideNonControlledSumFunction = false;
+
                             ASTNode node2 = node.Parent.Parent;
 
                             while (true)
                             {
-                                if (node2 == null || node2.Text == null) break;
-                                //aadded [0] to test for "sum" and "unfold"
-                                if (IsSumOrUnfoldFunction(node2))
+                                if (node2 == null || node2.Text == null) break;                                
+                                int numberOfArguments = node2.ChildrenCount() - 2;
+                                if (IsSumOrUnfoldFunction(node2))  //children = 4 --> has 2 "real" arguments
                                 {
-                                    if (node2[2].Text == "ASTBANKVARNAME")
+                                    if (numberOfArguments == 2)
                                     {
-                                        string s2 = GetSimpleName(node2[2]);  //arg number 1
-                                        if (G.Equal(s, s2))
+                                        if (node2[2].Text == "ASTBANKVARNAME")
                                         {
-                                            goto Label; //no more search, #i in x[#i] in sum(#i, x[#i]) is controlled from a sum() function
-                                        }
-                                    }
-                                    else if (node2[2].Text == "ASTDOLLAR")
-                                    {
-                                        string s2 = GetSimpleName(node2[2][0]); //in arg number 1
-                                        if (G.Equal(s, s2))
-                                        {
-                                            goto Label; //no more search, #i in x[#i] in sum(#i $ ..., x[#i]) is controlled from a sum() function
-                                        }
-                                    }
-                                    else if (node2[2].Text == "ASTLISTDEF")
-                                    {
-                                        foreach (ASTNode node3 in node2[2].ChildrenIterator())
-                                        {
-                                            string s2 = GetSimpleName(node3[0]);  //ZXCVB. //inside parenthesis in arg number 1
+                                            string s2 = GetSimpleName(node2[2]);  //arg number 1
                                             if (G.Equal(s, s2))
                                             {
-                                                goto Label; //no more search, #i in x[#i] in sum((#i, #j), x[#i]) is controlled from a sum() function
+                                                isControlled = true; //no more search, #i in x[#i] in sum(#i, x[#i]) is controlled from a sum() function
+                                            }
+                                            if (string.IsNullOrEmpty(s2) || s2[0] != Globals.symbolCollection)
+                                            {
+                                                isInsideNonControlledSumFunction = true;
                                             }
                                         }
+                                        else if (node2[2].Text == "ASTDOLLAR")
+                                        {
+                                            string s2 = GetSimpleName(node2[2][0]); //in arg number 1
+                                            if (G.Equal(s, s2))
+                                            {
+                                                isControlled = true; //no more search, #i in x[#i] in sum(#i $ ..., x[#i]) is controlled from a sum() function
+                                            }
+                                            if (string.IsNullOrEmpty(s2) || s2[0] != Globals.symbolCollection)
+                                            {
+                                                isInsideNonControlledSumFunction = true;
+                                            }
+                                        }
+                                        else if (node2[2].Text == "ASTLISTDEF")
+                                        {
+                                            foreach (ASTNode node3 in node2[2].ChildrenIterator())
+                                            {
+                                                string s2 = GetSimpleName(node3[0]);  //ZXCVB. //inside parenthesis in arg number 1
+                                                if (G.Equal(s, s2))
+                                                {
+                                                    isControlled = true; //no more search, #i in x[#i] in sum((#i, #j), x[#i]) is controlled from a sum() function
+                                                }
+                                                if (string.IsNullOrEmpty(s2) || s2[0] != Globals.symbolCollection)
+                                                {
+                                                    isInsideNonControlledSumFunction = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        isInsideNonControlledSumFunction = true;
                                     }
                                 }
                                 else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2")))  //Note: we cannot have both of these in the same tree, they are always separate
@@ -502,8 +523,11 @@ namespace Gekko.Parser.Gek
                                         }
                                     }
 
-                                    if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                                    if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
+                                    if (!isControlled && !isInsideNonControlledSumFunction)
+                                    {
+                                        if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                        if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
+                                    }
                                 }
 
                                 node2 = node2.Parent;

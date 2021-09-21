@@ -2757,25 +2757,32 @@ namespace UnitTests
             I("xx[a, d] = 200;");
             I("xx[b, c] = 300;");
             I("xx[b, d] = 400;");
-            I("y4 = sum(xx[#i, #j]);");  //this should perhaps not work... ?
-            _AssertSeries(First(), "y4!a", 2001, 1000d, sharedDelta);
+            FAIL("y4 = sum(xx[#i, #j]);");  //this should perhaps not work... ?
 
             Gekko.Table table = null;
 
             //Testing print of these sums
             I("prt sum({#i});");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum({#i});");
-            Assert.AreEqual(table.Get(2, 2).number,  30d);
-            return;
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a, y]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, x]");
-            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx[b, y]");
+            table = Globals.lastPrtOrMulprtTable;            
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "sum({#i})");  //why not (1,2)?
+            Assert.AreEqual(table.Get(3, 2).number,  30d);                       //why not (2,2)?
 
             I("prt sum(x{#i});");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "sum(x{#i})");
+            Assert.AreEqual(table.Get(3, 2).number, 3d);
+
             I("prt sum(x{#i}{#j});");
-            I("prt sum({#i}{#j});");            
-            I("prt sum(xx[#i, #j]);");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "s");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "um(x{#i}{#j})");
+            Assert.AreEqual(table.Get(3, 2).number, 1000d);
+
+            I("prt sum({#i}{#j});");
+            table = Globals.lastPrtOrMulprtTable;            
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "sum({#i}{#j})");
+            Assert.AreEqual(table.Get(3, 2).number, -1000d);
+
 
         }
 
