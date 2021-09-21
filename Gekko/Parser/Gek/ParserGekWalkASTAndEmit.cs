@@ -438,64 +438,87 @@ namespace Gekko.Parser.Gek
                         //Problem: sum({#i}) will not make the parent-looker stop, and therefore it will find PRTELEMENT in a PRT.
                         //So if no insides of any sum() function would trigger any freeIndexedLists, it would work...
 
-                        ASTNode node2 = node.Parent.Parent;
+                                               
+                        
+                        //If #i in x[#i] is not controlled from a parent sum(#i, ...) function
 
-                        while (true)
+
+
+
+
+                        if (true)
                         {
-                            if (node2 == null || node2.Text == null) break;
-                            //aadded [0] to test for "sum" and "unfold"
-                            if ((node2.Text == "ASTFUNCTION" || node2.Text == "ASTFUNCTION_Q") && (G.Equal(node2[0][0][0].Text, "sum") || G.Equal(node2[0][0][0].Text, "unfold")))
+                            //This is almost completely identical to the code here: #lakhf8akjaf
+
+                            ASTNode node2 = node.Parent.Parent;
+
+                            while (true)
                             {
-                                if (node2[2].Text == "ASTBANKVARNAME")
+                                if (node2 == null || node2.Text == null) break;
+                                //aadded [0] to test for "sum" and "unfold"
+                                if (IsSumOrUnfoldFunction(node2))
                                 {
-                                    string s2 = GetSimpleName(node2[2]);
-                                    if (G.Equal(s, s2))
+                                    if (node2[2].Text == "ASTBANKVARNAME")
                                     {
-                                        goto Label;
-                                    }
-                                }
-                                else if (node2[2].Text == "ASTDOLLAR")
-                                {
-                                    string s2 = GetSimpleName(node2[2][0]);
-                                    if (G.Equal(s, s2))
-                                    {
-                                        goto Label;
-                                    }
-                                }
-                                else if (node2[2].Text == "ASTLISTDEF")
-                                {
-                                    foreach (ASTNode node3 in node2[2].ChildrenIterator())
-                                    {                                        
-                                        string s2 = GetSimpleName(node3[0]);  //ZXCVB
+                                        string s2 = GetSimpleName(node2[2]);  //arg number 1
                                         if (G.Equal(s, s2))
-                                        {                                            
-                                            goto Label;
+                                        {
+                                            goto Label; //no more search, #i in x[#i] in sum(#i, x[#i]) is controlled from a sum() function
+                                        }
+                                    }
+                                    else if (node2[2].Text == "ASTDOLLAR")
+                                    {
+                                        string s2 = GetSimpleName(node2[2][0]); //in arg number 1
+                                        if (G.Equal(s, s2))
+                                        {
+                                            goto Label; //no more search, #i in x[#i] in sum(#i $ ..., x[#i]) is controlled from a sum() function
+                                        }
+                                    }
+                                    else if (node2[2].Text == "ASTLISTDEF")
+                                    {
+                                        foreach (ASTNode node3 in node2[2].ChildrenIterator())
+                                        {
+                                            string s2 = GetSimpleName(node3[0]);  //ZXCVB. //inside parenthesis in arg number 1
+                                            if (G.Equal(s, s2))
+                                            {
+                                                goto Label; //no more search, #i in x[#i] in sum((#i, #j), x[#i]) is controlled from a sum() function
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2")))  //Note: we cannot have both of these in the same tree, they are always separate
-                            {
-                                ASTNode tmp = node2;
-                                if (node2.Text == "ASTLEFTSIDE")
+                                else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2")))  //Note: we cannot have both of these in the same tree, they are always separate
                                 {
-                                    tmp = node2.Parent;
-                                    if (tmp.Text != "ASTASSIGNMENT")
+                                    //The #i in x[#i] or similar does not seem to be controlled from an outer sum(#i, ...) function
+                                    //Here we check if it is inside a more normal sum() function like for instance sum({#i}) or sum(x{#i}).
+                                    //  if so, we do not put the #i on freeIndexedLists. Because in PRT/PLOT/SHEET, this would produce columns and be wrong. 
+
+                                    ASTNode tmp = node2;
+                                    if (node2.Text == "ASTLEFTSIDE")
                                     {
-                                        new Error("Internal error #32468353233");  //see #32468353233
+                                        tmp = node2.Parent;
+                                        if (tmp.Text != "ASTASSIGNMENT")
+                                        {
+                                            new Error("Internal error #32468353233");  //see #32468353233
+                                        }
                                     }
+
+                                    if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                    if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
                                 }
 
-                                if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                                if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
+                                node2 = node2.Parent;
                             }
-
-                            node2 = node2.Parent;
+                        Label: node2 = node2;
                         }
-                    Label: node2 = node2;
+                    
                     }
                 }
             }
+        }
+
+        private static bool IsSumOrUnfoldFunction(ASTNode node2)
+        {
+            return (node2.Text == "ASTFUNCTION" || node2.Text == "ASTFUNCTION_Q") && (G.Equal(node2[0][0][0].Text, "sum") || G.Equal(node2[0][0][0].Text, "unfold"));
         }
 
         public static void WalkASTSimple(ASTNode node, int depth, ref int line)
