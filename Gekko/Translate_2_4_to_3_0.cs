@@ -2303,6 +2303,67 @@ namespace Gekko
             new Writeln("You may inspect the log-file here: " + logfile);
         }
 
+        public static void Insert2()
+        {
+            //kaldes med tell'clone gbk files lkjsf7akljaf7ds';                     
+
+            string g3 = @"g:\datopgek3";
+            string ext = ".gbk_gek2";
+
+            string logfile = Program.options.folder_working + "\\clone_log.txt";
+
+            //if (Globals.runningOnTTComputer) g3 = @"c:\Tools\slet";
+
+            System.Windows.Forms.MessageBox.Show("About to clone .gbk files into .gbk_gek2 in the folder: " + g3);
+
+            List<string> log = new List<string>();
+            
+            if (!Directory.Exists(g3))
+            {
+                new Error("Directory '" + g3 + "' does not exist");
+            }                        
+            
+            new Writeln("Clone started... ");
+
+            Insert2_WalkFolderHelper2(new DirectoryInfo(g3), log);
+            
+            new Writeln("... cloning ended");
+            new Writeln(log.Count + " files were cloned, cf. clone_log.txt");
+
+            using (FileStream fs = Program.WaitForFileStream(logfile, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter file2 = G.GekkoStreamWriter(fs))
+            {
+                foreach (string s in log)
+                {
+                    file2.WriteLine(s);
+                }
+            }
+            new Writeln("You may inspect the log-file here: " + logfile);
+        }
+
+        public static void Insert2_WalkFolderHelper2(DirectoryInfo directoryInfo, List<string> log)
+        {
+            foreach (FileInfo file in directoryInfo.GetFiles())
+            {
+                if (G.Equal(file.Extension, ".gbk"))
+                {
+                    string newFile = Path.ChangeExtension(file.FullName, ".gbk_gek2");
+                    string exist = "";
+                    if (File.Exists(newFile))
+                    {
+                        exist = " ---> the existing .gbk_gek2 file was overwritten";
+                    }
+                    File.Copy(file.FullName, newFile, true);
+                    log.Add(file.FullName + " --- copied to .gbk_gek2. " + exist);
+                }                
+            }
+
+            foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
+            {
+                Insert2_WalkFolderHelper2(subfolder, log);
+            }
+        }
+
         public static List<string> GetList()
         {
             List<string> m = new List<string>()

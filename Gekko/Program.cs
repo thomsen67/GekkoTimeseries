@@ -1588,6 +1588,11 @@ namespace Gekko
                 Translate_2_4_to_3_0.Insert();
                 return;
             }
+            else if (text.Trim().ToLower() == "clone gbk files lkjsf7akljaf7ds")
+            {
+                Translate_2_4_to_3_0.Insert2();
+                return;
+            }
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }        
@@ -19800,11 +19805,21 @@ namespace Gekko
             return xlistUnfolded;
         }
 
-        public static List<Series> UnfoldAsSeries(GekkoSmpl smpl, IVariable x)
+        /// <summary>
+        /// Used in the other UnfoldAsSeries() method that accepts a list of IVariables.
+        private static List<Series> UnfoldAsSeries(GekkoSmpl smpl, IVariable x)
         {
             return UnfoldAsSeries(smpl, new List<IVariable> { x });
         }
 
+        /// <summary>
+        /// Takes a list of IVariables an convert them into a list of Series. The IVariables may
+        /// be series, val or 1x1 matrix. 
+        /// Note: See also the methods O.ConvertToSeriesMaybeConstant() and Functions.Helper_GeneralFunction().
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="xlist"></param>
+        /// <returns></returns>
         public static List<Series> UnfoldAsSeries(GekkoSmpl smpl, List<IVariable> xlist)
         {
             List<Series> xlistUnfolded = new List<Series>();

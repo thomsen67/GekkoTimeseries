@@ -5744,7 +5744,8 @@ namespace Gekko
         // -------------- series converters start ---------------
 
         /// <summary>
-        /// Convert from IVariable.
+        /// Convert from IVariable, the input can be series, val or 1x1 matrix.
+        /// Note: See also the methods Functions.Helper_GeneralFunction() and Program.UnfoldAsSeries().
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="x"></param>
@@ -6952,9 +6953,7 @@ namespace Gekko
         }
 
         public class Smooth
-        {
-            //public IVariable rhs = null;
-            //public IVariable lhs = null;
+        {            
 
             public List names0;
             public List names1;
@@ -6990,12 +6989,7 @@ namespace Gekko
 
                 Series oldSeries = O.ConvertToSeries(ivOld) as Series;
                 Series lhs = O.ConvertToSeries(ivLhs) as Series;
-
-                //if (oldSeries.name.ToLower().Contains("d74200000001"))
-                //{
-
-                //}
-
+                
                 Series newSeriesTemp = oldSeries.DeepClone(null) as Series;  //brand new object, not present in Work (yet)                
 
                 ESmoothTypes type = ESmoothTypes.Spline;  //what is the default in AREMOS??

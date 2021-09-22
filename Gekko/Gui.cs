@@ -185,7 +185,7 @@ namespace Gekko
             version = G.PrintVersion(version, false);
 
             string pink = "";
-            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION]";
+            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (21/9 2021)]";
 
             this.Text = "Gekko " + version + pink;
             this.Name = "Gekko " + version + pink;
@@ -1912,7 +1912,7 @@ namespace Gekko
                 {
                     using (Note txt = new Note())
                     {
-                        txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the same databank on g:\\datopgek\\... .");
+                        txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension .gbk_gek2.");
                         txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
                     }
 
@@ -1922,7 +1922,10 @@ namespace Gekko
                         txt.MainNewLine();
                         foreach (string s in Globals.datopgek_banks)
                         {
-                            string ss = s.Replace("g:\\datopgek3", "g:\\datopgek").Replace("g:/datopgek3", "g:/datopgek");                            
+                            string ss = "";
+                            //string ss = s.Replace("g:\\datopgek3", "g:\\datopgek").Replace("g:/datopgek3", "g:/datopgek");
+                            if (s.ToLower().EndsWith(".gbk")) ss = G.Replace(s, ".gbk", ".gbk_gek2", StringComparison.OrdinalIgnoreCase, 1);
+                            else ss = s + ".gbk_gek2";
                             txt.MainAdd("read <first> '" + s + "';");
                             txt.MainNewLineTight();
                             txt.MainAdd("read <ref> '" + ss + "';");

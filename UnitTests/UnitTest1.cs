@@ -8153,34 +8153,87 @@ namespace UnitTests
             Databank work = First();
             //==================== SMOOTH ===========================================
 
-            //TODO: Test the others
-            //TODO: Test the others
-            //TODO: Test the others
+            for (int i = 0; i < 2; i++)
+            {
+                if (i == 0)
+                {
+                    I("reset;");
+                    I("time 2002 2010;");
+                    I("ts <2002 2004> = 2, 3, 4;");
+                    I("ts <2008 2010> = 12, 11, 10;");
+                    I("tsb <2004 2008> = -1, -2, -3, -4, -5;");
+                    I("smooth ts1 = ts LINEAR;");
+                    I("smooth ts2 = ts GEOMETRIC;");
+                    I("smooth ts3 = ts REPEAT;");
+                    I("smooth ts4 = ts SPLINE;");
+                    I("smooth ts5 = ts OVERLAY tsb;");
+                }
+                else
+                {
+                    I("reset;");
+                    I("time 2002 2010;");
+                    I("ts <2002 2004> = 2, 3, 4;");
+                    I("ts <2008 2010> = 12, 11, 10;");
+                    I("tsb <2004 2008> = -1, -2, -3, -4, -5;");
+                    I("ts1 = ts.smooth('LINEAR');");
+                    I("ts1a = ts.smooth();");  //default is linear
+                    I("ts2 = ts.smooth('GEOMETRIC');");
+                    I("ts3 = ts.smooth('REPEAT');");
+                    I("ts4 = ts.smooth('SPLINE');");
+                    I("ts5 = ts.smooth('OVERLAY', tsb);");
+                    I("ts5a = ts.smooth(tsb);");
+                    I("ts5b = ts.smooth(0);");
+                }
 
-            I("RESET;");
-            I("create ts, ts1, ts2, ts3, ts4;");
-            I("SERIES <2002 2004> ts = (2, 3, 4);");
-            I("SERIES <2008 2010> ts = (9, 8, 7);");
-            I("SERIES <2004 2008> tsb = (-1, -2, -3, -4, -5);");
-            I("smooth ts1 = ts spline;                                  //fill holes with cubic spline");
-            I("smooth work:ts2 = ts linear;                                  //fill holes with linear interpolation");
-            I("smooth ts3 = work:ts geometric;                               //fill holes with geometric interpolation");
-            I("smooth work:ts4 = work:ts repeat;                                  //fill holes with last known value.");
-            I("smooth work:ts5 = work:ts overlay work:tsb;                              //fill holes with other series.");
+                foreach (string s in new List<string>() { "ts1", "ts2", "ts3", "ts4", "ts5" })
+                {
+                    _AssertSeries(First(), s, 2002, 2d, sharedDelta);
+                    _AssertSeries(First(), s, 2003, 3d, sharedDelta);
+                    _AssertSeries(First(), s, 2004, 4d, sharedDelta);
 
-            _AssertSeries(First(), "ts4", 2004, 4d, sharedDelta);
-            _AssertSeries(First(), "ts4", 2005, 4d, sharedDelta);
-            _AssertSeries(First(), "ts4", 2006, 4d, sharedDelta);
-            _AssertSeries(First(), "ts4", 2007, 4d, sharedDelta);
-            _AssertSeries(First(), "ts4", 2008, 9d, sharedDelta);
+                    _AssertSeries(First(), s, 2008, 12d, sharedDelta);
+                    _AssertSeries(First(), s, 2009, 11d, sharedDelta);
+                    _AssertSeries(First(), s, 2010, 10d, sharedDelta);
+                }
 
-            _AssertSeries(First(), "ts5", 2004, 4d, sharedDelta);
-            _AssertSeries(First(), "ts5", 2005, -2d, sharedDelta);
-            _AssertSeries(First(), "ts5", 2006, -3d, sharedDelta);
-            _AssertSeries(First(), "ts5", 2007, -4d, sharedDelta);
-            _AssertSeries(First(), "ts5", 2008, 9d, sharedDelta);
+                _AssertSeries(First(), "ts1", 2005, 6d, sharedTableDelta);
+                _AssertSeries(First(), "ts1", 2006, 8d, sharedTableDelta);
+                _AssertSeries(First(), "ts1", 2007, 10d, sharedTableDelta);
 
-            I("prt <2002 2010> ts, ts1, ts2, ts3, ts4, ts5;");
+                if (i == 1)
+                {
+                    _AssertSeries(First(), "ts1a", 2005, 6d, sharedTableDelta);
+                    _AssertSeries(First(), "ts1a", 2006, 8d, sharedTableDelta);
+                    _AssertSeries(First(), "ts1a", 2007, 10d, sharedTableDelta);
+                }
+
+                _AssertSeries(First(), "ts2", 2005, 5.2643d, sharedTableDelta);
+                _AssertSeries(First(), "ts2", 2006, 6.9282d, sharedTableDelta);
+                _AssertSeries(First(), "ts2", 2007, 9.1180d, sharedTableDelta);
+
+                _AssertSeries(First(), "ts3", 2005, 4d, sharedTableDelta);
+                _AssertSeries(First(), "ts3", 2006, 4d, sharedTableDelta);
+                _AssertSeries(First(), "ts3", 2007, 4d, sharedTableDelta);
+
+                _AssertSeries(First(), "ts4", 2005, 6.1349d, sharedTableDelta);
+                _AssertSeries(First(), "ts4", 2006, 8.8696d, sharedTableDelta);
+                _AssertSeries(First(), "ts4", 2007, 11.1694d, sharedTableDelta);
+                                
+                _AssertSeries(First(), "ts5", 2005, -2d, sharedTableDelta);
+                _AssertSeries(First(), "ts5", 2006, -3d, sharedTableDelta);
+                _AssertSeries(First(), "ts5", 2007, -4d, sharedTableDelta);
+
+                if (i == 1)
+                {
+                    _AssertSeries(First(), "ts5a", 2005, -2d, sharedTableDelta);
+                    _AssertSeries(First(), "ts5a", 2006, -3d, sharedTableDelta);
+                    _AssertSeries(First(), "ts5a", 2007, -4d, sharedTableDelta);
+
+                    _AssertSeries(First(), "ts5b", 2005, -2d, sharedTableDelta);
+                    _AssertSeries(First(), "ts5b", 2006, -3d, sharedTableDelta);
+                    _AssertSeries(First(), "ts5b", 2007, -4d, sharedTableDelta);
+                }
+            }
         }
 
         [TestMethod]
@@ -18248,20 +18301,7 @@ print(df2)
             _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 3, 9d, sharedDelta);
             _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 4, 12d, sharedDelta);
             _AssertSeries(First(), "x5!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
             
-
-
-
-
-
-
-
-
-
-
-
-
             //Testing series with holes (M/NaN) inside
             I("RESET;");
             I("TIME 2000 2000;");

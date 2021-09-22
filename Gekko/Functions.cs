@@ -1363,10 +1363,12 @@ namespace Gekko
             return m;
         }
 
+
         /// <summary>
         /// Helper method to deal with two-argument function, where arguments may be scalar or series or even 1x1 matrix.
         /// The function must be given normal and "swapped", for instance (x1, x2) => x1 - x2, followed by (x1, x2) => x2 - x1.
         /// Just swap varnames on rhs only in the swapped function (pure syntactics, no thinking needed). For symmetrical functions swapping yields the same, but must still be stated.
+        /// Note: See also the methods O.ConvertToSeriesMaybeConstant() and Program.UnfoldAsSeries().
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="_t1"></param>
@@ -1413,7 +1415,6 @@ namespace Gekko
             if (items.Length < 2)
             {
                 new Error("Expected 2 or more arguments");
-                //throw new GekkoException();
             }
 
             bool hasDate = false;
@@ -2935,6 +2936,61 @@ namespace Gekko
 
             return rv;
         }
+
+        public static IVariable smooth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
+
+            Series input = null;
+            Series overlay = null;
+            string method = "linear";  //default
+
+            if (x.Length == 0)
+            {
+                new Error("smooth(): did not expect 0 arguments.");
+            }
+            
+            input = O.ConvertToSeries(x[0]) as Series;
+
+            if (x.Length == 1)
+            {
+                //do nothing here, it is linear as default
+            }
+            else if (x.Length == 2)
+            {
+                if (x[1].Type() == EVariableType.String)
+                {
+                    method = x[1].ConvertToString();
+                }
+                else
+                {
+                    //overlay, here we expect a series, scalar or 1x1 matrix
+                    method = "overlay";
+                    overlay = O.ConvertToSeriesMaybeConstant(smplHere, x[1]);
+                }
+            }
+            else if (x.Length == 3)
+            {
+                if (x[1].Type() == EVariableType.String)
+                {
+                    method = x[1].ConvertToString();
+                    overlay = O.ConvertToSeriesMaybeConstant(smplHere, x[2]);
+                    if (!G.Equal(method, "overlay")) new Error("Expected 'overlay' as 2. argument if there are 3 arguments.");
+                }
+                else
+                {
+                    new Error("Expected 'overlay' as 2. argument if there are 3 arguments.");
+                }
+            }
+            else
+            {
+                new Error("smooth(): did not expect > 3 arguments.");
+            }
+            
+            return new ScalarVal(d);
+        }
+
 
         public static IVariable rebase(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
