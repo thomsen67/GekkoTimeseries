@@ -4462,7 +4462,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
                         if (node[3] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[3].Code + ";" + G.NL);
-                        node.Code.A(node[0][0].Code);
+                        if (node[0].ChildrenCount() > 0) node.Code.A(node[0][0].Code);  //method option
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;

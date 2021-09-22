@@ -2988,7 +2988,7 @@ namespace Gekko
                 new Error("smooth(): did not expect > 3 arguments.");
             }
             
-            return new ScalarVal(d);
+            return new ScalarVal(0d);
         }
 
 
@@ -4714,13 +4714,15 @@ namespace Gekko
             }
             else if (rootHelper.roots.Count == 1)
             {
-                return new ScalarString(rootHelper.roots[0]);
+                string fileAndFolder = rootHelper.roots[0];
+                string folder = Path.GetDirectoryName(fileAndFolder);
+                return new ScalarString(folder);
             }
             else
             {
                 using (Error error = new Error())
                 {
-                    error.MainAdd("When searching for a " + rootFileName + " file in the folder '" + startFolder + "' or any parent folders, several files were found. This is illegal, since it is bound to produce confusion and perhaps errors. The found files are the following:");
+                    error.MainAdd("When searching for a " + rootFileName + " file in the folder '" + startFolder + "' or any parent folders, several files were found. This is illegal, since it is bound to produce confusion and perhaps errors. The files found are the following:");
                     error.MainNewLineTight();
                     int counter = 0;
                     foreach (string s in rootHelper.roots)

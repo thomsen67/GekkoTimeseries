@@ -185,7 +185,7 @@ namespace Gekko
             version = G.PrintVersion(version, false);
 
             string pink = "";
-            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (21/9 2021)]";
+            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (22/9 2021)]";
 
             this.Text = "Gekko " + version + pink;
             this.Name = "Gekko " + version + pink;

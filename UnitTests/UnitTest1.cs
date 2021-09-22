@@ -8162,6 +8162,7 @@ namespace UnitTests
                     I("ts <2002 2004> = 2, 3, 4;");
                     I("ts <2008 2010> = 12, 11, 10;");
                     I("tsb <2004 2008> = -1, -2, -3, -4, -5;");
+                    I("smooth ts0 = ts;");
                     I("smooth ts1 = ts LINEAR;");
                     I("smooth ts2 = ts GEOMETRIC;");
                     I("smooth ts3 = ts REPEAT;");
@@ -8175,8 +8176,8 @@ namespace UnitTests
                     I("ts <2002 2004> = 2, 3, 4;");
                     I("ts <2008 2010> = 12, 11, 10;");
                     I("tsb <2004 2008> = -1, -2, -3, -4, -5;");
-                    I("ts1 = ts.smooth('LINEAR');");
-                    I("ts1a = ts.smooth();");  //default is linear
+                    I("ts0 = ts.smooth();");  //default is linear
+                    I("ts1 = ts.smooth('LINEAR');");                    
                     I("ts2 = ts.smooth('GEOMETRIC');");
                     I("ts3 = ts.smooth('REPEAT');");
                     I("ts4 = ts.smooth('SPLINE');");
@@ -8185,7 +8186,7 @@ namespace UnitTests
                     I("ts5b = ts.smooth(0);");
                 }
 
-                foreach (string s in new List<string>() { "ts1", "ts2", "ts3", "ts4", "ts5" })
+                foreach (string s in new List<string>() { "ts0", "ts1", "ts2", "ts3", "ts4", "ts5" })
                 {
                     _AssertSeries(First(), s, 2002, 2d, sharedDelta);
                     _AssertSeries(First(), s, 2003, 3d, sharedDelta);
@@ -8196,10 +8197,10 @@ namespace UnitTests
                     _AssertSeries(First(), s, 2010, 10d, sharedDelta);
                 }
 
-                _AssertSeries(First(), "ts1", 2005, 6d, sharedTableDelta);
-                _AssertSeries(First(), "ts1", 2006, 8d, sharedTableDelta);
-                _AssertSeries(First(), "ts1", 2007, 10d, sharedTableDelta);
-
+                _AssertSeries(First(), "ts0", 2005, 6d, sharedTableDelta);
+                _AssertSeries(First(), "ts0", 2006, 8d, sharedTableDelta);
+                _AssertSeries(First(), "ts0", 2007, 10d, sharedTableDelta);
+                
                 if (i == 1)
                 {
                     _AssertSeries(First(), "ts1a", 2005, 6d, sharedTableDelta);
