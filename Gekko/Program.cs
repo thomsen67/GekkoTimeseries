@@ -11710,8 +11710,169 @@ namespace Gekko
             }
 
             RunHelper(o);
-        }        
-                
+        }
+
+        /// <summary>
+        /// Does the actual smoothing, cf. SMOOTH or smooth()
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="method"></param>
+        /// <param name="overlay"></param>
+        public static void SmoothHelper(Series lhs, Series rhs, ESmoothTypes method, Series overlay)
+        {
+            Series newSeriesTemp = rhs.DeepClone(null) as Series;  //brand new object, not present in Work (yet)                
+
+            GekkoTime realStart = rhs.GetRealDataPeriodFirst();
+            GekkoTime realEnd = rhs.GetRealDataPeriodLast();
+
+            if (realStart.IsNull())
+            {
+                //do nothing, the lhs series is not touched (but may be created here)
+                G.Writeln2("Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + " (" + rhs.name + " has no data)");
+            }
+            else
+            {
+                //this works okay if the rhs series has only 1 observation
+                if (method == ESmoothTypes.Spline)
+                {
+                    int counter = -1;  //this can actually be an arbitrary number, but we start with 0.
+                    List<double> xx = new List<double>();
+                    List<double> yy = new List<double>();
+                    List<int> missings = new List<int>();
+                    List<GekkoTime> missingsDates = new List<GekkoTime>();
+                    foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
+                    {
+                        counter++;
+                        double data = rhs.GetDataSimple(gt);
+                        if (G.isNumericalError(data))
+                        {
+                            missings.Add(counter);
+                            missingsDates.Add(gt);
+                            continue;  //ignore this observation
+                        }
+                        yy.Add(rhs.GetDataSimple(gt));
+                        xx.Add(counter);
+                    }
+
+                    double[] x = xx.ToArray();
+                    double[] y = yy.ToArray();
+
+                    alglib.spline1dinterpolant s;
+                    alglib.spline1dbuildcubic(x, y, out s);
+                    for (int i = 0; i < missings.Count; i++)
+                    {
+                        newSeriesTemp.SetData(missingsDates[i], alglib.spline1dcalc(s, missings[i]));
+                    }
+
+                    //AREMOS spline, fits parabola nicely. Gekko gives the same on this input data (left column)
+                    //2000       1.000000000000000     1.000000000000000
+                    //2001                      NC     0.562500000000000
+                    //2002       0.250000000000000     0.250000000000000
+                    //2003                      NC     0.062500000000000
+                    //2004       0.000000000000000     0.000000000000000
+                    //2005                      NC     0.062500000000000
+                    //2006       0.250000000000000     0.250000000000000
+                    //2007                      NC     0.562500000000000
+                    //2008       1.000000000000000     1.000000000000000                 
+                }
+                else if (method == ESmoothTypes.Linear || method == ESmoothTypes.Repeat || method == ESmoothTypes.Geometric)
+                {
+                    GekkoTime missingStart = GekkoTime.tNull;
+                    bool recording = false;
+                    foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
+                    {
+                        //realStart and realEnd can not be tNull here
+                        double z = rhs.GetDataSimple(gt);
+                        if (G.isNumericalError(z))
+                        {
+                            if (!recording)
+                            {
+                                missingStart = gt;
+                                recording = true;
+                            }
+                            continue;
+                        }
+
+                        if (recording)
+                        {
+                            GekkoTime t1 = missingStart.Add(-1);
+                            GekkoTime t2 = gt;
+                            double z1 = rhs.GetDataSimple(t1);
+                            double z2 = rhs.GetDataSimple(t2);
+                            double n = GekkoTime.Observations(t1, t2) - 1;
+                            if (method == ESmoothTypes.Geometric)
+                            {
+                                if (z1 <= 0d || z2 <= 0d)
+                                {
+                                    new Error("Geometric smoothing not intended for numbers <= 0");
+                                    //throw new GekkoException();
+                                }
+                            }
+                            double counterLinear = z1;
+                            double counterLinearA = (z2 - z1) / n;
+                            double counterGeometric = z1;
+                            double counterGeometricA = Math.Pow((z2 / z1), 1d / n);
+
+                            foreach (GekkoTime gt2 in new GekkoTimeIterator(t1.Add(1), t2.Add(-1)))
+                            {
+                                if (method == ESmoothTypes.Repeat)
+                                {
+                                    newSeriesTemp.SetData(gt2, z1);
+                                }
+                                else if (method == ESmoothTypes.Linear)
+                                {
+                                    counterLinear += counterLinearA;
+                                    newSeriesTemp.SetData(gt2, counterLinear);
+                                }
+                                else if (method == ESmoothTypes.Geometric)
+                                {
+                                    counterLinear *= counterGeometricA;
+                                    newSeriesTemp.SetData(gt2, counterLinear);
+                                }
+                                else throw new GekkoException();
+                            }
+                            recording = false;
+                            missingStart = GekkoTime.tNull;
+                        }
+                    }
+                }
+                else if (method == ESmoothTypes.Overlay)
+                {
+                    GekkoTime realStartOverlay = overlay.GetRealDataPeriodFirst();
+                    GekkoTime realEndOverlay = overlay.GetRealDataPeriodLast();
+
+                    if (realStartOverlay.IsNull())
+                    {
+                        new Warning("The overlay series '" + overlay.GetName() + "' has no observations");
+                    }
+                    else
+                    {
+                        foreach (GekkoTime gt in new GekkoTimeIterator(realStartOverlay, realEndOverlay))
+                        {
+                            //realStart and realEnd can not be tNull here
+                            double z = rhs.GetDataSimple(gt);
+                            if (G.isNumericalError(z))
+                            {
+                                newSeriesTemp.SetData(gt, overlay.GetDataSimple(gt));
+                            }
+                        }
+                    }
+                }
+                else throw new GekkoException();
+
+                foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
+                {
+                    //This is not terribly efficient, and we could use array copy etc.
+                    //And we do create and clone a whole new timeseries (newSeriesTemp).
+                    //But it works, and speed is probably not an issue with SMOOTH.
+                    lhs.SetData(gt, newSeriesTemp.GetDataSimple(gt));
+                }
+                lhs.Stamp();
+                G.Writeln2("Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + ", " + realStart.ToString() + "-" + realEnd.ToString());
+            }
+        }
+
         /// <summary>
         /// Helper for Run(). Will search for .gcm (RUN) file in OPTION folder command|command1|command2.
         /// </summary>
@@ -16427,11 +16588,7 @@ namespace Gekko
             
             if (writeType == EDatabankWriteType.Tsdx)
             {
-                new Error("You cannot use <tsdx>. The extension name has changed to ." + Globals.extensionDatabank + ". If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file, and rename that file to .tsdx afterwards.");
-                
-
-                //G.Writeln();
-                //throw new GekkoException();
+                new Error("You cannot use <tsdx>. The extension name has changed to ." + Globals.extensionDatabank + ". If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file, and rename that file to .tsdx afterwards.");                
             }
 
             bool isDefault = false;
@@ -16446,6 +16603,21 @@ namespace Gekko
             if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("WRITE/EXPORT of this file: " + fileName);
+            }
+
+            if (Globals.pink2)
+            {
+                if (writeType == EDatabankWriteType.Csv || writeType == EDatabankWriteType.Prn || writeType == EDatabankWriteType.Tsd)
+                {
+                    if (fileName != null && (fileName.ToLower().Contains("g:\\datopgek3\\") || fileName.ToLower().Contains("g:/datopgek3/")))
+                    {
+                        string fileName7 = fileName;
+                        if (writeType == EDatabankWriteType.Csv && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".csv";
+                        else if (writeType == EDatabankWriteType.Prn && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".prn";
+                        else if (writeType == EDatabankWriteType.Tsd && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".tsd";
+                        Globals.datopgek_banks.Add(fileName7);
+                    }
+                }
             }
 
             bool isCaps = true; if (G.Equal(o.opt_caps, "no")) isCaps = false;
@@ -16983,12 +17155,7 @@ namespace Gekko
             {
                 if (pathAndFileNameResultingFile != null && (pathAndFileNameResultingFile.ToLower().Contains("g:\\datopgek3\\") || pathAndFileNameResultingFile.ToLower().Contains("g:/datopgek3/")))
                 {
-                    bool hit = false;
-                    foreach (string s in Globals.datopgek_banks)
-                    {
-                        if (G.Equal(s, pathAndFileNameResultingFile)) hit = true;
-                    }
-                    if (!hit) Globals.datopgek_banks.Add(pathAndFileNameResultingFile);
+                    Globals.datopgek_banks.Add(pathAndFileNameResultingFile);
                 }
             }
 

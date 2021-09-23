@@ -2939,8 +2939,9 @@ namespace Gekko
 
         public static IVariable smooth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-            GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
+            //GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            //GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
+            //Is the sample or _t1 and _t2 to be used at all? We are just using the data period of the input series
 
             Series input = null;
             Series overlay = null;
@@ -2952,6 +2953,8 @@ namespace Gekko
             }
             
             input = O.ConvertToSeries(x[0]) as Series;
+
+            GekkoSmpl smplHere = new GekkoSmpl(input.GetRealDataPeriodFirst(), input.GetRealDataPeriodLast());
 
             if (x.Length == 1)
             {
@@ -2987,8 +2990,20 @@ namespace Gekko
             {
                 new Error("smooth(): did not expect > 3 arguments.");
             }
-            
-            return new ScalarVal(0d);
+
+            ESmoothTypes method2 = ESmoothTypes.Linear;  //spline is the default in AREMOS, but linear is simpler and we are certain that the average of the filled in holes is meaningful
+            if (G.Equal(method, "geometric")) method2 = ESmoothTypes.Geometric;
+            else if (G.Equal(method, "linear")) method2 = ESmoothTypes.Linear;
+            else if (G.Equal(method, "spline")) method2 = ESmoothTypes.Spline;
+            else if (G.Equal(method, "repeat")) method2 = ESmoothTypes.Repeat;
+            else if (G.Equal(method, "overlay")) method2 = ESmoothTypes.Overlay;
+            else
+            {
+                new Error("Expected smooth() method to be 'linear', 'geometric', 'spline', 'repeat' or 'overlay' -- not '" + method + "'"); ;            }
+
+            Series lhs = new Series(input.freq, null);  //could this be light?
+            Program.SmoothHelper(lhs, input, method2, overlay);
+            return lhs;
         }
 
 

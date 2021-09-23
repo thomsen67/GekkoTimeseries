@@ -40,8 +40,14 @@ namespace Gekko
     public class Globals
     {
         public static bool pink = true;
+        public static bool pink2 = true;  //keeps track of .lst and .tsd, .prn, .csv files
+        public static bool pink3 = true;  //tracks SYS commands
         public static List<string> datopgek_errors = null;
         public static List<string> datopgek_banks = null;
+        public static List<string> datopgek_otherBanks = null;
+        public static List<string> datopgek_listfiles = null;
+        public static List<string> datopgek_sysCalls = null;
+        public static List<string> datopgek_otherTypes = new List<string>() { "tsd", "prn", "csv" };
 
         public const string smpl = "§¤£";  //this line must be at top
 

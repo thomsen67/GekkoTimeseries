@@ -185,7 +185,7 @@ namespace Gekko
             version = G.PrintVersion(version, false);
 
             string pink = "";
-            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (22/9 2021)]";
+            if (Globals.pink) pink = "      [SPECIAL VERSION FOR DST DATA REVISION (23/9 2021)]";
 
             this.Text = "Gekko " + version + pink;
             this.Name = "Gekko " + version + pink;
@@ -1685,8 +1685,20 @@ namespace Gekko
             Globals.numberOfSkippedLines = 0;
             Program.AbortingReset();
             Globals.errorMemory = null;  //so that it is not recording all the time.   
-            if (Globals.pink) Globals.datopgek_errors = new List<string>();
-            if (Globals.pink) Globals.datopgek_banks = new List<string>();
+            if (Globals.pink)
+            {
+                Globals.datopgek_errors = new List<string>();
+                Globals.datopgek_banks = new List<string>();
+            }
+            if (Globals.pink2)
+            {
+                Globals.datopgek_otherBanks = new List<string>();
+                Globals.datopgek_listfiles = new List<string>();
+            }
+            if (Globals.pink3)
+            {
+                Globals.datopgek_sysCalls = new List<string>();
+            }
 
             if (newUserInput)
             {
@@ -1916,14 +1928,22 @@ namespace Gekko
                         txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
                     }
 
+                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("// ----- Gekko code start -----");
                         txt.MainNewLine();
                         foreach (string s in Globals.datopgek_banks)
                         {
+                            if (already.ContainsKey(s))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                already.Add(s, "");
+                            }
                             string ss = "";
-                            //string ss = s.Replace("g:\\datopgek3", "g:\\datopgek").Replace("g:/datopgek3", "g:/datopgek");
                             if (s.ToLower().EndsWith(".gbk")) ss = G.Replace(s, ".gbk", ".gbk_gek2", StringComparison.OrdinalIgnoreCase, 1);
                             else ss = s + ".gbk_gek2";
                             txt.MainAdd("read <first> '" + s + "';");
@@ -1939,8 +1959,120 @@ namespace Gekko
                         txt.MainNewLineTight();
                     }
                 }
+
+                if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
+                {
+                    using (Note txt = new Note())
+                    {
+                        txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension ...._gek2.");
+                        txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
+                    }
+
+                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("// ----- Gekko code start -----");
+                        txt.MainNewLine();
+                        foreach (string s in Globals.datopgek_otherBanks)
+                        {
+                            if (already.ContainsKey(s))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                already.Add(s, "");
+                            }
+
+                            string ext = "???";
+                            string ss = "";
+                            bool ok = false;
+                            foreach (string type in Globals.datopgek_otherTypes)
+                            {
+                                if (s.ToLower().EndsWith("." + type))
+                                {
+                                    ss = G.Replace(s, "." + type, "." + type + "_gek2", StringComparison.OrdinalIgnoreCase, 1);
+                                    ext = type;
+                                    ok = true;
+                                    break;
+                                }
+                            }
+                            if (!ok)
+                            {
+                                if (string.IsNullOrEmpty(Path.GetExtension(s)))
+                                {
+                                    //g:\datopgek3\tsdfil
+                                    ss = s + "." + ext + "_gek2"; // --> g:\datopgek3\tsdfil.???_gek2
+                                }
+                                else ss = s + "_gek2";  //should never happen...
+                            }
+
+                            txt.MainAdd("read <first " + ext + "> '" + s + "';");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("read <ref " + ext + "> '" + ss + "';");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("compare <1980 2021>;");
+                            txt.MainNewLineTight();
+                            txt.MainAdd("edit compare_databanks.txt;");
+                            txt.MainNewLine();
+                        }
+                        txt.MainAdd("// ----- Gekko code end -------");
+                        txt.MainNewLineTight();
+                    }
+                }
+
+                if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
+                {
+                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("The session wrote to listfiles (.lst) on g:\\datopgek3\\... . You may compare these with the original listfiles with extension .lst_gek2.");
+                        txt.MainAdd("In Total Commander, you can mark the two files (.lst and .lst_gek2) and use Files --> Compare By Content...");
+                        txt.MainAdd(" ----- Written listfiles:  -----");
+                        txt.MainNewLine();
+                        foreach (string s in Globals.datopgek_listfiles)
+                        {
+                            if (already.ContainsKey(s))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                already.Add(s, "");
+                            }
+                            txt.MainAdd(s);
+                            txt.MainNewLineTight();
+                        }
+                    }
+                }
+
+                if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0)
+                {
+                    GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    using (Writeln txt = new Writeln())
+                    {
+                        txt.MainAdd("The session used SYS to call the Windows system. You may want to check files copied 'manually' with SYS.");                        
+                        txt.MainAdd(" ----- SYS commands: -----");
+                        txt.MainNewLine();
+                        foreach (string s in Globals.datopgek_sysCalls)
+                        {
+                            if (already.ContainsKey(s))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                already.Add(s, "");
+                            }
+                            txt.MainAdd(s);
+                            txt.MainNewLineTight();
+                        }
+                    }
+                }
             }
-        }   
+        }
 
         public static void PrintTotalErrors(P p)
         {
