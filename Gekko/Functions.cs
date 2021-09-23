@@ -2939,10 +2939,9 @@ namespace Gekko
 
         public static IVariable smooth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
-            //GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
-            //GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
-            //Is the sample or _t1 and _t2 to be used at all? We are just using the data period of the input series
-
+            //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
+            //on the full sample. Therefore, _t1 and _t2 are ignored.
+            
             Series input = null;
             Series overlay = null;
             string method = "linear";  //default
@@ -3009,12 +3008,12 @@ namespace Gekko
 
         public static IVariable rebase(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
+            //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
+            //on the full sample. Therefore, _t1 and _t2 are ignored.
+
             // x, i         --> rebase(x, 2020)
             // x, i, v      --> rebase(x, 2020, 1)
-            // Does not support rebasing over a window of periods --> use REBASE command
-
-            GekkoTime t1, t2;
-            Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            // Does not support rebasing over a window of periods --> use REBASE command            
 
             //hmmm, what if we are doing a PLOT <2010 2030> pch(rebase(x, 2020)) --> we will get a missing in 2010...?
 
@@ -3032,7 +3031,7 @@ namespace Gekko
             Series ts; double sum; double n;
             Program.RebaseHelper1(gti, gti, iv, out ts, out sum, out n);
 
-            Series tsNew = ts.DeepClone(new GekkoSmplSimple(t1, t2)) as Series;
+            Series tsNew = ts.DeepClone(null) as Series;
 
             Program.RebaseHelper2(tsNew, sum, n, indexValue);
 
@@ -3041,16 +3040,16 @@ namespace Gekko
 
         public static IVariable collapse(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
+            //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
+            //on the full sample. Therefore, _t1 and _t2 are ignored.
+
             // collapse(x)
             // collapse(x, 'avg')
             // collapse(x, 'q')
-            // collapse(x, 'q', 'avg')
+            // collapse(x, 'q', 'avg')            
 
             //The two last are only used when collapsing from m --> a.
-            //Otherwise, we collapse per default from d --> m, m --> q, q --> a.
-
-            GekkoTime t1, t2;
-            Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            //Otherwise, we collapse per default from d --> m, m --> q, q --> a.            
 
             //hmmm, what if we are doing a PLOT <2010 2030> pch(rebase(x, 2020)) --> we will get a missing in 2010...?
 
@@ -3104,16 +3103,16 @@ namespace Gekko
 
         public static IVariable interpolate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
+            //The functions collapse(), interpolate(), rebase() and smooth() are essentially timeless, operating
+            //on the full sample. Therefore, _t1 and _t2 are ignored.
+
             // interpolate(x)
             // interpolate(x, 'repeat')
             // interpolate(x, 'm')
             // interpolate(x, 'm', 'repeat')
 
             //either a --> q, a --> m, or q --> m.
-            //if freq not stated: a --> q, q --> m. Else fail.            
-
-            GekkoTime t1, t2;
-            Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            //if freq not stated: a --> q, q --> m. Else fail.                        
 
             if (x.Length < 1) new Error("Expected interpolate() with >= 1 arguments.");
             if (x.Length > 3) new Error("Expected interpolate() with <= 3 arguments.");

@@ -2364,6 +2364,70 @@ namespace Gekko
             }
         }
 
+        public static void Insert3()
+        {
+            //kaldes med tell'clone data files ksf66adadjk34j';                     
+
+            string g3 = @"g:\datopgek3";
+            string ext = "_gek2";
+
+            string logfile = Program.options.folder_working + "\\clone2_log.txt";
+
+            if (Globals.runningOnTTComputer) g3 = @"c:\Tools\slet";
+
+            System.Windows.Forms.MessageBox.Show("About to clone data files into .[extension]_gek2 in the folder: " + g3);
+
+            List<string> log = new List<string>();
+
+            if (!Directory.Exists(g3))
+            {
+                new Error("Directory '" + g3 + "' does not exist");
+            }
+
+            new Writeln("Clone started... ");
+
+            Insert3_WalkFolderHelper(new DirectoryInfo(g3), log);
+
+            new Writeln("... cloning ended");
+            new Writeln(log.Count + " files were cloned, cf. clone2_log.txt");
+
+            using (FileStream fs = Program.WaitForFileStream(logfile, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter file2 = G.GekkoStreamWriter(fs))
+            {
+                foreach (string s in log)
+                {
+                    file2.WriteLine(s);
+                }
+            }
+            new Writeln("You may inspect the log-file here: " + logfile);
+        }
+
+        public static void Insert3_WalkFolderHelper(DirectoryInfo directoryInfo, List<string> log)
+        {
+            foreach (FileInfo file in directoryInfo.GetFiles())
+            {
+                foreach (string ext in Globals.datopgek_otherTypes2)
+                {
+                    if (G.Equal(file.Extension, "." + ext))
+                    {
+                        string newFile = Path.ChangeExtension(file.FullName, "." + ext + "_gek2");  //for instance .csv to .csv_gek2
+                        string exist = "";
+                        if (File.Exists(newFile))
+                        {
+                            exist = " ---> the existing ." + ext + "_gek2 file was overwritten";
+                        }
+                        File.Copy(file.FullName, newFile, true);
+                        log.Add(file.FullName + " --- copied to ." + ext + "_gek2. " + exist);
+                    }
+                }
+            }
+
+            foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
+            {
+                Insert3_WalkFolderHelper(subfolder, log);
+            }
+        }
+
         public static List<string> GetList()
         {
             List<string> m = new List<string>()

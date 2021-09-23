@@ -1593,6 +1593,11 @@ namespace Gekko
                 Translate_2_4_to_3_0.Insert2();
                 return;
             }
+            else if (text.Trim().ToLower() == "clone data files ksf66adadjk34j")
+            {
+                Translate_2_4_to_3_0.Insert3();
+                return;
+            }
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }        
@@ -11729,7 +11734,7 @@ namespace Gekko
             if (realStart.IsNull())
             {
                 //do nothing, the lhs series is not touched (but may be created here)
-                G.Writeln2("Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + " (" + rhs.name + " has no data)");
+                new Warning("Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + " (" + rhs.name + " has no data)");
             }
             else
             {
@@ -11806,7 +11811,6 @@ namespace Gekko
                                 if (z1 <= 0d || z2 <= 0d)
                                 {
                                     new Error("Geometric smoothing not intended for numbers <= 0");
-                                    //throw new GekkoException();
                                 }
                             }
                             double counterLinear = z1;
@@ -11868,8 +11872,7 @@ namespace Gekko
                     //But it works, and speed is probably not an issue with SMOOTH.
                     lhs.SetData(gt, newSeriesTemp.GetDataSimple(gt));
                 }
-                lhs.Stamp();
-                G.Writeln2("Smooth of '" + rhs.name + "', method = " + method.ToString().ToLower() + ", " + realStart.ToString() + "-" + realEnd.ToString());
+                lhs.Stamp();                
             }
         }
 
@@ -16248,7 +16251,7 @@ namespace Gekko
             }
             finally
             {
-                if (!Globals.threadIsInProcessOfAborting)
+                if (Globals.threadIsInProcessOfAborting)
                 {
                 }
                 else
@@ -16272,14 +16275,22 @@ namespace Gekko
                         }
                         else
                         {
-                            process.Close();
-                            process.Dispose();
+                            try
+                            {
+                                process.Close();
+                                process.Dispose();
+                            }
+                            catch { }
                         }
                     }
                     else
                     {
-                        process.Close();
-                        process.Dispose();
+                        try
+                        {
+                            process.Close();
+                            process.Dispose();
+                        }
+                        catch { }
                     }
                     //process = null;
                 }
@@ -16614,8 +16625,9 @@ namespace Gekko
                         string fileName7 = fileName;
                         if (writeType == EDatabankWriteType.Csv && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".csv";
                         else if (writeType == EDatabankWriteType.Prn && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".prn";
-                        else if (writeType == EDatabankWriteType.Tsd && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".tsd";
-                        Globals.datopgek_banks.Add(fileName7);
+                        else if (writeType == EDatabankWriteType.Tsd && string.IsNullOrEmpty(Path.GetExtension(fileName7))) fileName7 += ".tsd";                                                
+                        string fileName77 = CreateFullPathAndFileName(fileName7);
+                        Globals.datopgek_otherBanks.Add(fileName77);
                     }
                 }
             }

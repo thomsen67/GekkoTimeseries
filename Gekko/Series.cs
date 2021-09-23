@@ -2615,6 +2615,8 @@ namespace Gekko
 
         /// <summary>
         /// Creates a clone of the Series, copying all fields. Used for copying databanks in RAM.
+        /// If the argument is = null, everything is copied. Otherwise, the series will be truncated according
+        /// to the periods.
         /// </summary>
         /// <returns>The cloned Series object.</returns>
         public IVariable DeepClone(GekkoSmplSimple truncate)

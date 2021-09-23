@@ -2827,6 +2827,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".t2 = O.ConvertToDate(" + node[1][1].Code + ", O.GetDateChoices.Strict);" + G.NL);
                         }
                         if (node[2] != null) node.Code.A(node[2].Code);  //options
+                        node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -4469,7 +4470,7 @@ ASTPLACEHOLDER [0]
                 case "ASTSPLICE":
                     {
                         node.Code.A("O.Splice o" + Num(node) + " = new O.Splice();" + G.NL);
-
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);

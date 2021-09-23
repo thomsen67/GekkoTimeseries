@@ -39,6 +39,9 @@ namespace Gekko
     /// </summary>
     public class Globals
     {
+        // -------------------------------------------------
+        // pink stuff start
+        // -------------------------------------------------
         public static bool pink = true;
         public static bool pink2 = true;  //keeps track of .lst and .tsd, .prn, .csv files
         public static bool pink3 = true;  //tracks SYS commands
@@ -48,6 +51,10 @@ namespace Gekko
         public static List<string> datopgek_listfiles = null;
         public static List<string> datopgek_sysCalls = null;
         public static List<string> datopgek_otherTypes = new List<string>() { "tsd", "prn", "csv" };
+        public static List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
+        // -------------------------------------------------
+        // pink stuff end. Use this to track down the pink stuff when it should be deleted.
+        // -------------------------------------------------
 
         public const string smpl = "§¤£";  //this line must be at top
 

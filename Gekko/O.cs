@@ -3423,7 +3423,7 @@ namespace Gekko
 
             string listfileName = G.TransformListfileName(varnameWithFreq);
 
-            G.ServiceMessage("LIST " + listfileName + " updated ", null);
+            G.ServiceMessage("list " + listfileName + " updated ", null);
         }
 
         // =====================================================================
@@ -7004,20 +7004,19 @@ namespace Gekko
                 if (listItems2 != null) overlay = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError, true) as Series;
 
                 Program.SmoothHelper(lhs, rhs, method, overlay);
+                G.ServiceMessage("Smoothed '" + lhs.GetName() + "' from '" + rhs.GetName() + "', method = " + method.ToString().ToLower(), p);
             }            
         }
 
         public class Splice
         {
-
-
-
+                       
             public List names0 = null;
             public List names1 = null;
             public List names2 = null;
-
-
             public GekkoTime date = GekkoTime.tNull;
+            public P p = null;
+
             public void Exe()
             {
                 List<string> listItems0 = Restrict(names0, true, false, true, true);
@@ -7029,7 +7028,6 @@ namespace Gekko
                 if (listItems0.Count != 1 || listItems1.Count != 1 || listItems2.Count != 1)
                 {
                     new Error("SPLICE only supports one variable at a time, not lists (for now)");
-                    //throw new GekkoException();
                 }
 
                 IVariable iv1 = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError, true);
@@ -7043,20 +7041,17 @@ namespace Gekko
                 if (ts1.freq != ts2.freq)
                 {
                     new Error("Different freq for the two timerseries");
-                    //throw new GekkoException();
                 }
                 GekkoTime t1a = ts1.GetRealDataPeriodFirst();
                 if (t1a.IsNull())
                 {
                     new Error("No data in first timeseries");
-                    //throw new GekkoException();
                 }
                 GekkoTime t1b = ts1.GetRealDataPeriodLast();
                 GekkoTime t2a = ts2.GetRealDataPeriodFirst();
                 if (t2a.IsNull())
                 {
                     new Error("No data in second timeseries");
-                    //throw new GekkoException();
                 }
                 GekkoTime t2b = ts2.GetRealDataPeriodLast();
                 if (!date.IsNull())
@@ -7064,7 +7059,6 @@ namespace Gekko
                     if (date.freq != ts1.freq || date.freq != ts2.freq)
                     {
                         new Error("Wrong freq for indicated period");
-                        //throw new GekkoException();
                     }
                     t1b = date;
                     t2a = date;
@@ -7073,7 +7067,6 @@ namespace Gekko
                 if (obs < 1)
                 {
                     new Error("No overlapping periods for SPLICE");
-                    //throw new GekkoException();
                 }
 
 
@@ -7087,7 +7080,6 @@ namespace Gekko
                 //2008                 45.000000  
                 //2009                 46.000000  
                 //2010                 46.000000     t2b = 2010
-
 
                 double count = 0d;
                 double sum1 = 0d;
@@ -7107,13 +7099,11 @@ namespace Gekko
                     if (avg2 == 0d)
                     {
                         new Error("Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
-                        //throw new GekkoException();
                     }
                     double relative = avg1 / avg2;
                     if (G.isNumericalError(relative))
                     {
                         new Error("Seems there are missing data for common period " + t2a + "-" + t1b);
-                        //throw new GekkoException();
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t2a.Add(-1)))
                     {
@@ -7130,13 +7120,11 @@ namespace Gekko
                     if (avg2 == 0d)
                     {
                         new Error("Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
-                        //throw new GekkoException();
                     }
                     double relative = avg1 / avg2;
                     if (G.isNumericalError(relative))
                     {
                         new Error("Seems there are missing data for common period " + t2a + "-" + t1b);
-                        //throw new GekkoException();
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t1b))
                     {
@@ -7148,7 +7136,7 @@ namespace Gekko
                     }
                 }
                 ts3.Stamp();
-                G.Writeln2("Spliced '" + ts3.name + "' by means of " + obs + " common observations");
+                G.ServiceMessage("Spliced '" + ts3.name + "' by means of " + obs + " common observations", p);
             }
         }
 
@@ -8220,6 +8208,7 @@ namespace Gekko
             public string opt_frombank = null;
             public string opt_tobank = null;
             public double opt_index = 100d;
+            public P p = null;
             public void Exe()
             {
                 if (t2.IsNull())
@@ -8230,17 +8219,14 @@ namespace Gekko
                 if (t1.IsNull())
                 {
                     new Error("The index date does not seem to exist");  //probably cannot happen
-                    //throw new GekkoException();
                 }
                 if (t1.freq != t2.freq)
                 {
                     new Error("The two index dates have different frequencies");
-                    //throw new GekkoException();
                 }
                 if (t1.StrictlyLargerThan(t2))
                 {
                     new Error("The first date must not be later than the last date");  //probably cannot happen
-                    //throw new GekkoException();
                 }
 
                 List<string> listItems = Restrict(this.names, true, false, true, true);
@@ -8290,12 +8276,12 @@ namespace Gekko
                         if (!tsNew.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tsNew.meta.parentDatabank.name + "), see OPEN<edit> or UNLOCK");
                     }
 
-                    Program.RebaseHelper2(tsNew, sum, n, opt_index);
+                    Program.RebaseHelper2(tsNew, sum, n, opt_index);                    
 
                     count++;
 
                 }
-                G.Writeln2("Rebased " + count + " series");
+                G.ServiceMessage("Rebased " + count + " series", p);
             }            
         }
 

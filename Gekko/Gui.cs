@@ -1902,27 +1902,58 @@ namespace Gekko
                 }
                 p.ReportToRunStatus(true);
                 Gui.PrintTotalErrors(p);
-                if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
+
+                // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
+                // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
+                // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
+                // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
+                // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
+                // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
+                // PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF PINK STUFF
+
+                bool blue = false;
+                if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0) blue = true;
+                    if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0) blue = true;
+                if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0) blue = true;
+                if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0) blue = true;
+                if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0) blue = true;
+
+                if (Globals.pink && blue)
                 {
-                    using (Warning warning = new Warning())
+                    using (Writeln text = new Writeln())
                     {
-                        warning.MainAdd("-----------------------------------------------------------");
-                        warning.MainNewLineTight();
-                        warning.MainAdd("The run contained some access to files on g:\\datopgek:");
-                        warning.MainNewLineTight();
+                        text.color = Color.Blue;
+                        text.MainNewLine();
+                        text.MainAdd("-------------------------------------------------------");
+                        text.MainNewLineTight();
+                        text.MainAdd("--- datopgek3 report start ----------------------------");
+                        text.MainNewLineTight();
+                        text.MainAdd("-------------------------------------------------------");
+                        text.MainNewLine();
+                    }
+                }             
+
+                if (Globals.pink && Globals.datopgek_errors != null && Globals.datopgek_errors.Count > 0)
+                {                    
+                    using (Writeln text = new Writeln())
+                    {
+                        text.MainAdd("-----------------------------------------------------------");
+                        text.MainNewLineTight();
+                        text.MainAdd("WARNING: The run contained some access to files on g:\\datopgek:");
+                        text.MainNewLineTight();
                         foreach (string s in Globals.datopgek_errors)
                         {
-                            warning.MainAdd("- " + s);
-                            warning.MainNewLineTight();
+                            text.MainAdd("- " + s);
+                            text.MainNewLineTight();
                         }
-                        warning.MainAdd("-----------------------------------------------------------");
-                        warning.MainNewLineTight();
+                        text.MainAdd("-----------------------------------------------------------");
+                        text.MainNewLineTight();
                     }
                 }
 
                 if (Globals.pink && Globals.datopgek_banks != null && Globals.datopgek_banks.Count > 0)
-                {
-                    using (Note txt = new Note())
+                {                 
+                    using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension .gbk_gek2.");
                         txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
@@ -1962,7 +1993,8 @@ namespace Gekko
 
                 if (Globals.pink2 && Globals.datopgek_otherBanks != null && Globals.datopgek_otherBanks.Count > 0)
                 {
-                    using (Note txt = new Note())
+                 
+                    using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension ...._gek2.");
                         txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
@@ -2024,14 +2056,16 @@ namespace Gekko
 
                 if (Globals.pink2 && Globals.datopgek_listfiles != null && Globals.datopgek_listfiles.Count > 0)
                 {
+                 
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The session wrote to listfiles (.lst) on g:\\datopgek3\\... . You may compare these with the original listfiles with extension .lst_gek2.");
                         txt.MainAdd("In Total Commander, you can mark the two files (.lst and .lst_gek2) and use Files --> Compare By Content...");
+                        txt.MainNewLineTight();
                         txt.MainAdd(" ----- Written listfiles:  -----");
-                        txt.MainNewLine();
+                        txt.MainNewLineTight();
                         foreach (string s in Globals.datopgek_listfiles)
                         {
                             if (already.ContainsKey(s))
@@ -2050,12 +2084,14 @@ namespace Gekko
 
                 if (Globals.pink3 && Globals.datopgek_sysCalls != null && Globals.datopgek_sysCalls.Count > 0)
                 {
+                 
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     using (Writeln txt = new Writeln())
                     {
-                        txt.MainAdd("The session used SYS to call the Windows system. You may want to check files copied 'manually' with SYS.");                        
-                        txt.MainAdd(" ----- SYS commands: -----");
-                        txt.MainNewLine();
+                        txt.MainAdd("The session used the Gekko SYS command to call the Windows system. You may for instance want to check files copied 'manually' with the SYS command.");
+                        txt.MainNewLineTight();
+                        txt.MainAdd(" ----- SYS command contents: -----");
+                        txt.MainNewLineTight();
                         foreach (string s in Globals.datopgek_sysCalls)
                         {
                             if (already.ContainsKey(s))
@@ -2069,6 +2105,21 @@ namespace Gekko
                             txt.MainAdd(s);
                             txt.MainNewLineTight();
                         }
+                    }
+                }
+
+                if (Globals.pink && blue)
+                {
+                    using (Writeln text = new Writeln())
+                    {
+                        text.color = Color.Blue;
+                        text.MainNewLine();
+                        text.MainAdd("-------------------------------------------------------");
+                        text.MainNewLineTight();
+                        text.MainAdd("--- datopgek3 report end ------------------------------");
+                        text.MainNewLineTight();
+                        text.MainAdd("-------------------------------------------------------");
+                        text.MainNewLine();
                     }
                 }
             }
