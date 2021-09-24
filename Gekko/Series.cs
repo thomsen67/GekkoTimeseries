@@ -447,7 +447,7 @@ namespace Gekko
         public void Stamp()
         {
             //See also #80927435209843
-            this.meta.stamp = Globals.dateStamp;
+            if (this.meta != null) this.meta.stamp = Globals.dateStamp;
         }
 
         /// <summary>

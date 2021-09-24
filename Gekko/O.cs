@@ -7004,6 +7004,10 @@ namespace Gekko
                 if (listItems2 != null) overlay = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError, true) as Series;
 
                 Program.SmoothHelper(lhs, rhs, method, overlay);
+
+                lhs.Stamp();
+                lhs.SetDirty(true);
+
                 G.ServiceMessage("Smoothed '" + lhs.GetName() + "' from '" + rhs.GetName() + "', method = " + method.ToString().ToLower(), p);
             }            
         }
@@ -7135,7 +7139,10 @@ namespace Gekko
                         ts3.SetData(gt, ts2.GetDataSimple(gt) * relative);
                     }
                 }
+
                 ts3.Stamp();
+                ts3.SetDirty(true);
+
                 G.ServiceMessage("Spliced '" + ts3.name + "' by means of " + obs + " common observations", p);
             }
         }
@@ -8275,6 +8282,9 @@ namespace Gekko
                         tsNew = ts;
                         if (!tsNew.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + tsNew.meta.parentDatabank.name + "), see OPEN<edit> or UNLOCK");
                     }
+
+                    tsNew.Stamp();
+                    tsNew.SetDirty(true);
 
                     Program.RebaseHelper2(tsNew, sum, n, opt_index);                    
 

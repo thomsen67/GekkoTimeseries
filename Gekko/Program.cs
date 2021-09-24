@@ -7534,6 +7534,8 @@ namespace Gekko
         /// <param name="o"></param>
         public static void X12a(Gekko.O.X12a o)
         {
+            GekkoTime t1 = GekkoTime.tNull; GekkoTime t2 = GekkoTime.tNull;  //obtained from o.t1 and o.t2 later on
+
             List<string> listItems = O.Restrict(o.names, true, false, true, false);
             string parameters = o.opt_param;
             if (parameters == null)
@@ -7564,10 +7566,13 @@ namespace Gekko
 
                 Series ts = O.ConvertToSeries(iv) as Series;
                 tss.Add(ts);  //for later use
-                
+
+                //We may be operating on a timeseries with another frequency than what is current or put into the <...> option field                
+                GekkoTime.ConvertFreqs(ts.freq, o.t1, o.t2, ref t1, ref t2);
+
                 counter++;
                 string data = null;
-                foreach (GekkoTime t in new GekkoTimeIterator(o.t1, o.t2))
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
                 {
                     double v = ts.GetDataSimple(t);
                     if (G.isNumericalError(v))
@@ -7584,8 +7589,7 @@ namespace Gekko
                     sw.Write(data);
                     sw.Flush();
                     sw.Close();
-                }
-                //}
+                }             
             }
 
             using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + ".dta", GekkoFileReadOrWrite.Write))
@@ -7597,8 +7601,8 @@ namespace Gekko
             }
             string s2 = null;
             s2 += "series {" + G.NL;  //for instance 2000.2
-            s2 += "start = " + o.t1.super + "." + o.t1.sub + G.NL;  //for instance 2000.2
-            s2 += "period = " + GetFreqNumbers(o.t1.freq) + G.NL;  //4 or 12
+            s2 += "start = " + t1.super + "." + t1.sub + G.NL;  //for instance 2000.2
+            s2 += "period = " + GetFreqNumbers(t1.freq) + G.NL;  //4 or 12
             s2 += "}" + G.NL;
 
             s2 += "x11{ " + parameters + " }" + G.NL;
@@ -7652,10 +7656,7 @@ namespace Gekko
 
                 //for (int i = 0; i < o.listItems.Count; i++)
                 {
-                    i++;
-                    //List<BankNameVersion> list = GetInfoFromStringWildcard(o.listItems[i], o.opt_bank);
-                    //foreach (BankNameVersion bnv in list)
-                    //{
+                    i++;                    
                     foreach (string e in ext)
                     {
                         string sss = Path.GetFileName(file);
@@ -7665,7 +7666,7 @@ namespace Gekko
                             string varName2 = null; string freq = null; O.ChopFreq(ts0.name, ref freq, ref varName2);
                             string varName = varName2 + "_" + e + Globals.freqIndicator + freq;
 
-                            Series ts = new Series(o.t1.freq, varName);
+                            Series ts = new Series(t1.freq, varName);
                             string s = Program.GetTextFromFileWithWait(file);
                             List<string> lines = Stringlist.ExtractLinesFromText(s);
                             foreach (string line in lines)
@@ -7676,24 +7677,21 @@ namespace Gekko
                                 if (ss.Length != 2)
                                 {
                                     new Error("Error #8907523 in X12A");
-                                    //throw new GekkoException();
                                 }
                                 try
                                 {
                                     if (ss[0].Length != 6)
                                     {
                                         new Error("Error #897525 in X12A");
-                                        //throw new GekkoException();
                                     }
                                     int i1 = int.Parse(ss[0].Substring(0, 4));
                                     int i2 = int.Parse(ss[0].Substring(4, 2));
-                                    GekkoTime gt = new GekkoTime(o.t1.freq, i1, i2);
+                                    GekkoTime gt = new GekkoTime(t1.freq, i1, i2);
                                     ts.SetData(gt, G.ParseIntoDouble(ss[1]));
                                 }
                                 catch
                                 {
                                     new Error("Error #897524 in X12A");
-                                    //throw new GekkoException();
                                 }
                             }
                             Databank db = ts0.meta.parentDatabank;
@@ -7710,7 +7708,37 @@ namespace Gekko
 
             if (first)
             {
-                new Writeln("The X12A component did not produce any adjusted timeseries. See more info/logging in the tempX12aFile... files here: " + Globals.localTempFilesLocation);
+                string extra = null;
+                int n = GekkoTime.Observations(t1, t2);
+                int n2 = t2.super - t1.super + 1;  //yearly obs
+                if (t1.freq == EFreq.M)
+                {
+                    if (n > 708)
+                    {
+                        extra = "Note: there are " + n + " months in the sample " + t1.ToString() + "-" + t2.ToString() + ". ";
+                        extra += "It seems that the external X12A component used in Gekko only supports up to 708 months or 59 years for monthly data. ";
+                        extra += "To remedy this, you may split the period into overlapping sub-periods and use {a{SPLICE¤splice.htm}a} to splice them.";
+                    }
+                }
+                else if (t1.freq == EFreq.Q)
+                {
+                    if (n2 > 60)
+                    {
+                        extra = "Note: the quarters span over " + n2 + " calendar years (" + t2.super + " - " + t1.super + " + 1 = " + n2 + ") in the sample " + t1.ToString() + "-" + t2.ToString() + ". ";
+                        extra += "It seems that the external X12A component used in Gekko only supports up to 60 calendar years for quarterly data. ";
+                        extra += "To remedy this, you may split the period into overlapping sub-periods and use {a{SPLICE¤splice.htm}a} to splice them.";
+                    }
+                }
+
+                using (Warning txt = new Warning())
+                {
+                    txt.MainAdd("The X12A component did not produce any adjusted timeseries. See more info/logging in the tempX12aFile... files here: " + Globals.localTempFilesLocation + ".");
+                    if (extra != null)
+                    {
+                        txt.MainNewLine();
+                        txt.MainAdd(extra);
+                    }
+                }
             }
 
             if (parameters != null)
@@ -11872,7 +11900,7 @@ namespace Gekko
                     //But it works, and speed is probably not an issue with SMOOTH.
                     lhs.SetData(gt, newSeriesTemp.GetDataSimple(gt));
                 }
-                lhs.Stamp();                
+                           
             }
         }
 
@@ -19394,6 +19422,9 @@ namespace Gekko
                 EFreq eFreq0, eFreq1;
                 method = CollapseHelper(ts_lhs, ts_rhs, method, out eFreq0, out eFreq1);
 
+                ts_lhs.Stamp();
+                ts_lhs.SetDirty(true);
+
                 G.ServiceMessage("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
 
             }
@@ -19616,6 +19647,9 @@ namespace Gekko
 
                 EFreq eFreq0, eFreq1;
                 method = InterpolateHelper(ts_lhs, ts_rhs, method, out eFreq0, out eFreq1);
+
+                ts_lhs.Stamp();
+                ts_lhs.SetDirty(true);
 
                 G.ServiceMessage("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
             }
