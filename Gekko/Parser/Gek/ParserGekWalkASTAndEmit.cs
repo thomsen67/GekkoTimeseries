@@ -4808,7 +4808,6 @@ ASTPLACEHOLDER [0]
                         node.Code.A("O.X12a o" + Num(node) + " = new O.X12a();" + G.NL);
                         GetCodeFromAllChildren(node, node[0]);
                         node.Code.A("o" + Num(node) + ".names = " + node[1].Code + ";" + G.NL);
-                        //GetCodeFromAllChildren(node);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;

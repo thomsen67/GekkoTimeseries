@@ -437,6 +437,7 @@ namespace Gekko
                     commands.Add("series");
                     commands.Add("open");
                     commands.Add("close");
+                    //commands.Add("list");
                     if (!IsInsideOptionField(line, i) && commands.Contains(command))
                     {
                         List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
@@ -790,9 +791,23 @@ namespace Gekko
                         if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");                        
                         AddComment(line, "Maybe date type?");
                     }
-                }                                      
-                
-                if(hasNoTo) HandleCommandNameListElements(line, isList, isParallel);
+                }
+
+                if (hasNoTo)
+                {
+                    if (isList && line[2].ToString().StartsWith("["))
+                    {
+                        int eq = StringTokenizer.FindS(line, "=");
+                        line[eq + 1].s = "'" + line[eq + 1].s + "'";
+                        line[pos0].s = "";
+                        line[pos0 + 1].leftblanks = 0;
+                        line[pos0 + 1].s = "#" + line[pos0 + 1].s;
+                    }
+                    else
+                    {
+                        HandleCommandNameListElements(line, isList, isParallel);
+                    }
+                }
 
                 if (isList)
                 {
@@ -814,7 +829,7 @@ namespace Gekko
                 string name = line[pos + 1].s;
                 if (!matrixMemory.ContainsKey(name)) matrixMemory.Add(name, "");
                 line[pos].meta.commandName = "matrix";
-                if (Equal(line, 2, "="))
+                if (Equal(line, 2, "=") || Equal(line, 3, "="))  //can be a[...] = ...
                 {
                     line[pos].s = "#";
                     globalBankCounter++;
@@ -1154,6 +1169,10 @@ namespace Gekko
 
                 //l1, l2, l3 have been done
 
+                //HandleExpressionsRecursive(l1, line);
+                //HandleExpressionsRecursive(l2, line);
+                //HandleExpressionsRecursive(l3, line);
+
                 List<string> items = new List<string>();
                 List<string> itemsExtra = new List<string>();
                 string s = "";
@@ -1357,18 +1376,12 @@ namespace Gekko
 
                 if (true || isParallel || simple)  //no prefix etc.
                 {
-                    if (items.Count == 1)  //test of issimple... probably superfluous
+                    if (items.Count == 1 && items[0].StartsWith("#"))  //test of issimple... probably superfluous
                     {
-                        //one-element list like list m = a;   
-                        if (items[0].StartsWith("#"))
-                        {
-                            //do not translate list m = #mm --> #m = {#mm},;
-                            result2 = itemsExtra[0] + items[0];
-                        }
-                        else
-                        {
-                            result2 = itemsExtra[0] + UpgradeString(items[0], line) + ",";
-                        }
+                        
+                        //probably kind of math expression: list m3 = #m1 + #m2 ...
+                        result2 = itemsExtra[0] + items[0];
+                        
                     }
                     else
                     {

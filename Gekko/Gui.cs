@@ -1956,7 +1956,7 @@ namespace Gekko
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The session wrote to Gekko databanks on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension .gbk_gek2.");
-                        txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
+                        txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
 
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -1997,7 +1997,7 @@ namespace Gekko
                     using (Writeln txt = new Writeln())
                     {
                         txt.MainAdd("The session wrote to non-gbk data files on g:\\datopgek3\\... . You may copy-paste the following commands to the input window to compare with the original databank with extension ...._gek2.");
-                        txt.MainAdd("If the statements are multi-line, first mark them as a block before hitting Enter. You may want to adjust the timeperiod.");
+                        txt.MainAdd("Multi-line statements can be marked as a block and run with Enter. You may want to adjust the timeperiod.");
                     }
 
                     GekkoDictionary<string, string> already = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
