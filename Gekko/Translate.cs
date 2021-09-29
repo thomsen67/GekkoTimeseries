@@ -198,6 +198,11 @@ namespace Gekko
                 //bool isSeries = G.Equal(line[0].s, FromTo("ser", "series")) != null;
 
                 // ------------- start of real stuff ---------------------------
+
+                if (i == 0)
+                {
+
+                }
                                 
                 SetCurliesAroundNakedHash(line, i, topline[0].meta.commandName);
                 
@@ -431,7 +436,7 @@ namespace Gekko
                 else if (tokens == 1) setCurlies = true;
                 else
                 {
-                    //tokens == 2
+                    //tokens == 2                    
                     
                     List<string> commands = new List<string>();
                     commands.Add("series");
@@ -457,7 +462,7 @@ namespace Gekko
                     }
                 }
 
-                if (setCurlies) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
+                if (true) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
                 {
                     //this is a composed name
                     int iStart = i;
@@ -467,12 +472,36 @@ namespace Gekko
                     {
                         if (GetS(line, i1) == "#" && GetType(line, i1 + 1) == ETokenType.Word)
                         {
-                            s += "{%" + GetS(line, i1 + 1) + "}";
-                            i1++;
+                            bool isKnownListOrLiteral = listMemory.ContainsKey(line[i1 + 1].s) || (scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "literal");
+                            bool isListCommand = command == "list";  //probably never true because we do list separately
+
+                            if (setCurlies)
+                            {
+                                if (isKnownListOrLiteral && !isListCommand)
+                                {
+                                    s += "{#" + GetS(line, i1 + 1) + "}";
+                                }
+                                else
+                                {
+                                    s += "{%" + GetS(line, i1 + 1) + "}";
+                                }
+                                i1++;
+                            }
+                            else
+                            {
+                                s += GetS(line, i1);
+                            }
                         }
                         else if (GetS(line, i1) == "|")
                         {
-                            //skip
+                            if (setCurlies)
+                            {
+                                //skip
+                            }
+                            else
+                            {
+                                s += GetS(line, i1);
+                            }                            
                         }
                         else
                         {
@@ -527,7 +556,20 @@ namespace Gekko
                 //AREMOS: assign variable value
                 //          0       1       2    3
                 string name = line[pos + 1].s;
-                if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
+                string type = "";
+                if (G.Equal(line[pos + 2].s, "literal"))
+                {
+                    type = "literal";
+                }
+                else if (G.Equal(line[pos + 2].s, "string"))
+                {
+                    type = "string";
+                }
+                else if (G.Equal(line[pos + 2].s, "value"))
+                {
+                    type = "value";
+                }
+                if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, type);
                 line[pos].meta.commandName = "assign";
                 line[pos].s = "global:%";
                 globalBankCounter++;
@@ -770,7 +812,7 @@ namespace Gekko
                         //either FOR s = a, b, c...
                         string type = "string";                        
                         line[pos0 + 1].s = type + " " + "%" + name;
-                        if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
+                        if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "literal");
 
                         while (true)
                         {
@@ -780,7 +822,7 @@ namespace Gekko
                             type = "string";
                             name = line[eq - 1].s;
                             line[eq - 1].s = type + " " + "%" + name;
-                            if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");                                                        
+                            if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "literal");                                                        
                         }
                     }
                     else
@@ -788,7 +830,7 @@ namespace Gekko
                         //FOR                       
                         string type = "val";
                         line[pos0 + 1].s = type + " " + "%" + name;
-                        if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");                        
+                        if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "value");                        
                         AddComment(line, "Maybe date type?");
                     }
                 }
