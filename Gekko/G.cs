@@ -3354,8 +3354,8 @@ namespace Gekko
                     using (Error txt = new Error())
                     {
                         txt.MainAdd("Freq 'w' wrong week number: " + week + ".");
-                        txt.MainAdd("The year " + year + " contains week numbers 1 to " + maxWeeks + "(inclusive");
-                        txt.MainAdd("See the {a{ISO 8601 standard¤https://en.wikipedia.org/wiki/ISO_8601}} regarding week numbering.");
+                        txt.MainAdd("The year " + year + " contains week numbers 1 to " + maxWeeks + " (inclusive");
+                        txt.MainAdd("See the {a{ISO 8601 standard¤https://en.wikipedia.org/wiki/ISO_8601}a} regarding week numbering.");
                     }
                 }
                 else return true;

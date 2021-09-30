@@ -1285,7 +1285,7 @@ namespace Gekko
                 {
                     int pos = input0.IndexOf(Globals.linkSeparator1);
                     string input2 = input0.Substring(pos + 1);
-                    string[] input3 = input2.Split(Globals.linkSeparator2);
+                    string[] input3 = input2.Split(new char[] { Globals.linkSeparator2 }, 2);  //only find first ':' because a link may contain this
                     if (input3.Length != 2) G.Writeln2(EWrapType.Error, "Strange error rgd. links");
                     type = input3[0];
                     input = input3[1];
@@ -1498,7 +1498,18 @@ namespace Gekko
                 }
                 else if (type == "action")
                 {
-                    if (input.Trim().ToLower().EndsWith(".htm"))
+                    if (input.Trim().ToLower().StartsWith("http://") || input.Trim().ToLower().StartsWith("https://") || input.Trim().ToLower().StartsWith("www."))
+                    {
+                        try
+                        {
+                            System.Diagnostics.Process.Start(input);
+                        }
+                        catch
+                        {
+                            MessageBox.Show("ERROR: Could not open URL link '" + input + "'");
+                        }
+                    }
+                    else if (input.Trim().ToLower().EndsWith(".htm"))
                     {
                         //a link inside a string with the form {a{intro.htm}a}, 
                         O.Help(input);
