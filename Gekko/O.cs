@@ -1955,6 +1955,12 @@ namespace Gekko
                 Globals.globalPeriodStart = freqs.Item1;
                 Globals.globalPeriodEnd = freqs.Item2;
             }
+            else if (Program.options.freq == EFreq.W)
+            {
+                G.Writeln("Freq changed to weekly (W) -- note that start/end weeks have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;
+            }
             else if (Program.options.freq == EFreq.D)
             {
                 G.Writeln("Freq changed to daily (D) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");

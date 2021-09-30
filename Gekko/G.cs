@@ -429,6 +429,11 @@ namespace Gekko
             {
                 new Error("Start period must be <= end period");
             }
+            GekkoTime.ConvertFreqs(EFreq.W, t1, t2, ref allFreqsHelper.t1Weekly, ref allFreqsHelper.t2Weekly);
+            if (GekkoTime.Observations(allFreqsHelper.t1Weekly, allFreqsHelper.t2Weekly) < 1)
+            {
+                new Error("Start period must be <= end period");
+            }
             GekkoTime.ConvertFreqs(EFreq.D, t1, t2, ref allFreqsHelper.t1Daily, ref allFreqsHelper.t2Daily);
             if (GekkoTime.Observations(allFreqsHelper.t1Daily, allFreqsHelper.t2Daily) < 1)
             {

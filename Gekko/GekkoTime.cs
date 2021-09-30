@@ -776,7 +776,7 @@ namespace Gekko
 
                 if (freq == EFreq.A)
                 {
-                    //From Q or M or D to A freq is just the annual part of the date
+                    //From Q or M or D to A freq is just the annual part of the date. W is less simple.
 
                     if (t.freq == EFreq.Q)
                     {
@@ -785,6 +785,11 @@ namespace Gekko
                     else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
                         tt = new GekkoTime(EFreq.A, t.super, 1);
+                    }
+                    else if (t.freq == EFreq.W)
+                    {                        
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
+                        tt = new GekkoTime(EFreq.A, dt.Year, 1);
                     }
                     else if (t.freq == EFreq.U)
                     {
@@ -803,7 +808,13 @@ namespace Gekko
                     {
                         //from M or D to Q finds corresponding Q
                         tt = new GekkoTime(EFreq.Q, t.super, GekkoTime.FromMonthToQuarter(t.sub));  //first m                        
-                    }                    
+                    }
+                    else if (t.freq == EFreq.W)
+                    {
+                        //from W to Q
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
+                        tt = new GekkoTime(EFreq.Q, dt.Year, GekkoTime.FromMonthToQuarter(dt.Month));
+                    }
                     else if (t.freq == EFreq.U)
                     {
                         tt = new GekkoTime(EFreq.Q, t.super, 1);
@@ -826,11 +837,66 @@ namespace Gekko
                         //from D to M sets month directly
                         tt = new GekkoTime(EFreq.M, t.super, t.sub);
                     }
+                    else if (t.freq == EFreq.W)
+                    {
+                        //from W to M
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
+                        tt = new GekkoTime(EFreq.M, dt.Year, dt.Month);
+                    }
                     else if (t.freq == EFreq.U)
                     {
                         tt = new GekkoTime(EFreq.M, t.super, 1);
                     }
                 }
+
+
+
+
+                //WEEKLY START
+
+                else if (freq == EFreq.W)
+                {
+                    if (t.freq == EFreq.A)
+                    {
+                        //from A to W
+                        DateTime dt = new DateTime(t.super, 1, 1);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.Q)
+                    {
+                        //from Q to W
+                        DateTime dt = new DateTime(t.super, GekkoTime.FromQuarterToMonthStart(t.sub), 1);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.M)
+                    {
+                        //from M to W 
+                        DateTime dt = new DateTime(t.super, t.sub, 1);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.D)
+                    {
+                        //from D to W
+                        DateTime dt = new DateTime(t.super, t.sub, t.subsub);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.U)
+                    {
+                        //from U to W
+                        DateTime dt = new DateTime(t.super, 1, 1);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                }
+
+                //WEEKLY END
+
+
+
                 else if (freq == EFreq.D)
                 {
                     if (t.freq == EFreq.A)
@@ -847,7 +913,12 @@ namespace Gekko
                     {
                         //from M to D sets first day
                         tt = new GekkoTime(EFreq.D, t.super, t.sub, 1);
-                    }                    
+                    }
+                    else if (t.freq == EFreq.W)
+                    {
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
+                        tt = new GekkoTime(EFreq.D, dt.Year, dt.Month, dt.Day);
+                    }
                     else if (t.freq == EFreq.U)
                     {
                         tt = new GekkoTime(EFreq.D, t.super, 1, 1);
@@ -868,6 +939,11 @@ namespace Gekko
                     else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
                         tt = new GekkoTime(EFreq.U, t.super, 1);
+                    }
+                    else if (t.freq == EFreq.W)
+                    {
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
+                        tt = new GekkoTime(EFreq.U, dt.Year, 1);
                     }
                 }
             }
@@ -897,7 +973,7 @@ namespace Gekko
 
                 if (freq == EFreq.A)
                 {
-                    //From Q or M to A freq is just the annual part of the date
+                    //From Q or M to A freq is just the annual part of the date. W is less simple.
 
                     if (t.freq == EFreq.Q)
                     {
@@ -906,6 +982,11 @@ namespace Gekko
                     else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
                         tt = new GekkoTime(EFreq.A, t.super, 1);
+                    }
+                    else if (t.freq == EFreq.W)
+                    {
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Sunday);
+                        tt = new GekkoTime(EFreq.A, dt.Year, 1);
                     }
                     else if (t.freq == EFreq.U)
                     {
@@ -924,6 +1005,12 @@ namespace Gekko
                     {
                         //from M to Q finds corresponding Q                        
                         tt = new GekkoTime(EFreq.Q, t.super, GekkoTime.FromMonthToQuarter(t.sub));  //last m                 
+                    }
+                    else if (t.freq == EFreq.W)
+                    {
+                        //from W to Q
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Sunday);
+                        tt = new GekkoTime(EFreq.Q, dt.Year, GekkoTime.FromMonthToQuarter(dt.Month));
                     }
                     else if (t.freq == EFreq.U)
                     {
@@ -947,11 +1034,68 @@ namespace Gekko
                         //from D to M sets month directly
                         tt = new GekkoTime(EFreq.M, t.super, t.sub);
                     }
+                    else if (t.freq == EFreq.W)
+                    {
+                        //from W to M
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Sunday);
+                        tt = new GekkoTime(EFreq.M, dt.Year, dt.Month);
+                    }
                     else if (t.freq == EFreq.U)
                     {
                         tt = new GekkoTime(EFreq.M, t.super, GekkoTimeStuff.numberOfMonths);
                     }
                 }
+
+
+
+                //WEEKLY START
+
+                else if (freq == EFreq.W)
+                {
+                    if (t.freq == EFreq.A)
+                    {
+                        //from A to W
+                        DateTime dt = new DateTime(t.super, GekkoTimeStuff.numberOfMonths, 31);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.Q)
+                    {
+                        //from Q to W
+                        int month = GekkoTime.FromQuarterToMonthEnd(t.sub);
+                        DateTime dt = new DateTime(t.super, month, G.DaysInMonth(t.super, month));
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.M)
+                    {
+                        //from M to W                         
+                        DateTime dt = new DateTime(t.super, t.sub, G.DaysInMonth(t.super, t.sub));
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.D)
+                    {
+                        //from D to W
+                        DateTime dt = new DateTime(t.super, t.sub, t.subsub);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                    else if (t.freq == EFreq.U)
+                    {
+                        //from U to W                        
+                        DateTime dt = new DateTime(t.super, GekkoTimeStuff.numberOfMonths, 31);
+                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                    }
+                }
+
+                //WEEKLY END
+
+
+
+
+
                 else if (freq == EFreq.D)
                 {
                     if (t.freq == EFreq.A)
@@ -969,6 +1113,11 @@ namespace Gekko
                     {
                         //from M to D sets last day of month                        
                         tt = new GekkoTime(EFreq.D, t.super, t.sub, G.DaysInMonth(t.super, t.sub));
+                    }
+                    else if (t.freq == EFreq.W)
+                    {
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Sunday);
+                        tt = new GekkoTime(EFreq.D, dt.Year, dt.Month, dt.Day);
                     }
                     else if (t.freq == EFreq.U)
                     {
@@ -991,6 +1140,11 @@ namespace Gekko
                     else if (t.freq == EFreq.M || t.freq == EFreq.D)
                     {
                         tt = new GekkoTime(EFreq.U, t.super, 1);
+                    }
+                    else if (t.freq == EFreq.W)
+                    {
+                        DateTime dt = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Sunday);
+                        tt = new GekkoTime(EFreq.U, dt.Year, 1);
                     }
                 }
             }
@@ -1369,12 +1523,18 @@ namespace Gekko
 
     public class AllFreqsHelper
     {
+        //========================================================================================================
+        //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+        //========================================================================================================
+
         public GekkoTime t1Annual;
         public GekkoTime t2Annual;
         public GekkoTime t1Quarterly;
         public GekkoTime t2Quarterly;
         public GekkoTime t1Monthly;
         public GekkoTime t2Monthly;
+        public GekkoTime t1Weekly;
+        public GekkoTime t2Weekly;
         public GekkoTime t1Daily;
         public GekkoTime t2Daily;
         public GekkoTime t1Undated;
@@ -1403,6 +1563,11 @@ namespace Gekko
             {
                 t1 = this.t1Monthly;
                 t2 = this.t2Monthly;
+            }
+            if (desiredFreq == EFreq.W)
+            {
+                t1 = this.t1Weekly;
+                t2 = this.t2Weekly;
             }
             if (desiredFreq == EFreq.D)
             {
@@ -1507,6 +1672,12 @@ namespace Gekko
         }
     }
 
+    public class IsoWeekHelper
+    {
+        public int year = -12345;
+        public int week = -12345;
+    }
+
     /// <summary>
     /// Taken from .NET Core here: https://github.com/dotnet/runtime/blob/b41f1c5f2fde25d752d857a54c3af24145060cdd/src/libraries/System.Private.CoreLib/src/System/Globalization/ISOWeek.cs
     /// </summary>
@@ -1518,47 +1689,13 @@ namespace Gekko
         private const int MinWeek = 1;
         private const int MaxWeek = WeeksInLongYear;
 
-        public static int GetWeekOfYear(DateTime date)
+        public static IsoWeekHelper GetYearAndWeek(DateTime date)
         {
-            int week = GetWeekNumber(date);
-
-            if (week < MinWeek)
-            {
-                // If the week number obtained equals 0, it means that the
-                // given date belongs to the preceding (week-based) year.
-                return GetWeeksInYear(date.Year - 1);
-            }
-
-            if (week > GetWeeksInYear(date.Year))
-            {
-                // If a week number of 53 is obtained, one must check that
-                // the date is not actually in week 1 of the following year.
-                return MinWeek;
-            }
-
-            return week;
-        }
-
-        public static int GetYear(DateTime date)
-        {
-            int week = GetWeekNumber(date);
-
-            if (week < MinWeek)
-            {
-                // If the week number obtained equals 0, it means that the
-                // given date belongs to the preceding (week-based) year.
-                return date.Year - 1;
-            }
-
-            if (week > GetWeeksInYear(date.Year))
-            {
-                // If a week number of 53 is obtained, one must check that
-                // the date is not actually in week 1 of the following year.
-                return date.Year + 1;
-            }
-
-            return date.Year;
-        }
+            IsoWeekHelper helper = new IsoWeekHelper();
+            helper.year = GetYear(date);
+            helper.week = GetWeekOfYear(date);
+            return helper;
+        }        
 
         // The year parameter represents an ISO week-numbering year (also called ISO year informally).
         // Each week's year is the Gregorian year in which the Thursday falls.
@@ -1631,6 +1768,57 @@ namespace Gekko
             int ordinal = (week * 7) + GetWeekday(dayOfWeek) - correction;
 
             return new DateTime(year2, month: 1, day: 1).AddDays(ordinal - 1);
+        }
+
+        private static int GetWeekOfYear(DateTime date)
+        {
+            //TTH changed: made private
+
+            int week = GetWeekNumber(date);
+
+            if (week < MinWeek)
+            {
+                // If the week number obtained equals 0, it means that the
+                // given date belongs to the preceding (week-based) year.
+                return GetWeeksInYear(date.Year - 1);
+            }
+
+            if (week > GetWeeksInYear(date.Year))
+            {
+                // If a week number of 53 is obtained, one must check that
+                // the date is not actually in week 1 of the following year.
+                return MinWeek;
+            }
+
+            return week;
+        }
+
+        /// <summary>
+        /// May return y-1, y or y+1, where i is date.Year.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        private static int GetYear(DateTime date)
+        {
+            //TTH changed: made private
+
+            int week = GetWeekNumber(date);
+
+            if (week < MinWeek)
+            {
+                // If the week number obtained equals 0, it means that the
+                // given date belongs to the preceding (week-based) year.
+                return date.Year - 1;
+            }
+
+            if (week > GetWeeksInYear(date.Year))
+            {
+                // If a week number of 53 is obtained, one must check that
+                // the date is not actually in week 1 of the following year.
+                return date.Year + 1;
+            }
+
+            return date.Year;
         }
 
         // From https://en.wikipedia.org/wiki/ISO_week_date#Calculating_the_week_number_of_a_given_date:

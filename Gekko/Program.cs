@@ -26997,6 +26997,11 @@ namespace Gekko
                 tStart2 = dates.t1Monthly;
                 tEnd2 = dates.t2Monthly;
             }
+            else if (tsFreq == EFreq.W)
+            {
+                tStart2 = dates.t1Weekly;
+                tEnd2 = dates.t2Weekly;
+            }
             else if (tsFreq == EFreq.D)
             {
                 tStart2 = dates.t1Daily;
