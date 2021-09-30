@@ -319,7 +319,7 @@ namespace Gekko
             Add("FOLDER TABLE1", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("FOLDER TABLE2", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("FOLDER WORKING", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
-            Add("FREQ", Globals.xnameOrString2Freq, "a", "q", "m", "d", "u");
+            Add("FREQ", Globals.xnameOrString2Freq, "a", "q", "m", "w", "d", "u");
             Add("GAMS EXE FOLDER", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("GAMS FAST", Globals.xbool);
             Add("GAMS TIME DETECT AUTO", Globals.xbool);

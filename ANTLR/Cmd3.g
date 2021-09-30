@@ -5228,7 +5228,7 @@ DigitsEDigits:              DIGIT+  ( E_ )  DIGIT+;  //for instance 25e12, probl
 //                          FREQUENCY LOCATION, indicates where to implement more frequencies
 //========================================================================================================
 DateDef:					DIGIT+ M_ DIGIT+ D_ DIGIT+  //for instance 2000m12d24
-						  |	DIGIT+ ( A_ | Q_ | M_ | U_ ) DIGIT+  //for instance 2000q2 or 2003m11
+						  |	DIGIT+ ( A_ | Q_ | M_ | W_ | U_ ) DIGIT+  //for instance 2000q2 or 2003m11
 					      | DIGIT+ ( A_ | U_ )  //2010a or 18u						   
 						    ;  
                             //for instance 05a, everything not captured by Ident, Integer, DigitsEDigits, Datedef.

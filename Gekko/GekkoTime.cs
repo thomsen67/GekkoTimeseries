@@ -24,8 +24,8 @@ namespace Gekko
         U,        //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
         None,     //used to signal non-freq variable, for instance a VAL   
         D,        //daily        
-        Empty2,   // --------> this and the following can be filled/changed
-        Empty3,
+        W,        //weekly
+        Empty3,   // --------> this and the following can be filled/changed
         Empty4,
         Empty5,
         Empty6,
@@ -58,6 +58,7 @@ namespace Gekko
     {
         public static readonly int numberOfQuarters = 4;
         public static readonly int numberOfMonths = 12;
+        public static readonly int numberOfDaysInAWeek = 7;
     }
 
     [Serializable]
@@ -130,6 +131,11 @@ namespace Gekko
                     new Error("Freq 'm' wrong month: " + sub);
                 }
             }
+            else if (freq == EFreq.W)
+            {
+                if (subsub > 1) new Error("Internal error #78745728309472");
+                G.CheckWeekNumberAndMaybePrintErrorMessage(this.super, this.sub, true);
+            }
             else if (freq == EFreq.D)
             {
                 if (sub < 1 || sub > 12)
@@ -149,7 +155,7 @@ namespace Gekko
                     new Error("Freq 'u' cannot have subperiod > 1");
                 }
             }
-        }
+        }        
 
         private GekkoTime(EFreq freq2, int super2, int sub2, bool check)
         {
@@ -264,6 +270,22 @@ namespace Gekko
                 m = gt.sub;
                 if (first) d = 1;
                 else d = G.DaysInMonth(y, m);
+            }
+            else if (gt.freq == EFreq.W)
+            {
+                if (format == null) f = "yyyy-ww-dd";
+                if (first)
+                {
+                    DateTime dtw1 = ISOWeek.ToDateTime(gt.super, gt.sub, DayOfWeek.Monday);
+                    m = dtw1.Month;
+                    d = dtw1.Day;
+                }
+                else
+                {
+                    DateTime dtw2 = ISOWeek.ToDateTime(gt.super, gt.sub, DayOfWeek.Sunday);
+                    m = dtw2.Month;
+                    d = dtw2.Day;
+                }
             }
             else if (gt.freq == EFreq.D)
             {
@@ -385,7 +407,7 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        new Error("Timeperiod " + s + " not valid");
+                        new Error("Could not parse " + s + " as an annual date");
                     }
                     else return GekkoTime.tNull;
                 }
@@ -402,125 +424,141 @@ namespace Gekko
                 {
                     if (reportError)
                     {
-                        new Error("Timeperiod " + s + " not valid");
+                        new Error("Could not parse " + s + " as an annual date");
                     }
                     else return GekkoTime.tNull;
                 }
             }
 
+            //now other freqs
+            //now other freqs
+            //now other freqs
 
             if (s.Contains("q") || s.Contains("Q"))
             {
+                string[] temp1 = s.Split(new char[] { 'q', 'Q' });
+                int y1 = -12345;
+                int q1 = -12345;
                 try
                 {
-                    string[] temp1 = s.Split(new char[] { 'q', 'Q' });
-                    int y1 = G.findYear(int.Parse(temp1[0]));
-                    int q1 = int.Parse(temp1[1]);
-                    if (q1 < 1 || q1 > 4)
-                    {
-                        if (reportError)
-                        {
-                            new Error("Should have quarters from 1 to and including 4");
-                        }
-                        else return GekkoTime.tNull;
-                    }
-                    t = new GekkoTime(EFreq.Q, y1, q1);
+                    y1 = G.findYear(int.Parse(temp1[0]));
+                    q1 = int.Parse(temp1[1]);
                 }
-                catch (Exception e)
+                catch
                 {
-                    if (reportError)
-                    {
-                        new Error("Timeperiod " + s + " not valid");
-                    }
+                    if (reportError) new Error("Could not parse " + s + " as a quarterly date");
                     else return GekkoTime.tNull;
                 }
+                if (q1 < 1 || q1 > 4)
+                {
+                    if (reportError) new Error("Should have quarters from 1 to and including 4");
+                    else return GekkoTime.tNull;
+                }
+                t = new GekkoTime(EFreq.Q, y1, q1);
             }
             else if (allowKForQuarters && (s.Contains("k") || s.Contains("K")))
             {
+                string[] temp1 = s.Split(new char[] { 'k', 'K' });
+                int y1 = -12345;
+                int q1 = -12345;
                 try
                 {
-                    string[] temp1 = s.Split(new char[] { 'k', 'K' });
-                    int y1 = G.findYear(int.Parse(temp1[0]));
-                    int q1 = int.Parse(temp1[1]);
-                    if (q1 < 1 || q1 > 4)
-                    {
-                        if (reportError)
-                        {
-                            new Error("Should have quarters from 1 to and including 4");
-                        }
-                        else return GekkoTime.tNull;
-                    }
-                    t = new GekkoTime(EFreq.Q, y1, q1);
+                    y1 = G.findYear(int.Parse(temp1[0]));
+                    q1 = int.Parse(temp1[1]);
                 }
-                catch (Exception e)
+                catch
                 {
-                    if (reportError)
-                    {
-                        new Error("Timeperiod " + s + " not valid");
-                    }
+                    if (reportError) new Error("Could not parse " + s + " as a quarterly date");
                     else return GekkoTime.tNull;
                 }
+                if (q1 < 1 || q1 > 4)
+                {
+                    if (reportError) new Error("Should have quarters from 1 to and including 4");
+                    else return GekkoTime.tNull;
+                }
+                t = new GekkoTime(EFreq.Q, y1, q1);
             }
             else if (s.Contains("d") || s.Contains("D"))  //must be before 'm'
             {
+
+                int y1 = -12345;
+                int m1 = -12345;
+                int d = -12345;
+
                 try
                 {
                     string[] temp1 = s.Split(new char[] { 'm', 'M' });  //2019m12d24
                     string[] temp2 = temp1[1].Split(new char[] { 'd', 'D' });
-                    int y1 = G.findYear(int.Parse(temp1[0]));
-                    int m1 = int.Parse(temp2[0]);
-                    if (m1 < 1 || m1 > 12)
-                    {
-                        if (reportError)
-                        {
-                            new Error("Should have months from 1 to and including 12");
-                        }
-                        else return GekkoTime.tNull;
-                    }
-                    int d = int.Parse(temp2[1]);
-                    int maxDays = G.DaysInMonth(y1, m1); //see also #9832453429857
-                    if (d < 1 || d > maxDays)
-                    {
-                        new Error("Illegal day in daily date");
-                    }
-                    t = new GekkoTime(EFreq.D, y1, m1, d);
+                    y1 = G.findYear(int.Parse(temp1[0]));
+                    m1 = int.Parse(temp2[0]);
+                    d = int.Parse(temp2[1]);
                 }
-                catch (Exception e)
+                catch
                 {
-                    if (reportError)
-                    {
-                        new Error("Timeperiod " + s + " not valid");
-                    }
+                    if (reportError) new Error("Could not parse " + s + " as a daily date");
                     else return GekkoTime.tNull;
                 }
+
+                if (m1 < 1 || m1 > 12)
+                {
+                    if (reportError) new Error("Should have months from 1 to and including 12");
+                    else return GekkoTime.tNull;
+                }
+
+                int maxDays = G.DaysInMonth(y1, m1); //see also #9832453429857
+                if (d < 1 || d > maxDays)
+                {
+                    if (reportError) new Error("Illegal day in daily date");
+                    else return GekkoTime.tNull;
+                }
+                t = new GekkoTime(EFreq.D, y1, m1, d);
             }
             else if (s.Contains("m") || s.Contains("M"))
             {
+
+                int y1 = -12345;
+                int m1 = -12345;
+                string[] temp1 = s.Split(new char[] { 'm', 'M' });
                 try
                 {
-                    string[] temp1 = s.Split(new char[] { 'm', 'M' });
-                    int y1 = G.findYear(int.Parse(temp1[0]));
-                    int m1 = int.Parse(temp1[1]);
-                    if (m1 < 1 || m1 > 12)
-                    {
-                        if (reportError)
-                        {
-                            new Error("Should have months from 1 to and including 12");
-                        }
-                        else return GekkoTime.tNull;
-                    }
-                    t = new GekkoTime(EFreq.M, y1, m1);
+                    y1 = G.findYear(int.Parse(temp1[0]));
+                    m1 = int.Parse(temp1[1]);
                 }
-                catch (Exception e)
+                catch
                 {
-                    if (reportError)
-                    {
-                        new Error("Timeperiod " + s + " not valid");
-                    }
+                    if (reportError) new Error("Could not parse " + s + " as a monthly date");
                     else return GekkoTime.tNull;
                 }
+
+                if (m1 < 1 || m1 > 12)
+                {
+                    if (reportError) new Error("Should have months from 1 to and including 12");
+                    else return GekkoTime.tNull;
+                }
+                t = new GekkoTime(EFreq.M, y1, m1);
             }
-            else if (s.Contains("u") || s.Contains("U")) 
+            else if (s.Contains("w") || s.Contains("W"))
+            {
+
+                string[] temp1 = s.Split(new char[] { 'w', 'W' });
+                int y1 = -12345;
+                int w1 = -12345;
+                try
+                {
+                    y1 = G.findYear(int.Parse(temp1[0]));
+                    w1 = int.Parse(temp1[1]);
+                }
+                catch
+                {
+                    if (reportError) new Error("Could not parse " + s + " as a weekly date");
+                    else return GekkoTime.tNull;
+                }
+                bool error = G.CheckWeekNumberAndMaybePrintErrorMessage(y1, w1, reportError);
+                if (error) return GekkoTime.tNull;  //if there is an error and reportError = true above, we will not get here.                
+                t = new GekkoTime(EFreq.W, y1, w1);
+
+            }
+            else if (s.Contains("u") || s.Contains("U"))
             {
                 string s2 = s;
                 if (s.EndsWith("u1", StringComparison.OrdinalIgnoreCase))
@@ -536,21 +574,15 @@ namespace Gekko
                 {
                     t = new GekkoTime(EFreq.U, int.Parse(s2), 1);
                 }
-                catch (Exception e)
+                catch
                 {
-                    if (reportError)
-                    {
-                        new Error("Timeperiod " + s + " not valid");
-                    }
+                    if (reportError) new Error("Could not parse " + s + " as a undated date");
                     else return GekkoTime.tNull;
                 }
             }
             else
             {
-                if (reportError)
-                {
-                    new Error("Could not understand the timeperiod: " + s);
-                }
+                if (reportError) new Error("Could not parse the timeperiod: " + s);
                 else return GekkoTime.tNull;
             }
             return t;
@@ -658,6 +690,22 @@ namespace Gekko
                     DateTime dt1 = new DateTime(t1.super, t1.sub, t1.subsub);
                     DateTime dt2 = new DateTime(t2.super, t2.sub, t2.subsub);
                     return (dt2 - dt1).Days + 1;
+                }
+            }
+            else if (efreq == EFreq.W)
+            {                
+                if (t1.super < 1 || t1.super > 9999 || t2.super < 1 || t2.super > 9999)
+                {
+                    return int.MaxValue;  //does not make any sense anyhow
+                }
+                else
+                {
+                    //Could be done with knowledge of maxweeks in year and some modulo.
+                    //But this is probably more robust, and a little slower.
+                    DateTime dt1 = ISOWeek.ToDateTime(t1.super, t1.sub, DayOfWeek.Monday);
+                    DateTime dt2 = ISOWeek.ToDateTime(t2.super, t2.sub, DayOfWeek.Monday);
+                    //dt1 and dt2 are now both Mondays
+                    return (dt2 - dt1).Days % GekkoTimeStuff.numberOfDaysInAWeek + 1;
                 }
             }
             else
@@ -1230,6 +1278,47 @@ namespace Gekko
                 
             }
         }
+
+        ///// <summary>
+        ///// Converts a date to a week number.
+        ///// ISO 8601 week 1 is the week that contains the first Thursday that year.        
+        ///// </summary>
+        ///// //See https://stackoverflow.com/questions/11154673/get-the-correct-week-number-of-a-given-date
+        //public static int ToIso8601Weeknumber(DateTime date)
+        //{
+        //    var thursday = date.AddDays(3 - DayOffset(date.DayOfWeek));
+        //    return (thursday.DayOfYear - 1) / 7 + 1;
+        //}
+
+        ///// <summary>
+        ///// Converts a week number to a date.
+        ///// Note: Week 1 of a year may start in the previous year.
+        ///// ISO 8601 week 1 is the week that contains the first Thursday that year, so
+        ///// if December 28 is a Monday, December 31 is a Thursday,
+        ///// and week 1 starts January 4.
+        ///// If December 28 is a later day in the week, week 1 starts earlier.
+        ///// If December 28 is a Sunday, it is in the same week as Thursday January 1.
+        ///// Will set error = true if weekNumber &lt; 1 or > allowed weeknumber for the year. 
+        ///// </summary>
+        //public static DateTime FromIso8601Weeknumber(int weekNumber, int year, out bool error, DayOfWeek day = DayOfWeek.Monday)
+        //{
+        //    error = false;            
+        //    var dec28 = new DateTime(year - 1, 12, 28);
+        //    var monday = dec28.AddDays(7 * weekNumber - DayOffset(dec28.DayOfWeek));
+        //    DateTime dt = monday.AddDays(DayOffset(day));
+        //    int weekNumberCheck = ToIso8601Weeknumber(dt);
+        //    if (weekNumber != weekNumberCheck) error = true;
+        //    if (weekNumber < 1) error = true;
+        //    return dt;
+        //}
+
+        ///// <summary>
+        ///// Iso8601 weeks start on Monday. This returns 0 for Monday.
+        ///// </summary>
+        //private static int DayOffset(DayOfWeek weekDay)
+        //{
+        //    return ((int)weekDay + 6) % 7;
+        //}
     }
 
     public class GekkoTimeIterator : IEnumerable<GekkoTime>
@@ -1415,6 +1504,158 @@ namespace Gekko
             }
             s = s.Substring(0, s.Length - ", ".Length);
             return s;
+        }
+    }
+
+    /// <summary>
+    /// Taken from .NET Core here: https://github.com/dotnet/runtime/blob/b41f1c5f2fde25d752d857a54c3af24145060cdd/src/libraries/System.Private.CoreLib/src/System/Globalization/ISOWeek.cs
+    /// </summary>
+    public static class ISOWeek
+    {
+        private const int WeeksInLongYear = 53;
+        private const int WeeksInShortYear = 52;
+
+        private const int MinWeek = 1;
+        private const int MaxWeek = WeeksInLongYear;
+
+        public static int GetWeekOfYear(DateTime date)
+        {
+            int week = GetWeekNumber(date);
+
+            if (week < MinWeek)
+            {
+                // If the week number obtained equals 0, it means that the
+                // given date belongs to the preceding (week-based) year.
+                return GetWeeksInYear(date.Year - 1);
+            }
+
+            if (week > GetWeeksInYear(date.Year))
+            {
+                // If a week number of 53 is obtained, one must check that
+                // the date is not actually in week 1 of the following year.
+                return MinWeek;
+            }
+
+            return week;
+        }
+
+        public static int GetYear(DateTime date)
+        {
+            int week = GetWeekNumber(date);
+
+            if (week < MinWeek)
+            {
+                // If the week number obtained equals 0, it means that the
+                // given date belongs to the preceding (week-based) year.
+                return date.Year - 1;
+            }
+
+            if (week > GetWeeksInYear(date.Year))
+            {
+                // If a week number of 53 is obtained, one must check that
+                // the date is not actually in week 1 of the following year.
+                return date.Year + 1;
+            }
+
+            return date.Year;
+        }
+
+        // The year parameter represents an ISO week-numbering year (also called ISO year informally).
+        // Each week's year is the Gregorian year in which the Thursday falls.
+        // The first week of the year, hence, always contains 4 January.
+        // ISO week year numbering therefore slightly deviates from the Gregorian for some days close to 1 January.
+        public static DateTime GetYearStart(int year)
+        {
+            return ToDateTime(year, MinWeek, DayOfWeek.Monday);
+        }
+
+        // The year parameter represents an ISO week-numbering year (also called ISO year informally).
+        // Each week's year is the Gregorian year in which the Thursday falls.
+        // The first week of the year, hence, always contains 4 January.
+        // ISO week year numbering therefore slightly deviates from the Gregorian for some days close to 1 January.
+        public static DateTime GetYearEnd(int year)
+        {
+            return ToDateTime(year, GetWeeksInYear(year), DayOfWeek.Sunday);
+        }
+
+        // From https://en.wikipedia.org/wiki/ISO_week_date#Weeks_per_year:
+        //
+        // The long years, with 53 weeks in them, can be described by any of the following equivalent definitions:
+        //
+        // - Any year starting on Thursday and any leap year starting on Wednesday.
+        // - Any year ending on Thursday and any leap year ending on Friday.
+        // - Years in which 1 January and 31 December (in common years) or either (in leap years) are Thursdays.
+        //
+        // All other week-numbering years are short years and have 52 weeks.
+        public static int GetWeeksInYear(int year)
+        {
+            int year2 = G.findYear(year);  //TTH change: also checks reasonable value            
+
+            //static int P(int y) => (y + (y / 4) - (y / 100) + (y / 400)) % 7;  //TTH change: moved to method
+
+            if (P(year2) == 4 || P(year2 - 1) == 3)
+            {
+                return WeeksInLongYear;
+            }
+
+            return WeeksInShortYear;
+        }
+
+        // From https://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year,_week_number_and_weekday:
+        //
+        // This method requires that one know the weekday of 4 January of the year in question.
+        // Add 3 to the number of this weekday, giving a correction to be used for dates within this year.
+        //
+        // Multiply the week number by 7, then add the weekday. From this sum subtract the correction for the year.
+        // The result is the ordinal date, which can be converted into a calendar date.
+        //
+        // If the ordinal date thus obtained is zero or negative, the date belongs to the previous calendar year.
+        // If greater than the number of days in the year, to the following year.
+        public static DateTime ToDateTime(int year, int week, DayOfWeek dayOfWeek)
+        {
+            int year2 = G.findYear(year);  //TTH change: also checks reasonable value            
+            G.CheckWeekNumberAndMaybePrintErrorMessage(year2, week, true);
+
+            // We allow 7 for convenience in cases where a user already has a valid ISO
+            // day of week value for Sunday. This means that both 0 and 7 will map to Sunday.
+            // The GetWeekday method will normalize this into the 1-7 range required by ISO.
+            if ((int)dayOfWeek < 0 || (int)dayOfWeek > 7)
+            {                
+                new Error("The day of week must be >=0 and <= 7"); //TTH change
+            }
+
+            var jan4 = new DateTime(year2, month: 1, day: 4);
+
+            int correction = GetWeekday(jan4.DayOfWeek) + 3;
+
+            int ordinal = (week * 7) + GetWeekday(dayOfWeek) - correction;
+
+            return new DateTime(year2, month: 1, day: 1).AddDays(ordinal - 1);
+        }
+
+        // From https://en.wikipedia.org/wiki/ISO_week_date#Calculating_the_week_number_of_a_given_date:
+        //
+        // Using ISO weekday numbers (running from 1 for Monday to 7 for Sunday),
+        // subtract the weekday from the ordinal date, then add 10. Divide the result by 7.
+        // Ignore the remainder; the quotient equals the week number.
+        //
+        // If the week number thus obtained equals 0, it means that the given date belongs to the preceding (week-based) year.
+        // If a week number of 53 is obtained, one must check that the date is not actually in week 1 of the following year.
+        private static int GetWeekNumber(DateTime date)
+        {
+            return (date.DayOfYear - GetWeekday(date.DayOfWeek) + 10) / 7;
+        }
+
+        // Day of week in ISO is represented by an integer from 1 through 7, beginning with Monday and ending with Sunday.
+        // This matches the underlying values of the DayOfWeek enum, except for Sunday, which needs to be converted.
+        private static int GetWeekday(DayOfWeek dayOfWeek)
+        {
+            return dayOfWeek == DayOfWeek.Sunday ? 7 : (int)dayOfWeek;
+        }
+
+        private static int P(int y)
+        {
+            return (y + (y / 4) - (y / 100) + (y / 400)) % 7;  //TTH change: moved to method
         }
     }
 }

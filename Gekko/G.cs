@@ -574,6 +574,10 @@ namespace Gekko
             {
                 eFreq = EFreq.M;
             }
+            else if (G.Equal(freq, "w"))
+            {
+                eFreq = EFreq.W;
+            }
             else if (G.Equal(freq, "d"))
             {
                 eFreq = EFreq.D;
@@ -1084,6 +1088,10 @@ namespace Gekko
             else if (eFreq == EFreq.M)
             {
                 freq = "m";
+            }
+            else if (eFreq == EFreq.W)
+            {
+                freq = "w";
             }
             else if (eFreq == EFreq.D)
             {
@@ -3324,6 +3332,33 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Check if the week number is legal (some years have 52 weeks, some have 53 weeks). If reportError = false, 
+        /// the method returns true if there is a problem/error.
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="week"></param>
+        /// <param name="reportError"></param>
+        /// <returns></returns>
+        public static bool CheckWeekNumberAndMaybePrintErrorMessage(int year, int week, bool reportError)
+        {
+            int maxWeeks = ISOWeek.GetWeeksInYear(year);
+            if (week < 1 || week > maxWeeks)
+            {
+                if (reportError)
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("Freq 'w' wrong week number: " + week + ".");
+                        txt.MainAdd("The year " + year + " contains week numbers 1 to " + maxWeeks + "(inclusive");
+                        txt.MainAdd("See the {a{ISO 8601 standard¤https://en.wikipedia.org/wiki/ISO_8601}} regarding week numbering.");
+                    }
+                }
+                else return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// 1950 --> 1950.
         /// 50   --> 1950.
         /// 2010 --> 2010.
@@ -3395,23 +3430,27 @@ namespace Gekko
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
             string f = "";
-            if ((input == EFreq.A))
+            if (input == EFreq.A)
             {
                 f = "Annual";
             }
-            else if ((input == EFreq.Q))
+            else if (input == EFreq.Q)
             {
                 f = "Quarterly";
             }
-            else if ((input == EFreq.M)) 
+            else if (input == EFreq.M) 
             {
                 f = "Monthly";
             }
-            else if ((input == EFreq.D))
+            else if (input == EFreq.W)
+            {
+                f = "Weekly";
+            }
+            else if (input == EFreq.D)
             {
                 f = "Daily";                
             }
-            else if ((input == EFreq.U))
+            else if (input == EFreq.U)
             {
                 f = "Undated";
             }
@@ -3513,6 +3552,10 @@ namespace Gekko
             else if (gt.freq == EFreq.M)
             {
                 subend = "m" + gt.sub;
+            }
+            else if (gt.freq == EFreq.W)
+            {
+                subend = "w" + gt.sub;
             }
             else if (gt.freq == EFreq.D)
             {
