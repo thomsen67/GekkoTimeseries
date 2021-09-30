@@ -1285,8 +1285,8 @@ namespace Gekko
                 {
                     int pos = input0.IndexOf(Globals.linkSeparator1);
                     string input2 = input0.Substring(pos + 1);
-                    string[] input3 = input2.Split(new char[] { Globals.linkSeparator2 }, 2);  //only find first ':' because a link may contain this
-                    if (input3.Length != 2) G.Writeln2(EWrapType.Error, "Strange error rgd. links");
+                    string[] input3 = input2.Split(new char[] { Globals.linkSeparator2 }, 2);  //only find first ':' because a link may contain this too
+                    if (input3.Length != 2) new Warning("Strange error rgd. links");
                     type = input3[0];
                     input = input3[1];
                 }

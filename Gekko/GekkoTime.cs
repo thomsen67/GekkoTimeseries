@@ -739,6 +739,14 @@ namespace Gekko
             tt2 = ConvertFreqsLast(freq, t2);
         }
 
+        /// <summary>
+        /// Convert from a GekkoTime in one frequency to another frequency (possibly use start of period). Cf. ConvertFreqsLast().
+        /// The freqHelper object is only for offsetting and the lag problem (can be null).
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <param name="t"></param>
+        /// <param name="freqHelper"></param>
+        /// <returns></returns>
         public static GekkoTime ConvertFreqsFirst(EFreq freq, GekkoTime t, FreqHelper freqHelper)
         {
             //========================================================================================================
@@ -763,7 +771,6 @@ namespace Gekko
                 //Below, we start setting tt = freqHelper.t1, and then do the offset at the very end.
                 //
                 //All this could be handled more elegantly if .t0 was an offset instead of a date.
-
                 tt = freqHelper.t1;
             }
             
@@ -956,6 +963,12 @@ namespace Gekko
             return tt;
         }
 
+        /// <summary>
+        /// Convert from a GekkoTime in one frequency to another frequency (possibly use start of period). Cf. ConvertFreqsFirst().
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static GekkoTime ConvertFreqsLast(EFreq freq, GekkoTime t)
         {
             //========================================================================================================
@@ -1367,6 +1380,10 @@ namespace Gekko
             else if (this.freq == EFreq.M)
             {
                 return super + "m" + sub;
+            }
+            else if (this.freq == EFreq.W)
+            {
+                return super + "w" + sub;
             }
             else if (this.freq == EFreq.D)
             {

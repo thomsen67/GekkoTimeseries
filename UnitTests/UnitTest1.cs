@@ -6447,6 +6447,15 @@ namespace UnitTests
             TestCell(ref counter, tab, 2, 2, CellType.Number, (4d / 3d - 1) * 100d, sharedDelta);
             TestCell(ref counter, tab, 3, 1, CellType.Text, "2003");
             TestCell(ref counter, tab, 3, 2, CellType.Number, (5d / 4d - 1) * 100d, sharedDelta);
+
+            // --------------- Test of weekly W frequency start --------------- 
+                        
+            GekkoTime gt = GekkoTime.ConvertFreqsFirst(EFreq.W, new GekkoTime(EFreq.D, 2021, 9, 30), null);
+
+
+
+            // --------------- Test of weekly W frequency end ----------------- 
+
         }
 
         [TestMethod]

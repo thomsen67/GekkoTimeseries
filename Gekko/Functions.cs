@@ -76,7 +76,6 @@ namespace Gekko
                 if (!G.Equal(m_string, "m"))
                 {
                     new Error("date(): expected year, month and day");
-                    //throw new GekkoException();
                 }
                 int month_int = O.ConvertToInt(month);
 
@@ -84,7 +83,6 @@ namespace Gekko
                 if (!G.Equal(day_string, "d"))
                 {
                     new Error("date(): expected year, month and day");
-                    //throw new GekkoException();
                 }
                 int day_int = O.ConvertToInt(day);
                 GekkoTime gt = new GekkoTime(EFreq.D, year_int, month_int, day_int);
@@ -93,7 +91,6 @@ namespace Gekko
             else
             {
                 new Error("date(): expected year, month and day"); return null;
-                //throw new GekkoException();
             }
         }
 
@@ -107,6 +104,49 @@ namespace Gekko
 
             GekkoTime gt = (ths as ScalarDate).date;
             return new ScalarVal(gt.super);
+        }
+
+        public static IVariable getyearandweek(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            //essentially %d.getYearAndWeek() is an alias for %d.date('w', 'first') or %d.date('w', 'last')
+            if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.D)
+            {
+                return date(smpl, _t1, _t2, ths, new ScalarString("w"), new ScalarString("start"));  //could just as well be "end"
+            }
+            else
+            {
+                new Error("getYearAndWeek() expects a date with daily frequency as input"); return null;
+            }         
+        }
+
+        public static IVariable getweek(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            //%d.getWeek() is only legal for a %d of weekly frequency.
+            //This is to notify that there may be a year problem.
+            //But one can use %d.getYearAndWeek().getWeek().
+            if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.W)
+            {
+                int week = ((ScalarDate)ths).date.sub;
+                return new ScalarVal(week);
+            }
+            else
+            {
+                using (Error txt = new Error())
+                {
+                    txt.MainAdd("getWeek() expects a date with weekly frequency as input, so you cannot use %d.getWeek() directly ");
+                    txt.MainAdd("with a daily date %d. But you may use the getYearAndWeek() function as an intermediary, for instance ");
+                    txt.MainAdd("%d.getYearAndWeek().getWeek().");
+                    // ---
+                    txt.MoreAdd("This is to remind the user that week numbers ");
+                    txt.MoreAdd("have special logic around New Year, because 1 may be subtracted from or added to the year corresponding ");
+                    txt.MoreAdd("to %d. For instance, consider January 1, 2021. With this date, 2021m1d1.getYearAndWeek() ");
+                    txt.MoreAdd("returns the date 2020w53, that is, week 53 of 2020. Therefore, 2021m1d1.getYearAndWeek().getYear = 2020 ");
+                    txt.MoreAdd("and 2021m1d1.getYearAndWeek().getWeek = 53. Without this reminder, users could easily overlook ");
+                    txt.MoreAdd("that the year of the weekly date may change around New Year.");
+                }
+                 
+                return null;
+            }
         }
 
         public static IVariable getsubper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
