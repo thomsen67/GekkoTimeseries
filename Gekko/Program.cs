@@ -107,7 +107,8 @@ namespace Gekko
     {
         Unknown,
         PrintMixedAQMPretty,
-        PrintMixedMDPretty,
+        PrintMixedMDPretty, //if there are days
+        PrintMixedWDPretty, //if there are weeks (and maybe days)
         PrintNonmixedUgly,  //also for sheet
         Plot
     }

@@ -46,7 +46,7 @@ namespace Gekko
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            bool[] freqs = new bool[5];  //0=U, 1=A, 2=Q, 3=M, 4=D
+            bool[] freqs = new bool[6];  //0=U, 1=A, 2=Q, 3=M, 4=D, 5=W
 
             int numberOfGekkoNullVariables = 0;
             int numberOfOtherVariables = 0;
@@ -208,6 +208,7 @@ namespace Gekko
                             else if (temp0.freq == EFreq.Q) freqs[2] = true;
                             else if (temp0.freq == EFreq.M) freqs[3] = true;
                             else if (temp0.freq == EFreq.D) freqs[4] = true;
+                            else if (temp0.freq == EFreq.W) freqs[5] = true;
 
                         }
                         else if (temp1 != null)
@@ -217,6 +218,7 @@ namespace Gekko
                             else if (temp1.freq == EFreq.Q) freqs[2] = true;
                             else if (temp1.freq == EFreq.M) freqs[3] = true;
                             else if (temp1.freq == EFreq.D) freqs[4] = true;
+                            else if (temp1.freq == EFreq.W) freqs[5] = true;
                         }
 
                         if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
@@ -327,21 +329,22 @@ namespace Gekko
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
             // ----------------------- start -------------------------------------------------
-            if (freqs[0] && (freqs[1] || freqs[2] || freqs[3] || freqs[4]))
+            if (freqs[0] && (freqs[1] || freqs[2] || freqs[3] || freqs[4] || freqs[5]))
             {
                 new Error("You cannot mix undated and other frequencies for PRT/PLOT");
                 //throw new GekkoException();
             }
 
             EFreq sameFreq = EFreq.None;
-            if (freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4]) sameFreq = EFreq.U;
-            else if (!freqs[0] && freqs[1] && !freqs[2] && !freqs[3] && !freqs[4]) sameFreq = EFreq.A;
-            else if (!freqs[0] && !freqs[1] && freqs[2] && !freqs[3] && !freqs[4]) sameFreq = EFreq.Q;
-            else if (!freqs[0] && !freqs[1] && !freqs[2] && freqs[3] && !freqs[4]) sameFreq = EFreq.M;
-            else if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && freqs[4]) sameFreq = EFreq.D;
+            if (freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.U;
+            else if (!freqs[0] && freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.A;
+            else if (!freqs[0] && !freqs[1] && freqs[2] && !freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.Q;
+            else if (!freqs[0] && !freqs[1] && !freqs[2] && freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.M;
+            else if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && freqs[4] && !freqs[5]) sameFreq = EFreq.D;
+            else if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && freqs[5]) sameFreq = EFreq.W;
             else sameFreq = EFreq.None;  //superflous, just to state the obvious
 
-            if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4])
+            if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && !freqs[5])
             {
                 //for instance printing a scalar
                 sameFreq = Program.options.freq;
@@ -350,6 +353,7 @@ namespace Gekko
                 else if (Program.options.freq == EFreq.Q) freqs[2] = true;
                 else if (Program.options.freq == EFreq.M) freqs[3] = true;
                 else if (Program.options.freq == EFreq.D) freqs[4] = true;
+                else if (Program.options.freq == EFreq.W) freqs[5] = true;
             }
 
             // --------------------------- end ---------------------------------------------
@@ -399,56 +403,97 @@ namespace Gekko
             // there is a lot of frequency stuff going on in the following printing
             //--------------------------------------------------------------------------------------------------------
 
+            EFreq highestFreq = EFreq.A;
+            if (freqs[0]) highestFreq = EFreq.U;
+            if (freqs[1]) highestFreq = EFreq.A;
+            if (freqs[2]) highestFreq = EFreq.Q;
+            if (freqs[3]) highestFreq = EFreq.M;
+            if (freqs[5]) highestFreq = EFreq.W;  //d and w freqs ought to switch places in freqs[] array... but never mind
+            if (freqs[4]) highestFreq = EFreq.D;  //d and w freqs ought to switch places in freqs[] array... but never mind
+
             bool showAllFreqsEachYear = true;
             if (type == EPrintTypes.Sheet) showAllFreqsEachYear = false;  //SHEET <2010q2 2010q3> should not show q1 and q3
 
             bool pretty = false;
             if (type == EPrintTypes.Sheet && G.Equal(Program.options.sheet_freq, "pretty")) pretty = true;
             if (type == EPrintTypes.Print && G.Equal(Program.options.print_freq, "pretty")) pretty = true;
-
-
+            
             EPrtCollapseTypes collapse = GetCollapseType(o, type);
             if (pretty == false) collapse = EPrtCollapseTypes.None;  //switched off for non-pretty
 
             bool showRowWithYear = pretty || (sameFreq == EFreq.U || sameFreq == EFreq.A);
 
             EPrtPlotSheet tabletype = EPrtPlotSheet.Unknown;
-            if (type == EPrintTypes.Plot) tabletype = EPrtPlotSheet.Plot;
+            if (type == EPrintTypes.Plot)
+            {
+                tabletype = EPrtPlotSheet.Plot;
+            }
             else
             {
-                if (freqs[4]) tabletype = EPrtPlotSheet.PrintMixedMDPretty;
-            }
+                if ((freqs[1] || freqs[2] || freqs[3]) && !(freqs[4] || freqs[5]))
+                {
+                    // A or Q or M, but not W orD
+                    tabletype = EPrtPlotSheet.PrintMixedAQMPretty;
+                }
+                else if ((freqs[4] && freqs[5]) && !(freqs[1] || freqs[2] || freqs[3]))
+                {
+                    //W and D, but not A or Q or M
+                    tabletype = EPrtPlotSheet.PrintMixedWDPretty;
+                }
+                else if ((freqs[3] && freqs[4]) && !(freqs[1] || freqs[2] || freqs[5]))
+                {
+                    //M and D, but not A or Q or W
+                    tabletype = EPrtPlotSheet.PrintMixedMDPretty;
+                }        
+                else
+                {
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO warning or what, print separately?
+                    //TODO TODO
+                    //TODO TODO
+                    tabletype = EPrtPlotSheet.PrintMixedAQMPretty;
+                }
+            }            
 
-            int iPlot = 0;
+            int iPlot = 0;            
 
-            EFreq highestFreq = EFreq.A;
-            if (freqs[0]) highestFreq = EFreq.U;
-            if (freqs[1]) highestFreq = EFreq.A;
-            if (freqs[2]) highestFreq = EFreq.Q;
-            if (freqs[3]) highestFreq = EFreq.M;
-            if (freqs[4]) highestFreq = EFreq.D;
-
-            Table table = null;
+            Table printTable = null;
             PlotTable plotTable = null; //more lightweight than Table
 
             if (tabletype == EPrtPlotSheet.Plot)
             {
                 plotTable = Program.PlotMixed(smpl, type, containerExplode, n, o, highestFreq);
             }
-            else if (freqs[4])  //daily freq, will also accept d + m freq at same time
-            {
-                table = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
-            }
             else
             {
-                table = PrintMixedAQM(smpl, type, rows, containerExplode, labelMaxLine, freqs, n, sameFreq, y1, y2, pretty, collapse, showRowWithYear, iPlot, o);
-            }
+                if (tabletype==EPrtPlotSheet.PrintMixedAQMPretty)  //daily freq, will also accept d + m freq at same time
+                {
+                    printTable = PrintMixedAQM(smpl, type, rows, containerExplode, labelMaxLine, freqs, n, sameFreq, y1, y2, pretty, collapse, showRowWithYear, iPlot, o);                    
+                }
+                else if (tabletype == EPrtPlotSheet.PrintMixedMDPretty)
+                {
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                    //TODO TODO
+                    printTable = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
+                }
+                else if(tabletype==EPrtPlotSheet.PrintMixedMDPretty)
+                {
+                    printTable = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
+                }
+            }                
 
             //bool filter = ShouldFilterPeriod(new GekkoTime());
 
             if (type == EPrintTypes.Plot)
-            {
-                //G.Writeln("Calling gnuplot1");
+            {                
                 Plot.CallGnuplot(plotTable, o, containerExplode, highestFreq);
             }
             else if (type == EPrintTypes.Sheet)
@@ -456,7 +501,7 @@ namespace Gekko
                 bool isStamp = false; if (o != null && G.Equal(o.opt_stamp, "yes")) isStamp = true;
                 string title = o.opt_title;
 
-                Table tab2 = table.Transpose();
+                Table tab2 = printTable.Transpose();
 
                 if (Globals.excelDna)
                 {
@@ -472,16 +517,16 @@ namespace Gekko
             else if (type == EPrintTypes.Clip)
             {
                 //do not print anything, but put it on clipboard             
-                Table tab2 = table.Transpose();
+                Table tab2 = printTable.Transpose();
                 Program.PrtClipboard(tab2, false);
             }
             else  //is .Print type
             {
-                if (rows) table = table.Transpose();
+                if (rows) printTable = printTable.Transpose();
 
                 if (Globals.excelDna)
                 {
-                    Program.PrtToExcelDna(table, false, false, null); //isMulprt only relevant if there is a stamp, just set false here
+                    Program.PrtToExcelDna(printTable, false, false, null); //isMulprt only relevant if there is a stamp, just set false here
                 }
                 else
                 {
@@ -491,7 +536,7 @@ namespace Gekko
                     try
                     {
                         G.Writeln("");
-                        List<string> ss = table.Print();
+                        List<string> ss = printTable.Print();
                         foreach (string s in ss) G.Writeln(s);
                     }
                     finally
@@ -499,7 +544,7 @@ namespace Gekko
                         //resetting, also if there is an error
                         Program.options.print_width = widthRemember;
                     }
-                    Globals.lastPrtOrMulprtTable = table;  //if CLIP x, y, z, this Globals.lastPrtOrMulprtTable is used later on
+                    Globals.lastPrtOrMulprtTable = printTable;  //if CLIP x, y, z, this Globals.lastPrtOrMulprtTable is used later on
                     CrossThreadStuff.CopyButtonEnabled(true);
                 }
             }
