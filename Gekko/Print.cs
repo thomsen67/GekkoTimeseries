@@ -399,8 +399,6 @@ namespace Gekko
             // there is a lot of frequency stuff going on in the following printing
             //--------------------------------------------------------------------------------------------------------
 
-
-
             bool showAllFreqsEachYear = true;
             if (type == EPrintTypes.Sheet) showAllFreqsEachYear = false;  //SHEET <2010q2 2010q3> should not show q1 and q3
 
@@ -1481,8 +1479,7 @@ namespace Gekko
         }
 
         private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string operator2, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter, O.Prt.Element cc)
-        {
-            //få den til at returnere "n", måske skal 
+        {            
             string format = "f" + cc.widthFinal + "." + cc.decFinal;
 
             GekkoTime t = new GekkoTime(freqColumn, year, subHere);
@@ -1515,8 +1512,8 @@ namespace Gekko
             {
                 //cc.min = Math.Min(cc.min, (double)d);
                 //cc.max = Math.Max(cc.max, (double)d);
-                if (type != EPrintTypes.Plot)
-                {
+                //if (type != EPrintTypes.Plot)
+                //{
                     double dd = dd = (double)d;
                     if (double.IsNaN((double)d))
                     {
@@ -1533,17 +1530,14 @@ namespace Gekko
                         }
                     }
                     table.SetNumber(i, j, dd, format);
-                }
-                else
-                {
-                    double tt = ((ScalarVal)Functions.helper_time(t)).val;
-                    if (freqColumn == EFreq.U || freqColumn == EFreq.A) tt += 0.5;
-                    //table.SetNumber(i - 1, 2 * (j - 2) + 1, tt, format);  //j=2 -> 1, j=3 -> 3
-                    //table.SetNumber(i - 1, 2 * (j - 2) + 2, (double)d, format);  //j=2 -> 2, j=3 -> 4
-                    table.SetNumber(i - 1, (j - 2) + 1, tt, format);                 //j=2 -> 1, j=3 -> 2
-                    table.SetNumber(i - 1, (j - 2) + 1 + count, (double)d, format);  //j=2 -> 1+count, j=3 -> 2+count
-                }
-
+                //}
+                //else
+                //{
+                //    double tt = ((ScalarVal)Functions.helper_time(t)).val;
+                //    if (freqColumn == EFreq.U || freqColumn == EFreq.A) tt += 0.5;
+                //    table.SetNumber(i - 1, (j - 2) + 1, tt, format);                 //j=2 -> 1, j=3 -> 2
+                //    table.SetNumber(i - 1, (j - 2) + 1 + count, (double)d, format);  //j=2 -> 1+count, j=3 -> 2+count
+                //}
             }
 
             if (t.freq == EFreq.U) skipCounter[0] = 0;

@@ -260,7 +260,7 @@ namespace Gekko
                 //The link in the main tab to the explanation in the output tab
                 //---------------------------------------------------------------
 
-                WrapHelper(1, 1, margin, margin, "Detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", lineWidth, Color.Empty, ETabs.Main, this.type, mustAlsoPrintOnScreen);
+                WrapHelper(1, 2, margin, margin, "Info and detailed explanation " + G.GetLinkAction("here", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ".", lineWidth, Color.Empty, ETabs.Main, this.type, mustAlsoPrintOnScreen);
             }
 
             if (!G.IsUnitTesting()) Gui.gui.ScrollToEnd(Gui.gui.textBoxMainTabUpper); //if not, the text is not scrolled if many lines.

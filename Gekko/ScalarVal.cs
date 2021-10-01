@@ -69,7 +69,7 @@ namespace Gekko
                 else
                 {
                     int year = G.findYear(intValue);  //error if the year is crazy
-                    gt = new GekkoTime(EFreq.A, year, 1);  //for a, q, m
+                    gt = new GekkoTime(EFreq.A, year, 1);  //for a, q, m, w
                     //so date d = 2000 in freq=m will not turn this into 2000m1 or 2000m12
                 }
             }
@@ -84,19 +84,29 @@ namespace Gekko
                 {                    
                     int sub = 1;
                     if (c == O.GetDateChoices.FlexibleStart) sub = 1;
-                    else if (c == O.GetDateChoices.FlexibleEnd) sub = 4;
+                    else if (c == O.GetDateChoices.FlexibleEnd) sub = GekkoTimeStuff.numberOfQuarters;
                     gt = new GekkoTime(EFreq.Q, year, sub);
                 }
                 else if (Program.options.freq == EFreq.M)
                 {                    
                     int sub = 1;
                     if (c == O.GetDateChoices.FlexibleStart) sub = 1;
-                    else if (c == O.GetDateChoices.FlexibleEnd) sub = 12;
+                    else if (c == O.GetDateChoices.FlexibleEnd) sub = GekkoTimeStuff.numberOfMonths;
                     gt = new GekkoTime(EFreq.M, year, sub);
                 }
+                else if (Program.options.freq == EFreq.W)
+                {                    
+                    if (c == O.GetDateChoices.FlexibleStart)
+                    {
+                        gt = GekkoTime.ConvertFreqsFirstHelperAnnual(year);
+                    }
+                    else if (c == O.GetDateChoices.FlexibleEnd)
+                    {
+                        gt = GekkoTime.ConvertFreqsLastHelperAnnual(year);
+                    }                    
+                }
                 else if (Program.options.freq == EFreq.D)
-                {
-                    int sub = 1;
+                {                    
                     if (c == O.GetDateChoices.FlexibleStart)
                     {                        
                         gt = new GekkoTime(EFreq.D, year, 1, 1);
@@ -104,8 +114,7 @@ namespace Gekko
                     else if (c == O.GetDateChoices.FlexibleEnd)
                     {                        
                         gt = new GekkoTime(EFreq.D, year, 12, 31);
-                    }
-                    
+                    }                    
                 }
             }            
             return gt;

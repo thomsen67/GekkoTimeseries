@@ -106,9 +106,9 @@ namespace Gekko
             return new ScalarVal(gt.super);
         }
 
-        public static IVariable getyearandweek(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        public static IVariable getweekly(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
-            //essentially %d.getYearAndWeek() is an alias for %d.date('w', 'first') or %d.date('w', 'last')
+            //essentially %d.getWeekly() is an alias for %d.date('w', 'first') or %d.date('w', 'last')
             if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.D)
             {
                 return date(smpl, _t1, _t2, ths, new ScalarString("w"), new ScalarString("start"));  //could just as well be "end"
@@ -123,7 +123,7 @@ namespace Gekko
         {
             //%d.getWeek() is only legal for a %d of weekly frequency.
             //This is to notify that there may be a year problem.
-            //But one can use %d.getYearAndWeek().getWeek().
+            //But one can use %d.getWeekly().getWeek().
             if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.W)
             {
                 int week = ((ScalarDate)ths).date.sub;
@@ -133,16 +133,15 @@ namespace Gekko
             {
                 using (Error txt = new Error())
                 {
-                    txt.MainAdd("getWeek() expects a date with weekly frequency as input, so you cannot use %d.getWeek() directly ");
-                    txt.MainAdd("with a daily date %d. But you may use the getYearAndWeek() function as an intermediary, for instance ");
-                    txt.MainAdd("%d.getYearAndWeek().getWeek().");
+                    txt.MainAdd("The getWeek() function only accepts a date with weekly frequency as input, so you cannot use %d.getWeek() directly ");
+                    txt.MainAdd("on for instance a daily date %d. This is to remind you that when getting a week number from a daily date, ");
+                    txt.MainAdd("the year may change. You may use the getWeekly() function as an intermediary, cf. the explanation in the link. ");
                     // ---
-                    txt.MoreAdd("This is to remind the user that week numbers ");
-                    txt.MoreAdd("have special logic around New Year, because 1 may be subtracted from or added to the year corresponding ");
-                    txt.MoreAdd("to %d. For instance, consider January 1, 2021. With this date, 2021m1d1.getYearAndWeek() ");
-                    txt.MoreAdd("returns the date 2020w53, that is, week 53 of 2020. Therefore, 2021m1d1.getYearAndWeek().getYear = 2020 ");
-                    txt.MoreAdd("and 2021m1d1.getYearAndWeek().getWeek = 53. Without this reminder, users could easily overlook ");
-                    txt.MoreAdd("that the year of the weekly date may change around New Year.");
+                    txt.MoreAdd("Week numbers are special around New Year. For instance, December 31, 2019 is in week 1, 2020. And January 1, 2021, is in week 53, 2020.");
+                    txt.MoreAdd("So the year may change, and the user should be aware of this. Therefore, getWeek() cannot be ");
+                    txt.MoreAdd("used directly on a daily date. Instead, you may first convert the daily date to a weekly date with the ");
+                    txt.MoreAdd("getWeekly() function. Hence, to find the week number of a given daily date %d, you can use %d.getWeekly().getWeek(). Note ");
+                    txt.MoreAdd("here that %d.getWeekly().getYear() will get the year of the weekly date, and this year may be different from %d.getYear()!");
                 }
                  
                 return null;
@@ -2496,15 +2495,20 @@ namespace Gekko
 
             if (t.freq == EFreq.A || t.freq == EFreq.U)
             {
-                return new ScalarVal(t.super);
+                return new ScalarVal(t.super); //Annual: for plots, 0.5 will be added to align them with the higher frequencies
             }
-            else if (t.freq == EFreq.Q)
-            {
-                return new ScalarVal(t.super + 1d / 4d / 2d + 1d / 4d * (t.sub - 1));
+            else if (t.freq == EFreq.Q)   
+            {                
+                return new ScalarVal(t.super + 1d / GekkoTimeStuff.numberOfQuarters / 2d + 1d / GekkoTimeStuff.numberOfQuarters * (t.sub - 1));  //2001q1 --> 0.125, 2001q2 --> 0.375, ...
             }
             else if (t.freq == EFreq.M)
             {
-                return new ScalarVal(t.super + 1d / 12d / 2d + 1d / 12d * (t.sub - 1));
+                return new ScalarVal(t.super + 1d / GekkoTimeStuff.numberOfMonths / 2d + 1d / GekkoTimeStuff.numberOfMonths * (t.sub - 1));
+            }
+            else if (t.freq == EFreq.W)
+            {
+                double numberOfWeeks = ISOWeek.GetWeeksInYear(t.super);
+                return new ScalarVal(t.super + 1d / numberOfWeeks / 2d + 1d / numberOfWeeks * (t.sub - 1));
             }
             else if (t.freq == EFreq.D)
             {

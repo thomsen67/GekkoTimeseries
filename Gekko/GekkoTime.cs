@@ -187,7 +187,7 @@ namespace Gekko
             int subsub = 1;
             int super = dt.Year;
             if (freq == EFreq.A)
-            {                
+            {
             }
             else if (freq == EFreq.Q)
             {
@@ -196,6 +196,12 @@ namespace Gekko
             else if (freq == EFreq.M)
             {
                 sub = dt.Month;
+            }
+            else if (freq == EFreq.W)
+            {
+                IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+                super = helper.year;  //conversion may sometimes change the year!
+                sub = helper.week;
             }
             else if (freq == EFreq.D)
             {
@@ -705,7 +711,7 @@ namespace Gekko
                     DateTime dt1 = ISOWeek.ToDateTime(t1.super, t1.sub, DayOfWeek.Monday);
                     DateTime dt2 = ISOWeek.ToDateTime(t2.super, t2.sub, DayOfWeek.Monday);
                     //dt1 and dt2 are now both Mondays
-                    return (dt2 - dt1).Days % GekkoTimeStuff.numberOfDaysInAWeek + 1;
+                    return (dt2 - dt1).Days / GekkoTimeStuff.numberOfDaysInAWeek + 1;
                 }
             }
             else
@@ -865,10 +871,8 @@ namespace Gekko
                 {
                     if (t.freq == EFreq.A)
                     {
-                        //from A to W
-                        DateTime dt = new DateTime(t.super, 1, 1);
-                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
-                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                        //from A to W                        
+                        tt = ConvertFreqsFirstHelperAnnual(t.super);
                     }
                     else if (t.freq == EFreq.Q)
                     {
@@ -961,7 +965,7 @@ namespace Gekko
             }
 
             return tt;
-        }
+        }        
 
         /// <summary>
         /// Convert from a GekkoTime in one frequency to another frequency (possibly use start of period). Cf. ConvertFreqsFirst().
@@ -1067,10 +1071,8 @@ namespace Gekko
                 {
                     if (t.freq == EFreq.A)
                     {
-                        //from A to W
-                        DateTime dt = new DateTime(t.super, GekkoTimeStuff.numberOfMonths, 31);
-                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
-                        tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+                        //from A to W                        
+                        tt = ConvertFreqsLastHelperAnnual(t.super);
                     }
                     else if (t.freq == EFreq.Q)
                     {
@@ -1165,6 +1167,34 @@ namespace Gekko
             return tt;
         }
 
+        /// <summary>
+        /// Helper method to keeps this code together. Also used in ScalarVal class. The year of the returned GekkoTime
+        /// is not necessarily the same is the input year.
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        public static GekkoTime ConvertFreqsFirstHelperAnnual(int year)
+        {            
+            DateTime dt = new DateTime(year, 1, 1);
+            IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+            GekkoTime tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+            return tt;
+        }
+
+        /// <summary>
+        /// Helper method to keeps this code together. Also used in ScalarVal class. The year of the returned GekkoTime
+        /// is not necessarily the same is the input year.
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        public static GekkoTime ConvertFreqsLastHelperAnnual(int year)
+        {            
+            DateTime dt = new DateTime(year, GekkoTimeStuff.numberOfMonths, 31);
+            IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
+            GekkoTime tt = new GekkoTime(EFreq.W, helper.year, helper.week);
+            return tt;
+        }
+
         private void CheckSameFreq(GekkoTime gt2)
         {
             if (this.freq != gt2.freq)
@@ -1208,7 +1238,7 @@ namespace Gekko
                 }
                 else
                 {
-                    //same year, compare months/quarters
+                    //same year, compare weeks/months/quarters
                     if (this.sub > gt2.sub) return true;
                 }
             }
@@ -1279,7 +1309,7 @@ namespace Gekko
                 }
                 else
                 {
-                    //same year, compare months/quarters
+                    //same year, compare weeks/months/quarters
                     if (this.sub < gt2.sub) return true;
                 }
             }
@@ -1327,6 +1357,15 @@ namespace Gekko
                 //see also #98032743029847
                 DateTime dt1 = new DateTime(this.super, this.sub, this.subsub);  
                 DateTime dt2 = dt1.AddDays(addedPeriods);
+                GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(this.freq, dt2);
+                return gt;
+            }
+            else if (this.freq == EFreq.W)
+            {
+                //This could probably be done in a more efficient way, using knowledge of the number of
+                //weeks in different years. But this is pretty simple and therefore stable!
+                DateTime dt1 = ISOWeek.ToDateTime(this.super, this.sub, DayOfWeek.Monday);
+                DateTime dt2 = dt1.AddDays(addedPeriods * GekkoTimeStuff.numberOfDaysInAWeek);
                 GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(this.freq, dt2);
                 return gt;
             }
