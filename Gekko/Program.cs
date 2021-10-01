@@ -6000,9 +6000,7 @@ namespace Gekko
 
                 if (value < 0)
                 {
-
                     res.Write(s);
-
                 }
                 else
                 {
@@ -20330,6 +20328,9 @@ namespace Gekko
             return eo;
         }
 
+        /// <summary>
+        /// Plotting in Gekko (PLOT command). Can plot mixed frequencies.
+        /// </summary>
         public static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
         {            
             PlotTable plotTable = new PlotTable();
