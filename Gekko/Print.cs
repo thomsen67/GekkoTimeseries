@@ -46,7 +46,14 @@ namespace Gekko
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            bool[] freqs = new bool[6];  //0=U, 1=A, 2=Q, 3=M, 4=D, 5=W
+            //bool[] freqs = new bool[6];  //0=U, 1=A, 2=Q, 3=M, 4=D, 5=W
+            GekkoDictionary<string, bool> freqs = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            freqs.Add("U", false);
+            freqs.Add("A", false);
+            freqs.Add("Q", false);
+            freqs.Add("M", false);
+            freqs.Add("W", false);
+            freqs.Add("D", false);
 
             int numberOfGekkoNullVariables = 0;
             int numberOfOtherVariables = 0;
@@ -203,22 +210,22 @@ namespace Gekko
 
                         if (temp0 != null)
                         {
-                            if (temp0.freq == EFreq.U) freqs[0] = true;
-                            else if (temp0.freq == EFreq.A) freqs[1] = true;
-                            else if (temp0.freq == EFreq.Q) freqs[2] = true;
-                            else if (temp0.freq == EFreq.M) freqs[3] = true;
-                            else if (temp0.freq == EFreq.D) freqs[4] = true;
-                            else if (temp0.freq == EFreq.W) freqs[5] = true;
+                            if (temp0.freq == EFreq.U) freqs["U"] = true;
+                            else if (temp0.freq == EFreq.A) freqs["A"] = true;
+                            else if (temp0.freq == EFreq.Q) freqs["Q"] = true;
+                            else if (temp0.freq == EFreq.M) freqs["M"] = true;
+                            else if (temp0.freq == EFreq.D) freqs["D"] = true;
+                            else if (temp0.freq == EFreq.W) freqs["W"] = true;
 
                         }
                         else if (temp1 != null)
                         {
-                            if (temp1.freq == EFreq.U) freqs[0] = true;
-                            else if (temp1.freq == EFreq.A) freqs[1] = true;
-                            else if (temp1.freq == EFreq.Q) freqs[2] = true;
-                            else if (temp1.freq == EFreq.M) freqs[3] = true;
-                            else if (temp1.freq == EFreq.D) freqs[4] = true;
-                            else if (temp1.freq == EFreq.W) freqs[5] = true;
+                            if (temp1.freq == EFreq.U) freqs["U"] = true;
+                            else if (temp1.freq == EFreq.A) freqs["A"] = true;
+                            else if (temp1.freq == EFreq.Q) freqs["Q"] = true;
+                            else if (temp1.freq == EFreq.M) freqs["M"] = true;
+                            else if (temp1.freq == EFreq.D) freqs["D"] = true;
+                            else if (temp1.freq == EFreq.W) freqs["W"] = true;
                         }
 
                         if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
@@ -329,31 +336,31 @@ namespace Gekko
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
             // ----------------------- start -------------------------------------------------
-            if (freqs[0] && (freqs[1] || freqs[2] || freqs[3] || freqs[4] || freqs[5]))
+            if (freqs["U"] && (freqs["A"] || freqs["Q"] || freqs["M"] || freqs["D"] || freqs["W"]))
             {
                 new Error("You cannot mix undated and other frequencies for PRT/PLOT");
                 //throw new GekkoException();
             }
 
             EFreq sameFreq = EFreq.None;
-            if (freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.U;
-            else if (!freqs[0] && freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.A;
-            else if (!freqs[0] && !freqs[1] && freqs[2] && !freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.Q;
-            else if (!freqs[0] && !freqs[1] && !freqs[2] && freqs[3] && !freqs[4] && !freqs[5]) sameFreq = EFreq.M;
-            else if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && freqs[4] && !freqs[5]) sameFreq = EFreq.D;
-            else if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && freqs[5]) sameFreq = EFreq.W;
+            if (freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.U;
+            else if (!freqs["U"] && freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.A;
+            else if (!freqs["U"] && !freqs["A"] && freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.Q;
+            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.M;
+            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && freqs["D"] && !freqs["W"]) sameFreq = EFreq.D;
+            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && freqs["W"]) sameFreq = EFreq.W;
             else sameFreq = EFreq.None;  //superflous, just to state the obvious
 
-            if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4] && !freqs[5])
+            if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"])
             {
                 //for instance printing a scalar
                 sameFreq = Program.options.freq;
-                if (Program.options.freq == EFreq.U) freqs[0] = true;
-                else if (Program.options.freq == EFreq.A) freqs[1] = true;
-                else if (Program.options.freq == EFreq.Q) freqs[2] = true;
-                else if (Program.options.freq == EFreq.M) freqs[3] = true;
-                else if (Program.options.freq == EFreq.D) freqs[4] = true;
-                else if (Program.options.freq == EFreq.W) freqs[5] = true;
+                if (Program.options.freq == EFreq.U) freqs["U"] = true;
+                else if (Program.options.freq == EFreq.A) freqs["A"] = true;
+                else if (Program.options.freq == EFreq.Q) freqs["Q"] = true;
+                else if (Program.options.freq == EFreq.M) freqs["M"] = true;
+                else if (Program.options.freq == EFreq.D) freqs["D"] = true;
+                else if (Program.options.freq == EFreq.W) freqs["W"] = true;
             }
 
             // --------------------------- end ---------------------------------------------
@@ -404,12 +411,12 @@ namespace Gekko
             //--------------------------------------------------------------------------------------------------------
 
             EFreq highestFreq = EFreq.A;
-            if (freqs[0]) highestFreq = EFreq.U;
-            if (freqs[1]) highestFreq = EFreq.A;
-            if (freqs[2]) highestFreq = EFreq.Q;
-            if (freqs[3]) highestFreq = EFreq.M;
-            if (freqs[5]) highestFreq = EFreq.W;  //d and w freqs ought to switch places in freqs[] array... but never mind
-            if (freqs[4]) highestFreq = EFreq.D;  //d and w freqs ought to switch places in freqs[] array... but never mind
+            if (freqs["U"]) highestFreq = EFreq.U;
+            if (freqs["A"]) highestFreq = EFreq.A;
+            if (freqs["Q"]) highestFreq = EFreq.Q;
+            if (freqs["M"]) highestFreq = EFreq.M;
+            if (freqs["W"]) highestFreq = EFreq.W;  //d and w freqs ought to switch places in freqs[] array... but never mind
+            if (freqs["D"]) highestFreq = EFreq.D;  //d and w freqs ought to switch places in freqs[] array... but never mind
 
             bool showAllFreqsEachYear = true;
             if (type == EPrintTypes.Sheet) showAllFreqsEachYear = false;  //SHEET <2010q2 2010q3> should not show q1 and q3
@@ -430,17 +437,17 @@ namespace Gekko
             }
             else
             {
-                if (!freqs[1] && !freqs[2] && !freqs[3] && freqs[5])
+                if (!freqs["A"] && !freqs["Q"] && !freqs["M"] && freqs["W"])
                 {
                     //W alone or W+D, but not A or Q or M
                     tabletype = EPrtPlotSheet.PrintMixedWDPretty;
                 }
-                else if (!freqs[1] && !freqs[2] && freqs[4] && !freqs[5])
+                else if (!freqs["A"] && !freqs["Q"] && freqs["D"] && !freqs["W"])
                 {
                     //D alone or D+M, but not A or Q or W
                     tabletype = EPrtPlotSheet.PrintMixedMDPretty;
                 }
-                else if (freqs[1] || freqs[2] || freqs[3] && !freqs[4] && !freqs[5])
+                else if (freqs["A"] || freqs["Q"] || freqs["M"] && !freqs["D"] && !freqs["W"])
                 {
                     // A or Q or M, but not W orD
                     tabletype = EPrtPlotSheet.PrintMixedAQMPretty;
@@ -550,16 +557,10 @@ namespace Gekko
             }
         }
 
-        private static Table PrintMixedMD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, bool[] freqs, O.Prt o)
+        private static Table PrintMixedMD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, GekkoDictionary<string, bool> freqs, O.Prt o)
         {
             Table table = new Table();
-            table.writeOnce = true;
-
-            if (freqs[0] || freqs[1] || freqs[2])
-            {
-                new Error("You cannot mix Daily and Annual/Quarterly/Undated frequencies for PRT/PLOT");
-                //throw new GekkoException();
-            }
+            table.writeOnce = true;            
 
             for (int j = 1; j < n + 2; j++)
             {
@@ -690,7 +691,7 @@ namespace Gekko
             return table;
         }
 
-        private static Table PrintMixedAQM(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, bool[] freqs, int n, EFreq sameFreq, int y1, int y2, bool pretty, EPrtCollapseTypes collapse, bool showRowWithYear, int iPlot, O.Prt o)
+        private static Table PrintMixedAQM(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, GekkoDictionary<string, bool> freqs, int n, EFreq sameFreq, int y1, int y2, bool pretty, EPrtCollapseTypes collapse, bool showRowWithYear, int iPlot, O.Prt o)
         {
             Table table = new Table();
             table.writeOnce = true;
@@ -784,7 +785,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (2)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -808,7 +809,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (3)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -832,7 +833,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (4)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -858,7 +859,7 @@ namespace Gekko
 
                     if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (5)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]))
+                        if ((type != EPrintTypes.Plot && freqs["M"]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -896,7 +897,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (6)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
+                        if ((type != EPrintTypes.Plot && freqs["Q"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
@@ -930,7 +931,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (7)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -954,7 +955,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (8)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -980,7 +981,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (9)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1007,7 +1008,7 @@ namespace Gekko
 
                     if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (10)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]))
+                        if ((type != EPrintTypes.Plot && freqs["M"]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1045,7 +1046,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (11)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
+                        if ((type != EPrintTypes.Plot && freqs["Q"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
@@ -1093,7 +1094,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (12)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1119,7 +1120,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (13)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1145,7 +1146,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (14)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1172,7 +1173,7 @@ namespace Gekko
 
                     if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (15)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]))
+                        if ((type != EPrintTypes.Plot && freqs["M"]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1211,7 +1212,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (16)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
+                        if ((type != EPrintTypes.Plot && freqs["Q"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
@@ -1248,7 +1249,7 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (17)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1274,7 +1275,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (18)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1299,7 +1300,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (19)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
+                        if ((type != EPrintTypes.Plot && freqs["M"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1326,7 +1327,7 @@ namespace Gekko
 
                     if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (20)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]))
+                        if ((type != EPrintTypes.Plot && freqs["M"]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1367,7 +1368,7 @@ namespace Gekko
 
                     if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (21)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]))
+                        if ((type != EPrintTypes.Plot && freqs["M"]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.M;
@@ -1405,7 +1406,7 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (22)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
+                        if ((type != EPrintTypes.Plot && freqs["Q"]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {// --------------------------
                             EFreq freqHere = EFreq.Q;
                             int subHere = 4;
@@ -1431,7 +1432,7 @@ namespace Gekko
 
                     if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (23)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]))
+                        if ((type != EPrintTypes.Plot && freqs["Q"]))
                         {
                             // --------------------------
                             EFreq freqHere = EFreq.Q;
@@ -1478,8 +1479,8 @@ namespace Gekko
                         }
                         else
                         {
-                            if (freqs[0]) isUndatedOrAnnual = 0;
-                            else if (freqs[1]) isUndatedOrAnnual = 1;
+                            if (freqs["U"]) isUndatedOrAnnual = 0;
+                            else if (freqs["A"]) isUndatedOrAnnual = 1;
                         }
 
                         if (isUndatedOrAnnual != -12345)

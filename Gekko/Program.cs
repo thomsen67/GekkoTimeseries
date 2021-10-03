@@ -20741,7 +20741,7 @@ namespace Gekko
 
         
 
-        private static void PrintHelper2(List<O.PrtContainer> containerExplode, bool[] freqs, O.PrtContainer container, bool root, bool isRef, List<IVariable> errorList)
+        private static void PrintHelper2(List<O.PrtContainer> containerExplode, GekkoDictionary<string, bool> freqs, O.PrtContainer container, bool root, bool isRef, List<IVariable> errorList)
         {
             //TODO: what to do with ref, how to merge??? What if MULPRT {#m1}, and #m1 has different elements 
                       
@@ -20780,11 +20780,11 @@ namespace Gekko
             }
         }
 
-        private static void PrintFreqHelper(bool[] freqs, IVariable iv)
+        private static void PrintFreqHelper(GekkoDictionary<string, bool> freqs, IVariable iv)
         {
-            if (((Series)iv).freq == EFreq.A) freqs[0] = true;
-            else if (((Series)iv).freq == EFreq.Q) freqs[1] = true;
-            else if (((Series)iv).freq == EFreq.M) freqs[2] = true;
+            if (((Series)iv).freq == EFreq.A) freqs["A"] = true;
+            else if (((Series)iv).freq == EFreq.Q) freqs["Q"] = true;
+            else if (((Series)iv).freq == EFreq.M) freqs["M"] = true;
         }
 
         
