@@ -24061,8 +24061,12 @@ namespace Gekko
                         ws = excel2.Workbook.Worksheets.First<ExcelWorksheet>();
                     }
 
-                    var start = ws.Dimension.Start;
-                    var end = ws.Dimension.End;
+                    if (ws.Dimension == null)
+                    {
+                        new Error("It seems the sheet is empty.");
+                    }
+                    ExcelCellAddress start = ws.Dimension.Start;
+                    ExcelCellAddress end = ws.Dimension.End;
                     
                     object[,] intput = (object[,])ws.Cells[1, 1, end.Row, end.Column].Value;
                     int rows2 = intput.GetLength(0);

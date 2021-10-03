@@ -42,9 +42,9 @@ namespace Gekko
         // -------------------------------------------------
         // pink stuff start
         // -------------------------------------------------
-        public static bool pink = true;
-        public static bool pink2 = true;  //keeps track of .lst and .tsd, .prn, .csv files
-        public static bool pink3 = true;  //tracks SYS commands
+        public static bool pink = false;
+        public static bool pink2 = false;  //keeps track of .lst and .tsd, .prn, .csv files
+        public static bool pink3 = false;  //tracks SYS commands
         public static List<string> datopgek_errors = null;
         public static List<string> datopgek_banks = null;
         public static List<string> datopgek_otherBanks = null;

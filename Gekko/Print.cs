@@ -430,21 +430,21 @@ namespace Gekko
             }
             else
             {
-                if ((freqs[1] || freqs[2] || freqs[3]) && !(freqs[4] || freqs[5]))
+                if (!freqs[1] && !freqs[2] && !freqs[3] && freqs[5])
+                {
+                    //W alone or W+D, but not A or Q or M
+                    tabletype = EPrtPlotSheet.PrintMixedWDPretty;
+                }
+                else if (!freqs[1] && !freqs[2] && freqs[4] && !freqs[5])
+                {
+                    //D alone or D+M, but not A or Q or W
+                    tabletype = EPrtPlotSheet.PrintMixedMDPretty;
+                }
+                else if (freqs[1] || freqs[2] || freqs[3] && !freqs[4] && !freqs[5])
                 {
                     // A or Q or M, but not W orD
                     tabletype = EPrtPlotSheet.PrintMixedAQMPretty;
                 }
-                else if ((freqs[4] && freqs[5]) && !(freqs[1] || freqs[2] || freqs[3]))
-                {
-                    //W and D, but not A or Q or M
-                    tabletype = EPrtPlotSheet.PrintMixedWDPretty;
-                }
-                else if ((freqs[3] && freqs[4]) && !(freqs[1] || freqs[2] || freqs[5]))
-                {
-                    //M and D, but not A or Q or W
-                    tabletype = EPrtPlotSheet.PrintMixedMDPretty;
-                }        
                 else
                 {
                     //TODO TODO
@@ -471,7 +471,7 @@ namespace Gekko
                 {
                     printTable = PrintMixedAQM(smpl, type, rows, containerExplode, labelMaxLine, freqs, n, sameFreq, y1, y2, pretty, collapse, showRowWithYear, iPlot, o);                    
                 }
-                else if (tabletype == EPrtPlotSheet.PrintMixedMDPretty)
+                else if (tabletype == EPrtPlotSheet.PrintMixedWDPretty)
                 {
                     //TODO TODO
                     //TODO TODO
