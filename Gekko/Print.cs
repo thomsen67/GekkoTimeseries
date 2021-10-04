@@ -213,9 +213,9 @@ namespace Gekko
                             if (temp0.freq == EFreq.U) freqs["U"] = true;
                             else if (temp0.freq == EFreq.A) freqs["A"] = true;
                             else if (temp0.freq == EFreq.Q) freqs["Q"] = true;
-                            else if (temp0.freq == EFreq.M) freqs["M"] = true;
-                            else if (temp0.freq == EFreq.D) freqs["D"] = true;
+                            else if (temp0.freq == EFreq.M) freqs["M"] = true;                            
                             else if (temp0.freq == EFreq.W) freqs["W"] = true;
+                            else if (temp0.freq == EFreq.D) freqs["D"] = true;
 
                         }
                         else if (temp1 != null)
@@ -223,9 +223,9 @@ namespace Gekko
                             if (temp1.freq == EFreq.U) freqs["U"] = true;
                             else if (temp1.freq == EFreq.A) freqs["A"] = true;
                             else if (temp1.freq == EFreq.Q) freqs["Q"] = true;
-                            else if (temp1.freq == EFreq.M) freqs["M"] = true;
-                            else if (temp1.freq == EFreq.D) freqs["D"] = true;
+                            else if (temp1.freq == EFreq.M) freqs["M"] = true;                            
                             else if (temp1.freq == EFreq.W) freqs["W"] = true;
+                            else if (temp1.freq == EFreq.D) freqs["D"] = true;
                         }
 
                         if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
@@ -336,22 +336,22 @@ namespace Gekko
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
             // ----------------------- start -------------------------------------------------
-            if (freqs["U"] && (freqs["A"] || freqs["Q"] || freqs["M"] || freqs["D"] || freqs["W"]))
+            if (freqs["U"] && (freqs["A"] || freqs["Q"] || freqs["M"] || freqs["W"] || freqs["D"]))
             {
                 new Error("You cannot mix undated and other frequencies for PRT/PLOT");
                 //throw new GekkoException();
             }
 
             EFreq sameFreq = EFreq.None;
-            if (freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.U;
-            else if (!freqs["U"] && freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.A;
-            else if (!freqs["U"] && !freqs["A"] && freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.Q;
-            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && freqs["M"] && !freqs["D"] && !freqs["W"]) sameFreq = EFreq.M;
-            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && freqs["D"] && !freqs["W"]) sameFreq = EFreq.D;
-            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && freqs["W"]) sameFreq = EFreq.W;
+            if      (freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["W"] && !freqs["D"]) sameFreq = EFreq.U;
+            else if (!freqs["U"] && freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["W"] && !freqs["D"]) sameFreq = EFreq.A;
+            else if (!freqs["U"] && !freqs["A"] && freqs["Q"] && !freqs["M"] && !freqs["W"] && !freqs["D"]) sameFreq = EFreq.Q;
+            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && freqs["M"] && !freqs["W"] && !freqs["D"]) sameFreq = EFreq.M;
+            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && freqs["W"] && !freqs["D"]) sameFreq = EFreq.W;
+            else if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["W"] && freqs["D"]) sameFreq = EFreq.D;
             else sameFreq = EFreq.None;  //superflous, just to state the obvious
 
-            if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["D"] && !freqs["W"])
+            if (!freqs["U"] && !freqs["A"] && !freqs["Q"] && !freqs["M"] && !freqs["W"] && !freqs["D"])
             {
                 //for instance printing a scalar
                 sameFreq = Program.options.freq;
@@ -359,8 +359,8 @@ namespace Gekko
                 else if (Program.options.freq == EFreq.A) freqs["A"] = true;
                 else if (Program.options.freq == EFreq.Q) freqs["Q"] = true;
                 else if (Program.options.freq == EFreq.M) freqs["M"] = true;
-                else if (Program.options.freq == EFreq.D) freqs["D"] = true;
                 else if (Program.options.freq == EFreq.W) freqs["W"] = true;
+                else if (Program.options.freq == EFreq.D) freqs["D"] = true;                
             }
 
             // --------------------------- end ---------------------------------------------
@@ -454,12 +454,14 @@ namespace Gekko
                 }
                 else
                 {
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO warning or what, print separately?
-                    //TODO TODO
-                    //TODO TODO
-                    tabletype = EPrtPlotSheet.PrintMixedAQMPretty;
+                    string s = null;
+                    foreach (KeyValuePair<string, bool> kvp in freqs)
+                    {
+                        if (kvp.Value) s += kvp.Key + ", ";
+                    }
+                    s = s.Substring(0, s.Length - ", ".Length);
+                    string ss = "print"; if (type == EPrintTypes.Clip) ss = "clip"; else if (type == EPrintTypes.Sheet) ss = "sheet";
+                    new Error("You cannot mix series with frequencies " + s + " in one " + ss + ". You may try the " + ss + "<split> to split the differences.");
                 }
             }            
 
@@ -474,22 +476,13 @@ namespace Gekko
             }
             else
             {
-                if (tabletype==EPrtPlotSheet.PrintMixedAQMPretty)  //daily freq, will also accept d + m freq at same time
+                if (tabletype==EPrtPlotSheet.PrintMixedAQMPretty)
                 {
                     printTable = PrintMixedAQM(smpl, type, rows, containerExplode, labelMaxLine, freqs, n, sameFreq, y1, y2, pretty, collapse, showRowWithYear, iPlot, o);                    
                 }
                 else if (tabletype == EPrtPlotSheet.PrintMixedWDPretty)
-                {
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
-                    //TODO TODO
-                    printTable = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
+                {                    
+                    printTable = PrintMixedWD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
                 }
                 else if(tabletype==EPrtPlotSheet.PrintMixedMDPretty)
                 {
@@ -557,6 +550,9 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Print daily series (possibly together with monthly)
+        /// </summary>
         private static Table PrintMixedMD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, GekkoDictionary<string, bool> freqs, O.Prt o)
         {
             Table table = new Table();
@@ -619,7 +615,16 @@ namespace Gekko
                                 if (t.subsub == 1 && isMonthlyFreq)
                                 {                                    
                                     GekkoTime tMonth = new GekkoTime(EFreq.M, t.super, t.sub);
-                                    double d = PrintHelperTransform(smpl, tsWork, tsRef, tMonth, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+
+                                    double d = double.NaN;
+                                    if (tsWork == null && tsRef == null)  //not series
+                                    {
+                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                    }
+                                    else
+                                    {
+                                        d = PrintHelperTransform(smpl, tsWork, tsRef, tMonth, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                    }
                                     table.SetNumber(i, j, d, format);
                                 }
                             }
@@ -657,7 +662,7 @@ namespace Gekko
                     //sheet or non-pretty printing
                     if (isMonthlyFreq)
                     {
-                        new Error("Cannot use D and M freq at the same time");
+                        new Error("Cannot use M and D freq at the same time");
                         //throw new GekkoException();
                     }
                     i++;
@@ -674,6 +679,167 @@ namespace Gekko
                         }
                         else
                         {                            
+                            double d = double.NaN;
+                            if (tsWork == null && tsRef == null)  //not series
+                            {
+                                d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                            }
+                            else
+                            {
+                                d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                            }
+                            table.SetNumber(i, j, d, format);
+                        }
+                    }
+                }
+            }
+            return table;
+        }
+
+        /// <summary>
+        /// Print weekly series (possibly together with daily)
+        /// </summary>
+        private static Table PrintMixedWD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, GekkoDictionary<string, bool> freqs, O.Prt o)
+        {
+            //When we get here, we have either W or W+D, not D alone (this is caught in PrintMixedMD())
+
+            Table table = new Table();
+            table.writeOnce = true;
+
+            for (int j = 1; j < n + 2; j++)
+            {
+                int[] skipCounter = new int[4];
+
+                O.Prt.Element cc;
+                string operator2, format;
+                List<string> label;
+                EFreq freqColumn;
+                double scalarValueWork, scalarValueRef;
+                Series tsWork, tsRef;
+                PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+
+                int i = 0;
+
+                //              x!d      x!w
+                // 2019w1                100
+                //   m1d1        22
+                //   m1d2        23
+                //   m1d3        42
+                //    ...
+                // 2019w2                 120
+                //   m2d1        43
+                //   m2d2        23
+                //   m2d3        44
+                //    ...
+
+                bool isWeeklyFreq = false;
+                if (tsWork != null && tsWork.freq == EFreq.W || tsRef != null && tsWork.freq == EFreq.W)
+                {
+                    isWeeklyFreq = true;
+                }
+
+                i++;
+                i = PutLabelIntoTable(table, i, j, label, labelMaxLine);  //augments i
+                i--; //else a blank line too much at start                    
+
+                GekkoTime t1 = GekkoTime.tNull;
+                GekkoTime t2 = GekkoTime.tNull;
+                GekkoTime.ConvertFreqs(EFreq.W, smpl.t1, smpl.t2, ref t1, ref t2);                
+
+                if (pretty)  //pretty printing (sheet is non-pretty)
+                {
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))  //weeks
+                    {
+                        DateTime dt1 = ISOWeek.ToDateTime(t1.super, t1.sub, DayOfWeek.Monday);
+                        GekkoTime t1d = new GekkoTime(EFreq.D, dt1.Year, dt1.Month, dt1.Day);
+                        GekkoTime t2d = t1d;
+
+                        if (freqs["d"])
+                        {
+                            DateTime dt2 = ISOWeek.ToDateTime(t1.super, t1.sub, DayOfWeek.Sunday);
+                            t2d = new GekkoTime(EFreq.D, dt2.Year, dt2.Month, dt2.Day);
+                        }
+
+                        foreach (GekkoTime td in new GekkoTimeIterator(t1d, t2d))  //days, only Mondays if there are no daily timeseries
+                        {
+
+                            if (t.Equals(smpl.t1) || t.subsub == 1)
+                            {
+                                if (j == 1)
+                                {
+                                    i++;
+                                    i++;
+                                    table.Set(i, j, t.super + "w" + t.sub); if (rows) table.SetAlign(i, j, Align.Right);
+                                }
+                                else
+                                {
+                                    i++;
+                                    i++;
+                                    if (isWeeklyFreq)
+                                    {
+
+                                        double d = double.NaN;
+                                        if (tsWork == null && tsRef == null)  //not series
+                                        {
+                                            d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        }
+                                        else
+                                        {
+                                            d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        }
+                                        table.SetNumber(i, j, d, format);
+                                    }
+                                }
+                            }
+
+                            i++;
+
+                            if (j == 1)
+                            {
+                                table.Set(i, j, "w" + t.sub); if (rows) table.SetAlign(i, j, Align.Right);
+                            }
+                            else
+                            {
+                                //j > 1
+
+                                if (!isWeeklyFreq)
+                                {
+                                    double d = double.NaN;
+                                    if (tsWork == null && tsRef == null)  //not series
+                                    {
+                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                    }
+                                    else
+                                    {
+                                        d = PrintHelperTransform(smpl, tsWork, tsRef, td, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                    }
+
+                                    table.SetNumber(i, j, d, format);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    //sheet or non-pretty printing
+                    if (freqs["w"] && freqs["a"])
+                    {
+                        new Error("Cannot use W and D freq at the same time");
+                    }
+                    i++;
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))  //weeks
+                    {
+                        //TODO: allow prt x!d, x!m, but not other freqs.
+                        i++;
+                        if (j == 1)
+                        {
+                            table.Set(i, j, t.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                            table.Get(i, j).date_hack = t;
+                        }
+                        else
+                        {
                             double d = double.NaN;
                             if (tsWork == null && tsRef == null)  //not series
                             {
