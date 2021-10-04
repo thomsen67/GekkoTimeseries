@@ -600,7 +600,7 @@ namespace Gekko
                     {
                         //TODO: allow prt x!d, x!m, but not other freqs.
 
-                        if (t.Equals(smpl.t1) || t.subsub == 1)
+                        if (t.IsSamePeriod(smpl.t1) || t.subsub == 1)
                         {
                             if (j == 1)
                             {
@@ -701,8 +701,6 @@ namespace Gekko
         /// </summary>
         private static Table PrintMixedWD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, GekkoDictionary<string, bool> freqs, O.Prt o)
         {
-            //When we get here, we have either W or W+D, not D alone (this is caught in PrintMixedMD())
-
             Table table = new Table();
             table.writeOnce = true;
 
@@ -720,16 +718,16 @@ namespace Gekko
 
                 int i = 0;
 
-                //              x!d      x!w
-                // 2019w1                100
-                //   m1d1        22
-                //   m1d2        23
-                //   m1d3        42
+                //              x!d      x!m
+                // 2019m1                100
+                //     d1        22
+                //     d2        23
+                //     d3        42
                 //    ...
-                // 2019w2                 120
-                //   m2d1        43
-                //   m2d2        23
-                //   m2d3        44
+                // 2019m2
+                //     d1        43
+                //     d2        23
+                //     d3        44
                 //    ...
 
                 bool isWeeklyFreq = false;
@@ -742,68 +740,31 @@ namespace Gekko
                 i = PutLabelIntoTable(table, i, j, label, labelMaxLine);  //augments i
                 i--; //else a blank line too much at start                    
 
-                GekkoTime t1 = GekkoTime.tNull;
-                GekkoTime t2 = GekkoTime.tNull;
-                GekkoTime.ConvertFreqs(EFreq.W, smpl.t1, smpl.t2, ref t1, ref t2);                
-
                 if (pretty)  //pretty printing (sheet is non-pretty)
                 {
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))  //weeks
+                    foreach (GekkoTime t in new GekkoTimeIterator(Program.ConvertFreqs(smpl.t1, smpl.t2, EFreq.D)))  //handles if the freq given is not daily
                     {
-                        DateTime dt1 = ISOWeek.ToDateTime(t1.super, t1.sub, DayOfWeek.Monday);
-                        GekkoTime t1d = new GekkoTime(EFreq.D, dt1.Year, dt1.Month, dt1.Day);
-                        GekkoTime t2d = t1d;
+                        //TODO: allow prt x!d, x!w, but not other freqs.
 
-                        if (freqs["d"])
+                        if (t.IsSamePeriod(smpl.t1) || t.subsub == 1)
                         {
-                            DateTime dt2 = ISOWeek.ToDateTime(t1.super, t1.sub, DayOfWeek.Sunday);
-                            t2d = new GekkoTime(EFreq.D, dt2.Year, dt2.Month, dt2.Day);
-                        }
-
-                        foreach (GekkoTime td in new GekkoTimeIterator(t1d, t2d))  //days, only Mondays if there are no daily timeseries
-                        {
-
-                            if (t.Equals(smpl.t1) || t.subsub == 1)
-                            {
-                                if (j == 1)
-                                {
-                                    i++;
-                                    i++;
-                                    table.Set(i, j, t.super + "w" + t.sub); if (rows) table.SetAlign(i, j, Align.Right);
-                                }
-                                else
-                                {
-                                    i++;
-                                    i++;
-                                    if (isWeeklyFreq)
-                                    {
-
-                                        double d = double.NaN;
-                                        if (tsWork == null && tsRef == null)  //not series
-                                        {
-                                            d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
-                                        }
-                                        else
-                                        {
-                                            d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
-                                        }
-                                        table.SetNumber(i, j, d, format);
-                                    }
-                                }
-                            }
-
-                            i++;
-
                             if (j == 1)
                             {
-                                table.Set(i, j, "w" + t.sub); if (rows) table.SetAlign(i, j, Align.Right);
+                                i++;
+                                i++;
+                                table.Set(i, j, t.super + "w" + t.sub); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
-                                //j > 1
+                                i++;
+                                i++;
 
-                                if (!isWeeklyFreq)
+                                DateTime dt = new DateTime(t.super, t.sub, t.subsub);
+
+                                if (dt.DayOfWeek==DayOfWeek.Monday && isWeeklyFreq)
                                 {
+                                    GekkoTime tWeek = new GekkoTime(EFreq.M, t.super, t.sub);
+
                                     double d = double.NaN;
                                     if (tsWork == null && tsRef == null)  //not series
                                     {
@@ -811,11 +772,36 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        d = PrintHelperTransform(smpl, tsWork, tsRef, td, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                        d = PrintHelperTransform(smpl, tsWork, tsRef, tWeek, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
                                     }
-
                                     table.SetNumber(i, j, d, format);
                                 }
+                            }
+                        }
+
+                        i++;
+
+                        if (j == 1)
+                        {
+                            table.Set(i, j, "m" + t.sub + "d" + t.subsub); if (rows) table.SetAlign(i, j, Align.Right);
+                        }
+                        else
+                        {
+                            //j > 1
+
+                            if (!isWeeklyFreq)
+                            {
+                                double d = double.NaN;
+                                if (tsWork == null && tsRef == null)  //not series
+                                {
+                                    d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                }
+                                else
+                                {
+                                    d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, EPrtCollapseTypes.None, 1, skipCounter);
+                                }
+
+                                table.SetNumber(i, j, d, format);
                             }
                         }
                     }
@@ -823,16 +809,18 @@ namespace Gekko
                 else
                 {
                     //sheet or non-pretty printing
-                    if (freqs["w"] && freqs["a"])
+                    if (freqs["w"] && freqs["d"])
                     {
                         new Error("Cannot use W and D freq at the same time");
+                        //throw new GekkoException();
                     }
                     i++;
-
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))  //weeks
+                    foreach (GekkoTime t in new GekkoTimeIterator(Program.ConvertFreqs(smpl.t1, smpl.t2, EFreq.W)))
                     {
                         //TODO: allow prt x!d, x!m, but not other freqs.
+
                         i++;
+
                         if (j == 1)
                         {
                             table.Set(i, j, t.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
@@ -1039,7 +1027,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1188,7 +1176,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1353,7 +1341,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1508,7 +1496,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1548,7 +1536,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1612,7 +1600,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.Equals(tFilter))
+                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1698,7 +1686,7 @@ namespace Gekko
 
             foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
             {
-                if (t.freq == tFilter.freq && t.Equals(tFilter))
+                if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
                 {
                     if (t.freq == EFreq.U) skipCounter[0]++;
                     else if (t.freq == EFreq.A) skipCounter[1]++;
