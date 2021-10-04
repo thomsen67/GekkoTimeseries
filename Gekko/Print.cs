@@ -747,16 +747,31 @@ namespace Gekko
                 if (pretty)  //pretty printing (sheet is non-pretty)
                 {
                     int counter = 0;
-                    foreach (GekkoTime t in new GekkoTimeIterator(Program.ConvertFreqs(smpl.t1, smpl.t2, EFreq.D)))  //handles if the freq given is not daily
+
+                    Tuple<GekkoTime, GekkoTime> period = Program.ConvertFreqs(smpl.t1, smpl.t2, EFreq.D);
+
+                    int oldYear = -12345;
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(period))  //handles if the freq given is not daily
                     {
                         //TODO: allow prt x!d, x!w, but not other freqs.
-
+                                                
                         counter++;
 
                         //DateTime dt2 = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
                         DateTime dt = new DateTime(t.super, t.sub, t.subsub);
                         IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
                         GekkoTime tWeek = new GekkoTime(EFreq.W, helper.year, helper.week);
+
+                        if (oldYear != -12345 && tWeek.super > oldYear && !freqs["d"])
+                        {
+                            //line break for each year, if W freq only
+                            //note that this separates for instance labels
+                            //2001w52 and 2001w1, and these years may be
+                            //a bit phoney around New Year.
+                            i++;  
+                        }
+                        oldYear = tWeek.super;
 
                         if (counter == 1 || dt.DayOfWeek == DayOfWeek.Monday)
                         {

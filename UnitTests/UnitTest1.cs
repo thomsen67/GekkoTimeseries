@@ -4056,6 +4056,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_PrintMixedFrequencies1()
         {
+            Gekko.Table table = null;
+
             //made by running the code and copy-pasting to Excel.
             I("reset;");
             foreach (string s in new List<string>() { "total", "avg" })
@@ -4081,7 +4083,7 @@ namespace UnitTests
                 I("option freq a;");
                 //Globals.lastPrtOrMulprtTable = null;
                 I("p xx1, xx2, {#m};");
-                Gekko.Table table = Globals.lastPrtOrMulprtTable;
+                table = Globals.lastPrtOrMulprtTable;
                 double deltaHere = 0.0001d;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx1");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "%");
@@ -4228,6 +4230,110 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(75, 4).number, 1006d);
                 Assert.AreEqual(table.Get(75, 5).number, 0.09950, deltaHere);
             }
+
+            // -----------------------------
+            // W + D
+            // -----------------------------
+
+            //                   x!d         %            x!w         %
+            //2001w51                                  1.0000         M
+            //m12d17          1.0000         M
+            //m12d18          2.0000    100.00
+            //m12d19          3.0000     50.00
+            //m12d20          4.0000     33.33
+            //m12d21          5.0000     25.00
+            //m12d22          6.0000     20.00
+            //m12d23          7.0000     16.67
+            //
+            //2001w52                                  2.0000    100.00
+            //m12d24         11.0000     57.14
+            //m12d25         12.0000      9.09
+            I("option freq w;");
+            I("time 2001w51 2002w2;");
+            I("x = 1, 2, 3, 4;");
+            I("option freq d;");
+            I("x = 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37;");
+            I("option freq w;");
+            I("prt < 2001w51 2002w2 > x!d, x!w;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x!d");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x!w");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001w51");
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "m12d17");
+            Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "m12d23");
+            Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "2001w52");
+            Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "m12d24");
+            Assert.AreEqual(table.Get(2, 4).number, 1d);
+            Assert.AreEqual(table.Get(3, 2).number, 1d);
+            Assert.AreEqual(table.Get(4, 3).number, 100d);
+
+            // -----------------------------
+            // only W
+            // -----------------------------
+
+            //                x!w            %
+            //2001w51         1.0000         M
+            //2001w52         2.0000    100.00
+            //
+            //2002w1          3.0000     50.00
+            //2002w2          4.0000     33.33
+            I("prt < 2001w51 2002w2 > x!w;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x!w");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001w51");
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001w52");
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2002w1");
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2002w2");
+            Assert.AreEqual(table.Get(2, 2).number, 1d);
+            Assert.AreEqual(table.Get(6, 2).number, 4d);
+            Assert.AreEqual(table.Get(6, 3).number, 33.3333d, sharedTableDelta);
+
+            // -----------------------------
+            // M + D
+            // -----------------------------
+
+            Assert.IsTrue(false);
+
+            //TODO: check if other tests fail if we deactivate printmixedMD...()
+            //if so, maybe there is one. if not, do it by adjusting below into M + D.
+
+            //                   x!d         %            x!w         %
+            //2001w51                                  1.0000         M
+            //m12d17          1.0000         M
+            //m12d18          2.0000    100.00
+            //m12d19          3.0000     50.00
+            //m12d20          4.0000     33.33
+            //m12d21          5.0000     25.00
+            //m12d22          6.0000     20.00
+            //m12d23          7.0000     16.67
+            //
+            //2001w52                                  2.0000    100.00
+            //m12d24         11.0000     57.14
+            //m12d25         12.0000      9.09
+            I("option freq w;");
+            I("time 2001w51 2002w2;");
+            I("x = 1, 2, 3, 4;");
+            I("option freq d;");
+            I("x = 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37;");
+            I("option freq w;");
+            I("prt < 2001w51 2002w2 > x!d, x!w;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x!d");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x!w");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "%");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001w51");
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "m12d17");
+            Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "m12d23");
+            Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "2001w52");
+            Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "m12d24");
+            Assert.AreEqual(table.Get(2, 4).number, 1d);
+            Assert.AreEqual(table.Get(3, 2).number, 1d);
+            Assert.AreEqual(table.Get(4, 3).number, 100d);
+
         }
 
 
