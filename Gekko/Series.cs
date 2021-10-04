@@ -1934,7 +1934,7 @@ namespace Gekko
                     GekkoTime wwwindow1 = GekkoTime.tNull;
                     GekkoTime wwwindow2 = GekkoTime.tNull;
                     GekkoTime.ConvertFreqs(x1.freq, t0, t3, ref wwwindow1, ref wwwindow2);
-                    if (window1.IsSamePeriod(wwwindow1) && window2.IsSamePeriod(wwwindow2))
+                    if (window1.EqualsGekkoTime(wwwindow1) && window2.EqualsGekkoTime(wwwindow2))
                     {
                         //G.Writeln("----> window test ok", Color.Gray);
                     }

@@ -1258,7 +1258,7 @@ namespace Gekko
 
             if (check) CheckSameFreq(gt2);
             if (gt2.IsNull()) return true;
-            if (IsSamePeriod(gt2, false)) return true;
+            if (EqualsGekkoTime(gt2, false)) return true;
             if (StrictlyLargerThan(gt2, false)) return true;
             return false;
         }
@@ -1276,7 +1276,7 @@ namespace Gekko
 
             if (check) CheckSameFreq(gt2);
             if (gt2.IsNull()) return true;
-            if(IsSamePeriod(gt2, false)) return true;
+            if(EqualsGekkoTime(gt2, false)) return true;
             if (StrictlySmallerThan(gt2, false)) return true;
             return false;
         }
@@ -1316,12 +1316,18 @@ namespace Gekko
             return false;
         }
 
-        public bool IsSamePeriod(GekkoTime gt2)
+        /// <summary>
+        /// True if the two GekkoTimes are same period. Because of Equals() C# method, too dangerous to use the former IsSamePeriod()
+        /// </summary>
+        public bool EqualsGekkoTime(GekkoTime gt2)
         {
-            return IsSamePeriod(gt2, true);
+            return EqualsGekkoTime(gt2, true);
         }
 
-        public bool IsSamePeriod(GekkoTime gt2, bool check)
+        /// <summary>
+        /// True if the two GekkoTimes are same period. Because of Equals() C# method, too dangerous to use the former IsSamePeriod()
+        /// </summary>
+        public bool EqualsGekkoTime(GekkoTime gt2, bool check)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -1714,7 +1720,7 @@ namespace Gekko
             string s = null;
             foreach (GekkoTimeSpan gts in this.data)
             {
-                if (gts.tStart.IsSamePeriod(gts.tEnd))
+                if (gts.tStart.EqualsGekkoTime(gts.tEnd))
                 {
                     s += gts.tStart.ToString() + ", ";
                 }

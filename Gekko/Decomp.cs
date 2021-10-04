@@ -510,7 +510,7 @@ namespace Gekko
 
                             varnamesCounter++;
 
-                            if (t.IsSamePeriod(per1))
+                            if (t.EqualsGekkoTime(per1))
                             {
                                 DecompData dd = new DecompData();
                                 DecompInitDict(dd);

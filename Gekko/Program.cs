@@ -16118,7 +16118,7 @@ namespace Gekko
             {
                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                 {
-                    if (t.IsSamePeriod(tFilter))
+                    if (t.EqualsGekkoTime(tFilter))
                     {
                         shouldFilter = true;
                         break;
@@ -16477,7 +16477,7 @@ namespace Gekko
             foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))  //fix for other freqs
             {
                 counter++;
-                if (t.IsSamePeriod(indexYear))
+                if (t.EqualsGekkoTime(indexYear))
                 {
                     found = true;
                     indexYearI = counter;
@@ -19561,7 +19561,7 @@ namespace Gekko
                     GekkoTime tNext = t.Add(1);
                     GekkoTime tLowFreqNext = new GekkoTime(eFreq1, tNext.super, tNext.sub);
 
-                    bool shouldCollapse = tLowFreqNext.StrictlyLargerThan(tLowFreq) || t.IsSamePeriod(last);
+                    bool shouldCollapse = tLowFreqNext.StrictlyLargerThan(tLowFreq) || t.EqualsGekkoTime(last);
 
                     double value = ts_rhs.GetDataSimple(t);
 

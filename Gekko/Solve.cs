@@ -88,7 +88,7 @@ namespace Gekko
         {
             string s = "";
 
-            if (t.IsSamePeriod(tStart))
+            if (t.EqualsGekkoTime(tStart))
             {
                 if (Program.options.solve_print_iter) G.Writeln();
             }

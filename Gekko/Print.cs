@@ -600,7 +600,7 @@ namespace Gekko
                     {
                         //TODO: allow prt x!d, x!m, but not other freqs.
 
-                        if (t.IsSamePeriod(smpl.t1) || t.subsub == 1)
+                        if (t.EqualsGekkoTime(smpl.t1) || t.subsub == 1)
                         {
                             if (j == 1)
                             {
@@ -734,7 +734,7 @@ namespace Gekko
                 if (tsWork != null && tsWork.freq == EFreq.W || tsRef != null && tsWork.freq == EFreq.W)
                 {
                     isWeeklyFreq = true;
-                }
+                }                
 
                 i++;
                 i = PutLabelIntoTable(table, i, j, label, labelMaxLine);  //augments i
@@ -746,7 +746,7 @@ namespace Gekko
                     {
                         //TODO: allow prt x!d, x!w, but not other freqs.
 
-                        if (t.IsSamePeriod(smpl.t1) || t.subsub == 1)
+                        if (t.EqualsGekkoTime(smpl.t1) || t.subsub == 1)
                         {
                             if (j == 1)
                             {
@@ -1027,7 +1027,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
+                                    if (t.freq == tFilter.freq && t.EqualsGekkoTime(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1176,7 +1176,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
+                                    if (t.freq == tFilter.freq && t.EqualsGekkoTime(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1341,7 +1341,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
+                                    if (t.freq == tFilter.freq && t.EqualsGekkoTime(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1496,7 +1496,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
+                                    if (t.freq == tFilter.freq && t.EqualsGekkoTime(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1536,7 +1536,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
+                                    if (t.freq == tFilter.freq && t.EqualsGekkoTime(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1600,7 +1600,7 @@ namespace Gekko
                                 GekkoTime t = new GekkoTime(freqHere, year, subHere);
                                 foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
                                 {
-                                    if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
+                                    if (t.freq == tFilter.freq && t.EqualsGekkoTime(tFilter))
                                     {
                                         skip = true;
                                         break;
@@ -1686,7 +1686,7 @@ namespace Gekko
 
             foreach (GekkoTime tFilter in Globals.globalPeriodTimeFilters2)
             {
-                if (t.freq == tFilter.freq && t.IsSamePeriod(tFilter))
+                if (t.freq == tFilter.freq && t.EqualsGekkoTime(tFilter))
                 {
                     if (t.freq == EFreq.U) skipCounter[0]++;
                     else if (t.freq == EFreq.A) skipCounter[1]++;

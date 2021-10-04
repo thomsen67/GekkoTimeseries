@@ -1714,7 +1714,7 @@ namespace Gekko
                                         else
                                         {
                                             GekkoTimeSpan gts = ts2.meta.fixedNormal.data[ts2.meta.fixedNormal.data.Count - 1];
-                                            if (gts.tEnd.IsSamePeriod(gt.Add(-1)))
+                                            if (gts.tEnd.EqualsGekkoTime(gt.Add(-1)))
                                             {
                                                 gts.tEnd = gt;
                                             }

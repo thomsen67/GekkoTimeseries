@@ -3291,7 +3291,7 @@ namespace Gekko
                     using (Error e = new Error())
                     {
                         e.MainAdd("Missing value encountered in series " + lhs_series.GetNameAndFreqPretty(true) + ", period: " + t.ToString());
-                        if (!t1.IsSamePeriod(t2))
+                        if (!t1.EqualsGekkoTime(t2))
                         {
                             e.MainNewLineTight();
                             e.MainAdd("Values:");
@@ -4722,7 +4722,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
-                if (O.ConvertToDate(x).IsSamePeriod(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+                if (O.ConvertToDate(x).EqualsGekkoTime(O.ConvertToDate(y))) rv = Globals.scalarVal1;
             }
             else if (x.Type() == EVariableType.String && y.Type() == EVariableType.String)
             {
@@ -4806,7 +4806,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
             {
-                if (!O.ConvertToDate(x).IsSamePeriod(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+                if (!O.ConvertToDate(x).EqualsGekkoTime(O.ConvertToDate(y))) rv = Globals.scalarVal1;
             }
             else if (x.Type() == EVariableType.String && y.Type() == EVariableType.String)
             {
