@@ -24387,7 +24387,7 @@ namespace Gekko
             {
                 if (isMatrix)
                 {
-                    new Error("Matrix export only supported for 'option sheet engine = internal'.");
+                    new Error("Matrix export only supported for 'option sheet engine = internal'."); 
                 }
                 if (dateformat != null)
                 {
