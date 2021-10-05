@@ -39,6 +39,12 @@ namespace Gekko
     /// </summary>
     public class Globals
     {
+        public const string smpl = "§¤£";  //this line must be at top
+
+        public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
+        public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
+        public static DayOfWeek weeklyLastDayWhenPrinting = DayOfWeek.Sunday;
+
         // -------------------------------------------------
         // pink stuff start
         // -------------------------------------------------
@@ -54,9 +60,7 @@ namespace Gekko
         public static List<string> datopgek_otherTypes2 = new List<string>() { "tsd", "prn", "csv", "lst" };
         // -------------------------------------------------
         // pink stuff end. Use this to track down the pink stuff when it should be deleted.
-        // -------------------------------------------------
-
-        public const string smpl = "§¤£";  //this line must be at top
+        // -------------------------------------------------               
 
         public const string globalLibraryString = "Global";
         public const string localLibraryString = "Local";  //--> maybe used later

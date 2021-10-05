@@ -1094,24 +1094,30 @@ namespace Gekko
             if (this.type == ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #7");
-                //throw new GekkoException();
             }
             //The inverse method is GetArrayIndex()
             //Should maybe be private method? But then how to unit-test?
             //see also AddToPeriod()
             //DimensionCheck();
-            int subPeriods = 1;
-            if (this.freq == EFreq.Q) subPeriods = 4;
-            else if (this.freq == EFreq.M) subPeriods = 12;
-            else if (this.freq == EFreq.U) subPeriods = 1;
 
-            if (this.freq == EFreq.D)
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            
+            if (this.freq == EFreq.W || this.freq == EFreq.D)
             {
                 int offset = indexInDataArray - this.GetAnchorPeriodPositionInArray();
                 return this.data.anchorPeriod.Add(offset);
-            }
+            }            
             else
             {
+                //Could use the above offsetting and .Add() too, but this is probably for speed
+
+                int subPeriods = 1;
+                if (this.freq == EFreq.Q) subPeriods = GekkoTimeStuff.numberOfQuarters;
+                else if (this.freq == EFreq.M) subPeriods = GekkoTimeStuff.numberOfMonths;
+                else if (this.freq == EFreq.U) subPeriods = 1;
+
                 //Calculates the period by means of using the anchor. Uses integer division, so there is an
                 //implicit modulo calculation here.
                 int sub1 = this.data.anchorPeriod.sub + (indexInDataArray - this.GetAnchorPeriodPositionInArray());
@@ -1128,8 +1134,7 @@ namespace Gekko
                     resultSubPer += subPeriods;
                 }
                 return new GekkoTime(this.freq, resultSuperPer, resultSubPer);
-            }
-            
+            }            
         }
 
         // -----------------------------------------------------------------------------
@@ -1178,7 +1183,6 @@ namespace Gekko
             if (gt.freq != anchorPeriod.freq)
             {
                 new Error("Frequency mismatch");
-                //throw new GekkoException();
             }
             //this.anchorPeriod.sub is always 1 at the moment, and will always be 1 for Annual.
             //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   
@@ -1189,7 +1193,7 @@ namespace Gekko
                 //undated freq could return fast in the same way as this??
                 rv = anchorPeriodPositionInArray + gt.super - anchorPeriod.super;
             }
-            else if (anchorPeriod.freq == EFreq.D)
+            else if (anchorPeriod.freq == EFreq.W || anchorPeriod.freq == EFreq.D)
             {
                 //this cannot be fast, converts implicitly to C# DateTime
                 int dif = GekkoTime.Observations(anchorPeriod, gt) - 1;
@@ -1326,7 +1330,6 @@ namespace Gekko
                 if (indexes[i].Type() != EVariableType.String)
                 {
                     new Error("Expected [] indexer element #" + (i + 1) + " to be STRING");
-                    //throw new GekkoException();
                 }
                 hash += ((ScalarString)indexes[i]).string2;
                 if (i < indexes.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter
@@ -2535,7 +2538,6 @@ namespace Gekko
                 {
                     //Probably not possible, sum() and unfold are on the RHS
                     new Error("indexer on LHS on a null object");
-                    //throw new GekkoException();
                 }
                 O.LookupHelperLeftside(smpl, ts, rhsExpression, EVariableType.Var, options);                
             }

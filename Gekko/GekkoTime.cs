@@ -280,14 +280,14 @@ namespace Gekko
                 if (format == null) f = "yyyy-ww-dd";
                 if (first)
                 {
-                    DateTime dtw1 = ISOWeek.ToDateTime(gt, DayOfWeek.Monday);
+                    DateTime dtw1 = ISOWeek.ToDateTime(gt, Globals.weeklyFirstDayWhenPrinting);
                     y = dtw1.Year;
                     m = dtw1.Month;
                     d = dtw1.Day;
                 }
                 else
                 {
-                    DateTime dtw2 = ISOWeek.ToDateTime(gt, DayOfWeek.Sunday);
+                    DateTime dtw2 = ISOWeek.ToDateTime(gt, Globals.weeklyLastDayWhenPrinting);
                     y = dtw2.Year;
                     m = dtw2.Month;
                     d = dtw2.Day;
@@ -708,8 +708,8 @@ namespace Gekko
                 {
                     //Could be done with knowledge of maxweeks in year and some modulo.
                     //But this is probably more robust, and a little slower.
-                    DateTime dt1 = ISOWeek.ToDateTime(t1, DayOfWeek.Monday);
-                    DateTime dt2 = ISOWeek.ToDateTime(t2, DayOfWeek.Monday);
+                    DateTime dt1 = ISOWeek.ToDateTime(t1, DayOfWeek.Monday);  //could be any day...
+                    DateTime dt2 = ISOWeek.ToDateTime(t2, DayOfWeek.Monday);  //as long as the same
                     //dt1 and dt2 are now both Mondays
                     return (dt2 - dt1).Days / GekkoTimeStuff.numberOfDaysInAWeek + 1;
                 }
@@ -1360,7 +1360,7 @@ namespace Gekko
             {
                 //This could probably be done in a more efficient way, using knowledge of the number of
                 //weeks in different years. But this is pretty simple and therefore stable!
-                DateTime dt1 = ISOWeek.ToDateTime(this, DayOfWeek.Monday);
+                DateTime dt1 = ISOWeek.ToDateTime(this, DayOfWeek.Monday); //could be any weekday
                 DateTime dt2 = dt1.AddDays(addedPeriods * GekkoTimeStuff.numberOfDaysInAWeek);
                 GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(this.freq, dt2);
                 return gt;

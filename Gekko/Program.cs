@@ -5353,6 +5353,10 @@ namespace Gekko
                         {
                             freq = "q"; //2020q1
                         }
+                        if (s3.IndexOf("w", StringComparison.OrdinalIgnoreCase) != -1)
+                        {
+                            freq = "w"; //2020w1
+                        }
                         if (s3.IndexOf("m", StringComparison.OrdinalIgnoreCase) != -1 && s3.IndexOf("d", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             freq = "d";  //2020m3d15
@@ -5901,8 +5905,9 @@ namespace Gekko
                 sub1 = "0101";
                 sub2 = "0101";
             }
-            else if (ts.freq == EFreq.Q || ts.freq == EFreq.M)
+            else if (ts.freq == EFreq.Q || ts.freq == EFreq.M || ts.freq == EFreq.W)
             {
+                //W will get weekday pattern added
                 freq = G.ConvertFreq(ts.freq).ToUpper();
                 sub1 = per1.sub.ToString("D2") + "01";
                 sub2 = per2.sub.ToString("D2") + "01";
@@ -5948,7 +5953,20 @@ namespace Gekko
             else src = src + G.Blanks(16 - src.Length);
 
             string nul = "  0";
-            if (ts.freq == EFreq.D)
+            if (ts.freq == EFreq.W)
+            {
+                //necessary for AREMOS
+                string days = null;
+                if (Globals.weeklyWeekDayDefaultTsd == DayOfWeek.Sunday) days += "1"; else days += "0";
+                if (Globals.weeklyWeekDayDefaultTsd == DayOfWeek.Monday) days += "1"; else days += "0";
+                if (Globals.weeklyWeekDayDefaultTsd == DayOfWeek.Tuesday) days += "1"; else days += "0";
+                if (Globals.weeklyWeekDayDefaultTsd == DayOfWeek.Wednesday) days += "1"; else days += "0";
+                if (Globals.weeklyWeekDayDefaultTsd == DayOfWeek.Thursday) days += "1"; else days += "0";
+                if (Globals.weeklyWeekDayDefaultTsd == DayOfWeek.Friday) days += "1"; else days += "0";
+                if (Globals.weeklyWeekDayDefaultTsd == DayOfWeek.Saturday) days += "1"; else days += "0";
+                nul = "  0         " + days + "";  //weekdays sun, mon, tue, wed, thu, fri, sat
+            }
+            else if (ts.freq == EFreq.D)
             {
                 //necessary for AREMOS, otherwise the program crashes completely!
                 nul = "  0         1111111";  //weekdays sun, mon, tue, wed, thu, fri, sat --> are active
@@ -12295,10 +12313,7 @@ namespace Gekko
                 freq = G.GetFreqPretty(ts.freq);
 
                 bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
-
-                //GekkoTime first = ts.GetPeriodFirst();
-                //GekkoTime last = ts.GetPeriodLast();
-
+                                
                 GekkoTime first = ts.GetRealDataPeriodFirst();
                 GekkoTime last = ts.GetRealDataPeriodLast();
 
@@ -18278,6 +18293,11 @@ namespace Gekko
             {
                 per1 = new GekkoTime((Program.options.freq), yearStart, 1);
                 per2 = new GekkoTime((Program.options.freq), yearEnd, 12);
+            }
+            else if ((Program.options.freq == EFreq.W))
+            {
+                per1 = ISOWeek.ToGekkoTime(new DateTime(yearStart, 1, 1));
+                per2 = ISOWeek.ToGekkoTime(new DateTime(yearEnd, 12, 31));
             }
             else if ((Program.options.freq == EFreq.D))
             {
