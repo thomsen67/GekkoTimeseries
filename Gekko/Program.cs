@@ -1270,7 +1270,9 @@ namespace Gekko
         /// <summary>
         /// Helper for the GUI browser (DISP command)
         /// </summary>
-        public static List<string> guiBrowseHistory = new List<string>();        
+        public static List<string> guiBrowseHistory = new List<string>();
+
+        public static Dictionary<EFreq, int> dateLength = new Dictionary<EFreq, int>() { { EFreq.U, 4 }, { EFreq.A, 4 }, { EFreq.Q, 7 }, { EFreq.M, 7 }, { EFreq.W, 7 }, { EFreq.D, 10 } };
 
         public enum eOfficeVersion
         {
@@ -8069,7 +8071,7 @@ namespace Gekko
                     foreach (GekkoTime gt in new GekkoTimeIterator(Program.ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
                         counter++;
-                        string sss = gt.ToString() + " ";
+                        string sss = gt.ToString() + G.Blanks(-gt.ToString().Length + dateLength[gt.freq]) + " ";
 
                         double n1 = ts.GetDataSimple(gt);
                         double n0 = ts.GetDataSimple(gt.Add(-1));
@@ -12852,7 +12854,7 @@ namespace Gekko
                 {
 
                     G.Writeln("------------------------------------------------------------------------------------------");
-                    G.Writeln("Period        value        %");
+                    G.Writeln("Period          value         %");
 
                     int counter = 0;
 
@@ -12873,7 +12875,7 @@ namespace Gekko
                             }
                         }
 
-                        G.Write(gt.ToString() + " ");                        
+                        G.Write(gt.ToString() + G.Blanks(- gt.ToString().Length + dateLength[gt.freq]) + " ");                        
 
                         double n1 = ts.GetDataSimple(gt);
                         double n0 = ts.GetDataSimple(gt.Add(-1));
