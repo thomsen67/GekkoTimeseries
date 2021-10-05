@@ -761,8 +761,7 @@ namespace Gekko
 
                         //DateTime dt2 = ISOWeek.ToDateTime(t.super, t.sub, DayOfWeek.Monday);
                         DateTime dt = new DateTime(t.super, t.sub, t.subsub);
-                        IsoWeekHelper helper = ISOWeek.GetYearAndWeek(dt);
-                        GekkoTime tWeek = new GekkoTime(EFreq.W, helper.year, helper.week);
+                        GekkoTime tWeek = ISOWeek.ToGekkoTime(dt);
 
                         if (oldYear != -12345 && tWeek.super > oldYear && !freqs["d"])
                         {

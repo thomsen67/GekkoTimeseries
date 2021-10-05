@@ -115,7 +115,7 @@ namespace Gekko
             }
             else
             {
-                new Error("getYearAndWeek() expects a date with daily frequency as input"); return null;
+                new Error("getWeekly() expects a date with daily frequency as input"); return null;
             }         
         }
 
