@@ -10178,7 +10178,7 @@ namespace UnitTests
             int counter = 0;
             for (int i = 0; i < 2; i++)  //cols or not
             {
-                for (int f = 0; f < 5; f++)  //freq: 0:a, 1:q, 2:m, 3:u, 4:d
+                for (int f = 0; f < 6; f++)  //freq: 0:a, 1:q, 2:m, 3:u, 4:d, 5:w
                 {
                     for (int k = 0; k < 2; k++) //use SHEET or EXPORT<xlsx>
                     {
@@ -10228,6 +10228,10 @@ namespace UnitTests
                                         G.Writeln2("-----------------------------------------------");
                                         G.Writeln2("-----------------------------------------------");
 
+                                        //if (i == 0 && f == 5 && dateformat == 1 && datefirstLast == 0)
+                                        //{
+
+                                        //}                                    
 
                                         string s_datetype = "text";
                                         if (datetype == 1) s_datetype = "excel";
@@ -10259,9 +10263,8 @@ namespace UnitTests
                                         if (f == 1) { freq = "q"; time = "2010q1 2010q3"; }
                                         else if (f == 2) { freq = "m"; time = "2010m1 2010m3"; }
                                         else if (f == 3) { freq = "u"; time = "1u 3u"; }  //stange but possible
-                                        else if (f == 4) {
-                                            freq = "d"; time = "2010m12d30 2011m1d1";
-                                        }
+                                        else if (f == 4) { freq = "d"; time = "2010m12d30 2011m1d1"; }
+                                        else if (f == 5) { freq = "w"; time = "2010w51 2011w1"; }
 
                                         I("reset;");
                                         I("option freq " + freq + ";");
@@ -10316,7 +10319,7 @@ namespace UnitTests
                 }
             }
 
-            Assert.AreEqual(counter, 116);  //counting them so we are sure all are done!
+            Assert.AreEqual(counter, 146);  //counting them so we are sure all are done!
         }
 
         [TestMethod]

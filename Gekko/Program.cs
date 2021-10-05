@@ -24387,8 +24387,15 @@ namespace Gekko
             {
                 if (isMatrix)
                 {
-                    new Error("Matrix export only supported for OPTION sheet engine = internal");
-                    //throw new GekkoException();
+                    new Error("Matrix export only supported for 'option sheet engine = internal'.");
+                }
+                if (dateformat != null)
+                {
+                    new Error("Option 'dateformat' can only be used with 'option sheet engine = internal'.");
+                }
+                if (datetype != null)
+                {
+                    new Error("Option 'datetype' can only be used with 'option sheet engine = internal'.");
                 }
                 return WriteExcel_Interop(eo, oPrt, isMulprt);
             }

@@ -234,7 +234,7 @@ namespace Gekko
 
             date_as_string = null;
 
-            int y = gt.super;
+            int y = gt.super;  //Note: may be changed for W freq
             int m = -12345;
             int d = -12345;
 
@@ -281,12 +281,14 @@ namespace Gekko
                 if (first)
                 {
                     DateTime dtw1 = ISOWeek.ToDateTime(gt, DayOfWeek.Monday);
+                    y = dtw1.Year;
                     m = dtw1.Month;
                     d = dtw1.Day;
                 }
                 else
                 {
                     DateTime dtw2 = ISOWeek.ToDateTime(gt, DayOfWeek.Sunday);
+                    y = dtw2.Year;
                     m = dtw2.Month;
                     d = dtw2.Day;
                 }
