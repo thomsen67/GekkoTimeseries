@@ -4292,48 +4292,30 @@ namespace UnitTests
             Assert.AreEqual(table.Get(6, 3).number, 33.3333d, sharedTableDelta);
 
             // -----------------------------
-            // M + D
+            // M + D (M alone is tested otherwhere)
             // -----------------------------
-
-            Assert.IsTrue(false);
-
-            //TODO: check if other tests fail if we deactivate printmixedMD...()
-            //if so, maybe there is one. if not, do it by adjusting below into M + D.
-
-            //                   x!d         %            x!w         %
-            //2001w51                                  1.0000         M
-            //m12d17          1.0000         M
-            //m12d18          2.0000    100.00
-            //m12d19          3.0000     50.00
-            //m12d20          4.0000     33.33
-            //m12d21          5.0000     25.00
-            //m12d22          6.0000     20.00
-            //m12d23          7.0000     16.67
-            //
-            //2001w52                                  2.0000    100.00
-            //m12d24         11.0000     57.14
-            //m12d25         12.0000      9.09
-            I("option freq w;");
-            I("time 2001w51 2002w2;");
-            I("x = 1, 2, 3, 4;");
+                        
+            //                   x!d         %            x!m         %
+            //2001m12                                  2.0000         M
+            //d1            100.0000         M
+            //d2            100.0000      0.00
+            //d3            100.0000      0.00
+            I("option freq m;");
+            I("time 2001m12 2002m1;");
+            I("x = 2, 3;");
             I("option freq d;");
-            I("x = 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37;");
-            I("option freq w;");
-            I("prt < 2001w51 2002w2 > x!d, x!w;");
+            I("x = 100;");
+            I("option freq m;");
+            I("prt < 2001m12 2002m1 > x!d, x!m;");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x!d");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "%");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x!w");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x!m");
             Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "%");
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001w51");
-            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "m12d17");
-            Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "m12d23");
-            Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "2001w52");
-            Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "m12d24");
-            Assert.AreEqual(table.Get(2, 4).number, 1d);
-            Assert.AreEqual(table.Get(3, 2).number, 1d);
-            Assert.AreEqual(table.Get(4, 3).number, 100d);
-
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001m12");
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "d1");            ;
+            Assert.AreEqual(table.Get(2, 4).number, 2d);
+            Assert.AreEqual(table.Get(3, 2).number, 100d);
         }
 
 

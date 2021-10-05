@@ -447,9 +447,10 @@ namespace Gekko
                     //D alone or D+M, but not A or Q or W
                     tabletype = EPrtPlotSheet.PrintMixedMDPretty;
                 }
-                else if ((freqs["A"] || freqs["Q"] || freqs["M"]) && !(freqs["D"] || freqs["W"]))
+                else if (sameFreq == EFreq.U || ((freqs["A"] || freqs["Q"] || freqs["M"]) && !(freqs["D"] || freqs["W"])))
                 {
-                    // A or Q or M, but not W orD
+                    // A or Q or M, but not W or D
+                    // Also handles U, if there are not other freqs
                     tabletype = EPrtPlotSheet.PrintMixedAQMPretty;
                 }
                 else
