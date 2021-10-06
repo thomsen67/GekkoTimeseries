@@ -4383,17 +4383,12 @@ namespace Gekko
         /// <param name="readInfo"></param>
         /// <param name="fileLocal"></param>
         public static void ReadFlat(Databank databank, ReadInfo readInfo, string fileLocal)
-        {
-            
+        {            
             // x1 2001 2004 10 m -20 30.0
-
-            int emptyWarnings = 0;
-            int firstYearWarnings = 0;
-
+            
             DateTime dt1 = DateTime.Now;
 
             int variableCounter = 0;
-
             
             char[] c = new char[] { ' ' };
             double[] tempArray = new double[10000];
@@ -4417,7 +4412,6 @@ namespace Gekko
                     if (linesplit.Length < 3)
                     {
                         new Error("IMPORT<flat>: Expected two dates for series '" + varname + "' (line " + n + ")");
-                        //throw new GekkoException();
                     }
 
                     string per1 = linesplit[1];
@@ -4431,7 +4425,6 @@ namespace Gekko
                     if (gt1.freq != gt2.freq)
                     {
                         new Error("IMPORT<flat>: Dates for series '" + varname + "' have different frequencies (line " + n + ")");
-                        //throw new GekkoException();
                     }
 
                     int obs = GekkoTime.Observations(gt1, gt2);
@@ -4440,25 +4433,21 @@ namespace Gekko
                     if (obs < 1)
                     {
                         new Error("IMPORT<flat>: Invalid time period for series '" + varname + "' (line " + n + ")");
-                        //throw new GekkoException();
                     }
 
                     if (obs > 10000)
                     {
                         new Error("IMPORT<flat>: More then 10000 periods for series '" + varname + "' (line " + n + ")");
-                        //throw new GekkoException();
                     }
 
                     if (obs2 == 0)
                     {
                         new Error("IMPORT<flat>: Expected > 0 observations for series '" + varname + "' (line " + n + ")");
-                        //throw new GekkoException();
                     }
 
                     if (obs != obs2 && obs2 > 1)  //for obs2 = 1, any timeperiod is ok.
                     {
                         new Error("IMPORT<flat>: Expected " + obs + " observations for for series '" + varname + "', got " + obs2 + " (line " + n + ")");
-                        //throw new GekkoException();
                     }
 
                     Series ts = FindOrCreateTimeSeriesInDataBank(databank, varname, gt1.freq);
@@ -4483,7 +4472,6 @@ namespace Gekko
                             catch
                             {
                                 new Error("Could not understand '" + s + "' as a number for series '" + varname + "' (line " + n + ")");
-                                //throw new GekkoException();
                             }
                         }
 
@@ -4506,14 +4494,10 @@ namespace Gekko
             readInfo.startPerInFile = year1;
             readInfo.endPerInFile = year2;
             readInfo.nanCounter = 0;
-            //readInfo.databankVersion = "(vers: PCIM " + ver + ")";
-
-            readInfo.variables = n;  //does not count emptyWarnings
-            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
-            
+            readInfo.variables = n;
+            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;            
             readInfo.startPerResultingBank = readInfo.startPerInFile;
-            readInfo.endPerResultingBank = readInfo.endPerInFile;
-            
+            readInfo.endPerResultingBank = readInfo.endPerInFile;           
 
         }
 
@@ -6071,14 +6055,22 @@ namespace Gekko
         /// <summary>
         /// Write the Gekko-specific "flat" data file format.
         /// </summary>
-        /// <param name="per1"></param>
-        /// <param name="per2"></param>
+        /// <param name="per1_input"></param>
+        /// <param name="per2_input"></param>
         /// <param name="res"></param>
         /// <param name="ts"></param>
         /// <param name="name"></param>
         /// <param name="sb"></param>
-        private static void WriteFlatRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, StringBuilder sb)
+        private static void WriteFlatRecord(GekkoTime per1_input, GekkoTime per2_input, StreamWriter res, Series ts, string name, StringBuilder sb)
         {
+            GekkoTime per1 = GekkoTime.tNull; GekkoTime per2 = GekkoTime.tNull;
+            if (per1_input.IsNull() && per2_input.IsNull())
+            {
+                per1 = ts.GetRealDataPeriodFirst();
+                per2 = ts.GetRealDataPeriodLast();
+            }
+            else GekkoTime.ConvertFreqs(ts.freq, per1_input, per2_input, ref per1, ref per2);
+
             sb.Clear();
             sb.Append(name).Append(" ").Append(per1.ToString()).Append(" ").Append(per2.ToString()).Append(" ");            
             foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
@@ -16426,8 +16418,8 @@ namespace Gekko
             {                
                 for (int j = 0; j < vars.Count; j++)
                 {
-                    string var = vars[j].s1;  //includes bankname and freq
-                    string baseVar = G.Chop_SetBank(vars[j].s1, Globals.Ref);                    
+                    string var = vars[j].s2;  //includes bankname and freq
+                    string baseVar = G.Chop_SetBank(vars[j].s2, Globals.Ref);                    
                     IVariable ivBase = null;
                     Series tsBase = null;
 
@@ -16440,17 +16432,13 @@ namespace Gekko
                     IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError, true);  //can search!
                     Series ts = iv as Series;
 
-                    GekkoTime per1 = GekkoTime.tNull;
-                    GekkoTime per2 = GekkoTime.tNull;
+                    GekkoTime per1 = GekkoTime.tNull; GekkoTime per2 = GekkoTime.tNull;
                     if (per1_input.IsNull() && per2_input.IsNull())
                     {
                         per1 = ts.GetRealDataPeriodFirst();
                         per2 = ts.GetRealDataPeriodLast();
                     }
-                    else
-                    {
-                        GekkoTime.ConvertFreqs(ts.freq, per1_input, per2_input, ref per1, ref per2);
-                    }
+                    else GekkoTime.ConvertFreqs(ts.freq, per1_input, per2_input, ref per1, ref per2);                    
 
                     StringBuilder sb = new StringBuilder();
                     if (type == 1)
@@ -17488,7 +17476,7 @@ namespace Gekko
                         if (ts == null) continue; //skip  
                         if (ts.type != ESeriesType.Normal) continue; //skip  
                         count++;
-                        WriteFlatRecord(yr1, yr2, res, ts, G.Chop_GetName(var.s2), sb);
+                        WriteFlatRecord(yr1, yr2, res, ts, G.Chop_GetNameAndFreq(var.s2), sb);
                     }
                 }
                 res.Flush();
