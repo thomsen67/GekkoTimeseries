@@ -1271,9 +1271,7 @@ namespace Gekko
         /// Helper for the GUI browser (DISP command)
         /// </summary>
         public static List<string> guiBrowseHistory = new List<string>();
-
-        public static Dictionary<EFreq, int> dateLength = new Dictionary<EFreq, int>() { { EFreq.U, 4 }, { EFreq.A, 4 }, { EFreq.Q, 7 }, { EFreq.M, 7 }, { EFreq.W, 7 }, { EFreq.D, 10 } };
-
+        
         public enum eOfficeVersion
         {
             eOfficeVersion_Unrecognized, // error return value
@@ -1980,9 +1978,9 @@ namespace Gekko
                                 gt = new GekkoTime(freqHere, int.Parse(date), 1);
                                 done = true;
                             }
-                            else if (date.Length == 6 && (freqHere == EFreq.Q || freqHere == EFreq.M))
+                            else if (date.Length == 6 && (freqHere == EFreq.Q || freqHere == EFreq.M || freqHere == EFreq.W))
                             {
-                                //It might be a date like 199503, that is, 1995q3 or 1995m3
+                                //It might be a date like 199503, that is, 1995q3 or 1995m3 or 1995w3
                                 //We have to use the global freq here, how else to know the freq??
                                 //Only with freq Q or M
                                 gt = new GekkoTime(freqHere, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), 1);
@@ -4152,6 +4150,10 @@ namespace Gekko
                             //read stamp
                             string stamp = line.Substring(32, 8).Trim();
 
+                            //========================================================================================================
+                            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                            //                          quite a lot in rest of method
+                            //========================================================================================================
                             //read date
                             int iiStart = 37;
                             string date1 = line.Substring(iiStart + 7, 4);
@@ -4177,9 +4179,8 @@ namespace Gekko
                             catch
                             {
                                 new Error("" + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
-                                //throw new GekkoException();
                             }
-                            if (frequency == "d")
+                            if (frequency == "w" || frequency == "d")
                             {
                                 try
                                 {
@@ -4188,7 +4189,6 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("" + varName + ": could not parse '" + date1subsub + "' as an int (start day)");
-                                    //throw new GekkoException();
                                 }
                             }
                             try
@@ -4198,7 +4198,6 @@ namespace Gekko
                             catch
                             {
                                 new Error("" + varName + ": could not parse '" + date2 + "' as an int (end year)");
-                                //throw new GekkoException();
                             }
                             try
                             {
@@ -4207,9 +4206,8 @@ namespace Gekko
                             catch
                             {
                                 new Error("" + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
-                                //throw new GekkoException();
                             }
-                            if (frequency == "d")
+                            if (frequency == "w" || frequency == "d")
                             {
                                 try
                                 {
@@ -4218,7 +4216,6 @@ namespace Gekko
                                 catch
                                 {
                                     new Error("" + varName + ": could not parse '" + date2subsub + "' as an int (end day)");
-                                    //throw new GekkoException();
                                 }
                             }
 
@@ -4241,7 +4238,7 @@ namespace Gekko
 
                                         if (!G.IsSimpleToken(v1))
                                         {
-                                            new Error("tsd read: the following name is malformed: " + v1 + ". The name should contain letters, digits or underscore only (it seems there is a label starting in position 17, this is ok).");
+                                            new Error("Tsd read: the following name is malformed: " + v1 + ". The name should contain letters, digits or underscore only (it seems there is a label starting in position 17, this is ok).");
                                         }
 
                                         varName = v1;
@@ -4249,14 +4246,23 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        new Error("tsd read: the following name is malformed: " + varName + ". The name should contain letters, digits or underscore only");
+                                        new Error("Tsd read: the following name is malformed: " + varName + ". The name should contain letters, digits or underscore only");
                                     }
                                 }
 
                                 countdata = 0;
                                 freq = G.ConvertFreq(frequency);
 
-                                obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub, d1subsub), new GekkoTime(freq, d2, d2sub, d2subsub));
+                                if (freq == EFreq.W)
+                                {                                    
+                                    GekkoTime gtw1 = ISOWeek.ToGekkoTime(new DateTime(d1, d1sub, d1subsub));
+                                    GekkoTime gtw2 = ISOWeek.ToGekkoTime(new DateTime(d2, d2sub, d2subsub));
+                                    obs = GekkoTime.Observations(gtw1, gtw2);
+                                }
+                                else
+                                {
+                                    obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub, d1subsub), new GekkoTime(freq, d2, d2sub, d2subsub));
+                                }
 
                                 obsLeft = obs;
                                 ts = null;
@@ -4305,8 +4311,6 @@ namespace Gekko
                                     else
                                     {
                                         new Error("" + varName + ": could not parse '" + toParse + "' as a number");
-                                        //sr.Close();
-                                        //throw new GekkoException();
                                     }
                                 }
 
@@ -4330,8 +4334,18 @@ namespace Gekko
 
                             if (obsLeft == 0)
                             {
-                                GekkoTime gt1 = new GekkoTime(freq, d1, d1sub, d1subsub);
-                                GekkoTime gt2 = new GekkoTime(freq, d2, d2sub, d2subsub);
+                                GekkoTime gt1 = GekkoTime.tNull;
+                                GekkoTime gt2 = GekkoTime.tNull;                                
+                                if (freq == EFreq.W)
+                                {
+                                    gt1 = ISOWeek.ToGekkoTime(new DateTime(d1, d1sub, d1subsub));
+                                    gt2 = ISOWeek.ToGekkoTime(new DateTime(d2, d2sub, d2subsub));
+                                }
+                                else
+                                {
+                                    gt1 = new GekkoTime(freq, d1, d1sub, d1subsub);
+                                    gt2 = new GekkoTime(freq, d2, d2sub, d2subsub);
+                                }
 
                                 int offset = 0;
 
@@ -5864,7 +5878,7 @@ namespace Gekko
         /// <param name="name"></param>
         /// <param name="isCaps"></param>
         /// <param name="isTsdx"></param>
-        private static void WriteTsdRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, bool isCaps, bool isTsdx)
+        private static void WriteTsdRecord(GekkoTime per1_input, GekkoTime per2_input, StreamWriter res, Series ts, string name, bool isCaps, bool isTsdx)
         {
             int index1 = -12345;
             int index2 = -12345;
@@ -5873,8 +5887,15 @@ namespace Gekko
             //            +++++++++++++++++++++++
             //      ---------------
             double[] dataArray = null;
-            if (per1.IsNull() && per2.IsNull())
+
+            GekkoTime per1 = GekkoTime.tNull;
+            GekkoTime per2 = GekkoTime.tNull;
+
+            if (per1_input.IsNull() && per2_input.IsNull())
             {
+                //TODO: Maybe better do this with ts.GetRealDataPeriodFirst() etc.?
+                //could use stuff from the "else" below.
+                //problem is if we mess up....
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
                 dataArray = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE();
@@ -5883,9 +5904,12 @@ namespace Gekko
             }
             else
             {
+                GekkoTime.ConvertFreqs(ts.freq, per1_input, per2_input, ref per1, ref per2);
                 //also sets index1 and index2.
                 dataArray = ts.GetDataSequenceBEWARE(out index1, out index2, per1, per2);  //a little bit slack not to use a pointer
             }
+
+            //From here on, per1 and per2 have same freq as ts
 
             int count2 = 0;
             string s = "";
@@ -5894,11 +5918,12 @@ namespace Gekko
             string varName = ts.name;
             if (isCaps) varName = varName.ToUpper();  //for use with AREMOS
 
-
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
 
+            string super1 = per1.super.ToString();
+            string super2 = per2.super.ToString();
             string sub1 = "";
             string sub2 = "";
             string freq = "A";
@@ -5907,12 +5932,23 @@ namespace Gekko
                 sub1 = "0101";
                 sub2 = "0101";
             }
-            else if (ts.freq == EFreq.Q || ts.freq == EFreq.M || ts.freq == EFreq.W)
+            else if (ts.freq == EFreq.Q || ts.freq == EFreq.M)
             {
                 //W will get weekday pattern added
                 freq = G.ConvertFreq(ts.freq).ToUpper();
                 sub1 = per1.sub.ToString("D2") + "01";
                 sub2 = per2.sub.ToString("D2") + "01";
+            }
+            else if (ts.freq == EFreq.W)
+            {
+                //For weekly, tsd converts into YYYMMDD with a weekday pattern of only 1 day.
+                freq = G.ConvertFreq(ts.freq).ToUpper();
+                DateTime dt1 = ISOWeek.ToDateTime(per1, Globals.weeklyWeekDayDefaultTsd);
+                DateTime dt2 = ISOWeek.ToDateTime(per2, Globals.weeklyWeekDayDefaultTsd);
+                sub1 = dt1.Month.ToString("D2") + dt1.Day.ToString("D2");
+                sub2 = dt2.Month.ToString("D2") + dt2.Day.ToString("D2");
+                super1 = dt1.Year.ToString();
+                super2 = dt2.Year.ToString();
             }
             else if (ts.freq == EFreq.D)
             {
@@ -5974,7 +6010,7 @@ namespace Gekko
                 nul = "  0         1111111";  //weekdays sun, mon, tue, wed, thu, fri, sat --> are active
             }
 
-            res.WriteLine("                " + src + stmp + "0000" + per1.super + sub1 + per2.super + sub2 + freq + nul); //time is set to 0000
+            res.WriteLine("                " + src + stmp + "0000" + super1 + sub1 + super2 + sub2 + freq + nul); //time is set to 0000
 
             for (int index = index1; index <= index2; index++)
             {
@@ -8071,7 +8107,7 @@ namespace Gekko
                     foreach (GekkoTime gt in new GekkoTimeIterator(Program.ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
                         counter++;
-                        string sss = gt.ToString() + G.Blanks(-gt.ToString().Length + dateLength[gt.freq]) + " ";
+                        string sss = gt.ToString() + " ";  //see how it is done with a table here: #kj3ha3438u
 
                         double n1 = ts.GetDataSimple(gt);
                         double n0 = ts.GetDataSimple(gt.Add(-1));
@@ -12854,7 +12890,13 @@ namespace Gekko
                 {
 
                     G.Writeln("------------------------------------------------------------------------------------------");
-                    G.Writeln("Period          value         %");
+                    //G.Writeln("Period          value         %");
+
+                    
+                    Table tab = new Table();  //See #kj3ha3438u
+                    tab.Set(1, 1, "Period");
+                    tab.Set(1, 2, "value"); tab.SetAlign(1, 2, Align.Right);
+                    tab.Set(1, 3, "%"); tab.SetAlign(1, 3, Align.Right);
 
                     int counter = 0;
 
@@ -12873,9 +12915,9 @@ namespace Gekko
                             {
                                 continue;
                             }
-                        }
+                        }                        
 
-                        G.Write(gt.ToString() + G.Blanks(- gt.ToString().Length + dateLength[gt.freq]) + " ");                        
+                        //G.Write(gt.ToString() + G.Blanks(- gt.ToString().Length + dateLength[gt.freq]) + " ");                        
 
                         double n1 = ts.GetDataSimple(gt);
                         double n0 = ts.GetDataSimple(gt.Add(-1));
@@ -12889,9 +12931,20 @@ namespace Gekko
                         string pchFormatted;
                         Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
 
-                        G.Write(levelFormatted + " " + pchFormatted + " ");
-                        G.Writeln();
+                        //G.Write(levelFormatted + " " + pchFormatted + " ");
+                        //G.Writeln();
+
+                        tab.Set(counter + 1, 1, gt.ToString());
+                        tab.Set(counter + 1, 2, levelFormatted);
+                        tab.Set(counter + 1, 3, pchFormatted);
+
                     }
+
+                    foreach (string s in tab.Print())
+                    {
+                        G.Writeln(s);
+                    }
+
                     int surplus = counter - max;
                     if (!showAllPeriods && surplus > 0)
                     {
@@ -16346,32 +16399,20 @@ namespace Gekko
         /// Used for WRITE&lt;gcm&gt;, writing a data file that can be RUN in Gekko.
         /// </summary>
         /// <param name="vars"></param>
-        /// <param name="tStart"></param>
-        /// <param name="tEnd"></param>
+        /// <param name="per1_input"></param>
+        /// <param name="per2_input"></param>
         /// <param name="op"></param>
         /// <param name="file"></param>
-        public static void WriteGcm(List<ToFrom> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
+        public static void WriteGcm(List<ToFrom> vars, GekkoTime per1_input, GekkoTime per2_input, string op, string file)
         {
             if (op == null) op = "n";
-            if (op == "#")
-            {
-                new Error("The '#' operator is not supported in EXPORT<series>");
-                //throw new GekkoException();
-            }
-            if (G.Equal(op, "mp"))
-            {
-                new Error("The 'mp' operator is not supported in EXPORT<series>");
-                //throw new GekkoException();
-            }
+            if (op == "#") new Error("The '#' operator is not supported in EXPORT<series>");
+            if (G.Equal(op, "mp")) new Error("The 'mp' operator is not supported in EXPORT<series>");
 
             int type = 0;
             if (op == "=" || op == "^=" || op == "%=" || op == "+=" || op == "*=") type = 1;
             if (G.Equal(op, "n") || G.Equal(op, "d") || G.Equal(op, "p") || G.Equal(op, "m") || G.Equal(op, "q")) type = 2;
-            if (type == 0)
-            {
-                new Error("Operator type '" + op + "' not recognized");
-                //throw new GekkoException();
-            }
+            if (type == 0) new Error("Operator type '" + op + "' not recognized");            
 
             Databank base2 = Program.databanks.GetRef();
 
@@ -16379,20 +16420,15 @@ namespace Gekko
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
             if (File.Exists(pathAndFilename))
             {
-                new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " command file.");
-
-
-                //throw new GekkoException();
+                new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " command file.");                               
             }
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
-            {
-                //string var;
+            {                
                 for (int j = 0; j < vars.Count; j++)
                 {
-                    string var = G.Chop_GetName(vars[j].s1);
-                    string baseVar = G.Chop_SetBank(vars[j].s1, Globals.Ref);
-                    var = G.GetUpperLowerCase(var);
+                    string var = vars[j].s1;  //includes bankname and freq
+                    string baseVar = G.Chop_SetBank(vars[j].s1, Globals.Ref);                    
                     IVariable ivBase = null;
                     Series tsBase = null;
 
@@ -16405,16 +16441,29 @@ namespace Gekko
                     IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError, true);  //can search!
                     Series ts = iv as Series;
 
-                    string var2 = var;
+                    GekkoTime per1 = GekkoTime.tNull;
+                    GekkoTime per2 = GekkoTime.tNull;
+                    if (per1_input.IsNull() && per2_input.IsNull())
+                    {
+                        per1 = ts.GetRealDataPeriodFirst();
+                        per2 = ts.GetRealDataPeriodLast();
+                    }
+                    else
+                    {
+                        GekkoTime.ConvertFreqs(ts.freq, per1_input, per2_input, ref per1, ref per2);
+                    }
 
                     StringBuilder sb = new StringBuilder();
                     if (type == 1)
                     {
-                        sb.Append(var + " <" + tStart.ToString() + " " + tEnd.ToString() + "> " + op + " ");
+                        sb.Append(G.Chop_RemoveBank(var) + " <" + per1.ToString() + " " + per2.ToString() + "> " + op + " ");
                     }
-                    else sb.Append(var + " <" + tStart.ToString() + " " + tEnd.ToString() + " " + op + "> = ");
+                    else
+                    {
+                        sb.Append(G.Chop_RemoveBank(var) + " <" + per1.ToString() + " " + per2.ToString() + " " + op + "> = ");
+                    }                    
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
                         double val = double.NaN;
                         double w = ts.GetDataSimple(t);
@@ -16460,7 +16509,7 @@ namespace Gekko
 
                         valstring = valstring.Trim();  //necesssary?
                         sb.Append(valstring);
-                        if (GekkoTime.Observations(t, tEnd) > 1) sb.Append(", ");
+                        if (GekkoTime.Observations(t, per2) > 1) sb.Append(", ");
                     }
                     sb.Append(";");
                     sw.WriteLine(sb);
@@ -16718,7 +16767,7 @@ namespace Gekko
                 }
 
                 //??? why is EWriteType not used in line below and elsewhere???
-                bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes") || G.Equal(o.opt_arrow, "yes");
+                bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes") || G.Equal(o.opt_gcm, "yes") || G.Equal(o.opt_arrow, "yes");
 
                 //TODO TODO TODO
                 //TODO TODO TODO
@@ -16815,20 +16864,7 @@ namespace Gekko
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
                     return 0;
-                }
-                else if (o.opt_gcm != null)
-                {
-                    //RECORDS
-                    ErrorIfMatrix(variablesType);
-                    if (fileName == null || fileName.Trim() == "")
-                    {
-                        new Error("Please indicate a file name for EXPORT<series>");
-                        //throw new GekkoException();
-                    }
-                    CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    Program.WriteGcm(listFilteredForCurrentFreq, tStart, tEnd, o.opt_op, fileName);
-                    return 0;
-                }
+                }                
                 else if (o.opt_gdx != null)
                 {
                     //RECORDS
@@ -16836,7 +16872,6 @@ namespace Gekko
                     if (fileName == null || fileName.Trim() == "")
                     {
                         new Error("Please indicate a file name for EXPORT<gdx>");
-                        //throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     string file = G.AddExtension(fileName, "." + "gdx");
@@ -16884,7 +16919,6 @@ namespace Gekko
                 else if (isRecordsFormat)
                 {
                     //RECORDS
-                    //tsd or gbk or unspecified format                
                     CheckSomethingToWrite(list);
                     //first argument (the databank) is only used if list = null
                     if (isDefault)
@@ -16899,16 +16933,19 @@ namespace Gekko
                     {
                         return WriteFlat(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
                     }
+                    else if (writeType == EDatabankWriteType.Gcm)
+                    {
+                        Program.WriteGcm(list, tStart, tEnd, o.opt_op, fileName);
+                        return 0;
+                    }
                     else
                     {
                         new Error("Unknown databank format"); return 0;
-                        //throw new GekkoException();
                     }
                 }
                 else
                 {
                     new Error("Unknown databank format"); return 0;
-                    //throw new GekkoException();
                 }
             }
             finally
@@ -18258,7 +18295,7 @@ namespace Gekko
                 start = G.GekkoMin(start, ts.GetPeriodFirst().super);
                 end = G.GekkoMax(end, ts.GetPeriodLast().super);                
             }
-            GetQuartersOrMonthsFromYears(ref per1, ref per2, start, end);
+            GetLowerFreqsFromYears(ref per1, ref per2, start, end);
         }
 
         private static Databank GetBankFromBankNameVersion(string bankName)
@@ -18274,7 +18311,10 @@ namespace Gekko
             return db;
         }
 
-        private static void GetQuartersOrMonthsFromYears(ref GekkoTime per1, ref GekkoTime per2, int yearStart, int yearEnd)
+        /// <summary>
+        /// Used for databank period
+        /// </summary>
+        private static void GetLowerFreqsFromYears(ref GekkoTime per1, ref GekkoTime per2, int yearStart, int yearEnd)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies

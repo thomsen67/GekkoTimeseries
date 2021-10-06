@@ -620,8 +620,13 @@ namespace Gekko
         private static string GetStringFromNumber(Cell cell, string format, Table table)
         {            
             return G.FormatNumber(cell.number, format, cell.numberShouldShowAsN, G.Equal(table.type, "table"));
-        }        
+        }
 
+        /// <summary>
+        /// Actually 'produce' the table
+        /// </summary>
+        /// <param name="ptype"></param>
+        /// <returns></returns>
         public List<string> Print(string ptype)
         {
             ETablePrintType type = ETablePrintType.Txt;
@@ -636,6 +641,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Actually 'produce' the table (default as txt)
+        /// </summary>
+        /// <returns></returns>
         public List<string> Print()
         {
             //TODO: it is BAD that this as a sideeffect pumps up the table object coordinates

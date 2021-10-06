@@ -23214,6 +23214,181 @@ print(df2)
                 }
 
 
+                // ---------- Testing on weekly
+                // ---------- Testing on weekly
+                // ---------- Testing on weekly
+                // ---------- Testing on weekly
+                // ---------- Testing on weekly
+                // ---------- Testing on weekly
+
+                I("RESET;");
+                G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                I("OPTION freq w;");
+                // ------ gbk
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                // ------ gbk, selection
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                // ------ tsd
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<tsd>temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                // ------ tsd, selection
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                // ------ csv
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2020w53 2021w1 csv>temp;");
+                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("w", bank);
+
+                    //cols
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2020w53 2021w1 csv cols>temp;");
+                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                    I("READ<csv cols>temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                // ------ csv, selection
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<2020w53 2021w1 csv>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                // ------ prn
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2020w53 2021w1 prn>temp;");
+                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("w", bank);
+
+                    //cols
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2020w53 2021w1 prn cols>temp;");
+                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                    I("READ<prn cols>temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                // ------ prn, selection
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<2020w53 2021w1 prn>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("w", bank);
+                }
+                if (Globals.UNITTESTFOLLOWUP)
+                {
+                    //removed PIA interop xlsx checks below
+                    //cannot get xlsx writing to work on new pc.
+                    //and it is bad anyway.
+                }
+                // ------ xlsx
+                for (int i = 0; i < 1; i++)  //was: 2
+                {
+                    if (bank == null)
+                    {
+                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx>temp;");
+                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                        I("READ<xlsx>temp;");
+                        ReadFormatsHelper("w", bank);
+
+                        //cols
+                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx cols>temp;");
+                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                        I("READ<xlsx cols>temp;");
+                        ReadFormatsHelper("w", bank);
+                    }
+                    // ------ xlsx, selection
+                    {
+                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                        I("READ<xlsx>temp;");
+                        ReadFormatsHelper("w", bank);
+                    }
+
+                    // ------ xlsx cells with SHEET and SHEET<import>
+                    {
+
+                        I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("SHEET <2020w53 2021w1 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                        I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                        I("SHEET <2020w53 2021w1 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                        ReadFormatsHelper("w", bank);
+
+                        //TODO: <cols>
+
+                    }
+                }
+                // ------ gnuplot (not actually testing the file)
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2020w53 2021w1 gnuplot>temp;");
+                }
+                // ------ gnuplot, selection  (not actually testing the file)
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<2020w53 2021w1 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                }
+
+                // ------ flat
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq w; TIME 2020w53 2021w1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2020w53 2021w1 flat>temp;");
+                    I("RESET; OPTION freq w;");  //must tell Gekko what freq
+                    I("READ<flat>temp;");
+                    ReadFormatsHelper("w", bank);
+                }
             }
         }
 
@@ -23242,6 +23417,17 @@ print(df2)
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 1, 3001, sharedDelta);
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 2, 3002, sharedDelta);
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                }
+                else if (freq == "w")
+                {
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2020, 52, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2020, 53, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2021, 1, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2021, 2, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2020, 52, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2020, 53, 3001, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2021, 1, 3002, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2021, 2, double.NaN, sharedDelta);
                 }
                 else if (freq == "d")
                 {
@@ -23279,6 +23465,17 @@ print(df2)
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 1, 4001, sharedDelta);
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 2, 4002, sharedDelta);
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                }
+                else if (freq == "w")
+                {
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2020, 52, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2020, 53, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2021, 1, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1!w", EFreq.W, 2021, 2, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2020, 52, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2020, 53, 4001, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2021, 1, 4002, sharedDelta);
+                    _AssertSeries(First(), "xx3!w", EFreq.W, 2021, 2, double.NaN, sharedDelta);
                 }
                 else if (freq == "d")
                 {

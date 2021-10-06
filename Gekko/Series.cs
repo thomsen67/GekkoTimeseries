@@ -1000,7 +1000,6 @@ namespace Gekko
             if (this.type == ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #4");
-                //throw new GekkoException();
             }
             return GetPeriod(this.meta.firstPeriodPositionInArray);
         }
@@ -1017,7 +1016,6 @@ namespace Gekko
             if (this.type == ESeriesType.Timeless)
             {
                 new Error("Timeless variable error #5");
-                //throw new GekkoException();
             }
             return GetPeriod(this.meta.lastPeriodPositionInArray);
         }
