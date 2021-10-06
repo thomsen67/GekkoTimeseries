@@ -13703,7 +13703,7 @@ namespace Gekko
             {
                 command = "WRITE";
                 command2 = "write";
-                command3 = "wrote";
+                command3 = "written";
             }
             else if (type == EWildcardSearchType.Delete)
             {
@@ -14096,7 +14096,6 @@ namespace Gekko
                             ss = G.Chop_RemoveBank(ss);
                         }
                         new Error("The variables " + Stringlist.GetListWithCommas(temp) + " are all " + command3 + " to " + ss);
-                        //throw new GekkoException();
                     }
                     else
                     {
