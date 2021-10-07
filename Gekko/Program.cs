@@ -19442,7 +19442,6 @@ namespace Gekko
             if (lhs.list.Count != rhs.list.Count)
             {
                 new Error("" + lhs.list.Count + " items on left, " + rhs.list.Count + " items on right");
-                //throw new GekkoException();
             }
 
             List<string> xlhs = O.Restrict(lhs, true, false, true, true);
@@ -19451,7 +19450,6 @@ namespace Gekko
             if (xlhs.Count != xrhs.Count)
             {
                 new Error("Internal error #89353245");
-                //throw new GekkoException();
             }
 
             for (int i = 0; i < xlhs.Count; i++)
@@ -19478,6 +19476,10 @@ namespace Gekko
 
         public static void CollapseHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq freq_rhs, out EFreq freq_lhs)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             bool strictMissingsForDailyData = false;
 
             ECollapseMethod emethod = ECollapseMethod.Total;  //note: .Count is not used here
