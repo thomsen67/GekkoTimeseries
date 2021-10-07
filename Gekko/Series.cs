@@ -2381,7 +2381,6 @@ namespace Gekko
                     {
                         //should not be possible
                         new Error("Array-timeseries element is non-series.");
-                        //throw new GekkoException();
                     }
                 }
             }
