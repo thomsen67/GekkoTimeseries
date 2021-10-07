@@ -17835,37 +17835,6 @@ print(df2)
                                           
         }
 
-        //[TestMethod]
-        //public void _Test_ImportDailyFromXlsx()
-        //{
-        //    for (int e = 0; e < 2; e++)
-        //    { //engine
-
-        //        for (int j = 0; j < 2; j++)
-        //        {
-
-        //            string filename = "datapoints";
-        //            if (j == 1) filename = "datapoints2";
-        //            string extra = null;
-        //            if (j == 1) extra = " sheet='data2' cols cell='d5'  namecell='d2'  datecell='b5' ";
-
-        //            I("RESET;");
-        //            if (e == 0) I("OPTION sheet engine = excel;");
-        //            else I("OPTION sheet engine = internal;");
-
-        //            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-        //            I("OPTION freq d;");
-        //            I("IMPORT<xlsx " + extra + " datetype='excel'>" + filename + ";");
-        //            for (int i = 1; i <= 2; i++)
-        //            {
-        //                //_AssertSeries(First(), "ts1!d", EFreq.M, 2017, 11, double.NaN, sharedDelta);
-        //                //_AssertSeries(First(), "ts1!d", EFreq.M, 2017, 11, double.NaN, 1d);
-        //                //_AssertSeries(First(), "ts1!d", EFreq.M, 2017, 11, double.NaN, 1d);
-        //            }
-        //        }
-        //    }
-        //}
-    
 
         // =================== COLLAPSE METHOD        
 
@@ -17873,7 +17842,251 @@ print(df2)
         public void _Test_Collapse()
         {
 
-            //Testing collapse from days to months
+            // -------------------------------------------------
+            // q to other freqs
+            // -------------------------------------------------
+
+            //
+            // q --> a
+            //
+
+            I("RESET; MODE data;");
+            I("TIME 2000 2003;");
+            I("OPTION freq q;");
+            I("CREATE x;");
+            I("SERIES x =   (1, 2, 3, 4,       5, 6, 7, 8,       9, 10, -1, -2,     -3, 9, -3, 7);");
+            I("COLLAPSE x1!a = x!q total; ");
+            I("OPTION freq a;");
+            I("COLLAPSE x2 = x!q; ");
+            I("OPTION freq q;");
+            I("COLLAPSE x3!a = x!q avg; ");
+            I("COLLAPSE x4!a = work:x!q first; ");  //testing bank also
+            I("COLLAPSE work:x5!a = x!q last; ");   //testing bank also
+            I("OPTION freq a;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
+            _AssertSeries(First(), "x1!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2000, 10d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2001, 26d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2002, 16d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2003, 10d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2000, 10d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2001, 26d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2002, 16d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2003, 10d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2000, 10d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2001, 26d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2002, 16d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2003, 10d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2000, 1d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2002, 9d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2003, -3d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2000, 4d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2001, 8d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2002, -2d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2003, 7d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2004, double.NaN, sharedDelta);
+
+            // -------------------------------------------------
+            // m to other freqs
+            // -------------------------------------------------
+
+            //
+            // m --> a
+            //
+
+            I("RESET;");
+            I("TIME 2000 2001;");
+            I("OPTION freq m;");
+            I("CREATE x;");
+            I("SERIES x =   (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);");
+            I("COLLAPSE x1!a = x!m total; ");
+            I("OPTION freq a;");
+            I("COLLAPSE x2 = x!m; ");
+            I("OPTION freq m;");
+            I("COLLAPSE x3!a = x!m avg; ");
+            I("COLLAPSE x4!a = x!m first; ");
+            I("COLLAPSE x5!a = x!m last; ");
+            I("OPTION freq a;");
+            _AssertSeries(First(), "x1!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2000, 78d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2001, 222d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2000, 78d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2001, 222d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2000, 78d / 12d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2001, 222d / 12d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2000, 1d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2001, 13d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2000, 12d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2001, 24d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2004, double.NaN, sharedDelta);
+            
+            //
+            // m --> q
+            //
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("OPTION freq m;");
+            I("CREATE x;");
+            I("SERIES x =   (1, 2, 3,   4, 5, 6,   7, 8, 9,   10, 11, 12);");
+            I("COLLAPSE x1!q = x!m total; ");
+            I("OPTION freq q;");
+            I("COLLAPSE x2 = x!m; ");
+            I("OPTION freq m;");
+            I("COLLAPSE x3!q = x!m avg; ");
+            I("COLLAPSE x4!q = x!m first; ");
+            I("COLLAPSE x5!q = x!m last; ");
+            I("OPTION freq q;");
+            _AssertSeries(First(), "x1!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 1, 6d, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 3, 24d, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 4, 33d, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 1, 6d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 3, 24d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 4, 33d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 1, 6d / 3d, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 2, 15d / 3d, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 3, 24d / 3d, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 4, 33d / 3d, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 1, 1d, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 2, 4d, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 3, 7d, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 4, 10d, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 2, 6d, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 3, 9d, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 4, 12d, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+
+            //
+            // m --> q with holes
+            //
+            //Testing series with holes (M/NaN) inside
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("OPTION freq m;");
+            I("CREATE x;");
+            I("SERIES x =   (M(), 2, 3,   4, 5, 6,   7, M(), 9,   10, 11, M());");
+            I("COLLAPSE x1!q = x!m total; ");
+            I("OPTION freq q;");
+            I("COLLAPSE x2 = x!m; ");
+            I("OPTION freq m;");
+            I("COLLAPSE x3!q = x!m avg; ");
+            I("COLLAPSE x4!q = x!m first; ");
+            I("COLLAPSE x5!q = x!m last; ");
+            I("OPTION freq q;");
+            _AssertSeries(First(), "x1!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 2, 15d / 3d, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 2, 4d, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 3, 7d, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 4, 10d, sharedDelta);
+            _AssertSeries(First(), "x4!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 2, 6d, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 3, 9d, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+
+            ////
+            //// w --> m with holes
+            ////
+            ////    ---------- 2002 ------------
+            ////    52  |   23 24 25 26 27 28 29
+            ////     1  |   30 31                         w1 at most 3 days, else it would be w53
+            ////
+            ////    ---------- 2004 ------------
+            ////    52  |   20 21 22 23 24 25 26
+            ////    53  |   27 28 29 30 31
+            ////
+            ////    ---------- 2005 ------------
+            ////    51  |   19 20 21 22 23 24 25
+            ////    52  |   26 27 28 29 30 31            
+            ////
+            ////    ---------- 2007 ------------            
+            ////    52  |   24 25 26 27 28 29 30
+            ////    53  |   31
+            ////
+            ////Testing series with holes (M/NaN) inside
+            //I("RESET;");
+            //I("OPTION freq w;");
+            //I("TIME 2004w45 2005w12;");
+            //I("CREATE x;");
+            //I("SERIES x =   (m(), 2, 3, 4, 5, 6, 7, m(), 9, 10, 11, m(), 12, 13, 14, 15, 16, 17, 18, 19, 20;");
+            //I("COLLAPSE x1!m = x!w total; ");            
+            //I("COLLAPSE x3!m = x!w avg; ");
+            //I("COLLAPSE x4!m = x!w first; ");
+            //I("COLLAPSE x5!m = x!w last; ");
+
+            //// --------------------
+            //// 1 y     Split x out on days dividing by 7
+            //// 2 y     then collapse from days.
+            //// 3 x
+            //// 4 x
+            //// 5 x
+            //// 6 x
+            //// 7 x
+            //// ------------------
+            //// 1 x
+            //// 2 x
+            //// 3 x
+            //// 4 x
+            ////
+
+            //_AssertSeries(First(), "x1!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+
+                                                                             
+
+            // -------------------------------------------------
+            // d to other freqs
+            // -------------------------------------------------
+
+            //
+            // d --> m
+            //            
 
             I("RESET;");
             I("OPTION freq d;");
@@ -17882,24 +18095,10 @@ print(df2)
             I("SERIES x =   1, 2, 3, 4;");    // 1  2  <>  3, 4
             I("COLLAPSE x1!m = x!d total;");
             I("COLLAPSE x2!m = x!d avg;");
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                I("COLLAPSE x3!m = x!d first;");
-                I("COLLAPSE x4!m = x!d last;");
-            }
             _AssertSeries(First(), "x1!m", EFreq.M, 1999, 1, 3d, sharedDelta);
             _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, 7d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 3d / 2d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, 7d / 2d, sharedDelta);
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                _AssertSeries(First(), "x3!m", EFreq.M, 1999, 1, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x3!m", EFreq.M, 1999, 2, 2d, sharedDelta);
-                _AssertSeries(First(), "x4!m", EFreq.M, 1999, 1, 3d, sharedDelta);
-                _AssertSeries(First(), "x4!m", EFreq.M, 1999, 2, double.NaN, sharedDelta);
-            }
-
-
             I("RESET;");
             I("OPTION freq d;");
             I("TIME 1999m1d29 99m2d2;");  //4 days
@@ -17911,8 +18110,6 @@ print(df2)
             _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, 7d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 3d / 2d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, 7d / 2d, sharedDelta);
-
-
             I("RESET;");
             I("OPTION freq d;");
             I("TIME 1999m1d30 99m2d3;");  //4 days
@@ -17924,8 +18121,6 @@ print(df2)
             _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, 7d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 3d / 2d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, 7d / 2d, sharedDelta);
-
-
             I("RESET;");
             I("OPTION freq d;");
             I("TIME 1999m1d27 99m1d31;");  //4 days
@@ -17937,21 +18132,97 @@ print(df2)
             _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, double.NaN, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 10d / 4d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, double.NaN, sharedDelta);
-                                                               
-            //TODO: do an import<collapse> from days to months, and also do it
-            //      with normal collapse x!m = x!d, and compare
+
+            //
+            // d --> q
+            //         
+            I("RESET;");
+            I("OPTION freq d;");
+            I("TIME 1999m1d30 99m2d2;");  //4 days
+            I("SERIES x =   1, 2, 3, 4;");    // 1  2  <>  3, 4
+            I("COLLAPSE x1!q = x!d total;");
+            I("COLLAPSE x2!q = x!d avg;");
+            _AssertSeries(First(), "x1!q", EFreq.Q, 1999, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 1999, 2, 7d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 1999, 1, 3d / 2d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 1999, 2, 7d / 2d, sharedDelta);
+
+            //
+            // d --> a
+            //         
+            I("RESET;");
+            I("OPTION freq d;");
+            I("TIME 1999m1d30 99m2d2;");  //4 days
+            I("SERIES x =   1, 2, 3, 4;");    // 1  2  <>  3, 4
+            I("COLLAPSE x1!a = x!d total;");
+            I("COLLAPSE x2!a = x!d avg;");
+            _AssertSeries(First(), "x1!a", EFreq.A, 1999, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x1!a", EFreq.A, 2000, 1, 7d, sharedDelta);
+            _AssertSeries(First(), "x2!a", EFreq.A, 1999, 1, 3d / 2d, sharedDelta);
+            _AssertSeries(First(), "x2!a", EFreq.A, 2000, 1, 7d / 2d, sharedDelta);
+
+            
+            // ------------------------------
+            // Testing of collapse() function
+            // ------------------------------
+
+            I("RESET; MODE data;");
+            I("TIME 2000 2003;");
+            I("OPTION freq q;");
+            I("CREATE x;");
+            I("SERIES x =   (1, 2, 3, 4,       5, 6, 7, 8,       9, 10, -1, -2,     -3, 9, -3, 7);");
+            I("x1!a = x!q.collapse();");
+            I("OPTION freq a;");
+            I("x2 = x!q.collapse();");
+            I("OPTION freq q;");
+            I("x3!a = x!q.collapse('avg');");
+            I("x4!a = work:x!q.collapse('first');");  //testing bank also
+            I("work:x5!a = x!q.collapse('last'); ");   //testing bank also
+            I("OPTION freq a;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
+            _AssertSeries(First(), "x1!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2000, 10d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2001, 26d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2002, 16d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2003, 10d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2000, 10d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2001, 26d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2002, 16d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2003, 10d, sharedDelta);
+            _AssertSeries(First(), "x2!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2000, 10d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2001, 26d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2002, 16d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2003, 10d / 4d, sharedDelta);
+            _AssertSeries(First(), "x3!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2000, 1d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2002, 9d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2003, -3d, sharedDelta);
+            _AssertSeries(First(), "x4!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!a", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2000, 4d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2001, 8d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2002, -2d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2003, 7d, sharedDelta);
+            _AssertSeries(First(), "x5!a", 2004, double.NaN, sharedDelta);
+
 
             // --------- import<collapse> from Excel data points ----------------
             // --------- import<collapse> from Excel data points ----------------
             // --------- import<collapse> from Excel data points ----------------
             // --------- import<collapse> from Excel data points ----------------
             // --------- import<collapse> from Excel data points ----------------
-            for (int e = 0; e < 2; e++)
-            { //engine
 
-                for (int j = 0; j < 2; j++)
+            // Note: import<collapse> into w or d frequencies seems to work fine! (not tested here)
+
+            for (int e = 0; e < 2; e++) //engine
+            { 
+                for (int j = 0; j < 2; j++) //two files
                 {
-
                     string filename = "datapoints";
                     if (j == 1) filename = "datapoints2";
                     string extra = null;
@@ -18259,252 +18530,6 @@ print(df2)
                     }
                 }
             }
-
-            // =================== COLLAPSE METHOD
-
-
-            I("RESET; MODE data;");
-            I("TIME 2000 2003;");
-            I("OPTION freq q;");
-            I("CREATE x;");
-            I("SERIES x =   (1, 2, 3, 4,       5, 6, 7, 8,       9, 10, -1, -2,     -3, 9, -3, 7);");
-            I("COLLAPSE x1!a = x!q total; ");
-            I("OPTION freq a;");
-            I("COLLAPSE x2 = x!q; ");
-            I("OPTION freq q;");
-            I("COLLAPSE x3!a = x!q avg; ");
-            I("COLLAPSE x4!a = work:x!q first; ");  //testing bank also
-            I("COLLAPSE work:x5!a = x!q last; ");   //testing bank also
-            I("OPTION freq a;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
-
-            _AssertSeries(First(), "x1!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2000, 10d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2001, 26d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2002, 16d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2003, 10d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x2!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2000, 10d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2001, 26d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2002, 16d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2003, 10d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x3!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2000, 10d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2001, 26d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2002, 16d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2003, 10d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x4!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2000, 1d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2001, 5d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2002, 9d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2003, -3d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2004, double.NaN, sharedDelta);
-
-
-            _AssertSeries(First(), "x5!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2000, 4d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2001, 8d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2002, -2d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2003, 7d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2004, double.NaN, sharedDelta);
-
-
-            I("RESET;");
-            I("TIME 2000 2001;");
-            I("OPTION freq m;");
-            I("CREATE x;");
-            I("SERIES x =   (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);");
-            I("COLLAPSE x1!a = x!m total; ");
-            I("OPTION freq a;");
-            I("COLLAPSE x2 = x!m; ");
-            I("OPTION freq m;");
-            I("COLLAPSE x3!a = x!m avg; ");
-            I("COLLAPSE x4!a = x!m first; ");
-            I("COLLAPSE x5!a = x!m last; ");
-            I("OPTION freq a;");
-
-            _AssertSeries(First(), "x1!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2000, 78d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2001, 222d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x2!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2000, 78d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2001, 222d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x3!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2000, 78d / 12d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2001, 222d / 12d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x4!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2000, 1d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2001, 13d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x5!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2000, 12d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2001, 24d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2004, double.NaN, sharedDelta);
-            //
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("OPTION freq m;");
-            I("CREATE x;");
-            I("SERIES x =   (1, 2, 3,   4, 5, 6,   7, 8, 9,   10, 11, 12);");
-            I("COLLAPSE x1!q = x!m total; ");
-            I("OPTION freq q;");
-            I("COLLAPSE x2 = x!m; ");
-            I("OPTION freq m;");
-            I("COLLAPSE x3!q = x!m avg; ");
-            I("COLLAPSE x4!q = x!m first; ");
-            I("COLLAPSE x5!q = x!m last; ");
-            I("OPTION freq q;");
-
-            _AssertSeries(First(), "x1!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 1, 6d, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 3, 24d, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 4, 33d, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x2!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 1, 6d, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 3, 24d, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 4, 33d, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x3!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 1, 6d / 3d, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 2, 15d / 3d, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 3, 24d / 3d, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 4, 33d / 3d, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x4!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 1, 1d, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 2, 4d, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 3, 7d, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 4, 10d, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x5!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 1, 3d, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 2, 6d, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 3, 9d, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 4, 12d, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-            
-            //Testing series with holes (M/NaN) inside
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("OPTION freq m;");
-            I("CREATE x;");
-            I("SERIES x =   (M(), 2, 3,   4, 5, 6,   7, M(), 9,   10, 11, M());");
-            I("COLLAPSE x1!q = x!m total; ");
-            I("OPTION freq q;");
-            I("COLLAPSE x2 = x!m; ");
-            I("OPTION freq m;");
-            I("COLLAPSE x3!q = x!m avg; ");
-            I("COLLAPSE x4!q = x!m first; ");
-            I("COLLAPSE x5!q = x!m last; ");
-            I("OPTION freq q;");
-
-            _AssertSeries(First(), "x1!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 3, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x2!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 2, 15d, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 3, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x3!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 2, 15d / 3d, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 3, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x4!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 2, 4d, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 3, 7d, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2000, 4, 10d, sharedDelta);
-            _AssertSeries(First(), "x4!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x5!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 1, 3d, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 2, 6d, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 3, 9d, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x5!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
-
-            // ------------------------------
-            // collapse() function
-            // ------------------------------
-
-            I("RESET; MODE data;");
-            I("TIME 2000 2003;");
-            I("OPTION freq q;");
-            I("CREATE x;");
-            I("SERIES x =   (1, 2, 3, 4,       5, 6, 7, 8,       9, 10, -1, -2,     -3, 9, -3, 7);");
-            I("x1!a = x!q.collapse();");
-            I("OPTION freq a;");
-            I("x2 = x!q.collapse();");
-            I("OPTION freq q;");
-            I("x3!a = x!q.collapse('avg');");
-            I("x4!a = work:x!q.collapse('first');");  //testing bank also
-            I("work:x5!a = x!q.collapse('last'); ");   //testing bank also
-            I("OPTION freq a;");  //otherwise GetVariable() goes wrong: badly needs a fix for all this frequency stuff
-
-            _AssertSeries(First(), "x1!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2000, 10d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2001, 26d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2002, 16d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2003, 10d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x2!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2000, 10d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2001, 26d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2002, 16d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2003, 10d, sharedDelta);
-            _AssertSeries(First(), "x2!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x3!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2000, 10d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2001, 26d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2002, 16d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2003, 10d / 4d, sharedDelta);
-            _AssertSeries(First(), "x3!a", 2004, double.NaN, sharedDelta);
-
-            _AssertSeries(First(), "x4!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2000, 1d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2001, 5d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2002, 9d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2003, -3d, sharedDelta);
-            _AssertSeries(First(), "x4!a", 2004, double.NaN, sharedDelta);
-
-
-            _AssertSeries(First(), "x5!a", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2000, 4d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2001, 8d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2002, -2d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2003, 7d, sharedDelta);
-            _AssertSeries(First(), "x5!a", 2004, double.NaN, sharedDelta);
 
         }
 
