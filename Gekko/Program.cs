@@ -3290,7 +3290,7 @@ namespace Gekko
             {
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
-                    Series ts = O.GetIVariableFromString(listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must) as Series;
+                    Series ts = O.GetIVariableFromString(listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must, false) as Series;
                     for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                     {                        
                         CellLight cell = inputTable.Get(row, col);
@@ -7712,7 +7712,8 @@ namespace Gekko
                             string varName2 = null; string freq = null; O.ChopFreq(ts0.name, ref freq, ref varName2);
                             string varName = varName2 + "_" + e + Globals.freqIndicator + freq;
 
-                            Series ts = new Series(t1.freq, varName);
+                            Series ts = new Series(t1.freq, varName);                            
+
                             string s = Program.GetTextFromFileWithWait(file);
                             List<string> lines = Stringlist.ExtractLinesFromText(s);
                             foreach (string line in lines)
@@ -7743,6 +7744,10 @@ namespace Gekko
                             Databank db = ts0.meta.parentDatabank;
 
                             db.AddIVariableWithOverwrite(ts);
+
+                            ts.Stamp();
+                            //ts.SetDirty(true);  //already set with .AddIVariableWithOverwrite()
+
                             if (first) G.Writeln();
                             G.Writeln("Adjusted timeseries: " + db.name + ":" + varName);
                             first = false;
@@ -11937,7 +11942,8 @@ namespace Gekko
                     //But it works, and speed is probably not an issue with SMOOTH.
                     lhs.SetData(gt, newSeriesTemp.GetDataSimple(gt));
                 }
-                           
+                lhs.Stamp();
+                lhs.SetDirty(true);
             }
         }
 
@@ -19453,10 +19459,8 @@ namespace Gekko
 
                 string yLhs = xlhs[i];
                 string yRhs = xrhs[i];
-                                
-                //EFreq freq_lhs = G.ConvertFreq(G.Chop_GetFreq(yLhs), true);
-
-                Series ts_lhs =  O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
+                
+                Series ts_lhs =  O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must, false) as Series;
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
                 if (method == null) method = "total";
@@ -19651,7 +19655,7 @@ namespace Gekko
                 string yLhs = xlhs[ii];
                 string yRhs = xrhs[ii];
 
-                Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
+                Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must, false) as Series;
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReturnNull, true) as Series;  //can search
 
                 if (ts_lhs == null)

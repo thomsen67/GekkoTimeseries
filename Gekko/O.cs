@@ -2673,7 +2673,9 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Overload.
+        /// Get an IVariable from a string name like "b1:x!q". NOTE: Do not use with O.ECreatePossibilities.Must --> in that case,
+        /// use the overload where you can set canSearch = false. (In priniciple, this is not necessary if a bankname
+        /// is indicated, but for safety...!).
         /// </summary>
         /// <param name="fullname"></param>
         /// <param name="type"></param>
@@ -2684,7 +2686,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get an IVariable from a string name like "b1:x!q".
+        /// Get an IVariable from a string name like "b1:x!q". NOTE: If O.ECreatePossibilities.Must is set,
+        /// canSearch must be = false. Else no guarantee that object will be brand new, if no bank is given.
         /// </summary>
         /// <param name="fullname"></param>
         /// <param name="type"></param>
