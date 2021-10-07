@@ -19477,7 +19477,9 @@ namespace Gekko
         }
 
         public static void CollapseHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq eFreq0, out EFreq eFreq1)
-        {            
+        {
+            bool strictMissingsForDailyData = false;
+
             ECollapseMethod emethod = ECollapseMethod.Total;  //note: .Count is not used here
             if (G.Equal(method, "total")) emethod = ECollapseMethod.Total;
             else if (G.Equal(method, "avg")) emethod = ECollapseMethod.Avg;
@@ -19603,6 +19605,18 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(first, last))
                 {                    
                     double data = ts_rhs.GetDataSimple(t);
+                    if (G.isNumericalError(data))
+                    {
+                        //Note: these are only holes *inside * real data blocks, not surrounding them
+                        if (strictMissingsForDailyData)
+                        {
+                            //live with it: missings will be encountered
+                        }
+                        else
+                        {
+                            continue;  //skip it, and do not count it either.
+                        }
+                    }
                     GekkoTime gt = GekkoTime.ConvertFreqsFirst(eFreq1, t, null);  //...FreqsFirst() --> could just as well be ...FreqsLast(), since we are converting from the highest frequency availiable (days)
                     HandleCollapseData(ts_lhs, counter, data, gt, emethod, ref gt_min, ref gt_max);
                 }
