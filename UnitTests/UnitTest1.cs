@@ -18043,18 +18043,48 @@ print(df2)
             //     2  |    6  7  8  9 10 11 12         --> = 4
 
             //
-            // d --> a
+            // w --> a
             //        
             I("RESET;");
             I("OPTION freq w;");
             I("TIME 2002w52 2003w2;");  //3 weeks
-            I("SERIES x = 2, 3, 4;");   // 1  <w>  2  ...  3  <y>  4
+            I("SERIES x = 2, 3, 4;");   
+            I("COLLAPSE x1!a = x!w total;");
+            I("COLLAPSE x2!a = x!w avg;");
+            _AssertSeries(First(), "x1!a", EFreq.A, 2002, 1, 7d / 7d * 2d + 2d / 7d * 3d, sharedDelta);
+            _AssertSeries(First(), "x1!a", EFreq.A, 2003, 1, 5d / 7d * 3d + 7d / 7d * 4d, sharedDelta);
+            _AssertSeries(First(), "x2!a", EFreq.A, 2002, 1, (7d / 7d * 2d + 2d / 7d * 3d) / (7d + 2d), sharedDelta);
+            _AssertSeries(First(), "x2!a", EFreq.A, 2003, 1, (5d / 7d * 3d + 7d / 7d * 4d) / (5d + 7d), sharedDelta);
+
+
+            //
+            // w --> q
+            //        
+            I("RESET;");
+            I("OPTION freq w;");
+            I("TIME 2002w52 2003w2;");  //3 weeks
+            I("SERIES x = 2, 3, 4;");   
+            I("COLLAPSE x1!q = x!w total;");
+            I("COLLAPSE x2!q = x!w avg;");
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2002, 4, 7d / 7d * 2d + 2d / 7d * 3d, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2003, 1, 5d / 7d * 3d + 7d / 7d * 4d, sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2002, 4, (7d / 7d * 2d + 2d / 7d * 3d) / (7d + 2d), sharedDelta);
+            _AssertSeries(First(), "x2!q", EFreq.Q, 2003, 1, (5d / 7d * 3d + 7d / 7d * 4d) / (5d + 7d), sharedDelta);
+
+            //
+            // w --> m
+            //        
+            I("RESET;");
+            I("OPTION freq w;");
+            I("TIME 2002w52 2003w2;");  //3 weeks
+            I("SERIES x = 2, 3, 4;");  
             I("COLLAPSE x1!m = x!w total;");
             I("COLLAPSE x2!m = x!w avg;");
             _AssertSeries(First(), "x1!m", EFreq.M, 2002, 12, 7d / 7d * 2d + 2d/7d * 3d, sharedDelta);
             _AssertSeries(First(), "x1!m", EFreq.M, 2003, 1, 5d / 7d * 3d + 7d / 7d * 4d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 2002, 12, (7d / 7d * 2d + 2d / 7d * 3d) / (7d + 2d), sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 2003, 1, (5d / 7d * 3d + 7d / 7d * 4d) / (5d + 7d), sharedDelta);
+                                  
 
 
             // -------------------------------------------------

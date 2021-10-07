@@ -3126,10 +3126,11 @@ namespace Gekko
             if (freq_destination == null)
             {
                 //state defaults
-                if (ts.freq == EFreq.A) new Error("You cannot input an annual series for collapse().");
+                if (ts.freq == EFreq.A) new Error("You cannot collapse() an annual series.");
                 else if (ts.freq == EFreq.Q) freq_destination = "a";
                 else if (ts.freq == EFreq.M) freq_destination = "q";
-                else if (ts.freq == EFreq.D) freq_destination = "m";
+                else if (ts.freq == EFreq.W) freq_destination = "m";  //will use fractions...
+                else if (ts.freq == EFreq.D) freq_destination = "m";  //not W!
                 else
                 {
                     new Error("The frequency of the input timeseries should be D, M or Q for collapse().");
