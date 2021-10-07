@@ -19523,7 +19523,7 @@ namespace Gekko
                     else if (emethod == ECollapseMethod.Last)
                     {
                         if (t.sub == Globals.freqQSubperiods) ts_lhs.SetData(ttemp, value);
-                    }                    
+                    }
                 }
             }
             else if (eFreq0 == EFreq.M && eFreq1 == EFreq.A)
@@ -19587,6 +19587,54 @@ namespace Gekko
                     }
                 }
             }
+            else if (eFreq0 == EFreq.W)
+            {
+
+
+
+
+
+
+
+
+
+
+
+
+                //We first split the series to daily freq, so they are easier to collapse
+
+                Series ts_daily = new Series(EFreq.D, null);
+                foreach (GekkoTime t_w in new GekkoTimeIterator(first, last))
+                {
+                    double value = ts_rhs.GetDataSimple(t_w);
+                    //here, t is W freq
+                    GekkoTime t1 = GekkoTime.ConvertFreqsFirst(EFreq.D, t_w, null);
+                    GekkoTime t2 = GekkoTime.ConvertFreqsLast(EFreq.D, t_w);
+                    int n = GekkoTime.Observations(t1, t2);
+                    foreach (GekkoTime t_d in new GekkoTimeIterator(t1, t2))
+                    {
+                        ts_daily.SetData(t_d, value / (double)n);
+                    }
+                }
+                EFreq e0 = EFreq.None; EFreq e1 = EFreq.None;  //not used
+                CollapseHelper(ts_lhs, ts_daily, method, out e0, out e1);  //always "total" here, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            }
             else if (eFreq0 == EFreq.D)
             {
 
@@ -19595,15 +19643,15 @@ namespace Gekko
                 //The idea is to span dates enough to collapse into any freq.
                 //This means spanning years, and a little more than that because weeks
                 //may spill around years.
-                
+
                 GekkoTime gt_min = GekkoTime.tNull;
                 GekkoTime gt_max = GekkoTime.tNull;
                 Series counter = new Series(eFreq1, null);  //will be discared afterwards but practical here
-                
+
                 //GekkoTime firstBroader = GekkoTime.FromDateTimeToGekkoTime(eFreq0, ISOWeek.GetYearStart(first.super));
                 //GekkoTime lastBroader = GekkoTime.FromDateTimeToGekkoTime(eFreq0, ISOWeek.GetYearEnd(last.super));
                 foreach (GekkoTime t in new GekkoTimeIterator(first, last))
-                {                    
+                {
                     double data = ts_rhs.GetDataSimple(t);
                     if (G.isNumericalError(data))
                     {
@@ -19630,7 +19678,7 @@ namespace Gekko
                             ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / counter.GetDataSimple(gt));
                         }
                     }
-                }                
+                }
             }
             else
             {
