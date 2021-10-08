@@ -7613,6 +7613,15 @@ namespace Gekko
                 Series ts = O.ConvertToSeries(iv) as Series;
                 tss.Add(ts);  //for later use
 
+                if (ts.freq == EFreq.Q || ts.freq == EFreq.M)
+                {
+                    //good
+                }
+                else
+                {
+                    new Error("You cannot use X12A on " + ts.freq.Pretty() + " timeseries. The external X12A component from the US Census Bureau only supports Quarterly or Monthly.");
+                }
+
                 //We may be operating on a timeseries with another frequency than what is current or put into the <...> option field                
                 GekkoTime.ConvertFreqs(ts.freq, o.t1, o.t2, ref t1, ref t2);
 
@@ -19462,19 +19471,19 @@ namespace Gekko
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
                 if (method == null) method = "total";
-                EFreq eFreq0, eFreq1;
-                CollapseHelper(ts_lhs, ts_rhs, method, out eFreq0, out eFreq1);
+                
+                CollapseHelper(ts_lhs, ts_rhs, method);
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
 
-                G.ServiceMessage("Collapsed " + ts_lhs.GetName() + " (" + eFreq1.Pretty() + ") from " + ts_rhs.GetName() + " (" + eFreq0.Pretty() + ")", p);
+                G.ServiceMessage("Collapsed " + ts_lhs.GetName() + " (" + ts_lhs.freq.Pretty() + ") from " + ts_rhs.GetName() + " (" + ts_rhs.freq.Pretty() + ")", p);
 
             }
             return;
         }
 
-        public static void CollapseHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq freq_rhs, out EFreq freq_lhs)
+        public static void CollapseHelper(Series ts_lhs, Series ts_rhs, string method)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -19489,8 +19498,9 @@ namespace Gekko
             else if (G.Equal(method, "last")) emethod = ECollapseMethod.Last;
             else new Error("Expected method to be 'total', 'avg', 'first' or 'last'.");
 
-            freq_lhs = ts_lhs.freq;
-            freq_rhs = ts_rhs.freq;            
+            EFreq freq_lhs = ts_lhs.freq;
+            EFreq freq_rhs = ts_rhs.freq;        
+            
             if (freq_rhs == EFreq.U || freq_lhs == EFreq.U)
             {
                 new Error("COLLAPSE cannot involve undated timeseries");
@@ -19606,8 +19616,8 @@ namespace Gekko
                         ts_daily.SetData(t_d, value / (double)n);
                     }
                 }
-                EFreq e0 = EFreq.None; EFreq e1 = EFreq.None;  //not used
-                CollapseHelper(ts_lhs, ts_daily, method, out e0, out e1);  //always "total" here, 
+                
+                CollapseHelper(ts_lhs, ts_daily, method);
             }
             else if (freq_rhs == EFreq.D && (freq_lhs == EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M || freq_lhs == EFreq.W))
             {
@@ -19681,7 +19691,6 @@ namespace Gekko
             if (xlhs.Count != xrhs.Count)
             {
                 new Error("Internal error #89353245");
-                //throw new GekkoException();
             }
 
             for (int ii = 0; ii < xlhs.Count; ii++)
@@ -19697,26 +19706,36 @@ namespace Gekko
                 {
                     new Error("Cannot find: " + yRhs);
                 }
-
-                EFreq eFreq0, eFreq1;
-                method = InterpolateHelper(ts_lhs, ts_rhs, method, out eFreq0, out eFreq1);
+                                
+                method = InterpolateHelper(ts_lhs, ts_rhs, method);
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
 
-                G.ServiceMessage("Interpolated " + ts_lhs.GetName() + " (" + eFreq1.Pretty() + ") from " + ts_rhs.GetName() + " (" + eFreq0.Pretty() + ")", p);
+                G.ServiceMessage("Interpolated " + ts_lhs.GetName() + " (" + ts_lhs.freq.Pretty() + ") from " + ts_rhs.GetName() + " (" + ts_rhs.freq.Pretty() + ")", p);
             }
             return;
         }
 
-        public static string InterpolateHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq freq_rhs, out EFreq freq_lhs)
+        public static string InterpolateHelper(Series ts_lhs, Series ts_rhs, string method)
         {
             if (method == null) method = "repeat";
 
-            freq_rhs = ts_rhs.freq;
-            freq_lhs = ts_lhs.freq;
+            EFreq freq_rhs = ts_rhs.freq;
+            EFreq freq_lhs = ts_lhs.freq;
             GekkoTime first = ts_rhs.GetRealDataPeriodFirst(); //start of high-freq timeseries.
             GekkoTime last = ts_rhs.GetRealDataPeriodLast(); //end of high-freq timeseries
+
+            //A --> Q
+            //A --> M
+            //Q --> M
+
+            //A --> W
+            //Q --> W
+            //M --> W
+            //{i} --> D
+
+            //Maybe for W destination, first use D destination and then collapse?
 
             double vsum = double.NaN;
             foreach (GekkoTime t in new GekkoTimeIterator(first, last))

@@ -3140,8 +3140,8 @@ namespace Gekko
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
 
             if (method == null) method = "total";
-            EFreq e0; EFreq e1;
-            Program.CollapseHelper(tsNew, ts, method, out e0, out e1);
+            
+            Program.CollapseHelper(tsNew, ts, method);
 
             return tsNew;
         }
@@ -3200,9 +3200,8 @@ namespace Gekko
             }
 
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
-
-            EFreq e0; EFreq e1;
-            Program.InterpolateHelper(tsNew, ts, method, out e0, out e1);
+                        
+            Program.InterpolateHelper(tsNew, ts, method);
 
             return tsNew;
         }
