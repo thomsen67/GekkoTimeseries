@@ -3139,8 +3139,7 @@ namespace Gekko
 
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
 
-            if (method == null) method = "total";
-            
+            if (method == null) method = "total";            
             Program.CollapseHelper(tsNew, ts, method);
 
             return tsNew;
@@ -3188,19 +3187,17 @@ namespace Gekko
 
             if (freq_destination == null)
             {
-                //state defaults
-                if (ts.freq == EFreq.D) new Error("You cannot input a daily series for interpolate().");
-                else if (ts.freq == EFreq.M) new Error("You cannot input a monthly series for interpolate().");
+                //state defaults                
+                if (ts.freq == EFreq.A) freq_destination = "q";
                 else if (ts.freq == EFreq.Q) freq_destination = "m";
-                else if (ts.freq == EFreq.A) freq_destination = "q";
-                else
-                {
-                    new Error("The frequency of the input timeseries should be Q or M for interpolate().");
-                }
+                else if (ts.freq == EFreq.M) freq_destination = "d";
+                else if (ts.freq == EFreq.W) freq_destination = "d";
+                else if (ts.freq == EFreq.D) new Error("You cannot input a daily series for interpolate().");                
             }
 
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
-                        
+
+            if (method == null) method = "repeat";
             Program.InterpolateHelper(tsNew, ts, method);
 
             return tsNew;

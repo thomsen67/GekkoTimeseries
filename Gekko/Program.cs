@@ -19470,8 +19470,7 @@ namespace Gekko
                 Series ts_lhs =  O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must, false) as Series;
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
-                if (method == null) method = "total";
-                
+                if (method == null) method = "total";                
                 CollapseHelper(ts_lhs, ts_rhs, method);
 
                 ts_lhs.Stamp();
@@ -19603,20 +19602,13 @@ namespace Gekko
             {
                 //We first split the series to daily freq, so they are easier to collapse
 
-                Series ts_daily = new Series(EFreq.D, null);
-                foreach (GekkoTime t_w in new GekkoTimeIterator(first, last))
+                if (G.Equal(method, "first") || G.Equal(method, "last"))
                 {
-                    double value = ts_rhs.GetDataSimple(t_w);
-                    //here, t is W freq
-                    GekkoTime t1 = GekkoTime.ConvertFreqsFirst(EFreq.D, t_w, null);
-                    GekkoTime t2 = GekkoTime.ConvertFreqsLast(EFreq.D, t_w);
-                    int n = GekkoTime.Observations(t1, t2);
-                    foreach (GekkoTime t_d in new GekkoTimeIterator(t1, t2))
-                    {
-                        ts_daily.SetData(t_d, value / (double)n);
-                    }
+                    new Error("When collapsing from Weekly freq, method 'first' or 'last' are not implemented.");
                 }
-                
+
+                Series ts_daily = new Series(EFreq.D, null);                
+                InterpolateHelper(ts_daily, ts_rhs, "prorate");                
                 CollapseHelper(ts_lhs, ts_daily, method);
             }
             else if (freq_rhs == EFreq.D && (freq_lhs == EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M || freq_lhs == EFreq.W))
@@ -19626,6 +19618,11 @@ namespace Gekko
                 //The idea is to span dates enough to collapse into any freq.
                 //This means spanning years, and a little more than that because weeks
                 //may spill around years.
+
+                if (G.Equal(method, "first") || G.Equal(method, "last"))
+                {
+                    new Error("When collapsing from Daily freq, method 'first' or 'last' are not implemented.");
+                }
 
                 GekkoTime gt_min = GekkoTime.tNull;
                 GekkoTime gt_max = GekkoTime.tNull;
@@ -19706,8 +19703,9 @@ namespace Gekko
                 {
                     new Error("Cannot find: " + yRhs);
                 }
-                                
-                method = InterpolateHelper(ts_lhs, ts_rhs, method);
+
+                if (method == null) method = "repeat";
+                InterpolateHelper(ts_lhs, ts_rhs, method);
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
@@ -19717,7 +19715,7 @@ namespace Gekko
             return;
         }
 
-        public static string InterpolateHelper(Series ts_lhs, Series ts_rhs, string method)
+        public static void InterpolateHelper(Series ts_lhs, Series ts_rhs, string method)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -19726,7 +19724,14 @@ namespace Gekko
             //In principle, the generic methodology used for D freq destination could be used for all freqs here.
             //But for speed, we keep the code from A --> Q, A --> M and Q --> M. 
 
-            if (method == null) method = "repeat";
+            if (G.Equal(method, "rep") || G.Equal(method, "repeat") || G.Equal(method, "prorate"))
+            {
+                //good
+            }
+            else
+            {
+                new Error("Wrong method in INTERPOLATE: '" + method + "'. Choose between 'repeat' or 'prorate'.");
+            }
 
             EFreq freq_rhs = ts_rhs.freq;
             EFreq freq_lhs = ts_lhs.freq;
@@ -19757,11 +19762,7 @@ namespace Gekko
                             ts_lhs.SetData(gt, value / (double)Globals.freqQSubperiods);
                         }
                     }
-                    else
-                    {
-                        new Error("wrong method in INTERPOLATE: '" + method + "'");
-                        //throw new GekkoException();
-                    }
+                    else throw new GekkoException();
                 }
                 else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
                 {
@@ -19782,11 +19783,7 @@ namespace Gekko
                             ts_lhs.SetData(gt, value / (double)Globals.freqMSubperiods);
                         }
                     }
-                    else
-                    {
-                        new Error("wrong method in INTERPOLATE: '" + method + "'");
-                        //throw new GekkoException();
-                    }
+                    else throw new GekkoException();
                 }
                 else if (freq_lhs == EFreq.M && freq_rhs == EFreq.Q)
                 {
@@ -19809,11 +19806,14 @@ namespace Gekko
                             ts_lhs.SetData(gt, value / (double)mInQ);
                         }
                     }
-                    else new Error("Wrong method in INTERPOLATE: '" + method + "'");
+                    else throw new GekkoException();
                 }
                 else if (freq_lhs == EFreq.W && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M))
                 {
-                    //todo
+                    //First we interpolate the RHS into D freq, which makes it easier.
+                    Series ts_daily = new Series(EFreq.D, null);
+                    InterpolateHelper(ts_daily, ts_rhs, "prorate");
+                    CollapseHelper(ts_lhs, ts_daily, "total");
                 }
                 else if (freq_lhs == EFreq.D && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M || freq_rhs == EFreq.W))
                 {
@@ -19824,24 +19824,25 @@ namespace Gekko
 
                     double x = ts_rhs.GetDataSimple(t);
                     int n = GekkoTime.Observations(t1_lhs, t2_lhs);
-                    foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
+
+                    if (G.Equal(method, "repeat"))
                     {
-                                                                     
-                        if (G.Equal(method, "repeat"))
+                        foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
                         {
-                            ts_lhs.SetData(t_lhs, x);                         
+                            ts_lhs.SetData(t_lhs, x);
                         }
-                        else if (G.Equal(method, "prorate"))
+                    }
+                    else if (G.Equal(method, "prorate"))
+                    {
+                        foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
                         {
                             ts_lhs.SetData(t_lhs, x / (double)n);
                         }
-                        else new Error("Wrong method in INTERPOLATE: '" + method + "'");
                     }
+                    else throw new GekkoException();
                 }
                 else new Error("Cannot INTERPOLATE frequency '" + freq_rhs + "' to frequency '" + freq_lhs + "'");
-            }
-
-            return method;
+            }            
         }
 
         private static Databank GetDatabank(string b1)
