@@ -2277,7 +2277,7 @@ namespace Gekko
                     }
                     foreach (KeyValuePair<EFreq, long> kvp in count)
                     {
-                        s += kvp.Value + " (" + G.GetFreqPretty(kvp.Key) + "), ";
+                        s += kvp.Value + " (" + kvp.Key.Pretty() + "), ";
                     }
                     if (s != null)
                     {
@@ -5067,7 +5067,7 @@ namespace Gekko
             {
                 if (((Series)x).freq != ((Series)y).freq)
                 {
-                    new Error("You cannot logically compare two timeseries with freqs " + G.GetFreqPretty(((Series)x).freq) + " and " + G.GetFreqPretty(((Series)y).freq));
+                    new Error("You cannot logically compare two timeseries with freqs " + ((Series)x).freq.Pretty() + " and " + ((Series)y).freq.Pretty());
                     //throw new GekkoException();
                 }
             }
@@ -7017,7 +7017,7 @@ namespace Gekko
                 lhs.Stamp();
                 lhs.SetDirty(true);
 
-                G.ServiceMessage("Smoothed '" + lhs.GetName() + "' from '" + rhs.GetName() + "', method = " + method.ToString().ToLower(), p);
+                G.ServiceMessage("Smoothed " + lhs.GetName() + " from " + rhs.GetName() + ", method = " + method.ToString().ToLower(), p);
             }            
         }
 
@@ -7152,7 +7152,7 @@ namespace Gekko
                 ts3.Stamp();
                 ts3.SetDirty(true);
 
-                G.ServiceMessage("Spliced '" + ts3.name + "' by means of " + obs + " common observations", p);
+                G.ServiceMessage("Spliced " + ts3.GetName() + " by means of " + obs + " common observations", p);
             }
         }
 

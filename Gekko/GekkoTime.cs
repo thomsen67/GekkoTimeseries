@@ -45,6 +45,51 @@ namespace Gekko
         Empty20
     }
 
+    public static class Extensions
+    {
+        /// <summary>
+        /// Extension method for EFreq enum, pretty "printing" the freq. Convert to pretty string like "Annual", "Quarterly" etc.
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public static string Pretty(this EFreq freq)        {
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            string f = "";
+            if (freq == EFreq.A)
+            {
+                f = "Annual";
+            }
+            else if (freq == EFreq.Q)
+            {
+                f = "Quarterly";
+            }
+            else if (freq == EFreq.M)
+            {
+                f = "Monthly";
+            }
+            else if (freq == EFreq.W)
+            {
+                f = "Weekly";
+            }
+            else if (freq == EFreq.D)
+            {
+                f = "Daily";
+            }
+            else if (freq == EFreq.U)
+            {
+                f = "Undated";
+            }
+            else
+            {
+                new Error("Strange error regarding freq");
+            }
+            return f;
+        }
+    }
+
     public enum ESeriesMissing
     {
         Error,
@@ -652,8 +697,8 @@ namespace Gekko
             else
             {
                 new Error("Freq convertion problem"); return DateTime.MinValue;
-            }
-        }
+            }            
+        }        
 
         /// <summary>
         /// Finds the number of observations that a time range t1 to t2 spans. If t1 = 2020 and t2 = 2022, it will return 3. So note that it is the difference + 1.
@@ -674,7 +719,7 @@ namespace Gekko
 
             if (t1.freq != t2.freq)
             {
-                new Error("Frequency mismatch: " + G.GetFreqPretty(t1.freq) + " vs. " + G.GetFreqPretty(t2.freq));
+                new Error("Frequency mismatch: " + t1.freq.Pretty() + " vs. " + t2.freq.Pretty());                
             }
 
             if ((t1.IsNull() && !t2.IsNull()) || ((!t1.IsNull() && t2.IsNull())))

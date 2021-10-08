@@ -2948,7 +2948,7 @@ namespace Gekko
             if (p == null)
             {
                 G.Write2(s);
-                G.Writeln(Globals.serviceMessage, Color.LightGray);
+                G.Writeln(" " + Globals.serviceMessage, Color.LightGray);
             }
             else
             {
@@ -2957,7 +2957,7 @@ namespace Gekko
                     if (p.numberOfServiceMessages < 4)
                     {
                         G.Write2(s);
-                        G.Writeln(Globals.serviceMessage, Color.LightGray);
+                        G.Writeln(" " + Globals.serviceMessage, Color.LightGray);
                         p.numberOfServiceMessages++;
                     }
                     else if (p.numberOfServiceMessages == 4)
@@ -3107,7 +3107,7 @@ namespace Gekko
         {
             string start = G.FromDateToString(Globals.globalPeriodStart);
             string end = G.FromDateToString(Globals.globalPeriodEnd);
-            string f = G.GetFreqPretty();
+            string f = Program.options.freq.Pretty();
             string ss2 = f + " " + start + "-" + end;
             if (lowerCaseFirstChar) ss2 = char.ToLower(ss2[0]) + ss2.Substring(1);
             return ss2;
@@ -3400,7 +3400,7 @@ namespace Gekko
             string freq = null; string varname = null;
             O.ChopFreq(input, ref freq, ref varname);
             string freqPretty = null;
-            if (freq != null) freqPretty = " (" + G.GetFreqPretty(ConvertFreq(freq)) + ")";
+            if (freq != null) freqPretty = " (" + ConvertFreq(freq).Pretty() + ")";
             if(useQuotes) return "'" + varname + "'" + freqPretty;
             else return varname + freqPretty;
         }
@@ -3413,59 +3413,7 @@ namespace Gekko
         public static string GetNameAndFreqPretty(string input)
         {
             return GetNameAndFreqPretty(input, true);
-        }
-
-        /// <summary>
-        /// Convert EFreq to pretty string like "Annual", "Quarterly" etc.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetFreqPretty()
-        {            
-            return GetFreqPretty(Program.options.freq);            
-        }
-               
-        /// <summary>
-        /// Convert EFreq to pretty string like "Annual", "Quarterly" etc.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public static string GetFreqPretty(EFreq input)
-        {
-            //========================================================================================================
-            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
-            //========================================================================================================
-            string f = "";
-            if (input == EFreq.A)
-            {
-                f = "Annual";
-            }
-            else if (input == EFreq.Q)
-            {
-                f = "Quarterly";
-            }
-            else if (input == EFreq.M) 
-            {
-                f = "Monthly";
-            }
-            else if (input == EFreq.W)
-            {
-                f = "Weekly";
-            }
-            else if (input == EFreq.D)
-            {
-                f = "Daily";                
-            }
-            else if (input == EFreq.U)
-            {
-                f = "Undated";
-            }
-            else
-            {
-                new Error("Strange error regarding freq");
-            }
-
-            return f;
-        }
+        }      
 
         /// <summary>
         /// Check that t1 is less than or equal to t2

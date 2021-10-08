@@ -458,7 +458,7 @@ namespace Gekko
                     string s = null;
                     foreach (KeyValuePair<string, bool> kvp in freqs)
                     {
-                        if (kvp.Value) s += G.GetFreqPretty(G.ConvertFreq(kvp.Key)) + ", ";
+                        if (kvp.Value) s += G.ConvertFreq(kvp.Key).Pretty() + ", ";
                     }
                     s = s.Substring(0, s.Length - ", ".Length);
                     string ss = "print"; if (type == EPrintTypes.Clip) ss = "clip"; else if (type == EPrintTypes.Sheet) ss = "sheet";

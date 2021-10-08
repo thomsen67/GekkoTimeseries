@@ -362,7 +362,7 @@ namespace Gekko
             }
             if (this.freq != start.freq)
             {
-                new Error("Series is freq: " + G.GetFreqPretty(this.freq) + ", which is different from truncate freq: " + G.GetFreqPretty(start.freq));
+                new Error("Series is freq: " + this.freq.Pretty() + ", which is different from truncate freq: " + start.freq.Pretty());
                 //throw new GekkoException();
             }
             if (this.type == ESeriesType.Timeless) return;
@@ -575,7 +575,7 @@ namespace Gekko
 
         private void FreqError(GekkoTime t)
         {
-            new Error("Frequency mismatch: " + G.GetFreqPretty(this.freq) + " versus " + G.GetFreqPretty(t.freq));
+            new Error("Frequency mismatch: " + this.freq.Pretty() + " versus " + t.freq.Pretty());
             //throw new GekkoException();
         }
 
@@ -1912,7 +1912,7 @@ namespace Gekko
             {
                 if (x1.freq != x2_series.freq)
                 {
-                    new Error("Frequencies do not match: " + G.GetFreqPretty(x1.freq) + " vs " + G.GetFreqPretty(x2_series.freq));
+                    new Error("Frequencies do not match: " + x1.freq.Pretty() + " vs " + x2_series.freq.Pretty());
                     //throw new GekkoException();
                 }
             }
@@ -2175,7 +2175,7 @@ namespace Gekko
                         }
                         else
                         {
-                            new Error("You cannot index " + G.GetFreqPretty(this.freq) + " series with value " + i);
+                            new Error("You cannot index " + this.freq.Pretty() + " series with value " + i);
                             //throw new GekkoException();
                         }
                     }
@@ -2562,7 +2562,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("You cannot []-index a " + G.GetFreqPretty(this.freq) + " SERIES with [" + i + "]");
+                        new Error("You cannot []-index a " + this.freq.Pretty() + " SERIES with [" + i + "]");
                         //throw new GekkoException();
                     }
                 }

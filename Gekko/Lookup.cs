@@ -1316,7 +1316,7 @@ namespace Gekko
                                                                                                                                         //We copy in from that window
                                                 if (lhs_series.freq != rhs_series_beware.freq)
                                                 {
-                                                    new Error("Frequency mismatch. Left-hand series is " + G.GetFreqPretty(lhs_series.freq) + ", whereas right-hand series is " + G.GetFreqPretty(lhs_series.freq));
+                                                    new Error("Frequency mismatch. Left-hand series is " + lhs_series.freq.Pretty() + ", whereas right-hand series is " + lhs_series.freq.Pretty());
 
                                                     //throw new GekkoException();
                                                 }

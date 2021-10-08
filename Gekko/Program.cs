@@ -6524,7 +6524,7 @@ namespace Gekko
 
             start = G.FromDateToString(Globals.globalPeriodStart);
             end = G.FromDateToString(Globals.globalPeriodEnd);
-            string f = G.GetFreqPretty();
+            string f = Program.options.freq.Pretty();
 
             string workingFolder = "";
             string banks = "";
@@ -11587,7 +11587,7 @@ namespace Gekko
             int vars = matrix.GetRowMaxNumber() - i_data + 1;
             int obs = matrix.GetColMaxNumber() - j_data + 1;
             G.Writeln("Imported " + vars + " timeseries from " + obs + " data points");
-            G.Writeln("The collapsed series (" + G.GetFreqPretty(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
+            G.Writeln("The collapsed series (" + freq.Pretty() + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
 
         /// <summary>
@@ -12336,7 +12336,7 @@ namespace Gekko
 
                 string freq = "[unknown frequency]";
 
-                freq = G.GetFreqPretty(ts.freq);
+                freq = ts.freq.Pretty();
 
                 bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
                                 
@@ -12752,7 +12752,7 @@ namespace Gekko
 
             if (eqsPrinted) G.Writeln("");
 
-            G.Writeln(G.GetFreqPretty(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
+            G.Writeln(ts.freq.Pretty() + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
 
             double dimCount2 = 1d;
             string dimCount = null;
@@ -16061,7 +16061,7 @@ namespace Gekko
             G.Writeln2("Global time set: " + G.FromDateToString(Globals.globalPeriodStart) + " to " + G.FromDateToString(Globals.globalPeriodEnd) + " (" + GekkoTime.Observations(Globals.globalPeriodStart, Globals.globalPeriodEnd) + " periods)");
             if (t1.freq != Program.options.freq || t2.freq != Program.options.freq)
             {
-                new Note("The dates have been converted to " + G.GetFreqPretty(Program.options.freq) + " frequency");
+                new Note("The dates have been converted to " + Program.options.freq.Pretty() + " frequency");
             }            
         }        
 
@@ -19468,7 +19468,7 @@ namespace Gekko
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
 
-                G.ServiceMessage("Collapsed " + ts_lhs.GetName() + " (" + G.GetFreqPretty(eFreq1) + ") from " + ts_rhs.GetName() + " (" + G.GetFreqPretty(eFreq0) + ")", p);
+                G.ServiceMessage("Collapsed " + ts_lhs.GetName() + " (" + eFreq1.Pretty() + ") from " + ts_rhs.GetName() + " (" + eFreq0.Pretty() + ")", p);
 
             }
             return;
@@ -19655,7 +19655,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Cannot COLLAPSE frequency " + G.GetFreqPretty(freq_rhs) + " to frequency " + G.GetFreqPretty(freq_lhs) + "");
+                new Error("Cannot COLLAPSE frequency " + freq_rhs.Pretty() + " to frequency " + freq_lhs.Pretty() + "");
             }
         }
 
@@ -19704,17 +19704,17 @@ namespace Gekko
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
 
-                G.ServiceMessage("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
+                G.ServiceMessage("Interpolated " + ts_lhs.GetName() + " (" + eFreq1.Pretty() + ") from " + ts_rhs.GetName() + " (" + eFreq0.Pretty() + ")", p);
             }
             return;
         }
 
-        public static string InterpolateHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq eFreq0, out EFreq eFreq1)
+        public static string InterpolateHelper(Series ts_lhs, Series ts_rhs, string method, out EFreq freq_rhs, out EFreq freq_lhs)
         {
             if (method == null) method = "repeat";
 
-            eFreq0 = ts_rhs.freq;
-            eFreq1 = ts_lhs.freq;
+            freq_rhs = ts_rhs.freq;
+            freq_lhs = ts_lhs.freq;
             GekkoTime first = ts_rhs.GetRealDataPeriodFirst(); //start of high-freq timeseries.
             GekkoTime last = ts_rhs.GetRealDataPeriodLast(); //end of high-freq timeseries
 
@@ -19723,7 +19723,7 @@ namespace Gekko
             {
                 double value = ts_rhs.GetDataSimple(t);
                 if (value == double.NaN) continue;
-                if (eFreq1 == EFreq.Q && eFreq0 == EFreq.A)
+                if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
                 {
                     //Conversion from A to Q                                        
                     if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
@@ -19748,7 +19748,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
                 }
-                else if (eFreq1 == EFreq.M && eFreq0 == EFreq.A)
+                else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
                 {
                     //Conversion from A to M
                     if (G.Equal(method, "repeat"))
@@ -19773,7 +19773,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
                 }
-                else if (eFreq1 == EFreq.M && eFreq0 == EFreq.Q)
+                else if (freq_lhs == EFreq.M && freq_rhs == EFreq.Q)
                 {
                     //Conversion from Q to M
                     int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
@@ -19794,18 +19794,9 @@ namespace Gekko
                             ts_lhs.SetData(gt, value / (double)mInQ);
                         }
                     }
-                    else
-                    {
-                        new Error("wrong method in INTERPOLATE: " + method + "'");
-                        //throw new GekkoException();
-                    }
-
+                    else new Error("Wrong method in INTERPOLATE: " + method + "'");
                 }
-                else
-                {
-                    new Error("Cannot INTERPOLATE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
-                    //throw new GekkoException();
-                }
+                else new Error("Cannot INTERPOLATE frequency '" + freq_rhs + "' to frequency '" + freq_lhs + "'");
             }
 
             return method;
