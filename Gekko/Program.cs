@@ -19719,26 +19719,22 @@ namespace Gekko
 
         public static string InterpolateHelper(Series ts_lhs, Series ts_rhs, string method)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            //In principle, the generic methodology used for D freq destination could be used for all freqs here.
+            //But for speed, we keep the code from A --> Q, A --> M and Q --> M. 
+
             if (method == null) method = "repeat";
 
             EFreq freq_rhs = ts_rhs.freq;
             EFreq freq_lhs = ts_lhs.freq;
-            GekkoTime first = ts_rhs.GetRealDataPeriodFirst(); //start of high-freq timeseries.
-            GekkoTime last = ts_rhs.GetRealDataPeriodLast(); //end of high-freq timeseries
-
-            //A --> Q
-            //A --> M
-            //Q --> M
-
-            //A --> W
-            //Q --> W
-            //M --> W
-            //{i} --> D
-
-            //Maybe for W destination, first use D destination and then collapse?
-
+            GekkoTime t1_rhs = ts_rhs.GetRealDataPeriodFirst(); //start of low-freq timeseries.
+            GekkoTime t2_rhs = ts_rhs.GetRealDataPeriodLast(); //end of low-freq timeseries
+            
             double vsum = double.NaN;
-            foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+            foreach (GekkoTime t in new GekkoTimeIterator(t1_rhs, t2_rhs))
             {
                 double value = ts_rhs.GetDataSimple(t);
                 if (value == double.NaN) continue;
@@ -19788,7 +19784,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error("wrong method in INTERPOLATE: " + method + "'");
+                        new Error("wrong method in INTERPOLATE: '" + method + "'");
                         //throw new GekkoException();
                     }
                 }
@@ -19813,7 +19809,34 @@ namespace Gekko
                             ts_lhs.SetData(gt, value / (double)mInQ);
                         }
                     }
-                    else new Error("Wrong method in INTERPOLATE: " + method + "'");
+                    else new Error("Wrong method in INTERPOLATE: '" + method + "'");
+                }
+                else if (freq_lhs == EFreq.W && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M))
+                {
+                    //todo
+                }
+                else if (freq_lhs == EFreq.D && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M || freq_rhs == EFreq.W))
+                {
+                    GekkoTime t1_lhs = GekkoTime.ConvertFreqsFirst(freq_lhs, t, null);
+                    GekkoTime t2_lhs = GekkoTime.ConvertFreqsLast(freq_lhs, t);
+                    //For instance, freq_lhs is D and freq_rhs may be A, and we may have t1_rhs = 2020.
+                    //Then, we convert 2020 into the D date 2020m1d1.
+
+                    double x = ts_rhs.GetDataSimple(t);
+                    int n = GekkoTime.Observations(t1_lhs, t2_lhs);
+                    foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
+                    {
+                                                                     
+                        if (G.Equal(method, "repeat"))
+                        {
+                            ts_lhs.SetData(t_lhs, x);                         
+                        }
+                        else if (G.Equal(method, "prorate"))
+                        {
+                            ts_lhs.SetData(t_lhs, x / (double)n);
+                        }
+                        else new Error("Wrong method in INTERPOLATE: '" + method + "'");
+                    }
                 }
                 else new Error("Cannot INTERPOLATE frequency '" + freq_rhs + "' to frequency '" + freq_lhs + "'");
             }

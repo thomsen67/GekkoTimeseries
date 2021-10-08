@@ -477,11 +477,16 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Gets timeseries data without worrying about the lag problem. 
+        /// For Normal or Timeless series, not Light.
+        /// If out of bounds, a NaN is returned, no error is issued.
+        /// Tthis is fine if it is not an expression, for instance if it is taken directly from a databank.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public double GetDataSimple(GekkoTime t)
-        {
-            //for Normal or Timeless series, not Light
-            //if out of bounds, a NaN is returned, no error is issued
-            //this is fine if it is not an expression, for instance if it is taken directly from a databank
+        {            
             return GetData(null, t);
         }
 
