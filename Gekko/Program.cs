@@ -140,6 +140,11 @@ namespace Gekko
         Ols
     }
 
+    public class CollapseHelper
+    {
+        public Series counter = null;
+    }
+
     /// <summary>
 	/// Class emulates long process which runs in worker thread
 	/// and makes synchronous user UI operations.
@@ -19471,7 +19476,7 @@ namespace Gekko
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
                 if (method == null) method = "total";                
-                CollapseHelper(ts_lhs, ts_rhs, method);
+                CollapseHelper(ts_lhs, ts_rhs, method, new CollapseHelper());
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
@@ -19482,12 +19487,20 @@ namespace Gekko
             return;
         }
 
-        public static void CollapseHelper(Series ts_lhs, Series ts_rhs, string method)
+        /// <summary>
+        /// COLLAPSE and collapse(). The helper object contains counts only when collapsing from Daily to lower freqs
+        /// (this is used internally).
+        /// </summary>
+        /// <param name="ts_lhs"></param>
+        /// <param name="ts_rhs"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public static void CollapseHelper(Series ts_lhs, Series ts_rhs, string method, CollapseHelper helper)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-
+            
             bool strictMissingsForDailyData = false;
 
             ECollapseMethod emethod = ECollapseMethod.Total;  //note: .Count is not used here
@@ -19608,12 +19621,22 @@ namespace Gekko
                 }
 
                 Series ts_daily = new Series(EFreq.D, null);                
-                InterpolateHelper(ts_daily, ts_rhs, "prorate");                
-                CollapseHelper(ts_lhs, ts_daily, method);
+                InterpolateHelper(ts_daily, ts_rhs, "prorate");
+                CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
+                CollapseHelper(ts_lhs, ts_daily, "total", helper2);  //always total here!!
+                
+                if (emethod == ECollapseMethod.Avg)
+                {
+                    foreach (GekkoTime gt in new GekkoTimeIterator(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast()))
+                    {
+                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / helper2.counter.GetDataSimple(gt));  //nominator may be NaN
+                    }
+                }
+
             }
             else if (freq_rhs == EFreq.D && (freq_lhs == EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M || freq_lhs == EFreq.W))
             {
-                //Conversion from D to A/Q/M/W
+                //Conversion from D to A/Q/M/W  -- easy
 
                 //The idea is to span dates enough to collapse into any freq.
                 //This means spanning years, and a little more than that because weeks
@@ -19626,7 +19649,7 @@ namespace Gekko
 
                 GekkoTime gt_min = GekkoTime.tNull;
                 GekkoTime gt_max = GekkoTime.tNull;
-                Series counter = new Series(freq_lhs, null);  //will be discared afterwards but practical here
+                Series counter = new Series(freq_lhs, null);  //will be semi-discared afterwards but practical here
 
                 //GekkoTime firstBroader = GekkoTime.FromDateTimeToGekkoTime(eFreq0, ISOWeek.GetYearStart(first.super));
                 //GekkoTime lastBroader = GekkoTime.FromDateTimeToGekkoTime(eFreq0, ISOWeek.GetYearEnd(last.super));
@@ -19653,17 +19676,15 @@ namespace Gekko
                 {
                     foreach (GekkoTime gt in new GekkoTimeIterator(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast()))
                     {
-                        if (!double.IsNaN(ts_lhs.GetDataSimple(gt)))
-                        {
-                            ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / counter.GetDataSimple(gt));
-                        }
+                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / counter.GetDataSimple(gt));  //nominator may be NaN
                     }
                 }
+                helper.counter = counter;  //for potential use when collapsing from Weekly.
             }
             else
             {
                 new Error("Cannot COLLAPSE frequency " + freq_rhs.Pretty() + " to frequency " + freq_lhs.Pretty() + "");
-            }
+            }            
         }
 
         private static void CollapseHelper(string method, Series ts_lhs, double vsum, double n, GekkoTime tLowFreq)
@@ -19813,7 +19834,7 @@ namespace Gekko
                     //First we interpolate the RHS into D freq, which makes it easier.
                     Series ts_daily = new Series(EFreq.D, null);
                     InterpolateHelper(ts_daily, ts_rhs, "prorate");
-                    CollapseHelper(ts_lhs, ts_daily, "total");
+                    CollapseHelper(ts_lhs, ts_daily, "total", new CollapseHelper());
                 }
                 else if (freq_lhs == EFreq.D && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M || freq_rhs == EFreq.W))
                 {

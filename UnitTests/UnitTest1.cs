@@ -17763,6 +17763,10 @@ print(df2)
 
 
 
+
+
+
+
             // ================================
             //        A to D
             // ================================
@@ -17807,6 +17811,13 @@ print(df2)
             _AssertSeries(First(), "x!w", EFreq.W, 2006, 1, 1, double.NaN, sharedDelta);
             I("INTERPOLATE x!w = x!a prorate;");
             
+
+
+
+
+
+
+
 
 
 
