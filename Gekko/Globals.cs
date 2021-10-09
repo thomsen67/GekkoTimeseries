@@ -44,6 +44,8 @@ namespace Gekko
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
         public static DayOfWeek weeklyLastDayWhenPrinting = DayOfWeek.Sunday;
+        public static bool dailyAllowMissings = true;
+        public static bool weeklyAllowMissings = false;
 
         // -------------------------------------------------
         // pink stuff start
