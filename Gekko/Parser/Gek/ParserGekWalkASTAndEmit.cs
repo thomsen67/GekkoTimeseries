@@ -1156,8 +1156,9 @@ namespace Gekko.Parser.Gek
                         node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
                         string type = "null";
-                        if (node.ChildrenCount() >= 3) type = "O.ConvertToString(" + node[2].Code.ToString() + ")";
+                        if (node[2].ChildrenCount() > 0) type = "O.ConvertToString(" + node[2][0].Code.ToString() + ")";
                         node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
+                        GetCodeFromAllChildren(node, node[3]);  //options
                         node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }

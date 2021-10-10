@@ -9253,10 +9253,11 @@ namespace Gekko
             public List lhs = null;
             public List rhs = null;
             public string type = null;
+            public string opt_missing = null;
             public P p;
             public void Exe()
             {                
-                Program.Collapse(this.lhs, this.rhs, this.type, this.p);                
+                Program.Collapse(this.lhs, this.rhs, this.type, this.opt_missing, this.p);                
             }
         }
 

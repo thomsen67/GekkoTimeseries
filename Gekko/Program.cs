@@ -143,6 +143,11 @@ namespace Gekko
     public class CollapseHelper
     {
         public Series counter = null;
+        public string missing = null; // collapse <missing = ...>
+        //public bool Q_AllowMissings = false; //not active
+        //public bool M_AllowMissings = false; //not active
+        //public bool W_AllowMissings = false;
+        //public bool D_AllowMissings = true;
     }
 
     /// <summary>
@@ -19450,7 +19455,7 @@ namespace Gekko
 
         
 
-        public static void Collapse(List lhs, List rhs, string method, P p)
+        public static void Collapse(List lhs, List rhs, string method, string missing, P p)
         {
 
             if (lhs.list.Count != rhs.list.Count)
@@ -19475,8 +19480,11 @@ namespace Gekko
                 Series ts_lhs =  O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must, false) as Series;
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
-                if (method == null) method = "total";                
-                CollapseHelper(ts_lhs, ts_rhs, method, new CollapseHelper());
+                if (method == null) method = "total";
+                CollapseHelper helper = new CollapseHelper();
+                helper.missing = missing;
+                
+                CollapseHelper(ts_lhs, ts_rhs, method, helper);
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
@@ -19511,8 +19519,18 @@ namespace Gekko
             else new Error("Expected method to be 'total', 'avg', 'first' or 'last'.");
 
             EFreq freq_lhs = ts_lhs.freq;
-            EFreq freq_rhs = ts_rhs.freq;        
-            
+            EFreq freq_rhs = ts_rhs.freq;
+
+            ESeriesMissing missing = ESeriesMissing.M;
+            if (freq_lhs == EFreq.D) missing = ESeriesMissing.Skip;
+            if (G.Equal(helper.missing, "m")) missing = ESeriesMissing.M;
+            else if (G.Equal(helper.missing, "skip")) missing = ESeriesMissing.Skip;
+
+            if (missing == ESeriesMissing.Skip && (freq_lhs == EFreq.Q || freq_lhs == EFreq.M))
+            {
+                new Error("option <missing = skip> not yet implemented for Q or M frequency.");
+            }
+
             if (freq_rhs == EFreq.U || freq_lhs == EFreq.U)
             {
                 new Error("COLLAPSE cannot involve undated timeseries");
@@ -19623,6 +19641,7 @@ namespace Gekko
                 Series ts_daily = new Series(EFreq.D, null);                
                 InterpolateHelper(ts_daily, ts_rhs, "prorate");
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
+                helper2.missing = "m";  //will become NaN
                 CollapseHelper(ts_lhs, ts_daily, "total", helper2);  //always total here!!
                 
                 if (emethod == ECollapseMethod.Avg)
@@ -19636,6 +19655,12 @@ namespace Gekko
             }
             else if (freq_rhs == EFreq.D && (freq_lhs == EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M || freq_lhs == EFreq.W))
             {
+                //option collapse q missing = m;
+                //option collapse m missing = m;
+                //option collapse w missing = m;
+                //option collapse d missing = skip;
+                //collapse <missing = skip> x!w = x!d total;
+
                 //Conversion from D to A/Q/M/W  -- easy
 
                 //The idea is to span dates enough to collapse into any freq.
@@ -19659,13 +19684,17 @@ namespace Gekko
                     if (G.isNumericalError(data))
                     {
                         //Note: these are only holes *inside * real data blocks, not surrounding them
-                        if (strictMissingsForDailyData)
+                        if (missing == ESeriesMissing.Skip)
+                        {
+                            continue;  //skip it, and do not count it either.                            
+                        }
+                        else if (missing == ESeriesMissing.M)
                         {
                             //live with it: missings will be encountered
                         }
                         else
                         {
-                            continue;  //skip it, and do not count it either.
+                            new Error("Error #782342b234");
                         }
                     }
                     GekkoTime gt = GekkoTime.ConvertFreqsFirst(freq_lhs, t, null);  //...FreqsFirst() --> could just as well be ...FreqsLast(), since we are converting from the highest frequency availiable (days)

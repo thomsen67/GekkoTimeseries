@@ -2810,9 +2810,11 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 // COLLAPSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-collapse:				    COLLAPSE seqOfBankvarnames '=' seqOfBankvarnames2 collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 collapseMethod?);
+collapse:				    COLLAPSE collapseOpt1? seqOfBankvarnames '=' seqOfBankvarnames2 collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 ^(ASTPLACEHOLDER collapseMethod?) ^(ASTPLACEHOLDER collapseOpt1?));
 collapseMethod:			    name;
-//collapseMethod:			    FIRST|LAST|AVG|TOTAL;
+collapseOpt1:				ISNOTQUAL | leftAngle collapseOpt1h* RIGHTANGLE -> ^(ASTOPT1 collapseOpt1h*);
+collapseOpt1h:				MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)							
+						    ;		
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // COMPARE

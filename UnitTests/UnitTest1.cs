@@ -17642,7 +17642,7 @@ print(df2)
             // ================================
 
             //also testing bank on rhs, implicitely also tests this for COLLAPSE
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");
             I("SERIES @x = (1, 5, 3, m(), 10);");
@@ -17661,7 +17661,7 @@ print(df2)
             //
 
             //also testing bank on lhs, implicitely also tests this for COLLAPSE
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");
             I("SERIES x = (1, 5, 3, m(), 10);");
@@ -17681,7 +17681,7 @@ print(df2)
             //        A to M
             // ================================
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2001 2005;");
             I("SERIES x = (1, 5, 3, m(), 10);");
             I("OPTION freq m;");
@@ -17699,7 +17699,7 @@ print(df2)
 
             //
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");
             I("SERIES x = (1, 5, 3, m(), 10);");
@@ -17720,7 +17720,7 @@ print(df2)
             //        Q to M
             // ================================
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2001 2005;");
             I("OPTION freq q;");
             I("SERIES <2001q1 2002q1> x = (1, 5, 3, m(), 10);");
@@ -17736,7 +17736,7 @@ print(df2)
             }
             _AssertSeries(First(), "x1!m", EFreq.M, 2002, 4, double.NaN, sharedDelta);
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2001 2005;");
             I("OPTION freq q;");
             I("SERIES <2001q1 2002q1> x = (1, 5, 3, m(), 10);");
@@ -17771,7 +17771,7 @@ print(df2)
             //        A to D
             // ================================
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");            
             I("SERIES x = 1, 5, 3, m(), 10;");
@@ -17797,7 +17797,7 @@ print(df2)
             //        A to D
             // ================================
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");            
             I("SERIES x = 1, 5, 3, m(), 10;");
@@ -17835,7 +17835,7 @@ print(df2)
             // -------------------
 
             //also testing bank on rhs, implicitely also tests this for COLLAPSE
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");
             I("SERIES @x = (1, 5, 3, m(), 10);");
@@ -17928,7 +17928,7 @@ print(df2)
             // q --> a
             //
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2000 2003;");
             I("OPTION freq q;");
             I("CREATE x;");
@@ -17980,7 +17980,7 @@ print(df2)
             // m --> a
             //
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2000 2001;");
             I("OPTION freq m;");
             I("CREATE x;");
@@ -18017,7 +18017,7 @@ print(df2)
             //
             // m --> q
             //
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2000 2000;");
             I("OPTION freq m;");
             I("CREATE x;");
@@ -18065,7 +18065,7 @@ print(df2)
             // m --> q with holes
             //
             //Testing series with holes (M/NaN) inside
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2000 2000;");
             I("OPTION freq m;");
             I("CREATE x;");
@@ -18132,22 +18132,37 @@ print(df2)
             //
             //In one experiment, w53 = 49 is set to missing.
 
+                        
             //
-            // w --> a
+            // w --> m
             //        
-            Helper_CollapseInterpolateReset();
-            Globals.weeklyAllowMissings = true;
+            I("reset;");            
+            I("OPTION freq w;");
+            I("TIME 2004w49 2005w2;");  //3 weeks
+            I("x!w = 21, 28, 35, 42, 49, 56, 63;");
+            I("COLLAPSE <missing = skip> x1!m  = x!w total;");
+            I("COLLAPSE <missing = skip> x2!m = x!w avg;");
+            _AssertSeries(First(), "x1!m", EFreq.M, 2004, 11, 6d, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 2004, 12, 155d, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 2005, 1, 133d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 2004, 11, 21d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 2004, 12, 35.0000d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 2005, 1, 58.19d, sharedDelta);
+
+
+
+
+            // Just an older test that does not hurt to keep
+            I("reset;");            
             I("OPTION freq w;");
             I("TIME 2002w52 2003w2;");  //3 weeks
             I("SERIES x = 2, 3, 4;");
-            I("COLLAPSE x1!a = x!w total;");
-            I("COLLAPSE x2!a = x!w avg;");
+            I("COLLAPSE <missing = skip> x1!a = x!w total;");
+            I("COLLAPSE <missing = skip> x2!a = x!w avg;");
             _AssertSeries(First(), "x1!a", EFreq.A, 2002, 1, 7d / 7d * 2d + 2d / 7d * 3d, sharedDelta);
             _AssertSeries(First(), "x1!a", EFreq.A, 2003, 1, 5d / 7d * 3d + 7d / 7d * 4d, sharedDelta);
             _AssertSeries(First(), "x2!a", EFreq.A, 2002, 1, (7d / 7d * 2d + 2d / 7d * 3d) / (7d + 2d), sharedDelta);
-            _AssertSeries(First(), "x2!a", EFreq.A, 2003, 1, (5d / 7d * 3d + 7d / 7d * 4d) / (5d + 7d), sharedDelta);
-
-            
+            _AssertSeries(First(), "x2!a", EFreq.A, 2003, 1, (5d / 7d * 3d + 7d / 7d * 4d) / (5d + 7d), sharedDelta);            
 
             // -------------------------------------------------
             // d to lower freqs
@@ -18162,7 +18177,7 @@ print(df2)
             //
             // d --> a
             //        
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //4 days            
             I("SERIES x =   1, 2, 3, 4;");   // 1  <w>  2  ...  3  <y>  4
@@ -18172,7 +18187,7 @@ print(df2)
             _AssertSeries(First(), "x1!a", EFreq.A, 2003, 1, 4d, sharedDelta);
             _AssertSeries(First(), "x2!a", EFreq.A, 2002, 1, 6d / 3d, sharedDelta);
             _AssertSeries(First(), "x2!a", EFreq.A, 2003, 1, 4d / 1d, sharedDelta);
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //one hole            
             I("SERIES x =   1, 2, m(), 4;");
@@ -18186,7 +18201,7 @@ print(df2)
             //
             // d --> q
             //        
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //4 days            
             I("SERIES x =   1, 2, 3, 4;");   // 1  <w>  2  ...  3  <y>  4
@@ -18196,7 +18211,7 @@ print(df2)
             _AssertSeries(First(), "x1!q", EFreq.Q, 2003, 1, 4d, sharedDelta);
             _AssertSeries(First(), "x2!q", EFreq.Q, 2002, 4, 6d / 3d, sharedDelta);
             _AssertSeries(First(), "x2!q", EFreq.Q, 2003, 1, 4d / 1d, sharedDelta);
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //one hole            
             I("SERIES x =   1, 2, m(), 4;");
@@ -18211,7 +18226,7 @@ print(df2)
             //
             // d --> m
             //        
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //4 days            
             I("SERIES x =   1, 2, 3, 4;");   // 1  <w>  2  ...  3  <y>  4
@@ -18221,7 +18236,7 @@ print(df2)
             _AssertSeries(First(), "x1!m", EFreq.M, 2003, 1, 4d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 2002, 12, 6d / 3d, sharedDelta);
             _AssertSeries(First(), "x2!m", EFreq.M, 2003, 1, 4d / 1d, sharedDelta);
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //one hole            
             I("SERIES x =   1, 2, m(), 4;");
@@ -18235,7 +18250,7 @@ print(df2)
             //
             // d --> w
             //        
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //4 days            
             I("SERIES x =   1, 2, 3, 4;");   // 1  <w>  2  ...  3  <y>  4
@@ -18245,7 +18260,7 @@ print(df2)
             _AssertSeries(First(), "x1!w", EFreq.W, 2003, 1, 9d, sharedDelta);
             _AssertSeries(First(), "x2!w", EFreq.W, 2002, 52, 1d / 1d, sharedDelta);
             _AssertSeries(First(), "x2!w", EFreq.W, 2003, 1, 9d / 3d, sharedDelta);
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("OPTION freq d;");
             I("TIME 2002m12d29 2003m1d1;");  //one hole            
             I("SERIES x =   1, 2, m(), 4;");
@@ -18265,7 +18280,7 @@ print(df2)
             // Testing of collapse() function
             // ------------------------------
 
-            Helper_CollapseInterpolateReset();
+            I("reset;");
             I("TIME 2000 2003;");
             I("OPTION freq q;");
             I("CREATE x;");
@@ -18327,7 +18342,7 @@ print(df2)
                     string extra = null;
                     if (j == 1) extra = " sheet='data2' cols cell='d5'  namecell='d2'  datecell='b5' ";
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     string freq = "m";
@@ -18354,7 +18369,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "q";
@@ -18372,7 +18387,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "a";
@@ -18390,7 +18405,7 @@ print(df2)
                     //avg ------------------------------------------------------------
 
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "m";
@@ -18415,7 +18430,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "q";
@@ -18433,7 +18448,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "a";
@@ -18450,7 +18465,7 @@ print(df2)
 
                     //count ------------------------------------------------------------
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "m";
@@ -18475,7 +18490,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "q";
@@ -18493,7 +18508,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "a";
@@ -18510,7 +18525,7 @@ print(df2)
 
                     //first ------------------------------------------------------------
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "m";
@@ -18535,7 +18550,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "q";
@@ -18553,7 +18568,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "a";
@@ -18570,7 +18585,7 @@ print(df2)
 
                     //last ------------------------------------------------------------
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "m";
@@ -18595,7 +18610,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "q";
@@ -18613,7 +18628,7 @@ print(df2)
                         Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
                     }
 
-                    Helper_CollapseInterpolateReset();
+                    I("reset;");
                     if (e == 0) I("OPTION sheet engine = excel;");
                     else I("OPTION sheet engine = internal;");
                     freq = "a";
@@ -18629,15 +18644,7 @@ print(df2)
                     }
                 }
             }
-
-        }
-
-        private static void Helper_CollapseInterpolateReset()
-        {
-            I("RESET;");
-            Globals.dailyAllowMissings = true;
-            Globals.weeklyAllowMissings = false;
-        }
+        }        
 
 
         [TestMethod]
