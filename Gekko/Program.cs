@@ -19644,16 +19644,27 @@ namespace Gekko
                 CollapseHelper(ts_lhs, ts_daily, method, helper2);
 
                 //TODO TODO
+                //TODO TODO
+                //TODO TODO
+                //TODO TODO
                 //TODO TODO If we are using this for non-weeks, correct the seven
+                //TODO TODO
+                //TODO TODO
+                //TODO TODO
                 //TODO TODO
                 int seven = GekkoTimeStuff.numberOfDaysInAWeek;
 
                 if (emethod == ECollapseMethod.Avg)
                 {
-                    foreach (GekkoTime gt in new GekkoTimeIterator(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast()))
+                    GekkoTime realFirst = ts_lhs.GetRealDataPeriodFirst();
+                    if (!realFirst.IsNull())
                     {
-                        double fixme = 7d;
-                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) * seven);  //nominator may be NaN
+                        //only do this if there are actually some data
+                        GekkoTime realLast = ts_lhs.GetRealDataPeriodLast();
+                        foreach (GekkoTime gt in new GekkoTimeIterator(realFirst, realLast))
+                        {
+                            ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) * (double)seven);  //nominator may be NaN
+                        }
                     }
                 }
             }

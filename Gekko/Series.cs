@@ -1025,7 +1025,10 @@ namespace Gekko
             return GetPeriod(this.meta.lastPeriodPositionInArray);
         }
                
-
+        /// <summary>
+        /// Finds the first real non-missing datapoint in the timeseries. Will return GekkoTime.tNull if all data are missing.
+        /// </summary>
+        /// <returns></returns>
         public GekkoTime GetRealDataPeriodFirst()
         {
             //TODO: Implement for array-series
@@ -1052,6 +1055,10 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Finds the last real non-missing datapoint in the timeseries. Will return GekkoTime.tNull if all data are missing.
+        /// </summary>
+        /// <returns></returns>
         public GekkoTime GetRealDataPeriodLast()
         {
             //TODO: Implement for array-series
