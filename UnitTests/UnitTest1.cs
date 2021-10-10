@@ -18487,7 +18487,7 @@ print(df2)
             // Testing of collapse() function
             // ------------------------------
 
-            I("reset;");
+            I("reset;"); 
             I("TIME 2000 2003;");
             I("OPTION freq q;");
             I("CREATE x;");
