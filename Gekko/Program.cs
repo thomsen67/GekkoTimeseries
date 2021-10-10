@@ -19814,119 +19814,125 @@ namespace Gekko
             GekkoTime t1_rhs = ts_rhs.GetRealDataPeriodFirst(); //start of low-freq timeseries.
             if (t1_rhs.IsNull()) new Error("It seems the input series has no data.");
             GekkoTime t2_rhs = ts_rhs.GetRealDataPeriodLast(); //end of low-freq timeseries
-            
-            double vsum = double.NaN;
-            foreach (GekkoTime t in new GekkoTimeIterator(t1_rhs, t2_rhs))
+                        
+            if (freq_lhs == EFreq.W && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M))
             {
-                double value = ts_rhs.GetDataSimple(t);
-                if (value == double.NaN) continue;
-                if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
+                //Splitting out W into A, Q or M is done in a special way.
+                //We cannot just run over the RHS time period, because the freqs do not fit neatly and we first convert to D freq.
+                //First we interpolate the RHS into D freq, which makes it easier.
+                Series ts_daily = new Series(EFreq.D, null);
+                InterpolateHelper(ts_daily, ts_rhs, "prorate");
+                CollapseHelper(ts_lhs, ts_daily, "total", new CollapseHelper());
+                GekkoTime t1_lhs = ts_lhs.GetRealDataPeriodFirst();
+                if (t1_lhs.IsNull()) new Error("The output series has no data.");
+                GekkoTime t2_lhs = ts_lhs.GetRealDataPeriodLast();
+                foreach (GekkoTime t5 in new GekkoTimeIterator(t1_lhs, t2_lhs))  //t5 is weekly freq
                 {
-                    //Conversion from A to Q                                        
-                    if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
-                    {
-                        for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
-                        {
-                            GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
-                            ts_lhs.SetData(gt, value);
-                        }
-                    }
-                    else if (G.Equal(method, "prorate"))
-                    {
-                        for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
-                        {
-                            GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
-                            ts_lhs.SetData(gt, value / (double)Globals.freqQSubperiods);
-                        }
-                    }
-                    else throw new GekkoException();
+                    GekkoTime lastDay=ISOWeek.ToDateTime(t5, )
+                    ts_lhs.SetData(t5, ts_lhs.GetDataSimple(t5) * 31d / (double)GekkoTimeStuff.numberOfDaysInAWeek);
                 }
-                else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
-                {
-                    //Conversion from A to M
-                    if (G.Equal(method, "repeat"))
-                    {
-                        for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
-                        {
-                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                            ts_lhs.SetData(gt, value);
-                        }
-                    }
-                    else if (G.Equal(method, "prorate"))
-                    {
-                        for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
-                        {
-                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                            ts_lhs.SetData(gt, value / (double)Globals.freqMSubperiods);
-                        }
-                    }
-                    else throw new GekkoException();
-                }
-                else if (freq_lhs == EFreq.M && freq_rhs == EFreq.Q)
-                {
-                    //Conversion from Q to M
-                    int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
-                    int startSub = (t.sub - 1) * mInQ + 1;  //1->1, 2->4, 3->7, 4->10
-                    if (G.Equal(method, "repeat"))
-                    {
-                        for (int i = startSub; i < startSub + mInQ; i++)
-                        {
-                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                            ts_lhs.SetData(gt, value);
-                        }
-                    }
-                    else if (G.Equal(method, "prorate"))
-                    {
-                        for (int i = startSub; i < startSub + mInQ; i++)
-                        {
-                            GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
-                            ts_lhs.SetData(gt, value / (double)mInQ);
-                        }
-                    }
-                    else throw new GekkoException();
-                }
-                else if (freq_lhs == EFreq.W && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M))
-                {
-                    //First we interpolate the RHS into D freq, which makes it easier.
-                    Series ts_daily = new Series(EFreq.D, null);
-                    InterpolateHelper(ts_daily, ts_rhs, "prorate");
-                    CollapseHelper(ts_lhs, ts_daily, "total", new CollapseHelper());
-                    GekkoTime t1_lhs = ts_lhs.GetRealDataPeriodFirst();
-                    if (t1_lhs.IsNull()) new Error("The output series has no data.");
-                    GekkoTime t2_lhs = ts_lhs.GetRealDataPeriodLast();
-                    foreach (GekkoTime t5 in new GekkoTimeIterator(t1_lhs, t2_lhs))
-                    {
-                        ts_lhs.SetData(t5, ts_lhs.GetDataSimple(t5) * 31d / 7d);
-                    }
-                }
-                else if (freq_lhs == EFreq.D && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M || freq_rhs == EFreq.W))
-                {
-                    GekkoTime t1_lhs = GekkoTime.ConvertFreqsFirst(freq_lhs, t, null);
-                    GekkoTime t2_lhs = GekkoTime.ConvertFreqsLast(freq_lhs, t);
-                    //For instance, freq_lhs is D and freq_rhs may be A, and we may have t1_rhs = 2020.
-                    //Then, we convert 2020 into the D date 2020m1d1.
+            }
+            else
+            {
 
-                    double x = ts_rhs.GetDataSimple(t);
-                    int n = GekkoTime.Observations(t1_lhs, t2_lhs);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_rhs, t2_rhs))
+                {
+                    double value = ts_rhs.GetDataSimple(t);
+                    if (value == double.NaN) continue;
+                    if (freq_lhs == EFreq.Q && freq_rhs == EFreq.A)
+                    {
+                        //Conversion from A to Q                                        
+                        if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
+                        {
+                            for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
+                            {
+                                GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
+                                ts_lhs.SetData(gt, value);
+                            }
+                        }
+                        else if (G.Equal(method, "prorate"))
+                        {
+                            for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
+                            {
+                                GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
+                                ts_lhs.SetData(gt, value / (double)Globals.freqQSubperiods);
+                            }
+                        }
+                        else throw new GekkoException();
+                    }
+                    else if (freq_lhs == EFreq.M && freq_rhs == EFreq.A)
+                    {
+                        //Conversion from A to M
+                        if (G.Equal(method, "repeat"))
+                        {
+                            for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
+                            {
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                                ts_lhs.SetData(gt, value);
+                            }
+                        }
+                        else if (G.Equal(method, "prorate"))
+                        {
+                            for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
+                            {
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                                ts_lhs.SetData(gt, value / (double)Globals.freqMSubperiods);
+                            }
+                        }
+                        else throw new GekkoException();
+                    }
+                    else if (freq_lhs == EFreq.M && freq_rhs == EFreq.Q)
+                    {
+                        //Conversion from Q to M
+                        int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
+                        int startSub = (t.sub - 1) * mInQ + 1;  //1->1, 2->4, 3->7, 4->10
+                        if (G.Equal(method, "repeat"))
+                        {
+                            for (int i = startSub; i < startSub + mInQ; i++)
+                            {
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                                ts_lhs.SetData(gt, value);
+                            }
+                        }
+                        else if (G.Equal(method, "prorate"))
+                        {
+                            for (int i = startSub; i < startSub + mInQ; i++)
+                            {
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
+                                ts_lhs.SetData(gt, value / (double)mInQ);
+                            }
+                        }
+                        else throw new GekkoException();
+                    }
+                    else if (freq_lhs == EFreq.D && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M || freq_rhs == EFreq.W))
+                    {
+                        GekkoTime t1_lhs = GekkoTime.ConvertFreqsFirst(freq_lhs, t, null);
+                        GekkoTime t2_lhs = GekkoTime.ConvertFreqsLast(freq_lhs, t);
+                        //For instance, freq_lhs is D and freq_rhs may be A, and we may have t1_rhs = 2020.
+                        //Then, we convert 2020 into the D date 2020m1d1.
 
-                    if (G.Equal(method, "repeat"))
-                    {
-                        foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
+                        double x = ts_rhs.GetDataSimple(t);
+                        int n = GekkoTime.Observations(t1_lhs, t2_lhs);
+
+                        if (G.Equal(method, "repeat"))
                         {
-                            ts_lhs.SetData(t_lhs, x);
+                            foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
+                            {
+                                ts_lhs.SetData(t_lhs, x);
+                            }
                         }
-                    }
-                    else if (G.Equal(method, "prorate"))
-                    {
-                        foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
+                        else if (G.Equal(method, "prorate"))
                         {
-                            ts_lhs.SetData(t_lhs, x / (double)n);
+                            foreach (GekkoTime t_lhs in new GekkoTimeIterator(t1_lhs, t2_lhs))
+                            {
+                                ts_lhs.SetData(t_lhs, x / (double)n);
+                            }
                         }
+                        else throw new GekkoException();
                     }
-                    else throw new GekkoException();
+                    else new Error("Cannot INTERPOLATE frequency '" + freq_rhs + "' to frequency '" + freq_lhs + "'");
                 }
-                else new Error("Cannot INTERPOLATE frequency '" + freq_rhs + "' to frequency '" + freq_lhs + "'");
-            }            
+            }
         }
 
         private static Databank GetDatabank(string b1)
