@@ -591,15 +591,25 @@ namespace Gekko
                                             //throw new GekkoException();
                                         }
                                         else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
-                                        {                                            
+                                        {
                                             //it is probably ok to create it here like this                                            
                                             //never mind...
-                                            rv = new Series(G.ConvertFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
-                                            Program.databanks.GetFirst().AddIVariableWithOverwrite(rv);
+                                            //Note: dbName is guaranteed to be = null here
+                                            rv = CreateBrandNewSeriesInFirstDatabank(varnameWithFreq);
                                         }
                                         else
                                         {
                                             //just return the null
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //This is added 10/10 2021. Seems it was a bug that it was not here.
+                                        //is already existing
+                                        //Note: dbName is guaranteed to be = null here
+                                        if (settings.create == ECreatePossibilities.Must)
+                                        {
+                                            rv = CreateBrandNewSeriesInFirstDatabank(varnameWithFreq);
                                         }
                                     }
                                 }
@@ -635,6 +645,15 @@ namespace Gekko
                     }
                 }
             }
+            return rv;
+        }
+
+        private static IVariable CreateBrandNewSeriesInFirstDatabank(string varnameWithFreq)
+        {
+            //Only for timeseries names
+            if (G.Chop_HasSigil(varnameWithFreq)) return null;
+            IVariable rv = new Series(G.ConvertFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(rv);
             return rv;
         }
 

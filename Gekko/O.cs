@@ -2686,8 +2686,10 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get an IVariable from a string name like "b1:x!q". NOTE: If O.ECreatePossibilities.Must is set,
-        /// canSearch must be = false. Else no guarantee that object will be brand new, if no bank is given.
+        /// Get an IVariable from a string name like "b1:x!q". NOTE: If O.ECreatePossibilities.Must or .Can is set,
+        /// canSearch must be = false, else an exception is thrown. Using .Must and canSearch == false is typically when
+        /// we want to create a brand new variable (in the first-position databank if fullname has no bank indicator).
+        /// Note that .Can and .Must can only be used for timeseries names (without sigils).
         /// </summary>
         /// <param name="fullname"></param>
         /// <param name="type"></param>
@@ -2705,8 +2707,8 @@ namespace Gekko
 
             if (canSearch == true && (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must))
             {
+                //This is not allowed: it would be fluffy where the variable is created. With canSearch == false, we know it should be created in the first-position databank
                 new Error("Internal error #80975234985");
-                //throw new GekkoException();
             }
 
             LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, type, canSearch);
