@@ -19526,7 +19526,7 @@ namespace Gekko
             if (G.Equal(helper.missing, "m")) missing = ESeriesMissing.M;
             else if (G.Equal(helper.missing, "skip")) missing = ESeriesMissing.Skip;
 
-            if (missing == ESeriesMissing.Skip && (freq_lhs == EFreq.Q || freq_lhs == EFreq.M))
+            if (missing == ESeriesMissing.Skip && (freq_rhs == EFreq.Q || freq_rhs == EFreq.M))
             {
                 new Error("option <missing = skip> not yet implemented for Q or M frequency.");
             }
@@ -19642,13 +19642,14 @@ namespace Gekko
                 InterpolateHelper(ts_daily, ts_rhs, "prorate");
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
                 helper2.missing = "m";  //will become NaN
-                CollapseHelper(ts_lhs, ts_daily, "total", helper2);  //always total here!!
+                CollapseHelper(ts_lhs, ts_daily, method, helper2);
                 
                 if (emethod == ECollapseMethod.Avg)
                 {
                     foreach (GekkoTime gt in new GekkoTimeIterator(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast()))
                     {
-                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / helper2.counter.GetDataSimple(gt));  //nominator may be NaN
+                        double fixme = 7d;  maybe counter should store this!
+                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) * fixme);  //nominator may be NaN
                     }
                 }
 
