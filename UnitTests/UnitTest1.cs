@@ -17754,18 +17754,54 @@ print(df2)
 
 
 
+            if (true)
+            {
 
+                // ================================
+                //        M to W
+                // ================================
 
+                //        29_11   30_11    1_12    2_12    3_12    4_12    5_12
+                //2004w49                     x       x       x       x       x           
+                //         6_12    7_12    8_12    9_12   10_12   11_12   12_12
+                //2004w50     x       x       x       x       x       x       x           
+                //        13_12   14_12   15_12   16_12   17_12   18_12   19_12
+                //2004w51     x       x       x       x       x       x       x           
+                //        20_12   21_12   22_12   23_12   24_12   25_12   26_12
+                //2004w52     x       x       x       x       x       x       x
+                //        27_12   28_12   29_12   30_12   31_12     1_1     2_1
+                //2004w53     x       x       x       x       x       y       y
+                //          3_1     4_1     5_1     6_1     7_1     8_1     9_1
+                //2005w1      y       y       y       y       y       y       y
+                //         10_1    11_1    12_1    13_1    14_1    15_1    16_1
+                //2005w2      y       y       y       y       y       y       y
+                //         17_1    18_1    19_1    20_1    21_1    22_1    23_1
+                //2005w3      y       y       y       y       y       y       y
+                //         24_1    25_1    26_1    27_1    28_1    29_1    30_1
+                //2005w4      y       y       y       y       y       y       y
+                //         31_1     1_2     2_2
+                //2005w5      y       
+                //
 
+                I("reset;");
+                I("OPTION freq m;");
+                I("TIME 2004m12 2005m1;");
+                I("x!m = 3, 4;");
+                I("INTERPOLATE x!w = x!m repeat;");
+                _AssertSeries(First(), "x!w", EFreq.W, 2004, 48, double.NaN, sharedDelta);
+                //_AssertSeries(First(), "x!w", EFreq.W, 2004, 49, 5d / 7d * 3d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2004, 50, 3d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2004, 51, 3d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2004, 52, 3d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2004, 53, 5d / 7d * 3d + 2d / 7d * 4d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2001, 1, 4d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2001, 2, 4d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2001, 3, 4d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2001, 4, 4d, sharedDelta);
+                _AssertSeries(First(), "x!w", EFreq.W, 2001, 5, 1d / 7d * 4d, sharedDelta);
 
-
-
-
-
-
-
-
-
+            }
+                                                                                                
 
             // ================================
             //        A to D
@@ -17792,43 +17828,96 @@ print(df2)
             _AssertSeries(First(), "x!d", EFreq.D, 2005, 12, 31, 10d / 365d, sharedDelta);
             _AssertSeries(First(), "x!d", EFreq.D, 2006, 1, 1, double.NaN, sharedDelta);
 
+            // ================================
+            //        Q to D (just a limited test here)
+            // ================================
+            I("reset;");
+            I("option freq q;");
+            I("time 2001q1 2001q2;");
+            I("x = 7, 8;");
+            I("interpolate x!d = x!q repeat;");
+            _AssertSeries(First(), "x!d", EFreq.D, 2001, 1, 15, 7d, sharedDelta);
+            I("interpolate x!d = x!q prorate;");
+            _AssertSeries(First(), "x!d", EFreq.D, 2001, 1, 15, 7d / (31d + 28d + 31d), sharedDelta);
 
             // ================================
-            //        A to D
+            //        M to D (just a limited test here)
             // ================================
 
             I("reset;");
-            I("OPTION freq a;");
-            I("TIME 2001 2005;");            
-            I("SERIES x = 1, 5, 3, m(), 10;");
-            I("INTERPOLATE x!w = x!a repeat;");
-            _AssertSeries(First(), "x!w", EFreq.W, 2000, 52, 31, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!w", EFreq.W, 2001, 52, 1, 1d, sharedDelta);
-            _AssertSeries(First(), "x!w", EFreq.W, 2002, 12, 31, 5d, sharedDelta);
-            _AssertSeries(First(), "x!w", EFreq.W, 2003, 1, 1, 3d, sharedDelta);
-            _AssertSeries(First(), "x!w", EFreq.W, 2004, 1, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x!w", EFreq.W, 2005, 12, 31, 10d, sharedDelta);
-            _AssertSeries(First(), "x!w", EFreq.W, 2006, 1, 1, double.NaN, sharedDelta);
-            I("INTERPOLATE x!w = x!a prorate;");
+            I("option freq m;");
+            I("time 2001m1 2001m2;");
+            I("x = 7, 8;");
+            I("interpolate x!d = x!m repeat;");
+            _AssertSeries(First(), "x!d", EFreq.D, 2001, 1, 15, 7d, sharedDelta);
+            I("interpolate x!d = x!m prorate;");
+            _AssertSeries(First(), "x!d", EFreq.D, 2001, 1, 15, 7d / 31d, sharedDelta);
 
+            // ================================
+            //        W to D
+            // ================================
 
+            //We are using these data (repeating here)
 
+            //        27_12   28_12   29_12   30_12   31_12     1_1     2_1
+            //2004w53     7       7       7       7       7       7       7             7
+            //          3_1     4_1     5_1     6_1     7_1     8_1     9_1
+            //2005w1      M       M       M       M       M       M       M             M
+            //         10_1    11_1    12_1    13_1    14_1    15_1    16_1
+            //2005w2      9       9       9       9       9       9       9             9
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            I("reset;");
+            I("OPTION freq w;");
+            I("TIME 2004w53 2005w2;");
+            I("x =7, m(), 9;");
+            I("INTERPOLATE x!d = x!w repeat;");
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 26, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 27, 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 28, 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 29, 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 30, 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 31, 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 1, 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 2, 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 5, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 6, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 7, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 8, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 9, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 10, 9d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 11, 9d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 12, 9d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 13, 9d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 14, 9d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 15, 9d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 16, 9d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 17, double.NaN, sharedDelta);
+            I("INTERPOLATE x!d = x!w prorate;");
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 26, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 27, 7d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 28, 7d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 29, 7d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 30, 7d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2004, 12, 31, 7d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 1, 7d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 2, 7d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 5, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 6, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 7, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 8, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 9, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 10, 9d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 11, 9d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 12, 9d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 13, 9d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 14, 9d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 15, 9d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 16, 9d / 7d, sharedDelta);
+            _AssertSeries(First(), "x!d", EFreq.D, 2005, 1, 17, double.NaN, sharedDelta);
 
             // -------------------
             // function interpolate()

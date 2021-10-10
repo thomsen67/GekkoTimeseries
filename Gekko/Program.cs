@@ -19536,6 +19536,7 @@ namespace Gekko
             }
 
             GekkoTime t1_highfreq = ts_rhs.GetRealDataPeriodFirst(); //start of high-freq timeseries
+            if (t1_highfreq.IsNull()) new Error("It seems the input series has no data.");
             GekkoTime t2_highfreq = ts_rhs.GetRealDataPeriodLast(); //end of high-freq timeseries
 
             if (freq_rhs == EFreq.Q && freq_lhs == EFreq.A)
@@ -19772,7 +19773,7 @@ namespace Gekko
                 string yRhs = xrhs[ii];
 
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must, false) as Series;
-                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReturnNull, true) as Series;  //can search
+                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
                 if (ts_lhs == null)
                 {
@@ -19811,6 +19812,7 @@ namespace Gekko
             EFreq freq_rhs = ts_rhs.freq;
             EFreq freq_lhs = ts_lhs.freq;
             GekkoTime t1_rhs = ts_rhs.GetRealDataPeriodFirst(); //start of low-freq timeseries.
+            if (t1_rhs.IsNull()) new Error("It seems the input series has no data.");
             GekkoTime t2_rhs = ts_rhs.GetRealDataPeriodLast(); //end of low-freq timeseries
             
             double vsum = double.NaN;
@@ -19889,6 +19891,13 @@ namespace Gekko
                     Series ts_daily = new Series(EFreq.D, null);
                     InterpolateHelper(ts_daily, ts_rhs, "prorate");
                     CollapseHelper(ts_lhs, ts_daily, "total", new CollapseHelper());
+                    GekkoTime t1_lhs = ts_lhs.GetRealDataPeriodFirst();
+                    if (t1_lhs.IsNull()) new Error("The output series has no data.");
+                    GekkoTime t2_lhs = ts_lhs.GetRealDataPeriodLast();
+                    foreach (GekkoTime t5 in new GekkoTimeIterator(t1_lhs, t2_lhs))
+                    {
+                        ts_lhs.SetData(t5, ts_lhs.GetDataSimple(t5) * 31d / 7d);
+                    }
                 }
                 else if (freq_lhs == EFreq.D && (freq_rhs == EFreq.A || freq_rhs == EFreq.Q || freq_rhs == EFreq.M || freq_rhs == EFreq.W))
                 {
