@@ -142,7 +142,7 @@ namespace Gekko
 
     public class CollapseHelper
     {
-        public Series counter = null;
+        //public Series counter = null;
         public string missing = null; // collapse <missing = ...>
         //public bool Q_AllowMissings = false; //not active
         //public bool M_AllowMissings = false; //not active
@@ -11417,7 +11417,6 @@ namespace Gekko
             {
                 counter.SetData(gt, counter.GetDataSimple(gt) + 1d); //add 1
             }
-
         }
 
         /// <summary>
@@ -19522,7 +19521,7 @@ namespace Gekko
             EFreq freq_rhs = ts_rhs.freq;
 
             ESeriesMissing missing = ESeriesMissing.M;
-            if (freq_lhs == EFreq.D) missing = ESeriesMissing.Skip;
+            if (freq_rhs == EFreq.D) missing = ESeriesMissing.Skip;
             if (G.Equal(helper.missing, "m")) missing = ESeriesMissing.M;
             else if (G.Equal(helper.missing, "skip")) missing = ESeriesMissing.Skip;
 
@@ -19536,14 +19535,14 @@ namespace Gekko
                 new Error("COLLAPSE cannot involve undated timeseries");
             }
 
-            GekkoTime first = ts_rhs.GetRealDataPeriodFirst(); //start of high-freq timeseries
-            GekkoTime last = ts_rhs.GetRealDataPeriodLast(); //end of high-freq timeseries
+            GekkoTime t1_highfreq = ts_rhs.GetRealDataPeriodFirst(); //start of high-freq timeseries
+            GekkoTime t2_highfreq = ts_rhs.GetRealDataPeriodLast(); //end of high-freq timeseries
 
             if (freq_rhs == EFreq.Q && freq_lhs == EFreq.A)
             {
                 //Conversion from Q to A
                 double vsum = double.NaN;
-                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_highfreq, t2_highfreq))
                 {
                     double value = ts_rhs.GetDataSimple(t);
                     if (t.sub == 1) vsum = 0d;
@@ -19572,7 +19571,7 @@ namespace Gekko
             {
                 //Conversion from M to A
                 double vsum = double.NaN;
-                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_highfreq, t2_highfreq))
                 {
 
                     double value = ts_rhs.GetDataSimple(t);
@@ -19602,7 +19601,7 @@ namespace Gekko
             {
                 //Conversion from M to Q
                 double vsum = double.NaN;
-                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_highfreq, t2_highfreq))
                 {
                     double value = ts_rhs.GetDataSimple(t);
                     int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
@@ -19641,18 +19640,22 @@ namespace Gekko
                 Series ts_daily = new Series(EFreq.D, null);                
                 InterpolateHelper(ts_daily, ts_rhs, "prorate");
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
-                helper2.missing = "m";  //will become NaN
+                if (missing != null) helper2.missing = missing.ToString().ToLower();  //a bit hacky
                 CollapseHelper(ts_lhs, ts_daily, method, helper2);
-                
+
+                //TODO TODO
+                //TODO TODO If we are using this for non-weeks, correct the seven
+                //TODO TODO
+                int seven = GekkoTimeStuff.numberOfDaysInAWeek;
+
                 if (emethod == ECollapseMethod.Avg)
                 {
                     foreach (GekkoTime gt in new GekkoTimeIterator(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast()))
                     {
-                        double fixme = 7d;  maybe counter should store this!
-                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) * fixme);  //nominator may be NaN
+                        double fixme = 7d;
+                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) * seven);  //nominator may be NaN
                     }
                 }
-
             }
             else if (freq_rhs == EFreq.D && (freq_lhs == EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M || freq_lhs == EFreq.W))
             {
@@ -19676,10 +19679,8 @@ namespace Gekko
                 GekkoTime gt_min = GekkoTime.tNull;
                 GekkoTime gt_max = GekkoTime.tNull;
                 Series counter = new Series(freq_lhs, null);  //will be semi-discared afterwards but practical here
-
-                //GekkoTime firstBroader = GekkoTime.FromDateTimeToGekkoTime(eFreq0, ISOWeek.GetYearStart(first.super));
-                //GekkoTime lastBroader = GekkoTime.FromDateTimeToGekkoTime(eFreq0, ISOWeek.GetYearEnd(last.super));
-                foreach (GekkoTime t in new GekkoTimeIterator(first, last))
+                                
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_highfreq, t2_highfreq))
                 {
                     double data = ts_rhs.GetDataSimple(t);
                     if (G.isNumericalError(data))
@@ -19708,8 +19709,20 @@ namespace Gekko
                     {
                         ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / counter.GetDataSimple(gt));  //nominator may be NaN
                     }
+                }                
+
+                //Now, handle if there are missing days at the beginning or end of
+                //the daily series, and this should invalidate the beginning/end of
+                //the collapsed series.
+                if (missing == ESeriesMissing.M)
+                {
+                    GekkoTime t_lhs_real1 = ts_lhs.GetRealDataPeriodFirst();
+                    GekkoTime t_lhs_real2 = ts_lhs.GetRealDataPeriodLast();
+                    GekkoTime fix1 = GekkoTime.ConvertFreqsFirst(freq_lhs, t1_highfreq.Add(-1), null);
+                    GekkoTime fix2 = GekkoTime.ConvertFreqsFirst(freq_lhs, t2_highfreq.Add(1), null);
+                    if (fix1.EqualsGekkoTime(t_lhs_real1)) ts_lhs.SetData(t_lhs_real1, double.NaN);
+                    if (fix2.EqualsGekkoTime(t_lhs_real2)) ts_lhs.SetData(t_lhs_real2, double.NaN);
                 }
-                helper.counter = counter;  //for potential use when collapsing from Weekly.
             }
             else
             {
