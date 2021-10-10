@@ -18443,7 +18443,41 @@ print(df2)
             _AssertSeries(First(), "x1!w", EFreq.W, 2003, 1, 6d, sharedDelta);
             _AssertSeries(First(), "x2!w", EFreq.W, 2002, 52, 1d / 1d, sharedDelta);
             _AssertSeries(First(), "x2!w", EFreq.W, 2003, 1, 6d / 2d, sharedDelta);
-
+            I("reset;");
+            I("OPTION freq d;");
+            I("TIME 2002m12d29 2003m1d1;");  //4 days            
+            I("SERIES x =   1, 2, 3, 4;");   // 1  <w>  2  ...  3  <y>  4
+            I("COLLAPSE <missing = m> x1!w = x!d total;");
+            I("COLLAPSE <missing = m> x2!w = x!d avg;");
+            _AssertSeries(First(), "x1!w", EFreq.W, 2002, 52, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!w", EFreq.W, 2003, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!w", EFreq.W, 2002, 52, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!w", EFreq.W, 2003, 1, double.NaN, sharedDelta);
+            I("reset;");
+            I("OPTION freq d;");
+            I("TIME 2002m12d29 2003m1d1;");  //one hole            
+            I("SERIES x =   1, 2, m(), 4;");
+            I("COLLAPSE <missing = m> x1!w = x!d total;");
+            I("COLLAPSE <missing = m> x2!w = x!d avg;");
+            _AssertSeries(First(), "x1!w", EFreq.W, 2002, 52, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!w", EFreq.W, 2003, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!w", EFreq.W, 2002, 52, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!w", EFreq.W, 2003, 1, double.NaN, sharedDelta);
+            // ---
+            //testing a week that has enough data to actually become a non-missing number
+            I("reset;");
+            I("OPTION freq d;");
+            I("TIME 2002m12d22 2003m1d1;");  //11 days, one hole            
+            I("SERIES x =   1, 2, 3, 4, 5, 6, 7, 8, m(), 10, 11;");  //the week 2002w52 spans numbers 2..8 here, starting 23/12 2002 and ending 29/12 2002.
+            I("COLLAPSE <missing = m> x1!w = x!d total;");
+            I("COLLAPSE <missing = m> x2!w = x!d avg;");
+            _AssertSeries(First(), "x1!w", EFreq.W, 2002, 51, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!w", EFreq.W, 2002, 52, 2d + 3d + 4d + 5d + 6d + 7d + 8d, sharedDelta);
+            _AssertSeries(First(), "x1!w", EFreq.W, 2003, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!w", EFreq.W, 2002, 51, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!w", EFreq.W, 2002, 52, (2d + 3d + 4d + 5d + 6d + 7d + 8d) / 7d, sharedDelta);
+            _AssertSeries(First(), "x2!w", EFreq.W, 2003, 1, double.NaN, sharedDelta);
+                       
 
             // ==========================================================================
             // ==========================================================================
