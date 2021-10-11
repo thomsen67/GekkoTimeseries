@@ -6616,7 +6616,7 @@ namespace Gekko
 
             if (Globals.workerThread != null)
             {
-                string ss2 = G.FreqAndPeriodPretty(false) + banks + "    |    " + workingFolder;
+                string ss2 = G.FreqAndPeriodPretty(false, false) + banks + "    |    " + workingFolder;
                 WorkerThreadHelper1 wh = new WorkerThreadHelper1();                
                 wh.statusField = ss2;
                 Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
@@ -16075,17 +16075,17 @@ namespace Gekko
         public static void Time(GekkoTime t1, GekkoTime t2)
         {
             Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(t1, t2, Program.options.freq);
-            
+
             G.CheckLegalPeriod(freqs.Item1, freqs.Item2);
 
             Globals.globalPeriodStart = freqs.Item1;
             Globals.globalPeriodEnd = freqs.Item2;
-            G.Writeln2("Global time set: " + G.FromDateToString(Globals.globalPeriodStart) + " to " + G.FromDateToString(Globals.globalPeriodEnd) + " (" + GekkoTime.Observations(Globals.globalPeriodStart, Globals.globalPeriodEnd) + " periods)");
+            G.Writeln2(G.FreqAndPeriodPretty(false, true));
             if (t1.freq != Program.options.freq || t2.freq != Program.options.freq)
             {
                 new Note("The dates have been converted to " + Program.options.freq.Pretty() + " frequency");
-            }            
-        }        
+            }
+        }
 
         /// <summary>
         /// TIMEFILTER command.

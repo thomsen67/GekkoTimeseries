@@ -3111,12 +3111,14 @@ namespace Gekko
         /// Pretty showing current frequency and period, like "Quarterly 2020q1-2024q4".
         /// </summary>
         /// <returns></returns>
-        public static string FreqAndPeriodPretty(bool lowerCaseFirstChar)
+        public static string FreqAndPeriodPretty(bool lowerCaseFirstChar, bool includeObservations)
         {
+            string observations = null;
+            if (includeObservations) observations = " (" + GekkoTime.Observations(Globals.globalPeriodStart, Globals.globalPeriodEnd) + " periods)";
             string start = G.FromDateToString(Globals.globalPeriodStart);
             string end = G.FromDateToString(Globals.globalPeriodEnd);
             string f = Program.options.freq.Pretty();
-            string ss2 = f + " " + start + "-" + end;
+            string ss2 = f + " " + start + "-" + end + observations;
             if (lowerCaseFirstChar) ss2 = char.ToLower(ss2[0]) + ss2.Substring(1);
             return ss2;
         }        
@@ -3144,7 +3146,7 @@ namespace Gekko
                 //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
                 string wf = "[empty]";
                 if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
-                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true);
+                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true, false);
             }
             else if (G.Equal(s, "short4"))
             {
@@ -3158,7 +3160,7 @@ namespace Gekko
                 //Gekko 3.0.1 (64-bit), working folder = g:\temp\gekko
                 string wf = "[empty]";
                 if (!string.IsNullOrEmpty(wf)) wf = Program.options.folder_working;
-                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true) + ", working folder = " + wf;
+                rv = "Gekko " + Globals.gekkoVersion + " (" + Program.Get64Bitness(1) + "-bit), " + G.FreqAndPeriodPretty(true, false) + ", working folder = " + wf;
             }
             else
             {

@@ -8332,7 +8332,7 @@ namespace Gekko
             }
             public static void Q()
             {                
-                new Writeln(G.FreqAndPeriodPretty(false));
+                new Writeln(G.FreqAndPeriodPretty(false, true));
             }
 
             
