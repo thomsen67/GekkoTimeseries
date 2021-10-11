@@ -405,27 +405,28 @@ namespace Gekko
         /// Converts from a string like "2020q2" or "2020k2" or "2020m04d02" to a GekkoTime struct. Trailing "a" or "a1" or "u" or "u1" allowed. A string like "98" will be understood as 1998.
         /// </summary>
         /// <param name="s"></param>
-        /// <param name="allowKForQuarters"></param>
+        /// <param name="allowKForQuartersAndUForWeeks"></param>
         /// <returns></returns>
-        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuarters)
+        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuartersAndUForWeeks)
         {
-            return FromStringToGekkoTime(s, allowKForQuarters, true);
+            return FromStringToGekkoTime(s, allowKForQuartersAndUForWeeks, true);
         }
 
         /// <summary>
         /// Converts from a string like "2020q2" or "2020k2" or "2020m04d02" to a GekkoTime struct. Trailing "a" or "a1" or "u" or "u1" allowed. A string like "98" will be understood as 1998.
         /// </summary>
         /// <param name="s"></param>
-        /// <param name="allowKForQuarters"></param>
+        /// <param name="allowKForQuartersAndUForWeeks"></param>
         /// <param name="reportError"></param>
         /// <returns></returns>
-        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuarters, bool reportError)
+        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuartersAndUForWeeks, bool reportError)
         {
             //To do the reverse: see G.FromDateToString()   
 
-            //trailing a or a1 accepted: 2001a, 2001a1
-            //trailing u or u1 accepted: 2001u, 2001u1
-            //k may be accepted for dates (allowK...)
+            //trailing a or a1 accepted for annual: 2001a, 2001a1
+            //trailing u accepted for undated: 2001u, 2001u1
+            //k{i} may be accepted for dates (allowK...)
+            //u[i} may be accepted for dates (allowK...)
             //two digits like 98 are understood as annual 1998
             //else: 2001, 2001q1, 2001m1, 2001m1d15
 
@@ -484,6 +485,8 @@ namespace Gekko
             //now other freqs
             //now other freqs
             //now other freqs
+                        
+            bool weekU = allowKForQuartersAndUForWeeks && (s.Contains("u") || s.Contains("U")) && char.IsDigit(s[s.Length - 1]);
 
             if (s.Contains("q") || s.Contains("Q"))
             {
@@ -507,7 +510,7 @@ namespace Gekko
                 }
                 t = new GekkoTime(EFreq.Q, y1, q1);
             }
-            else if (allowKForQuarters && (s.Contains("k") || s.Contains("K")))
+            else if (allowKForQuartersAndUForWeeks && (s.Contains("k") || s.Contains("K")))
             {
                 string[] temp1 = s.Split(new char[] { 'k', 'K' });
                 int y1 = -12345;
@@ -590,7 +593,6 @@ namespace Gekko
             }
             else if (s.Contains("w") || s.Contains("W"))
             {
-
                 string[] temp1 = s.Split(new char[] { 'w', 'W' });
                 int y1 = -12345;
                 int w1 = -12345;
@@ -607,16 +609,35 @@ namespace Gekko
                 bool error = G.CheckWeekNumberAndMaybePrintErrorMessage(y1, w1, reportError);
                 if (error) return GekkoTime.tNull;  //if there is an error and reportError = true above, we will not get here.                
                 t = new GekkoTime(EFreq.W, y1, w1);
-
+            }
+            else if (weekU)
+            {
+                string[] temp1 = s.Split(new char[] { 'u', 'U' });
+                int y1 = -12345;
+                int w1 = -12345;
+                try
+                {
+                    y1 = G.findYear(int.Parse(temp1[0]));
+                    w1 = int.Parse(temp1[1]);
+                }
+                catch
+                {
+                    if (reportError) new Error("Could not parse " + s + " as a weekly date");
+                    else return GekkoTime.tNull;
+                }
+                bool error = G.CheckWeekNumberAndMaybePrintErrorMessage(y1, w1, reportError);
+                if (error) return GekkoTime.tNull;  //if there is an error and reportError = true above, we will not get here.                
+                t = new GekkoTime(EFreq.W, y1, w1);
             }
             else if (s.Contains("u") || s.Contains("U"))
             {
                 string s2 = s;
-                if (s.EndsWith("u1", StringComparison.OrdinalIgnoreCase))
-                {
-                    s2 = s.Substring(0, s.Length - 2);
-                }
-                else if (s.EndsWith("u", StringComparison.OrdinalIgnoreCase))
+                //u1 not allowed for undated anymore: can be confused with weeks...
+                //if (s.EndsWith("u1", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    s2 = s.Substring(0, s.Length - 2);
+                //}
+                if (s.EndsWith("u", StringComparison.OrdinalIgnoreCase))
                 {
                     s2 = s.Substring(0, s.Length - 1);
                 }

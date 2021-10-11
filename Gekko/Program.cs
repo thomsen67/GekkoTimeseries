@@ -5362,6 +5362,10 @@ namespace Gekko
                         {
                             freq = "q"; //2020q1
                         }
+                        if (s3.IndexOf("u", StringComparison.OrdinalIgnoreCase) != -1)
+                        {
+                            freq = "w"; //2020w1
+                        }
                         if (s3.IndexOf("w", StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             freq = "w"; //2020w1

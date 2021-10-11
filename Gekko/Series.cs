@@ -581,13 +581,11 @@ namespace Gekko
         private void FreqError(GekkoTime t)
         {
             new Error("Frequency mismatch: " + this.freq.Pretty() + " versus " + t.freq.Pretty());
-            //throw new GekkoException();
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
         {
             new Error("Type error regarding concat and SERIES"); return null;
-            //throw new GekkoException();
         }
 
         public void SetTimelessData(double value)

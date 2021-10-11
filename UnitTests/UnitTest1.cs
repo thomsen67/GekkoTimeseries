@@ -8241,6 +8241,13 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("RUN dnmud;");
 
+            //Tests weekly series download from statbank, also tests px read.
+            I("RESET;");  //https://www.statistikbanken.dk/statbank5a/SelectVarVal/Define.asp?Maintable=EKSP02&PLanguage=0
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("option freq w;");
+            I("time 2020 2021;");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' eksp02.json;");            
+            _AssertSeries(First(), "eksp02_BNOEGLE_30!w", EFreq.W, 2020, 1, 12158d, sharedDelta);
         }
 
         [TestMethod]
