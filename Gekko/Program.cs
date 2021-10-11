@@ -19834,30 +19834,13 @@ namespace Gekko
                         divide = GekkoTimeStuff.numberOfDaysInAWeek;
                     }
                     else if (G.Equal(method, "prorate"))
-                    {
-                        //TODO TODO
-                        //TODO TODO
-                        //TODO TODO
-                        //TODO TODO
-                        //TODO TODO
-                        GekkoTime gt7 = GekkoTime.ConvertFreqsFirst(freq_rhs, t5, null);  //first/last method will yield the same, we are converting from high-freq to lower-freq
-                        GekkoTime gt8 = GekkoTime.ConvertFreqsFirst(EFreq.D, gt7, null);
-                        GekkoTime gt9 = GekkoTime.ConvertFreqsLast(EFreq.D, gt7);
-                        int n = GekkoTime.Observations(gt8, gt9);
-                        //DateTime dt = GekkoTime.FromGekkoTimeToDateTime(new GekkoTime(EFreq.M, t5.super, t5.sub), O.GetDateChoices.FlexibleEnd);
-                        divide = n;
+                    {                        
+                        GekkoTime gt7 = GekkoTime.ConvertFreqsFirst(freq_rhs, t5, null);  //first/last method will yield the same, we are converting from high-freq to lower-freq                        
+                        divide = GekkoTime.Observations(GekkoTime.ConvertFreqsFirst(EFreq.D, gt7, null), GekkoTime.ConvertFreqsLast(EFreq.D, gt7));
                     }
                     ts_daily.SetData(t5, ts_daily.GetDataSimple(t5) / divide);
                 }
                 CollapseHelper(ts_lhs, ts_daily, "total", new CollapseHelper());
-                //GekkoTime t1_lhs = ts_lhs.GetRealDataPeriodFirst();
-                //if (t1_lhs.IsNull()) new Error("The output series has no data.");
-                //GekkoTime t2_lhs = ts_lhs.GetRealDataPeriodLast();
-                //foreach (GekkoTime t5 in new GekkoTimeIterator(t1_lhs, t2_lhs))  //t5 is weekly freq
-                //{
-                //    GekkoTime lastDay=ISOWeek.ToDateTime(t5, )
-                //    ts_lhs.SetData(t5, ts_lhs.GetDataSimple(t5) * 31d / (double)GekkoTimeStuff.numberOfDaysInAWeek);
-                //}
             }
             else
             {

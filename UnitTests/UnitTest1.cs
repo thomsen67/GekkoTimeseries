@@ -17752,8 +17752,6 @@ print(df2)
             }
             _AssertSeries(First(), "x1!m", EFreq.M, 2002, 4, double.NaN, sharedDelta);
 
-
-
             // ================================
             //        M to W
             // ================================
@@ -17785,6 +17783,8 @@ print(df2)
             I("TIME 2004m12 2005m1;");
             I("x!m = 3, 4;");
             I("INTERPOLATE x!w = x!m repeat;");
+            I("option freq w; time 2004w49 2005w5;");
+            I("%sum = sumt(x!w);");
             _AssertSeries(First(), "x!w", EFreq.W, 2004, 48, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!w", EFreq.W, 2004, 49, 5d / 7d * 3d, sharedDelta);
             _AssertSeries(First(), "x!w", EFreq.W, 2004, 50, 3d, sharedDelta);
@@ -17797,17 +17797,43 @@ print(df2)
             _AssertSeries(First(), "x!w", EFreq.W, 2005, 4, 4d, sharedDelta);
             _AssertSeries(First(), "x!w", EFreq.W, 2005, 5, 1d / 7d * 4d, sharedDelta);
             _AssertSeries(First(), "x!w", EFreq.W, 2005, 6, double.NaN, sharedDelta);
+            _AssertScalarVal(First(), "%sum", 3d * 31d / 7d + 4d * 31d / 7d, sharedDelta);  //both the months we are splitting out have 31 days.
             I("INTERPOLATE x!w = x!m prorate;");
-            //TODO
-            //TODO
-            //TODO
-            //TODO
-            //TODO
-            //TODO
-            //TODO
-            //TODO
-            //TODO
-            
+            I("%sum = sumt(x!w);");
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 48, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 49, 5d / 31d * 3d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 50, 3d * 7d / 31d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 51, 3d * 7d / 31d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 52, 3d * 7d / 31d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 53, 5d / 31d * 3d + 2d / 31d * 4d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 1, 4d * 7d / 31d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 2, 4d * 7d / 31d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 3, 4d * 7d / 31d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 4, 4d * 7d / 31d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 5, 1d / 31d * 4d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 6, double.NaN, sharedDelta);
+            _AssertScalarVal(First(), "%sum", 3d + 4d, sharedDelta);
+
+            // ================================
+            //        Q to W
+            // ================================
+
+            //Only superficial testing: see m to w for more elaborate test
+
+            I("reset;");
+            I("OPTION freq q;");
+            I("TIME 2004q4 2005q1;");
+            I("x!q = 3, 4;");
+            I("INTERPOLATE x!w = x!q repeat;");
+            I("option freq w; time 2004w40 2005w13;");
+            I("%sum = sumt(x!w);");
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 39, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2004, 41, 3d, sharedDelta);            
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 12, 4d, sharedDelta);
+            _AssertSeries(First(), "x!w", EFreq.W, 2005, 14, double.NaN, sharedDelta);
+            I("INTERPOLATE x!w = x!q prorate;");
+            I("%sum = sumt(x!w);");            
+            _AssertScalarVal(First(), "%sum", 3d + 4d, sharedDelta);
 
             // ================================
             //        A to D
