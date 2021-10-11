@@ -457,6 +457,10 @@ namespace Gekko
         /// <param name="gt2"></param>
         public static void PickFromAllFreqs(AllFreqsHelper dates, EFreq freqHere, out GekkoTime gt1, out GekkoTime gt2)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             if (freqHere == EFreq.A)
             {
                 gt1 = dates.t1Annual;
@@ -472,6 +476,11 @@ namespace Gekko
                 gt1 = dates.t1Monthly;
                 gt2 = dates.t2Monthly;
             }
+            else if (freqHere == EFreq.W)
+            {
+                gt1 = dates.t1Weekly;
+                gt2 = dates.t2Weekly;
+            }
             else if (freqHere == EFreq.D)
             {
                 gt1 = dates.t1Daily;
@@ -485,7 +494,6 @@ namespace Gekko
             else
             {
                 new Error("Freq error"); gt1 = GekkoTime.tNull; gt2 = GekkoTime.tNull;
-                //throw new GekkoException();
             }
         }
 

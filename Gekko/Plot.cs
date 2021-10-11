@@ -689,6 +689,10 @@ namespace Gekko
             {
                 widthForBoxes = 1d / 12d;
             }
+            else if (highestFreq == EFreq.W)
+            {
+                widthForBoxes = 1d / 53d;
+            }
             else if (highestFreq == EFreq.D)
             {
                 widthForBoxes = 1d / 366d;
@@ -995,6 +999,11 @@ namespace Gekko
                 numberOfMinorTics = 12;
                 extra = (double)o.t2.sub / (double)numberOfMinorTics;
             }
+            else if (highestFreq == EFreq.W)
+            {
+                numberOfMinorTics = 53;
+                extra = (double)o.t2.sub / (double)numberOfMinorTics;
+            }
             else if (highestFreq == EFreq.D)
             {
                 numberOfMinorTics = 12; //we show month minor tics                    
@@ -1052,7 +1061,7 @@ namespace Gekko
                 //                          FREQUENCY LOCATION, indicates where to implement more frequencies
                 //========================================================================================================
 
-                if ((highestFreq == EFreq.M && years <= 25) || (highestFreq == EFreq.Q && years <= 75) || highestFreq == EFreq.D)
+                if ((highestFreq == EFreq.Q && years <= 75) || (highestFreq == EFreq.M && years <= 25) || (highestFreq == EFreq.W && years <= 6) || highestFreq == EFreq.D)
                 {
                     for (int tt = 1; tt < numberOfMinorTics; tt++)  //is skipped if sub = 1
                     {
