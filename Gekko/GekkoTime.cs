@@ -917,7 +917,7 @@ namespace Gekko
                     if (t.freq == EFreq.A)
                     {
                         //from A to W                        
-                        tt = ConvertFreqsFirstHelperAnnual(t.super);
+                        tt = ISOWeekFirstDayInYear(t.super);
                     }
                     else if (t.freq == EFreq.Q)
                     {
@@ -1113,7 +1113,7 @@ namespace Gekko
                     if (t.freq == EFreq.A)
                     {
                         //from A to W                        
-                        tt = ConvertFreqsLastHelperAnnual(t.super);
+                        tt = ISOWeekLastDayInYear(t.super);
                     }
                     else if (t.freq == EFreq.Q)
                     {
@@ -1210,7 +1210,7 @@ namespace Gekko
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        public static GekkoTime ConvertFreqsFirstHelperAnnual(int year)
+        public static GekkoTime ISOWeekFirstDayInYear(int year)
         {            
             DateTime dt = new DateTime(year, 1, 1);
             GekkoTime tt = ISOWeek.ToGekkoTime(dt);
@@ -1223,7 +1223,7 @@ namespace Gekko
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        public static GekkoTime ConvertFreqsLastHelperAnnual(int year)
+        public static GekkoTime ISOWeekLastDayInYear(int year)
         {            
             DateTime dt = new DateTime(year, GekkoTimeStuff.numberOfMonths, 31);
             GekkoTime tt = ISOWeek.ToGekkoTime(dt);

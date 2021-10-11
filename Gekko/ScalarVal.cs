@@ -98,11 +98,11 @@ namespace Gekko
                 {                    
                     if (c == O.GetDateChoices.FlexibleStart)
                     {
-                        gt = GekkoTime.ConvertFreqsFirstHelperAnnual(year);
+                        gt = GekkoTime.ISOWeekFirstDayInYear(year);
                     }
                     else if (c == O.GetDateChoices.FlexibleEnd)
                     {
-                        gt = GekkoTime.ConvertFreqsLastHelperAnnual(year);
+                        gt = GekkoTime.ISOWeekLastDayInYear(year);
                     }                    
                 }
                 else if (Program.options.freq == EFreq.D)

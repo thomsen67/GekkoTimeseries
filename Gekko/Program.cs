@@ -19840,7 +19840,12 @@ namespace Gekko
                         //TODO TODO
                         //TODO TODO
                         //TODO TODO
-                        divide = 31;
+                        GekkoTime gt7 = GekkoTime.ConvertFreqsFirst(freq_rhs, t5, null);  //first/last method will yield the same, we are converting from high-freq to lower-freq
+                        GekkoTime gt8 = GekkoTime.ConvertFreqsFirst(EFreq.D, gt7, null);
+                        GekkoTime gt9 = GekkoTime.ConvertFreqsLast(EFreq.D, gt7);
+                        int n = GekkoTime.Observations(gt8, gt9);
+                        //DateTime dt = GekkoTime.FromGekkoTimeToDateTime(new GekkoTime(EFreq.M, t5.super, t5.sub), O.GetDateChoices.FlexibleEnd);
+                        divide = n;
                     }
                     ts_daily.SetData(t5, ts_daily.GetDataSimple(t5) / divide);
                 }
