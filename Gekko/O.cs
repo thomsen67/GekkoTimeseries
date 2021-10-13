@@ -9255,7 +9255,7 @@ namespace Gekko
             public List lhs = null;
             public List rhs = null;
             public string type = null;
-            public string opt_missing = null;
+            public string opt_missing = null;  //strict|flex
             public P p;
             public void Exe()
             {                

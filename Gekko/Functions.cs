@@ -3111,23 +3111,26 @@ namespace Gekko
             if (x.Length > 1)
             {
                 string s = O.ConvertToString(x[1]);
-                if (G.Equal(s, "total") || G.Equal(s, "avg") || G.Equal(s, "first") || G.Equal(s, "last"))
+                if (s.ToLower().StartsWith("total") || s.ToLower().StartsWith("avg") || s.ToLower().StartsWith("first") || s.ToLower().StartsWith("last"))
                 {
+                    // collapse(x!d, 'total') or collapse(x!d, 'avg-strict'), etc.
+                    // Not allowed to do collapse(x!d, 'total', 'a')
                     method = s;
-                    if (x.Length == 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the frequency first, and then the method.");
+                    if (x.Length >= 3) new Error("If you state a method as second argument, you cannot use further arguments. Alternatively, indicate the destination frequency first, and then the method.");
                 }
                 else
                 {
+                    // collapse(x!d, 'a') or collapse(x!d, 'q'), etc.
                     freq_destination = s;
                     if (x.Length == 3) method = O.ConvertToString(x[2]);
+                    if (x.Length > 3) new Error("Collapse() function has too many arguments.");
                 }
             }
 
             if (freq_destination == null)
             {
-                //state defaults
-                if (ts.freq == EFreq.A) new Error("You cannot collapse() an annual series.");
-                else if (ts.freq == EFreq.Q) freq_destination = "a";
+                //state defaults                
+                if (ts.freq == EFreq.Q) freq_destination = "a";
                 else if (ts.freq == EFreq.M) freq_destination = "q";
                 else if (ts.freq == EFreq.W) freq_destination = "m";  //will use fractions...
                 else if (ts.freq == EFreq.D) freq_destination = "m";  //not W!
@@ -3139,8 +3142,21 @@ namespace Gekko
 
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
 
-            if (method == null) method = "total";            
-            Program.CollapseHelper(tsNew, ts, method, new CollapseHelper());
+            string missing = null;
+            if (method != null)
+            {
+                string[] ss = method.Split('-');
+                if (ss.Length == 2)
+                {
+                    method = ss[0];
+                    missing = ss[1];
+                }
+            }
+
+            CollapseHelper helper = new CollapseHelper();
+            if (method != null) helper.method = method;
+            if (missing != null) helper.collapse_missing_d = missing;
+            Program.CollapseHelper(tsNew, ts, helper);
 
             return tsNew;
         }

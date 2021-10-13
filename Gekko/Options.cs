@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Gekko
 {
@@ -35,6 +36,11 @@ namespace Gekko
         //bugfix options (options starting with "bugfix_" are not shown in user manual or in "option?"
         public bool bugfix_import_export = false;  //not mentioned in help                     
         public bool bugfix_missing = true;  //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
+        // ---
+        //method options could look like the 2 following:
+        //public string collapse_method = "total";
+        //public string interpolate_method = "repeat";
+        public string collapse_missing_d = "flex";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
         // ---
         public bool databank_create_auto = true;             
         public bool databank_file_copylocal = true;
@@ -295,6 +301,12 @@ namespace Gekko
             
             Add("BUGFIX IMPORT EXPORT", Globals.xbool);
             Add("BUGFIX MISSING", Globals.xbool);
+              
+            //method options could look like the 2 following:
+            //Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg");
+            //Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
+            Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
+
             Add("DATABANK CREATE AUTO", Globals.xbool);
             Add("DATABANK FILE COPYLOCAL", Globals.xbool);
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);
@@ -525,7 +537,9 @@ namespace Gekko
                 
                 if (s_handmadeList != s_listFromReflection)
                 {
-                    new Error("Mismatch regarding options, cf. Options.Syntax()");
+                    //Very unlikely that this kind of error does not get caught during development
+                    MessageBox.Show("*** ERROR: Mismatch regarding options, cf. Options.Syntax()");
+                    throw new GekkoException();
                 }
                 i1++;
                 i2++;

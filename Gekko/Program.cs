@@ -142,12 +142,8 @@ namespace Gekko
 
     public class CollapseHelper
     {
-        //public Series counter = null;
-        public string missing = null; // collapse <missing = ...>
-        //public bool Q_AllowMissings = false; //not active
-        //public bool M_AllowMissings = false; //not active
-        //public bool W_AllowMissings = false;
-        //public bool D_AllowMissings = true;
+        public string method = "total";
+        public string collapse_missing_d = "flex"; // corresponds to collapse <strict|flex> = x!m = x!d;        
     }
 
     /// <summary>
@@ -19483,11 +19479,10 @@ namespace Gekko
                 Series ts_lhs =  O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must, false) as Series;
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
-                if (method == null) method = "total";
                 CollapseHelper helper = new CollapseHelper();
-                helper.missing = missing;
-                
-                CollapseHelper(ts_lhs, ts_rhs, method, helper);
+                if (method != null) helper.method = method;
+                if (missing != null) helper.collapse_missing_d = missing;
+                CollapseHelper(ts_lhs, ts_rhs, helper);
 
                 ts_lhs.Stamp();
                 ts_lhs.SetDirty(true);
@@ -19506,33 +19501,38 @@ namespace Gekko
         /// <param name="ts_rhs"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static void CollapseHelper(Series ts_lhs, Series ts_rhs, string method, CollapseHelper helper)
+        public static void CollapseHelper(Series ts_lhs, Series ts_rhs, CollapseHelper helper)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
             
-            bool strictMissingsForDailyData = false;
-
             ECollapseMethod emethod = ECollapseMethod.Total;  //note: .Count is not used here
-            if (G.Equal(method, "total")) emethod = ECollapseMethod.Total;
-            else if (G.Equal(method, "avg")) emethod = ECollapseMethod.Avg;
-            else if (G.Equal(method, "first")) emethod = ECollapseMethod.First;
-            else if (G.Equal(method, "last")) emethod = ECollapseMethod.Last;
+            if (G.Equal(helper.method, "total")) emethod = ECollapseMethod.Total;
+            else if (G.Equal(helper.method, "avg")) emethod = ECollapseMethod.Avg;
+            else if (G.Equal(helper.method, "first")) emethod = ECollapseMethod.First;
+            else if (G.Equal(helper.method, "last")) emethod = ECollapseMethod.Last;
             else new Error("Expected method to be 'total', 'avg', 'first' or 'last'.");
 
             EFreq freq_lhs = ts_lhs.freq;
             EFreq freq_rhs = ts_rhs.freq;
 
-            ESeriesMissing missing = ESeriesMissing.M;
-            if (freq_rhs == EFreq.D) missing = ESeriesMissing.Skip;
-            if (G.Equal(helper.missing, "m")) missing = ESeriesMissing.M;
-            else if (G.Equal(helper.missing, "skip")) missing = ESeriesMissing.Skip;
-
-            if (missing == ESeriesMissing.Skip && (freq_rhs == EFreq.Q || freq_rhs == EFreq.M))
+            if (helper.collapse_missing_d != null && !(G.Equal(helper.collapse_missing_d, "strict") || G.Equal(helper.collapse_missing_d, "flex")))
             {
-                new Error("option <missing = skip> not yet implemented for Q or M frequency.");
+                new Error("For <missing = ...> you must use 'strict' or 'flex', not '" + helper.collapse_missing_d + "'");
             }
+
+            string missingLower = "strict";
+            if (freq_rhs == EFreq.D)
+            {
+                missingLower = Program.options.collapse_missing_d.ToLower();
+                if (helper.collapse_missing_d != null) missingLower = helper.collapse_missing_d;
+            }
+
+            if (missingLower == "flex" && freq_rhs != EFreq.D)
+            {
+                new Error("COLLAPSE: You cannot use local option <flex> on an input series of " + freq_rhs.Pretty().ToLower() + " frequency.");
+            }            
 
             if (freq_rhs == EFreq.U || freq_lhs == EFreq.U)
             {
@@ -19637,7 +19637,7 @@ namespace Gekko
             {
                 //We first split the series to daily freq, so they are easier to collapse
 
-                if (G.Equal(method, "first") || G.Equal(method, "last"))
+                if (G.Equal(helper.method, "first") || G.Equal(helper.method, "last"))
                 {
                     new Error("When collapsing from Weekly freq, method 'first' or 'last' are not implemented.");
                 }
@@ -19645,8 +19645,10 @@ namespace Gekko
                 Series ts_daily = new Series(EFreq.D, null);                
                 InterpolateHelper(ts_daily, ts_rhs, "prorate");
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
-                if (missing != null) helper2.missing = missing.ToString().ToLower();  //a bit hacky
-                CollapseHelper(ts_lhs, ts_daily, method, helper2);
+                helper2.method = helper.method;
+                //if (missingLower != null) helper2.collapse_missing_d = missingLower;
+                helper2.collapse_missing_d = "strict";  //must be strict here
+                CollapseHelper(ts_lhs, ts_daily, helper2);
 
                 //TODO TODO
                 //TODO TODO
@@ -19675,19 +19677,7 @@ namespace Gekko
             }
             else if (freq_rhs == EFreq.D && (freq_lhs == EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M || freq_lhs == EFreq.W))
             {
-                //option collapse q missing = m;
-                //option collapse m missing = m;
-                //option collapse w missing = m;
-                //option collapse d missing = skip;
-                //collapse <missing = skip> x!w = x!d total;
-
-                //Conversion from D to A/Q/M/W  -- easy
-
-                //The idea is to span dates enough to collapse into any freq.
-                //This means spanning years, and a little more than that because weeks
-                //may spill around years.
-
-                if (G.Equal(method, "first") || G.Equal(method, "last"))
+                if (G.Equal(helper.method, "first") || G.Equal(helper.method, "last"))
                 {
                     new Error("When collapsing from Daily freq, method 'first' or 'last' are not implemented.");
                 }
@@ -19702,11 +19692,11 @@ namespace Gekko
                     if (G.isNumericalError(data))
                     {
                         //Note: these are only holes *inside * real data blocks, not surrounding them
-                        if (missing == ESeriesMissing.Skip)
+                        if (missingLower == "flex")
                         {
                             continue;  //skip it, and do not count it either.                            
                         }
-                        else if (missing == ESeriesMissing.M)
+                        else if (missingLower == "strict")
                         {
                             //live with it: missings will be encountered
                         }
@@ -19730,7 +19720,7 @@ namespace Gekko
                 //Now, handle if there are missing days at the beginning or end of
                 //the daily series, and this should invalidate the beginning/end of
                 //the collapsed series.
-                if (missing == ESeriesMissing.M)
+                if (missingLower == "strict")
                 {
                     GekkoTime t_lhs_real1 = ts_lhs.GetRealDataPeriodFirst();
                     GekkoTime t_lhs_real2 = ts_lhs.GetRealDataPeriodLast();
@@ -19844,7 +19834,10 @@ namespace Gekko
                     }
                     ts_daily.SetData(t5, ts_daily.GetDataSimple(t5) / divide);
                 }
-                CollapseHelper(ts_lhs, ts_daily, "total", new CollapseHelper());
+                CollapseHelper helper2 = new CollapseHelper();
+                helper2.method = "total";
+                helper2.collapse_missing_d = "strict";
+                CollapseHelper(ts_lhs, ts_daily, helper2);
             }
             else
             {
