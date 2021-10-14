@@ -17908,7 +17908,7 @@ print(df2)
             //_AssertScalarVal(First(), "%sum", 3d + 4d, sharedDelta);
             _AssertScalarVal(First(), "%sum", 6.38709677419355, sharedDelta);  //probably ok as number (close to 7)
 
-            //M to W with alternating data and holes
+            //M to W with alternating data and holes -------------------
 
             I("reset;");
             I("option freq m;");

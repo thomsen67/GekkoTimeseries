@@ -11368,29 +11368,28 @@ namespace Gekko
         /// Used in CollapsePoints(), see this method
         /// </summary>
         /// <param name="ts"></param>
-        /// <param name="counter"></param>
+        /// <param name="countPeriods"></param>
         /// <param name="data"></param>
         /// <param name="gt"></param>
         /// <param name="method"></param>
         /// <param name="gt_min"></param>
         /// <param name="gt_max"></param>
-        private static void HandleCollapseData(Series ts, Series counter, double data, GekkoTime gt, ECollapseMethod method, ref GekkoTime gt_min, ref GekkoTime gt_max)
+        private static void HandleCollapseData(bool isPoints, Series ts, Series countPeriods, Series countNonMissing, double data, GekkoTime gt, ECollapseMethod method)
         {
-            if (gt_min.IsNull()) gt_min = gt;
-            else
-            {
-                if (gt.StrictlySmallerThan(gt_min)) gt_min = gt;
-            }
-
-            if (gt_max.IsNull()) gt_max = gt;
-            else
-            {
-                if (gt.StrictlyLargerThan(gt_max)) gt_max = gt;
-            }
-
             if (double.IsNaN(ts.GetDataSimple(gt)))
             {
-                ts.SetData(gt, data);
+                if (isPoints)
+                {
+                    ts.SetData(gt, data);  //first point in this bucket
+                }
+                else
+                {
+                    double count = countPeriods.GetDataSimple(gt);
+                    if (double.IsNaN(count) || count == 0d)  //the latter can probably not happen
+                    {
+                        ts.SetData(gt, data);  //first observation allows NaN to become a value
+                    }
+                }
             }
             else
             {
@@ -11409,13 +11408,25 @@ namespace Gekko
                 }
             }
 
-            if (double.IsNaN(counter.GetDataSimple(gt)))
+            if (double.IsNaN(countPeriods.GetDataSimple(gt)))
             {
-                counter.SetData(gt, 1d);  //first one
+                countPeriods.SetData(gt, 1d);  //first one
             }
             else
             {
-                counter.SetData(gt, counter.GetDataSimple(gt) + 1d); //add 1
+                countPeriods.SetData(gt, countPeriods.GetDataSimple(gt) + 1d); //add 1
+            }
+
+            if (!double.IsNaN(data))
+            {
+                if (double.IsNaN(countNonMissing.GetDataSimple(gt)))
+                {
+                    countNonMissing.SetData(gt, 1d);  //first one
+                }
+                else
+                {
+                    countNonMissing.SetData(gt, countNonMissing.GetDataSimple(gt) + 1d); //add 1
+                }
             }
         }
 
@@ -11539,22 +11550,20 @@ namespace Gekko
                 }
                 nameList.Add(s);
             }
-
-            GekkoTime gt_min = GekkoTime.tNull;
-            GekkoTime gt_max = GekkoTime.tNull;
-
+            
             for (int i = i_data; i <= matrix.GetRowMaxNumber(); i++)
             {
                 string varnameWithFreq = G.Chop_AddFreq(nameList[i - i_data], G.ConvertFreq(freq));
                 Series ts = new Series(freq, varnameWithFreq);
                 Series counter = new Series(freq, null);  //will be discared afterwards but practical here
+                Series countNonMissing = new Series(freq, null);  //will be discared afterwards but practical here
                 for (int j = j_data; j <= matrix.GetColMaxNumber(); j++)
                 {
                     DateTime dt = dateList[j - j_data];
                     CellLight c = matrix.Get(i, j);
                     double v = Program.GetValueFromSpreadsheetCell(isTranspose, i, j, c);                    
                     GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(freq, dt);
-                    HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
+                    HandleCollapseData(true, ts, counter, countNonMissing, v, gt, emethod);
                 }
 
                 if (emethod == ECollapseMethod.Avg)
@@ -11605,7 +11614,6 @@ namespace Gekko
             int vars = matrix.GetRowMaxNumber() - i_data + 1;
             int obs = matrix.GetColMaxNumber() - j_data + 1;
             G.Writeln("Imported " + vars + " timeseries from " + obs + " data points");
-            G.Writeln("The collapsed series (" + freq.Pretty() + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
 
         /// <summary>
@@ -19633,7 +19641,7 @@ namespace Gekko
                     }
                 }
             }
-            else if (freq_rhs == EFreq.W && (freq_lhs==EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M))
+            else if (freq_rhs == EFreq.W && (freq_lhs == EFreq.A || freq_lhs == EFreq.Q || freq_lhs == EFreq.M))
             {
                 //We first split the series to daily freq, so they are easier to collapse
 
@@ -19642,7 +19650,7 @@ namespace Gekko
                     new Error("When collapsing from Weekly freq, method 'first' or 'last' are not implemented.");
                 }
 
-                Series ts_daily = new Series(EFreq.D, null);                
+                Series ts_daily = new Series(EFreq.D, null);
                 InterpolateHelper(ts_daily, ts_rhs, "prorate");
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
                 helper2.method = helper.method;
@@ -19682,11 +19690,16 @@ namespace Gekko
                     new Error("When collapsing from Daily freq, method 'first' or 'last' are not implemented.");
                 }
 
-                GekkoTime gt_min = GekkoTime.tNull;
-                GekkoTime gt_max = GekkoTime.tNull;
-                Series counter = new Series(freq_lhs, null);  //will be semi-discared afterwards but practical here
-                                
-                foreach (GekkoTime t in new GekkoTimeIterator(t1_highfreq, t2_highfreq))
+                Series countPeriods = new Series(freq_lhs, null);  //will be semi-discared afterwards but practical here
+                Series countNonMissing = new Series(freq_lhs, null); //will be semi-discared afterwards but practical here
+
+                GekkoTime loopx1 = GekkoTime.ConvertFreqsFirst(freq_lhs, t1_highfreq, null);  //first/last is not important here
+                GekkoTime loopx2 = GekkoTime.ConvertFreqsLast(freq_lhs, t2_highfreq); //first/last is not important here
+
+                GekkoTime loop1 = GekkoTime.ConvertFreqsFirst(freq_rhs, loopx1, null);  //first/last is important here
+                GekkoTime loop2 = GekkoTime.ConvertFreqsLast(freq_rhs, loopx2); //first/last is important here
+
+                foreach (GekkoTime t in new GekkoTimeIterator(loop1, loop2))
                 {
                     double data = ts_rhs.GetDataSimple(t);
                     if (G.isNumericalError(data))
@@ -19706,28 +19719,33 @@ namespace Gekko
                         }
                     }
                     GekkoTime gt = GekkoTime.ConvertFreqsFirst(freq_lhs, t, null);  //...FreqsFirst() --> could just as well be ...FreqsLast(), since we are converting from the highest frequency availiable (days)
-                    HandleCollapseData(ts_lhs, counter, data, gt, emethod, ref gt_min, ref gt_max);
+                    HandleCollapseData(false, ts_lhs, countPeriods, countNonMissing, data, gt, emethod);
                 }
+
+                ////Now, handle if there are missing days at the beginning or end of
+                ////the daily series, and this should invalidate the beginning/end of
+                ////the collapsed series.
+                //if (missingLower == "strict")
+                //{
+                //    GekkoTime t_lhs_real1 = ts_lhs.GetRealDataPeriodFirst();
+                //    GekkoTime t_lhs_real2 = ts_lhs.GetRealDataPeriodLast();
+                //    GekkoTime fix1 = GekkoTime.ConvertFreqsFirst(freq_lhs, t1_highfreq.Add(-1), null);
+                //    GekkoTime fix2 = GekkoTime.ConvertFreqsFirst(freq_lhs, t2_highfreq.Add(1), null);
+                //    if (fix1.EqualsGekkoTime(t_lhs_real1)) ts_lhs.SetData(t_lhs_real1, double.NaN);
+                //    if (fix2.EqualsGekkoTime(t_lhs_real2)) ts_lhs.SetData(t_lhs_real2, double.NaN);
+                //}
 
                 if (emethod == ECollapseMethod.Avg)
                 {
-                    foreach (GekkoTime gt in new GekkoTimeIterator(ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast()))
+                    GekkoTime time1 = ts_lhs.GetRealDataPeriodFirst();
+                    if (!time1.IsNull())
                     {
-                        ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / counter.GetDataSimple(gt));  //nominator may be NaN
+                        GekkoTime time2 = ts_lhs.GetRealDataPeriodLast();
+                        foreach (GekkoTime gt in new GekkoTimeIterator(time1, time2))
+                        {
+                            ts_lhs.SetData(gt, ts_lhs.GetDataSimple(gt) / countPeriods.GetDataSimple(gt));  //nominator may be NaN
+                        }
                     }
-                }                
-
-                //Now, handle if there are missing days at the beginning or end of
-                //the daily series, and this should invalidate the beginning/end of
-                //the collapsed series.
-                if (missingLower == "strict")
-                {
-                    GekkoTime t_lhs_real1 = ts_lhs.GetRealDataPeriodFirst();
-                    GekkoTime t_lhs_real2 = ts_lhs.GetRealDataPeriodLast();
-                    GekkoTime fix1 = GekkoTime.ConvertFreqsFirst(freq_lhs, t1_highfreq.Add(-1), null);
-                    GekkoTime fix2 = GekkoTime.ConvertFreqsFirst(freq_lhs, t2_highfreq.Add(1), null);
-                    if (fix1.EqualsGekkoTime(t_lhs_real1)) ts_lhs.SetData(t_lhs_real1, double.NaN);
-                    if (fix2.EqualsGekkoTime(t_lhs_real2)) ts_lhs.SetData(t_lhs_real2, double.NaN);
                 }
             }
             else
