@@ -3155,7 +3155,7 @@ namespace Gekko
 
             CollapseHelper helper = new CollapseHelper();
             if (method != null) helper.method = method;
-            if (missing != null) helper.collapse_missing_d = missing;
+            if (missing != null) helper.collapse_missing = missing;
             Program.CollapseHelper(tsNew, ts, helper);
 
             return tsNew;

@@ -143,7 +143,7 @@ namespace Gekko
     public class CollapseHelper
     {
         public string method = "total";
-        public string collapse_missing_d = "flex"; // corresponds to collapse <strict|flex> = x!m = x!d;        
+        public string collapse_missing = null; // corresponds to collapse <strict|flex> = x!m = x!d;        
     }
 
     /// <summary>
@@ -19489,7 +19489,7 @@ namespace Gekko
 
                 CollapseHelper helper = new CollapseHelper();
                 if (method != null) helper.method = method;
-                if (missing != null) helper.collapse_missing_d = missing;
+                if (missing != null) helper.collapse_missing = missing;
                 CollapseHelper(ts_lhs, ts_rhs, helper);
 
                 ts_lhs.Stamp();
@@ -19525,23 +19525,28 @@ namespace Gekko
             EFreq freq_lhs = ts_lhs.freq;
             EFreq freq_rhs = ts_rhs.freq;
 
-            if (helper.collapse_missing_d != null && !(G.Equal(helper.collapse_missing_d, "strict") || G.Equal(helper.collapse_missing_d, "flex")))
+            if (helper.collapse_missing != null && !(G.Equal(helper.collapse_missing, "strict") || G.Equal(helper.collapse_missing, "flex")))
             {
-                new Error("For <missing = ...> you must use 'strict' or 'flex', not '" + helper.collapse_missing_d + "'");
+                new Error("For <missing = ...> you must use 'strict' or 'flex', not '" + helper.collapse_missing + "'");
             }
 
             string missingLower = "strict";
             if (freq_rhs == EFreq.D)
             {
                 missingLower = Program.options.collapse_missing_d.ToLower();
-                if (helper.collapse_missing_d != null) missingLower = helper.collapse_missing_d;
+                if (helper.collapse_missing != null) missingLower = helper.collapse_missing.ToLower();
             }
-
-            if (missingLower == "flex" && freq_rhs != EFreq.D)
+            else
             {
-                new Error("COLLAPSE: You cannot use local option <flex> on an input series of " + freq_rhs.Pretty().ToLower() + " frequency.");
-            }            
-
+                //non-daily RHS
+                missingLower = "strict";  //default, has no global option default like daily
+                if (helper.collapse_missing != null) missingLower = helper.collapse_missing.ToLower();
+                if (G.Equal(missingLower, "flex"))
+                {
+                    new Error("COLLAPSE: You cannot use local option <missing=flex> on an input series of " + freq_rhs.Pretty().ToLower() + " frequency.");
+                }
+            }
+            
             if (freq_rhs == EFreq.U || freq_lhs == EFreq.U)
             {
                 new Error("COLLAPSE cannot involve undated timeseries");
@@ -19655,7 +19660,8 @@ namespace Gekko
                 CollapseHelper helper2 = new CollapseHelper();  //fetches the count series. Using this is more robust than trying to infer the number of observations from two dates
                 helper2.method = helper.method;
                 //if (missingLower != null) helper2.collapse_missing_d = missingLower;
-                helper2.collapse_missing_d = "strict";  //must be strict here
+                helper2.collapse_missing = "strict";  //must be strict here
+                if (Globals.collapseFlexOverride) helper2.collapse_missing = "flex";  //only for unit test, not legal
                 CollapseHelper(ts_lhs, ts_daily, helper2);
 
                 //TODO TODO
@@ -19692,14 +19698,13 @@ namespace Gekko
 
                 Series countPeriods = new Series(freq_lhs, null);  //will be semi-discared afterwards but practical here
                 Series countNonMissing = new Series(freq_lhs, null); //will be semi-discared afterwards but practical here
+                
+                //for the first and last highfreq real observations, find the first/last observation of the corresponding "parent" (lower freq) time period.
+                //this way, missing values at the start/end of the "parent" time period can be detected conveniently
+                GekkoTime t1_highfreq_adjusted = GekkoTime.ConvertFreqsFirst(freq_rhs, GekkoTime.ConvertFreqsFirst(freq_lhs, t1_highfreq, null), null);  //first/last is important here
+                GekkoTime t2_highfreq_adjusted = GekkoTime.ConvertFreqsLast(freq_rhs, GekkoTime.ConvertFreqsLast(freq_lhs, t2_highfreq)); //first/last is important here
 
-                GekkoTime loopx1 = GekkoTime.ConvertFreqsFirst(freq_lhs, t1_highfreq, null);  //first/last is not important here
-                GekkoTime loopx2 = GekkoTime.ConvertFreqsLast(freq_lhs, t2_highfreq); //first/last is not important here
-
-                GekkoTime loop1 = GekkoTime.ConvertFreqsFirst(freq_rhs, loopx1, null);  //first/last is important here
-                GekkoTime loop2 = GekkoTime.ConvertFreqsLast(freq_rhs, loopx2); //first/last is important here
-
-                foreach (GekkoTime t in new GekkoTimeIterator(loop1, loop2))
+                foreach (GekkoTime t in new GekkoTimeIterator(t1_highfreq_adjusted, t2_highfreq_adjusted))
                 {
                     double data = ts_rhs.GetDataSimple(t);
                     if (G.isNumericalError(data))
@@ -19720,20 +19725,7 @@ namespace Gekko
                     }
                     GekkoTime gt = GekkoTime.ConvertFreqsFirst(freq_lhs, t, null);  //...FreqsFirst() --> could just as well be ...FreqsLast(), since we are converting from the highest frequency availiable (days)
                     HandleCollapseData(false, ts_lhs, countPeriods, countNonMissing, data, gt, emethod);
-                }
-
-                ////Now, handle if there are missing days at the beginning or end of
-                ////the daily series, and this should invalidate the beginning/end of
-                ////the collapsed series.
-                //if (missingLower == "strict")
-                //{
-                //    GekkoTime t_lhs_real1 = ts_lhs.GetRealDataPeriodFirst();
-                //    GekkoTime t_lhs_real2 = ts_lhs.GetRealDataPeriodLast();
-                //    GekkoTime fix1 = GekkoTime.ConvertFreqsFirst(freq_lhs, t1_highfreq.Add(-1), null);
-                //    GekkoTime fix2 = GekkoTime.ConvertFreqsFirst(freq_lhs, t2_highfreq.Add(1), null);
-                //    if (fix1.EqualsGekkoTime(t_lhs_real1)) ts_lhs.SetData(t_lhs_real1, double.NaN);
-                //    if (fix2.EqualsGekkoTime(t_lhs_real2)) ts_lhs.SetData(t_lhs_real2, double.NaN);
-                //}
+                }                
 
                 if (emethod == ECollapseMethod.Avg)
                 {
@@ -19854,7 +19846,8 @@ namespace Gekko
                 }
                 CollapseHelper helper2 = new CollapseHelper();
                 helper2.method = "total";
-                helper2.collapse_missing_d = "strict";
+                helper2.collapse_missing = "strict";
+                if (Globals.collapseFlexOverride) helper2.collapse_missing = "flex";  //only for unit test, not legal
                 CollapseHelper(ts_lhs, ts_daily, helper2);
             }
             else
