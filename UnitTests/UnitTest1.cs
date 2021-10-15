@@ -18001,8 +18001,10 @@ print(df2)
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 21, 1d, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 21, double.NaN, sharedDelta);
                     //
-                    _AssertSeries(First(), "x1!w", EFreq.W, 2001, 22, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "x2!w", EFreq.W, 2001, 22, double.NaN, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x1!w", EFreq.W, 2001, 22, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 22, 4d / 7d, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2001, 22, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x2!w", EFreq.W, 2001, 22, 3d / 7d, sharedDelta);
                     //
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 23, double.NaN, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 23, 1d, sharedDelta);
@@ -18013,8 +18015,10 @@ print(df2)
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 25, double.NaN, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 25, 1d, sharedDelta);
                     //
-                    _AssertSeries(First(), "x1!w", EFreq.W, 2001, 26, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "x2!w", EFreq.W, 2001, 26, double.NaN, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x1!w", EFreq.W, 2001, 26, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 26, 1d / 7d, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2001, 26, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x2!w", EFreq.W, 2001, 26, 6d / 7d, sharedDelta);
                     //
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 27, 1d, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 27, double.NaN, sharedDelta);
@@ -18028,8 +18032,10 @@ print(df2)
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 30, 1d, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 30, double.NaN, sharedDelta);
                     //
-                    _AssertSeries(First(), "x1!w", EFreq.W, 2001, 31, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "x2!w", EFreq.W, 2001, 31, double.NaN, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x1!w", EFreq.W, 2001, 31, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 31, 2d / 7d, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2001, 31, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x2!w", EFreq.W, 2001, 31, 5d / 7d, sharedDelta);
                     //
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 32, double.NaN, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 32, 1d, sharedDelta);
@@ -18040,8 +18046,10 @@ print(df2)
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 34, double.NaN, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 34, 1d, sharedDelta);
                     //
-                    _AssertSeries(First(), "x1!w", EFreq.W, 2001, 35, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "x2!w", EFreq.W, 2001, 35, double.NaN, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x1!w", EFreq.W, 2001, 35, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 35, 2d / 7d, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2001, 35, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x2!w", EFreq.W, 2001, 35, 5d / 7d, sharedDelta);
                     //
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 36, 1d, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 36, double.NaN, sharedDelta);
@@ -18067,8 +18075,10 @@ print(df2)
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 43, double.NaN, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 43, 1d, sharedDelta);
                     //
-                    _AssertSeries(First(), "x1!w", EFreq.W, 2001, 44, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "x2!w", EFreq.W, 2001, 44, double.NaN, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x1!w", EFreq.W, 2001, 44, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 44, 4d / 7d, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2001, 44, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x2!w", EFreq.W, 2001, 44, 3d / 7d, sharedDelta);
                     //
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 45, 1d, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 45, double.NaN, sharedDelta);
@@ -18079,8 +18089,10 @@ print(df2)
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 47, 1d, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 47, double.NaN, sharedDelta);
                     //
-                    _AssertSeries(First(), "x1!w", EFreq.W, 2001, 48, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "x2!w", EFreq.W, 2001, 48, double.NaN, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x1!w", EFreq.W, 2001, 48, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x1!w", EFreq.W, 2001, 48, 5d / 7d, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2001, 48, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x2!w", EFreq.W, 2001, 48, 2d / 7d, sharedDelta);
                     //
                     _AssertSeries(First(), "x1!w", EFreq.W, 2001, 49, double.NaN, sharedDelta);
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 49, 1d, sharedDelta);
@@ -18095,7 +18107,8 @@ print(df2)
                     _AssertSeries(First(), "x2!w", EFreq.W, 2001, 52, 1d, sharedDelta);
                     //
                     _AssertSeries(First(), "x1!w", EFreq.W, 2002, 1, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "x2!w", EFreq.W, 2002, 1, double.NaN, sharedDelta);
+                    if (i == 0) _AssertSeries(First(), "x2!w", EFreq.W, 2002, 1, double.NaN, sharedDelta);
+                    else _AssertSeries(First(), "x2!w", EFreq.W, 2002, 1, 1d / 7d, sharedDelta);
                     //
 
                 }
