@@ -3161,6 +3161,32 @@ namespace Gekko
             return tsNew;
         }
 
+        /// <summary>
+        /// Work out the date for Easter Sunday for specified year
+        /// </summary>
+        /// <param name="year">The year as an integer</param>
+        /// <returns>Returns a datetime of Easter Sunday.</returns>
+        public static ScalarDate geteaster(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            //Taken from here: https://github.com/martinjw/Holiday/blob/efafc0d6d7f5ef56017f7d47b830a8d1c820de9b/src/PublicHoliday/HolidayCalculator.cs#L15
+            //should be
+            //Easter Monday  28 Mar 2005  17 Apr 2006  9 Apr 2007  24 Mar 2008
+            //Oudin's Algorithm - http://www.smart.net/~mmontes/oudin.html     
+            GekkoTime t = O.ConvertToDate(x);
+            if (t.freq != EFreq.A) new Error("getEaster() function was fed with a date of " + t.freq.Pretty() + " frequency. Only Annual dates or integers can be used.");
+            int year = t.super;
+            var g = year % 19;
+            var c = year / 100;
+            var h = (c - c / 4 - (8 * c + 13) / 25 + 19 * g + 15) % 30;
+            var i = h - (h / 28) * (1 - (h / 28) * (29 / (h + 1)) * ((21 - g) / 11));
+            var j = (year + year / 4 + i + 2 - c + c / 4) % 7;
+            var p = i - j;
+            var easterDay = 1 + (p + 27 + (p + 6) / 40) % 31;
+            var easterMonth = 3 + (p + 26) / 30;
+            //return new DateTime(year, easterMonth, easterDay);
+            return new ScalarDate(new GekkoTime(EFreq.D, year, easterMonth, easterDay));
+        }
+
 
         public static IVariable interpolate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {

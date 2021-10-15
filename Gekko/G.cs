@@ -3381,7 +3381,7 @@ namespace Gekko
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int findYear(int x)
+        public static int FindYear(int x)
         {
             if (x >= 1500 && x <= 3000)
             {
@@ -3393,7 +3393,7 @@ namespace Gekko
             }
             else
             {
-                new Error("Regarding year");
+                new Error("A year with value " + x + " was input. The allowable range for years is [1500-3000] or [0-199] -- the latter has 1900 added.");
                 return -12345;  //will never return anything
             }
         }

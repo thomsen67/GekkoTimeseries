@@ -443,7 +443,7 @@ namespace Gekko
                 if (b)
                 {
                     //happens often, so we do it fast
-                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.FindYear(i), 1);
                 }
             }
 
@@ -453,7 +453,7 @@ namespace Gekko
                 bool b = int.TryParse(s.Substring(0, s.Length - 2), out i);
                 if (b)
                 {
-                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.FindYear(i), 1);
                 }
                 else
                 {
@@ -470,7 +470,7 @@ namespace Gekko
                 bool b = int.TryParse(s.Substring(0, s.Length - 1), out i);
                 if (b)
                 {
-                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.FindYear(i), 1);
                 }
                 else
                 {
@@ -495,7 +495,7 @@ namespace Gekko
                 int q1 = -12345;
                 try
                 {
-                    y1 = G.findYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]));
                     q1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -517,7 +517,7 @@ namespace Gekko
                 int q1 = -12345;
                 try
                 {
-                    y1 = G.findYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]));
                     q1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -543,7 +543,7 @@ namespace Gekko
                 {
                     string[] temp1 = s.Split(new char[] { 'm', 'M' });  //2019m12d24
                     string[] temp2 = temp1[1].Split(new char[] { 'd', 'D' });
-                    y1 = G.findYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]));
                     m1 = int.Parse(temp2[0]);
                     d = int.Parse(temp2[1]);
                 }
@@ -575,7 +575,7 @@ namespace Gekko
                 string[] temp1 = s.Split(new char[] { 'm', 'M' });
                 try
                 {
-                    y1 = G.findYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]));
                     m1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -598,7 +598,7 @@ namespace Gekko
                 int w1 = -12345;
                 try
                 {
-                    y1 = G.findYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]));
                     w1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -617,7 +617,7 @@ namespace Gekko
                 int w1 = -12345;
                 try
                 {
-                    y1 = G.findYear(int.Parse(temp1[0]));
+                    y1 = G.FindYear(int.Parse(temp1[0]));
                     w1 = int.Parse(temp1[1]);
                 }
                 catch
@@ -1843,7 +1843,7 @@ namespace Gekko
         // All other week-numbering years are short years and have 52 weeks.
         public static int GetWeeksInYear(int year)
         {
-            int year2 = G.findYear(year);  //TTH change: also checks reasonable value            
+            int year2 = G.FindYear(year);  //TTH change: also checks reasonable value            
 
             //static int P(int y) => (y + (y / 4) - (y / 100) + (y / 400)) % 7;  //TTH change: moved to method
 
@@ -1871,7 +1871,7 @@ namespace Gekko
             if (gt.IsNull()) new Error("ISOWeek:ToDateTime(): GekkoTime is set to null");
             if (gt.freq != EFreq.W) new Error("ISOWeek:ToDateTime(): GekkoTime must be W freq");
             int year = gt.super;            
-            int year2 = G.findYear(year);  //TTH change: also checks reasonable value            
+            int year2 = G.FindYear(year);  //TTH change: also checks reasonable value            
             int week = gt.sub;
 
             G.CheckWeekNumberAndMaybePrintErrorMessage(year2, week, true);
