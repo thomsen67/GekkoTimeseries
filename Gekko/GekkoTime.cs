@@ -1596,7 +1596,7 @@ namespace Gekko
             }
         }        
 
-        public static GekkoTime GetHoliday(EHolidayName name, int year)
+        public static GekkoTime GetHoliday(int year, EHolidayName name)
         {
             GekkoTime gt = GekkoTime.tNull;
             if (name == EHolidayName.New_Year)
@@ -1662,7 +1662,7 @@ namespace Gekko
             return gt;
         }
 
-        public static GekkoTime GetHoliday(string s, int year)
+        public static GekkoTime GetHoliday(int year, string s)
         {            
             EHolidayName name = EHolidayName.Null;
             foreach (HolidayNames h in GekkoTime.HolidayNames)
@@ -1684,17 +1684,17 @@ namespace Gekko
                     txt.MoreNewLine();
                     foreach (HolidayNames h in GekkoTime.HolidayNames)
                     {                        
-                        txt.MoreAdd($"{GetHoliday(h.name, y).ToString(),-15}" + $"{h.eng,-25}" + $"{ h.dan,-25}");
+                        txt.MoreAdd($"{GetHoliday(y, h.name).ToString(),-15}" + $"{h.eng,-25}" + $"{ h.dan,-25}");
                         txt.MoreNewLineTight();
                     }
                 }
             }
 
-            return GetHoliday(name, year);
+            return GetHoliday(year, name);
         }
 
         /// <summary>
-        /// Work out the date for Easter Sunday for specified year
+        /// Internal method. Work out the date for Easter Sunday for specified year. Quite complicated.
         /// </summary>
         /// <param name="year">The year as an integer</param>
         /// <returns>Returns a datetime of Easter Sunday.</returns>
@@ -1703,7 +1703,8 @@ namespace Gekko
             //Taken from here: https://github.com/martinjw/Holiday/blob/efafc0d6d7f5ef56017f7d47b830a8d1c820de9b/src/PublicHoliday/HolidayCalculator.cs#L15
             //should be
             //Easter Monday  28 Mar 2005  17 Apr 2006  9 Apr 2007  24 Mar 2008
-            //Oudin's Algorithm - http://www.smart.net/~mmontes/oudin.html                 
+            //Oudin's Algorithm - http://www.smart.net/~mmontes/oudin.html      
+            //Note: dates for Eastern Orthodox Church may be different!
             var g = year % 19;
             var c = year / 100;
             var h = (c - c / 4 - (8 * c + 13) / 25 + 19 * g + 15) % 30;

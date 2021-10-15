@@ -3166,11 +3166,11 @@ namespace Gekko
         /// </summary>
         /// <param name="year">The year as an integer</param>
         /// <returns>Returns a datetime of Easter Sunday.</returns>
-        public static ScalarDate getholiday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable name, IVariable date)
+        public static ScalarDate getholiday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable date, IVariable name)
         {              
             GekkoTime t = O.ConvertToDate(date);
             if (t.freq != EFreq.A) new Error("getHoliday() function was called with a date of " + t.freq.Pretty() + " frequency. Only Annual dates or integers can be used.");            
-            GekkoTime t2 = GekkoTime.GetHoliday(O.ConvertToString(name), t.super);
+            GekkoTime t2 = GekkoTime.GetHoliday(t.super, O.ConvertToString(name));
             return new ScalarDate(t2);
         }
 
