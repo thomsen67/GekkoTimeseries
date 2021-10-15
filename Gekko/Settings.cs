@@ -114,7 +114,7 @@ namespace Gekko
             this.DataSetName = "Settings";
             this.Prefix = "";
             this.Namespace = "http://tempuri.org/Settings.xsd";
-            this.Locale = new System.Globalization.CultureInfo("en-US");
+            this.Locale = new System.Globalization.CultureInfo(Globals.languageEnUS);
             this.CaseSensitive = false;
             this.EnforceConstraints = true;
             this.tableMain = new MainDataTable();

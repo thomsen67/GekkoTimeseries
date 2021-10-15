@@ -48,7 +48,7 @@ namespace Gekko
     public enum EHolidayName
     {
         Null,  //null
-        New_Year, //Nytaarsdag
+        New_Years_Day, //Nytaarsdag
         Maundy_Thursday, //Skaertorsdag
         Good_Friday, //Langfredag
         Easter_Sunday, //Paaskedag
@@ -62,6 +62,7 @@ namespace Gekko
         Christmas_Eve, //Juleaften
         Christmas_Day, //Foerste_juledag
         Boxing_Day, //Anden_juledag
+        New_Years_Eve, //Nytaarsaften
     }
 
     public static class Extensions
@@ -150,22 +151,42 @@ namespace Gekko
             {
                 if (GekkoTime.holidayNames != null) return GekkoTime.holidayNames;
                 List<HolidayNames> holidays = new List<HolidayNames>();
-                holidays.Add(new HolidayNames(EHolidayName.New_Year, "New_Year", "Nytaarsdag"));
+                holidays.Add(new HolidayNames(EHolidayName.New_Years_Day, "New_Years_Day", "Nytaarsdag"));
                 holidays.Add(new HolidayNames(EHolidayName.Maundy_Thursday, "Maundy_Thursday", "Skaertorsdag"));
                 holidays.Add(new HolidayNames(EHolidayName.Good_Friday, "Good_Friday", "Langfredag"));
                 holidays.Add(new HolidayNames(EHolidayName.Easter_Sunday, "Easter_Sunday", "Paaskedag"));
                 holidays.Add(new HolidayNames(EHolidayName.Easter_Monday, "Easter_Monday", "Anden_paaskedag"));
-                holidays.Add(new HolidayNames(EHolidayName.Labour_Day, "Labour_Day", "Foerste_maj"));
-                holidays.Add(new HolidayNames(EHolidayName.Constitution_Day, "Constitution_Day", "Grundlovsdag"));
+                holidays.Add(new HolidayNames(EHolidayName.Labour_Day, "Labour_Day", "Foerste_maj"));                
                 holidays.Add(new HolidayNames(EHolidayName.General_Prayer_Day, "General_Prayer_Day", "Store_bededag"));
                 holidays.Add(new HolidayNames(EHolidayName.Ascension_Day, "Ascension_Day", "Kristi_himmelfartsdag"));
                 holidays.Add(new HolidayNames(EHolidayName.Whit_Sunday, "Whit_Sunday", "Pinsedag"));
                 holidays.Add(new HolidayNames(EHolidayName.Whit_Monday, "Whit_Monday", "Anden_pinsedag"));
+                holidays.Add(new HolidayNames(EHolidayName.Constitution_Day, "Constitution_Day", "Grundlovsdag"));
                 holidays.Add(new HolidayNames(EHolidayName.Christmas_Eve, "Christmas_Eve", "Juleaften"));
                 holidays.Add(new HolidayNames(EHolidayName.Christmas_Day, "Christmas_Day", "Foerste_juledag"));
                 holidays.Add(new HolidayNames(EHolidayName.Boxing_Day, "Boxing_Day", "Anden_juledag"));
+                holidays.Add(new HolidayNames(EHolidayName.New_Years_Eve, "New_Years_Eve", "Nytaarsaften"));
                 GekkoTime.holidayNames = holidays;
                 return holidays;
+            }
+        }
+
+        private static List<WeekDayNames> weekdayNames = null;  //use WeekdayNames!!
+        public static List<WeekDayNames> WeekdayNames
+        {
+            get
+            {
+                if (GekkoTime.weekdayNames != null) return GekkoTime.weekdayNames;
+                List<WeekDayNames> weekdays = new List<WeekDayNames>();
+                weekdays.Add(new WeekDayNames(1, "Monday", "Mandag"));
+                weekdays.Add(new WeekDayNames(2, "Tuesday", "Tirsdag"));
+                weekdays.Add(new WeekDayNames(3, "Wednesday", "Onsdag"));
+                weekdays.Add(new WeekDayNames(4, "Thursday", "Torsdag"));
+                weekdays.Add(new WeekDayNames(5, "Friday", "Fredag"));
+                weekdays.Add(new WeekDayNames(6, "Saturday", "Loerdag"));
+                weekdays.Add(new WeekDayNames(7, "Sunday", "Soendag"));
+                GekkoTime.weekdayNames = weekdays;
+                return weekdays;
             }
         }
 
@@ -1599,17 +1620,17 @@ namespace Gekko
         public static GekkoTime GetHoliday(int year, EHolidayName name)
         {
             GekkoTime gt = GekkoTime.tNull;
-            if (name == EHolidayName.New_Year)
+            if (name == EHolidayName.New_Years_Day)
             {
-
+                gt = new GekkoTime(EFreq.D, year, 1, 1);
             }
             else if (name == EHolidayName.Maundy_Thursday)
             {
-
+                gt = GetEaster(year).Add(-3);
             }
             else if (name == EHolidayName.Good_Friday)
             {
-
+                gt = GetEaster(year).Add(-2);
             }
             else if (name == EHolidayName.Easter_Sunday)
             {
@@ -1617,43 +1638,47 @@ namespace Gekko
             }
             else if (name == EHolidayName.Easter_Monday)
             {
-
+                gt = GetEaster(year).Add(1);
             }
             else if (name == EHolidayName.Labour_Day)
             {
-
+                gt = new GekkoTime(EFreq.D, year, 5, 1);
             }
             else if (name == EHolidayName.Constitution_Day)
             {
-
+                gt = new GekkoTime(EFreq.D, year, 6, 5);
             }
             else if (name == EHolidayName.General_Prayer_Day)
             {
-
+                gt = GetEaster(year).Add(5 + (7 * 3));                
             }
             else if (name == EHolidayName.Ascension_Day)
             {
-
+                gt = GetEaster(year).Add(4 + (7 * 5));
             }
             else if (name == EHolidayName.Whit_Sunday)
             {
-
+                gt = GetEaster(year).Add(7 * 7);
             }
             else if (name == EHolidayName.Whit_Monday)
             {
-
+                gt = GetEaster(year).Add((7 * 7) + 1);
             }
             else if (name == EHolidayName.Christmas_Eve)
             {
-
+                gt = new GekkoTime(EFreq.D, year, 12, 24);
             }
             else if (name == EHolidayName.Christmas_Day)
             {
-
+                gt = new GekkoTime(EFreq.D, year, 12, 25);
             }
             else if (name == EHolidayName.Boxing_Day)
             {
-
+                gt = new GekkoTime(EFreq.D, year, 12, 26);
+            }
+            else if (name == EHolidayName.New_Years_Eve)
+            {
+                gt = new GekkoTime(EFreq.D, year, 12, 31);
             }
             else
             {
@@ -1667,7 +1692,7 @@ namespace Gekko
             EHolidayName name = EHolidayName.Null;
             foreach (HolidayNames h in GekkoTime.HolidayNames)
             {
-                if (G.Equal(s, h.eng) || G.Equal(s, h.dan))
+                if (G.Equal(s, h.en) || G.Equal(s, h.da))
                 {
                     name = h.name;
                     break;
@@ -1680,11 +1705,11 @@ namespace Gekko
                 {
                     int y = Program.ComputerYear();
                     txt.MainAdd("The holiday name '" + s + "' was not recognized. Click the link to see legal names.");
-                    txt.MoreAdd("The following is a list of recognized holiday names (English and Danish, with dates shown for the current year " + y + ")");
+                    txt.MoreAdd("The following is a list of recognized holiday names (English and Danish). Dates are shown for the current year: these are not necessarily consequtive as shown here.");
                     txt.MoreNewLine();
                     foreach (HolidayNames h in GekkoTime.HolidayNames)
                     {                        
-                        txt.MoreAdd($"{GetHoliday(y, h.name).ToString(),-15}" + $"{h.eng,-25}" + $"{ h.dan,-25}");
+                        txt.MoreAdd($"{GetHoliday(y, h.name).ToString(),-15}" + $"{h.en,-25}" + $"{ h.da,-25}");
                         txt.MoreNewLineTight();
                     }
                 }

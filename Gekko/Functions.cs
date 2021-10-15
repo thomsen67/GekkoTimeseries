@@ -212,6 +212,11 @@ namespace Gekko
 
         public static IVariable getweekday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
+            return getweekday(smpl, _t1, _t2, ths, null);
+        }
+
+        public static IVariable getweekday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable lang)
+        {
             if (ths.Type() != EVariableType.Date)
             {
                 new Error("getweekday() expects date input");
@@ -221,13 +226,35 @@ namespace Gekko
             if (gt.freq != EFreq.D)
             {
                 new Error("getweekday() expects daily date");
-            }
+            }            
 
             DateTime dt1 = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.Strict);
             int day = (int)dt1.DayOfWeek;  //sunday = 0, monday = 1, ... , saturday = 6.
-            if (day == 0) day = 7;
+            if (day == 0) day = 7;  //now day is: monday = 1, ... , saturday = 6, sunday = 7.
 
-            return new ScalarVal(day);
+            if (lang == null)
+            {
+                return new ScalarVal(day);
+            }
+            else
+            {
+                string language = O.ConvertToString(lang);
+                string s = null;
+                foreach (WeekDayNames w in GekkoTime.WeekdayNames)
+                {
+                    if (G.Equal(language, Globals.languageEn))
+                    {
+                        if (w.number == day) return new ScalarString(w.en);
+                    }
+                    else if (G.Equal(language, Globals.languageDa))
+                    {
+                        if (w.number == day) return new ScalarString(w.da);
+                    }
+                    else new Error("Language '" + language + "' not recognized.");
+                }
+                new Error("Unexpected error #623uikhd7af6");  //should not be possible
+                return null;
+            }            
         }
 
         public static IVariable getparent(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)

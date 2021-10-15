@@ -75,7 +75,12 @@ namespace Gekko
         public static bool fixPxProblem = true;
 
         public static bool if_old_helper = false;
-        
+
+        public const string languageDa = "da";
+        public const string languageEn = "en";
+        public const string languageDaDK = "da-DK";
+        public const string languageEnUS = "en-US";
+
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
 
         //Must be near the top of Globals.cs

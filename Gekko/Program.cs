@@ -1110,13 +1110,26 @@ namespace Gekko
     public class HolidayNames
     {
         public EHolidayName name = EHolidayName.Null;
-        public string eng = null;
-        public string dan = null;
+        public string en = null;
+        public string da = null;
         public HolidayNames(EHolidayName name, string eng, string dan)
         {
             this.name = name;
-            this.eng = eng;
-            this.dan = dan;
+            this.en = eng;
+            this.da = dan;
+        }
+    }
+
+    public class WeekDayNames
+    {
+        public int number = 1;  //default: monday, but default not used anyway...
+        public string en = null;
+        public string da = null;
+        public WeekDayNames(int number, string eng, string dan)
+        {
+            this.number = number;
+            this.en = eng;
+            this.da = dan;
         }
     }
 
@@ -17663,7 +17676,7 @@ namespace Gekko
         {
             string code = "G";
             if (shortTime) code = "g";  //no seconds
-            string now = date1.ToString(code, CultureInfo.CreateSpecificCulture("da-DK"));
+            string now = date1.ToString(code, CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             return now;
         }
 
@@ -17671,14 +17684,14 @@ namespace Gekko
         {
             //See also #80927435209843
             DateTime date1 = DateTime.Now;
-            string now = date1.ToString("d", CultureInfo.CreateSpecificCulture("da-DK"));
+            string now = date1.ToString("d", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             return now;
         }
 
         public static string GetTimeStamp()
         {
             DateTime date1 = DateTime.Now;
-            string now = date1.ToString("T", CultureInfo.CreateSpecificCulture("da-DK"));
+            string now = date1.ToString("T", CultureInfo.CreateSpecificCulture(Globals.languageDaDK));
             return now;
         }
 
@@ -25210,7 +25223,7 @@ namespace Gekko
             //without, there was a bug on Excel 2003 (english version), where the language was set to
             //something different that english.
             System.Globalization.CultureInfo oldCI = System.Threading.Thread.CurrentThread.CurrentCulture;
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(Globals.languageEnUS);
 
             try  //this try makes ture the thread currentculture is set back to what it was
             {
