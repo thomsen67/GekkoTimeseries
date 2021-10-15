@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Gekko
 {
-
+    
     public class FreqHelper
     {
         public GekkoTime t1;
@@ -43,6 +43,25 @@ namespace Gekko
         Empty18,
         Empty19, 
         Empty20
+    }
+
+    public enum EHolidayName
+    {
+        Null,  //null
+        New_Year, //Nytaarsdag
+        Maundy_Thursday, //Skaertorsdag
+        Good_Friday, //Langfredag
+        Easter_Sunday, //Paaskedag
+        Easter_Monday, //Anden_paaskedag
+        Labour_Day, //Foerste_maj
+        Constitution_Day, //Grundlovsdag
+        General_Prayer_Day, //Store_bededag
+        Ascension_Day, //Kristi_himmelfartsdag
+        Whit_Sunday, //Pinsedag
+        Whit_Monday, //Anden_pinsedag
+        Christmas_Eve, //Juleaften
+        Christmas_Day, //Foerste_juledag
+        Boxing_Day, //Anden_juledag
     }
 
     public static class Extensions
@@ -122,7 +141,33 @@ namespace Gekko
         public readonly EFreq freq;
 
         public static GekkoTime tNull = new GekkoTime(EFreq.A, -12345, 1);  //think of it as a 'null' object (but it is a struct)
-        public static DateTime unixTimeOrigin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);        
+        public static DateTime unixTimeOrigin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                
+        private static List<HolidayNames> holidayNames = null;  //use HolidayNames!!
+        public static List<HolidayNames> HolidayNames
+        {
+            get
+            {
+                if (GekkoTime.holidayNames != null) return GekkoTime.holidayNames;
+                List<HolidayNames> holidays = new List<HolidayNames>();
+                holidays.Add(new HolidayNames(EHolidayName.New_Year, "New_Year", "Nytaarsdag"));
+                holidays.Add(new HolidayNames(EHolidayName.Maundy_Thursday, "Maundy_Thursday", "Skaertorsdag"));
+                holidays.Add(new HolidayNames(EHolidayName.Good_Friday, "Good_Friday", "Langfredag"));
+                holidays.Add(new HolidayNames(EHolidayName.Easter_Sunday, "Easter_Sunday", "Paaskedag"));
+                holidays.Add(new HolidayNames(EHolidayName.Easter_Monday, "Easter_Monday", "Anden_paaskedag"));
+                holidays.Add(new HolidayNames(EHolidayName.Labour_Day, "Labour_Day", "Foerste_maj"));
+                holidays.Add(new HolidayNames(EHolidayName.Constitution_Day, "Constitution_Day", "Grundlovsdag"));
+                holidays.Add(new HolidayNames(EHolidayName.General_Prayer_Day, "General_Prayer_Day", "Store_bededag"));
+                holidays.Add(new HolidayNames(EHolidayName.Ascension_Day, "Ascension_Day", "Kristi_himmelfartsdag"));
+                holidays.Add(new HolidayNames(EHolidayName.Whit_Sunday, "Whit_Sunday", "Pinsedag"));
+                holidays.Add(new HolidayNames(EHolidayName.Whit_Monday, "Whit_Monday", "Anden_pinsedag"));
+                holidays.Add(new HolidayNames(EHolidayName.Christmas_Eve, "Christmas_Eve", "Juleaften"));
+                holidays.Add(new HolidayNames(EHolidayName.Christmas_Day, "Christmas_Day", "Foerste_juledag"));
+                holidays.Add(new HolidayNames(EHolidayName.Boxing_Day, "Boxing_Day", "Anden_juledag"));
+                GekkoTime.holidayNames = holidays;
+                return holidays;
+            }
+        }
 
         //Note: using "new GekkoTime()" without arguments is not intended to be used, even
         //      though it is valid to do. Such a struct cannot have its fields changed anyway, so
@@ -1549,48 +1594,128 @@ namespace Gekko
                 t3 = GekkoTime.ConvertFreqsLast(desiredFreq, t3);               
                 
             }
+        }        
+
+        public static GekkoTime GetHoliday(EHolidayName name, int year)
+        {
+            GekkoTime gt = GekkoTime.tNull;
+            if (name == EHolidayName.New_Year)
+            {
+
+            }
+            else if (name == EHolidayName.Maundy_Thursday)
+            {
+
+            }
+            else if (name == EHolidayName.Good_Friday)
+            {
+
+            }
+            else if (name == EHolidayName.Easter_Sunday)
+            {
+                gt = GetEaster(year);
+            }
+            else if (name == EHolidayName.Easter_Monday)
+            {
+
+            }
+            else if (name == EHolidayName.Labour_Day)
+            {
+
+            }
+            else if (name == EHolidayName.Constitution_Day)
+            {
+
+            }
+            else if (name == EHolidayName.General_Prayer_Day)
+            {
+
+            }
+            else if (name == EHolidayName.Ascension_Day)
+            {
+
+            }
+            else if (name == EHolidayName.Whit_Sunday)
+            {
+
+            }
+            else if (name == EHolidayName.Whit_Monday)
+            {
+
+            }
+            else if (name == EHolidayName.Christmas_Eve)
+            {
+
+            }
+            else if (name == EHolidayName.Christmas_Day)
+            {
+
+            }
+            else if (name == EHolidayName.Boxing_Day)
+            {
+
+            }
+            else
+            {
+                new Error("Unexpected error #jklhfs7af78f");
+            }
+            return gt;
         }
 
-        ///// <summary>
-        ///// Converts a date to a week number.
-        ///// ISO 8601 week 1 is the week that contains the first Thursday that year.        
-        ///// </summary>
-        ///// //See https://stackoverflow.com/questions/11154673/get-the-correct-week-number-of-a-given-date
-        //public static int ToIso8601Weeknumber(DateTime date)
-        //{
-        //    var thursday = date.AddDays(3 - DayOffset(date.DayOfWeek));
-        //    return (thursday.DayOfYear - 1) / 7 + 1;
-        //}
+        public static GekkoTime GetHoliday(string s, int year)
+        {            
+            EHolidayName name = EHolidayName.Null;
+            foreach (HolidayNames h in GekkoTime.HolidayNames)
+            {
+                if (G.Equal(s, h.eng) || G.Equal(s, h.dan))
+                {
+                    name = h.name;
+                    break;
+                }
+            }
 
-        ///// <summary>
-        ///// Converts a week number to a date.
-        ///// Note: Week 1 of a year may start in the previous year.
-        ///// ISO 8601 week 1 is the week that contains the first Thursday that year, so
-        ///// if December 28 is a Monday, December 31 is a Thursday,
-        ///// and week 1 starts January 4.
-        ///// If December 28 is a later day in the week, week 1 starts earlier.
-        ///// If December 28 is a Sunday, it is in the same week as Thursday January 1.
-        ///// Will set error = true if weekNumber &lt; 1 or > allowed weeknumber for the year. 
-        ///// </summary>
-        //public static DateTime FromIso8601Weeknumber(int weekNumber, int year, out bool error, DayOfWeek day = DayOfWeek.Monday)
-        //{
-        //    error = false;            
-        //    var dec28 = new DateTime(year - 1, 12, 28);
-        //    var monday = dec28.AddDays(7 * weekNumber - DayOffset(dec28.DayOfWeek));
-        //    DateTime dt = monday.AddDays(DayOffset(day));
-        //    int weekNumberCheck = ToIso8601Weeknumber(dt);
-        //    if (weekNumber != weekNumberCheck) error = true;
-        //    if (weekNumber < 1) error = true;
-        //    return dt;
-        //}
+            if (name == EHolidayName.Null)
+            {
+                using (Error txt = new Error())
+                {
+                    int y = Program.ComputerYear();
+                    txt.MainAdd("The holiday name '" + s + "' was not recognized. Click the link to see legal names.");
+                    txt.MoreAdd("The following is a list of recognized holiday names (English and Danish, with dates shown for the current year " + y + ")");
+                    txt.MoreNewLine();
+                    foreach (HolidayNames h in GekkoTime.HolidayNames)
+                    {                        
+                        txt.MoreAdd($"{GetHoliday(h.name, y).ToString(),-15}" + $"{h.eng,-25}" + $"{ h.dan,-25}");
+                        txt.MoreNewLineTight();
+                    }
+                }
+            }
 
-        ///// <summary>
-        ///// Iso8601 weeks start on Monday. This returns 0 for Monday.
-        ///// </summary>
-        //private static int DayOffset(DayOfWeek weekDay)
-        //{
-        //    return ((int)weekDay + 6) % 7;
-        //}
+            return GetHoliday(name, year);
+        }
+
+        /// <summary>
+        /// Work out the date for Easter Sunday for specified year
+        /// </summary>
+        /// <param name="year">The year as an integer</param>
+        /// <returns>Returns a datetime of Easter Sunday.</returns>
+        private static GekkoTime GetEaster(int year)
+        {
+            //Taken from here: https://github.com/martinjw/Holiday/blob/efafc0d6d7f5ef56017f7d47b830a8d1c820de9b/src/PublicHoliday/HolidayCalculator.cs#L15
+            //should be
+            //Easter Monday  28 Mar 2005  17 Apr 2006  9 Apr 2007  24 Mar 2008
+            //Oudin's Algorithm - http://www.smart.net/~mmontes/oudin.html                 
+            var g = year % 19;
+            var c = year / 100;
+            var h = (c - c / 4 - (8 * c + 13) / 25 + 19 * g + 15) % 30;
+            var i = h - (h / 28) * (1 - (h / 28) * (29 / (h + 1)) * ((21 - g) / 11));
+            var j = (year + year / 4 + i + 2 - c + c / 4) % 7;
+            var p = i - j;
+            var easterDay = 1 + (p + 27 + (p + 6) / 40) % 31;
+            var easterMonth = 3 + (p + 26) / 30;
+            return new GekkoTime(EFreq.D, year, easterMonth, easterDay);
+        }
+
+
     }
 
     public class GekkoTimeIterator : IEnumerable<GekkoTime>

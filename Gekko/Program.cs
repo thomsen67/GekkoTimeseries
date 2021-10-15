@@ -1105,6 +1105,22 @@ namespace Gekko
     }
 
     /// <summary>
+    /// Used in getHoliday() function
+    /// </summary>
+    public class HolidayNames
+    {
+        public EHolidayName name = EHolidayName.Null;
+        public string eng = null;
+        public string dan = null;
+        public HolidayNames(EHolidayName name, string eng, string dan)
+        {
+            this.name = name;
+            this.eng = eng;
+            this.dan = dan;
+        }
+    }
+
+    /// <summary>
     /// Helper class
     /// </summary>
     public class UserFunctionsHelper1
@@ -19340,11 +19356,16 @@ namespace Gekko
             return pch_work - pch_base;
         }
 
+        public static int ComputerYear()
+        {
+            int year = DateTime.Now.Year;
+            if (year < 2020 || year > 2099) year = 2020;  //Set to something sensible if computer clock is completely crazy...????
+            return year;
+        }
+
         public static void GetStartingPeriod()
         {
-            //#09350943534
-            int year = DateTime.Now.Year;
-            if (year < 2015 || year > 2030) year = 2015;
+            int year = ComputerYear();
             Globals.globalPeriodStart = new GekkoTime(Program.options.freq, year - 10, 1);
             Globals.globalPeriodEnd = new GekkoTime(Program.options.freq, year + 0, 1);
         }
