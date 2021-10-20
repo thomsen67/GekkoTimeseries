@@ -27259,15 +27259,22 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used to convert frequencies.
+        /// Used to convert frequencies. Allows startEnd to be = null, if input freq is higher than output freq
         /// </summary>
         /// <param name="t"></param>
         /// <param name="tsFreq"></param>
         /// <param name="startEnd"></param>
         /// <returns></returns>
         public static GekkoTime ConvertFreq(GekkoTime t, EFreq tsFreq, string startEnd)
-        {            
-            if (G.Equal(startEnd, "start"))
+        {
+            if (startEnd == null)
+            {
+                GekkoTime t1 = GekkoTime.ConvertFreqsFirst(tsFreq, t, null);
+                GekkoTime t2 = GekkoTime.ConvertFreqsLast(tsFreq, t);
+                if (!t1.EqualsGekkoTime(t2)) new Error("Cannot convert " + t.ToString() + " to " + tsFreq.Pretty() + " frequency without indicating 'start' or 'end' parameter.");
+                return t1;  //same as t2
+            }
+            else if (G.Equal(startEnd, "start"))
             {
                 return GekkoTime.ConvertFreqsFirst(tsFreq, t, null);
             }
@@ -27279,7 +27286,6 @@ namespace Gekko
             {
                 new Error("Expected 'start' or 'end' argument, not '" + startEnd + "'");
                 return GekkoTime.tNull;
-                //throw new GekkoException();
             }
         }
 

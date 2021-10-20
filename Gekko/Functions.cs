@@ -44,6 +44,15 @@ namespace Gekko
         // ========================= functions to manipulate dates start =============================================================
         // ===========================================================================================================================
 
+        public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2)
+        {
+            //%d.date('m');
+            GekkoTime dd = O.ConvertToDate(iv1);
+            string ff = O.ConvertToString(iv2);
+            GekkoTime gt = Program.ConvertFreq(dd, G.ConvertFreq(ff), null);
+            return new ScalarDate(gt);
+        }
+
         public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2, IVariable iv3)
         {
             if (iv1.Type() == EVariableType.Val)
@@ -105,25 +114,12 @@ namespace Gekko
             GekkoTime gt = (ths as ScalarDate).date;
             return new ScalarVal(gt.super);
         }
-
-        public static IVariable getweekly(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
-        {
-            //essentially %d.getWeekly() is an alias for %d.date('w', 'first') or %d.date('w', 'last')
-            if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.D)
-            {
-                return date(smpl, _t1, _t2, ths, new ScalarString("w"), new ScalarString("start"));  //could just as well be "end"
-            }
-            else
-            {
-                new Error("getWeekly() expects a date with daily frequency as input"); return null;
-            }         
-        }
-
+        
         public static IVariable getweek(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             //%d.getWeek() is only legal for a %d of weekly frequency.
             //This is to notify that there may be a year problem.
-            //But one can use %d.getWeekly().getWeek().
+            //But one can use %d.date('w').getWeek().
             if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.W)
             {
                 int week = ((ScalarDate)ths).date.sub;
@@ -135,13 +131,13 @@ namespace Gekko
                 {
                     txt.MainAdd("The getWeek() function only accepts a date with weekly frequency as input, so you cannot use %d.getWeek() directly ");
                     txt.MainAdd("on for instance a daily date %d. This is to remind you that when getting a week number from a daily date, ");
-                    txt.MainAdd("the year may change. You may use the getWeekly() function as an intermediary, cf. the explanation in the link. ");
+                    txt.MainAdd("the year may change. You may use the date('w') function as an intermediary, cf. the explanation in the link. ");
                     // ---
                     txt.MoreAdd("Week numbers are special around New Year. For instance, December 31, 2019 is in week 1, 2020. And January 1, 2021, is in week 53, 2020.");
                     txt.MoreAdd("So the year may change, and the user should be aware of this. Therefore, getWeek() cannot be ");
                     txt.MoreAdd("used directly on a daily date. Instead, you may first convert the daily date to a weekly date with the ");
-                    txt.MoreAdd("getWeekly() function. Hence, to find the week number of a given daily date %d, you can use %d.getWeekly().getWeek(). Note ");
-                    txt.MoreAdd("here that %d.getWeekly().getYear() will get the year of the weekly date, and this year may be different from %d.getYear()!");
+                    txt.MoreAdd("date('w') function. Hence, to find the week number of a given daily date %d, you can use %d.date('w').getWeek(). Note ");
+                    txt.MoreAdd("here that %d.date('w').getYear() will get the year of the weekly date, and this year may be different from %d.getYear()!");
                 }
                  
                 return null;
@@ -3783,6 +3779,42 @@ namespace Gekko
             }
         }
 
+        public static IVariable upperfirst(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            //Only first char is "uppered". 
+
+            if (ths.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(ths);
+                if (s1.Length > 1) return new ScalarString(char.ToUpper(s1[0]) + s1.Substring(1));
+                return new ScalarString(s1.ToUpper());
+            }
+            else if (ths.Type() == EVariableType.List)
+            {
+                List m = ths as List;
+                List tmp = new List();
+                foreach (IVariable iv in m.list)
+                {
+                    if (iv.Type() == EVariableType.String)
+                    {
+                        string s1 = O.ConvertToString(iv);
+                        if (s1.Length > 1) tmp.Add(new ScalarString(char.ToUpper(s1[0]) + s1.Substring(1)));
+                        else tmp.Add(new ScalarString(s1.ToUpper()));
+                    }
+                    else
+                    {
+                        tmp.Add(iv);
+                    }
+                }
+                return tmp;
+            }
+            else
+            {
+                FunctionError("upper", ths);  //throws exception
+                return null;
+            }
+        }
+
         public static IVariable isupper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             if (ths.Type() == EVariableType.String)
@@ -4097,12 +4129,11 @@ namespace Gekko
             else
             {
                 new Error("Expected a LIST variable as argument");
-                //throw new GekkoException();
             }
             return new ScalarString(s);
         }
 
-        public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)  //'string' not allowed as method name
+        public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)  
         {
             GekkoTime d = GekkoTime.tNull;
             if (x.Type() == EVariableType.Val)
@@ -4130,8 +4161,8 @@ namespace Gekko
             }
             return new ScalarDate(d);
         }
-
-        public static IVariable val(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)  //'string' not allowed as method name
+        
+        public static IVariable val(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             if (G.IsGekkoNull(x1)) return x1;
             double v = double.NaN;
