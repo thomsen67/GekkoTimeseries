@@ -122,7 +122,7 @@ namespace Gekko
             //But one can use %d.date('w').getWeek().
             if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.W)
             {
-                int week = ((ScalarDate)ths).date.sub;
+                int week = ((ScalarDate)ths).date.sub; 
                 return new ScalarVal(week);
             }
             else
