@@ -122,7 +122,7 @@ namespace Gekko
             //But one can use %d.date('w').getWeek().
             if (ths.Type() == EVariableType.Date && ((ScalarDate)ths).date.freq == EFreq.W)
             {
-                int week = ((ScalarDate)ths).date.sub; 
+                int week = ((ScalarDate)ths).date.sub;
                 return new ScalarVal(week);
             }
             else
@@ -131,7 +131,7 @@ namespace Gekko
                 {
                     txt.MainAdd("The getWeek() function only accepts a date with weekly frequency as input, so you cannot use %d.getWeek() directly ");
                     txt.MainAdd("on for instance a daily date %d. This is to remind you that when getting a week number from a daily date, ");
-                    txt.MainAdd("the year may change. You may use the date('w') function as an intermediary, cf. the explanation in the link. ");
+                    txt.MainAdd("the year may change. You may use %d.date('w').getWeek() instead, cf. the explanation in the link. ");
                     // ---
                     txt.MoreAdd("Week numbers are special around New Year. For instance, December 31, 2019 is in week 1, 2020. And January 1, 2021, is in week 53, 2020.");
                     txt.MoreAdd("So the year may change, and the user should be aware of this. Therefore, getWeek() cannot be ");

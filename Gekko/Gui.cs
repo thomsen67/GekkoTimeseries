@@ -315,10 +315,22 @@ namespace Gekko
             {
                 using (Note note = new Note())
                     {
-                    note.MainAdd("Starting with the Gekko 3.1.12 version, the default {a{MODE¤mode.htm}a} of Gekko is changed to 'mixed'.");
-                    note.MainAdd("This is the most general mode, and the change should have no concequences for existing Gekko 3.x programs.");
-                    note.MainAdd("Per default, the status bar at the bottom of the main window is now yellow because of this change.");
+                    note.MainAdd("Breaking change: from Gekko 3.1.13 on, collapsing from daily frequency to lower frequencies is strict, ");
+                    note.MainAdd("implying that missing values (missing days) will result in missing values in the collapsed series. ");
+                    note.MainAdd("See the link for more explanation and options to circumvent the change ");
+                    note.MainAdd("(besides, also note that the default mode of Gekko is changed to 'mixed', and therefore the status bar is now yellow).");
                     //
+                    note.MoreAdd("In Gekko versions 3.1.1-3.1.12, {a{collapsing¤collapse.htm}a} (aggregating) from daily frequency timeseries to lower frequencies like for instance monthly,");
+                    note.MoreAdd("missing days were treated flexibly, that is, just skipped. This is changed in Gekko 3.1.13 and on, to make it");
+                    note.MoreAdd("consistent with the way weekly, monthly and quarterly frequency timeseries are collapsed,");
+                    note.MoreAdd("where collapsing is always strict (a missing value in the higher frequency timeseries will result in");
+                    note.MoreAdd("a missing value in the lower frequency timeseries). The change is breaking in the sense that existing");
+                    note.MoreAdd("programs written for Gekko 3.1.1-3.1.12 may suddently fail because of missing values after collapsing.");
+                    note.MoreAdd("To remedy this quickly, just set 'option collapse missing d = flex;' and your programs should run like before");
+                    note.MoreAdd("(or alternatively use the local option COLLAPSE <missing=flex>).");
+                    note.MoreNewLine();
+                    note.MoreAdd("Regarding mixed mode, this is the most general mode, and the change should have no concequences for existing Gekko 3.x programs.");                    
+                    note.MoreAdd("Per default, the status bar at the bottom of the main window is now yellow because of this change.");                    
                     note.MoreAdd("Gekko has three {a{modes¤mode.htm}a}: mixed-mode (the most general), data-mode (for data management), and sim-mode (for modeling).");
                     note.MoreAdd("The most particular of these three modes is sim-mode, where you must use {a{CREATE¤create.htm}a} to define a non-model timeseries,");
                     note.MoreAdd("and where databank searching is deactivated. The other two modes are more similar, and the differences between data-mode and mixed-mode");

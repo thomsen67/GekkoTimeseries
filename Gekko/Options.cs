@@ -38,9 +38,9 @@ namespace Gekko
         public bool bugfix_missing = true;  //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
         // ---
         //method options could look like the 2 following:
-        //public string collapse_method = "total";
-        //public string interpolate_method = "repeat";
-        public string collapse_missing_d = "flex";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
+        public string collapse_method = "total";  //total|avg
+        public string interpolate_method = "repeat"; //repeat|prorate
+        public string collapse_missing_d = "strict";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
         // ---
         public bool databank_create_auto = true;             
         public bool databank_file_copylocal = true;
