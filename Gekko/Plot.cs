@@ -88,7 +88,7 @@ namespace Gekko
                 if (Program.options.plot_using != "")
                 {
                     string fileName = Program.options.plot_using;
-                    fileName = G.AddExtension(fileName, ".gpt");
+                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
                     fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
                     doc1 = new XmlDocument();
                     string xmlText = Program.GetTextFromFileWithWait(fileName);
@@ -110,11 +110,11 @@ namespace Gekko
                     bool cancel = false;
                     if (fileName == "*")
                     {
-                        Program.SelectFile("gpt", ref fileName, ref cancel);
+                        Program.SelectFile(Globals.extensionPlot, ref fileName, ref cancel);
                     }
                     if (cancel) return;
 
-                    fileName = G.AddExtension(fileName, ".gpt");
+                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
                     fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
                     doc2 = new XmlDocument();
                     string xmlText = Program.GetTextFromFileWithWait(fileName);
@@ -239,6 +239,18 @@ namespace Gekko
             // ---------------------------------------------
             // --------- loading main section start
             // ---------------------------------------------
+
+            string plotcode1 = GetText(null, null, null, doc.SelectSingleNode("gekkoplot/plotcode"), null);
+            string plotcode2 = o.opt_plotcode;
+            string plotcode = null;
+            if (!string.IsNullOrEmpty(plotcode1) && !string.IsNullOrEmpty(plotcode2))
+            {
+                plotcode = plotcode1 + "; " + plotcode2;
+            }
+            else
+            {
+                plotcode = plotcode1 + plotcode2;  //result may be empty string
+            }
 
             string size2 = GetText(null, o.opt_size, null, doc.SelectSingleNode("gekkoplot/size"), null);
             string title = GetText(null, o.opt_title, null, doc.SelectSingleNode("gekkoplot/title"), null);
@@ -667,10 +679,10 @@ namespace Gekko
                 if (ticsTxt != null) txt.AppendLine(ticsTxt);
             }
 
-            if (o.opt_plotcode != null)
+            if (!string.IsNullOrEmpty(plotcode))
             {
                 txt.AppendLine("");
-                txt.AppendLine(o.opt_plotcode);  //user code
+                txt.AppendLine(plotcode);  //user code
                 txt.AppendLine("");
             }
 

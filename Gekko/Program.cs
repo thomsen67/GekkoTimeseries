@@ -1599,7 +1599,8 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer)
-            {
+            {               
+
                 if (text == "arrow")
                 {
                     //while (true)
