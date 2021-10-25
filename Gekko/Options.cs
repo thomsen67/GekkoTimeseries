@@ -38,8 +38,7 @@ namespace Gekko
         public bool bugfix_missing = true;  //not mentioned in help. If option true, m()==m() will be true, and m()<>m() false for series comparison        
         // ---
         //method options could look like the 2 following:
-        public string collapse_method = "total";  //total|avg
-        public string interpolate_method = "repeat"; //repeat|prorate
+        public string collapse_method = "total";  //total|avg|first|last
         public string collapse_missing_d = "strict";  //strict|flex, can daily data contain holes? Corresponds to COLLAPSE <flex> when the input series is !d frequency.
         // ---
         public bool databank_create_auto = true;             
@@ -101,6 +100,8 @@ namespace Gekko
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
         public bool interface_table_operators = true;
         public int interface_zoom = 100;
+        // ---
+        public string interpolate_method = "repeat"; //repeat|prorate
         // ---
         public bool library_cache = true;  //if using cache on file or not        
         // ---
@@ -170,6 +171,8 @@ namespace Gekko
         public bool sheet_prt_gdif = false;  //dp
         public bool sheet_cols = false;
         public bool sheet_rows = true;
+        // ---
+        public string smooth_method = "linear"; //linear|geometric|repeat|spline|overlay
         // ---
         public bool solve_data_create_auto = false;
         public bool solve_data_ignoremissing = false;  //for now, keep it here
@@ -276,17 +279,10 @@ namespace Gekko
                 if (w.Contains("  "))
                 {
                     new Error("Option type error, too many blanks");
-                }
-                //if (w.Contains("("))
-                //{
-                //    string[] sss = w.Split(' ');
-                //    for(int i =0;i<sss.Length;i++)
-
-                //}
+                }                
                 ss5.Add(w); //is also lowercase
                 for (int i = 1; i < ss.Length; i++) ss5.Add(ss[i].Trim());
-                rv.Add(ss5);               
-
+                rv.Add(ss5); 
             }
 
             void Alias(string s1, string s2)
@@ -301,12 +297,8 @@ namespace Gekko
             
             Add("BUGFIX IMPORT EXPORT", Globals.xbool);
             Add("BUGFIX MISSING", Globals.xbool);
-              
-            //method options could look like the 2 following:
-            //Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg");
-            //Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
+            Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
-
             Add("DATABANK CREATE AUTO", Globals.xbool);
             Add("DATABANK FILE COPYLOCAL", Globals.xbool);
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);
@@ -365,6 +357,7 @@ namespace Gekko
             Add("INTERFACE SUGGESTIONS", Globals.xnameOrString, "none", "option");
             Add("INTERFACE TABLE OPERATORS", Globals.xbool);
             Add("INTERFACE ZOOM", Globals.xint);
+            Add("INTERPOLATE METHOD", Globals.xnameOrString, "repeat", "prorate");
             Add("LIBRARY CACHE", Globals.xbool);
             Add("MENU STARTFILE", Globals.xnameOrStringOrFilename); //cf. #jsadklgasj4j
             Add("MODEL CACHE", Globals.xbool);
@@ -443,6 +436,7 @@ namespace Gekko
             Add("SHEET PRT PCH", Globals.xbool);
             Add("SHEET ROWS", Globals.xbool);
             Add("SHEET COLS", Globals.xbool);
+            Add("SMOOTH METHOD", Globals.xnameOrString, "linear", "geometric", "repeat", "spline", "overlay");
             Add("SOLVE DATA CREATE AUTO", Globals.xbool);
             Add("SOLVE DATA IGNOREMISSING", Globals.xbool);
             Add("SOLVE DATA INIT", Globals.xbool);

@@ -19522,7 +19522,14 @@ namespace Gekko
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
                 CollapseHelper helper = new CollapseHelper();
-                if (method != null) helper.method = method;
+                if (method != null)
+                {
+                    helper.method = method;
+                }
+                else
+                {
+                    helper.method = Program.options.collapse_method.ToLower();
+                }
                 if (missing != null) helper.collapse_missing = missing;
                 CollapseHelper(ts_lhs, ts_rhs, helper);
 
