@@ -11968,6 +11968,8 @@ namespace Gekko
                 }
                 else if (method == ESmoothTypes.Overlay)
                 {
+                    if (overlay == null) new Error("For smoothing with overlay method, you need to input a timeseries as argument");
+
                     GekkoTime realStartOverlay = overlay.GetRealDataPeriodFirst();
                     GekkoTime realEndOverlay = overlay.GetRealDataPeriodLast();
 

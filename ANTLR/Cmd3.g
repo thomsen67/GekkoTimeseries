@@ -4251,7 +4251,7 @@ ident2: 					Ident |
   SIGN|
   SIM|
   SMOOTH|
-  SPLICE|
+  SPLICE|  
   STOP|
   STRING2|
   SYS|
@@ -4465,6 +4465,7 @@ ident2: 					Ident |
   LANGUAGE|
   LAST|
   LEV|
+  LINEAR|
   LINECOLOR|
   LINESPOINTS|
   LINES|
@@ -4616,6 +4617,7 @@ ident2: 					Ident |
   SOUND|
   SOURCE|
   SPECIALMINUS|
+  SPLINE|
   SPLIT|
   STACKED|
   STACK|
