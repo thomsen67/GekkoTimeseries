@@ -7004,7 +7004,15 @@ namespace Gekko
                 Series rhs = O.ConvertToSeries(ivRhs) as Series;
                 Series lhs = O.ConvertToSeries(ivLhs) as Series;
 
+                //The following sets default/global method
                 ESmoothTypes method = ESmoothTypes.Linear;  //spline is the default in AREMOS, but linear is simpler and we are certain that the average of the filled in holes is meaningful
+                if (G.Equal(Program.options.smooth_method, "geometric")) method = ESmoothTypes.Geometric;
+                else if (G.Equal(Program.options.smooth_method, "linear")) method = ESmoothTypes.Linear;
+                else if (G.Equal(Program.options.smooth_method, "spline")) method = ESmoothTypes.Spline;
+                else if (G.Equal(Program.options.smooth_method, "repeat")) method = ESmoothTypes.Repeat;
+                else if (G.Equal(Program.options.smooth_method, "overlay")) method = ESmoothTypes.Overlay;
+                                
+                //If a local method is set
                 if (G.Equal(opt_geometric, "yes")) method = ESmoothTypes.Geometric;
                 if (G.Equal(opt_linear, "yes")) method = ESmoothTypes.Linear;
                 if (G.Equal(opt_spline, "yes")) method = ESmoothTypes.Spline;

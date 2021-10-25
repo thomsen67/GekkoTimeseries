@@ -3024,7 +3024,7 @@ namespace Gekko
 
             if (x.Length == 1)
             {
-                //do nothing here, it is linear as default
+                method = Program.options.smooth_method;  //default is "linear"
             }
             else if (x.Length == 2)
             {
@@ -3223,7 +3223,7 @@ namespace Gekko
             if (ts == null) new Error("Expected a timeseries as first argument, got " + G.GetTypeString(iv) + " type");
 
             string freq_destination = null;
-            string method = "repeat";
+            string method = Program.options.interpolate_method;  // "repeat" is default
 
             if (x.Length > 1)
             {
@@ -3252,7 +3252,7 @@ namespace Gekko
 
             Series tsNew = new Series(G.ConvertFreq(freq_destination, false), null);  //the name will not be used for anything --> the series is temporary
 
-            if (method == null) method = "repeat";
+            if (method == null) method = "repeat";  //never happens...?
             Program.InterpolateHelper(tsNew, ts, method);
 
             return tsNew;

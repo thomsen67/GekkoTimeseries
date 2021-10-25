@@ -19825,7 +19825,7 @@ namespace Gekko
                     new Error("Cannot find: " + yRhs);
                 }
 
-                if (method == null) method = "repeat";
+                if (method == null) method = Program.options.interpolate_method; // default is "repeat"
                 InterpolateHelper(ts_lhs, ts_rhs, method);
 
                 ts_lhs.Stamp();
