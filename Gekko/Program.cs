@@ -8063,7 +8063,7 @@ namespace Gekko
         public static string FlowInsertLabel(string s)
         {
             string rv = "";
-            foreach (string s2 in GetVariableExplanationAugmented(s))
+            foreach (string s2 in GetVariableExplanationAugmented(s, null))
             {
                 rv += s2 + G.NL;
             }
@@ -8071,7 +8071,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get label, source, unit, etc. for a timeseries.
+        /// Get name, label, source, unit, etc. for a timeseries (will also get lines from external varlist.dat file if present: these lines are shown right after name)
         /// </summary>
         /// <param name="variableName"></param>
         /// <param name="printName"></param>
@@ -8079,8 +8079,11 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanationNEW(string variableName, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd)
+        public static List<string> GetVariableExplanation(string variableName, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
         {
+            bool danish = false;
+            if (htmlBrowserSettings != null && htmlBrowserSettings.isDanish) danish = true;
+
             List<string> rv = new List<string>();
             IVariable iv = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReturnNull, false);
             Series ts = null;
@@ -8089,8 +8092,9 @@ namespace Gekko
             {
                 rv.Add("Series: " + variableName);
             }
-            List<string> varExpl = Program.GetVariableExplanation(variableName);
-            foreach (string line in varExpl)
+
+            List<string> explanationsFromExternalFile = Program.GetVariableExplanationFromExternalFile(variableName);
+            foreach (string line in explanationsFromExternalFile)
             {
                 if (line != "")
                 {
@@ -8103,39 +8107,57 @@ namespace Gekko
                 
                 if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless)
                 {
+                    string label_string = "Label: ";
+                    string source_string = "Source: "; if (danish) source_string = "Kilde: ";
+                    string units_string = "Units: "; if (danish) source_string = "Enheder: ";
+
                     if (!G.NullOrBlanks(ts.meta.label))
                     {
-                        rv.Add("Label: " + ts.meta.label);
+                        rv.Add(label_string + ts.meta.label);
                     }
                     else
                     {
                         if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.label))
                         {
-                            rv.Add("Label: " + ts.mmi.parent.meta.label);
+                            rv.Add(label_string + ts.mmi.parent.meta.label);
                         }
                     }
-
+                    
                     if (!G.NullOrBlanks(ts.meta.source))
-                    {
-                        rv.Add("Source: " + ts.meta.source);
+                    {                        
+                        if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
+                        {
+                            //do nothing
+                        }
+                        else
+                        {
+                            rv.Add(source_string + ts.meta.source);
+                        }
                     }
                     else
                     {
-                        if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.source))
+                        if (htmlBrowserSettings != null && htmlBrowserSettings.show_source == false)
                         {
-                            rv.Add("Source: " + ts.mmi.parent.meta.source);
+                            //do nothing
+                        }
+                        else
+                        {
+                            if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.source))
+                            {
+                                rv.Add(source_string + ts.mmi.parent.meta.source);
+                            }
                         }
                     }
-
+                    
                     if (!G.NullOrBlanks(ts.meta.units))
                     {
-                        rv.Add("Units: " + ts.meta.units);
+                        rv.Add(units_string + ts.meta.units);
                     }
                     else
                     {
                         if (ts.mmi != null && ts.mmi.parent != null && !G.NullOrBlanks(ts.mmi.parent.meta.units))
                         {
-                            rv.Add("Units: " + ts.mmi.parent.meta.units);
+                            rv.Add(units_string + ts.mmi.parent.meta.units);
                         }
                     }
                 }
@@ -8183,11 +8205,11 @@ namespace Gekko
         /// </summary>
         /// <param name="variableNameWithOrWithoutLag"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag)
+        public static List<string> GetVariableExplanationAugmented(string variableNameWithOrWithoutLag, HtmlBrowserSettings htmlBrowserSettings)
         {
             string ss = "";
             string var2 = G.ExtractOnlyVariableIgnoreLag(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
-            List<string> ss2 = Program.GetVariableExplanationNEW(var2, true, false, GekkoTime.tNull, GekkoTime.tNull);
+            List<string> ss2 = Program.GetVariableExplanation(var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
             return ss2;
         }
 
@@ -8718,7 +8740,7 @@ namespace Gekko
             text = text.Replace("&", "&amp;");
             text = text.Replace("<", "&lt;");
             text = text.Replace(">", "&gt;");
-            text = text.Replace("<", "");
+            text = text.Replace("<", ""); //hmmmm what does this do? never mind.
             text = text.Replace("\"", "&quot;");
             text = text.Replace("'", "&#39;");
             return text;
@@ -12436,7 +12458,7 @@ namespace Gekko
                     }
                 }
 
-                List<string> expls = Program.GetVariableExplanationNEW(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull);
+                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
                 foreach (string expl in expls) G.Writeln(expl);
 
                 bool eqsPrinted = false;
@@ -12596,11 +12618,9 @@ namespace Gekko
             G.Writeln2("==========================================================================================");
             G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
 
-            List<string> expls = Program.GetVariableExplanationNEW(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull);
+            List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
             foreach (string expl in expls) G.Writeln(expl);
-
-            //if (!G.NullOrBlanks(ts.meta.label)) G.Writeln(ts.meta.label);
-
+            
             if (ts.type == ESeriesType.ArraySuper)
             {
 
@@ -13213,11 +13233,11 @@ namespace Gekko
         }
 
         /// <summary>
-        /// For a timeseries, get label, source, units, etc.
+        /// For a timeseries, get label, source, units, etc. from the external variable list (varlist.dat)
         /// </summary>
         /// <param name="var"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanation(string var)
+        public static List<string> GetVariableExplanationFromExternalFile(string var)
         {
             List<string> explanation = new List<string>();
             if (Program.unfoldedVariableList == null) return explanation;

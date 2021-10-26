@@ -315,7 +315,7 @@ namespace Gekko
             {
                 using (Note note = new Note())
                     {
-                    note.MainAdd("Breaking change: from Gekko 3.1.13 on, collapsing from daily frequency to lower frequencies is strict, ");
+                    note.MainAdd("Breaking change: from Gekko 3.1.13 on, collapsing/aggregating from daily frequency to lower frequencies is strict, ");
                     note.MainAdd("implying that missing values (missing days) will result in missing values in the collapsed series. ");
                     note.MainAdd("See the link for more explanation and options to circumvent the change ");
                     note.MainAdd("(besides, also note that the default mode of Gekko is changed to 'mixed', and therefore the status bar is now yellow).");

@@ -2678,7 +2678,7 @@ namespace Gekko
                     tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
                     if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
                     if (this.meta.source != null) tsCopy.meta.source = this.meta.source;
-                    if (this.meta.units != null) tsCopy.meta.source = this.meta.units;
+                    if (this.meta.units != null) tsCopy.meta.units = this.meta.units;
                     if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;
                     if (this.meta.domains != null)
                     {

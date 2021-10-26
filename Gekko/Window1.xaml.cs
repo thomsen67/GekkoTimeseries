@@ -993,7 +993,7 @@ namespace Gekko
                             else
                             {
                                 string txt = "";
-                                foreach (string s in Program.GetVariableExplanationAugmented(var2))
+                                foreach (string s in Program.GetVariableExplanationAugmented(var2, null))
                                 {
                                     txt += s + G.NL;
                                 }

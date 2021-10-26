@@ -8,6 +8,15 @@ using System.Windows.Forms;
 
 namespace Gekko
 {
+    /// <summary>
+    /// Used to store info on how label, unit, etc. is shown in EquationBrower (html). In this classe so not to pollute anything...
+    /// </summary>
+    public class HtmlBrowserSettings
+    {
+        public bool isDanish = true;
+        public bool show_source = false;
+    }
+
     public static class EquationBrowser
     {
         public static void Browser()
@@ -146,7 +155,7 @@ namespace Gekko
             try { settings_ekstrafiler = (object[])jsonTree["ekstrafiler"]; } catch { }
             if (settings_ekstrafiler == null)
             {
-                new Error("JSON: ekstrafiler");
+                new Error("JSON: ekstrafiler problem");
             }
 
             // -------------------------------------------------------------
@@ -171,7 +180,6 @@ namespace Gekko
                 if (file.Contains("/") || file.Contains("\\"))
                 {
                     new Error("'" + file + "' should not contain '/' or '\\'");
-                    //throw new GekkoException();
                 }
             }
 
@@ -194,7 +202,7 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    new Error("JSON: ekstrafiler");
+                    new Error("JSON: ekstrafiler problem");
                 }
                 if (s != null) filesToCopy.Add(s);
             }
@@ -206,7 +214,6 @@ namespace Gekko
                 if (!File.Exists(fileNameIndex))
                 {
                     new Error("'" + fileNameIndex + "' was not found");
-                    //throw new GekkoException();
                 }
                 File.Copy(fileNameIndex, fileNameIndex2, true);
             }
@@ -244,7 +251,6 @@ namespace Gekko
                 vars.Clear();
                 foreach (string s14 in temp.Keys) vars.Add(s14);
             }
-
             
             if (Globals.browserLimit)
             {
@@ -260,7 +266,6 @@ namespace Gekko
                 }
             }
 
-
             vars.Sort(StringComparer.OrdinalIgnoreCase);
 
             // -------------------------------------------
@@ -273,6 +278,7 @@ namespace Gekko
             // Html
             // -------------------------------------------
 
+            //Fetches info on external documents that contain read-more info on particular variables
             GekkoDictionary<string, List<Tuple<string, string>>> doc = new GekkoDictionary<string, List<Tuple<string, string>>>(StringComparer.OrdinalIgnoreCase);
             string dokFileName = Program.options.folder_working + "\\" + settings_dok_filename;
             string dok2 = Program.GetTextFromFileWithWait(dokFileName);
@@ -296,11 +302,11 @@ namespace Gekko
                     doc.Add(varname, tuples);
                 }
                 doc[varname].Add(new Tuple<string, string>(path, descr));
-
             }
 
             List<string> vars2 = new List<string>();
 
+            //Fetches estimation output
             GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + settings_est_filename);
             List<string> lines = Stringlist.ExtractLinesFromText(est);
@@ -381,18 +387,25 @@ namespace Gekko
                 sb.AppendLine("</tr>");
                 sb.AppendLine("</table>");
 
-                //List<string> varExpl = Program.GetVariableExplanation(var);
-                //string explanation2 = Program.GetVariableExplanationAugmented(var, G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator)).Trim();
-                List<string> varExpl = Program.GetVariableExplanationAugmented(var);
+                // --------------------------------
+                // html print green explanations here. Includes name, label, source, units -- and may also include raw lines from external varlist.dat file (they are shown first, if present)
+                // --------------------------------
 
+                HtmlBrowserSettings htmlBrowserSettings = new HtmlBrowserSettings();
+                htmlBrowserSettings.isDanish = true;
+                htmlBrowserSettings.show_source = settings_show_source;
+                List<string> varExpl = Program.GetVariableExplanationAugmented(var, htmlBrowserSettings);
                 foreach (string line in varExpl)
                 {
                     if (line != "")
-                    {
-                        string line2 = Program.SpecialXmlChars(line);
-                        WriteHtmlColor(sb, line2);
+                    {                        
+                        WriteHtmlColor(sb, Program.SpecialXmlChars(line));
                     }
                 }
+
+                // --------------------------------
+                // stash explanations for later use in JavaScript find component
+                // --------------------------------
 
                 string explanation = null;
                 if (varExpl != null && varExpl.Count > 0)
@@ -405,98 +418,120 @@ namespace Gekko
                 }
                 vars2.Add(var + "¤" + explanation);
 
-                StringBuilder sb4 = new StringBuilder();
+                // --------------------------------
+                // html print info on ENDO/EXO, freq, data period
+                // --------------------------------
 
-                if (true)
+                EEndoOrExo type1 = Program.VariableTypeEndoExo(var);
+                string type = "";
+                if (type1 == EEndoOrExo.Exo) type = "Eksogen, ";
+                else if (type1 == EEndoOrExo.Endo) type = "Endogen, ";
+
+                //========================================================================================================
+                //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                //========================================================================================================
+
+                string freq = "[ukendt frekvens]";
+                if (ts1.freq == EFreq.A)
                 {
-                    EEndoOrExo type1 = Program.VariableTypeEndoExo(var);
-                    string type = "";
-                    if (type1 == EEndoOrExo.Exo) type = "Eksogen, ";
-                    else if (type1 == EEndoOrExo.Endo) type = "Endogen, ";
+                    freq = "Årlig";
+                }
+                else if (ts1.freq == EFreq.Q)
+                {
+                    freq = "Kvartalsvis";
+                }
+                else if (ts1.freq == EFreq.M)
+                {
+                    freq = "Månedlig";
+                }
+                else if (ts1.freq == EFreq.W)
+                {
+                    freq = "Ugentlig";
+                }
+                else if (ts1.freq == EFreq.D)
+                {
+                    freq = "Daglig";
+                }
+                else if (ts1.freq == EFreq.U)
+                {
+                    freq = "Udateret";
+                }
 
-                    string freq = "[ukendt frekvens]";
-                    if (ts1.freq == EFreq.A)
-                    {
-                        freq = "Årlig";
-                    }
-                    else if (ts1.freq == EFreq.Q)
-                    {
-                        freq = "Kvartalsvis";
-                    }
-                    else if (ts1.freq == EFreq.M)
-                    {
-                        freq = "Månedlig";
-                    }
-                    else if (ts1.freq == EFreq.U)
-                    {
-                        freq = "Udateret";
-                    }
+                bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data
 
-                    bool noData = ts1.IsNullPeriod(); //We are opening up to this possibility of 'empty' data
+                GekkoTime first = ts1.GetRealDataPeriodFirst();
+                GekkoTime last = ts1.GetRealDataPeriodLast();
 
-                    //GekkoTime first = ts.GetPeriodFirst();
-                    //GekkoTime last = ts.GetPeriodLast();
-
-                    GekkoTime first = ts1.GetRealDataPeriodFirst();
-                    GekkoTime last = ts1.GetRealDataPeriodLast();
-
-                    sb4.Append(type);
-                    string stamp = null;
-                    if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (opdateret: " + ts1.meta.stamp + ")";
-                    if (ts1.freq == EFreq.A || ts1.freq == EFreq.U)
+                StringBuilder sb4 = new StringBuilder();
+                sb4.Append(type);
+                string stamp = null;
+                if (ts1.meta.stamp != null && ts1.meta.stamp != "") stamp = " (opdateret: " + ts1.meta.stamp + ")";
+                if (ts1.freq == EFreq.A || ts1.freq == EFreq.U)
+                {
+                    if (noData || first.super == -12345 || last.super == -12345)
                     {
-                        if (noData || first.super == -12345 || last.super == -12345)
-                        {
-                            sb4.Append(freq + ", ingen dataperiode");
-                        }
-                        else
-                        {
-                            //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                            sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
-                        }
+                        sb4.Append(freq + ", ingen dataperiode");
                     }
                     else
                     {
-                        if (noData || first.super == -12345 || last.super == -12345)
-                        {
-                            sb4.Append(freq + ", ingen dataperiode");
-                        }
-                        else
-                        {
-                            sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp);
-                        }
+                        //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                        sb4.Append(freq + " data fra " + first.super + " til " + last.super + stamp);
                     }
-                    WriteHtml(sb, sb4.ToString());
-
                 }
-
-                if (ts1.meta.label != null) WriteHtml(sb, "Label: " + ts1.meta.label);
-
-                if (settings_show_source)
+                else
                 {
-                    if (ts1.meta.source != null)
+                    if (noData || first.super == -12345 || last.super == -12345)
                     {
-                        //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                        string src2 = ts1.meta.source.Trim();
-                        if (src2 != "")
-                        {
-                            int i = src2.IndexOf("(hash ");
-                            if (i > -1)
-                                src2 = src2.Substring(0, i);
-                            WriteHtml(sb, "Seneste beregning: " + src2);
-                        }
+                        sb4.Append(freq + ", ingen dataperiode");
+                    }
+                    else
+                    {
+                        sb4.Append(freq + " data fra " + first.super + ts1.freq.ToString() + first.sub + " til " + last.super + ts1.freq.ToString() + last.sub + stamp);
                     }
                 }
+                WriteHtml(sb, sb4.ToString());  //for instance: Endogen: Årlige data fra 1966 til 2030 (opdateret: 23-09-2021)
 
-                if (ts1.meta.units != null)
-                {
-                    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                    string src2 = ts1.meta.units.Trim();
-                    if (src2 != "")
-                    {
-                        WriteHtml(sb, "Enheder: " + src2);
-                    }
-                }
+                //// --------------------------------
+                //// html print label
+                //// --------------------------------
+
+                //if (ts1.meta.label != null) WriteHtml(sb, "Label: " + ts1.meta.label);
+
+                //// --------------------------------
+                //// html print source
+                //// --------------------------------
+
+                //if (settings_show_source)
+                //{
+                //    if (ts1.meta.source != null)
+                //    {                        
+                //        string src2 = ts1.meta.source.Trim();
+                //        if (src2 != "")
+                //        {
+                //            int i = src2.IndexOf("(hash ");
+                //            if (i > -1) src2 = src2.Substring(0, i);
+                //            WriteHtml(sb, "Seneste beregning: " + src2);
+                //        }
+                //    }
+                //}
+
+                //// --------------------------------
+                //// html print units
+                //// --------------------------------
+
+                //if (ts1.meta.units != null)
+                //{
+                //    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
+                //    string src2 = ts1.meta.units.Trim();
+                //    if (src2 != "")
+                //    {
+                //        WriteHtml(sb, "Enheder: " + src2);
+                //    }
+                //}
+
+                // --------------------------------
+                // print link(s) to possible external documentation files
+                // --------------------------------
 
                 List<Tuple<string, string>> tuples = null; doc.TryGetValue(var, out tuples);
                 if (tuples != null)
@@ -509,8 +544,6 @@ namespace Gekko
                         string s = null;
                         if (counter == 0) s = "Dokumentation:&nbsp;&nbsp;";
                         sb.Append("<tr>");
-                        //sb.Append("<td width = `1%`>" + s + "</td>");
-                        //sb.Append("<td width = `99%`><a href = `" + tuple.Item1 + "`>" + tuple.Item2 + "</a></td>");
                         sb.Append("<td>" + s + "</td>");
                         sb.Append("<td><a href = `" + tuple.Item1 + "`>" + tuple.Item2 + "</a></td>");
                         sb.Append("</tr>");
@@ -518,120 +551,15 @@ namespace Gekko
                     sb.Append("</table>");
                 }
 
+                // --------------------------------
+                // html print dependents etc.
+                // --------------------------------
 
-                if (G.HasModelGekko())
-                {
-                    List<string> list = new List<string>();
-                    if (Program.model.modelGekko.dependents.ContainsKey(var))
-                    {
-                        Dictionary<string, string> d2 = Program.model.modelGekko.dependents[var].storage;
-                        if (d2 != null)
-                        {
-                            foreach (string d3 in d2.Keys)
-                            {
-                                list.Add(d3);
-                            }
-                        }
-                        list.Sort(StringComparer.InvariantCulture);
-                    }
+                BrowserDependents(var, sb, ref jName, ref jNameAutoGen);
 
-                    EquationHelper eq = Program.FindEquationByMeansOfVariableName(var);
-
-                    if (eq == null)
-                    {
-                        for (int i = 0; i < Program.model.modelGekko.equationsReverted.Count; i++)
-                        {
-                            EquationHelper eh = Program.model.modelGekko.equationsReverted[i];
-                            if (G.Equal(var, eh.lhs))
-                            {
-                                eq = eh;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (eq == null)
-                    {
-                        for (int i = 0; i < Program.model.modelGekko.equationsNotRunAtAll.Count; i++)
-                        {
-                            EquationHelper eh = Program.model.modelGekko.equationsNotRunAtAll[i];
-                            if (G.Equal(var, eh.lhs))
-                            {
-                                eq = eh;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (eq != null && eq.equationCode != null)
-                    {
-                        foreach (string s in eq.precedentsWithLagIndicator.Keys)
-                        {
-                            string jvar = null;
-                            int lag = 0;
-                            G.ExtractVariableAndLag(s, out jvar, out lag);
-                            if (jvar.StartsWith("j", StringComparison.OrdinalIgnoreCase))
-                            {
-                                if (G.Contains(jvar, var))
-                                {
-                                    jName = jvar;
-                                    if (!G.Contains(eq.equationText, jvar))
-                                    {
-                                        jNameAutoGen = true;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (eq != null && eq.modelBlock != null && eq.modelBlock != "" && eq.modelBlock != "Unnamed")
-                    {
-                        WriteHtml(sb, "Modelblock: " + eq.modelBlock);
-                    }
-
-                    StringBuilder sb5 = new StringBuilder();
-                    sb5.Append("Påvirker: ");
-                    if (list.Count == 0) sb5.Append("<none>");
-                    else
-                    {
-
-                        int counter = 0;
-                        for (int i = 0; i < list.Count; i++)
-                        {
-                            string s = list[i];
-
-
-                            sb5.Append(HtmlLink(s));
-
-
-                            if (i < list.Count - 1) sb5.Append(", ");
-
-
-                        }
-                        sb5.AppendLine();
-
-                    }
-                    WriteHtml(sb, sb5.ToString());
-
-                    if (eq != null)
-                    {
-                        StringBuilder sb2 = new StringBuilder();
-                        if (eq.equationType == EEquationType.RevertedAutoGenerated || eq.equationType == EEquationType.RevertedP || eq.equationType == EEquationType.RevertedT || eq.equationType == EEquationType.RevertedY)
-                        {
-                            sb2.AppendLine("----------------------------------------------");
-                            sb2.AppendLine("    Note that this equation is run *after*");
-                            sb2.AppendLine("    the model itself is solved.");
-                            sb2.AppendLine("----------------------------------------------");
-                            sb2.AppendLine("");
-                        }
-                        string equationText = eq.equationText;
-                        if (jNameAutoGen) equationText += G.NL + G.NL + "J-led: " + jName;
-                        InsertLinksIntoEquation(equationText, true, sb2);
-                        WriteHtmlPreCode(sb, sb2.ToString());
-                    }
-
-                }
+                // --------------------------------
+                // html print estimation output etc.
+                // --------------------------------
 
                 string xxx = null;
                 if (est2.ContainsKey(var))
@@ -649,6 +577,10 @@ namespace Gekko
                     FoldingButtonEnd(sb);
                 }
 
+                // --------------------------------
+                // html print data generation info
+                // --------------------------------
+
                 List<string> datagen2 = null; datagen.TryGetValue(var, out datagen2);
                 if (datagen2 != null)
                 {
@@ -665,6 +597,10 @@ namespace Gekko
 
                 int max = Program.options.print_disp_maxlines;
                 if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
+
+                // --------------------------------
+                // make plots
+                // --------------------------------
 
                 string l1 = bank1.ToLower().Replace(".gbk", "") + ":" + var;
                 string l2 = bank2.ToLower().Replace(".gbk", "") + ":" + var;
@@ -691,49 +627,47 @@ namespace Gekko
 
                 if (jName != null)
                 {
-
                     FoldingButtonStart(sb, "J-led");
                     sb.AppendLine("<img src = `" + jName.ToLower() + ".svg" + "`>");
                     FoldingButtonEnd(sb);
                 }
 
-                if (true)
+                // --------------------------------
+                // html print data values of series
+                // --------------------------------
+
+                StringBuilder sb3 = new StringBuilder();
+                sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + bank2);
+                sb3.AppendLine();
+                sb3.AppendLine("Period        value        %  " + G.Blanks(gap) + "Period        value        %  ");
+                int counter6 = 0;
+                foreach (GekkoTime gt in new GekkoTimeIterator(print_start, print_end))
                 {
-
-                    StringBuilder sb3 = new StringBuilder();
-                    sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + bank2);
-                    sb3.AppendLine();
-                    sb3.AppendLine("Period        value        %  " + G.Blanks(gap) + "Period        value        %  ");
-                    int counter = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(print_start, print_end))
+                    counter6++;
+                    if (hasFilter)  //some periods are set via TIMEFILTER
                     {
-                        counter++;
-                        if (hasFilter)  //some periods are set via TIMEFILTER
-                        {
-                            if (Program.ShouldFilterPeriod(gt)) continue;
-                        }
-
-                        int counter2 = -1;
-                        foreach (Series ts in new List<Series> { ts1, ts2 })
-                        {
-                            counter2++;
-                            if (ts == null)
-                            {
-                                //ignore it
-                            }
-                            else
-                            {
-                                BrowserWritePrintLine(ts, sb3, gt);
-                                if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
-                            }
-                        }
-
-                        sb3.AppendLine();
+                        if (Program.ShouldFilterPeriod(gt)) continue;
                     }
 
-                    WriteHtmlPreCode(sb, sb3.ToString());
+                    int counter2 = -1;
+                    foreach (Series ts in new List<Series> { ts1, ts2 })
+                    {
+                        counter2++;
+                        if (ts == null)
+                        {
+                            //ignore it
+                        }
+                        else
+                        {
+                            BrowserWritePrintLine(ts, sb3, gt);
+                            if (counter2 == 0) sb3.Append(G.Blanks(gap + 1));
+                        }
+                    }
 
+                    sb3.AppendLine();
                 }
+
+                WriteHtmlPreCode(sb, sb3.ToString());
 
                 StringBuilder x = new StringBuilder();
                 x.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
@@ -799,7 +733,7 @@ namespace Gekko
 
             foreach (string var2 in vars)
             {
-                List<string> varExpl = Program.GetVariableExplanation(var2);
+                List<string> varExpl = Program.GetVariableExplanationFromExternalFile(var2);
                 string expl = "";
                 if (varExpl != null && varExpl.Count > 0) expl = Program.SpecialXmlChars(varExpl[0]);
 
@@ -824,8 +758,9 @@ namespace Gekko
                 sw.Write(x2.Replace('`', '\"'));
             }
 
-
+            // ------------------------------------------------------------
             // ----------------- find -------------------------------------
+            // ------------------------------------------------------------
 
             vars2.Sort(StringComparer.OrdinalIgnoreCase);
 
@@ -1000,6 +935,123 @@ namespace Gekko
 
         }
 
+        private static void BrowserDependents(string var, StringBuilder sb, ref string jName, ref bool jNameAutoGen)
+        {
+            if (G.HasModelGekko())
+            {
+                List<string> list = new List<string>();
+                if (Program.model.modelGekko.dependents.ContainsKey(var))
+                {
+                    Dictionary<string, string> d2 = Program.model.modelGekko.dependents[var].storage;
+                    if (d2 != null)
+                    {
+                        foreach (string d3 in d2.Keys)
+                        {
+                            list.Add(d3);
+                        }
+                    }
+                    list.Sort(StringComparer.InvariantCulture);
+                }
+
+                EquationHelper eq = Program.FindEquationByMeansOfVariableName(var);
+
+                if (eq == null)
+                {
+                    for (int i = 0; i < Program.model.modelGekko.equationsReverted.Count; i++)
+                    {
+                        EquationHelper eh = Program.model.modelGekko.equationsReverted[i];
+                        if (G.Equal(var, eh.lhs))
+                        {
+                            eq = eh;
+                            break;
+                        }
+                    }
+                }
+
+                if (eq == null)
+                {
+                    for (int i = 0; i < Program.model.modelGekko.equationsNotRunAtAll.Count; i++)
+                    {
+                        EquationHelper eh = Program.model.modelGekko.equationsNotRunAtAll[i];
+                        if (G.Equal(var, eh.lhs))
+                        {
+                            eq = eh;
+                            break;
+                        }
+                    }
+                }
+
+                if (eq != null && eq.equationCode != null)
+                {
+                    foreach (string s in eq.precedentsWithLagIndicator.Keys)
+                    {
+                        string jvar = null;
+                        int lag = 0;
+                        G.ExtractVariableAndLag(s, out jvar, out lag);
+                        if (jvar.StartsWith("j", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (G.Contains(jvar, var))
+                            {
+                                jName = jvar;
+                                if (!G.Contains(eq.equationText, jvar))
+                                {
+                                    jNameAutoGen = true;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (eq != null && eq.modelBlock != null && eq.modelBlock != "" && eq.modelBlock != "Unnamed")
+                {
+                    WriteHtml(sb, "Modelblock: " + eq.modelBlock);
+                }
+
+                StringBuilder sb5 = new StringBuilder();
+                sb5.Append("Påvirker: ");
+                if (list.Count == 0) sb5.Append("<none>");
+                else
+                {
+
+                    int counter = 0;
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        string s = list[i];
+
+
+                        sb5.Append(HtmlLink(s));
+
+
+                        if (i < list.Count - 1) sb5.Append(", ");
+
+
+                    }
+                    sb5.AppendLine();
+
+                }
+                WriteHtml(sb, sb5.ToString());
+
+                if (eq != null)
+                {
+                    StringBuilder sb2 = new StringBuilder();
+                    if (eq.equationType == EEquationType.RevertedAutoGenerated || eq.equationType == EEquationType.RevertedP || eq.equationType == EEquationType.RevertedT || eq.equationType == EEquationType.RevertedY)
+                    {
+                        sb2.AppendLine("----------------------------------------------");
+                        sb2.AppendLine("    Note that this equation is run *after*");
+                        sb2.AppendLine("    the model itself is solved.");
+                        sb2.AppendLine("----------------------------------------------");
+                        sb2.AppendLine("");
+                    }
+                    string equationText = eq.equationText;
+                    if (jNameAutoGen) equationText += G.NL + G.NL + "J-led: " + jName;
+                    InsertLinksIntoEquation(equationText, true, sb2);
+                    WriteHtmlPreCode(sb, sb2.ToString());
+                }
+
+            }
+        }
+
         private static void BrowserCleanupFolders(string rootFolder, string varsFolder)
         {
             List<string> folders = new List<string> { rootFolder, varsFolder };
@@ -1050,6 +1102,10 @@ namespace Gekko
             sb.AppendLine("<div id = `b" + buttonId + "` style = `display: none;`>");
         }
 
+        /// <summary>
+        /// Extracts info from data generation file, to show as source (for instance y = x/z;).
+        /// </summary>
+        /// <returns></returns>
         private static GekkoDictionary<string, List<string>> BrowserDataGenerationExtract()
         {
             GekkoDictionary<string, List<string>> datagen = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
@@ -1060,7 +1116,6 @@ namespace Gekko
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
             List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(genr, fat, tags1, tags2, null, null).storage;
-            //List<TokenHelper> a = Program.GetTokensWithLeftBlanks(genr, fat, true);
 
             List<List<TokenHelper>> statements = new List<List<TokenHelper>>();
 

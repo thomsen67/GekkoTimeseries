@@ -7569,7 +7569,6 @@ namespace Gekko
                         if (iv_series == null)
                         {
                             new Error("Only series are allowed as input varname");
-                            //throw new GekkoException();
                         }
                         if (opt_label != null) iv_series.meta.label = opt_label;
                         if (opt_source != null) iv_series.meta.source = opt_source;
