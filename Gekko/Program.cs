@@ -1105,7 +1105,7 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Used in getHoliday() function
+    /// Used in getSpecialDay() function
     /// </summary>
     public class HolidayNames
     {

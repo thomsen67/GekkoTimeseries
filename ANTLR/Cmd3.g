@@ -4191,6 +4191,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  LIBRARY|
   KEEPTYPES|
   PREDICT|
   FIND|

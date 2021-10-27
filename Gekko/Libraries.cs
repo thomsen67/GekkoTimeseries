@@ -59,7 +59,7 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsReservedName(string libraryName)
         {
-            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || G.Equal(libraryName, Globals.gekkoLibraryString);
+            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || libraryName.ToLower().StartsWith(Globals.gekkoLibraryString.ToLower());
         }
 
         /// <summary>
@@ -323,7 +323,27 @@ namespace Gekko
                 string fileName2 = G.AddExtension(fileName3, "." + "zip");
                 string libraryName = Path.GetFileNameWithoutExtension(fileName2);
                 if (o.aliases[i] != null) libraryName = O.ConvertToString(o.aliases[i]);
-                if (IsReservedName(libraryName)) new Error("The name '" + libraryName + "' is reserved regarding libraries");
+                if (IsReservedName(libraryName))
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("The name '" + libraryName + "' is reserved regarding libraries. ");
+                        txt.MoreAdd("The names 'Global' and 'Local' are reserved, because normal functions/procedures are stored in these (not 'Local' at the moment, though). ");
+                        txt.MoreAdd("In addition, a user library cannot start with 'Gekko'. This is reserved because at some point, Gekko-developed functions/procedures ");
+                        txt.MoreAdd("will be distributed together with Gekko, in the form of library zip files. These will be named for instance 'Gekko' or 'Gekko_3_1_12' or something similar and ");
+                        txt.MoreAdd("should not be confused with user-developed libraries.");
+                    }
+                }
+
+                if (libraryName.Length <= 1)
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("The library name '" + libraryName + "' cannot be just 1 character. ");
+                        txt.MoreAdd("Library names must be of length > 1. At some point it will be possible to refer to for instance .gtb or .gpt files stored inside a library zip file. The length restriction is to avoid the possibility of storing for instance a pretty.gpt schema file for plots inside a c.zip file, and later refer to the schema file with c:pretty.gpt. This would be confusing, since c: could be a drive letter.");
+                    }
+                }
+
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_command);
                 folders.Add(Program.options.folder_command1);

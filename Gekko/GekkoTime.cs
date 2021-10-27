@@ -49,6 +49,7 @@ namespace Gekko
     {
         Null,  //null
         New_Years_Day, //Nytaarsdag
+        Leap_Day, //Skuddag
         Maundy_Thursday, //Skaertorsdag
         Good_Friday, //Langfredag
         Easter_Sunday, //Paaskedag
@@ -152,6 +153,7 @@ namespace Gekko
                 if (GekkoTime.holidayNames != null) return GekkoTime.holidayNames;
                 List<HolidayNames> holidays = new List<HolidayNames>();
                 holidays.Add(new HolidayNames(EHolidayName.New_Years_Day, "New_Years_Day", "Nytaarsdag"));
+                holidays.Add(new HolidayNames(EHolidayName.Leap_Day, "Leap_Day", "Skuddag"));
                 holidays.Add(new HolidayNames(EHolidayName.Maundy_Thursday, "Maundy_Thursday", "Skaertorsdag"));
                 holidays.Add(new HolidayNames(EHolidayName.Good_Friday, "Good_Friday", "Langfredag"));
                 holidays.Add(new HolidayNames(EHolidayName.Easter_Sunday, "Easter_Sunday", "Paaskedag"));
@@ -1531,7 +1533,7 @@ namespace Gekko
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
 
-            if (this.IsNull()) return "[unknown]";
+            if (this.IsNull()) return "[null]";
             if (this.freq == EFreq.A)
             {
                 if (super >= Globals.timeStringsStart && super <= Globals.timeStringsEnd)
@@ -1617,12 +1619,23 @@ namespace Gekko
             }
         }        
 
-        public static GekkoTime GetHoliday(int year, EHolidayName name)
+        public static GekkoTime GetSpecialDay(int year, EHolidayName name)
         {
             GekkoTime gt = GekkoTime.tNull;
             if (name == EHolidayName.New_Years_Day)
             {
                 gt = new GekkoTime(EFreq.D, year, 1, 1);
+            }
+            else if (name == EHolidayName.Leap_Day)
+            {
+                if (DateTime.IsLeapYear(year))
+                {
+                    gt = new GekkoTime(EFreq.D, year, 2, 29);
+                }
+                else
+                {
+                    gt = GekkoTime.tNull;
+                }
             }
             else if (name == EHolidayName.Maundy_Thursday)
             {
@@ -1687,7 +1700,7 @@ namespace Gekko
             return gt;
         }
 
-        public static GekkoTime GetHoliday(int year, string s)
+        public static GekkoTime GetSpecialDay(int year, string s)
         {            
             EHolidayName name = EHolidayName.Null;
             foreach (HolidayNames h in GekkoTime.HolidayNames)
@@ -1709,13 +1722,13 @@ namespace Gekko
                     txt.MoreNewLine();
                     foreach (HolidayNames h in GekkoTime.HolidayNames)
                     {                        
-                        txt.MoreAdd($"{GetHoliday(y, h.name).ToString(),-15}" + $"{h.en,-25}" + $"{ h.da,-25}");
+                        txt.MoreAdd($"{GetSpecialDay(y, h.name).ToString(),-15}" + $"{h.en,-25}" + $"{ h.da,-25}");
                         txt.MoreNewLineTight();
                     }
                 }
             }
 
-            return GetHoliday(year, name);
+            return GetSpecialDay(year, name);
         }
 
         /// <summary>

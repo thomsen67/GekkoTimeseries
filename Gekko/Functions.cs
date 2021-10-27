@@ -1595,9 +1595,14 @@ namespace Gekko
         }
 
         public static IVariable null2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        {
-            //alias
+        {            
             return GekkoNull.gekkoNull;
+        }
+
+        public static IVariable isnull(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            if (G.IsGekkoNull(x1)) return Globals.scalarVal1;
+            else return Globals.scalarVal0;
         }
 
         public static IVariable m(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
@@ -2864,9 +2869,15 @@ namespace Gekko
                 new Error("pch(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return null;
+        }        
+
+        public static IVariable observations(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            GekkoTime t1 = O.ConvertToDate(x1);
+            GekkoTime t2 = O.ConvertToDate(x2);
+            int obs = GekkoTime.Observations(t1, t2); //can be 0 or negative, we allow this                        
+            return new ScalarVal(obs);
         }
-
-
 
         public static IVariable seq(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
@@ -3193,11 +3204,12 @@ namespace Gekko
         /// </summary>
         /// <param name="year">The year as an integer</param>
         /// <returns>Returns a datetime of Easter Sunday.</returns>
-        public static ScalarDate getholiday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable date, IVariable name)
-        {              
+        public static IVariable getspecialday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable date, IVariable name)
+        {
             GekkoTime t = O.ConvertToDate(date);
-            if (t.freq != EFreq.A) new Error("getHoliday() function was called with a date of " + t.freq.Pretty() + " frequency. Only Annual dates or integers can be used.");            
-            GekkoTime t2 = GekkoTime.GetHoliday(t.super, O.ConvertToString(name));
+            if (t.freq != EFreq.A) new Error("getSpecialDay() function was called with a date of " + t.freq.Pretty() + " frequency. Only Annual dates or integers can be used.");
+            GekkoTime t2 = GekkoTime.GetSpecialDay(t.super, O.ConvertToString(name));
+            if (t2.IsNull()) return GekkoNull.gekkoNull;
             return new ScalarDate(t2);
         }
 
