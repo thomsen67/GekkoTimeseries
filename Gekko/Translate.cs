@@ -201,24 +201,61 @@ namespace Gekko
                     continue;
                 }
 
-                //bool isSeries = G.Equal(line[0].s, FromTo("ser", "series")) != null;
-
                 // ------------- start of real stuff ---------------------------
 
-                if (i == 0)
+                if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
                 {
-
+                    AddComment(topline, "Note that ##x in Gekko is written %{%x} or #{%x}");
                 }
-                                
+
+
+
+
+
+
+
+
+                //CURLY STUFF START
+
                 SetCurliesAroundNakedHash(line, i, topline[0].meta.commandName);
                 
                 if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == 0 && GetType(line, i + 1) == ETokenType.Word)
                 {
-                    if (!(matrixMemory.ContainsKey(line[i + 1].s) || listMemory.ContainsKey(line[i + 1].s)))
+                    //something like #i
+                    //if it is not a known list, #i is changed to %i
+                    //could be for instance a scalar
+                    if (!(listMemory.ContainsKey(line[i + 1].s)))
                     {
                         line[i].s = "%";
                     }
+                }                
+
+                if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
+                {
+                    //something like x (no sigils)
+                    //if known matrix, make it #x
+
+                    if (matrixMemory.ContainsKey(line[i + 1].s))
+                    {
+                        if (!(line[0].s == "set"))
+                        {
+                            //avoid set freq a --> set freq #a...
+                            int lb = line[i + 1].leftblanks;
+                            line[i + 1].leftblanks = 0;
+                            line.Insert(i + 1, new TokenHelper(lb, "#")); i++;
+                        }
+                    }
                 }
+
+                //CURLY STUFF END
+
+
+
+
+
+
+
+
 
                 if (Equal(line, i, "average") && topline[0].meta.commandName == "collapse")
                 {
@@ -243,7 +280,7 @@ namespace Gekko
 
                 if (Equal(line, i, "."))
                 {
-                    if (Equal(line, i + 1, new List<string>() { "a", "q", "m" }) && GetLeftblanks(line, i + 1) == 0)
+                    if (Equal(line, i + 1, new List<string>() { "a", "q", "m", "w", "d" }) && GetLeftblanks(line, i + 1) == 0)
                     {
                         //x.q --> x!q
                         line[i].s = "!";
@@ -355,27 +392,7 @@ namespace Gekko
                 {
                     // log (x) --> log(x)                    
                     if (KnownFunction(GetS(line, i))) line[i + 1].subnodes[0].leftblanks = 0;
-                }
-                if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
-                {
-                    AddComment(topline, "Note that ##x in Gekko is written %{%x} or #{%x}");
-                }
-
-                if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
-                {
-                    //normal variable/word
-
-                    if (matrixMemory.ContainsKey(line[i + 1].s))
-                    {
-                        if (!(line[0].s == "set"))
-                        {
-                            //avoid set freq a --> set freq #a...
-                            int lb = line[i + 1].leftblanks;
-                            line[i + 1].leftblanks = 0;
-                            line.Insert(i + 1, new TokenHelper(lb, "#")); i++;
-                        }
-                    }
-                }
+                }                
 
                 if (GetS(line, i).Length > 1 && GetS(line, i).EndsWith("."))
                 {
@@ -424,155 +441,152 @@ namespace Gekko
 
         private static void SetCurliesAroundNakedHash(List<TokenHelper> line, int i, string command)
         {
-            if (IsNamePartStart(line, i))
+            if (!IsNamePartStart(line, i)) return;
+
+            int i2 = i;
+            for (int i1 = i + 1; i1 < line.Count; i1++)
             {
-                int i2 = i;
-                for (int i1 = i + 1; i1 < line.Count; i1++)
+                if (!IsNamePartMiddle(line, i1))
                 {
-                    if (!IsNamePartMiddle(line, i1))
+                    break;
+                }
+                i2 = i1;
+            }
+            int tokens = i2 - i + 1;
+
+            bool setCurlies = false;
+            if (tokens > 2)
+            {
+                setCurlies = true;
+            }
+            else if (tokens == 1)  //??
+            {
+                setCurlies = true;
+            }
+            else
+            {
+                //tokens == 2
+                //There are two token, like for instance #i
+
+                //We check if it is in a sanctioned command type
+                //And it must not be inside <...> option field
+                //And it must not be inside []-brackets
+
+                List<string> commands = new List<string>();
+                commands.Add("analyze");
+                commands.Add("clear");
+                commands.Add("close");
+                commands.Add("collapse");
+                commands.Add("compare");
+                commands.Add("convert");
+                commands.Add("copy"); //COPY list m --> non - upgrade and remove list
+                commands.Add("count");
+                commands.Add("excelimport");
+                commands.Add("excelexport");
+                commands.Add("index");
+                commands.Add("delete");
+                commands.Add("display");
+                commands.Add("equation"); //   translate EQU to OLS
+                commands.Add("export");
+                //??"for         U U --> handled on its own ?? Hvis der er TO-- > ingen upgrade, ellers upgrade.
+                commands.Add("graph");
+                commands.Add("plot");
+                commands.Add("interpolate");
+                //??"list handled on its own ?? What to do, cf.FOR
+                // --> isMatrix must have # "matrix     bevist matrix skal have # på i alle kommandoer. Ellers ingen upgrade.
+                commands.Add("obey");
+                commands.Add("open");
+                commands.Add("predict");
+                commands.Add("print");
+                commands.Add("rebase");
+                commands.Add("rename");
+                commands.Add("series");  // last u could be scalar, but oh well
+                commands.Add("smooth");
+                commands.Add("splice");
+                commands.Add("spool");
+                commands.Add("truncate");
+                commands.Add("x12a");
+
+                if (!IsInsideOptionField(line, i) && commands.Contains(command))
+                {
+                    List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
+                    bool insideSquare = false;
+                    foreach (TokenHelper th in nesting)
                     {
-                        break;
-                    }
-                    i2 = i1;
-                }
-                int tokens = i2 - i + 1;
-
-                bool setCurlies = false;
-                if (tokens > 2)
-                {
-                    setCurlies = true;
-                }
-                else if (tokens == 1)  //??
-                {
-                    setCurlies = true;
-                }
-                else
-                {
-                    //tokens == 2
-                    //There are two token, like for instance #i
-
-                    //We check if it is in a sanctioned command type
-                    //It must not be inside <...> option field
-                    //And it must not be inside []-brackets
-
-                    List<string> commands = new List<string>();
-                    commands.Add("analyze");
-                    commands.Add("clear");
-                    commands.Add("close");
-                    commands.Add("collapse");
-                    commands.Add("compare");
-                    commands.Add("convert");
-                    commands.Add("copy"); //COPY list m --> non - upgrade and remove list
-                    commands.Add("count");
-                    commands.Add("excelimport");
-                    commands.Add("excelexport");
-                    commands.Add("index");
-                    commands.Add("delete");
-                    commands.Add("display");
-                    commands.Add("equation"); //   translate EQU to OLS
-                    commands.Add("export");
-                    //??"for         U U --> handled on its own ?? Hvis der er TO-- > ingen upgrade, ellers upgrade.
-                    commands.Add("graph");
-                    commands.Add("plot");
-                    commands.Add("interpolate");
-                    //??"list handled on its own ?? What to do, cf.FOR
-                    // --> isMatrix must have # "matrix     bevist matrix skal have # på i alle kommandoer. Ellers ingen upgrade.
-                    commands.Add("obey");
-                    commands.Add("open");
-                    commands.Add("predict");
-                    commands.Add("print");
-                    commands.Add("rebase");
-                    commands.Add("rename");
-                    commands.Add("series");  // last u could be scalar, but oh well
-                    commands.Add("smooth");
-                    commands.Add("splice");
-                    commands.Add("spool");
-                    commands.Add("truncate");
-                    commands.Add("x12a");
-
-                    if (!IsInsideOptionField(line, i) && commands.Contains(command))
-                    {
-                        List<TokenHelper> nesting = StringTokenizer.GetNesting(line);
-                        bool insideSquare = false;
-                        foreach (TokenHelper th in nesting)
+                        if (th.s == "[")
                         {
-                            if (th.s == "[")
-                            {
-                                insideSquare = true;
-                                break;
-                            }
-                        }
-                        if (!insideSquare)
-                        {
-                            setCurlies = true;
+                            insideSquare = true;
+                            break;
                         }
                     }
-                }
-
-                if (true) 
-                {
-                    //this is a composed name
-                    int iStart = i;
-                    int iEnd = i2;
-                    string s = "";
-                    for (int i1 = iStart; i1 <= iEnd; i1++)
+                    if (!insideSquare)
                     {
-                        if (GetS(line, i1) == "#" && GetType(line, i1 + 1) == ETokenType.Word)
-                        {
-                            bool isKnownList = listMemory.ContainsKey(line[i1 + 1].s);
-                            bool isKnownLiteral = scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "literal";
-                            bool isListCommand = command == "list";  //probably never true because we do list separately
+                        setCurlies = true;
+                    }
+                }
+            }
 
-                            if (setCurlies)
+            if (setCurlies)
+            {
+
+                //here, setCurlies may be == true, if it a simple #i, not inside <...> or [...], and 
+                //in an allowed command.
+                //But we still check it more.
+                int iStart = i;
+                int iEnd = i2;
+                string s = "";
+                for (int i1 = iStart; i1 <= iEnd; i1++)
+                {
+                    if (GetS(line, i1) == "#" && GetType(line, i1 + 1) == ETokenType.Word)
+                    {
+                        bool isKnownList = listMemory.ContainsKey(line[i1 + 1].s);
+                        bool isKnownLiteral = scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "literal";
+
+                        bool isKnownNonLiteral = (scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "string") || (scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "value") || (scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "date");
+
+                        do SOMTEHING WITH ABOVE.
+
+                        bool isListCommand = command == "list";  //probably never true because we do list separately
+
+                        if (setCurlies)
+                        {
+                            if (!isListCommand)
                             {
-                                if (!isListCommand)
+                                if (isKnownList)
                                 {
-                                    if (isKnownList)
-                                    {
-                                        s += "{#" + GetS(line, i1 + 1) + "}";
-                                    }
-                                    else if (isKnownLiteral)
-                                    {
-                                        s += "{%" + GetS(line, i1 + 1) + "}";
-                                    }
-                                    else
-                                    {
-                                        //just betting on this...
-                                        s += "{%" + GetS(line, i1 + 1) + "}";
-                                    }
-                                    i1++;
+                                    s += "{#" + GetS(line, i1 + 1) + "}";
                                 }
+                                else if (isKnownLiteral)
+                                {
+                                    s += "{%" + GetS(line, i1 + 1) + "}";
+                                }
+                                else
+                                {
+                                    //just betting on this...
+                                    s += "{%" + GetS(line, i1 + 1) + "}";
+                                }
+                                i1++;
                             }
-                        }
-                        else if (GetS(line, i1) == "|")
-                        {
-                            if (setCurlies)
-                            {
-                                //skip
-                            }
-                        }
-                        else
-                        {
-                            s += GetS(line, i1);
                         }
                     }
-
-                    if (setCurlies)
+                    else if (GetS(line, i1) == "|")
                     {
-                        //if setCurlies is false, some stuff is done regarding the s string, and this will
-                        //then not be used, which is okay. If setCurlies == false, nothing will be touched
-                        //by this method! 
-
-                        int lb = GetLeftblanks(line, iStart);
-                        for (int i1 = iStart; i1 <= iEnd; i1++)
-                        {
-                            SetNull(line, i1);
-                        }
-                        line[i].s = s;
-                        line[i].type = ETokenType.Unknown;
-                        line[i].leftblanks = lb;
+                        //do nothing, skip it
+                    }
+                    else
+                    {
+                        s += GetS(line, i1);
                     }
                 }
+                
+                int lb = GetLeftblanks(line, iStart);
+                for (int i1 = iStart; i1 <= iEnd; i1++)
+                {
+                    SetNull(line, i1);
+                }
+                line[i].s = s;
+                line[i].type = ETokenType.Unknown;
+                line[i].leftblanks = lb;
             }
         }
 
@@ -614,7 +628,7 @@ namespace Gekko
                 //AREMOS: assign variable value
                 //          0       1       2    3
                 string name = line[pos + 1].s;
-                string type = "";
+                string type = "literal";  //default
                 if (G.Equal(line[pos + 2].s, "literal"))
                 {
                     type = "literal";
@@ -627,6 +641,15 @@ namespace Gekko
                 {
                     type = "value";
                 }
+                else if (G.Equal(line[pos + 2].s, "int") || G.Equal(line[pos + 2].s, "integer"))
+                {
+                    type = "value";
+                }
+                else if (G.Equal(line[pos + 2].s, "date"))
+                {
+                    type = "date";
+                }
+
                 if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, type);
                 line[pos].meta.commandName = "assign";
                 line[pos].s = "global:%";
