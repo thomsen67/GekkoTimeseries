@@ -9567,7 +9567,6 @@ namespace Gekko
                 if (File.Exists(zz) && !Globals.runningOnTTComputer)
                 {
                     new Error("The destination file '" + zz + "' already exists:");
-                    //throw new GekkoException();
                 }
                 if (G.Equal(opt_gekko18, "yes"))
                 {
@@ -9583,7 +9582,7 @@ namespace Gekko
 
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                    {                        
+                    {
                         sw.Write(ss);
                         sw.Flush();
                         sw.Close();
@@ -9643,7 +9642,7 @@ namespace Gekko
                         sw.Flush();
                         sw.Close();
                     }
-                    
+
                     using (var w = new Writeln())
                     {
                         w.MainAdd("Translated file into: " + zz);
@@ -9658,9 +9657,25 @@ namespace Gekko
                             w.MoreAdd("put into the Global databank (for instance, 'assign x value 100;' will become 'global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
                             w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
                             w.MoreAdd("Some of these 'global:' bank indicators may be unnecessary, but better safe than sorry.");
-                        }
+                        }                        
                     }
 
+                    if (Translator_AREMOS_Gekko30.warning)
+                    {
+                        using (Warning text = new Warning())
+                        {
+                            text.MainAdd("Possible problem with name(s) with consecutive #'s. See the link for more explanation.");
+                            text.MoreAdd("The translator does not handle variable names starting with # and containing additional #'s.");
+                            text.MoreAdd("You will have to inspect these and translate them manually. Examples:");
+                            text.MoreNewLine();
+                            text.MoreAdd("- ##i            --> #{%i} if the variable is a list, else %{%i}");
+                            text.MoreNewLineTight();
+                            text.MoreAdd("- #i#j           --> #i{%j} if the variable is a list, else %i{%j}");
+                            text.MoreNewLine();
+                            text.MoreAdd("Note that combinations that include '|' concatenation are translated correctly. For instance, #i|#j is translated into {%i}{%j},");
+                            text.MoreAdd("and #i|a#j or #i|a|#j is translated into {%i}a{%j}.");
+                        }
+                    }
                 }
                 else
                 {

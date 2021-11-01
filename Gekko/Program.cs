@@ -4900,8 +4900,10 @@ namespace Gekko
 
             int vars = -12345;
             GekkoTime startYear;
-            GekkoTime endYear;            
-            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, out vars, out startYear, out endYear);
+            GekkoTime endYear;
+            string warning = null;
+            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, out vars, out warning, out startYear, out endYear);
+            if (warning != null) new Warning(warning);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;
@@ -5101,7 +5103,7 @@ namespace Gekko
         /// <summary>
         /// Read the .px data file format (used by Statistics Denmark and others)
         /// </summary>
-        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
         {            
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
 
@@ -5116,6 +5118,10 @@ namespace Gekko
             GekkoTime gt_end = GekkoTime.tNull;
             string freq = "a";
             int obs = -12345; //number of observations
+            int expectedNumberOfDataInPxFile = -12345;
+            int foundNumberOfDataInPxFile = 0;
+            numberOfDataPointsWarning = null;
+            bool hasSeenTimeDefinition = false;
 
             List<string> dates = new List<string>();
 
@@ -5231,7 +5237,13 @@ namespace Gekko
 
                 if (state == 1)
                 {
-                    //state=1, handle the data and convert it from strings to real numbers (double)                      
+                    //state=1, handle the data and convert it from strings to real numbers (double)   
+
+                    if (!hasSeenTimeDefinition)
+                    {
+                        string extra = " If the px file originates from a {a{DOWNLOAD¤download.htm}a}, make sure to include a \"code\": \"tid\" or \"code\": \"time\" field last in your .json file.";                        
+                        new Error("It does not seem that the px file contains a time dimension, since CODES(\"tid\") or CODES(\"time\") does not seem to be present." + extra);
+                    }
 
                     if (firstLine)
                     {
@@ -5256,6 +5268,7 @@ namespace Gekko
                         //also handles holes in dates, for instance for daily observations if there is no data for weekends
 
                         data = G.CreateArrayDouble(codesCombi.Count * totalDatesIncludingHoles, double.NaN);
+                        expectedNumberOfDataInPxFile = codesCombi.Count * dates.Count;
                     }
 
                     string s = line;
@@ -5308,6 +5321,7 @@ namespace Gekko
                                 new Error("More than " + data.Length + " (= " + codesCombi.Count + " x " + totalDatesIncludingHoles + ") numbers found in data section");
                             }
                             data[ii + holesii + jj * totalDatesIncludingHoles] = value;  //ii is date, jj is variable
+                            foundNumberOfDataInPxFile++;
 
                             //ii counts dates as they are. If dates are 2021m1d7, 2020m2d8, 2020m2d11, 2020m2d12
                             //ii will be 0, 1, 2, 3 here.
@@ -5343,11 +5357,13 @@ namespace Gekko
                 else if (state == 2)
                 {
                     //Reading dates from CODES("tid")
-                    //This will only be run once
+                    //This will only be run once                    
 
                     //========================================================================================================
                     //                          FREQUENCY LOCATION, indicates where to implement more frequencies
                     //========================================================================================================
+
+                    hasSeenTimeDefinition = true;
 
                     string s = lineHelper.ToString();
                     if (s.StartsWith(codeTimeString, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString.Length);
@@ -5465,6 +5481,14 @@ namespace Gekko
                     //  CODES("ydelse, k?n og alder")="TOT","NET","LDP","LKT","AKI","ADP","AKT","MEN","KVR","U25","O25","O30","O40","O50","O60";
                     //  CODES("s?sonkorrigering og faktiske tal")="10";
                     //
+
+                    if (hasSeenTimeDefinition)
+                    {
+                        string extra = "";
+                        extra = " If the px file originates from a {a{DOWNLOAD¤download.htm}a}, please put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.";
+                        new Error("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element." + extra);
+                    }
+
                     string line777 = lineHelper.ToString();
                     int i = line777.IndexOf("=");
                     if (i < 0)
@@ -5477,7 +5501,6 @@ namespace Gekko
                     codesHeader.Add(s3);
 
                     string s = line777.Substring(i + 1);
-                    //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
 
                     string[] ss = null;
                     if (Globals.fixPxProblem)
@@ -5561,10 +5584,20 @@ namespace Gekko
 
                 if (semi) state = 0;  //resetting
 
-            }  //for each line
-
+            }  //for each line            
             
             G.Writeln("    All data read and prepared, now putting into series");
+
+            if (expectedNumberOfDataInPxFile != foundNumberOfDataInPxFile)
+            {
+                string s5 = "";
+                foreach (List<string> xx in codes)
+                {
+                    s5 = s5 + xx.Count + " * ";
+                }                
+                s5 = s5 + dates.Count;  //number of dates will be shown last here
+                numberOfDataPointsWarning = "Beware: expected " + s5 + " = " + expectedNumberOfDataInPxFile + " data points in px file, got " + foundNumberOfDataInPxFile;
+            }
 
             if (isArray)
             {

@@ -12,6 +12,7 @@ namespace Gekko
         public static GekkoDictionary<string, string> matrixMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static int globalBankCounter = 0;
+        public static bool warning = false;
 
         //This class translates from AREMOS to Gekko 3.0
 
@@ -21,6 +22,7 @@ namespace Gekko
             matrixMemory.Clear();
             scalarMemory.Clear();
             globalBankCounter = 0;
+            warning = false;
 
             string txt = input;            
             var tags2 = new List<string>() { "!" };
@@ -203,14 +205,12 @@ namespace Gekko
 
                 // ------------- start of real stuff ---------------------------
 
-                if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
-                {
-                    AddComment(topline, "Note that ##x in Gekko is written %{%x} or #{%x}");
-                }
+                //if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
+                //{
+                //    AddComment(topline, "Note that ##x in Gekko is written %{%x} or #{%x}");
+                //}
 
-
-
-
+                                                                      
 
 
 
@@ -441,8 +441,19 @@ namespace Gekko
 
         private static void SetCurliesAroundNakedHash(List<TokenHelper> line, int i, string command)
         {
+            //This handles stuff like x#i, x|#i etc.
+            // -----
+            //But we also need to handle #i#j or #i|#j or ##i, 
+            //which are %i{%j}, %i{%j}, or %{%i}. For
+            //now, we just put a note if we have a pattern like this.
+
+            bool startsWithHash = false;
+            bool hasWordFollowedByHash = false;
+            if (line[i].s == "#") startsWithHash = true;
+
             if (!IsNamePartStart(line, i)) return;
 
+            string name = "";
             int i2 = i;
             for (int i1 = i + 1; i1 < line.Count; i1++)
             {
@@ -451,8 +462,10 @@ namespace Gekko
                     break;
                 }
                 i2 = i1;
+                //tests if there is a pattern like "x#i" or "#x#i" anything with "x#"
+                if (GetType(line, i1 - 1) == ETokenType.Word && line[i1].s == "#") hasWordFollowedByHash = true;
             }
-            int tokens = i2 - i + 1;
+            int tokens = i2 - i + 1;            
 
             bool setCurlies = false;
             if (tokens > 2)
@@ -541,32 +554,26 @@ namespace Gekko
                     {
                         bool isKnownList = listMemory.ContainsKey(line[i1 + 1].s);
                         bool isKnownLiteral = scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "literal";
-
                         bool isKnownNonLiteral = (scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "string") || (scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "value") || (scalarMemory.ContainsKey(line[i1 + 1].s) && scalarMemory[line[i1 + 1].s] == "date");
 
-                        do SOMTEHING WITH ABOVE.
-
-                        bool isListCommand = command == "list";  //probably never true because we do list separately
-
-                        if (setCurlies)
+                        if (!isKnownNonLiteral)
                         {
-                            if (!isListCommand)
+
+                            if (isKnownList)
                             {
-                                if (isKnownList)
-                                {
-                                    s += "{#" + GetS(line, i1 + 1) + "}";
-                                }
-                                else if (isKnownLiteral)
-                                {
-                                    s += "{%" + GetS(line, i1 + 1) + "}";
-                                }
-                                else
-                                {
-                                    //just betting on this...
-                                    s += "{%" + GetS(line, i1 + 1) + "}";
-                                }
-                                i1++;
+                                s += "{#" + GetS(line, i1 + 1) + "}";
                             }
+                            else if (isKnownLiteral)
+                            {
+                                s += "{%" + GetS(line, i1 + 1) + "}";
+                            }
+                            else
+                            {
+                                //just betting on this...
+                                s += "{%" + GetS(line, i1 + 1) + "}";
+                            }
+                            i1++;
+
                         }
                     }
                     else if (GetS(line, i1) == "|")
@@ -587,6 +594,11 @@ namespace Gekko
                 line[i].s = s;
                 line[i].type = ETokenType.Unknown;
                 line[i].leftblanks = lb;
+            }
+            if (startsWithHash && hasWordFollowedByHash)
+            {                
+                AddComment(line, "Possible problem with name with consecutive #'s: see warning message");
+                warning = true;  //global variable
             }
         }
 

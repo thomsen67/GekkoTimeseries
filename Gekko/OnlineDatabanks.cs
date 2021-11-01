@@ -191,8 +191,10 @@ namespace Gekko
                 {                    
                     int vars;
                     GekkoTime perStart;
-                    GekkoTime perEnd;                    
-                    Program.ReadPx(Program.databanks.GetFirst(), o1.opt_array, true, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);
+                    GekkoTime perEnd;
+                    string warning = null;
+                    Program.ReadPx(Program.databanks.GetFirst(), o1.opt_array, true, source, tableName, codesHeaderJson, pxLinesText, out vars, out warning, out perStart, out perEnd);
+                    if (warning != null) new Warning(warning);
                 }
             }
         }
