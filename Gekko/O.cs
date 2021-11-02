@@ -9664,16 +9664,18 @@ namespace Gekko
                     {
                         using (Warning text = new Warning())
                         {
-                            text.MainAdd("Possible problem with name(s) with consecutive #'s. See the link for more explanation.");
-                            text.MoreAdd("The translator does not handle variable names starting with # and containing additional #'s.");
-                            text.MoreAdd("You will have to inspect these and translate them manually. Examples:");
+                            text.MainAdd("Possible problem with AREMOS name(s) with consecutive #'s.");
+                            text.MoreAdd("The translator has problems with names that start with # and contain additional #'s.");
+                            text.MoreAdd("You will have to inspect these and translate them manually.");
+                            text.MoreAdd("The following illustrates how such names should be translated:");
                             text.MoreNewLine();
-                            text.MoreAdd("- ##i            --> #{%i} if the variable is a list, else %{%i}");
+                            text.MoreAdd("- ##i            --> #{%i} if the name refers to a list, else %{%i}");
                             text.MoreNewLineTight();
-                            text.MoreAdd("- #i#j           --> #i{%j} if the variable is a list, else %i{%j}");
+                            text.MoreAdd("- #i#j           --> #i{%j} if the name refers to a list, else %i{%j}");
                             text.MoreNewLine();
-                            text.MoreAdd("Note that combinations that include '|' concatenation are translated correctly. For instance, #i|#j is translated into {%i}{%j},");
-                            text.MoreAdd("and #i|a#j or #i|a|#j is translated into {%i}a{%j}.");
+                            text.MoreAdd("Note that combinations that include '|' concatenation are typically translated correctly by the automatic translator. For instance, #i|#j is translated into {%i}{%j},");
+                            text.MoreAdd("and #i|a#j or #i|a|#j is translated into {%i}a{%j}. These translations are correct, and in such");
+                            text.MoreAdd("cases, #i cannot meaningfully be a list and is expected to be an assign variable (literal).");
                         }
                     }
                 }

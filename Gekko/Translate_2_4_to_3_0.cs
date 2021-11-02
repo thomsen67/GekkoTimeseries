@@ -2129,7 +2129,18 @@ namespace Gekko
 
         private static void AddComment(List<TokenHelper> line, string s)
         {
-            string s2 = " /* TRANSLATE: " + s + " */";
+            //List<TokenHelper> line = line2;
+            ////find supreme
+            //while (true)
+            //{
+            //    if (line != null && line.Count > 0 && line[0].parent != null && line[0].parent.parent != null && line[0].parent.parent.subnodes != null && line[0].parent.parent.subnodes.storage != null)
+            //    {
+            //        line = line[0].parent.parent.subnodes.storage;
+            //    }
+            //    else break;
+            //}
+
+            string s2 = " /* TRANSLATE: " + s + " */ ";
             TokenHelper th = new TokenHelper(s2);
             bool ok = true;
             foreach (TokenHelper th2 in line)

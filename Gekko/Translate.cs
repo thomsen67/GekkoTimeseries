@@ -448,12 +448,12 @@ namespace Gekko
             //now, we just put a note if we have a pattern like this.
 
             bool startsWithHash = false;
-            bool hasWordFollowedByHash = false;
+            bool consecutiveHashes = false;
             if (line[i].s == "#") startsWithHash = true;
 
             if (!IsNamePartStart(line, i)) return;
 
-            string name = "";
+            string originalName = line[i].ToString();
             int i2 = i;
             for (int i1 = i + 1; i1 < line.Count; i1++)
             {
@@ -463,9 +463,12 @@ namespace Gekko
                 }
                 i2 = i1;
                 //tests if there is a pattern like "x#i" or "#x#i" anything with "x#"
-                if (GetType(line, i1 - 1) == ETokenType.Word && line[i1].s == "#") hasWordFollowedByHash = true;
+                if (GetType(line, i1 - 1) == ETokenType.Word && line[i1].s == "#") consecutiveHashes = true;
+                if (line[i1 - 1].s == "#" && line[i1].s == "#") consecutiveHashes = true;
+                originalName += line[i1].ToString();
             }
-            int tokens = i2 - i + 1;            
+            int tokens = i2 - i + 1;
+            originalName = originalName.Trim();
 
             bool setCurlies = false;
             if (tokens > 2)
@@ -595,9 +598,9 @@ namespace Gekko
                 line[i].type = ETokenType.Unknown;
                 line[i].leftblanks = lb;
             }
-            if (startsWithHash && hasWordFollowedByHash)
-            {                
-                AddComment(line, "Possible problem with name with consecutive #'s: see warning message");
+            if (startsWithHash && consecutiveHashes)
+            {
+                AddComment(line, "Possible problem with #'s in the AREMOS name " + originalName + ": see warning message");
                 warning = true;  //global variable
             }
         }
@@ -1629,11 +1632,21 @@ namespace Gekko
 
         private static void AddComment(List<TokenHelper> line, string s)
         {
-            
-            string s2 = " /* TRANSLATE: " + s + " */";
+            //List<TokenHelper> line = line2;
+            ////find supreme
+            //while (true)
+            //{
+            //    if (line != null && line.Count > 0 && line[0].parent != null && line[0].parent.parent != null && line[0].parent.parent.subnodes != null && line[0].parent.parent.subnodes.storage != null)
+            //    {
+            //        line = line[0].parent.parent.subnodes.storage;
+            //    }
+            //    else break;
+            //}
+
+            string s2 = " /* TRANSLATE: " + s + " */ ";
             TokenHelper th = new TokenHelper(s2);
             bool ok = true;
-            foreach(TokenHelper th2 in line)
+            foreach (TokenHelper th2 in line)
             {
                 if (th2.s == s2)
                 {
@@ -1715,6 +1728,9 @@ namespace Gekko
         {
             List<TokenHelper> line = GetCommandLine(line2);
             int i1 = 1;  //always
+            
+            //either do it as now. If token[1] is not <, try looking for ... < ... > ... =. If so, ...
+
             if (!Equal(line, 1, "<")) return new Tuple<int, int>(-12345, -12345);
             int i2 = -12345;
             for (int i = i1 + 1; i < line.Count; i++)

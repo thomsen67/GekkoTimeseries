@@ -2252,7 +2252,7 @@ namespace Gekko
 
         
         /// <summary>
-        /// Helper method for file access (writing)
+        /// Helper method for file access (writing). Writes in ANSI (code 1252), so the for instance זרו look nicer in old text editors like Kedit.
         /// </summary>
         /// <param name="fs2"></param>
         /// <returns></returns>
