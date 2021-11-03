@@ -744,6 +744,14 @@ namespace Gekko
             {
                 line[pos].meta.commandName = "copy";
                 line[pos].s = "copy";
+                for (int i = 2; i < line.Count; i++)
+                {
+                    if (G.Equal(line[i].s, "as") && line[i].leftblanks > 0 && line[i - 1].s != ",")
+                    {
+                        line[i].s = "to";
+                        break;
+                    }
+                }
             }
 
             else if (G.Equal(line[pos].s, FromTo("de", "delete")) != null)
@@ -1226,8 +1234,7 @@ namespace Gekko
             else if (G.Equal(line[pos].s, FromTo("unspool", "unspool")) != null)
             {
                 line[pos].meta.commandName = "unspool";
-                line[pos].s = "pipe con";
-                //AddOption(node, "fix");  //JUST TESTING ------------------- !
+                line[pos].s = "pipe <stop>";
             }
 
             else if (G.Equal(line[pos].s, FromTo("vis", "vis")) != null)
@@ -1392,6 +1399,9 @@ namespace Gekko
                 }
 
                 //do result3 here
+                //note here that in AREMOS both these are legal:
+                //list m2 = #m prefix = x;
+                //list m2 = #m prefix x;
                 int iSpecial = -12345;
                 for (int i = 0; i < l3.Count; i++)
                 {
@@ -1404,7 +1414,7 @@ namespace Gekko
                         if (j == -12345) j = l3.Count - 1;
                         l3[i].leftblanks = 0;
                         l3[i].s = "." + l3[i].s + "(";
-                        l3[i + 1].s = "";
+                        if (l3[i + 1].s == "=") l3[i + 1].s = "";
                         l3[j].s = ")" + l3[j].s;
 
                         if (j0 != -12345)
@@ -1412,7 +1422,7 @@ namespace Gekko
                             l3[j].leftblanks = 0;
                             l3[j].s = "." + l3[j].s + "(";
                             if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
-                            l3[j + 1].s = "";
+                            if (l3[j + 1].s == "=") l3[j + 1].s = "";
                             l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
                         }
                     }
@@ -1424,7 +1434,7 @@ namespace Gekko
                         if (j == -12345) j = l3.Count - 1;
                         l3[i].leftblanks = 0;
                         l3[i].s = "." + l3[i].s + "(";
-                        l3[i + 1].s = "";
+                        if (l3[i + 1].s == "=") l3[i + 1].s = "";
                         l3[j].s = ")" + l3[j].s;
 
                         if (j0 != -12345)
@@ -1432,7 +1442,7 @@ namespace Gekko
                             l3[j].leftblanks = 0;
                             l3[j].s = "." + l3[j].s + "(";
                             if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
-                            l3[j + 1].s = "";
+                            if (l3[j + 1].s == "=") l3[j + 1].s = "";
                             l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
                         }
                     }                    
@@ -1448,7 +1458,7 @@ namespace Gekko
                         iSpecial = i;
                         l3[i].leftblanks = 0;
                         l3[i].s = "." + "replaceinside" + "(";
-                        l3[i + 1].s = "";
+                        if (l3[i + 1].s == "=") l3[i + 1].s = "";
                         l3[j].s = ", '')" + l3[j].s;
                     }
                 }
@@ -1726,23 +1736,48 @@ namespace Gekko
 
         private static Tuple<int, int> FindOptionField(List<TokenHelper> line2)
         {
+            //hacky...
+
             List<TokenHelper> line = GetCommandLine(line2);
-            int i1 = 1;  //always
-            
+
+
             //either do it as now. If token[1] is not <, try looking for ... < ... > ... =. If so, ...
 
-            if (!Equal(line, 1, "<")) return new Tuple<int, int>(-12345, -12345);
-            int i2 = -12345;
-            for (int i = i1 + 1; i < line.Count; i++)
+            if (Equal(line, 1, "<"))
             {
-                if (line[i].s == ">")
+                int i1 = 1;  //always
+                int i2 = -12345;
+                for (int i = i1 + 1; i < line.Count; i++)
                 {
-                    i2 = i;
-                    break;
+                    if (line[i].s == ">")
+                    {
+                        i2 = i;
+                        break;
+                    }
                 }
+                if (i2 == -12345) return new Tuple<int, int>(-12345, -12345);
+                return new Tuple<int, int>(i1, i2);
             }
-            if (i2 == -12345) return new Tuple<int, int>(-12345, -12345);
-            return new Tuple<int, int>(i1, i2);
+            else
+            {
+
+                int i1 = -12345;
+                int i2 = -12345;
+                int i3 = -12345;
+                for (int i = 0; i < line.Count; i++)
+                {
+                    if (line[i].s == "<" && i1 == -12345) i1 = i;
+                    if (line[i].s == ">" && i2 == -12345) i2 = i;
+                    if (line[i].s == "=" && i3 == -12345) i3 = i;
+                }
+
+                if (i1 != -12345 && i2 != -12345 && i3 != -12345 && i1 < i2 && i2 < i3)
+                {
+                    return new Tuple<int, int>(i1, i2);
+                }
+
+                return new Tuple<int, int>(-12345, -12345);
+            }
         }
 
         private static void AddToOptionField(List<TokenHelper> line2, int leftblanks, string s)
