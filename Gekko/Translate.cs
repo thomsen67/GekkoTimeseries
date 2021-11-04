@@ -12,6 +12,7 @@ namespace Gekko
         public static GekkoDictionary<string, string> matrixMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static int globalBankCounter = 0;
+        public static int globalOpenCounter = 0;
         public static bool warning = false;
 
         //This class translates from AREMOS to Gekko 3.0
@@ -22,6 +23,7 @@ namespace Gekko
             matrixMemory.Clear();
             scalarMemory.Clear();
             globalBankCounter = 0;
+            globalOpenCounter = 0;
             warning = false;
 
             string txt = input;            
@@ -847,8 +849,7 @@ namespace Gekko
                 if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
                 {
                     if (!listMemory.ContainsKey(last.s)) listMemory.Add(last.s, "");
-                    last.s = "to global:#" + last.s;
-                    globalBankCounter++;
+                    last.s = "to #" + last.s;                    
                     end = line.Count - 3;
                 }
                 else
@@ -982,7 +983,6 @@ namespace Gekko
                 if (Equal(line, 2, "=") || Equal(line, 3, "="))  //can be a[...] = ...
                 {
                     line[pos].s = "#";
-                    globalBankCounter++;
                     line[pos + 1].leftblanks = 0;
                 }
             }
@@ -1003,6 +1003,7 @@ namespace Gekko
             {
                 line[pos].meta.commandName = "open";
                 line[pos].s = "open";
+                globalOpenCounter++;
             }
 
             else if (G.Equal(line[pos].s, FromTo("pa", "pause")) != null)
@@ -1384,13 +1385,7 @@ namespace Gekko
                     else
                     {
                         for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
-                        //see also #09835324985                        
-                        if (true)
-                        {
-                            result1 = extra + "global:" + "#" + result1.TrimStart();
-                            globalBankCounter++;
-                        }
-                        else result1 = extra + "#" + result1;
+                        result1 = extra + "#" + result1.TrimStart();  //do not put global: on this!
                     }
                 }
                 else
@@ -1588,19 +1583,15 @@ namespace Gekko
                         line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null;
                     }
                 }
-                line[0].leftblanks = 0;
 
+                //line[0].leftblanks = 0;
 
-                if (true || simple)
+                if (true)
                 {
                     line[0].s = result1 + result2 + result3;
                 }
-                //else
-                //{
-                //    line[0].s = result1 + " (" + result2.TrimStart(new char[] { ' ' }) + ")" + result3;
-                //}
 
-                //if(isParallel) AddComment(line, "Parallel loops may not be translated properly, including missing {}-curlies on elements");
+                
             }
 
             foreach (TokenHelper th in comments)

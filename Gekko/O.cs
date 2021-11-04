@@ -9651,13 +9651,26 @@ namespace Gekko
                         if (Translator_AREMOS_Gekko30.globalBankCounter > 0)
                         {
                             w.MainNewLineTight();
-                            w.MainAdd("Note: The translator added " + Translator_AREMOS_Gekko30.globalBankCounter + " 'global:' bank indicators on the left-hand side of ASSIGN/LIST/MATRIX commands (or in INDEX).");
-                            w.MoreAdd("In Gekko 3.0 and above, vals, dates, strings, lists and matrices all live in databanks.");
-                            w.MoreAdd("Therefore, 'global:' is added to all such statements, so that these variables are ");
+                            w.MainAdd("Note: The translator added " + Translator_AREMOS_Gekko30.globalBankCounter + " 'global:' bank indicators on the left-hand side of ASSIGN commands (cf. explanation).");
+
+                            w.MoreAdd("In Gekko 3.0 and above, vals, dates and strings all live in databanks.");
+                            w.MoreAdd("Therefore, 'global:' is added to assign variables, so that these variables are ");
                             w.MoreAdd("put into the Global databank (for instance, 'assign x value 100;' will become 'global:%x = 100;'). Variables in the Global databank are always accessible, so that ");
                             w.MoreAdd("they are not suddenly inaccessible after for instance CLEAR, CLOSE, READ or similar commands.");
                             w.MoreAdd("Some of these 'global:' bank indicators may be unnecessary, but better safe than sorry.");
-                        }                        
+                        }
+
+                        if (Translator_AREMOS_Gekko30.globalOpenCounter > 0)
+                        {
+                            w.MainNewLineTight();
+                            w.MainAdd("Note: There are OPEN commands in the translated file: consider OPEN <pos=2>, cf. explanation.");
+
+                            w.MoreNewLine();
+                            w.MoreAdd("Firstly, note that OPEN <prim> translates fine as OPEN <edit>. But normal OPEN in AREMOS opens the databank in position #2, whereas it is opened in last position in Gekko. ");
+                            w.MoreAdd("Often, this is irrelevant, but in some cases the databank order may be important. ");
+                            w.MoreAdd("If in doubt, replace all normal OPEN commands with OPEN <pos=2>, but the translator prefers not ");
+                            w.MoreAdd("to do this automatically, because it is seldom relevant.");
+                        }
                     }
 
                     if (Translator_AREMOS_Gekko30.warning)
