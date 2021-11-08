@@ -7422,9 +7422,9 @@ namespace UnitTests
               "COLLAPSE fY!a = qbank:fY!q first;");
 
             T("compare %x;",
-              "compare {%x}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
+              "compare {%x}; /* TRANSLATE: COMPARE has changed syntax, see the help files */ ");
             T("compare #m;",
-              "compare {#m}; /* TRANSLATE: COMPARE has changed syntax, see the help files */");
+              "compare {#m}; /* TRANSLATE: COMPARE has changed syntax, see the help files */ ");
 
             T("copy %x to %xx;",
               "copy {%x} to {%xx};");
@@ -7521,10 +7521,10 @@ namespace UnitTests
             T("list c = '007', '2g', 'ab', e;",
               "global:#c = 007, 2g, ab, e;");
             T("list c = '007', '2g', 'ab', e, 'a b';",
-              "global:#c = 007, 2g, ab, e, 'a b'; /* TRANSLATE: One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');. */", true);
+              "global:#c = 007, 2g, ab, e, 'a b'; /* TRANSLATE: One or more elements are quoted ('). You should use a list definition with parentheses, like #m = (...). For instance: list m = a, 'b', 'c d'; becomes #m = ('a', 'b', 'c d');. */ ", true);
 
             T("option interface databank swap = yes;",
-              "//option interface databank swap = yes; /* TRANSLATE: Option obsolete */");
+              "//option interface databank swap = yes; /* TRANSLATE: Option obsolete */ ");
 
             T("option interface Table printcodes = yes;",
               "option interface Table operators = yes;");
@@ -7724,13 +7724,13 @@ namespace UnitTests
               "for string %x = a, b;y = {%x}; end;");
 
             T("SERIES x = x[-1] + 1;",
-              "x <dyn> = x[-1] + 1; /* TRANSLATE: Note: <dyn> added */");
+              "x <dyn> = x[-1] + 1; /* TRANSLATE: Note: <dyn> added */ ");
 
             T("series x = x.1 + 1;",
-              "x <dyn> = x.1 + 1; /* TRANSLATE: Note: <dyn> added */");
+              "x <dyn> = x.1 + 1; /* TRANSLATE: Note: <dyn> added */ ");
 
             T("series {%x} = {%x}[-1] + 1;",
-              " {%x} <dyn> = {%x}[-1] + 1; /* TRANSLATE: Note: <dyn> added */");
+              " {%x} <dyn> = {%x}[-1] + 1; /* TRANSLATE: Note: <dyn> added */ ");
 
             T("series {i} = {j} + {i}x + x{j} + a{j}b;",
               "{%i} = {%j} + {%i}x + x{%j} + a{%j}b;");
