@@ -9647,7 +9647,7 @@ namespace Gekko
                     {
                         w.MainAdd("Translated file into: " + zz);
                         w.MainNewLineTight();
-                        w.MainAdd("Translate comments: see /* TRANSLATE: .... */");
+                        w.MainAdd("Translate comments: see /* TRANSLATE: .... */. If your AREMOS file uses wildcards, please check these manually (Gekko wildcards have a slightly {a{different logic¤i_wildcards.htm}a}).");
                         if (Translator_AREMOS_Gekko30.globalBankCounter > 0)
                         {
                             w.MainNewLineTight();

@@ -319,9 +319,23 @@ namespace Gekko
                 {
                     if (Equal(line, i - 1, ">")) line[i].leftblanks = 0;  //'>'                
                 }
-                if (Equal(line, i, "repeat"))
+
+                if (topline[0].meta.commandName == "series")
                 {
-                    line[i].s = "rep";
+                    if (Equal(line, i, "repeat"))
+                    {
+                        line[i].s = "rep";
+                    }
+
+                    if (i + 1 < line.Count)
+                    {
+                        if (G.Equal(line[i].s, "rep") && G.Equal(line[i + 1].s, "*"))
+                        {
+                            line[i].s = "";
+                            line[i + 1].s = "";
+                            line[i + 1].leftblanks = 0;
+                        }
+                    }
                 }
 
                 if (line[i].type == ETokenType.Comment)
@@ -627,8 +641,7 @@ namespace Gekko
 
         public static void HandleCommandName(List<TokenHelper> line)
         {
-            int pos = 0;
-            bool hasCloseall = false;
+            int pos = 0;            
 
             line[pos].meta.commandName = line[pos].s;  //default
 
@@ -714,8 +727,7 @@ namespace Gekko
             {
                 line[pos].meta.commandName = "closeall";
                 line[pos].s = Globals.restartSnippet;
-                AddComment(line, "Note that in some cases, CLOSEALL is better replaced with \"CLOSE *; CLEAR;\" if scalars are to survive");
-                hasCloseall = true;
+                AddComment(line, "Consider \"CLOSE *; CLEAR;\" if global scalars should survive");
             }
 
             else if (G.Equal(line[pos].s, FromTo("col", "collapse")) != null)

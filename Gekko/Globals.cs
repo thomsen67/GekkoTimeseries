@@ -229,7 +229,7 @@ namespace Gekko
 
         public static bool holesFix = true;
 
-        public static string restartSnippet = "restart; mode mixed";
+        public static string restartSnippet = "reset";
 
         public static int firstPeriodPositionInArrayNull = int.MaxValue;
         public static int lastPeriodPositionInArrayNull = int.MinValue;

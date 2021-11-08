@@ -112,6 +112,11 @@ namespace Gekko
             G.WritelnGray("TRIM: " + G.Seconds(t0));            
         }
 
+        /// <summary>
+        /// Get IVariable from databank. May return null.
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
         public IVariable GetIVariable(string variable)
         {            
             IVariable iv = null;
@@ -123,6 +128,11 @@ namespace Gekko
             return iv;
         }
 
+        /// <summary>
+        /// Get IVariable from databank, possibly adding global frequency to the name. May return null.
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
         public IVariable GetIVariableWithAddedFreq(string variable)
         {
             if (!G.StartsWithSigil(variable))
@@ -142,7 +152,6 @@ namespace Gekko
             }
             else
             {
-
                 if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
                 if (x.Type() == EVariableType.Series && ((Series)x).type == ESeriesType.Light)
                 {

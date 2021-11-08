@@ -1599,8 +1599,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer)
-            {               
-
+            {
                 if (text == "arrow")
                 {
                     //while (true)
@@ -6474,7 +6473,24 @@ namespace Gekko
 
                 try
                 {
-                    Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                    bool onlyParse = false;
+
+                    if (onlyParse && Globals.runningOnTTComputer)
+                    {
+                        if(commandLinesFlat.ToLower().StartsWith("run ") && Regex.Matches(commandLinesFlat, ";").Count==1)
+                        {
+                            //else we cannot even do a RUN xx.gcm, because the file does not get called.
+                            Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                        }
+                        else
+                        {
+                            //skip running
+                        }                        
+                    }
+                    else
+                    {
+                        Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                    }
                 }
                 catch (Exception e)
                 {

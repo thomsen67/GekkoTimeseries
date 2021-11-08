@@ -413,7 +413,7 @@ namespace Gekko
                     foreach (string varExpl2 in varExpl)
                     {
                         if (varExpl2.Trim().StartsWith("Series: " + var, StringComparison.OrdinalIgnoreCase)) continue;  //not interesting here
-                        explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";
+                        explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";  //see also #324lkj2342
                     }
                 }
                 vars2.Add(var + "¤" + explanation);
@@ -735,7 +735,15 @@ namespace Gekko
             {
                 List<string> varExpl = Program.GetVariableExplanationFromExternalFile(var2);
                 string expl = "";
-                if (varExpl != null && varExpl.Count > 0) expl = Program.SpecialXmlChars(varExpl[0]);
+                if (varExpl != null && varExpl.Count > 0) expl = varExpl[0];
+                if (expl != null) expl = expl.Trim();                
+                Series ts1 = Program.databanks.GetFirst().GetIVariable(var2 + "!a") as Series;
+                if (ts1 != null && ts1.meta != null && !string.IsNullOrWhiteSpace(ts1.meta.label))
+                {
+                    if (!string.IsNullOrWhiteSpace(expl)) expl += ". "; //see also #324lkj2342
+                    expl += ts1.meta.label;
+                }
+                expl = Program.SpecialXmlChars(expl);                
 
                 x2.Append("<tr>");
                 x2.Append("<td width = `20%`>");
