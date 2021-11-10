@@ -2416,7 +2416,7 @@ namespace Gekko
             string orignialFileName = fileName;
 
             fileName = Program.FindFile(fileName, folders, true, true);  //calls CreateFullPathAndFileName()
-            Globals.HANDLE_LIBRARY = true;
+            //Globals.HANDLE_LIBRARY = true;
 
             if (File.Exists(fileName))
             {

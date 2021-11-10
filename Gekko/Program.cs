@@ -12099,7 +12099,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command2);
 
             string fileName2 = FindFile(s, folders, true, true);  //also calls CreateFullPathAndFileName()
-            Globals.HANDLE_LIBRARY = true;
+            //Globals.HANDLE_LIBRARY = true;
 
             if (fileName2 == null)
             {
@@ -14849,7 +14849,7 @@ namespace Gekko
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
             fileName = FindFile(fileName, folders, true, true);  //calls CreateFullPathAndFileName()
-            Globals.HANDLE_LIBRARY = true;
+            //Globals.HANDLE_LIBRARY = true;
 
             Globals.modelPathAndFileName = fileName;  //always contains a path
             Globals.modelFileName = Path.GetFileName(Globals.modelPathAndFileName);
@@ -15625,7 +15625,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
                 fileName = FindFile(fileName, folders, true, true);
-                Globals.HANDLE_LIBRARY = true;
+                //Globals.HANDLE_LIBRARY = true;
             }
 
             return fileName;
@@ -15697,8 +15697,11 @@ namespace Gekko
                 else fileNameTemp = null;  //not allowed to search in folders
             }
 
-            Globals.HANDLE_LIBRARY = true;
-            //look for it in library folder
+            if (allowLibrary && fileNameTemp == null)
+            {
+                Globals.HANDLE_LIBRARY = true;
+                //look for it in library folder
+            }
 
             return fileNameTemp;
         }
@@ -27560,7 +27563,7 @@ namespace Gekko
             }
 
             string fileNameTemp = FindFile(inputFileName, folders, true, true);
-            Globals.HANDLE_LIBRARY = true;
+            //Globals.HANDLE_LIBRARY = true;
 
             if (fileNameTemp == null)
             {
