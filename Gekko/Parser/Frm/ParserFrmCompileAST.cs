@@ -963,6 +963,7 @@ namespace Gekko.Parser.Frm
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_model);
                 fileNameTemp = Program.FindFile("varlist.dat", folders);
+                Globals.HANDLE_LIBRARY = true;
                 if (fileNameTemp != null)
                 {
                     string s = Program.GetTextFromFileWithWait(fileNameTemp);  //can read an ANSI file without problems

@@ -1805,7 +1805,7 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(G.GetProgramDir());
-            string fileName2 = Program.FindFile(s, folders, false);  //also calls CreateFullPathAndFileName()
+            string fileName2 = Program.FindFile(s, folders, false, false);  //also calls CreateFullPathAndFileName()
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
@@ -1823,7 +1823,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
-            fileName2 = Program.FindFile(s, folders, true);  //also calls CreateFullPathAndFileName()
+            fileName2 = Program.FindFile(s, folders); //also calls CreateFullPathAndFileName(), library files not allowed
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
@@ -2514,6 +2514,8 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             string fileNameTemp = Program.FindFile(fileName, folders);
+            Globals.HANDLE_LIBRARY = true;
+
             if (fileNameTemp == null)
             {
                 new Error("Listfile " + fileName + " could not be found");
@@ -9448,7 +9450,7 @@ namespace Gekko
             public string fileName = null;
             public void Exe()
             {                
-                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName));
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName, true, true));  //allow libraries
             }
         }
 

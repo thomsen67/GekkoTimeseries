@@ -41,6 +41,7 @@ namespace Gekko
     {
         public const string smpl = "§¤£";  //this line must be at top
         public const string libraryDriveCheatString = "library___name___";
+        public static bool HANDLE_LIBRARY = false;
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;

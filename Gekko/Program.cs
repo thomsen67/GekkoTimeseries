@@ -7309,7 +7309,7 @@ namespace Gekko
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName, true, true));  //allows library
                 Program.ROrPythonExport(o.names, o.opt_target, 0);
             }
             else
@@ -7547,7 +7547,7 @@ namespace Gekko
             if (true)
             {
                 Globals.python_fileContent = null;
-                Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName));
+                Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName, true, true));  //allow libraries
                 Program.ROrPythonExport(o.names, o.opt_target, 1);
             }
 
@@ -11804,7 +11804,7 @@ namespace Gekko
         /// <returns></returns>
         public static string GetTextFromFileWithWait(string filename)
         {
-            return GetTextFromFileWithWait(filename, true);
+            return GetTextFromFileWithWait(filename, true, false);
         }
 
         /// <summary>
@@ -11813,17 +11813,25 @@ namespace Gekko
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public static string GetTextFromFileWithWait(string filename, bool slow)
+        public static string GetTextFromFileWithWait(string filename, bool slow, bool allowLibrary)
         {
             //Encoding encoding = Encoding.Default;
             String original = String.Empty;
 
             filename = CreateFullPathAndFileName(filename);
 
-            if (!IsLibraryWithColonName(filename) && !File.Exists(filename))
+            if (!File.Exists(filename))
             {
-                new Error("File '" + filename + "' does not exist");
-            }
+                if (allowLibrary)
+                {
+                    //do something if lib1:data.csv (must have path)
+                    Globals.HANDLE_LIBRARY = true;
+                }
+                else
+                {
+                    new Error("File '" + filename + "' does not exist");
+                }
+            }            
 
             Encoding current = null;
 
@@ -12091,6 +12099,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command2);
 
             string fileName2 = FindFile(s, folders);  //also calls CreateFullPathAndFileName()
+            Globals.HANDLE_LIBRARY = true;
 
             if (fileName2 == null)
             {
@@ -14840,6 +14849,7 @@ namespace Gekko
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
             fileName = FindFile(fileName, folders);  //calls CreateFullPathAndFileName()
+            Globals.HANDLE_LIBRARY = true;
 
             Globals.modelPathAndFileName = fileName;  //always contains a path
             Globals.modelFileName = Path.GetFileName(Globals.modelPathAndFileName);
@@ -15614,7 +15624,8 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                fileName = FindFile(fileName, folders);                
+                fileName = FindFile(fileName, folders);
+                Globals.HANDLE_LIBRARY = true;
             }
 
             return fileName;
@@ -15639,24 +15650,24 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Overload.
+        /// Overload. Includes working folder and excludes libraries.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="folders"></param>
         /// <returns></returns>
         public static string FindFile(string fileName, List<string> folders)
         {
-            return FindFile(fileName, folders, true);
+            return FindFile(fileName, folders, true, false);
         }
 
         /// <summary>
-        /// Find a file, may indicate folders to look in, and may include working folder.
+        /// Find a file, may indicate folders to look in, and may include working folder and may include libraries.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="folders"></param>
         /// <param name="includeWorkingFolder"></param>
         /// <returns></returns>
-        public static string FindFile(string fileName, List<string> folders, bool includeWorkingFolder)
+        public static string FindFile(string fileName, List<string> folders, bool includeWorkingFolder, bool allowLibrary)
         {
             if (IsLibraryWithColonName(fileName)) return fileName;  //quick return if it is a library call like lib1:data.csv
             string fileNameTemp = null;
@@ -15685,6 +15696,9 @@ namespace Gekko
                 }
                 else fileNameTemp = null;  //not allowed to search in folders
             }
+
+            //look for it in library folder
+
             return fileNameTemp;
         }
 
@@ -17612,6 +17626,7 @@ namespace Gekko
         {
             string filename = Program.CreateFullPathAndFileName(s);
             bool exist = File.Exists(filename);
+            //do something if lib1:data.csv (must have path)
             return exist;
         }
 
@@ -27537,13 +27552,15 @@ namespace Gekko
             if (menuTable)  //never done for normal table call
             {
                 folders.Add(Path.GetDirectoryName(inputFileName));
-                //Called from menus, a .tab file will always be with a full path.
+                //Called from menus, a .gtb file will always be with a full path.
                 //But we want it to look in other folders too, so we strip the
                 //path (added to folders above) and keep the filename.
                 inputFileName = Path.GetFileName(inputFileName);
             }
 
             string fileNameTemp = FindFile(inputFileName, folders);
+            Globals.HANDLE_LIBRARY = true;
+
             if (fileNameTemp == null)
             {
                 string s = FileNotFoundErrorMessage(inputFileName);
