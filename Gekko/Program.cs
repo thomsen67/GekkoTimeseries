@@ -12098,7 +12098,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
 
-            string fileName2 = FindFile(s, folders);  //also calls CreateFullPathAndFileName()
+            string fileName2 = FindFile(s, folders, true, true);  //also calls CreateFullPathAndFileName()
             Globals.HANDLE_LIBRARY = true;
 
             if (fileName2 == null)
@@ -14848,7 +14848,7 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
-            fileName = FindFile(fileName, folders);  //calls CreateFullPathAndFileName()
+            fileName = FindFile(fileName, folders, true, true);  //calls CreateFullPathAndFileName()
             Globals.HANDLE_LIBRARY = true;
 
             Globals.modelPathAndFileName = fileName;  //always contains a path
@@ -15624,7 +15624,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                fileName = FindFile(fileName, folders);
+                fileName = FindFile(fileName, folders, true, true);
                 Globals.HANDLE_LIBRARY = true;
             }
 
@@ -15669,7 +15669,7 @@ namespace Gekko
         /// <returns></returns>
         public static string FindFile(string fileName, List<string> folders, bool includeWorkingFolder, bool allowLibrary)
         {
-            if (IsLibraryWithColonName(fileName)) return fileName;  //quick return if it is a library call like lib1:data.csv
+            //if (IsLibraryWithColonName(fileName)) return fileName;  //quick return if it is a library call like lib1:data.csv
             string fileNameTemp = null;
             string fileNameWorkingFolder = CreateFullPathAndFileName(fileName);
             if (includeWorkingFolder && File.Exists(fileNameWorkingFolder))
@@ -15678,7 +15678,7 @@ namespace Gekko
             }
             else
             {
-                if (Program.options.folder)
+                if (Program.options.folder && folders != null)
                 {
                     //allowed to search in folders
                     foreach (string folder in folders)
@@ -15697,6 +15697,7 @@ namespace Gekko
                 else fileNameTemp = null;  //not allowed to search in folders
             }
 
+            Globals.HANDLE_LIBRARY = true;
             //look for it in library folder
 
             return fileNameTemp;
@@ -27558,7 +27559,7 @@ namespace Gekko
                 inputFileName = Path.GetFileName(inputFileName);
             }
 
-            string fileNameTemp = FindFile(inputFileName, folders);
+            string fileNameTemp = FindFile(inputFileName, folders, true, true);
             Globals.HANDLE_LIBRARY = true;
 
             if (fileNameTemp == null)

@@ -89,7 +89,8 @@ namespace Gekko
                 {
                     string fileName = Program.options.plot_using;
                     fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
-                    fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
+                    fileName = Program.FindFile(fileName, null, true, true);
+                    //fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
                     Globals.HANDLE_LIBRARY = true;
 
                     doc1 = new XmlDocument();
@@ -117,7 +118,8 @@ namespace Gekko
                     if (cancel) return;
 
                     fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
-                    fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
+                    fileName = Program.FindFile(fileName, null, true, true);
+                    //fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
                     Globals.HANDLE_LIBRARY = true;
 
                     doc2 = new XmlDocument();

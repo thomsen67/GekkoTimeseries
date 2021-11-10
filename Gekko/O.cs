@@ -2513,7 +2513,7 @@ namespace Gekko
             }
 
             List<string> folders = new List<string>();
-            string fileNameTemp = Program.FindFile(fileName, folders);
+            string fileNameTemp = Program.FindFile(fileName, folders, true, true);
             Globals.HANDLE_LIBRARY = true;
 
             if (fileNameTemp == null)
