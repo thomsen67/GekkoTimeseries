@@ -13870,7 +13870,7 @@ namespace UnitTests
                 _AssertScalarString(First(), "%y4", "zip2");
                 I("read <csv> libfiles1:data.csv;");  //test that unquoted library access parses ok
                 _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
-                I("write <csv> libfiles1:data.csv;");  //writing must be illegal
+                FAIL("write <csv> libfiles1:data.csv;");  //writing must be illegal
             }
         }
 

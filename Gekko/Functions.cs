@@ -3606,14 +3606,14 @@ namespace Gekko
 
         public static IVariable readfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
-            string s1 = O.ConvertToString(x1);
+            string s1 = O.ConvertToString(O.ReplaceSlash(x1));
             string txt = Program.GetTextFromFileWithWait(s1);
             return new ScalarString(txt);
         }
 
         public static IVariable existfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
-            string s = O.ConvertToString(x1);
+            string s = O.ConvertToString(O.ReplaceSlash(x1));
             bool exist = Program.ExistFile(s);
             if (exist) return Globals.scalarVal1;
             else return Globals.scalarVal0;
@@ -3621,7 +3621,7 @@ namespace Gekko
 
         public static void writefile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable file1, IVariable x1)
         {
-            Program.WriteFile(file1, x1);
+            Program.WriteFile(file1, O.ReplaceSlash(x1));
         }
 
         public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)

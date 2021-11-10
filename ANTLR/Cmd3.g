@@ -51,6 +51,7 @@ tokens {
 	ASTFORTYPE2;
 	ASTNAKEDLISTMISS;
 	ASTPARENTDIRECTORY;
+	ASTLIBRARYNAME;
 	ASTLOCAL;
 	ASTARGS;
 	ASTCOLON;
@@ -4031,15 +4032,9 @@ filter:                     FILTER '=' (  no   -> ^(ASTPRTTIMEFILTER NO)
 						  | FILTER -> ^(ASTPRTTIMEFILTER YES)
 						  | NOFILTER -> ^(ASTPRTTIMEFILTER NO)
 						    ;
-
-optionFreq:                 a | q | m | u;
-a:                          A;
-q:                          Q;
-m:                          M;
-u:                          U;
-
 						    
-fileName:                   fileNameFirstPart (slashHelper1 fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)     //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
+fileName:                   name ':' fileNamePart -> ^(ASTLIBRARYNAME name fileNamePart)  //library call like lib1:nice.gpt
+						  | fileNameFirstPart (slashHelper1 fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)     //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
 						  | expression -> ^(ASTFILENAME expression)
 						    ;
 fileNameFirstPart:          fileNameFirstPart1                                                                                   //   c:\xx

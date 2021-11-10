@@ -11820,10 +11820,9 @@ namespace Gekko
 
             filename = CreateFullPathAndFileName(filename);
 
-            if (!File.Exists(filename))
+            if (!IsLibraryWithColonName(filename) && !File.Exists(filename))
             {
-                new Error("file '" + filename + "' does not exist");
-                //throw new GekkoException();
+                new Error("File '" + filename + "' does not exist");
             }
 
             Encoding current = null;
@@ -12155,10 +12154,11 @@ namespace Gekko
                 new Error("Expected a file name, but it is not defined");
                 //throw new GekkoException();
             }
+            
             file = file.Trim(); //Most probably not necessary, but better safe than sorry
             folder = folder.Trim(); //Most probably not necessary, but better safe than sorry
             string fileName2 = "";
-            if (file.Contains(":\\") || file.StartsWith("\\\\"))  //either 'c:\...' or '\\server1\...'
+            if (file.Contains(":\\") || file.StartsWith("\\\\") || IsLibraryWithColonName(file))  //either 'c:\...' or '\\server1\...' or 'lib1:data.csv'
             {
                 fileName2 = file;
             }
@@ -12189,7 +12189,7 @@ namespace Gekko
             }
 
             if (isUNC) fileName2 = "\\\\" + fileName2;
-
+                        
             string rv = O.ResolvePath(fileName2);
 
             return rv;  //see https://stackoverflow.com/questions/970911/net-remove-dots-from-the-path
@@ -15658,6 +15658,7 @@ namespace Gekko
         /// <returns></returns>
         public static string FindFile(string fileName, List<string> folders, bool includeWorkingFolder)
         {
+            if (IsLibraryWithColonName(fileName)) return fileName;  //quick return if it is a library call like lib1:data.csv
             string fileNameTemp = null;
             string fileNameWorkingFolder = CreateFullPathAndFileName(fileName);
             if (includeWorkingFolder && File.Exists(fileNameWorkingFolder))
@@ -15673,6 +15674,7 @@ namespace Gekko
                     {
                         //when folder is "", shouldn't it just skip to next? For "", the result will be the working folder...?
                         //as long as working folder is always king, this is not an issue.
+                        if (string.IsNullOrWhiteSpace(folder)) continue;
                         string fileNameFolder = CreateFullPathAndFileNameFromFolder(fileName, folder);
                         if (File.Exists(fileNameFolder))
                         {
@@ -17961,6 +17963,11 @@ namespace Gekko
 
         public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen)
         {
+            //if (Globals.runningOnTTComputer)
+            //{                
+            //    bool isLibraryName = IsLibraryWithColonName(pathAndFilename);
+            //}
+
             FileStream fs = null;
 
             int gap = Globals.waitFileGap;  //1 second
@@ -18056,6 +18063,12 @@ namespace Gekko
                 //throw new GekkoException();
             }
             return fs;
+        }
+
+        private static bool IsLibraryWithColonName(string pathAndFilename)
+        {            
+            if (pathAndFilename.StartsWith(Globals.libraryDriveCheatString)) return true;
+            return false;
         }
 
         public static void WaitForFileCopy(string pathAndFilenameSource, string pathAndFilenameDestination)

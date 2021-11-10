@@ -2278,6 +2278,12 @@ namespace Gekko.Parser.Gek
                     }
                     break;
 
+                case "ASTLIBRARYNAME":
+                    {
+                        node.Code.A("O.ReplaceSlash(").A(node[0].Code).A(".Concat(" + Globals.smpl + ", O.scalarStringColon)").A(".Concat(" + Globals.smpl + ", ").A(node[1].Code).A("))");
+                    }
+                    break;
+
                 case "ASTFILENAME":
                     {
                         //node.Code.CA(node[0].Code;

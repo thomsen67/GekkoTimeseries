@@ -528,23 +528,60 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Replace "/" shash with "\"
+        /// Replace "/" shash with "\". Also transforms a library call
+        /// like lib1:data.csv into library___name___lib1:\data.csv cheat name.
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
         public static IVariable ReplaceSlashHelper(IVariable x)
         {
             if (x.Type() != EVariableType.String) return x;
-            ScalarString ss = x as ScalarString;
-            if (ss.string2.Contains("/"))
+            string s = x.ConvertToString();
+            string orignialS = s;
+
+            bool change = false;
+
+            if (s.Contains("/"))
             {
-                x = new ScalarString(ss.string2.Replace("/", "\\"));
+                s = s.Replace("/", "\\");
+                change = true;
             }
+            
+            string[] ss = s.Split(':');
+            if (ss.Length == 2)
+            {
+                if (ss[1].Trim().StartsWith("/") || ss[1].Trim().StartsWith("\\"))
+                {
+                    //a path like c:\docs\xx.txt or c:/docs/xx.txt
+                }
+                else
+                {
+                    //a library path like lib1:xx.txt, but something like c:xx.txt will not be considered a library
+                    if (ss[0].Trim().Length > 1)
+                    {
+                        s = Globals.libraryDriveCheatString + ss[0].Trim() + ":\\" + ss[1];
+                        change = true;
+                    }
+                    else
+                    {
+                        using (var txt = new Error())
+                        {
+                            txt.MainAdd("Gekko does not accept library names with less than two characters ('" + orignialS + "').");
+                            txt.MoreAdd("The reference looks like a library reference, since there is no slash after the colon.");
+                            txt.MoreAdd("Referring to a library file may look like for instance lib1:data.csv. This is all good, but if 1-character libraries were allowed ");
+                            txt.MoreAdd("we could have a library c, and the reference to data.csv inside c would be c:data.csv. ");
+                            txt.MoreAdd("This would be too confusing, since the very similar c:\\data.csv is a file referene.");
+                        }
+                    }
+                }
+            }
+
+            if (change) return new ScalarString(s);
             return x;
         }
 
         /// <summary>
-        /// Replace "/" shash with "\"
+        /// See ReplaceSlashHelper() for explanation.
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
@@ -700,15 +737,32 @@ namespace Gekko
             string rv = null;
             try
             {
+                //Wonder what this really does...? Maybe it check if the name is legal at all?
                 rv = Path.GetFullPath(fileName2);
             }
             catch { };
             if (rv == null)
             {
-                new Warning("The path name seems invalid: '" + fileName2 + "'");
+                new Warning("The path name seems invalid: '" + RemoveLibraryCheatString(fileName2) + "'");
                 rv = fileName2;
             }
             return rv;
+        }
+
+        /// <summary>
+        /// Turns a fake path like library___name___lib1:\data.csv into the origina lib1:data.csv
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private static string RemoveLibraryCheatString(string s)
+        {
+            if (s.Contains(Globals.libraryDriveCheatString))
+            {
+                //library___name___lib1:\data.csv ----> lib1:data.csv
+                s = s.Replace(Globals.libraryDriveCheatString, "").Replace(":\\", ":").Replace(":/", ":");
+            }
+
+            return s;
         }
 
         /// <summary>
