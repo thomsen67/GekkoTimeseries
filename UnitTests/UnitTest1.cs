@@ -13846,6 +13846,31 @@ namespace UnitTests
                 _AssertScalarVal(First(), "%y1", 100d);  //will take in-built
                 FAIL("%y2 = p6:abs(-100);");  //error: already exists as in-built
 
+                // ------------------------------------------------------------
+                // get a file
+                // ------------------------------------------------------------                                    
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                //here, we must have a raw file file1.txt, and a libfiles.zip with file1.txt too
+                //in the raw file, the text is "raw1", and in the zip it is "zip1".
+                //libfiles.zip also has file2.txt with the text "zip2"
+                I("reset;");
+                I("option folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library libfiles1;");
+                I("%y1 = readfile('file1.txt');");
+                _AssertScalarString(First(), "%y1", "raw1");  //is read from working folder first                
+                I("%y2 = readfile('libfiles1:file1.txt');");   //from libfiles.zip
+                _AssertScalarString(First(), "%y2", "zip1");
+                I("%y3 = readfile('file2.txt');");            //from libfiles.zip, does not exist in working folder
+                _AssertScalarString(First(), "%y3", "zip2");
+                FAIL("tell readfile('libfiles1:sub1\\file1.txt');");   
+                FAIL("tell readfile('libfiles1:\\sub1\\file1.txt');");
+                FAIL("library libfiles2;");  //duplicate files
+                I("library libfiles3;");
+                I("%y4 = readfile('libfiles3:file2.txt');");  //exists in subfolder inside zip
+                _AssertScalarString(First(), "%y4", "zip2");
+                I("read <csv> libfiles1:data.csv;");  //test that unquoted library access parses ok
+                _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
+                I("write <csv> libfiles1:data.csv;");  //writing must be illegal
             }
         }
 

@@ -705,7 +705,7 @@ namespace Gekko
             catch { };
             if (rv == null)
             {
-                new Note("Could not resolve the path '" + fileName2 + "'");
+                new Warning("The path name seems invalid: '" + fileName2 + "'");
                 rv = fileName2;
             }
             return rv;
