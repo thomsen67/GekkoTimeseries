@@ -15696,11 +15696,9 @@ namespace Gekko
 
             if (allowLibrary && fileNameTemp == null)
             {
-                Globals.HANDLE_LIBRARY = true;
-                                
                 if (filenameMaybeWithoutPath.StartsWith(Globals.libraryDriveCheatString))
                 {
-                    //a designated library
+                    //a designated library like lib1:zz.csv
                     string[] ss = filenameMaybeWithoutPath.Split(':');
                     string libraryName = ss[0].Replace(Globals.libraryDriveCheatString, "");
                     string dataFileNameWithoutPath = ss[1].Substring(1);
@@ -15716,19 +15714,20 @@ namespace Gekko
                     //fileNameTemp = "c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\zz.csv" because
                     //zz.csv is inside a \sub subfolder and the library "lb" is an alias from lib1.zip.                    
                 }
-
-                NOW DO SEARCH IF NO LIB NAME
-
-                //look for it in library folder
-                var xx = Program.libraries;
-                foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
+                else if (!filenameMaybeWithoutPath.Contains("\\"))
                 {
-                    //Local lib will just skip quickly
-                    if (library.GetDataFiles().ContainsKey(filenameMaybeWithoutPath))
+                    //a loose file without path like zz.csv. Cannot accept \data\zz.csv which must be on the real filesystem.
+                    foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
                     {
-                        MessageBox.Show("Lib file " + fileNameTemp + " found");
+                        //Local lib will just skip quickly
+                        string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
+                        if (dataFilePathInsideZip != null)
+                        {
+                            fileNameTemp = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
+                            break;
+                        }
                     }
-                }
+                }                
             }
 
             return fileNameTemp;
