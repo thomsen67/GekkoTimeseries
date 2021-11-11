@@ -1762,9 +1762,9 @@ namespace Gekko
                         
             string freqHere = G.ConvertFreq(Program.options.freq);
 
-            string fullFileNameAndPath = CreateFullPathAndFileName(file);
+            string fullFileNameAndPath = Program.FindFile(file, null);
 
-            if (!File.Exists(fullFileNameAndPath))
+            if (fullFileNameAndPath == null)
             {
                 if (type == EDataFormat.Csv) new Error("Csv file does not exist");
                 else if (type == EDataFormat.Prn) new Error("Prn file does not exist");
@@ -7309,7 +7309,7 @@ namespace Gekko
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName, true, true));  //allows library
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(Program.FindFile(o.fileName, null, true, true)));
                 Program.ROrPythonExport(o.names, o.opt_target, 0);
             }
             else
@@ -7547,7 +7547,7 @@ namespace Gekko
             if (true)
             {
                 Globals.python_fileContent = null;
-                Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(o.fileName, true, true));  //allow libraries
+                Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(Program.FindFile(o.fileName, null, true, true))); 
                 Program.ROrPythonExport(o.names, o.opt_target, 1);
             }
 
@@ -11583,7 +11583,9 @@ namespace Gekko
             bool isTranspose = false;
             if (G.Equal(o.opt_cols, "yes")) isTranspose = true;
 
-            string fn = Program.CreateFullPathAndFileName(G.AddExtension(o.fileName, "." + x));
+            string s2 = G.AddExtension(o.fileName, "." + x);
+            string fn = Program.FindFile(s2, null, true, true);
+            if (fn == null) new Error("Could not find file '" + s2 + "'");
 
             //string s = Program.GetTextFromFileWithWait(fileName_string);
 
@@ -11804,51 +11806,31 @@ namespace Gekko
         /// <returns></returns>
         public static string GetTextFromFileWithWait(string filename)
         {
-            return GetTextFromFileWithWait(filename, true, false);
+            return GetTextFromFileWithWait(filename, true);
         }
 
         /// <summary>
-        /// Gets a text file as a C# string. Can handle UTF8/ANSI encoding, too. If slow == false, there will be
-        /// no UTF8 check, and the file is read fast as binary.
+        /// Gets a text file as a C# string. Can handle UTF8/ANSI encoding, too. If convertAnyAnsiToUtf8 == false, it will run a bit faster, 
+        /// but if the file IS in ANSI format, there will be funny characters. See also FindFile()
         /// </summary>
-        /// <param name="filename"></param>
+        /// <param name="filenameMaybeWithoutPath"></param>
         /// <returns></returns>
-        public static string GetTextFromFileWithWait(string filename, bool slow, bool allowLibrary)
+        public static string GetTextFromFileWithWait(string filenameMaybeWithoutPath, bool convertAnyAnsiToUtf8)
         {
             //Encoding encoding = Encoding.Default;
             String original = String.Empty;
 
-            string filenameOriginal = filename;
-            filename = CreateFullPathAndFileName(filename);
+            string filenameOriginal = filenameMaybeWithoutPath;
 
-            if (!File.Exists(filename))
-            {
-                if (allowLibrary)
-                {
-                    //do something if lib1:data.csv (must have path)
-                    Globals.HANDLE_LIBRARY = true;
-
-                    foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
-                    {
-                        //Local lib will just skip quickly
-                        if (library.GetDataFiles().ContainsKey(filenameOriginal))
-                        {
-                            MessageBox.Show("Lib file " + filenameOriginal + " found");
-                        }
-                    }
-                }
-                else
-                {
-                    new Error("File '" + filename + "' does not exist");
-                }
-            }            
-
+            //!usually it is already called with a full path, but never mind
+            filenameMaybeWithoutPath = CreateFullPathAndFileName(filenameMaybeWithoutPath);
+            
             Encoding current = null;
 
             bool utf8checker = false;
-            using (FileStream fs = WaitForFileStream(filename, GekkoFileReadOrWrite.Read))
+            using (FileStream fs = WaitForFileStream(filenameMaybeWithoutPath, GekkoFileReadOrWrite.Read))
             {
-                if (slow) utf8checker = Utf8Checker.IsUtf8(fs);  //NOTE: tastes the file: this may be slow on very large files. So avoid GetTextFromFileWithWait() on databank reading etc. //previously, sr.CurrentEncoding was used, but it is not precise enough to detect UTF8 without BOM mark at start (TextPad for instance)
+                if (convertAnyAnsiToUtf8) utf8checker = Utf8Checker.IsUtf8(fs);  //NOTE: tastes the file: this may be slow on very large files. So avoid GetTextFromFileWithWait() on databank reading etc. //previously, sr.CurrentEncoding was used, but it is not precise enough to detect UTF8 without BOM mark at start (TextPad for instance)
                 fs.Position = 0;  //to rewind
                 Encoding encoding = Encoding.Default;
                 if (utf8checker) encoding = Encoding.UTF8;
@@ -11860,7 +11842,7 @@ namespace Gekko
                 }
             }
             
-            if (slow)
+            if (convertAnyAnsiToUtf8)
             {
                 string s = null;
                 if (utf8checker)
@@ -15660,28 +15642,30 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Overload. Includes working folder and excludes libraries.
+        /// Overload. Includes working folder and excludes libraries. Returns null if no file is found.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="folders"></param>
         /// <returns></returns>
         public static string FindFile(string fileName, List<string> folders)
         {
+            //When called with folders == null, this is the same as CreateFullPathAndFileName(),
+            //but with the difference that it returns null if the file does not exist.
             return FindFile(fileName, folders, true, false);
         }
 
         /// <summary>
-        /// Find a file, may indicate folders to look in, and may include working folder and may include libraries.
+        /// Find a file, may indicate folders to look in, and may include working folder and may include libraries. Returns null if no file is found.
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="filenameMaybeWithoutPath"></param>
         /// <param name="folders"></param>
         /// <param name="includeWorkingFolder"></param>
         /// <returns></returns>
-        public static string FindFile(string fileName, List<string> folders, bool includeWorkingFolder, bool allowLibrary)
+        public static string FindFile(string filenameMaybeWithoutPath, List<string> folders, bool includeWorkingFolder, bool allowLibrary)
         {
             //if (IsLibraryWithColonName(fileName)) return fileName;  //quick return if it is a library call like lib1:data.csv
             string fileNameTemp = null;
-            string fileNameWorkingFolder = CreateFullPathAndFileName(fileName);
+            string fileNameWorkingFolder = CreateFullPathAndFileName(filenameMaybeWithoutPath);
             if (includeWorkingFolder && File.Exists(fileNameWorkingFolder))
             {
                 fileNameTemp = fileNameWorkingFolder;
@@ -15696,7 +15680,7 @@ namespace Gekko
                         //when folder is "", shouldn't it just skip to next? For "", the result will be the working folder...?
                         //as long as working folder is always king, this is not an issue.
                         if (string.IsNullOrWhiteSpace(folder)) continue;
-                        string fileNameFolder = CreateFullPathAndFileNameFromFolder(fileName, folder);
+                        string fileNameFolder = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
                         if (File.Exists(fileNameFolder))
                         {
                             fileNameTemp = fileNameFolder;
@@ -15704,18 +15688,43 @@ namespace Gekko
                         }
                     }
                 }
-                else fileNameTemp = null;  //not allowed to search in folders
+                else
+                {
+                    fileNameTemp = null;  //not allowed to search in folders
+                }
             }
 
             if (allowLibrary && fileNameTemp == null)
             {
                 Globals.HANDLE_LIBRARY = true;
+                                
+                if (filenameMaybeWithoutPath.StartsWith(Globals.libraryDriveCheatString))
+                {
+                    //a designated library
+                    string[] ss = filenameMaybeWithoutPath.Split(':');
+                    string libraryName = ss[0].Replace(Globals.libraryDriveCheatString, "");
+                    string dataFileNameWithoutPath = ss[1].Substring(1);
+                    Library library = Program.libraries.GetLibrary(libraryName, true);
+                    //if we get here, the library exists, and if not there is an error issued above
+                    string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(dataFileNameWithoutPath, out dataFilePathInsideZip);
+                    if (dataFilePathInsideZip == null)
+                    {
+                        new Error("The file '" + dataFileNameWithoutPath + "' was not found inside the \\data subfolder of the library '" + library.GetFileNameWithPath() + "'");
+                    }
+                    fileNameTemp = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;
+                    //NOTE: for instance if filenameMaybeWithoutPath = "library___name___lb:\zz.csv" we may get 
+                    //fileNameTemp = "c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\zz.csv" because
+                    //zz.csv is inside a \sub subfolder and the library "lb" is an alias from lib1.zip.                    
+                }
+
+                NOW DO SEARCH IF NO LIB NAME
+
                 //look for it in library folder
                 var xx = Program.libraries;
                 foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
                 {
                     //Local lib will just skip quickly
-                    if (library.GetDataFiles().ContainsKey(fileName))
+                    if (library.GetDataFiles().ContainsKey(filenameMaybeWithoutPath))
                     {
                         MessageBox.Show("Lib file " + fileNameTemp + " found");
                     }

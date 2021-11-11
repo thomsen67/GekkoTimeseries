@@ -20,9 +20,8 @@ namespace Gekko
             catch
             {
                 //no reason to fail on this
-            }            
-            string input = Program.CreateFullPathAndFileName(o1.fileName);
-            string jsonCode = Program.GetTextFromFileWithWait(input, true, true); //also removes some kinds of funny characters, allows libraries
+            }                        
+            string jsonCode = Program.GetTextFromFileWithWait(Program.FindFile(o1.fileName, null, true, true)); //also removes some kinds of funny characters
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(o1.dbUrl);
             httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max        
             httpWebRequest.ContentType = "text/json";
@@ -221,9 +220,8 @@ namespace Gekko
             string jsonCode = null;
             if (o1.fileName != null)
             {
-                //string input = Program.options.folder_working + "\\" + o1.fileName;
-                string input = Program.CreateFullPathAndFileName(o1.fileName);
-                jsonCode = Program.GetTextFromFileWithWait(input, true, true); //also removes some kinds of funny characters, allows libraries
+                //string input = Program.options.folder_working + "\\" + o1.fileName;                
+                jsonCode = Program.GetTextFromFileWithWait(Program.FindFile(o1.fileName, null, true, true)); //also removes some kinds of funny characters
             }
 
             StreamWriter streamWriter = null;

@@ -9450,7 +9450,7 @@ namespace Gekko
             public string fileName = null;
             public void Exe()
             {                
-                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(this.fileName, true, true));  //allow libraries
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(Program.FindFile(this.fileName, null, true, true)));
             }
         }
 

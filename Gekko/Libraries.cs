@@ -410,7 +410,7 @@ namespace Gekko
                     //Now we try the disk cache.                    
                     //We only allow a match if it is BOTH the same bytes in the file, AND the filepath + alias is the same.
                     //This makes file references easier, less to think about. So two identical libs may be parsed two times if the are in two different file locations (or a different alias is used)
-                    string s = Program.GetTextFromFileWithWait(fileNameWithPath, false, false);
+                    string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
                     string ss = s + G.NL + "Filename: " + fileNameWithPath + "Alias: " + libraryName;
                     string modelHash = Program.GetMD5Hash(ss); //Pretty unlikely that two different libs could produce the same hash.
                     modelHash = modelHash.Trim();  //probably not necessary
