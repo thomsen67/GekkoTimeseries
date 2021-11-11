@@ -11818,6 +11818,7 @@ namespace Gekko
             //Encoding encoding = Encoding.Default;
             String original = String.Empty;
 
+            string filenameOriginal = filename;
             filename = CreateFullPathAndFileName(filename);
 
             if (!File.Exists(filename))
@@ -11826,6 +11827,15 @@ namespace Gekko
                 {
                     //do something if lib1:data.csv (must have path)
                     Globals.HANDLE_LIBRARY = true;
+
+                    foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
+                    {
+                        //Local lib will just skip quickly
+                        if (library.GetDataFiles().ContainsKey(filenameOriginal))
+                        {
+                            MessageBox.Show("Lib file " + filenameOriginal + " found");
+                        }
+                    }
                 }
                 else
                 {
@@ -15701,6 +15711,15 @@ namespace Gekko
             {
                 Globals.HANDLE_LIBRARY = true;
                 //look for it in library folder
+                var xx = Program.libraries;
+                foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
+                {
+                    //Local lib will just skip quickly
+                    if (library.GetDataFiles().ContainsKey(fileName))
+                    {
+                        MessageBox.Show("Lib file " + fileNameTemp + " found");
+                    }
+                }
             }
 
             return fileNameTemp;

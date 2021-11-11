@@ -38,7 +38,7 @@ namespace Gekko
         /// Active libraries (excluding the Glbobal library). There are also non-active libraries in .libraryCache.
         /// </summary>        
         private List<Library> libraries = new List<Library>();        
-        private Library globalLibrary = new Library(Globals.globalLibraryString, null, new DateTime(0l));
+        private Library localLibrary = new Library(Globals.localLibraryString, null, new DateTime(0l));
 
         /// <summary>
         /// All historically loaded libraries. Active (non-Global) libraries are in .libraries.
@@ -81,7 +81,7 @@ namespace Gekko
                 writeln.MainNewLineTight();
                 int counter = 0;
                 
-                foreach (Library library in Program.libraries.GetLibrariesIncludingGlobal())
+                foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
                 {
                     counter++;
                     if (name != null && !G.Equal(library.GetName(), name))
@@ -205,14 +205,14 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Returns a list of libraries. Includes the Global library as the last element.
+        /// Returns a list of libraries. Includes the Local library as the first element.
         /// </summary>
         /// <returns></returns>
-        public List<Library> GetLibrariesIncludingGlobal()
+        public List<Library> GetLibrariesIncludingLocal()
         {
             List<Library> temp = new List<Library>();
-            temp.AddRange(this.libraries);
-            temp.Add(this.globalLibrary);
+            temp.Add(this.localLibrary);
+            temp.AddRange(this.libraries);            
             return temp;
         }
 
@@ -224,12 +224,12 @@ namespace Gekko
         /// <returns></returns>
         public Library GetLibrary(string name, bool abortWithError)
         {
-            //By convention, calling with null means the Global library. This is the default place
+            //By convention, calling with null means the Local library. This is the default place
             //for functions/procedures.
             
-            if (name == null) return this.globalLibrary;
+            if (name == null) return this.localLibrary;
 
-            foreach (Library lib in this.GetLibrariesIncludingGlobal())
+            foreach (Library lib in this.GetLibrariesIncludingLocal())
             {
                 if (G.Equal(lib.GetName(), name))
                 {                    
@@ -265,7 +265,7 @@ namespace Gekko
             {
                 if (callingLibraryName == null)
                 {
-                    foreach (Library thisLib in this.GetLibrariesIncludingGlobal())
+                    foreach (Library thisLib in this.GetLibrariesIncludingLocal())
                     {
                         rv = thisLib.GetFunction(functionName, false);
                         if (rv != null) break;
@@ -279,7 +279,7 @@ namespace Gekko
                     if (rv == null)
                     {
                         //then we search the rest normally
-                        foreach (Library thisLib2 in this.GetLibrariesIncludingGlobal())
+                        foreach (Library thisLib2 in this.GetLibrariesIncludingLocal())
                         {
                             if (thisLib2 == callingLibrary) continue;  //skip this, we have tested it, and the function does not exist.
                             rv = thisLib2.GetFunction(functionName, false);
@@ -596,13 +596,13 @@ namespace Gekko
 
         public void ClearLibrary(string libraryName)
         {
-            if (G.Equal(libraryName, Globals.globalLibraryString))
+            if (G.Equal(libraryName, Globals.localLibraryString))
             {
-                this.globalLibrary = new Library(Globals.globalLibraryString, null, new DateTime(0l));
+                this.localLibrary = new Library(Globals.localLibraryString, null, new DateTime(0l));
             }
             else
             {
-                new Error("You can only clear 'Global' (the global library)");
+                new Error("You can only clear 'Local' (the local library)");
             }
         }
     }
@@ -629,7 +629,10 @@ namespace Gekko
 
         [ProtoMember(3)]
         private GekkoDictionary<string, GekkoFunction> functions = new GekkoDictionary<string, GekkoFunction>(StringComparer.OrdinalIgnoreCase);
-        
+
+        [ProtoMember(4)]
+        private GekkoDictionary<string, string> dataFiles = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>
         /// Stamp: when the file was written. Do not protobuf.
         /// </summary>
@@ -692,6 +695,11 @@ namespace Gekko
             this.functions.Add(function.GetName(), function);            
         }
 
+        public Dictionary<string, string> GetDataFiles()
+        {
+            return this.dataFiles;
+        }
+
         /// <summary>
         /// Gets a list of function names inside the library. Does not show overloads (number of arguments), just the names proper.
         /// </summary>
@@ -730,18 +738,42 @@ namespace Gekko
 
         /// <summary>
         /// Finds all .gcm files in a folder structure, and extracts functions/procedures. Is recursive.
+        /// Will also catalogue all "external" files in the \data subfolder.
         /// </summary>
         /// <param name="targetDirectory"></param>
         public void LibraryExtractor(string targetDirectory, string originalDirectory, string zipFileName)
         {
             // Process the list of files found in the directory.
             string[] fileEntries = Directory.GetFiles(targetDirectory);
+            string relativePath = targetDirectory.Replace(originalDirectory, "");          
+
             foreach (string fileName in fileEntries)
             {
-                if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
+                if (relativePath.ToLower() == "\\data" || relativePath.ToLower().StartsWith("\\data\\"))
                 {
-                    this.LibraryExtractorHandleGcmFile(fileName, originalDirectory, zipFileName);
+                    //Normal external files. These are not extracted: just recorded.
+                    if (this.dataFiles.ContainsKey(Path.GetFileName(fileName)))
+                    {
+                        using (var txt = new Error())
+                        {
+                            string ss = this.dataFiles[Path.GetFileName(fileName)];
+                            txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\data subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
+                            txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+                        }
+                    }
+                    else
+                    {
+                        this.dataFiles.Add(Path.GetFileName(fileName), relativePath);
+                    }
                 }
+                else
+                {
+                    //.gcm files with functions/procedures for lazy loading
+                    if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.LibraryExtractorHandleGcmFile(fileName, originalDirectory, zipFileName);
+                    }
+                }                
             }
 
             // Recurse into subdirectories of this directory.
