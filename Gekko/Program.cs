@@ -18009,11 +18009,6 @@ namespace Gekko
 
         public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen)
         {
-            //if (Globals.runningOnTTComputer)
-            //{                
-            //    bool isLibraryName = IsLibraryWithColonName(pathAndFilename);
-            //}
-
             FileStream fs = null;
 
             int gap = Globals.waitFileGap;  //1 second
@@ -18041,6 +18036,42 @@ namespace Gekko
 
                 if (type == GekkoFileReadOrWrite.Read)
                 {
+                    //Here, we swap any parts of path that passes through zip files.
+
+
+                    int j1 = pathAndFilename.IndexOf(".zip");
+                    if (j1 != -1)
+                    {
+                        int ok1 = -12345;
+                        for (int j2 = j1 - 1; j2 >= 1; j2--)
+                        {
+                            if (pathAndFilename[j2] == '\\' && !(pathAndFilename[j2 - 1] == '\\'))
+                            {
+                                ok1 = j2 + 1;
+                                break;
+                            }
+                        }
+                        int ok2 = -12345;
+                        int j3 = j1 + ".zip".Length;
+                        if (j3 < pathAndFilename.Length && pathAndFilename[j3] == '\\') ok2 = j3 - 1;
+                        if (ok1 != -12345 && ok2 != -12345)
+                        {
+                            //TODO: blanks would not be good, like ...\subfolder1\ lib1.zip \subfolder2\...
+                            string zipFileWithPath = pathAndFilename.Substring(0, ok2 + 1);
+                            string zipFileWithoutPath = pathAndFilename.Substring(ok1, ok2 - ok1  + 1);
+                            string pathInsideZip = G.Substring(pathAndFilename, ok2 + 2, pathAndFilename.Length - 1);
+                            if (!File.Exists(zipFileWithPath)) new Error("Zip file '" + zipFileWithoutPath + "' does not seem to exist. Trying to unzip this file, because it is part of the path '" + pathAndFilename + "'.");
+                            ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
+                            ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
+                            entry.ExtractToFile("c:\\tools\\sletmig.txt", true);
+                            pathAndFilename = "c:\\tools\\sletmig.txt";
+                        }
+                    }                   
+
+
+
+
+
                     //checking if the file is there at all for reading
                     if (!File.Exists(pathAndFilename))
                     {
@@ -18071,7 +18102,6 @@ namespace Gekko
                     if (Directory.Exists(pathAndFilename))
                     {
                         new Error("There exists a folder with the same name: " + pathAndFilename);
-                        //throw new GekkoException();
                     }
 
                     if (pathName != "")  //sometimes pathAndFilename may be just the filename??
@@ -18079,7 +18109,6 @@ namespace Gekko
                         if (!Directory.Exists(pathName))
                         {
                             new Error("Could not find directory '" + pathName + "' for writing");
-                            //throw new GekkoException();
                         }
                     }
                 }
@@ -18091,14 +18120,13 @@ namespace Gekko
                 catch (UnauthorizedAccessException e)
                 {                    
                     new Warning("File '" + pathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
-                    System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
+                    Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
-
                 }
                 catch (Exception e)
                 {
                     new Warning("File '" + pathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
-                    System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
+                    Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
                 }
                 break;
@@ -18106,7 +18134,6 @@ namespace Gekko
             if (fs == null)
             {
                 new Error("Gave up on file '" + pathAndFilename + "'. Is it blocked by another program?");
-                //throw new GekkoException();
             }
             return fs;
         }

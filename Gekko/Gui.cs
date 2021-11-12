@@ -781,8 +781,8 @@ namespace Gekko
 
             try
             {
-                long sumMax = 500L * 1000000L;  //500 MB, if over it is pruned down to 80% of this (400 MB), deleting 100 MB of oldest models
-                                                //500 MB corresponds to > 60 different large models
+                long sumMax = 1000L * 1000000L;  //1000 MB, if over it is pruned down to 80% of this (800 MB), deleting 200 MB of oldest models/libs
+                                                 //1000 MB corresponds to > 120 different large models
                 double fraction = 0.8d;
                 long sum = 0L;
 
@@ -791,7 +791,7 @@ namespace Gekko
                 List<DateTimeHelper> ddd = new List<DateTimeHelper>();
                 foreach (FileInfo file in files)
                 {
-                    if (G.Equal(file.Extension, ".mdl"))
+                    if (G.Equal(file.Extension, ".mdl")  || G.Equal(file.Extension, Libraries.libCacheExtension))
                     {
                         sum += file.Length;
                         ddd.Add(new DateTimeHelper() { dt = file.LastWriteTime, s = file.FullName, size = file.Length });
@@ -799,26 +799,15 @@ namespace Gekko
                 }
 
                 if (sum > sumMax)
-                {
-                    //StringBuilder sb = new StringBuilder();
-                    //foreach (DateTimeHelper d in ddd) Console.WriteLine(d.dt + " " + d.size + " " + d.s);
-                    ddd.Sort((a, b) => a.dt.CompareTo(b.dt));
-                    //Console.WriteLine();
-                    //foreach (DateTimeHelper d in ddd) Console.WriteLine(d.dt + " " + d.size + " " + d.s);
+                {                    
+                    ddd.Sort((a, b) => a.dt.CompareTo(b.dt));                    
                     double temp = (double)sumMax * fraction;  //we crop it some more, so we don't have to delete files for a while (= speedy startup)
                     long tooMuch = sum - (long)(temp);
                     long sum2 = 0L;
                     foreach (DateTimeHelper d in ddd)
                     {
-                        sum2 += d.size;
-                        //try
-                        {
-                            File.Delete(d.s);  //best not to use WaitForFileDelete() here, since failure is caught when calling the method (cleanup)
-                        }
-                        //catch
-                        {
-                            //do nothing
-                        }
+                        sum2 += d.size;                        
+                        File.Delete(d.s);  //best not to use WaitForFileDelete() here, since failure is caught when calling the method (cleanup)                        
                         if (sum2 > tooMuch) break;
                     }
                 }
