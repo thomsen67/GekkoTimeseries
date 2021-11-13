@@ -13879,7 +13879,7 @@ namespace UnitTests
                 I("%y4 = readfile('" + Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\sub\data2.txt');");
                 _AssertScalarString(First(), "%y4", "lib1datasubdata2\r\n");
                 I("read <csv> "+ Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\data.csv;");
-                _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
+                _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta); 
             }
         }
 
