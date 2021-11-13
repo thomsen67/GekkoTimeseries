@@ -2405,9 +2405,8 @@ namespace Gekko
             string orignialFileName = fileName;
 
             fileName = Program.FindFile(fileName, folders, true, true);  //calls CreateFullPathAndFileName()
-            //Globals.HANDLE_LIBRARY = true;
 
-            if (File.Exists(fileName))
+            if (fileName != null)
             {
                 string path = Path.GetDirectoryName(fileName);
                 string menuFolder = Program.CreateFullPathAndFileName(Program.options.folder_menu);

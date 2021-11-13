@@ -2050,9 +2050,8 @@ namespace Gekko
             string path = Program.FindFile("gekko.chm", folders);  //calls CreateFullPathAndFileName()
 
             if (path == null)
-            {
-                G.Writeln();
-                G.Writeln("Sorry: could not find the help system file ('gekko.chm').");
+            {                
+                G.Writeln2("Could not find the help system file ('gekko.chm').");
                 return false;
             }
 
@@ -9449,8 +9448,10 @@ namespace Gekko
         {            
             public string fileName = null;
             public void Exe()
-            {                
-                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(Program.FindFile(this.fileName, null, true, true)));
+            {
+                string file = Program.FindFile(this.fileName, null, true, true);
+                if (file == null) new Error("The file does not exist: " + this.fileName);
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
             }
         }
 

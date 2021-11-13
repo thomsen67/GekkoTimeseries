@@ -3607,7 +3607,9 @@ namespace Gekko
         public static IVariable readfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
-            string txt = Program.GetTextFromFileWithWait(Program.FindFile(s1, null, true, true));
+            string file = Program.FindFile(s1, null, true, true);
+            if (file == null) new Error("Could not find file: " + s1);
+            string txt = Program.GetTextFromFileWithWait(file);            
             return new ScalarString(txt);
         }
 

@@ -87,7 +87,8 @@ namespace Gekko
 
         //Must be near the top of Globals.cs
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
-        
+        public static int tempFilesCounter = 0;  //used when unzipping files
+
         public static ItemHandler itemHandler = null;  //hack
 
         public static bool decompSubstitute = false;

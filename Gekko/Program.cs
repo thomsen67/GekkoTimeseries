@@ -7309,7 +7309,9 @@ namespace Gekko
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(Program.FindFile(o.fileName, null, true, true)));
+                string file = Program.FindFile(o.fileName, null, true, true);
+                if (file == null) new Error("The file does not exist: " + o.fileName);
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
                 Program.ROrPythonExport(o.names, o.opt_target, 0);
             }
             else
@@ -7547,7 +7549,9 @@ namespace Gekko
             if (true)
             {
                 Globals.python_fileContent = null;
-                Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(Program.FindFile(o.fileName, null, true, true))); 
+                string file = Program.FindFile(o.fileName, null, true, true);
+                if (file == null) new Error("The file does not exist: " + o.fileName);
+                Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file)); 
                 Program.ROrPythonExport(o.names, o.opt_target, 1);
             }
 
@@ -12110,7 +12114,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// See CreateFullPathAndFileNameFromFolder(). Will add working folder.
+        /// See CreateFullPathAndFileNameFromFolder(). Will add working folder. Does not taste any files: this is pure string manipulation.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -12120,13 +12124,17 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// Will add working folder for simple filename input.
+        /// Will add working folder for simple filename input. Does not taste any files: this is pure string manipulation.
         /// </summary>
         /// <param name="file"></param>
         /// <param name="folder"></param>
         /// <returns></returns>
         public static string CreateFullPathAndFileNameFromFolder(string file, string folder)
         {
+            // TODO: If file contains a subfolder (like "\sub1\xx.csv), this is ok for working folder, but when called with for
+            // instance folder \command1, \command2 etc., it should not be allowed to glue these on for instance \sub1\xx.csv.
+            // Not super important. Maybe consider this for Gekko 4.0...
+
             //This method can be called with path = null or path = "", in that case it reduces to
             //only adding the working folder if file is without colon.
             //Path is given from options: "option folder bank = ..." for instance
@@ -12153,7 +12161,6 @@ namespace Gekko
             if (file == null)
             {
                 new Error("Expected a file name, but it is not defined");
-                //throw new GekkoException();
             }
             
             file = file.Trim(); //Most probably not necessary, but better safe than sorry
@@ -15655,7 +15662,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Find a file, may indicate folders to look in, and may include working folder and may include libraries. Returns null if no file is found.
+        /// Find a file, may indicate folders to look in, and may include working folder and may include libraries. Will return null if no file is found (no file exists)
         /// </summary>
         /// <param name="filenameMaybeWithoutPath"></param>
         /// <param name="folders"></param>
@@ -15663,12 +15670,31 @@ namespace Gekko
         /// <returns></returns>
         public static string FindFile(string filenameMaybeWithoutPath, List<string> folders, bool includeWorkingFolder, bool allowLibrary)
         {
-            //if (IsLibraryWithColonName(fileName)) return fileName;  //quick return if it is a library call like lib1:data.csv
-            string fileNameTemp = null;
-            string fileNameWorkingFolder = CreateFullPathAndFileName(filenameMaybeWithoutPath);
-            if (includeWorkingFolder && File.Exists(fileNameWorkingFolder))
+            //Can be of these types:
+            // -----------------------------------------------
+            // zz.csv
+            // sub1\sub2\zz.csv
+            // \sub1\sub2\zz.csv
+            // g:\data\sub1\sub2\zz.csv
+            // \\localhost\g$\data\sub1\sub2\zz.csv
+            // -----------------------------------------------
+            // files.zip\sub2\zz.csv
+            // \files.zip\sub2\zz.csv
+            // g:\data\files.zip\sub2\zz.csv
+            // \\localhost\g$\data\files.zip\sub2\zz.csv
+            // -----------------------------------------------    
+
+            bool success = false;
+            string rv_fileName = filenameMaybeWithoutPath;
+
+            if (includeWorkingFolder)
             {
-                fileNameTemp = fileNameWorkingFolder;
+                rv_fileName = CreateFullPathAndFileName(filenameMaybeWithoutPath);  //will now start with g:\... or \\localhost\...                        
+                rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
+                if (rv_fileName != null && File.Exists(rv_fileName))
+                {
+                    success = true;
+                }
             }
             else
             {
@@ -15680,25 +15706,27 @@ namespace Gekko
                         //when folder is "", shouldn't it just skip to next? For "", the result will be the working folder...?
                         //as long as working folder is always king, this is not an issue.
                         if (string.IsNullOrWhiteSpace(folder)) continue;
-                        string fileNameFolder = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
-                        if (File.Exists(fileNameFolder))
+                        rv_fileName = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
+                        rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
+                        if (rv_fileName != null && File.Exists(rv_fileName))
                         {
-                            fileNameTemp = fileNameFolder;
+                            success = true;
                             break; //no more searching
                         }
                     }
                 }
                 else
                 {
-                    fileNameTemp = null;  //not allowed to search in folders
+                    //do nothing: cannot use working folder, and is not allowed to search in folders
                 }
             }
 
-            if (allowLibrary && fileNameTemp == null)
+            if (!success && allowLibrary)
             {
+                //see if we can find the file in an open zip library
                 if (filenameMaybeWithoutPath.StartsWith(Globals.libraryDriveCheatString))
                 {
-                    //a designated library like lib1:zz.csv
+                    //a designated library with colon like library___name___lib1:\zz.csv (representing lib1:zz.csv)
                     string[] ss = filenameMaybeWithoutPath.Split(':');
                     string libraryName = ss[0].Replace(Globals.libraryDriveCheatString, "");
                     string dataFileNameWithoutPath = ss[1].Substring(1);
@@ -15709,28 +15737,101 @@ namespace Gekko
                     {
                         new Error("The file '" + dataFileNameWithoutPath + "' was not found inside the \\data subfolder of the library '" + library.GetFileNameWithPath() + "'");
                     }
-                    fileNameTemp = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;
+                    rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;
+                    rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
                     //NOTE: for instance if filenameMaybeWithoutPath = "library___name___lb:\zz.csv" we may get 
                     //fileNameTemp = "c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\zz.csv" because
                     //zz.csv is inside a \sub subfolder and the library "lb" is an alias from lib1.zip.                    
                 }
                 else if (!filenameMaybeWithoutPath.Contains("\\"))
                 {
+                    //normal raw filename without folder structure stated
                     //a loose file without path like zz.csv. Cannot accept \data\zz.csv which must be on the real filesystem.
+                    //will search for the file in open libraries
                     foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
                     {
                         //Local lib will just skip quickly
                         string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
                         if (dataFilePathInsideZip != null)
                         {
-                            fileNameTemp = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
+                            rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
+                            rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
                             break;
                         }
                     }
-                }                
+                }
+                else
+                {
+                    //not a designated library call like lib1:xx.csv or a raw file like xx.csv that may be inside a library.
+                    //ends up returning the input file name.
+                }
             }
 
-            return fileNameTemp;
+            if (!File.Exists(rv_fileName)) rv_fileName = null;  //signals non-success
+
+            return rv_fileName;
+        }
+
+        /// <summary>
+        /// Will identify zip parts of a path, like g:\sub1\data.zip\sub2\xx.csv, extract the file inside the zip, and put the xx.csv
+        /// file somewhere in a temp folder (and return this path). The method will call itself recursively before leaving (so
+        /// nested zips are possible).
+        /// </summary>
+        /// <param name="fileNameWithPath"></param>
+        /// <param name="folders"></param>
+        /// <param name="includeWorkingFolder"></param>
+        /// <param name="allowLibrary"></param>
+        /// <returns></returns>
+        private static string FindFileResolveZip(string fileNameWithPath)
+        {
+            if ((fileNameWithPath.ToLower().Contains(".zip") && (fileNameWithPath.Contains(":\\") || fileNameWithPath.StartsWith("\\\\"))))
+            {
+                //ok, we will proceed below
+            }
+            else
+            {
+                //nothing to do: either no .zip in path, or there is a .zip but it is something like xx.zip or \sub\xx.zip.
+                return fileNameWithPath;  
+            }
+
+            string rv_fileName = fileNameWithPath;
+            int j1 = fileNameWithPath.IndexOf(".zip", StringComparison.OrdinalIgnoreCase);
+            if (j1 != -1)
+            {
+                int ok1 = -12345;
+                for (int j2 = j1 - 1; j2 >= 1; j2--)
+                {
+                    if (fileNameWithPath[j2] == '\\' && !(fileNameWithPath[j2 - 1] == '\\'))
+                    {
+                        ok1 = j2 + 1;
+                        break;
+                    }
+                }
+                int ok2 = -12345;
+                int j3 = j1 + ".zip".Length;
+                if (j3 < fileNameWithPath.Length && fileNameWithPath[j3] == '\\') ok2 = j3 - 1;
+                if (ok1 != -12345 && ok2 != -12345)
+                {
+                    //TODO: blanks would not be good, like ...\subfolder1\ lib1.zip \subfolder2\...
+                    string zipFileWithPath = fileNameWithPath.Substring(0, ok2 + 1);
+                    string zipFileWithoutPath = fileNameWithPath.Substring(ok1, ok2 - ok1 + 1);
+                    string pathInsideZip = G.Substring(fileNameWithPath, ok2 + 2, fileNameWithPath.Length - 1);
+                    if (!File.Exists(zipFileWithPath)) new Error("Zip file '" + zipFileWithoutPath + "' does not seem to exist. Trying to unzip this file, because it is part of the path '" + fileNameWithPath + "'.");
+
+                    ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
+                    ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
+
+                    string tempFileName = Globals.localTempFilesLocation + "\\" + "tempfile" + ++Globals.tempFilesCounter + ".tmp";
+                    if (File.Exists(tempFileName)) WaitForFileDelete(tempFileName);  //if it exists, it is from an older session, so probably easy to delete without problems
+
+                    entry.ExtractToFile(tempFileName, true);
+
+                    //may be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv
+                    rv_fileName = FindFileResolveZip(tempFileName);
+                }
+            }
+
+            return rv_fileName;
         }
 
         /// <summary>
@@ -18035,42 +18136,7 @@ namespace Gekko
                 string pathName = Path.GetDirectoryName(pathAndFilename);
 
                 if (type == GekkoFileReadOrWrite.Read)
-                {
-                    //Here, we swap any parts of path that passes through zip files.
-
-
-                    int j1 = pathAndFilename.IndexOf(".zip");
-                    if (j1 != -1)
-                    {
-                        int ok1 = -12345;
-                        for (int j2 = j1 - 1; j2 >= 1; j2--)
-                        {
-                            if (pathAndFilename[j2] == '\\' && !(pathAndFilename[j2 - 1] == '\\'))
-                            {
-                                ok1 = j2 + 1;
-                                break;
-                            }
-                        }
-                        int ok2 = -12345;
-                        int j3 = j1 + ".zip".Length;
-                        if (j3 < pathAndFilename.Length && pathAndFilename[j3] == '\\') ok2 = j3 - 1;
-                        if (ok1 != -12345 && ok2 != -12345)
-                        {
-                            //TODO: blanks would not be good, like ...\subfolder1\ lib1.zip \subfolder2\...
-                            string zipFileWithPath = pathAndFilename.Substring(0, ok2 + 1);
-                            string zipFileWithoutPath = pathAndFilename.Substring(ok1, ok2 - ok1  + 1);
-                            string pathInsideZip = G.Substring(pathAndFilename, ok2 + 2, pathAndFilename.Length - 1);
-                            if (!File.Exists(zipFileWithPath)) new Error("Zip file '" + zipFileWithoutPath + "' does not seem to exist. Trying to unzip this file, because it is part of the path '" + pathAndFilename + "'.");
-                            ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
-                            ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
-                            entry.ExtractToFile("c:\\tools\\sletmig.txt", true);
-                            pathAndFilename = "c:\\tools\\sletmig.txt";
-                        }
-                    }                   
-
-
-
-
+                {                    
 
                     //checking if the file is there at all for reading
                     if (!File.Exists(pathAndFilename))
@@ -18166,7 +18232,6 @@ namespace Gekko
             if (type == "copy" && !Directory.Exists(dir))
             {
                 new Error("The folder " + dir + " does not exist for file copying");
-                //throw new GekkoException();
             }
 
             int gap = Globals.waitFileGap;  //2 second
