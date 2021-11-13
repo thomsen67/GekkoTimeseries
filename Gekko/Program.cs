@@ -15773,6 +15773,32 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Locates a zip file inside a path (if there are more, it locates the first one). Returns start and end index.
+        /// </summary>
+        /// <param name="fileNameWithPath"></param>
+        /// <returns></returns>
+        public static Tuple<int, int> FindZipFileInString(string fileNameWithPath)
+        {
+            int ok1 = -12345;
+            int ok2 = -12345;
+            int j1 = fileNameWithPath.IndexOf(".zip", StringComparison.OrdinalIgnoreCase);
+            if (j1 != -1)
+            {                
+                for (int j2 = j1 - 1; j2 >= 1; j2--)
+                {
+                    if (fileNameWithPath[j2] == '\\' && !(fileNameWithPath[j2 - 1] == '\\'))
+                    {
+                        ok1 = j2 + 1;
+                        break;
+                    }
+                }                
+                int j3 = j1 + ".zip".Length;
+                if (j3 < fileNameWithPath.Length && fileNameWithPath[j3] == '\\') ok2 = j3 - 1;
+            }
+            return new Tuple<int, int>(ok1, ok2);
+        }
+
+        /// <summary>
         /// Will identify zip parts of a path, like g:\sub1\data.zip\sub2\xx.csv, extract the file inside the zip, and put the xx.csv
         /// file somewhere in a temp folder (and return this path). The method will call itself recursively before leaving (so
         /// nested zips are possible).
@@ -15795,40 +15821,28 @@ namespace Gekko
             }
 
             string rv_fileName = fileNameWithPath;
-            int j1 = fileNameWithPath.IndexOf(".zip", StringComparison.OrdinalIgnoreCase);
-            if (j1 != -1)
+            Tuple<int, int> tup = FindZipFileInString(fileNameWithPath);
+
+            if (tup.Item1 != -12345 && tup.Item2 != -12345)
             {
-                int ok1 = -12345;
-                for (int j2 = j1 - 1; j2 >= 1; j2--)
+                //TODO: blanks would not be good, like ...\subfolder1\ lib1.zip \subfolder2\...
+                string zipFileWithPath = fileNameWithPath.Substring(0, tup.Item2 + 1);
+                string zipFileWithoutPath = fileNameWithPath.Substring(tup.Item1, tup.Item2 - tup.Item1 + 1);
+                string pathInsideZip = G.Substring(fileNameWithPath, tup.Item2 + 2, fileNameWithPath.Length - 1);
+                if (!File.Exists(zipFileWithPath)) new Error("Zip file '" + zipFileWithoutPath + "' does not seem to exist. Trying to unzip this file, because it is part of the path '" + fileNameWithPath + "'.");
+                ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
+                ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
+                string tempFileName = Globals.localTempFilesLocation + "\\" + "tempfile" + ++Globals.tempFilesCounter + ".tmp";
+                if (File.Exists(tempFileName)) WaitForFileDelete(tempFileName);  //if it exists, it is from an older session, so probably easy to delete without problems
+                if (entry == null)
                 {
-                    if (fileNameWithPath[j2] == '\\' && !(fileNameWithPath[j2 - 1] == '\\'))
-                    {
-                        ok1 = j2 + 1;
-                        break;
-                    }
+                    string s = null;
+                    if (pathInsideZip.ToLower().Contains(".zip")) s = ". Note that nested zip files are not yet supported.";
+                    new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "'" + s);
                 }
-                int ok2 = -12345;
-                int j3 = j1 + ".zip".Length;
-                if (j3 < fileNameWithPath.Length && fileNameWithPath[j3] == '\\') ok2 = j3 - 1;
-                if (ok1 != -12345 && ok2 != -12345)
-                {
-                    //TODO: blanks would not be good, like ...\subfolder1\ lib1.zip \subfolder2\...
-                    string zipFileWithPath = fileNameWithPath.Substring(0, ok2 + 1);
-                    string zipFileWithoutPath = fileNameWithPath.Substring(ok1, ok2 - ok1 + 1);
-                    string pathInsideZip = G.Substring(fileNameWithPath, ok2 + 2, fileNameWithPath.Length - 1);
-                    if (!File.Exists(zipFileWithPath)) new Error("Zip file '" + zipFileWithoutPath + "' does not seem to exist. Trying to unzip this file, because it is part of the path '" + fileNameWithPath + "'.");
-
-                    ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
-                    ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
-
-                    string tempFileName = Globals.localTempFilesLocation + "\\" + "tempfile" + ++Globals.tempFilesCounter + ".tmp";
-                    if (File.Exists(tempFileName)) WaitForFileDelete(tempFileName);  //if it exists, it is from an older session, so probably easy to delete without problems
-
-                    entry.ExtractToFile(tempFileName, true);
-
-                    //may be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv
-                    rv_fileName = FindFileResolveZip(tempFileName);
-                }
+                entry.ExtractToFile(tempFileName, true);
+                //cannot yet be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv
+                rv_fileName = tempFileName;
             }
 
             return rv_fileName;

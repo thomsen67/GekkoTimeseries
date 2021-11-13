@@ -13684,7 +13684,7 @@ namespace UnitTests
                 I("function val f(val %x); return %x + 100; end;");
                 I("%y = f(2);");
                 _AssertScalarVal(First(), "%y", 102d);
-                I("library <clear> global;");
+                I("library <clear> local;");
                 FAIL("%y = f(2);");
 
                 // ------------------------------------------------------------
@@ -13732,18 +13732,18 @@ namespace UnitTests
                 I("%y3 = f2('a', 'b');");
                 _AssertScalarString(First(), "%y3", "p1_f2_ab");
 
-                //Test that Global lib is really alway last in the list of libs.
+                //Test that Local lib is really alway first in the list of libs.
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-                I("function string f1(string %x1); return 'global_f1_' + %x1; end;");
+                I("function string f1(string %x1); return 'local_f1_' + %x1; end;");
                 I("%y1 = f1('a');");
-                _AssertScalarString(First(), "%y1", "global_f1_a");
+                _AssertScalarString(First(), "%y1", "local_f1_a");
                 I("library p1;");
                 I("%y2 = f1('a');");
-                _AssertScalarString(First(), "%y2", "p1_f1_a");
-                I("%y3 = global:f1('a');");
-                _AssertScalarString(First(), "%y3", "global_f1_a");
+                _AssertScalarString(First(), "%y2", "local_f1_a");
+                I("%y3 = p1:f1('a');");
+                _AssertScalarString(First(), "%y3", "p1_f1_a");
 
                 // ------------------------------------------------------------
                 // colon and remove
@@ -13812,9 +13812,13 @@ namespace UnitTests
                 FAIL("library <close> p2;");
                 FAIL("library <clear> p1;");
                 FAIL("library <clear> p2;");
-                FAIL("library <close> global;");
+                FAIL("library <close> local;");
                 Globals.unitTestScreenOutput = new StringBuilder();
+                FAIL("library local;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" reserved "));
                 FAIL("library global;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" reserved "));
+                FAIL("library gekko5;");
                 Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" reserved "));
 
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
@@ -13847,7 +13851,7 @@ namespace UnitTests
                 FAIL("%y2 = p6:abs(-100);");  //error: already exists as in-built
 
                 // ------------------------------------------------------------
-                // get a file
+                // get a file from the \data subfolder in i library
                 // ------------------------------------------------------------                                    
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
                 //here, we must have a raw file file1.txt, and a libfiles.zip with file1.txt too
@@ -13855,22 +13859,27 @@ namespace UnitTests
                 //libfiles.zip also has file2.txt with the text "zip2"
                 I("reset;");
                 I("option folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-                I("library libfiles1;");
-                I("%y1 = readfile('file1.txt');");
-                _AssertScalarString(First(), "%y1", "raw1");  //is read from working folder first                
-                I("%y2 = readfile('libfiles1:file1.txt');");   //from libfiles.zip
-                _AssertScalarString(First(), "%y2", "zip1");
-                I("%y3 = readfile('file2.txt');");            //from libfiles.zip, does not exist in working folder
-                _AssertScalarString(First(), "%y3", "zip2");
-                FAIL("tell readfile('libfiles1:sub1\\file1.txt');");   
-                FAIL("tell readfile('libfiles1:\\sub1\\file1.txt');");
-                FAIL("library libfiles2;");  //duplicate files
-                I("library libfiles3;");
-                I("%y4 = readfile('libfiles3:file2.txt');");  //exists in subfolder inside zip
-                _AssertScalarString(First(), "%y4", "zip2");
-                I("read <csv> libfiles1:data.csv;");  //test that unquoted library access parses ok
+                I("library lib1;");
+                I("%y1 = readfile('data1.txt');");
+                _AssertScalarString(First(), "%y1", "lib1datadata1\r\n");
+                I("%y2 = readfile('data2.txt');");
+                _AssertScalarString(First(), "%y2", "lib1datasubdata2\r\n");
+                I("read <csv> data.csv;");  //found as normal file, shadows for the file in lib1.
+                _AssertSeries(First(), "x!a", 2015, 12d, sharedDelta);
+                I("read <csv> lib1:data.csv;");  //found in lib1
                 _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
+                I("read <csv> data2.csv;");  //found in lib1
+                _AssertSeries(First(), "x!a", 2015, 22d, sharedDelta);
                 FAIL("write <csv> libfiles1:data.csv;");  //writing must be illegal
+                // ------------------------------------------------------------
+                // testing direct access through zip file
+                // ------------------------------------------------------------                                                    
+                I("%y3 = readfile('" + Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\data1.txt');");
+                _AssertScalarString(First(), "%y3", "lib1datadata1\r\n");
+                I("%y4 = readfile('" + Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\sub\data2.txt');");
+                _AssertScalarString(First(), "%y4", "lib1datasubdata2\r\n");
+                I("read <csv> "+ Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\data.csv;");
+                _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
             }
         }
 
