@@ -13864,10 +13864,13 @@ namespace UnitTests
                 _AssertScalarString(First(), "%y1", "lib1datadata1\r\n");
                 I("%y2 = readfile('data2.txt');");
                 _AssertScalarString(First(), "%y2", "lib1datasubdata2\r\n");
+                I("delete x!a;");
                 I("read <csv> data.csv;");  //found as normal file, shadows for the file in lib1.
                 _AssertSeries(First(), "x!a", 2015, 12d, sharedDelta);
+                I("delete x!a;");
                 I("read <csv> lib1:data.csv;");  //found in lib1
                 _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
+                I("delete x!a;");
                 I("read <csv> data2.csv;");  //found in lib1
                 _AssertSeries(First(), "x!a", 2015, 22d, sharedDelta);
                 FAIL("write <csv> libfiles1:data.csv;");  //writing must be illegal
@@ -13878,8 +13881,14 @@ namespace UnitTests
                 _AssertScalarString(First(), "%y3", "lib1datadata1\r\n");
                 I("%y4 = readfile('" + Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\sub\data2.txt');");
                 _AssertScalarString(First(), "%y4", "lib1datasubdata2\r\n");
+                I("delete x!a;");
                 I("read <csv> "+ Globals.ttPath2 + @"\regres\Libraries\lib1.zip\data\data.csv;");
-                _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta); 
+                _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
+                I("delete x!a;");
+                I("read <csv> lib1.zip\\data\\data.csv;");  //local path to the zip
+                _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
+                I("%y5 = lib1:f();");
+                _AssertScalarString(First(), "%y5", "; 2015; 2016;\r\nx; 2; 3;\r\n");
             }
         }
 
