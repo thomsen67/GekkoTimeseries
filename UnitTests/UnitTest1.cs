@@ -13732,7 +13732,7 @@ namespace UnitTests
                 I("%y3 = f2('a', 'b');");
                 _AssertScalarString(First(), "%y3", "p1_f2_ab");
 
-                //Test that Local lib is really alway first in the list of libs.
+                //Test that Local lib is really always first in the list of libs.
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
@@ -13889,6 +13889,16 @@ namespace UnitTests
                 _AssertSeries(First(), "x!a", 2015, 2d, sharedDelta);
                 I("%y5 = lib1:f();");
                 _AssertScalarString(First(), "%y5", "; 2015; 2016;\r\nx; 2; 3;\r\n");
+                I("%y6 = lib1:g1();");
+                _AssertScalarString(First(), "%y6", "__g2");
+                FAIL("%y7 = lib1:__g2();");                                //is private
+                I("%y8 = lib1:h1();");
+                _AssertScalarString(First(), "%y8", "lib1data__data2");
+                FAIL("%y9 = readfile('__data2.txt');");                    //is private
+                I("%y10 = lib1:h2();");
+                _AssertScalarString(First(), "%y10", "__g2");
+                I("%y11 = lib1:h3   ();");
+                _AssertScalarString(First(), "%y11", "; 2015; 2016;\r\nx; 2; 3;\r\n");                
             }
         }
 

@@ -68,6 +68,9 @@ namespace Gekko
         public const string globalLibraryString = "Global";
         public const string localLibraryString = "Local";  //--> maybe used later
         public const string gekkoLibraryString = "Gekko";  //--> maybe used later
+        public const string thisLibraryString = "this";   //--> maybe used later
+        public const string dataLibraryString = "data";   //--> reserved
+        public const string metaLibraryString = "meta";   //--> reserved
 
         public const string functionSpecialName1 = "_UfunctionSpecialName";
         public const string functionSpecialName2 = "O.FunctionLookupNew";

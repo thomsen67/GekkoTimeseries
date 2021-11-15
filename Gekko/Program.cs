@@ -15670,6 +15670,14 @@ namespace Gekko
         /// <returns></returns>
         public static string FindFile(string filenameMaybeWithoutPath, List<string> folders, bool includeWorkingFolder, bool allowLibrary)
         {
+            // +--------------- #kja890adsfjkaas1 ------------------+
+            // |                                                    |
+            // |    Note that something very similar takes place    |
+            // |    in Libraries.GetFunction(). This method also    |
+            // |    deals with "this" and "__" prefix, etc.         |
+            // |                                                    |
+            // +----------------------------------------------------+
+
             //Can be of these types:
             // -----------------------------------------------
             // zz.csv
@@ -15682,7 +15690,7 @@ namespace Gekko
             // \files.zip\sub2\zz.csv
             // g:\data\files.zip\sub2\zz.csv
             // \\localhost\g$\data\files.zip\sub2\zz.csv
-            // -----------------------------------------------    
+            // ----------------------------------------------- 
 
             bool success = false;
             string rv_fileName = filenameMaybeWithoutPath;

@@ -54,13 +54,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// If "Global", "Local" or "Gekko"
+        /// If "Global", "Local", "this", or starts with "Gekko"
         /// </summary>
         /// <param name="libraryName"></param>
         /// <returns></returns>
         public static bool IsReservedName(string libraryName)
         {
-            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || libraryName.ToLower().StartsWith(Globals.gekkoLibraryString.ToLower());
+            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || G.Equal(libraryName, Globals.thisLibraryString) || libraryName.ToLower().StartsWith(Globals.gekkoLibraryString.ToLower());
         }
 
         /// <summary>
@@ -253,7 +253,15 @@ namespace Gekko
         /// <param name="functionName"></param>
         /// <returns></returns>
         public GekkoFunction GetFunction(string callingLibraryName, string libraryName, string functionName)
-        {            
+        {
+            // +--------------- #kja890adsfjkaas1 ------------------+
+            // |                                                    |
+            // |    Note that something very similar takes place    |
+            // |    in Program.FindFile(). This method also         |
+            // |    deals with "this" and "__" prefix, etc.         |            
+            // |                                                    |            
+            // +----------------------------------------------------+
+
             GekkoFunction rv = null;
 
             if (libraryName != null)
@@ -634,6 +642,9 @@ namespace Gekko
         [ProtoMember(4)]
         private GekkoDictionary<string, string> dataFiles = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+        [ProtoMember(5)]
+        private GekkoDictionary<string, string> metaFiles = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>
         /// Stamp: when the file was written. Do not protobuf.
         /// </summary>
@@ -701,6 +712,11 @@ namespace Gekko
             return this.dataFiles;
         }
 
+        public Dictionary<string, string> GetMetaFiles()
+        {
+            return this.metaFiles;
+        }
+
         /// <summary>
         /// Gets a list of function names inside the library. Does not show overloads (number of arguments), just the names proper.
         /// </summary>
@@ -750,7 +766,7 @@ namespace Gekko
 
             foreach (string fileName in fileEntries)
             {
-                if (relativePath.ToLower() == "\\data" || relativePath.ToLower().StartsWith("\\data\\"))
+                if (relativePath.ToLower() == "\\" + Globals.dataLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.dataLibraryString + "\\"))
                 {
                     //Normal external files. These are not extracted: just recorded.
                     if (this.dataFiles.ContainsKey(Path.GetFileName(fileName)))
@@ -767,12 +783,33 @@ namespace Gekko
                         this.dataFiles.Add(Path.GetFileName(fileName), relativePath);
                     }
                 }
+                else if (relativePath.ToLower() == "\\" + Globals.metaLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.metaLibraryString + "\\"))
+                {
+                    //Normal external files with metadata. These are not extracted: just recorded.
+                    if (this.metaFiles.ContainsKey(Path.GetFileName(fileName)))
+                    {
+                        using (var txt = new Error())
+                        {
+                            string ss = this.dataFiles[Path.GetFileName(fileName)];
+                            txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\meta subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
+                            txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+                        }
+                    }
+                    else
+                    {
+                        this.metaFiles.Add(Path.GetFileName(fileName), relativePath);
+                    }
+                }
                 else
                 {
                     //.gcm files with functions/procedures for lazy loading
                     if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
                     {
                         this.LibraryExtractorHandleGcmFile(fileName, originalDirectory, zipFileName);
+                    }
+                    else
+                    {
+                        //non-gcm files are just skipped here.
                     }
                 }                
             }
