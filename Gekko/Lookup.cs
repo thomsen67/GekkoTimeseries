@@ -515,7 +515,7 @@ namespace Gekko
                         {
                             //special case: #(listfile m)
 
-                            List ml = ReadListFile(varname);
+                            List ml = ReadListFile(varname, smpl.p);
                             return ml;
                         }
                         else

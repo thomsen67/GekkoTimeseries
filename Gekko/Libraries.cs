@@ -248,6 +248,7 @@ namespace Gekko
         /// in the list of libraries (first opened first). If libraryName != null, only this particular library will be searched
         /// for the function. When libraryName == null, and callingLibraryName != null, the callingLibraryName will be searched
         /// first, so that functions in the same library have priority.
+        /// Note that callingLibraryName is never = "Local", in that case it is = null.
         /// We are obtaining a GekkoFunction of a particular name, and the GekkoFunction contains all overloads inside.
         /// </summary>
         /// <param name="functionName"></param>
@@ -264,14 +265,50 @@ namespace Gekko
 
             GekkoFunction rv = null;
 
+            if (functionName.StartsWith("__"))
+            {
+                if (callingLibraryName == null)
+                {
+                    //called from prompt or command file or function/procedure defined in promt/command file.
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("Calling a '__' method (like '%y = __f1();') is only permitted from within library functions/procedures.");
+                    }
+                }
+                else
+                {
+                    //called from inside library
+                    if (libraryName != null && !G.Equal(libraryName, Globals.thisLibraryString))
+                    {
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("You are calling a private '__' method with a library name (like '%y = lib1:__f1();'). You cannot use library names with private '__' methods.");
+                        }
+                    }
+                    //if we are calling from within lib1, we interpret the call __f2() as being equal to lib1:__f2()
+                    libraryName = callingLibraryName;  
+                }
+            }
+
             if (libraryName != null)
             {
-                //explicit calling, like lib1:f1().
-                Library thisLib = this.GetLibrary(libraryName, true);
+                //explicit calling, like lib1:f1() or this:f1()
+                //if we are calling from within lib1, we interpret the call this:f2() as being equal to lib1:f2()
+                //difference between this:f2() and __f2() is that the latter is private and can not be 
+                //called by prompt or from other libraries.
+                //If the function f2() really exists in lib1, there is no difference between the two, because
+                //this:f2() makes sure that lib1 is searched first. The difference only shows when it is forgotten
+                //that f2() does not exist in lib1, but f2() does exist in some other library (or promt-level).
+                //In that case, using __f2() is more safe, and if using this:f2(), the user may forget the
+                //'this'. With '__', there can be no forgetting.
+
+                if (G.Equal(libraryName, Globals.thisLibraryString)) libraryName = callingLibraryName;                
+                Library thisLib = this.GetLibrary(libraryName, true);                
                 rv = thisLib.GetFunction(functionName, true);
             }
             else
             {
+                //non-explicit calling, like f1()
                 if (callingLibraryName == null)
                 {
                     foreach (Library thisLib in this.GetLibrariesIncludingLocal())

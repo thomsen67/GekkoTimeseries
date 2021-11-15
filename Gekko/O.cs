@@ -1805,7 +1805,7 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(G.GetProgramDir());
-            string fileName2 = Program.FindFile(s, folders, false, false);  //also calls CreateFullPathAndFileName()
+            string fileName2 = Program.FindFile(s, folders, p, false, false);  //also calls CreateFullPathAndFileName()
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
@@ -2501,7 +2501,7 @@ namespace Gekko
         /// </summary>
         /// <param name="varname"></param>
         /// <returns></returns>
-        private static List ReadListFile(string varname)
+        private static List ReadListFile(string varname, P p)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             fileName = G.AddExtension(fileName, "." + "lst");
@@ -2512,7 +2512,7 @@ namespace Gekko
             }
 
             List<string> folders = new List<string>();
-            string fileNameTemp = Program.FindFile(fileName, folders, true, true);
+            string fileNameTemp = Program.FindFile(fileName, folders, p, true, true);
             //Globals.HANDLE_LIBRARY = true;
 
             if (fileNameTemp == null)
@@ -6783,7 +6783,7 @@ namespace Gekko
                     offset.namecell = this.opt_namecell;
                     offset.datecell = this.opt_datecell;
 
-                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, hlp, open, readInfos, false);
+                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, hlp, open, readInfos, false, this.p);
                     Program.ReadInfo readInfo = readInfos[0];
                     readInfo.shouldMerge = hlp.Merge;
 
@@ -6913,6 +6913,7 @@ namespace Gekko
             public string fileName2 = null;  //dump file (px for statistikbanken, csv for jobindsats)            
             public string opt_array = null;  //arrays yes or no (statistikbanken)
             public string opt_key = null;  //only used for jobindsats
+            public P p = null;
             public void Exe()
             {
                 if ( G.Contains(this.dbUrl, "jobindsats"))
@@ -7455,6 +7456,7 @@ namespace Gekko
             public string opt_save = null;
             public double opt_pos = double.NaN;
             public string opt_create = null;  //may use OPEN b1, where b1.gbk does not exist (like OPEN<edit>b1).
+            public P p = null;
 
             public void Exe()
             {
@@ -7565,7 +7567,7 @@ namespace Gekko
                 CellOffset offset = new CellOffset();
 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(offset, false, hlp, true, readInfos, create);
+                Program.OpenOrRead(offset, false, hlp, true, readInfos, create, this.p);
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {
@@ -8431,11 +8433,8 @@ namespace Gekko
                 public string opt_mp = null;                
 
                 public bool menuTable = false;
-                //FIXMEFIXME
-                //FIXMEFIXME
-                //FIXMEFIXME
-                //FIXMEFIXME
-                //FIXMEFIXME
+                
+                //Is there a problem with this...? Seems to be done in the parser.
                 public P p = null;
                 
                 public void Exe() 
@@ -8455,7 +8454,7 @@ namespace Gekko
                     Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolScalar + "__tabletimestart", new ScalarDate(this.t1));
                     Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolScalar + "__tabletimeend", new ScalarDate(this.t2));
 
-                    string tableFileName = Program.TableHelper(this.fileName, this.menuTable);
+                    string tableFileName = Program.TableHelper(this.fileName, this.menuTable, p);
 
                     Globals.lastCalledMenuTable = tableFileName;
                     TableStuff.XmlTable(tableFileName, this.opt_html, this.opt_window, p);
@@ -9318,7 +9317,7 @@ namespace Gekko
             public List rhs = null;
             public string type = null;
             public string opt_missing = null;  //strict|flex
-            public P p;
+            public P p = null;
             public void Exe()
             {                
                 Program.Collapse(this.lhs, this.rhs, this.type, this.opt_missing, this.p);                
@@ -9330,7 +9329,7 @@ namespace Gekko
             public List lhs = null;
             public List rhs = null;
             public string type = null;
-            public P p;
+            public P p = null;
             public void Exe()
             {
                 Program.Interpolate(this.lhs, this.rhs, this.type, this.p);
@@ -9447,9 +9446,10 @@ namespace Gekko
         public class R_file
         {            
             public string fileName = null;
+            public P p = null;
             public void Exe()
             {
-                string file = Program.FindFile(this.fileName, null, true, true);
+                string file = Program.FindFile(this.fileName, null, this.p, true, true);
                 if (file == null) new Error("The file does not exist: " + this.fileName);
                 Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
             }
@@ -9471,6 +9471,8 @@ namespace Gekko
             public string opt_target = null; //new in 3.1.8
             public string fileName = null; //new in 3.1.8
             public List names = null; //new in 3.1.8
+            public P p = null;
+
             public void Exe()
             {
                 try
@@ -9490,6 +9492,7 @@ namespace Gekko
             public string opt_target = null; //new in 3.1.8
             public string fileName = null; //new in 3.1.8
             public List names = null; //new in 3.1.8
+            public P p = null;
             public void Exe()
             {
                 try

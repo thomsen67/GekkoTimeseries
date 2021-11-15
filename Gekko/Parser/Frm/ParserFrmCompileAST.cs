@@ -946,7 +946,7 @@ namespace Gekko.Parser.Frm
             }
         }
 
-        public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper)
+        public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper, P p)
         {
             StringBuilder varList = null;
 
@@ -962,7 +962,7 @@ namespace Gekko.Parser.Frm
                 //try to find it externally, look also in model path!
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_model);
-                fileNameTemp = Program.FindFile("varlist.dat", folders, true, true);
+                fileNameTemp = Program.FindFile("varlist.dat", folders, p, true, true);
                 //Globals.HANDLE_LIBRARY = true;
                 if (fileNameTemp != null)
                 {

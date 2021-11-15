@@ -2174,7 +2174,7 @@ namespace Gekko.Parser.Gek
                         w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
                         w.headerCs.AppendLine("O.Add" + numberOfParameters + Globals.functionSpecialName1 + "(" + libraryName + ", `" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
                         w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower, w.fileNameContainingParsedCode) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
-
+                        
                         //for instance, f(x1, x2, x3, x4=..., x5=...)
                         //here we have 5 parameters, of which 2 are optional
                         //Then we need to create all in all 2+1 functions:
@@ -2751,6 +2751,7 @@ namespace Gekko.Parser.Gek
                         node.Code.A(node[1].Code);  //fileName json
                         if (node[2] != null) node.Code.A(node[2].Code); //px file dump
                         if (node[3] != null) node.Code.A(node[3].Code); //options
+                        node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -3952,6 +3953,7 @@ ASTPLACEHOLDER [0]
                         //node.Code.A(Globals.clearTsCsCode + G.NL);
                         node.Code.A("O.Open o" + Num(node) + " = new O.Open();" + G.NL);
                         GetCodeFromAllChildren(node);
+                        node.Code.A("o" + Num(node) + ".p = p;");
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -4822,6 +4824,7 @@ ASTPLACEHOLDER [0]
                     {
                         node.Code.A("O.R_file o" + Num(node) + " = new O.R_file();" + G.NL);
                         node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0][0].Code + ");" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
@@ -4839,31 +4842,18 @@ ASTPLACEHOLDER [0]
                         GetCodeFromAllChildren(node, node[0]);
                         if (node[1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                         if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[2][0].Code + ");" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;
-
-                case "ASTPYTHON_FILE":
-                    {
-                        node.Code.A("O.Python_file o" + Num(node) + " = new O.Python_file();" + G.NL);
-                        node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0][0].Code + ");" + G.NL);
-                        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                    }
-                    break;
-                case "ASTPYTHON_EXPORT":
-                    {
-                        node.Code.A("O.Python_export o" + Num(node) + " = new O.Python_export();" + G.NL);
-                        GetCodeFromAllChildren(node, node[0]);
-                        node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
-                        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                    }
-                    break;
+                
                 case "ASTPYTHON_RUN":
                     {
                         node.Code.A("O.Python_run o" + Num(node) + " = new O.Python_run();" + G.NL);
                         GetCodeFromAllChildren(node, node[0]);
                         if (node[1].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                         if (node[2].ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[2][0].Code + ");" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     }
                     break;

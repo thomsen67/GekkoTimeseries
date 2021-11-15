@@ -64,7 +64,7 @@ namespace Gekko
             base.Dispose(disposing);
         }
 
-        public P p;
+        public P p = null;
 
         public Image red = null;
         public Image yellow = null;
@@ -2404,7 +2404,7 @@ namespace Gekko
             }
             string orignialFileName = fileName;
 
-            fileName = Program.FindFile(fileName, folders, true, true);  //calls CreateFullPathAndFileName()
+            fileName = Program.FindFile(fileName, folders, Gui.gui.p, true, true);  //calls CreateFullPathAndFileName(). Hmm, is Gui.gui.p really working? Probably...
 
             if (fileName != null)
             {

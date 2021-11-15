@@ -14,7 +14,7 @@ namespace Gekko
 {
     public static class Plot
     {
-        public static void CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq)
+        public static void CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq, P pp)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
@@ -90,7 +90,7 @@ namespace Gekko
                     string fileName = Program.options.plot_using;
                     fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
                     string tmp = fileName;
-                    fileName = Program.FindFile(fileName, null, true, true);
+                    fileName = Program.FindFile(fileName, null, pp, true, true);
                     if (fileName == null) new Error("The file does not exist: " + tmp);
 
                     doc1 = new XmlDocument();
@@ -119,7 +119,7 @@ namespace Gekko
 
                     fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
                     string tmp = fileName;
-                    fileName = Program.FindFile(fileName, null, true, true);
+                    fileName = Program.FindFile(fileName, null, pp, true, true);
                     if (fileName == null) new Error("The file does not exist: " + tmp);
 
                     doc2 = new XmlDocument();

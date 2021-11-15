@@ -462,7 +462,7 @@ namespace Gekko
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public assignmantTypeLhs lhsAssignmentType = assignmantTypeLhs.Inactive;
         public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight 
-        public P p;
+        public P p = null;
 
         public GekkoSmpl()
         {
@@ -1600,6 +1600,8 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
+                
+
                 if (text == "arrow")
                 {
                     //while (true)
@@ -2376,7 +2378,7 @@ namespace Gekko
         /// <param name="open"></param>
         /// <param name="readInfos"></param>
         /// <param name="create"></param>
-        public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create)
+        public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create, P p)
         {
             //open = true if called with OPEN command              
 
@@ -2542,7 +2544,7 @@ namespace Gekko
                 //       name (not file name) as shown in the F2 window is readInfo.dbName
 
                 bool cancel = false;                
-                file = ReadHelper(file, ref cancel, extension);
+                file = ReadHelper(file, ref cancel, extension, p);
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
@@ -7309,7 +7311,7 @@ namespace Gekko
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                string file = Program.FindFile(o.fileName, null, true, true);
+                string file = Program.FindFile(o.fileName, null, o.p, true, true);
                 if (file == null) new Error("The file does not exist: " + o.fileName);
                 Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
                 Program.ROrPythonExport(o.names, o.opt_target, 0);
@@ -7549,7 +7551,7 @@ namespace Gekko
             if (true)
             {
                 Globals.python_fileContent = null;
-                string file = Program.FindFile(o.fileName, null, true, true);
+                string file = Program.FindFile(o.fileName, null, o.p, true, true);
                 if (file == null) new Error("The file does not exist: " + o.fileName);
                 Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file)); 
                 Program.ROrPythonExport(o.names, o.opt_target, 1);
@@ -11588,7 +11590,7 @@ namespace Gekko
             if (G.Equal(o.opt_cols, "yes")) isTranspose = true;
 
             string s2 = G.AddExtension(o.fileName, "." + x);
-            string fn = Program.FindFile(s2, null, true, true);
+            string fn = Program.FindFile(s2, null, o.p, true, true);
             if (fn == null) new Error("Could not find file '" + s2 + "'");
 
             //string s = Program.GetTextFromFileWithWait(fileName_string);
@@ -12094,7 +12096,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
 
-            string fileName2 = FindFile(s, folders, true, true);  //also calls CreateFullPathAndFileName()
+            string fileName2 = FindFile(s, folders, o.p, true, true);  //also calls CreateFullPathAndFileName()
             //Globals.HANDLE_LIBRARY = true;
 
             if (fileName2 == null)
@@ -14847,7 +14849,7 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
-            fileName = FindFile(fileName, folders, true, true);  //calls CreateFullPathAndFileName()
+            fileName = FindFile(fileName, folders, o.p, true, true);  //calls CreateFullPathAndFileName()
             //Globals.HANDLE_LIBRARY = true;
 
             Globals.modelPathAndFileName = fileName;  //always contains a path
@@ -14914,7 +14916,7 @@ namespace Gekko
             }
             else
             {
-                ReadGekkoModel(fileName, dt0, textInputRaw);
+                ReadGekkoModel(fileName, dt0, textInputRaw, o.p);
             }
         }
 
@@ -14924,7 +14926,7 @@ namespace Gekko
         /// <param name="fileName"></param>
         /// <param name="dt0"></param>
         /// <param name="textInputRaw"></param>
-        private static void ReadGekkoModel(string fileName, DateTime dt0, string textInputRaw)
+        private static void ReadGekkoModel(string fileName, DateTime dt0, string textInputRaw, P p)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
             Program.model = new Model();
@@ -14982,7 +14984,7 @@ namespace Gekko
                 Parser.Frm.ParserFrmCompileAST.ParserFrmMakeProtobuf();
             }
 
-            Parser.Frm.ParserFrmCompileAST.ParserFrmHandleVarlist(modelCommentsHelper);
+            Parser.Frm.ParserFrmCompileAST.ParserFrmHandleVarlist(modelCommentsHelper, p);
 
             if (!G.NullOrEmpty(modelCommentsHelper.cutout_runbefore))
             {
@@ -15608,7 +15610,7 @@ namespace Gekko
         /// <param name="cancel"></param>
         /// <param name="extension"></param>
         /// <returns></returns>
-        private static string ReadHelper(string fileName, ref bool cancel, string extension)
+        private static string ReadHelper(string fileName, ref bool cancel, string extension, P p)
         {
             string rv = null;
             if (fileName == "*")
@@ -15623,7 +15625,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                fileName = FindFile(fileName, folders, true, true);
+                fileName = FindFile(fileName, folders, p, true, true);
                 //Globals.HANDLE_LIBRARY = true;
             }
 
@@ -15658,7 +15660,7 @@ namespace Gekko
         {
             //When called with folders == null, this is the same as CreateFullPathAndFileName(),
             //but with the difference that it returns null if the file does not exist.
-            return FindFile(fileName, folders, true, false);
+            return FindFile(fileName, folders, null, true, false);  //no P p here, since allowLibrary is false anyway
         }
 
         /// <summary>
@@ -15668,7 +15670,7 @@ namespace Gekko
         /// <param name="folders"></param>
         /// <param name="includeWorkingFolder"></param>
         /// <returns></returns>
-        public static string FindFile(string filenameMaybeWithoutPath, List<string> folders, bool includeWorkingFolder, bool allowLibrary)
+        public static string FindFile(string filenameMaybeWithoutPath, List<string> folders, P p, bool includeWorkingFolder, bool allowLibrary)
         {
             // +--------------- #kja890adsfjkaas1 ------------------+
             // |                                                    |
@@ -15691,6 +15693,23 @@ namespace Gekko
             // g:\data\files.zip\sub2\zz.csv
             // \\localhost\g$\data\files.zip\sub2\zz.csv
             // ----------------------------------------------- 
+
+            if (false)
+            {
+                string callingLibrary = null;
+                if (p != null)
+                {
+                    int max = p.GetDepth();
+                    string command = p.GetStack(max);
+                    string fileText = p.GetStackCommandFileText(max - 1);
+
+                    new Writeln("+++ Finding file " + filenameMaybeWithoutPath + " \r\n --> " + command);
+                }
+                else
+                {
+                    new Writeln("+++ Finding file " + filenameMaybeWithoutPath + " \r\n --> null");
+                }
+            }
 
             bool success = false;
             string rv_fileName = filenameMaybeWithoutPath;
@@ -27681,7 +27700,7 @@ namespace Gekko
         /// <param name="inputFileName"></param>
         /// <param name="menuTable"></param>
         /// <returns></returns>
-        public static string TableHelper(string inputFileName, bool menuTable)
+        public static string TableHelper(string inputFileName, bool menuTable, P p)
         {            
             //This is called from "TABLE filename.tab" command, including calls from menus which
             //will issue such a command in a thread (is so, menuTable is true).
@@ -27703,7 +27722,7 @@ namespace Gekko
                 inputFileName = Path.GetFileName(inputFileName);
             }
 
-            string fileNameTemp = FindFile(inputFileName, folders, true, true);
+            string fileNameTemp = FindFile(inputFileName, folders, p, true, true);
             //Globals.HANDLE_LIBRARY = true;
 
             if (fileNameTemp == null)

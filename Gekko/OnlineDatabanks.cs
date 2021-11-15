@@ -21,7 +21,7 @@ namespace Gekko
             {
                 //no reason to fail on this
             }
-            string file = Program.FindFile(o1.fileName, null, true, true);
+            string file = Program.FindFile(o1.fileName, null, o1.p, true, true);
             if (file == null) new Error("The file does not exist: " + o1.fileName);
             string jsonCode = Program.GetTextFromFileWithWait(file); //also removes some kinds of funny characters
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(o1.dbUrl);
@@ -223,7 +223,7 @@ namespace Gekko
             if (o1.fileName != null)
             {
                 //string input = Program.options.folder_working + "\\" + o1.fileName;     
-                string file = Program.FindFile(o1.fileName, null, true, true);
+                string file = Program.FindFile(o1.fileName, null, o1.p, true, true);
                 if (file == null) new Error("The file does not exist: " + o1.fileName);
                 jsonCode = Program.GetTextFromFileWithWait(file); //also removes some kinds of funny characters
             }
