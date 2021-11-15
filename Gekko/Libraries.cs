@@ -272,7 +272,7 @@ namespace Gekko
                     //called from prompt or command file or function/procedure defined in promt/command file.
                     using (Error txt = new Error())
                     {
-                        txt.MainAdd("Calling a '__' method (like '%y = __f1();') is only permitted from within library functions/procedures.");
+                        txt.MainAdd("Calling a private '__' method (like '%y = __f1();') is only permitted from within library functions/procedures.");
                     }
                 }
                 else

@@ -5331,7 +5331,7 @@ namespace Gekko
         public static string LastText(string functionName, string fileName)
         {            
             return G.FromLibraryToFunctionProcedureName(functionName, 4) + ", " + fileName + "";
-        }
+        }        
 
         /// <summary>
         /// Used for Gekko user-defined functions.
@@ -5344,7 +5344,8 @@ namespace Gekko
             Func<GekkoSmpl, P, bool, IVariable> rv = null;
             GekkoFunction f = Program.libraries.GetFunction(callingLibrary, library, name);
             rv = f.function0;
-            if (rv == null) {
+            if (rv == null)
+            {
                 FunctionLookupHelper(f);
                 rv = f.function0;
                 if (rv == null) FunctionLookupError(name, f, 0);

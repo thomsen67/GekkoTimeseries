@@ -688,13 +688,13 @@ namespace Gekko.Parser.Gek
                     if (Globals.special.ContainsKey(node.Text))
                     {
                         //do nothing
-                        string putInBefore = G.NL + "p.SetText(@`¤" + line + "`);" + G.NL + w.wh?.localFuncsCode?.ToString() + G.NL;
+                        string putInBefore = G.NL + "p.SetStack(@`¤" + line + "`);" + G.NL + w.wh?.localFuncsCode?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }
                     else
                     {
                         //#2384328423                        
-                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localFuncsCode?.ToString() + G.NL;
+                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetStack(@`¤" + line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localFuncsCode?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }
 
@@ -2173,7 +2173,7 @@ namespace Gekko.Parser.Gek
                         //Version with all parameters, also optional parameters
                         w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
                         w.headerCs.AppendLine("O.Add" + numberOfParameters + Globals.functionSpecialName1 + "(" + libraryName + ", `" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
-                        w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower, w.fileNameContainingParsedCode) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
+                        w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower, w.fileNameContainingParsedCode, libraryName) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower, libraryName) + "});" + G.NL);
                         
                         //for instance, f(x1, x2, x3, x4=..., x5=...)
                         //here we have 5 parameters, of which 2 are optional
@@ -4760,8 +4760,7 @@ ASTPLACEHOLDER [0]
                     }
                     break;
                 case "ASTREAD":
-                    {
-                        //node.Code.A(Globals.clearTsCsCode + G.NL);
+                    {                                                
                         node.Code.A("O.Read o" + Num(node) + " = new O.Read();" + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
@@ -4888,14 +4887,14 @@ ASTPLACEHOLDER [0]
                     break;
                 case "ASTRUN":
                     {
-                        node.Code.A(LocalCode1(Num(node), null, null)); //see LocalCode2
+                        node.Code.A(LocalCode1(Num(node), null, null, null)); //see LocalCode2
                         node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                         //HMMM is this right:
                         node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                         if (node[1] != null) node.Code.A(node[1].Code + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                        node.Code.A(LocalCode2(Num(node), null)); //see LocalCode1
+                        node.Code.A(LocalCode2(Num(node), null, null)); //see LocalCode1
                     }
                     break;
 
@@ -5378,27 +5377,40 @@ ASTPLACEHOLDER [0]
             throw new GekkoException();
         }
 
-        private static string LocalCode1(string num, string functionName, string fileName)
+        /// <summary>
+        /// Used for function/procedure defininions and RUN calls
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="functionName"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static string LocalCode1(string num, string functionName, string fileName, string libraryName)
         {
             string s = null;            
             if (functionName != null)
             {
                 //See also this: #08975389245253
-                s = "p.lastFileSentToANTLR = O.LastText(`" + functionName + "`, @`" + fileName + "`); p.SetLastFileSentToANTLR(O.LastText(`" + functionName + "`, @`" + fileName + "`)); p.Deeper();";
+                s = "p.lastFileSentToANTLR = O.LastText(`" + functionName + "`, @`" + fileName + "`); p.SetLastFileSentToANTLR(O.LastText(`" + functionName + "`, @`" + fileName + "`)); p.SetCurrentLibrary(" + libraryName + "); p.Deeper();";
             }
             return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); " + s + G.NL + "try {" + G.NL;
         }
 
-        private static string LocalCode2(string num, string functionName)
+        /// <summary>
+        /// Used for function/procedure definitions and RUN calls
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="functionName"></param>
+        /// <returns></returns>
+        private static string LocalCode2(string num, string functionName, string libraryName)
         {
             string s = null;
             string s2 = null;
             if (functionName != null)
             {
-                s = "p.RemoveLast();";  //must be inside finally {}, because there may be a return from the method (and also an exception should adjust the counter)
+                s = "p.SetCurrentLibrary(null); p.RemoveLast();";  //must be inside finally {}, because there may be a return from the method (and also an exception should adjust the counter)
                 s2 = "catch { p.Deeper(); throw; }" + G.NL;  //otherwise the following RemoveLast will remove too much for functions/procedures
             }
-            return "} " + G.NL + s2 + " finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + s + ";" + G.NL + "} " + G.NL;
+            return "} " + G.NL + s2 + " finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + "; " + s + ";" + G.NL + "} " + G.NL;
         }
 
         private static string LocalCode3(string num)

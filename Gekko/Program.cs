@@ -15694,108 +15694,118 @@ namespace Gekko
             // \\localhost\g$\data\files.zip\sub2\zz.csv
             // ----------------------------------------------- 
 
-            if (false)
-            {
-                string callingLibrary = null;
-                if (p != null)
-                {
-                    int max = p.GetDepth();
-                    string command = p.GetStack(max);
-                    string fileText = p.GetStackCommandFileText(max - 1);
-
-                    new Writeln("+++ Finding file " + filenameMaybeWithoutPath + " \r\n --> " + command);
-                }
-                else
-                {
-                    new Writeln("+++ Finding file " + filenameMaybeWithoutPath + " \r\n --> null");
-                }
-            }
-
             bool success = false;
             string rv_fileName = filenameMaybeWithoutPath;
+            string currentLibrary = p?.currentLibrary;
+            bool hasPath = filenameMaybeWithoutPath.Contains("\\") || filenameMaybeWithoutPath.Contains(":");            
 
-            if (includeWorkingFolder)
+            if (!success && allowLibrary && filenameMaybeWithoutPath.StartsWith(Globals.libraryDriveCheatString))
             {
-                rv_fileName = CreateFullPathAndFileName(filenameMaybeWithoutPath);  //will now start with g:\... or \\localhost\...                        
-                rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                if (rv_fileName != null && File.Exists(rv_fileName))
+                //a designated library like lib1:zz.csv (internally represented as library___name___lib1:\zz.csv).
+                //can also be this:zz.csv
+                string[] ss = filenameMaybeWithoutPath.Split(':');
+                string libraryName = ss[0].Replace(Globals.libraryDriveCheatString, "");
+                if (G.Equal(libraryName, Globals.thisLibraryString))
                 {
-                    success = true;
+                    //Handling 'this:data.csv'
+                    if (currentLibrary == null)
+                    {
+                        new Error("You are using 'this:' before a filename, but this is only legal when issued from a library function or procedure.");
+                    }
+                    else
+                    {
+                        libraryName = currentLibrary;
+                    }
+                }
+                string dataFileNameWithoutPath = ss[1].Substring(1);
+                Library library = Program.libraries.GetLibrary(libraryName, true);
+                //if we get here, the library exists, and if not there is an error issued above
+                string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(dataFileNameWithoutPath, out dataFilePathInsideZip);
+                if (dataFilePathInsideZip == null)
+                {
+                    new Error("The file '" + dataFileNameWithoutPath + "' was not found inside the \\data subfolder of the library '" + library.GetFileNameWithPath() + "'");
+                }
+                rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;
+                rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
+                if (rv_fileName != null && File.Exists(rv_fileName)) success = true;
+                //NOTE: for instance if filenameMaybeWithoutPath = "library___name___lb:\zz.csv" we may get 
+                //fileNameTemp = "c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\zz.csv" because
+                //zz.csv is inside a \sub subfolder and the library "lb" is an alias from lib1.zip.                    
+            }            
+
+            if (!success && allowLibrary && currentLibrary != null && !hasPath)
+            {
+                //Look for the file in its own library first
+                //The file must be path-less ("raw").
+                //If we are for instance reading from a f() function inside lib1, or 
+                //if this f() function runs a .gcm that reads something, we
+                //first look in the \data folder of lib1.zip.
+                Library library = Program.libraries.GetLibrary(currentLibrary, false);
+                if (library != null)
+                {
+                    //if we get here, the library exists, and if not there is an error issued above
+                    string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
+                    if (dataFilePathInsideZip != null)
+                    {
+                        rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
+                        rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
+                        if (rv_fileName != null && File.Exists(rv_fileName)) success = true;
+                    }
                 }
             }
-            else
+
+            if (!success && includeWorkingFolder)
             {
-                if (Program.options.folder && folders != null)
+                //always searched first of normal files in the file system, if it is included
+                rv_fileName = CreateFullPathAndFileName(filenameMaybeWithoutPath);  //will now start with g:\... or \\localhost\...                        
+                rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
+                if (rv_fileName != null && File.Exists(rv_fileName)) success = true;
+            }
+
+            if (!success && Program.options.folder && folders != null)
+            {
+                //allowed to search in folders
+                foreach (string folder in folders)
                 {
-                    //allowed to search in folders
-                    foreach (string folder in folders)
+                    //when folder is "", shouldn't it just skip to next? For "", the result will be the working folder...?
+                    //as long as working folder is always king, this is not an issue.
+                    if (string.IsNullOrWhiteSpace(folder)) continue;
+                    rv_fileName = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
+                    rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
+                    if (rv_fileName != null && File.Exists(rv_fileName))
                     {
-                        //when folder is "", shouldn't it just skip to next? For "", the result will be the working folder...?
-                        //as long as working folder is always king, this is not an issue.
-                        if (string.IsNullOrWhiteSpace(folder)) continue;
-                        rv_fileName = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
+                        success = true;
+                        break; //no more searching
+                    }
+                }
+            }        
+
+            if (!success && allowLibrary && !hasPath)
+            {
+                //normal raw filename without folder structure stated
+                //a loose file without path like zz.csv. Cannot accept \data\zz.csv which must be on the real filesystem.
+                //will search for the file in open libraries
+                // (if the file is stated inside a library function, we may already have searched
+                // for it in its own library. But never mind, checking takes very little time, and file reading
+                // is slow anyway.)
+                foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
+                {
+                    //Local lib will just skip quickly
+                    string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
+                    if (dataFilePathInsideZip != null)
+                    {
+                        rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
                         rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
                         if (rv_fileName != null && File.Exists(rv_fileName))
                         {
                             success = true;
-                            break; //no more searching
-                        }
-                    }
-                }
-                else
-                {
-                    //do nothing: cannot use working folder, and is not allowed to search in folders
-                }
-            }
-
-            if (!success && allowLibrary)
-            {
-                //see if we can find the file in an open zip library
-                if (filenameMaybeWithoutPath.StartsWith(Globals.libraryDriveCheatString))
-                {
-                    //a designated library with colon like library___name___lib1:\zz.csv (representing lib1:zz.csv)
-                    string[] ss = filenameMaybeWithoutPath.Split(':');
-                    string libraryName = ss[0].Replace(Globals.libraryDriveCheatString, "");
-                    string dataFileNameWithoutPath = ss[1].Substring(1);
-                    Library library = Program.libraries.GetLibrary(libraryName, true);
-                    //if we get here, the library exists, and if not there is an error issued above
-                    string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(dataFileNameWithoutPath, out dataFilePathInsideZip);
-                    if (dataFilePathInsideZip == null)
-                    {
-                        new Error("The file '" + dataFileNameWithoutPath + "' was not found inside the \\data subfolder of the library '" + library.GetFileNameWithPath() + "'");
-                    }
-                    rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;
-                    rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                    //NOTE: for instance if filenameMaybeWithoutPath = "library___name___lb:\zz.csv" we may get 
-                    //fileNameTemp = "c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\zz.csv" because
-                    //zz.csv is inside a \sub subfolder and the library "lb" is an alias from lib1.zip.                    
-                }
-                else if (!filenameMaybeWithoutPath.Contains("\\"))
-                {
-                    //normal raw filename without folder structure stated
-                    //a loose file without path like zz.csv. Cannot accept \data\zz.csv which must be on the real filesystem.
-                    //will search for the file in open libraries
-                    foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
-                    {
-                        //Local lib will just skip quickly
-                        string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
-                        if (dataFilePathInsideZip != null)
-                        {
-                            rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
-                            rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
                             break;
                         }
                     }
                 }
-                else
-                {
-                    //not a designated library call like lib1:xx.csv or a raw file like xx.csv that may be inside a library.
-                    //ends up returning the input file name.
-                }
-            }
+            }        
 
-            if (!File.Exists(rv_fileName)) rv_fileName = null;  //signals non-success
-
+            if (!success) rv_fileName = null;  //signals failure
             return rv_fileName;
         }
 
@@ -28649,6 +28659,7 @@ namespace Gekko
         private string[] stackCommandFileText = new string[200];
         private string[] stackFileSentToAntlr = new string[200];
         public string lastFileSentToANTLR = null;
+        public string currentLibrary = null;
         public bool isOneLinerFromGui = false;
         public bool hasBeenCmdFile = false;
         //public bool hasBeenIsstartCmdFile = false;
@@ -28697,7 +28708,7 @@ namespace Gekko
             this.stackFileSentToAntlr[counter] = s;            
         }        
 
-        public void SetText(string s)
+        public void SetStack(string s)
         {
             //This method is called in translated code, for each line (that is not "simple", ie. FOR, IF etc.)
 
@@ -28717,6 +28728,28 @@ namespace Gekko
             //if (Globals.runningOnTTComputer) G.Writeln2("DEEPER " + this.counter, Color.Green);
             this.counter++;            
         }
+
+        /// <summary>
+        /// Used for Gekko user-defined functions. May be set to null.
+        /// </summary>
+        /// <param name="functionName"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public void SetCurrentLibrary(string libraryName)
+        {
+            this.currentLibrary = libraryName;
+        }
+        /// <summary>
+        /// Used for Gekko user-defined functions.
+        /// </summary>
+        /// <param name="functionName"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public string GetCurrentLibrary(P p)
+        {
+            return this.currentLibrary;
+        }
+
 
         public void RemoveLast()
         {

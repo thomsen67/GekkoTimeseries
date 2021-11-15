@@ -13893,11 +13893,10 @@ namespace UnitTests
                 _AssertScalarString(First(), "%y6", "__g2");
                 FAIL("%y7 = lib1:__g2();");                                //is private
                 I("%y8 = lib1:h1();");
-                _AssertScalarString(First(), "%y8", "lib1data__data2");
-                FAIL("%y9 = readfile('__data2.txt');");                    //is private
+                _AssertScalarString(First(), "%y8", "lib1data__data2\r\n");
                 I("%y10 = lib1:h2();");
                 _AssertScalarString(First(), "%y10", "__g2");
-                I("%y11 = lib1:h3   ();");
+                I("%y11 = lib1:h3();");
                 _AssertScalarString(First(), "%y11", "; 2015; 2016;\r\nx; 2; 3;\r\n");                
             }
         }

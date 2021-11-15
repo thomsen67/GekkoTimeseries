@@ -12,7 +12,7 @@ public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
 public static int labelCounter;
 public static void C0(GekkoSmpl smpl, P p) {
 //[[commandStart]]0
-p.SetText(@"¤12"); O.InitSmpl(smpl, p);
+p.SetStack(@"¤12"); O.InitSmpl(smpl, p);
 
 Func<GraphHelper, string> print0 = (gh) =>
 {
