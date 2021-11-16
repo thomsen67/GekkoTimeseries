@@ -60,7 +60,7 @@ namespace Gekko
         /// <returns></returns>
         public static bool IsReservedName(string libraryName)
         {
-            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || G.Equal(libraryName, Globals.thisLibraryString) || libraryName.ToLower().StartsWith(Globals.gekkoLibraryString.ToLower());
+            return G.Equal(libraryName, Globals.globalLibraryString) || G.Equal(libraryName, Globals.localLibraryString) || G.Equal(libraryName, Globals.thisLibraryString) || G.Equal(libraryName, Globals.nullLibraryString) || libraryName.ToLower().StartsWith(Globals.gekkoLibraryString.ToLower());
         }
 
         /// <summary>
