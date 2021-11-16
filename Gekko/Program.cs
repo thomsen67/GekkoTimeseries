@@ -15693,16 +15693,17 @@ namespace Gekko
             // g:\data\files.zip\sub2\zz.csv
             // \\localhost\g$\data\files.zip\sub2\zz.csv
             // ----------------------------------------------- 
-
+            
             bool success = false;
             string rv_fileName = filenameMaybeWithoutPath;
-            string currentLibrary = p?.currentLibrary;
-            bool hasPath = filenameMaybeWithoutPath.Contains("\\") || filenameMaybeWithoutPath.Contains(":");            
+            string currentLibrary = p?.currentLibrary;  //may be null
+            bool hasPath = filenameMaybeWithoutPath.Contains("\\") || filenameMaybeWithoutPath.Contains(":");                                    
 
             if (!success && allowLibrary && filenameMaybeWithoutPath.StartsWith(Globals.libraryDriveCheatString))
             {
                 //a designated library like lib1:zz.csv (internally represented as library___name___lib1:\zz.csv).
                 //can also be this:zz.csv
+                //we also handle lib1:__f() here, being only legal if called from lib1. In contrast, this:__f() is always ok.
                 string[] ss = filenameMaybeWithoutPath.Split(':');
                 string libraryName = ss[0].Replace(Globals.libraryDriveCheatString, "");
                 if (G.Equal(libraryName, Globals.thisLibraryString))
@@ -15716,8 +15717,15 @@ namespace Gekko
                     {
                         libraryName = currentLibrary;
                     }
-                }
+                }                
                 string dataFileNameWithoutPath = ss[1].Substring(1);
+                if (dataFileNameWithoutPath.StartsWith("__"))
+                {
+                    if (!G.Equal(libraryName, currentLibrary))
+                    {
+                        new Error("You can only refer to a '__' library file from its own library.");
+                    }
+                }
                 Library library = Program.libraries.GetLibrary(libraryName, true);
                 //if we get here, the library exists, and if not there is an error issued above
                 string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(dataFileNameWithoutPath, out dataFilePathInsideZip);
@@ -15735,7 +15743,7 @@ namespace Gekko
 
             if (!success && allowLibrary && currentLibrary != null && !hasPath)
             {
-                //Look for the file in its own library first
+                //Look for the file in its own library first (ok if it is __ file).
                 //The file must be path-less ("raw").
                 //If we are for instance reading from a f() function inside lib1, or 
                 //if this f() function runs a .gcm that reads something, we
@@ -15757,6 +15765,7 @@ namespace Gekko
             if (!success && includeWorkingFolder)
             {
                 //always searched first of normal files in the file system, if it is included
+                //allowed __ prefix names here.
                 rv_fileName = CreateFullPathAndFileName(filenameMaybeWithoutPath);  //will now start with g:\... or \\localhost\...                        
                 rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
                 if (rv_fileName != null && File.Exists(rv_fileName)) success = true;
@@ -15764,7 +15773,7 @@ namespace Gekko
 
             if (!success && Program.options.folder && folders != null)
             {
-                //allowed to search in folders
+                //allowed to search in folders. Allowed __ prefix names here.
                 foreach (string folder in folders)
                 {
                     //when folder is "", shouldn't it just skip to next? For "", the result will be the working folder...?
@@ -15787,19 +15796,25 @@ namespace Gekko
                 //will search for the file in open libraries
                 // (if the file is stated inside a library function, we may already have searched
                 // for it in its own library. But never mind, checking takes very little time, and file reading
-                // is slow anyway.)
-                foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
+                // is slow anyway. Also Local lib will be checked, again never mind).
+
+                if (!filenameMaybeWithoutPath.StartsWith("__"))
                 {
-                    //Local lib will just skip quickly
-                    string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
-                    if (dataFilePathInsideZip != null)
+                    //if it has prefix __, and there is a hit in its own library, this will have been
+                    //caught above.
+                    foreach (Library library in Program.libraries.GetLibrariesIncludingLocal())
                     {
-                        rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
-                        rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                        if (rv_fileName != null && File.Exists(rv_fileName))
+                        //Local lib will just skip quickly, never mind
+                        string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
+                        if (dataFilePathInsideZip != null)
                         {
-                            success = true;
-                            break;
+                            rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
+                            rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
+                            if (rv_fileName != null && File.Exists(rv_fileName))
+                            {
+                                success = true;
+                                break;
+                            }
                         }
                     }
                 }

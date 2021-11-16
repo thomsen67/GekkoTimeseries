@@ -54,7 +54,8 @@ namespace Gekko
         public static char NL2 = '\n';     //best for counting number of newlines, since Windows accepts both \r\n and \n as newline. Mac uses \r, hmm, never mind.
 
         /// <summary>
-        /// Compares two strings, ignoring case (so "aBc" == "Abc").
+        /// Compares two strings, ignoring case (so "aBc" == "Abc"). If one but not the other
+        /// is null, it returns false. If both are null, it returns true.
         /// </summary>
         /// <param name="s1">First string</param>
         /// <param name="s2">Second string</param>
