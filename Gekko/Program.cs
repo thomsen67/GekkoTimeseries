@@ -3265,8 +3265,7 @@ namespace Gekko
             //do copylocal
             string fileName = o.fileName;
             fileName = G.AddExtension(fileName, ".xlsx");
-            fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-            //TableLight inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);  
+            fileName = Program.FindFile(fileName, null, o.p, true, true);
                         
             if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
@@ -17818,15 +17817,7 @@ namespace Gekko
                 }
                 res.Flush();
             }
-        }
-
-        public static bool ExistFile(string s)
-        {
-            string filename = Program.CreateFullPathAndFileName(s);
-            bool exist = File.Exists(filename);
-            //do something if lib1:data.csv (must have path)
-            return exist;
-        }
+        }        
 
         public static void WriteFile(IVariable file2, IVariable x1)
         {

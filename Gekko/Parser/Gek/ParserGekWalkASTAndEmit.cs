@@ -4805,6 +4805,7 @@ ASTPLACEHOLDER [0]
                 case "ASTSHEETIMPORT":
                     {
                         node.Code.A("O.SheetImport o" + Num(node) + " = new O.SheetImport();" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p = p;");
                         GetCodeFromAllChildren(node, node[0]);
                         node.Code.A(node[1].Code + ";" + G.NL);
                         node.Code.A("o" + Num(node) + ".names = " + node[2].Code + ";" + G.NL);

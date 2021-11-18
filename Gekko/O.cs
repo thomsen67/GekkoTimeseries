@@ -6932,6 +6932,7 @@ namespace Gekko
         //See O.Prt for SHEET in export mode
         public class SheetImport
         {
+            public P p = null;
             public string fileName = null;
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set

@@ -94,8 +94,8 @@ namespace Gekko
                         hit = true;
                     }
 
-                    List<string> functions, procedures;
-                    QHelper(library, out functions, out procedures);
+                    List<string> functions, procedures, files;
+                    QHelper(library, out functions, out procedures, out files);
 
                     Action<GAO> a = (gao) =>
                     {
@@ -144,15 +144,20 @@ namespace Gekko
                             }
                         };
 
-                        string ff5 = null;
+                        string functions_string = null;
                         foreach (string s in functions)
                         {
-                            ff5 += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
+                            functions_string += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
                         }
-                        string pp5 = null;
+                        string procedures_string = null;
                         foreach (string s in procedures)
                         {
-                            pp5 += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
+                            procedures_string += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
+                        }
+                        string files_string = null;
+                        foreach (string s in files)
+                        {
+                            files_string += s + ", ";
                         }
                         using (Writeln writeln2 = new Writeln())
                         {
@@ -164,12 +169,17 @@ namespace Gekko
                             writeln2.MainNewLineTight();
                             if (functions.Count > 0)
                             {
-                                writeln2.MainAdd(G.AddS(functions.Count, "function") + ": " + ff5.Substring(0, ff5.Length - ", ".Length));
+                                writeln2.MainAdd(G.AddS(functions.Count, "function") + ": " + functions_string.Substring(0, functions_string.Length - ", ".Length));
                                 writeln2.MainNewLineTight();
                             }
                             if (procedures.Count > 0)
                             {
-                                writeln2.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + pp5.Substring(0, pp5.Length - ", ".Length));
+                                writeln2.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + procedures_string.Substring(0, procedures_string.Length - ", ".Length));
+                                writeln2.MainNewLineTight();
+                            }
+                            if (files.Count > 0)
+                            {
+                                writeln2.MainAdd(G.AddS(files.Count, "file") + ": " + files_string.Substring(0, files_string.Length - ", ".Length));
                                 writeln2.MainNewLineTight();
                             }
                             writeln2.MainAdd("---------------------------------------------------------------");
@@ -177,11 +187,11 @@ namespace Gekko
                     };
 
                     string more = null;
-                    if (functions.Count + procedures.Count > 0)
+                    if (functions.Count + procedures.Count + files.Count > 0)
                     {
                         more = " (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
                     }
-                    writeln.MainAdd("'" + library.GetName() + "' with " + G.AddS(functions.Count, "function") + " and " + G.AddS(procedures.Count, "procedure") + more);
+                    writeln.MainAdd("'" + library.GetName() + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + more);
                     writeln.MainNewLineTight();
                 }
                 writeln.MainNewLineTight();
@@ -194,15 +204,18 @@ namespace Gekko
             }
         }
 
-        private static void QHelper(Library library, out List<string> functions, out List<string> procedures)
+        private static void QHelper(Library library, out List<string> functions, out List<string> procedures, out List<string> files)
         {
             functions = new List<string>();
             procedures = new List<string>();
+            files = new List<string>();
             foreach (string s in library.GetFunctionNames())
             {
                 if (s.StartsWith(Globals.procedure)) procedures.Add(G.FromLibraryToFunctionProcedureName(s, 1));
                 else functions.Add(G.FromLibraryToFunctionProcedureName(s, 1));
             }
+            files = new List<string>(library.GetDataFiles().Keys);
+            files.Sort(StringComparer.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -549,9 +562,9 @@ namespace Gekko
                 }                    
 
                 this.libraries.Add(library);
-                List<string> functions, procedures;
-                QHelper(library, out functions, out procedures);
-                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + " and " + G.AddS(procedures.Count, "procedure")+". Library path: " + fileNameWithPath);
+                List<string> functions, procedures, files;
+                QHelper(library, out functions, out procedures, out files);
+                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + ". Library path: " + fileNameWithPath);
             }
         }
 
