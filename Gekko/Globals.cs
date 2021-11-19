@@ -91,7 +91,7 @@ namespace Gekko
 
         //Must be near the top of Globals.cs
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
-        public static int tempFilesCounter = 0;  //used when unzipping files
+        public static int tempFilesCounter = 0;  //used when unzipping files. Do not set to 0 for reset: it is better that it is only set to 0 when Gekko starts up (because then the previous files are probably not blocked).
 
         public static ItemHandler itemHandler = null;  //hack
 

@@ -95,101 +95,12 @@ namespace Gekko
                     }
 
                     List<string> functions, procedures, files;
-                    QHelper(library, out functions, out procedures, out files);
-
-                    Action<GAO> a = (gao) =>
-                    {
-                        Action<GAO> a3 = (gao3) =>
-                        {
-                            string fname = gao3.s1;
-                            if (fname.EndsWith("()")) fname = fname.Substring(0, fname.Length - "()".Length);
-                            else fname = Globals.procedure + fname;
-                            GekkoFunction f = library.GetFunction(fname, true);  //should be there
-
-                            using (Writeln w = new Writeln("", -12345, System.Drawing.Color.Empty, false, ETabs.Output))
-                            {
-                                foreach (GekkoFunctionCode gfc in f.overloads)
-                                {
-                                    List<string> xx = Stringlist.ExtractLinesFromText(gfc.code);
-                                    if (xx.Count > 1000)
-                                    {
-                                        List<string> temp = new List<string>();
-                                        for (int i = 0; i < 900; i++)
-                                        {
-                                            temp.Add(xx[i]);
-                                        }
-                                        temp.Add("");
-                                        temp.Add("---------------------------------------------------------------------");                                        
-                                        temp.Add("...");
-                                        temp.Add("...");
-                                        temp.Add("File has " + xx.Count + " lines and has been truncated here");
-                                        temp.Add("...");
-                                        temp.Add("...");
-                                        temp.Add("---------------------------------------------------------------------");
-                                        temp.Add("");
-                                        for (int i = xx.Count - 20; i < xx.Count; i++)
-                                        {
-                                            temp.Add(xx[i]);
-                                        }
-                                        xx = temp;
-                                    }
-                                    StringBuilder code = Stringlist.ExtractTextFromLines(xx);
-                                                                        
-                                    //See also this: #08975389245253     
-                                    w.MainAdd("//[file = " + gfc.fileNameWithPath + " line " + gfc.line + "]");
-                                    w.MainNewLineTight();
-                                    w.MainAdd(code.ToString());
-                                    w.MainNewLine();
-                                }
-                            }
-                        };
-
-                        string functions_string = null;
-                        foreach (string s in functions)
-                        {
-                            functions_string += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
-                        }
-                        string procedures_string = null;
-                        foreach (string s in procedures)
-                        {
-                            procedures_string += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
-                        }
-                        string files_string = null;
-                        foreach (string s in files)
-                        {
-                            files_string += s + ", ";
-                        }
-                        using (Writeln writeln2 = new Writeln())
-                        {
-                            writeln2.MainAdd("---------------------------------------------------------------");
-                            writeln2.MainNewLineTight();
-                            writeln2.MainAdd("Library '" + library.GetName() + "':");
-                            writeln2.MainNewLineTight();
-                            writeln2.MainAdd("---------------------------------------------------------------");
-                            writeln2.MainNewLineTight();
-                            if (functions.Count > 0)
-                            {
-                                writeln2.MainAdd(G.AddS(functions.Count, "function") + ": " + functions_string.Substring(0, functions_string.Length - ", ".Length));
-                                writeln2.MainNewLineTight();
-                            }
-                            if (procedures.Count > 0)
-                            {
-                                writeln2.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + procedures_string.Substring(0, procedures_string.Length - ", ".Length));
-                                writeln2.MainNewLineTight();
-                            }
-                            if (files.Count > 0)
-                            {
-                                writeln2.MainAdd(G.AddS(files.Count, "file") + ": " + files_string.Substring(0, files_string.Length - ", ".Length));
-                                writeln2.MainNewLineTight();
-                            }
-                            writeln2.MainAdd("---------------------------------------------------------------");
-                        }
-                    };
+                    QHelper(library, out functions, out procedures, out files);                    
 
                     string more = null;
                     if (functions.Count + procedures.Count + files.Count > 0)
                     {
-                        more = " (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")";
+                        more = " (" + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, QHelperActions(library, functions, procedures, files))) + ")";
                     }
                     writeln.MainAdd("'" + library.GetName() + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + more);
                     writeln.MainNewLineTight();
@@ -202,6 +113,99 @@ namespace Gekko
                 }
                 writeln.MainAdd("---------------------------------------------------------------");                
             }
+        }
+
+        private static Action<GAO> QHelperActions(Library library, List<string> functions, List<string> procedures, List<string> files)
+        {
+            Action<GAO> a = (gao) =>
+            {
+                Action<GAO> a3 = (gao3) =>
+                {
+                    string fname = gao3.s1;
+                    if (fname.EndsWith("()")) fname = fname.Substring(0, fname.Length - "()".Length);
+                    else fname = Globals.procedure + fname;
+                    GekkoFunction f = library.GetFunction(fname, true);  //should be there
+
+                    using (Writeln w = new Writeln("", -12345, System.Drawing.Color.Empty, false, ETabs.Output))
+                    {
+                        foreach (GekkoFunctionCode gfc in f.overloads)
+                        {
+                            List<string> xx = Stringlist.ExtractLinesFromText(gfc.code);
+                            if (xx.Count > 1000)
+                            {
+                                List<string> temp = new List<string>();
+                                for (int i = 0; i < 900; i++)
+                                {
+                                    temp.Add(xx[i]);
+                                }
+                                temp.Add("");
+                                temp.Add("---------------------------------------------------------------------");
+                                temp.Add("...");
+                                temp.Add("...");
+                                temp.Add("File has " + xx.Count + " lines and has been truncated here");
+                                temp.Add("...");
+                                temp.Add("...");
+                                temp.Add("---------------------------------------------------------------------");
+                                temp.Add("");
+                                for (int i = xx.Count - 20; i < xx.Count; i++)
+                                {
+                                    temp.Add(xx[i]);
+                                }
+                                xx = temp;
+                            }
+                            StringBuilder code = Stringlist.ExtractTextFromLines(xx);
+
+                            //See also this: #08975389245253     
+                            w.MainAdd("//[file = " + gfc.fileNameWithPath + " line " + gfc.line + "]");
+                            w.MainNewLineTight();
+                            w.MainAdd(code.ToString());
+                            w.MainNewLine();
+                        }
+                    }
+                };
+
+                string functions_string = null;
+                foreach (string s in functions)
+                {
+                    functions_string += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
+                }
+                string procedures_string = null;
+                foreach (string s in procedures)
+                {
+                    procedures_string += G.GetLinkAction(s, new GekkoAction(EGekkoActionTypes.Unknown, null, a3, new GAO() { s1 = s })) + ", ";
+                }
+                string files_string = null;
+                foreach (string s in files)
+                {
+                    files_string += s + ", ";
+                }
+                using (Writeln writeln2 = new Writeln())
+                {
+                    writeln2.MainAdd("---------------------------------------------------------------");
+                    writeln2.MainNewLineTight();
+                    writeln2.MainAdd("Library '" + library.GetName() + "':");
+                    writeln2.MainNewLineTight();
+                    writeln2.MainAdd("---------------------------------------------------------------");
+                    writeln2.MainNewLineTight();
+                    if (functions.Count > 0)
+                    {
+                        writeln2.MainAdd(G.AddS(functions.Count, "function") + ": " + functions_string.Substring(0, functions_string.Length - ", ".Length));
+                        writeln2.MainNewLineTight();
+                    }
+                    if (procedures.Count > 0)
+                    {
+                        writeln2.MainAdd(G.AddS(procedures.Count, "procedure") + ": " + procedures_string.Substring(0, procedures_string.Length - ", ".Length));
+                        writeln2.MainNewLineTight();
+                    }
+                    if (files.Count > 0)
+                    {
+                        writeln2.MainAdd(G.AddS(files.Count, "file") + ": " + files_string.Substring(0, files_string.Length - ", ".Length));
+                        writeln2.MainNewLineTight();
+                    }
+                    writeln2.MainAdd("---------------------------------------------------------------");
+                }
+            };
+            return a;
         }
 
         private static void QHelper(Library library, out List<string> functions, out List<string> procedures, out List<string> files)
@@ -387,7 +391,8 @@ namespace Gekko
                     using (Error txt = new Error())
                     {
                         txt.MainAdd("The name '" + libraryName + "' is reserved regarding libraries. ");
-                        txt.MoreAdd("The names 'Global' and 'Local' are reserved, because normal functions/procedures are stored in these (not 'Local' at the moment, though). ");
+                        txt.MoreAdd("The names 'Global' and 'Local' are reserved, because normal functions/procedures are stored in these (not 'Global' at the moment, though). ");
+                        txt.MoreAdd("Similarly, 'this' and 'null' are reserved names, too, because the may be used in the future. ");
                         txt.MoreAdd("In addition, a user library cannot start with 'Gekko'. This is reserved because at some point, Gekko-developed functions/procedures ");
                         txt.MoreAdd("will be distributed together with Gekko, in the form of library zip files. These will be named for instance 'Gekko' or 'Gekko_3_1_12' or something similar and ");
                         txt.MoreAdd("should not be confused with user-developed libraries.");
@@ -399,7 +404,7 @@ namespace Gekko
                     using (Error txt = new Error())
                     {
                         txt.MainAdd("The library name '" + libraryName + "' cannot be just 1 character. ");
-                        txt.MoreAdd("Library names must be of length > 1. At some point it will be possible to refer to for instance .gtb or .gpt files stored inside a library zip file. The length restriction is to avoid the possibility of storing for instance a pretty.gpt schema file for plots inside a c.zip file, and later refer to the schema file with c:pretty.gpt. This would be confusing, since c: could be a drive letter.");
+                        txt.MoreAdd("Library names must be of length > 1. The length restriction is to avoid the possibility of storing for instance a pretty.gpt schema file for plots inside a c.zip file, and later refer to the schema file with c:pretty.gpt. This would be confusing, since c: could be a drive letter.");
                     }
                 }
 
@@ -445,7 +450,7 @@ namespace Gekko
 
                 if (hit != null && hit.GetStamp().Ticks != 0l && stamp.CompareTo(hit.GetStamp()) != 0)
                 {
-                    //if .Tics == 0l, it is the Global library.
+                    //if .Tics == 0l, it is the Local library.
                     //if not, we compare the stamp from the .zip file with the stored stamp.
                     //if different, we need to reload the .zip (because it has been altered).
                     //so we just remove it from cache, and sets hit = null.
@@ -538,7 +543,7 @@ namespace Gekko
                             //not catastrofic if this fails
                         }                        
 
-                        try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                        try //not the end of world if it fails
                         {                            
                             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                             RuntimeTypeModel serializer = TypeModel.Create();
@@ -564,7 +569,13 @@ namespace Gekko
                 this.libraries.Add(library);
                 List<string> functions, procedures, files;
                 QHelper(library, out functions, out procedures, out files);
-                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + ". Library path: " + fileNameWithPath);
+
+                string more = null;
+                if (functions.Count + procedures.Count + files.Count > 0)
+                {
+                    more = " (" + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, QHelperActions(library, functions, procedures, files))) + ")";
+                }
+                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + more + ". Library path: " + fileNameWithPath);
             }
         }
 
@@ -805,7 +816,7 @@ namespace Gekko
 
         /// <summary>
         /// Finds all .gcm files in a folder structure, and extracts functions/procedures. Is recursive.
-        /// Will also catalogue all "external" files in the \data subfolder.
+        /// Will also catalogue all "external" files from the \data subfolder.
         /// </summary>
         /// <param name="targetDirectory"></param>
         public void LibraryExtractor(string targetDirectory, string originalDirectory, string zipFileName)
@@ -882,9 +893,11 @@ namespace Gekko
             // ...
             // function ...           --> or procedure
             // ...
+            // end;
             // ...
             // function ...
             // ...
+            // end;
             // ...
 
             // will be cut like this:
@@ -894,10 +907,12 @@ namespace Gekko
             // ...
             // function ...                                functionNames[0], functionCounter = 1
             // ...
+            // end;
             // ...
             //=========================================
             // function ...                                functionNames[1], functionCounter = 2
             // ...
+            // end;
             // ...
             //=========================================
 
@@ -939,6 +954,15 @@ namespace Gekko
 
                     if (!problem)
                     {
+                        int i1 = i;
+                        TokenHelper th = null;
+                        if (th1 != null) th = th1.SiblingBefore(1, true);
+                        if (th != null && G.Equal(th.s, "end"))
+                        {
+                            //searching for the "end" just before the ";" of the previous
+                            //command (ignoring comments)
+                            i1 = th1.id + 1;  //the node after the ";"
+                        }
 
                         functionCounter++;
 
@@ -955,8 +979,8 @@ namespace Gekko
 
                         if (functionCounter >= 2)
                         {
-                            this.LibraryExtractorGetFunctionCode(i0, i, functionNamesLower[functionCounter - 2], t2.subnodes, pathToFileInsideZip);
-                            i0 = i;
+                            this.LibraryExtractorGetFunctionCode(i0, i1, functionNamesLower[functionCounter - 2], t2.subnodes, pathToFileInsideZip);
+                            i0 = i1;
                         }
                     }
                 }
