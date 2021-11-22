@@ -5338,7 +5338,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, IVariable> FunctionLookupNew0(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, IVariable> FunctionLookupNew0(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, IVariable> rv = null;
@@ -5358,7 +5358,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, IVariable> FunctionLookupNew1(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, IVariable> FunctionLookupNew1(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, IVariable> rv = null;
@@ -5378,7 +5378,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> FunctionLookupNew2(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> FunctionLookupNew2(P p, string callingLibrary, string library, string name)
         {   
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5398,7 +5398,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(P p, string callingLibrary, string library, string name)
         {
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
             GekkoFunction f = Program.libraries.GetFunction(callingLibrary, library, name);
@@ -5418,7 +5418,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew4(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew4(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5438,7 +5438,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew5(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew5(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5458,7 +5458,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew6(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew6(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5478,7 +5478,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew7(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew7(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5498,7 +5498,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew8(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew8(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5518,7 +5518,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew9(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew9(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5538,7 +5538,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew10(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew10(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5558,7 +5558,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew11(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew11(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5578,7 +5578,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew12(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew12(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -5598,7 +5598,7 @@ namespace Gekko
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew13(string callingLibrary, string library, string name)
+        public static Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew13(P p, string callingLibrary, string library, string name)
         {
             //NOTE: the number of args is hardcoded two places below
             Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
@@ -6494,7 +6494,7 @@ namespace Gekko
         public static void StopHelper(GekkoSmpl smpl, P p)
         {            
             p.hasSeenStopCommand = 1;
-            O.FunctionLookupNew2(null, null, Globals.stopHelper)(smpl, p, false, null, null);
+            O.FunctionLookupNew2(p, null, null, Globals.stopHelper)(smpl, p, false, null, null);
         }
 
         /// <summary>

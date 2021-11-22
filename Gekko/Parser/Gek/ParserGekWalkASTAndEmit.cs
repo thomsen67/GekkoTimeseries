@@ -2262,11 +2262,11 @@ namespace Gekko.Parser.Gek
                             w.headerCs.AppendLine("List<string> " + typesName + " = new List<string> { " + types + " };");
                             w.headerCs.AppendLine("List<IVariable> " + labelCodesName + " = new List<IVariable> { " + labelCodes + " };");
                             w.headerCs.AppendLine("List<IVariable> " + promptResultsName + " = O.Prompt(" + questionsName + ", " + defaultValueCodesName + ", " + typesName + ", " + labelCodesName + ");");
-                            w.headerCs.AppendLine("return " + Globals.functionSpecialName2 + numberOfParameters + "(" + libraryNameWhereTheFunctionIsCallingFrom + ", " + libraryName + ", `" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverloadedVersion, 1) + " " + prompts + ");");
+                            w.headerCs.AppendLine("return " + Globals.functionSpecialName2 + numberOfParameters + "(p, " + libraryNameWhereTheFunctionIsCallingFrom + ", " + libraryName + ", `" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverloadedVersion, 1) + " " + prompts + ");");
                             w.headerCs.AppendLine("}" + G.NL);
                             w.headerCs.AppendLine("else" + G.NL);
                             w.headerCs.AppendLine("{" + G.NL);
-                            w.headerCs.AppendLine("return " + Globals.functionSpecialName2 + numberOfParameters + "(" + libraryNameWhereTheFunctionIsCallingFrom + ", " + libraryName + ", `" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverloadedVersion, 1) + " " + prompts2 + ");");
+                            w.headerCs.AppendLine("return " + Globals.functionSpecialName2 + numberOfParameters + "(p, " + libraryNameWhereTheFunctionIsCallingFrom + ", " + libraryName + ", `" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverloadedVersion, 1) + " " + prompts2 + ");");
                             w.headerCs.AppendLine("}" + G.NL);
 
                             w.headerCs.AppendLine(G.NL + " return null; });" + G.NL);
@@ -2663,15 +2663,15 @@ namespace Gekko.Parser.Gek
 
                                 if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q")
                                 {
-                                    node.Code.A(Globals.functionSpecialName2).A(numberOfArguments + 1).A("(").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
+                                    node.Code.A(Globals.functionSpecialName2).A(numberOfArguments + 1).A("(p, ").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                 }
                                 else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                 {
-                                    node.Code.A(Globals.functionSpecialName2).A(numberOfArguments + 1).A("(").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
+                                    node.Code.A(Globals.functionSpecialName2).A(numberOfArguments + 1).A("(p, ").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                 }
                                 else
                                 {
-                                    node.Code.A(Globals.functionSpecialName2).A(numberOfArguments).A("(").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1 + aa2).A(")");
+                                    node.Code.A(Globals.functionSpecialName2).A(numberOfArguments).A("(p, ").A(libraryNameWhereTheFunctionIsCallingFrom).A(", ").A(libraryName).A(", `").A(functionName).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1 + aa2).A(")");
                                 }
 
                                 if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q" || node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
