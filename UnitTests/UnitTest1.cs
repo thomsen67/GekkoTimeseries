@@ -13682,6 +13682,13 @@ namespace UnitTests
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library lib3;");
+                I("%x = lib3:f1();");
+                _AssertScalarString(First(), "%x", "abcde\r\nedcba\r\n");  //first from lib3.zip/data, next from lib4.zip/data
+
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
                 I("library lib2;");
                 I("%x = f1();");
                 _AssertScalarVal(First(), "%x", 10d);
@@ -13700,6 +13707,19 @@ namespace UnitTests
                 I("function val call_hundred3(); return this:hundred2(); end;");
                 I("%y3 = call_hundred3();");          //translates the this: as Local:
                 _AssertScalarVal(First(), "%y3", -100d);  //this or no this has no significance
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 // ------------------------------------------------------------
                 // normal function
