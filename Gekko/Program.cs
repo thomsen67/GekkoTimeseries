@@ -5484,9 +5484,14 @@ namespace Gekko
 
                     if (hasSeenTimeDefinition)
                     {
-                        string extra = "";
-                        extra = " If the px file originates from a {a{DOWNLOAD¤download.htm}a}, please put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.";
-                        new Error("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element." + extra);
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
+                            txt.MainAdd("If the px file originates from a { a{ DOWNLOAD¤download.htm} a}, please put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.");
+                            txt.MoreAdd("If the requirement that .px files must have time as the last element (dimension) is annoying, please contact the Gekko editor. This would be easy to fix, but for now the requirement has its advantages regarding .px reading (faster speed and less memory usage, because Gekko timeseries data are aligned in the time dimension). So the requirement may pay off in the long run, if people start to download really large tables, where it would be beneficial that the px data are aligned in the time dimension.");
+                            txt.MoreNewLine();
+                            txt.MoreAdd("If an existing .json file causes problems due to the time dimension not being stated as the last dimension, you can simply move the time section in the .json file so that it becomes the last of the codes.");                            
+                        }
                     }
 
                     string line777 = lineHelper.ToString();
@@ -5494,7 +5499,6 @@ namespace Gekko
                     if (i < 0)
                     {
                         new Error("Expected a '=' in this line: " + line777);
-                        //throw new GekkoException();
                     }
 
                     string s3 = line777.Substring(0, i); s3 = s3.Substring(7); s3 = s3.Substring(0, s3.Length - 2);

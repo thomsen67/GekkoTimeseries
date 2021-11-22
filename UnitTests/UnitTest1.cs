@@ -13909,8 +13909,9 @@ namespace UnitTests
                 _AssertScalarString(First(), "%y8", "lib1data__data2\r\n");
                 I("%y10 = lib1:h2();");  //tests 'this:'
                 _AssertScalarString(First(), "%y10", "__g2");
-                I("%y11 = lib1:h3();");
-                _AssertScalarString(First(), "%y11", "; 2015; 2016;\r\nx; 2; 3;\r\n");
+                I("%y11 = lib1:h3();");  //tests 'this:'
+                I("%y12 = lib1:h3();");
+                _AssertScalarString(First(), "%y12", "; 2015; 2016;\r\nx; 2; 3;\r\n");
 
                 // ----------------------------------------------------------------
 
