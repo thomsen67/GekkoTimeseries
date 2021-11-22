@@ -1392,7 +1392,7 @@ namespace Gekko
                 if (FindException(e2, "lexer error"))
                 {
                     Parser.ParseHelper ph = new Parser.ParseHelper();
-                    string s2 = p.GetStackCommandFileText(p.GetDepth());
+                    string s2 = p.GetStackCommandFileText(p.GetDepth());                    
                     string s3 = "";
                     if (s2 != null) s3 = s2;
                     Gekko.Parser.Frm.ParserFrmCreateAST.HandleModelParserErrors(Stringlist.CreateListOfStringsFromFile(e2.Message), Stringlist.CreateListOfStringsFromFile(s3), ph);
@@ -6429,6 +6429,7 @@ namespace Gekko
 
                 ph.commandsText = commandLinesFlat;
                 p.SetCommandFileText(commandLinesFlat);
+                p.SetCurrentLibrary(null);  //a call to a gcm file always counts a current library == null
 
                 try
                 {
@@ -15699,7 +15700,9 @@ namespace Gekko
             
             bool success = false;
             string rv_fileName = filenameMaybeWithoutPath;
-            string currentLibrary = p?.currentLibrary;  //may be null
+            string currentLibrary = null;
+            if (p != null) currentLibrary = p.GetCurrentLibrary(p.GetDepthM1());
+
             bool hasPath = filenameMaybeWithoutPath.Contains("\\") || filenameMaybeWithoutPath.Contains(":");                                    
 
             if (!success && allowLibrary && filenameMaybeWithoutPath.StartsWith(Globals.libraryDriveCheatString))
@@ -28675,6 +28678,7 @@ namespace Gekko
         private string[] stack = new string[200];  //2000 nested cmd files -- should be enough
         private string[] stackCommandFileText = new string[200];
         private string[] stackFileSentToAntlr = new string[200];
+        private string[] stackCurrentLibrary = new string[200];
         public string lastFileSentToANTLR = null;
         public string currentLibrary = null;
         public bool isOneLinerFromGui = false;
@@ -28714,9 +28718,19 @@ namespace Gekko
             return stackCommandFileText[i];
         }
 
+        public string GetCurrentLibrary(int i)
+        {
+            return stackCurrentLibrary[i];
+        }
+
         public int GetDepth()
         {
             return counter;
+        }
+
+        public int GetDepthM1()
+        {
+            return counter - 1;
         }
 
         public void SetLastFileSentToANTLR(string s)
@@ -28740,33 +28754,23 @@ namespace Gekko
             this.stackCommandFileText[counter] = s;
         }
 
+        /// <summary>
+        /// This library name is always == null for running gcm files, or for functions/procedures defined
+        /// in a normal gcm file. The library name is only != null when a function or procedure is loaded
+        /// from a library zip file. In that case, the library name is burned into the function/procedure while
+        /// parsing (cf. LocalCode1()).
+        /// </summary>
+        /// <param name="s"></param>
+        public void SetCurrentLibrary(string s)
+        {
+            this.stackCurrentLibrary[counter] = s;
+        }
+
         public void Deeper()
         {
             //if (Globals.runningOnTTComputer) G.Writeln2("DEEPER " + this.counter, Color.Green);
             this.counter++;            
-        }
-
-        /// <summary>
-        /// Used for Gekko user-defined functions. May be set to null.
-        /// </summary>
-        /// <param name="functionName"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public void SetCurrentLibrary(string libraryName)
-        {
-            this.currentLibrary = libraryName;
-        }
-        /// <summary>
-        /// Used for Gekko user-defined functions.
-        /// </summary>
-        /// <param name="functionName"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public string GetCurrentLibrary(P p)
-        {
-            return this.currentLibrary;
-        }
-
+        }        
 
         public void RemoveLast()
         {
@@ -28802,6 +28806,7 @@ namespace Gekko
                 this.stack[counter] = null;
                 this.stackCommandFileText[counter - 1] = null;
                 this.stackFileSentToAntlr[counter - 1] = null;
+                this.stackCurrentLibrary[counter - 1] = null;
 
             }
             this.counter--;

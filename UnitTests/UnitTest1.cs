@@ -13695,7 +13695,7 @@ namespace UnitTests
                 I("f1;");
                 _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
                 I("f2;");
-                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);  //#987432433279h: see the code that makes sure that we get 5 here and not 10.
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);  //command file has no 
                 I("f3;");
                 _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
 

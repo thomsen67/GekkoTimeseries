@@ -4893,8 +4893,7 @@ ASTPLACEHOLDER [0]
                         //HMMM is this right:
                         node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                         if (node[1] != null) node.Code.A(node[1].Code + G.NL);
-                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
-                        node.Code.A("o" + Num(node) + ".p.currentLibrary = null;" + G.NL);  //#987432433279h: any library info will not be inherited down into .gcm files (will only work for functions/procedures) 
+                        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);                        
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         node.Code.A(LocalCode2(Num(node), null, null)); //see LocalCode1
                     }
@@ -5409,7 +5408,7 @@ ASTPLACEHOLDER [0]
             string s2 = null;
             if (functionName != null)
             {
-                s = "p.SetCurrentLibrary(null); p.RemoveLast();";  //must be inside finally {}, because there may be a return from the method (and also an exception should adjust the counter)
+                s = "p.RemoveLast();";  //must be inside finally {}, because there may be a return from the method (and also an exception should adjust the counter)
                 s2 = "catch { p.Deeper(); throw; }" + G.NL;  //otherwise the following RemoveLast will remove too much for functions/procedures
             }
             return "} " + G.NL + s2 + " finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + "; " + s + ";" + G.NL + "} " + G.NL;
