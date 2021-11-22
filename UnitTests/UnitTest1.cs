@@ -13661,6 +13661,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Library()
         {
+            
             //function string f1(string %x1); return 'px_f1_' + %x1; end;
             //function string f1(string %x1, string %x2); return 'px_f1_' + %x1 + %x2; end;
             //
@@ -13675,6 +13676,18 @@ namespace UnitTests
 
             for (int i = 0; i < 2; i++)
             {
+
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library lib2;");
+                I("%x = f1();");
+                _AssertScalarVal(First(), "%x", 10d);
+                I("f1;");
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
+                I("f2;");
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);
+
 
                 // ------------------------------------------------------------
                 // normal function
@@ -13897,7 +13910,12 @@ namespace UnitTests
                 I("%y10 = lib1:h2();");  //tests 'this:'
                 _AssertScalarString(First(), "%y10", "__g2");
                 I("%y11 = lib1:h3();");
-                _AssertScalarString(First(), "%y11", "; 2015; 2016;\r\nx; 2; 3;\r\n");                
+                _AssertScalarString(First(), "%y11", "; 2015; 2016;\r\nx; 2; 3;\r\n");
+
+                // ----------------------------------------------------------------
+
+               
+
             }
         }
 
