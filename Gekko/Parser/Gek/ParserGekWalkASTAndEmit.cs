@@ -4894,6 +4894,7 @@ ASTPLACEHOLDER [0]
                         node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                         if (node[1] != null) node.Code.A(node[1].Code + G.NL);
                         node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                        node.Code.A("o" + Num(node) + ".p.currentLibrary = null;" + G.NL);  //#987432433279h: any library info will not be inherited down into .gcm files (will only work for functions/procedures) 
                         node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         node.Code.A(LocalCode2(Num(node), null, null)); //see LocalCode1
                     }

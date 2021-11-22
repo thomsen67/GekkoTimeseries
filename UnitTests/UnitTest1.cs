@@ -13677,6 +13677,8 @@ namespace UnitTests
             for (int i = 0; i < 2; i++)
             {
 
+                //MOVE THIS TO END!!
+
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
@@ -13686,8 +13688,18 @@ namespace UnitTests
                 I("f1;");
                 _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
                 I("f2;");
-                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);  //#987432433279h: see the code that makes sure that we get 5 here and not 10.
+                I("f3;");
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
 
+                I("function val hundred1(); return 100; end;");  //library version returns 200                                
+                I("function val hundred2(); return -100; end;");                
+                I("%y1 = call_hundred1();");
+                _AssertScalarVal(First(), "%y1", 200d);  //this or no this has no significance
+                FAIL("%y2 = call_hundred2();");          //cannot access the version from Local, because this:hundred2() is used in lib2:call_hundred2().
+                I("function val call_hundred3(); return this:hundred2(); end;");
+                I("%y3 = call_hundred3();");          //translates the this: as Local:
+                _AssertScalarVal(First(), "%y3", -100d);  //this or no this has no significance
 
                 // ------------------------------------------------------------
                 // normal function

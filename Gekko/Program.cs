@@ -15709,12 +15709,19 @@ namespace Gekko
                 //we also handle lib1:__f() here, being only legal if called from lib1. In contrast, this:__f() is always ok.
                 string[] ss = filenameMaybeWithoutPath.Split(':');
                 string libraryName = ss[0].Replace(Globals.libraryDriveCheatString, "");
+
                 if (G.Equal(libraryName, Globals.thisLibraryString))
                 {
                     //Handling 'this:data.csv'
                     if (currentLibrary == null)
                     {
-                        new Error("You are using 'this:' before a filename, but this is only legal when issued from a library function or procedure.");
+                        using (Error txt = new Error())
+                        {
+                            txt.MainAdd("You are using 'this:' before a filename, but 'this:' is only legal when issued from a library function or procedure.");
+                            txt.MoreAdd("Library files can only be put into a zip-file library (in a \\data subfolder), and therefore using 'this:' outside of a library function or procedure is not meaningful.");
+                            txt.MoreAdd("The Local library (where 'normal' functions/procedures are stored) cannot contain files in the same way as a zip-file library.");
+                            txt.MoreAdd("Why? The answer is that such a capability would not make much sense anyway, because local files are naturally stored in the working folder.");
+                        }
                     }
                     else
                     {
