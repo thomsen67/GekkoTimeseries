@@ -383,7 +383,7 @@ namespace Gekko
             for (int i = 0; i < o.files.Count; i++)
             {
                 string fileName3 = O.ConvertToString(o.files[i]);
-                string fileName2 = G.AddExtension(fileName3, "." + "zip");
+                string fileName2 = G.AddExtension(fileName3, Globals.zip);
                 string libraryName = Path.GetFileNameWithoutExtension(fileName2);
                 if (o.aliases[i] != null) libraryName = O.ConvertToString(o.aliases[i]);
                 if (IsReservedName(libraryName))

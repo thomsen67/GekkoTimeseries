@@ -754,7 +754,7 @@ namespace Gekko
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        private static string RemoveLibraryCheatString(string s)
+        public static string RemoveLibraryCheatString(string s)
         {
             if (s.Contains(Globals.libraryDriveCheatString))
             {

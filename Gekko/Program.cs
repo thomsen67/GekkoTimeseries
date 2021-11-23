@@ -3640,7 +3640,7 @@ namespace Gekko
 
             if (databankVersion == "1.0" || databankVersion == "1.1")
             {
-                deserializedDatabank = ReadGbk_1_1(oRead, readInfo, ref file, databank, originalFilePath, ref tsdxFile, ref tempTsdxPath, databankVersion);
+                deserializedDatabank = ReadGbk_1_1(oRead, readInfo, ref file, databank, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath, databankVersion);
             }
             else
             {
@@ -3723,7 +3723,7 @@ namespace Gekko
         /// <param name="tempTsdxPath"></param>
         /// <param name="databankVersion"></param>
         /// <returns></returns>
-        private static Databank ReadGbk_1_1(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, string databankVersion)
+        private static Databank ReadGbk_1_1(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, Databank databank, string originalFilePath, string originalFilePathPretty, ref string tsdxFile, ref string tempTsdxPath, string databankVersion)
         {
             /// <summary>
             /// Only used for ReadGbk_1_1()
@@ -3739,7 +3739,7 @@ namespace Gekko
             int nanCounter = 0;
             ReadInfo readInfo_oldbank = new ReadInfo();
             Databank_1_1 databank_1_1 = null;
-            Utilities_1_1.ReadGbkOld_1_1(databank.name, databankVersion, oRead, readInfo_oldbank, ref file, ref databank_1_1, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref nanCounter);
+            Utilities_1_1.ReadGbkOld_1_1(databank.name, databankVersion, oRead, readInfo_oldbank, ref file, ref databank_1_1, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath, ref nanCounter);
             if (databank_1_1.storage.Count == 0)
             {
                 new Error("Old databank in " + readInfo.databankVersion + " format has 0 variables");
@@ -15817,7 +15817,7 @@ namespace Gekko
         {
             int ok1 = -12345;
             int ok2 = -12345;
-            int j1 = fileNameWithPath.IndexOf(".zip", StringComparison.OrdinalIgnoreCase);
+            int j1 = fileNameWithPath.IndexOf(Globals.zip, StringComparison.OrdinalIgnoreCase);
             if (j1 != -1)
             {                
                 for (int j2 = j1 - 1; j2 >= 1; j2--)
@@ -15828,7 +15828,7 @@ namespace Gekko
                         break;
                     }
                 }                
-                int j3 = j1 + ".zip".Length;
+                int j3 = j1 + Globals.zip.Length;
                 if (j3 < fileNameWithPath.Length && fileNameWithPath[j3] == '\\') ok2 = j3 - 1;
             }
             return new Tuple<int, int>(ok1, ok2);
@@ -15846,7 +15846,7 @@ namespace Gekko
         /// <returns></returns>
         private static string FindFileResolveZip(string fileNameWithPath)
         {
-            if ((fileNameWithPath.ToLower().Contains(".zip") && (fileNameWithPath.Contains(":\\") || fileNameWithPath.StartsWith("\\\\"))))
+            if ((fileNameWithPath.ToLower().Contains(Globals.zip) && (fileNameWithPath.Contains(":\\") || fileNameWithPath.StartsWith("\\\\"))))
             {
                 //ok, we will proceed below
             }
@@ -15873,7 +15873,7 @@ namespace Gekko
                 if (entry == null)
                 {
                     string s = null;
-                    if (pathInsideZip.ToLower().Contains(".zip")) s = ". Note that nested zip files are not yet supported.";
+                    if (pathInsideZip.ToLower().Contains(Globals.zip)) s = ". Note that nested zip files are not yet supported.";
                     new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "'" + s);
                 }
                 entry.ExtractToFile(tempFileName, true);
@@ -18152,6 +18152,11 @@ namespace Gekko
 
         public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen)
         {
+            if (type != GekkoFileReadOrWrite.Read)
+            {
+                PossibleLibraryOrZipWriteError(pathAndFilename, "write");
+            }
+
             FileStream fs = null;
 
             int gap = Globals.waitFileGap;  //1 second
@@ -18246,6 +18251,32 @@ namespace Gekko
             return fs;
         }
 
+        private static void PossibleLibraryOrZipWriteError(string pathAndFilename, string s)
+        {
+            if (pathAndFilename == null) return;
+
+            if (pathAndFilename.StartsWith(Globals.libraryDriveCheatString))
+            {
+                //Trying to write to a file inside a zip folder (like for instance #(listfile lib1:m.lst) = a, b, c;
+                //In that case, the file will look like "library___name___lib1:\m.lst".
+                using (Error txt = new Error())
+                {
+                    txt.MainAdd("You cannot " + s + " the file '" + O.RemoveLibraryCheatString(pathAndFilename) + "'.");
+                    txt.MainAdd("Files inside zip files (for instance inside libraries) are considered read-only.");
+                }
+            }
+
+            if (G.ContainsZipPath(pathAndFilename))
+            {
+                //a zip path
+                using (Error txt = new Error())
+                {
+                    txt.MainAdd("You cannot " + s + " the file '" + O.RemoveLibraryCheatString(pathAndFilename) + "'.");
+                    txt.MainAdd("Files inside zip files (for instance inside libraries) are considered read-only.");
+                }
+            }
+        }        
+
         private static bool IsLibraryWithColonName(string pathAndFilename)
         {            
             if (pathAndFilename.StartsWith(Globals.libraryDriveCheatString)) return true;
@@ -18263,11 +18294,12 @@ namespace Gekko
         }
 
         private static void WaitForFileCopyDeleteAbstract(string pathAndFilenameSource, string pathAndFilenameDestination, string type)
-        {
+        {            
+            PossibleLibraryOrZipWriteError(pathAndFilenameDestination, type);
+
             if (!(type == "copy" || type == "delete"))
             {
-                new Error("Sorry, internal Gekko error #837432");
-                //throw new GekkoException();
+                new Error("Internal Gekko error #837432");
             }
 
             string dir = Path.GetDirectoryName(pathAndFilenameDestination);

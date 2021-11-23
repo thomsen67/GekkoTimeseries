@@ -1726,6 +1726,16 @@ namespace Gekko
         }
 
         /// <summary>
+        /// True for a path like lib1.zip\data\x.csv, also works for full paths.
+        /// </summary>
+        /// <param name="pathAndFilename"></param>
+        /// <returns></returns>
+        public static bool ContainsZipPath(string pathAndFilename)
+        {
+            return pathAndFilename.ToLower().Contains(Globals.zip + "\\");
+        }
+
+        /// <summary>
         /// Only replace first occurrence
         /// </summary>
         /// <param name="original"></param>

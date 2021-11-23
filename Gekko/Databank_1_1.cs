@@ -1379,11 +1379,11 @@ namespace Gekko
             }
         }
 
-        public static void ReadGbkOld_1_1(string databankName, string version, ReadOpenMulbkHelper oRead, Program.ReadInfo readInfo, ref string file, ref Databank_1_1 databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        public static void ReadGbkOld_1_1(string databankName, string version, ReadOpenMulbkHelper oRead, Program.ReadInfo readInfo, ref string file, ref Databank_1_1 databank, string originalFilePath, string originalFilePathPretty, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //handles databank versions 1.0 and 1.1
 
-            readInfo.fileName = originalFilePath; readInfo.fileNamePretty = originalFilePath;  //TODO: is the last right?
+            readInfo.fileName = originalFilePath; readInfo.fileNamePretty = originalFilePathPretty;  //TODO: is the last right?
 
             int type = -12345;
             string file2 = null;
