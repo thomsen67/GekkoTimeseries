@@ -14885,7 +14885,7 @@ namespace Gekko
             }
             else
             {
-                ReadGekkoModel(fileName, dt0, textInputRaw, o.p);
+                ReadGekkoModel(fileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
             }
         }
 
@@ -14895,12 +14895,12 @@ namespace Gekko
         /// <param name="fileName"></param>
         /// <param name="dt0"></param>
         /// <param name="textInputRaw"></param>
-        private static void ReadGekkoModel(string fileName, DateTime dt0, string textInputRaw, P p)
+        private static void ReadGekkoModel(string fileName, string prettyFileName, DateTime dt0, string textInputRaw, P p)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
             Program.model = new Model();
             Program.model.modelGekko = new ModelGekko();
-            Program.model.modelGekko.modelInfo.fileName = fileName;
+            Program.model.modelGekko.modelInfo.fileName = prettyFileName;
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);

@@ -334,10 +334,16 @@ namespace Gekko
 
             tab.CurRow.SetText(1, "Model     : " + fileName);
             tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Info      : " + info);
-            tab.CurRow.Next();
-            tab.CurRow.SetText(1, "Date      : " + date);
-            tab.CurRow.Next();
+            if (info != null)
+            {
+                tab.CurRow.SetText(1, "Info      : " + info);
+                tab.CurRow.Next();
+            }
+            if (date != null)
+            {
+                tab.CurRow.SetText(1, "Date      : " + date);
+                tab.CurRow.Next();
+            }
             if (varlistStatus != null)
             {
                 tab.CurRow.SetText(1, "Varlist   : " + varlistStatus);
