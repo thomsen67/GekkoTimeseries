@@ -14895,12 +14895,12 @@ namespace Gekko
         /// <param name="fileName"></param>
         /// <param name="dt0"></param>
         /// <param name="textInputRaw"></param>
-        private static void ReadGekkoModel(string fileName, string prettyFileName, DateTime dt0, string textInputRaw, P p)
+        private static void ReadGekkoModel(string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
             Program.model = new Model();
             Program.model.modelGekko = new ModelGekko();
-            Program.model.modelGekko.modelInfo.fileName = prettyFileName;
+            Program.model.modelGekko.modelInfo.fileName = fileNamePretty;
             //this also creates Program.model.modelGekko.varlist if there is a varlist
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
             string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
@@ -14910,7 +14910,7 @@ namespace Gekko
             {
                 if (File.Exists(mdlFileNameAndPath))
                 {
-                    ParserFrmGetProtobuf(fileName, mdlFileNameAndPath);
+                    ParserFrmGetProtobuf(fileNamePretty, mdlFileNameAndPath);
                 }
             }
             else
@@ -15059,9 +15059,9 @@ namespace Gekko
         /// <summary>
         /// Load a cached model from an internal protobuf file.
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="fileNamePretty"></param>
         /// <param name="mdlFileNameAndPath"></param>
-        private static void ParserFrmGetProtobuf(string fileName, string mdlFileNameAndPath)
+        private static void ParserFrmGetProtobuf(string fileNamePretty, string mdlFileNameAndPath)
         {
             try
             {
@@ -15087,7 +15087,7 @@ namespace Gekko
 
                 G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                 Program.model.modelGekko.modelInfo.loadedFromMdlFile = true;
-                Program.model.modelGekko.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+                Program.model.modelGekko.modelInfo.fileName = fileNamePretty;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
             }
             catch (Exception e)
             {
@@ -28015,7 +28015,7 @@ namespace Gekko
                         sb.AppendLine("Model largest lag/lead: " + this.modelLargestLag + "/" + this.modelLargestLead);
                         LinkContainer lc = new LinkContainer(sb.ToString());
                         Globals.linkContainer.Add(lc.counter, lc);
-                        new Note("The databank contains MODEL/SIM info ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")");
+                        G.Write("The databank contains MODEL/SIM info ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")");
                     }
                 }
                 finally
