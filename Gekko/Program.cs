@@ -2672,7 +2672,7 @@ namespace Gekko
                         file = localFileThatShouldBeDeletedPathAndFilename;
                     }
 
-                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
                     {
                         if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
@@ -3010,7 +3010,7 @@ namespace Gekko
         /// <param name="tempTsdxPath"></param>
         /// <param name="NaNCounter"></param>
         /// <returns></returns>
-        public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //note: file is altered below, not sure why
 
@@ -3022,15 +3022,15 @@ namespace Gekko
             }
             else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
             {
-                Read2DCells_csv_prn_xlsx(offset, oRead, readInfo, file, databankTemp, originalFilePath, dateformat, datetype);
+                Read2DCells_csv_prn_xlsx(offset, oRead, readInfo, file, databankTemp, originalFilePath, originalFilePathPretty, dateformat, datetype);
             }
             else if (oRead.Type == EDataFormat.Tsd)
             {
-                ReadTsd(oRead, readInfo, ref file, ref databankTemp, originalFilePath, ref NaNCounter);
+                ReadTsd(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref NaNCounter);
             }
             else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
             {
-                ReadGbk(oRead, readInfo, ref file, ref databankTemp, originalFilePath, ref tsdxFile, ref tempTsdxPath);
+                ReadGbk(oRead, readInfo, ref file, ref databankTemp, originalFilePath, originalFilePathPretty, ref tsdxFile, ref tempTsdxPath);
             }
             else if (oRead.Type == EDataFormat.Tsp)
             {
@@ -3163,7 +3163,7 @@ namespace Gekko
         /// <param name="originalFilePath"></param>
         /// <param name="dateformat"></param>
         /// <param name="datetype"></param>
-        private static void Read2DCells_csv_prn_xlsx(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string dateformat, string datetype)
+        private static void Read2DCells_csv_prn_xlsx(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string originalFilePathPretty, string dateformat, string datetype)
         {
             //TODO:
             //For speedup:
@@ -3174,6 +3174,7 @@ namespace Gekko
 
             //DateTime t000 = DateTime.Now;
             readInfo.fileName = originalFilePath;
+            readInfo.fileNamePretty = originalFilePathPretty;
             TableLight matrix = null;
             string prnType = null;
             if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
@@ -3500,7 +3501,7 @@ namespace Gekko
         /// <param name="originalFilePath"></param>
         /// <param name="tsdxFile"></param>
         /// <param name="tempTsdxPath"></param>
-        public static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
+        public static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, string originalFilePathPretty, ref string tsdxFile, ref string tempTsdxPath)
         {
             
             //Note: file is altered below in several places, including is_a_protobuffer_file stuff
@@ -3635,6 +3636,7 @@ namespace Gekko
 
             Databank deserializedDatabank = null;
             readInfo.fileName = originalFilePath;
+            readInfo.fileNamePretty = originalFilePathPretty;
 
             if (databankVersion == "1.0" || databankVersion == "1.1")
             {
@@ -3695,7 +3697,8 @@ namespace Gekko
                     Program.databanks.ReplaceDatabank(databank, deserializedDatabank);
                     //readInfo.databank = deserializedDatabank;  //since this pointer is altered
                     databank = deserializedDatabank;  //since this pointer is altered
-                    databank.FileNameWithPath = originalFilePath; databank.FileNameWithPathPretty = originalFilePath;  //TODO: THE LAST MAY BE WRONG!
+                    databank.FileNameWithPath = originalFilePath;
+                    databank.FileNameWithPathPretty = originalFilePathPretty;
                 }
                 catch (Exception e)
                 {
@@ -4042,11 +4045,12 @@ namespace Gekko
         /// <param name="databank"></param>
         /// <param name="originalFilePath"></param>
         /// <param name="NaNCounter"></param>
-        private static void ReadTsd(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
+        private static void ReadTsd(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, string originalFilePathPretty, ref int NaNCounter)
         {
             bool isTsdx = false;
             //bool mergeOrTimeLimit = oRead.Merge || dates != null;
             readInfo.fileName = originalFilePath;
+            readInfo.fileNamePretty = originalFilePathPretty;
             //also deals with merging (not clearing the databank first if merging)
             ReadAllTsdRecords(file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
             readInfo.nanCounter = NaNCounter;
@@ -15864,7 +15868,7 @@ namespace Gekko
                 if (!File.Exists(zipFileWithPath)) new Error("Zip file '" + zipFileWithoutPath + "' does not seem to exist. Trying to unzip this file, because it is part of the path '" + fileNameWithPath + "'.");
                 ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
                 ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
-                string tempFileName = Globals.localTempFilesLocation + "\\" + "tempfile" + ++Globals.tempFilesCounter + ".tmp";
+                string tempFileName = Globals.localTempFilesLocation + "\\" + Globals.tempFileStart + ++Globals.tempFilesCounter + Globals.tempFileEnd;
                 if (File.Exists(tempFileName)) WaitForFileDelete(tempFileName);  //if it exists, it is from an older session, so probably easy to delete without problems
                 if (entry == null)
                 {
@@ -19183,13 +19187,29 @@ namespace Gekko
             GekkoTime tEnd = GekkoTime.tNull;            
             if (!removed.FileNameWithPath.EndsWith("." + Globals.extensionDatabank + ""))
             {
-                using (Error e = new Error())
+                string fn5 = Path.GetFileName(removed.FileNameWithPath);
+                if (fn5.StartsWith(Globals.tempFileStart) && fn5.EndsWith(Globals.tempFileEnd))
                 {
-                    e.MainAdd("The databank '" + removed.name + "' was opened with the OPEN command.");
-                    e.MainAdd("It has been altered, but the changes cannot be written back to the");
-                    e.MainAdd("underlying databank file, since this file is not a " + Globals.extensionDatabank + " file.");
-                    e.MainAdd("(If the databank was opened with OPEN<edit>, you may use WRITE to write the ");
-                    e.MainAdd("databank to file).");
+                    //a temp file representing a file unzipped from a zip file.
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("The databank '" + removed.name + "' was opened from inside a zip file ('" + removed.FileNameWithPathPretty + "').");
+                        e.MainAdd("The databank has been altered, but the changes cannot be written back to the zip file, ");
+                        e.MainAdd("because such zip files are consideres read-only.");
+                        e.MainAdd("(If the databank was opened with OPEN<edit>, you may use WRITE to write the ");
+                        e.MainAdd("databank to a normal file).");
+                    }
+                }
+                else
+                {
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("The databank '" + removed.name + "' was opened with the OPEN command.");
+                        e.MainAdd("It has been altered, but the changes cannot be written back to the");
+                        e.MainAdd("underlying databank file, since this file is not a " + Globals.extensionDatabank + " file.");
+                        e.MainAdd("(If the databank was opened with OPEN<edit>, you may use WRITE to write the ");
+                        e.MainAdd("databank to a file).");
+                    }
                 }
             }
             if (true)
