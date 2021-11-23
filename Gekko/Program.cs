@@ -5635,7 +5635,7 @@ namespace Gekko
                     ts.meta.stamp = Globals.dateStamp;                    
                     ts.SetDirty(true);
                     
-                    int offset = 0;                                        
+                    int offset = 0;                                         
 
                     ts.SetDataSequence(gt_start, gt_end, data, j * totalDatesIncludingHoles + offset);  //the last is the offset
                     ts.Trim();  //to save ram                    
