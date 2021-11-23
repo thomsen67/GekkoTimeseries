@@ -21,9 +21,9 @@ namespace Gekko
             {
                 //no reason to fail on this
             }
-            string file = Program.FindFile(o1.fileName, null, o1.p, true, true);
-            if (file == null) new Error("The file does not exist: " + o1.fileName);
-            string jsonCode = Program.GetTextFromFileWithWait(file); //also removes some kinds of funny characters
+            FindFileHelper ffh = Program.FindFile(o1.fileName, null, o1.p, true, true);
+            if (ffh.realPathAndFileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
+            string jsonCode = Program.GetTextFromFileWithWait(ffh.realPathAndFileName); //also removes some kinds of funny characters
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(o1.dbUrl);
             httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max        
             httpWebRequest.ContentType = "text/json";
@@ -223,9 +223,9 @@ namespace Gekko
             if (o1.fileName != null)
             {
                 //string input = Program.options.folder_working + "\\" + o1.fileName;     
-                string file = Program.FindFile(o1.fileName, null, o1.p, true, true);
-                if (file == null) new Error("The file does not exist: " + o1.fileName);
-                jsonCode = Program.GetTextFromFileWithWait(file); //also removes some kinds of funny characters
+                FindFileHelper ffh = Program.FindFile(o1.fileName, null, o1.p, true, true);
+                if (ffh.realPathAndFileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
+                jsonCode = Program.GetTextFromFileWithWait(ffh.realPathAndFileName); //also removes some kinds of funny characters
             }
 
             StreamWriter streamWriter = null;

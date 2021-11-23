@@ -147,6 +147,16 @@ namespace Gekko
     }
 
     /// <summary>
+    /// Helper for FindFile(). Note: uglyPathAndFileName --> the real file that may be an unzipped file put in a temp folder. May be same as prettyPathAndFileName.
+    /// Note: prettyPathAndFileName --> the pretty path that may "go through" a zip file. May be same as uglyPathAndFileName.      
+    /// </summary>
+    public class FindFileHelper
+    {
+        public string realPathAndFileName = null;    //the real file
+        public string prettyPathAndFileName = null;  //a pretty path 
+    }
+
+    /// <summary>
 	/// Class emulates long process which runs in worker thread
 	/// and makes synchronous user UI operations.
 	/// </summary>
@@ -2521,8 +2531,7 @@ namespace Gekko
                 }
 
                 string originalFileNameWithExtension =  G.AddExtension(originalFileName, "." + extension);  //just for error messages
-
-
+                
                 // ---------------------------------------------------------------------------------
                 //                  Start of categories
                 // ---------------------------------------------------------------------------------
@@ -2544,7 +2553,9 @@ namespace Gekko
                 //       name (not file name) as shown in the F2 window is readInfo.dbName
 
                 bool cancel = false;                
-                file = ReadHelper(file, ref cancel, extension, p);
+                FindFileHelper ffh = ReadHelper(file, ref cancel, extension, p);
+                file = ffh.realPathAndFileName;                
+
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
@@ -2557,7 +2568,7 @@ namespace Gekko
                 }
                 else
                 {
-                    readInfo.dbName = Path.GetFileNameWithoutExtension(file);                    
+                    readInfo.dbName = Path.GetFileNameWithoutExtension(ffh.prettyPathAndFileName);                    
                     category2_fileExists = true;
                 }
                 if (as2 != null && as2.Trim() != "*")
@@ -2612,7 +2623,6 @@ namespace Gekko
                         if (!open)
                         {
                             new Error("OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
-                            //throw new GekkoException();
                         }
                     }
                 }
@@ -2621,10 +2631,6 @@ namespace Gekko
                 if (as2 != null) readInfo.dbName = as2;
 
                 DateTime dt1 = DateTime.Now;
-
-                //bool isReadFromFile = true; //always true for READ/MULBK
-
-                //readInfo.databank = databank;
 
                 string originalFilePath = file;
 
@@ -2653,6 +2659,12 @@ namespace Gekko
                 {
                     if (copyLocal && !Globals.excelDna)
                     {
+                        //TODO
+                        //TODO
+                        //TODO copying is a waste of time if we have a zip path, no?
+                        //TODO
+                        //TODO
+
                         DateTime t0 = DateTime.Now;
                         localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
                         WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
@@ -2685,11 +2697,9 @@ namespace Gekko
                     //OPEN or READ...TO...
                     // -----------------------
 
-                    databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI, create); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
-                                        
+                    databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI, create); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                                                                
                     databank.editable = false;
                     if (oRead.openType == EOpenType.Edit) databank.editable = true;
-
                     databank.name = readInfo.dbName;
                 }
                 else
@@ -2698,7 +2708,6 @@ namespace Gekko
                     //READ/IMPORT
                     // -----------------------
 
-
                     // ----------------------
                     //READ or IMPORT, puts data into First or Ref
                     // ----------------------
@@ -2706,7 +2715,6 @@ namespace Gekko
                     if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
                     {
                         new Error("Date-truncation not yet implemented for undated frequency.");
-                        //throw new GekkoException();
                     }
                     else
                     {
@@ -2863,12 +2871,7 @@ namespace Gekko
                     databank.FileNameWithPath = databankTemp.FileNameWithPath;
 
                 }
-
-                //readInfo.startPerInFile = minYearInProtobufFile;
-                //readInfo.endPerInFile = maxYearInProtobufFile;
-                //readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
-                //readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
-
+                
                 HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty                    
 
                 if (Program.options.solve_data_create_auto == true)
@@ -3265,7 +3268,8 @@ namespace Gekko
             //do copylocal
             string fileName = o.fileName;
             fileName = G.AddExtension(fileName, ".xlsx");
-            fileName = Program.FindFile(fileName, null, o.p, true, true);
+            FindFileHelper ffh = Program.FindFile(fileName, null, o.p, true, true);
+            fileName = ffh.realPathAndFileName;
                         
             if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
@@ -7315,8 +7319,9 @@ namespace Gekko
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                string file = Program.FindFile(o.fileName, null, o.p, true, true);
-                if (file == null) new Error("The file does not exist: " + o.fileName);
+                FindFileHelper ffh = Program.FindFile(o.fileName, null, o.p, true, true);
+                string file = ffh.realPathAndFileName;
+                if (file == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
                 Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
                 Program.ROrPythonExport(o.names, o.opt_target, 0);
             }
@@ -7555,8 +7560,9 @@ namespace Gekko
             if (true)
             {
                 Globals.python_fileContent = null;
-                string file = Program.FindFile(o.fileName, null, o.p, true, true);
-                if (file == null) new Error("The file does not exist: " + o.fileName);
+                FindFileHelper ffh = Program.FindFile(o.fileName, null, o.p, true, true);
+                string file = ffh.realPathAndFileName;
+                if (file == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
                 Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file)); 
                 Program.ROrPythonExport(o.names, o.opt_target, 1);
             }
@@ -11594,8 +11600,9 @@ namespace Gekko
             if (G.Equal(o.opt_cols, "yes")) isTranspose = true;
 
             string s2 = G.AddExtension(o.fileName, "." + x);
-            string fn = Program.FindFile(s2, null, o.p, true, true);
-            if (fn == null) new Error("Could not find file '" + s2 + "'");
+            FindFileHelper ffh = Program.FindFile(s2, null, o.p, true, true);
+            string fn = ffh.realPathAndFileName;
+            if (fn == null) new Error("Could not find file '" + ffh.prettyPathAndFileName + "'");
 
             //string s = Program.GetTextFromFileWithWait(fileName_string);
 
@@ -12100,13 +12107,13 @@ namespace Gekko
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
 
-            string fileName2 = FindFile(s, folders, o.p, true, true);  //also calls CreateFullPathAndFileName()
-            //Globals.HANDLE_LIBRARY = true;
+            FindFileHelper ffh = FindFile(s, folders, o.p, true, true);  //also calls CreateFullPathAndFileName()
+            string fileName2 = ffh.realPathAndFileName;
 
             if (fileName2 == null)
             {
                 //calling RUN gekko.ini here manually will fail if the file does not exist, which is fine
-                new Error("Could not find file: " + s);
+                new Error("Could not find file: " + ffh.prettyPathAndFileName);
             }
 
             Program.RunGekkoCommands("", fileName2, (int)o.opt_skip, o.p);
@@ -14847,22 +14854,20 @@ namespace Gekko
             DateTime dt0 = DateTime.Now;
                         
             fileName = G.AddExtension(fileName, "." + type);
-
-            string fileNameSimple = fileName;
-
-            List<string> folders = new List<string>();
-            folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
-            string fileNameOriginal = fileName;
-            fileName = FindFile(fileName, folders, o.p, true, true);  //calls CreateFullPathAndFileName()
             
-            Globals.modelPathAndFileName = fileName;  //always contains a path            
-            Globals.modelFileName = Path.GetFileName(fileNameOriginal);
+            List<string> folders = new List<string>();
+            folders.Add(Program.options.folder_model); //looks here first, after looking in working folder            
+            FindFileHelper ffh = FindFile(fileName, folders, o.p, true, true);  //calls CreateFullPathAndFileName()
+            fileName = ffh.realPathAndFileName;
+
+            Globals.modelPathAndFileName = ffh.prettyPathAndFileName;  //always contains a path            
+            Globals.modelFileName = Path.GetFileName(ffh.prettyPathAndFileName);
 
             if (!File.Exists(fileName))
             {
                 using (Error e = new Error())
                 {
-                    e.MainAdd("Could not find model file '" + fileNameSimple + "'");
+                    e.MainAdd("Could not find model file '" + ffh.prettyPathAndFileName + "'");
                     //e.MainNextSection(); // "aaa                        
                     e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
                     e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
@@ -15574,13 +15579,15 @@ namespace Gekko
         /// <param name="cancel"></param>
         /// <param name="extension"></param>
         /// <returns></returns>
-        private static string ReadHelper(string fileName, ref bool cancel, string extension, P p)
+        private static FindFileHelper ReadHelper(string fileName, ref bool cancel, string extension, P p)
         {
-            string rv = null;
+            FindFileHelper ffh = new FindFileHelper();
             if (fileName == "*")
             {
                 SelectFile(extension, ref fileName, ref cancel);
                 CrossThreadStuff.SetTextInput(fileName, null);
+                ffh.realPathAndFileName = fileName;
+                ffh.prettyPathAndFileName = fileName;
             }
             else
             {                
@@ -15589,11 +15596,11 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                fileName = FindFile(fileName, folders, p, true, true);
-                //Globals.HANDLE_LIBRARY = true;
+                ffh = FindFile(fileName, folders, p, true, true);
+                fileName = ffh.realPathAndFileName;
             }
 
-            return fileName;
+            return ffh;
         }
 
         /// <summary>
@@ -15624,7 +15631,7 @@ namespace Gekko
         {
             //When called with folders == null, this is the same as CreateFullPathAndFileName(),
             //but with the difference that it returns null if the file does not exist.
-            return FindFile(fileName, folders, null, true, false);  //no P p here, since allowLibrary is false anyway
+            return FindFile(fileName, folders, null, true, false).realPathAndFileName;  //no P p here, since allowLibrary is false anyway
         }
 
         /// <summary>
@@ -15634,7 +15641,7 @@ namespace Gekko
         /// <param name="folders"></param>
         /// <param name="includeWorkingFolder"></param>
         /// <returns></returns>
-        public static string FindFile(string filenameMaybeWithoutPath, List<string> folders, P p, bool includeWorkingFolder, bool allowLibrary)
+        public static FindFileHelper FindFile(string filenameMaybeWithoutPath, List<string> folders, P p, bool includeWorkingFolder, bool allowLibrary)
         {
             // +--------------- #kja890adsfjkaas1 ------------------+
             // |                                                    |
@@ -15657,9 +15664,9 @@ namespace Gekko
             // g:\data\files.zip\sub2\zz.csv
             // \\localhost\g$\data\files.zip\sub2\zz.csv
             // ----------------------------------------------- 
-            
+
+            FindFileHelper rv = new FindFileHelper();
             bool success = false;
-            string rv_fileName = filenameMaybeWithoutPath;
             string currentLibrary = null;
             if (p != null) currentLibrary = p.GetCurrentLibrary(p.GetDepthM1());
 
@@ -15706,9 +15713,9 @@ namespace Gekko
                 {
                     new Error("The file '" + dataFileNameWithoutPath + "' was not found inside the \\data subfolder of the library '" + library.GetFileNameWithPath() + "'");
                 }
-                rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;
-                rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                if (rv_fileName != null && File.Exists(rv_fileName)) success = true;
+                rv.prettyPathAndFileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + dataFileNameWithoutPath;                 
+                rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.                
+                if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName)) success = true;
                 //NOTE: for instance if filenameMaybeWithoutPath = "library___name___lb:\zz.csv" we may get 
                 //fileNameTemp = "c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\zz.csv" because
                 //zz.csv is inside a \sub subfolder and the library "lb" is an alias from lib1.zip.                    
@@ -15728,9 +15735,9 @@ namespace Gekko
                     string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
                     if (dataFilePathInsideZip != null)
                     {
-                        rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
-                        rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                        if (rv_fileName != null && File.Exists(rv_fileName)) success = true;
+                        rv.prettyPathAndFileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
+                        rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                        if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName)) success = true;
                     }
                 }
             }
@@ -15739,9 +15746,9 @@ namespace Gekko
             {
                 //always searched first of normal files in the file system, if it is included
                 //allowed __ prefix names here.
-                rv_fileName = CreateFullPathAndFileName(filenameMaybeWithoutPath);  //will now start with g:\... or \\localhost\...                        
-                rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                if (rv_fileName != null && File.Exists(rv_fileName)) success = true;
+                rv.prettyPathAndFileName = CreateFullPathAndFileName(filenameMaybeWithoutPath);  //will now start with g:\... or \\localhost\...    
+                rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName)) success = true;
             }
 
             if (!success && Program.options.folder && folders != null)
@@ -15752,9 +15759,9 @@ namespace Gekko
                     //when folder is "", shouldn't it just skip to next? For "", the result will be the working folder...?
                     //as long as working folder is always king, this is not an issue.
                     if (string.IsNullOrWhiteSpace(folder)) continue;
-                    rv_fileName = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
-                    rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                    if (rv_fileName != null && File.Exists(rv_fileName))
+                    rv.prettyPathAndFileName = CreateFullPathAndFileNameFromFolder(filenameMaybeWithoutPath, folder);
+                    rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                    if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName))
                     {
                         success = true;
                         break; //no more searching
@@ -15781,9 +15788,9 @@ namespace Gekko
                         string dataFilePathInsideZip = null; library.GetDataFiles().TryGetValue(filenameMaybeWithoutPath, out dataFilePathInsideZip);
                         if (dataFilePathInsideZip != null)
                         {
-                            rv_fileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
-                            rv_fileName = FindFileResolveZip(rv_fileName); //Here, we swap any parts of path that passes through zip files.
-                            if (rv_fileName != null && File.Exists(rv_fileName))
+                            rv.prettyPathAndFileName = library.GetFileNameWithPath() + dataFilePathInsideZip + "\\" + filenameMaybeWithoutPath;
+                            rv.realPathAndFileName = FindFileResolveZip(rv.prettyPathAndFileName); //Here, we swap any parts of path that passes through zip files.
+                            if (rv.realPathAndFileName != null && File.Exists(rv.realPathAndFileName))
                             {
                                 success = true;
                                 break;
@@ -15791,10 +15798,10 @@ namespace Gekko
                         }
                     }
                 }
-            }        
+            }
 
-            if (!success) rv_fileName = null;  //signals failure
-            return rv_fileName;
+            if (!success) rv.realPathAndFileName = null;  //signals failure
+            return rv;
         }
 
         /// <summary>
@@ -27712,12 +27719,12 @@ namespace Gekko
                 inputFileName = Path.GetFileName(inputFileName);
             }
 
-            string fileNameTemp = FindFile(inputFileName, folders, p, true, true);
-            //Globals.HANDLE_LIBRARY = true;
+            FindFileHelper ffh = FindFile(inputFileName, folders, p, true, true);
+            string fileNameTemp = ffh.realPathAndFileName;
 
             if (fileNameTemp == null)
             {
-                string s = FileNotFoundErrorMessage(inputFileName);
+                string s = FileNotFoundErrorMessage(ffh.prettyPathAndFileName);
                 MessageBox.Show(s);
                 throw new GekkoException();
             }
@@ -27871,10 +27878,9 @@ namespace Gekko
         public class ReadInfo
         {
             public static GekkoTime tStart = GekkoTime.tNull;
-            public static GekkoTime tEnd = GekkoTime.tNull;
-            //public EReadInfoTypes type = EReadInfoTypes.Normal;
+            public static GekkoTime tEnd = GekkoTime.tNull;            
             public string fileName = null;
-            //public bool copiedIntoBaseMessage = false;
+            public string dbName = null; //internal name for the RAM databank (key in hashtable of databanks)            
             public int variables;
             public int startPerInFile = -12345;
             public int endPerInFile = -12345;
@@ -27882,7 +27888,7 @@ namespace Gekko
             public int endPerResultingBank = -12345;
             public int createdVars;
             public int nanCounter;
-            public string dbName = null; //internal name for the RAM databank (key in hashtable of databanks)
+            
             public double time = 0d;
             public Databank databank = null;
             public bool conversionMessage = false;

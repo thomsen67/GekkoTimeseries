@@ -962,8 +962,8 @@ namespace Gekko.Parser.Frm
                 //try to find it externally, look also in model path!
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_model);
-                fileNameTemp = Program.FindFile("varlist.dat", folders, p, true, true);
-                //Globals.HANDLE_LIBRARY = true;
+                FindFileHelper ffh = Program.FindFile("varlist.dat", folders, p, true, true);
+                fileNameTemp = ffh.realPathAndFileName;
                 if (fileNameTemp != null)
                 {
                     string s = Program.GetTextFromFileWithWait(fileNameTemp);  //can read an ANSI file without problems

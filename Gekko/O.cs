@@ -1805,7 +1805,8 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(G.GetProgramDir());
-            string fileName2 = Program.FindFile(s, folders, p, false, false);  //also calls CreateFullPathAndFileName()
+            FindFileHelper ffh = Program.FindFile(s, folders, p, false, false);  //also calls CreateFullPathAndFileName()
+            string fileName2 = ffh.realPathAndFileName;
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
@@ -2504,23 +2505,18 @@ namespace Gekko
         private static List ReadListFile(string varname, P p)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-            fileName = G.AddExtension(fileName, "." + "lst");
-                        
+            fileName = G.AddExtension(fileName, "." + "lst");                        
             if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
                 Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
             }
-
             List<string> folders = new List<string>();
-            string fileNameTemp = Program.FindFile(fileName, folders, p, true, true);
-
-            if (fileNameTemp == null)
+            FindFileHelper ffh = Program.FindFile(fileName, folders, p, true, true);
+            if (ffh.realPathAndFileName == null)
             {
-                new Error("Listfile " + fileName + " could not be found");
+                new Error("Listfile '" + ffh.prettyPathAndFileName + "' could not be found");
             }
-
-            List ml = GetRawListElements(fileNameTemp);
-
+            List ml = GetRawListElements(ffh.realPathAndFileName);
             return ml;
         }
 
@@ -9449,9 +9445,9 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                string file = Program.FindFile(this.fileName, null, this.p, true, true);
-                if (file == null) new Error("The file does not exist: " + this.fileName);
-                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
+                FindFileHelper ffh = Program.FindFile(this.fileName, null, this.p, true, true);
+                if (ffh.realPathAndFileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
+                Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(ffh.realPathAndFileName));
             }
         }
 

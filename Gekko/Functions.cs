@@ -3607,17 +3607,17 @@ namespace Gekko
         public static IVariable readfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
-            string file = Program.FindFile(s1, null, smpl.p, true, true);
-            if (file == null) new Error("Could not find file: " + s1);
-            string txt = Program.GetTextFromFileWithWait(file);            
+            FindFileHelper ffh = Program.FindFile(s1, null, smpl.p, true, true);
+            if (ffh.realPathAndFileName == null) new Error("Could not find file: " + s1);
+            string txt = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);            
             return new ScalarString(txt);
         }
 
         public static IVariable existfile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {            
             string s1 = O.ConvertToString(O.ReplaceSlash(x1));
-            string file = Program.FindFile(s1, null, smpl.p, true, true);
-            if (file == null) return Globals.scalarVal0;
+            FindFileHelper ffh = Program.FindFile(s1, null, smpl.p, true, true);
+            if (ffh.realPathAndFileName == null) return Globals.scalarVal0;
             return Globals.scalarVal1;
         }
 

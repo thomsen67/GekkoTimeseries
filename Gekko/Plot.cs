@@ -88,10 +88,10 @@ namespace Gekko
                 if (Program.options.plot_using != "")
                 {
                     string fileName = Program.options.plot_using;
-                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
-                    string tmp = fileName;
-                    fileName = Program.FindFile(fileName, null, pp, true, true);
-                    if (fileName == null) new Error("The file does not exist: " + tmp);
+                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);                    
+                    FindFileHelper ffh = Program.FindFile(fileName, null, pp, true, true);
+                    fileName = ffh.realPathAndFileName;
+                    if (fileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
 
                     doc1 = new XmlDocument();
                     string xmlText = Program.GetTextFromFileWithWait(fileName);
@@ -117,10 +117,10 @@ namespace Gekko
                     }
                     if (cancel) return;
 
-                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);
-                    string tmp = fileName;
-                    fileName = Program.FindFile(fileName, null, pp, true, true);
-                    if (fileName == null) new Error("The file does not exist: " + tmp);
+                    fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);                    
+                    FindFileHelper ffh = Program.FindFile(fileName, null, pp, true, true);
+                    fileName = ffh.realPathAndFileName;
+                    if (fileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
 
                     doc2 = new XmlDocument();
                     string xmlText = Program.GetTextFromFileWithWait(fileName);
