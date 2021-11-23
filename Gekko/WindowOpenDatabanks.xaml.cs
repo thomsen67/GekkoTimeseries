@@ -118,7 +118,7 @@ namespace Gekko
                 string prot = null;
                 if (databank.editable) prot = Globals.protectSymbol;
                 else prot = "";
-                list.Add(new GekkoTask(s, Program.GetDatabankFilename(databank), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
+                list.Add(new GekkoTask(s, Program.GetDatabankFilename(databank), databank.FileNameWithPathPretty, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
 
             }
             //unswap.IsEnabled = Program.AreDatabanksSwapped();

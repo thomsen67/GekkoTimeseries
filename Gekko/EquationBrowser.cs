@@ -228,8 +228,8 @@ namespace Gekko
             GekkoTime print_start = new GekkoTime(EFreq.A, G.IntParse(settings_print_start), 1);
             GekkoTime print_end = new GekkoTime(EFreq.A, G.IntParse(settings_print_end), 1);
 
-            string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPath);
-            string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
+            string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPathPretty);
+            string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPathPretty);
 
             List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError, true) as List;
             List<string> vars = Stringlist.GetListOfStringsFromIVariable(ml);

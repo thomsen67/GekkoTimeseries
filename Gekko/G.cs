@@ -1710,7 +1710,7 @@ namespace Gekko
         /// <param name="originalDatabank"></param>                
         public static void CloneDatabank(Databank newDatabank, Databank originalDatabank)
         {
-            newDatabank.FileNameWithPath = originalDatabank.FileNameWithPath;
+            newDatabank.FileNameWithPath = originalDatabank.FileNameWithPath; newDatabank.FileNameWithPathPretty = originalDatabank.FileNameWithPathPretty;
             newDatabank.yearStart = originalDatabank.yearStart;
             newDatabank.yearEnd = originalDatabank.yearEnd;
             newDatabank.info1 = originalDatabank.info1;

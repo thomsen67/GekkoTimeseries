@@ -6796,7 +6796,7 @@ namespace Gekko
                     if (isTo)
                     {
                         readInfo.open = true;
-                        if (readTo != null && readTo == "*") readTo = Path.GetFileNameWithoutExtension(readInfo.fileName);
+                        if (readTo != null && readTo == "*") readTo = Path.GetFileNameWithoutExtension(readInfo.fileNamePretty);
                         readInfo.dbName = readTo;
                     }
 

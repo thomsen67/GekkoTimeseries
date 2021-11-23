@@ -1383,7 +1383,7 @@ namespace Gekko
         {
             //handles databank versions 1.0 and 1.1
 
-            readInfo.fileName = originalFilePath;
+            readInfo.fileName = originalFilePath; readInfo.fileNamePretty = originalFilePath;  //TODO: is the last right?
 
             int type = -12345;
             string file2 = null;

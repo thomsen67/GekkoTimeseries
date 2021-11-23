@@ -35,6 +35,15 @@ namespace Gekko
         [ProtoMember(1)]
         public GekkoDictionary<string, IVariable> storage;
         public string name = null;
+
+        //TODO:
+        //TODO:
+        //TODO: For now, these fileNameWithPath are a bit of a mess. In Gekko 4.0, clean it up.
+        //TODO: But in general, FileNameWithPath may be a link to a temp file, whereas
+        //TODO: FileNameWithPathPretty should "go through" zip paths etc. Beware that
+        //TODO: FileNameWithPath is used for MD5.
+        //TODO:
+        //TODO:
         private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
         public string FileNameWithPath
         {
@@ -68,6 +77,41 @@ namespace Gekko
                 }
             }
         }
+
+        private string fileNameWithPathPretty = null;  //will be constructed when reading: do not protobuf it        
+        public string FileNameWithPathPretty
+        {
+            //?????????
+            //?????????
+            //????????? Could this be avoided by means of testing boolean open == true/false, in Program.OpenOrRead()?
+            //?????????
+            //?????????
+            get
+            {
+                return this.fileNameWithPathPretty;
+            }
+            set
+            {
+                if (G.Equal(this.name, Globals.Work) || G.Equal(this.name, Globals.Ref))
+                {
+                    this.fileNameWithPathPretty = value;  //overwrite filename with latest bank read or merged into Work/Ref
+                }
+                else
+                {
+                    //If the bank is not Work or Ref, it must have been opened with OPEN
+                    //If there is no filename, put it in. But if there is a filename already, always keep it.
+                    //  This may happen in the IMPORT here: OPEN<edit>bank; IMPORT<xlsx>data;
+                    //  An IMPORT or READ statement should not alter the filename.
+                    if (this.fileNameWithPathPretty == null) this.fileNameWithPathPretty = value;
+                    else
+                    {
+                        //do nothing, keep the first filename encountered. This is the filename that the OPEN databank
+                        //is tied to, and that it will be trying to write to when the bank is closed.
+                    }
+                }
+            }
+        }
+
         public bool save = true;  //Don't use protobuffer on this field.
         public int yearStart = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        
         public int yearEnd = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        

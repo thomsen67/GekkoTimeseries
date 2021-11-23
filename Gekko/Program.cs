@@ -2641,7 +2641,7 @@ namespace Gekko
 
                 bool copyLocal = Program.options.databank_file_copylocal;
 
-                readInfo.fileName = file;
+                readInfo.fileName = file; readInfo.fileNamePretty = ffh.prettyPathAndFileName;
 
                 Databank databank = null;
 
@@ -2868,7 +2868,7 @@ namespace Gekko
                         }
 
                     }
-                    databank.FileNameWithPath = databankTemp.FileNameWithPath;
+                    databank.FileNameWithPath = databankTemp.FileNameWithPath; databank.FileNameWithPathPretty = databankTemp.FileNameWithPathPretty;
 
                 }
                 
@@ -2949,7 +2949,7 @@ namespace Gekko
 
                 databank.info1 = readInfo.info1;
                 databank.date = readInfo.date;
-                databank.FileNameWithPath = readInfo.fileName;
+                databank.FileNameWithPath = readInfo.fileName; databank.FileNameWithPathPretty = readInfo.fileNamePretty;
 
                 if (open)
                 {
@@ -2980,7 +2980,7 @@ namespace Gekko
                     if (category3_createBrandNew)
                     {
                         databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
-                        databank.FileNameWithPath = Program.CreateFullPathAndFileName(originalFileNameWithExtension);
+                        databank.FileNameWithPath = Program.CreateFullPathAndFileName(originalFileNameWithExtension); databank.FileNameWithPathPretty = ffh.prettyPathAndFileName;
                     }
                     else
                     {
@@ -3695,7 +3695,7 @@ namespace Gekko
                     Program.databanks.ReplaceDatabank(databank, deserializedDatabank);
                     //readInfo.databank = deserializedDatabank;  //since this pointer is altered
                     databank = deserializedDatabank;  //since this pointer is altered
-                    databank.FileNameWithPath = originalFilePath;
+                    databank.FileNameWithPath = originalFilePath; databank.FileNameWithPathPretty = originalFilePath;  //TODO: THE LAST MAY BE WRONG!
                 }
                 catch (Exception e)
                 {
@@ -6729,7 +6729,7 @@ namespace Gekko
             string fileName = "[no bank filename]";
             if (bank != null)
             {
-                fileName = bank.FileNameWithPath;
+                fileName = bank.FileNameWithPathPretty;
             }
             return fileName;
         }
@@ -18844,14 +18844,14 @@ namespace Gekko
                 if (G.Equal(o.opt_first, "yes"))
                 {
                     Program.databanks.GetFirst().Clear();
-                    if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
-                    G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().name + "')");
+                    if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) { Program.databanks.GetFirst().FileNameWithPath = null; Program.databanks.GetFirst().FileNameWithPathPretty = null; }
+                        G.Writeln2("Cleared first databank ('" + Program.databanks.GetFirst().name + "')");
                 }
                 if (G.Equal(o.opt_ref, "yes"))
                 {
                     Program.databanks.GetRef().Clear();
-                    if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
-                    G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().name + "')");
+                    if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) { Program.databanks.GetRef().FileNameWithPath = null; Program.databanks.GetRef().FileNameWithPathPretty = null; }
+                        G.Writeln2("Cleared ref databank ('" + Program.databanks.GetRef().name + "')");
                 }
 
                 if (!G.Equal(o.opt_first, "yes") && !G.Equal(o.opt_ref, "yes"))
@@ -18859,9 +18859,9 @@ namespace Gekko
                     //Before: Cleared 'Work' and 'Ref' regardless of position
                     Program.databanks.GetFirst().Clear();
                     Program.databanks.GetRef().Clear();
-                    if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) Program.databanks.GetFirst().FileNameWithPath = null;
-                    if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) Program.databanks.GetRef().FileNameWithPath = null;
-                    G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().name + "' and '" + Program.databanks.GetRef().name + "')");
+                    if (Program.databanks.GetFirst().name == Globals.Work || Program.databanks.GetFirst().name == Globals.Ref) { Program.databanks.GetFirst().FileNameWithPath = null; Program.databanks.GetFirst().FileNameWithPathPretty = null; }
+                    if (Program.databanks.GetRef().name == Globals.Work || Program.databanks.GetRef().name == Globals.Ref) { Program.databanks.GetRef().FileNameWithPath = null; Program.databanks.GetRef().FileNameWithPathPretty = null; }
+                        G.Writeln2("Cleared first and ref databanks ('" + Program.databanks.GetFirst().name + "' and '" + Program.databanks.GetRef().name + "')");
                 }
             }
             else
@@ -18886,7 +18886,7 @@ namespace Gekko
 
                         Databank db1 = Program.databanks.GetDatabank(name);
                         db1.Clear();
-                        if (db1.name == Globals.Work || db1.name == Globals.Ref) db1.FileNameWithPath = null;
+                        if (db1.name == Globals.Work || db1.name == Globals.Ref) { db1.FileNameWithPath = null; db1.FileNameWithPathPretty = null; }
                         G.Writeln2("Cleared databank: " + name);
                     }
                     
@@ -18950,8 +18950,8 @@ namespace Gekko
             Program.databanks.local.Clear();
             Program.databanks.global.Clear();
             Program.databanks.localGlobal = new LocalGlobal();     
-            w2.FileNameWithPath = null;
-            b2.FileNameWithPath = null;
+            w2.FileNameWithPath = null; w2.FileNameWithPathPretty = null;
+            b2.FileNameWithPath = null; b2.FileNameWithPathPretty = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
 
             string resetRestartFirstLine = null;
@@ -27688,7 +27688,7 @@ namespace Gekko
         /// <returns></returns>
         public static string GetDatabankFilename(Databank databank)
         {
-            return System.IO.Path.GetFileName(databank.FileNameWithPath);
+            return System.IO.Path.GetFileName(databank.FileNameWithPathPretty);
         }
         
         /// <summary>
@@ -27742,7 +27742,7 @@ namespace Gekko
             Databank secondary = Program.databanks.GetRef();
             secondary.Clear();
             G.CloneDatabank(secondary, first);
-            secondary.FileNameWithPath = first.FileNameWithPath;
+            secondary.FileNameWithPath = first.FileNameWithPath; secondary.FileNameWithPathPretty = first.FileNameWithPathPretty;
         }
 
         /// <summary>
@@ -27880,6 +27880,7 @@ namespace Gekko
             public static GekkoTime tStart = GekkoTime.tNull;
             public static GekkoTime tEnd = GekkoTime.tNull;            
             public string fileName = null;
+            public string fileNamePretty = null;
             public string dbName = null; //internal name for the RAM databank (key in hashtable of databanks)            
             public int variables;
             public int startPerInFile = -12345;
@@ -27913,25 +27914,25 @@ namespace Gekko
 
             public void Print()
             {
-                string fileNameWithPath = null;
-                string fileNameWithoutPath = null;
-                string fileNameName = null;
-                string fileNameExtension = null;
+                string fileNameWithPathPretty = null;
+                string fileNameWithoutPathPretty = null;
+                string fileNameNamePretty = null;
+                string fileNameExtensionPretty = null;
                 if (this.fileName != null)
                 {
-                    fileNameWithPath = this.fileName;
-                    fileNameWithoutPath = Path.GetFileNameWithoutExtension(this.fileName);
-                    fileNameName = Path.GetFileName(this.fileName);
-                    fileNameExtension = Path.GetExtension(this.fileName);                    
+                    fileNameWithPathPretty = this.fileNamePretty;
+                    fileNameWithoutPathPretty = Path.GetFileNameWithoutExtension(this.fileNamePretty);
+                    fileNameNamePretty = Path.GetFileName(this.fileNamePretty);
+                    fileNameExtensionPretty = Path.GetExtension(this.fileNamePretty);                    
                 }
                 else
                 {
                     if (Globals.excelDna)
                     {
-                        fileNameWithPath = "[Gekcel]";
-                        fileNameWithoutPath = "[Gekcel]";
-                        fileNameName = "[Gekcel]";
-                        fileNameExtension = "[xlsx]";
+                        fileNameWithPathPretty = "[Gekcel]";
+                        fileNameWithoutPathPretty = "[Gekcel]";
+                        fileNameNamePretty = "[Gekcel]";
+                        fileNameExtensionPretty = "[xlsx]";
                     }
                 }
 
@@ -27945,8 +27946,8 @@ namespace Gekko
                 string date = this.date;
                 if (date == null || date == "" || date == strange) date = "[empty]";
                 string ext = "";
-                if (fileNameExtension.ToLower() == "bnk") ext = ".bnk";
-                tab.CurRow.SetText(1, "DATABANK " + fileNameWithoutPath);                
+                if (fileNameExtensionPretty.ToLower() == "bnk") ext = ".bnk";
+                tab.CurRow.SetText(1, "DATABANK " + fileNameWithoutPathPretty);                
                 tab.CurRow.SetBottomBorder(1, 1);
                 tab.CurRow.Next();
                 tab.CurRow.SetText(1, "Info     : " + info);
@@ -27955,10 +27956,10 @@ namespace Gekko
                 tab.CurRow.Next();
                 if (open)
                 {
-                    tab.CurRow.SetText(1, "Open     : Opened " + fileNameName + " as '" + this.dbName + "'");
+                    tab.CurRow.SetText(1, "Open     : Opened " + fileNameNamePretty + " as '" + this.dbName + "'");
                     tab.CurRow.Next();
                 }
-                tab.CurRow.SetText(1, "File     : " + fileNameWithPath + " " + this.databankVersion);
+                tab.CurRow.SetText(1, "File     : " + fileNameWithPathPretty + " " + this.databankVersion);
                 tab.CurRow.Next();
 
                 string i1, i2; GetYearPeriod(this.startPerInFile, this.endPerInFile, out i1, out i2);

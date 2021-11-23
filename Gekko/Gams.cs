@@ -1356,7 +1356,7 @@ namespace Gekko
             readInfo.startPerResultingBank = readInfo.startPerInFile;
             readInfo.endPerResultingBank = readInfo.endPerInFile;
 
-            databank.FileNameWithPath = readInfo.fileName;
+            databank.FileNameWithPath = readInfo.fileName; databank.FileNameWithPathPretty = readInfo.fileNamePretty;
 
             //TODO: Maybe only do this on the gdx variables if possible
             //Anyway, the speed penalty is small anyway.

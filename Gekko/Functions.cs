@@ -810,7 +810,7 @@ namespace Gekko
             string y2 = x2.ConvertToString();
             if (G.Equal(y2, "fullpath"))
             {
-                rv = db.FileNameWithPath;
+                rv = db.FileNameWithPathPretty;
             }
             else
             {
