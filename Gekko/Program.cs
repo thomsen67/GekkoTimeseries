@@ -3269,7 +3269,7 @@ namespace Gekko
                         
             if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
             {
-                Globals.datopgek_errors.Add("SHEET<import> used this file: " + fileName);
+                Globals.datopgek_errors.Add("SHEET<import> used this file: " + o.fileName);
             }
 
             EDataFormat fileType = EDataFormat.Xlsx;
@@ -12107,7 +12107,6 @@ namespace Gekko
             {
                 //calling RUN gekko.ini here manually will fail if the file does not exist, which is fine
                 new Error("Could not find file: " + s);
-                //throw new GekkoException();
             }
 
             Program.RunGekkoCommands("", fileName2, (int)o.opt_skip, o.p);
@@ -14853,63 +14852,24 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
+            string fileNameOriginal = fileName;
             fileName = FindFile(fileName, folders, o.p, true, true);  //calls CreateFullPathAndFileName()
-            //Globals.HANDLE_LIBRARY = true;
-
-            Globals.modelPathAndFileName = fileName;  //always contains a path
-            Globals.modelFileName = Path.GetFileName(Globals.modelPathAndFileName);
+            
+            Globals.modelPathAndFileName = fileName;  //always contains a path            
+            Globals.modelFileName = Path.GetFileName(fileNameOriginal);
 
             if (!File.Exists(fileName))
             {
-                if (false && Globals.runningOnTTComputer)
+                using (Error e = new Error())
                 {
-                    using (Error e = new Error())
-                    {
-                        for (int i = 0; i < 3; i++)  //test scrolling behavior
-                        {
-                            e.MainAdd("Could not find model file '" + fileNameSimple + "'");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainNewLine(); // "aaa
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainNewLine(); // "aaa
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainNewLine(); // "aaa
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MainAdd("lkajdsf kladfj lkafj adskljf adsklfj asklfj dasklfj adsklfj dasklf");
-                            e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                            e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                            e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
-                            e.MoreNewLine();
-                            e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                            e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                            e.MoreNewLine();
-                            e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                            e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                            e.MoreNewLine();
-                            e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                            e.MoreAdd("lajkdf kalsdfj adklfj adsklfj adskljf adsklf adsklfj adsklfj adsklfj adsklfj adsklfj ");
-                        }
-                    }
+                    e.MainAdd("Could not find model file '" + fileNameSimple + "'");
+                    //e.MainNextSection(); // "aaa                        
+                    e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
+                    e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
+                    e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
+                    //e.MoreNextSection();
                 }
-                else
-                {
-                    using (Error e = new Error())
-                    {
-                        e.MainAdd("Could not find model file '" + fileNameSimple + "'");                        
-                        //e.MainNextSection(); // "aaa                        
-                        e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
-                        e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
-                        e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
-                        //e.MoreNextSection();
-                    }
-                }
+
             }
 
             string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$

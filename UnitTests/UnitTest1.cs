@@ -13677,50 +13677,6 @@ namespace UnitTests
             for (int i = 0; i < 2; i++)
             {
 
-                //MOVE THIS TO END!!
-
-                if (i == 0) Program.Flush(); //wipes out existing cached libs
-                I("reset;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-                I("library lib3;");
-                I("%x = lib3:f1();");
-                _AssertScalarString(First(), "%x", "abcde\r\nedcba\r\n");  //first from lib3.zip/data, next from lib4.zip/data
-
-                if (i == 0) Program.Flush(); //wipes out existing cached libs
-                I("reset;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
-                I("library lib2;");
-                I("%x = f1();");
-                _AssertScalarVal(First(), "%x", 10d);
-                I("f1;");
-                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
-                I("f2;");
-                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);  //command file has no 
-                I("f3;");
-                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
-
-                I("function val hundred1(); return 100; end;");  //library version returns 200                                
-                I("function val hundred2(); return -100; end;");                
-                I("%y1 = call_hundred1();");
-                _AssertScalarVal(First(), "%y1", 200d);  //this or no this has no significance
-                FAIL("%y2 = call_hundred2();");          //cannot access the version from Local, because this:hundred2() is used in lib2:call_hundred2().
-                I("function val call_hundred3(); return this:hundred2(); end;");
-                I("%y3 = call_hundred3();");          //translates the this: as Local:
-                _AssertScalarVal(First(), "%y3", -100d);  //this or no this has no significance
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 // ------------------------------------------------------------
                 // normal function
                 // ------------------------------------------------------------                                    
@@ -13945,9 +13901,57 @@ namespace UnitTests
                 I("%y12 = lib1:h3();");
                 _AssertScalarString(First(), "%y12", "; 2015; 2016;\r\nx; 2; 3;\r\n");
 
-                // ----------------------------------------------------------------
+                // ----- testing more complicated stuff, masking ------------------------------
 
-               
+                //Testing that when calling a gcm file, all context regarding 
+                //library is lost, even if the gcm is called from a function.
+                //So a library gcm has no sense of where it is called from (from which library).
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library lib7;");
+                I("function string g(); return 'abcde'; end;");
+                Globals.unitTestScreenOutput = new StringBuilder();
+                I("f1();");  //" 12"
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 12.0000"));
+                Globals.unitTestScreenOutput = new StringBuilder();
+                I("f1;");  //" 112"
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("112.0000"));
+                Globals.unitTestScreenOutput = new StringBuilder();
+                I("ff1();");  //"abcde"
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("abcde"));
+                Globals.unitTestScreenOutput = new StringBuilder();
+                I("ff1;");  //"edcba"
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("edcba"));
+
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library lib3;");
+                I("%x = lib3:f1();");
+                _AssertScalarString(First(), "%x", "abcde\r\nedcba\r\n");  //first from lib3.zip/data, next from lib4.zip/data
+
+                if (i == 0) Program.Flush(); //wipes out existing cached libs
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
+                I("library lib2;");
+                I("%x = f1();");
+                _AssertScalarVal(First(), "%x", 10d);
+                I("f1;");
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
+                I("f2;");
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 5d);  //command file has no 
+                I("f3;");
+                _AssertScalarVal(Program.databanks.GetGlobal(), "%rv", 10d);
+
+                I("function val hundred1(); return 100; end;");  //library version returns 200                                
+                I("function val hundred2(); return -100; end;");
+                I("%y1 = call_hundred1();");
+                _AssertScalarVal(First(), "%y1", 200d);  //this or no this has no significance
+                FAIL("%y2 = call_hundred2();");          //cannot access the version from Local, because this:hundred2() is used in lib2:call_hundred2().
+                I("function val call_hundred3(); return this:hundred2(); end;");
+                I("%y3 = call_hundred3();");          //translates the this: as Local:
+                _AssertScalarVal(First(), "%y3", -100d);  //this or no this has no significance
 
             }
         }
