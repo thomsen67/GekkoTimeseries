@@ -24451,7 +24451,7 @@ print(df2)
                 _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
             }
 
-            if (true)
+            if (Globals.fixPxDim)
             {
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px';");

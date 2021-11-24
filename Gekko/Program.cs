@@ -5333,7 +5333,10 @@ namespace Gekko
                             int x = -12345;
 
                             if (Globals.fixPxDim)
-                            {                                   
+                            {
+                                int jj5 = 0;
+                                int factor = 1;
+                                if (foundNumberOfDataInPxFile > 0) indexes[codesIncludingTime.Count - 1]++;
                                 for (int i = codesIncludingTime.Count - 1; i >= 0; i--)
                                 {                                    
                                     if (indexes[i] >= codesIncludingTime[i].Count)
@@ -5341,19 +5344,24 @@ namespace Gekko
                                         indexes[i - 1] += indexes[i] / codesIncludingTime[i].Count;
                                         indexes[i] = indexes[i] % codesIncludingTime[i].Count;
                                     }
+                                    if (i != timeDimensionIncodesIncludingTime)
+                                    {
+                                        jj5 += factor * indexes[i];
+                                        factor = factor * codesIncludingTime[i].Count;
+                                    }
                                 }
                                 string s5 = foundNumberOfDataInPxFile + "       ";
                                 for (int i = 0; i < codesIncludingTime.Count; i++)
                                 {
                                     s5 += indexes[i] + ", ";
                                 }
-                                new Writeln(s5);
-                                indexes[codesIncludingTime.Count - 1]++;  //prepare for next
-                                int timeIndex = indexes[timeDimensionIncodesIncludingTime];
+                                                  
+                                int ii5 = indexes[timeDimensionIncodesIncludingTime];
                                 int holesii5 = 0;
-                                if (holes != null) holesii5 = holes[timeIndex];
+                                if (holes != null) holesii5 = holes[ii5];
+                                x = ii5 + holesii5 + jj5 * totalDatesIncludingHoles;
 
-                                x = timeIndex + holesii5 + jj * totalDatesIncludingHoles;
+                                new Writeln(s5 + " --> " + x);
                             }
                             else
                             {
@@ -5530,7 +5538,7 @@ namespace Gekko
 
                     if (hasSeenTimeDefinition)
                     {
-                        using (Error txt = new Error())
+                        using (Warning txt = new Warning())
                         {
                             txt.MainAdd("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
                             txt.MainAdd("If the px file originates from a {a{DOWNLOAD¤download.htm}a}, please put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.");
