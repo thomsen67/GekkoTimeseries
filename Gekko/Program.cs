@@ -5291,6 +5291,7 @@ namespace Gekko
                             }
                             temp.Insert(timeDimensionIncodesIncludingTime, "tid");
                             codesHeader2 = temp;
+                            codes.Insert(timeDimensionIncodesIncludingTime, null);
                         }
 
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
@@ -5873,7 +5874,7 @@ namespace Gekko
             {   
 
                 //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
-                if (depth > codes.Count - 0)
+                if (depth > codes.Count - 1)
                 {
                     if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
                     if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
