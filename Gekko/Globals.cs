@@ -46,7 +46,7 @@ namespace Gekko
         public const string tempFileEnd = ".tmp";
         public const string zip = ".zip";
 
-        public const bool pxAllowAnyTimeDimensionIndex = true;
+        public const bool pxAllowAnyTimeDimensionIndex = true; 
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
