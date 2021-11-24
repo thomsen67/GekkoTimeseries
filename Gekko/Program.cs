@@ -5138,7 +5138,11 @@ namespace Gekko
 
             List<string> codesHeader = new List<string>();
             List<List<string>> codes = new List<List<string>>();
+            List<List<string>> codesIncludingTime = new List<List<string>>();
             List<List<string>> values = new List<List<string>>();
+
+            int timeDimensionIncodesIncludingTime = -12345;
+            int[] indexes = null;
 
             //int counter = 0;
             string codeTimeString = "CODES(\"tid\")=";
@@ -5246,7 +5250,7 @@ namespace Gekko
                 if (state == 1)
                 {
                     //state=1, handle the data and convert it from strings to real numbers (double)   
-
+                    
                     if (!hasSeenTimeDefinition)
                     {
                         string extra = " If the px file originates from a {a{DOWNLOAD¤download.htm}a}, make sure to include a \"code\": \"tid\" or \"code\": \"time\" field last in your .json file.";                        
@@ -5255,6 +5259,8 @@ namespace Gekko
 
                     if (firstLine)
                     {
+                        indexes = new int[codesIncludingTime.Count];
+
                         int totalHoles = 0;
                         if (holes != null) totalHoles = holes[holes.Count - 1];
                         totalDatesIncludingHoles = dates.Count + totalHoles;
@@ -5324,11 +5330,41 @@ namespace Gekko
                             int holesii = 0;
                             if (holes != null) holesii = holes[ii];
 
-                            if (ii + holesii + jj * totalDatesIncludingHoles >= data.Length)
+                            int x = -12345;
+
+                            if (Globals.fixPxDim)
+                            {                                   
+                                for (int i = codesIncludingTime.Count - 1; i >= 0; i--)
+                                {                                    
+                                    if (indexes[i] >= codesIncludingTime[i].Count)
+                                    {                                        
+                                        indexes[i - 1] += indexes[i] / codesIncludingTime[i].Count;
+                                        indexes[i] = indexes[i] % codesIncludingTime[i].Count;
+                                    }
+                                }
+                                string s5 = foundNumberOfDataInPxFile + "       ";
+                                for (int i = 0; i < codesIncludingTime.Count; i++)
+                                {
+                                    s5 += indexes[i] + ", ";
+                                }
+                                new Writeln(s5);
+                                indexes[codesIncludingTime.Count - 1]++;  //prepare for next
+                                int timeIndex = indexes[timeDimensionIncodesIncludingTime];
+                                int holesii5 = 0;
+                                if (holes != null) holesii5 = holes[timeIndex];
+
+                                x = timeIndex + holesii5 + jj * totalDatesIncludingHoles;
+                            }
+                            else
+                            {
+                                x = ii + holesii + jj * totalDatesIncludingHoles;
+                            }
+
+                            if (x >= data.Length)
                             {
                                 new Error("More than " + data.Length + " (= " + codesCombi.Count + " x " + totalDatesIncludingHoles + ") numbers found in data section");
-                            }
-                            data[ii + holesii + jj * totalDatesIncludingHoles] = value;  //ii is date, jj is variable
+                            }                            
+                            data[x] = value;  //ii is date, jj is variable
                             foundNumberOfDataInPxFile++;
 
                             //ii counts dates as they are. If dates are 2021m1d7, 2020m2d8, 2020m2d11, 2020m2d12
@@ -5480,6 +5516,8 @@ namespace Gekko
                             gt_before = gt;
                         }
                     }
+                    codesIncludingTime.Add(new List<string>(ss));
+                    timeDimensionIncodesIncludingTime = codesIncludingTime.Count - 1;
                 }
                 else if (state == 3)
                 {
@@ -5495,7 +5533,7 @@ namespace Gekko
                         using (Error txt = new Error())
                         {
                             txt.MainAdd("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
-                            txt.MainAdd("If the px file originates from a { a{ DOWNLOAD¤download.htm} a}, please put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.");
+                            txt.MainAdd("If the px file originates from a {a{DOWNLOAD¤download.htm}a}, please put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.");
                             txt.MoreAdd("If the requirement that .px files must have time as the last element (dimension) is annoying, please contact the Gekko editor. This would be easy to fix, but for now the requirement has its advantages regarding .px reading (faster speed and less memory usage, because Gekko timeseries data are aligned in the time dimension). So the requirement may pay off in the long run, if people start to download really large tables, where it would be beneficial that the px data are aligned in the time dimension.");
                             txt.MoreNewLine();
                             txt.MoreAdd("If an existing .json file causes problems due to the time dimension not being stated as the last dimension, you can simply move the time section in the .json file so that it becomes the last of the codes.");                            
@@ -5546,6 +5584,7 @@ namespace Gekko
                         //throw new GekkoException();
                     }
                     codes.Add(names2);
+                    codesIncludingTime.Add(names2);
                 }
                 else if (state == 4)
                 {
@@ -5610,6 +5649,12 @@ namespace Gekko
                 s5 = s5 + dates.Count;  //number of dates will be shown last here
                 numberOfDataPointsWarning = "Beware: expected " + s5 + " = " + expectedNumberOfDataInPxFile + " data points in px file, got " + foundNumberOfDataInPxFile;
             }
+
+            // ==================== putting into timeseries =============================
+            // ==================== putting into timeseries =============================
+            // ==================== putting into timeseries =============================
+            // ==================== putting into timeseries =============================
+            // ==================== putting into timeseries =============================
 
             if (isArray)
             {
