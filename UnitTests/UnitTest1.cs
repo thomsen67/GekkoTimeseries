@@ -8228,40 +8228,37 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank0.json;");
+            Helper_AssertPx(false);
 
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 1, 149.9000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 2, 149.9000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 3, 151.5000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 4, 150.4000d, sharedDelta);
+            //Time not last dimension here
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank1.json;");
+            Helper_AssertPx(false);
 
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 1, 0d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 2, 0d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 3, 1.1000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 4, -0.7000d, sharedDelta);
+            //Time not last dimension here
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank2.json;");
+            Helper_AssertPx(false);
 
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 1, 6.8000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 2, 5.8000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 3, 6.3000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 4, 4.6000d, sharedDelta);
-            
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 1, 114.7000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 2, 114.5000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 3, 114.6000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 4, 115.5000d, sharedDelta);
+            //with time holes
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank0a.json;");
+            Helper_AssertPx(true);
 
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 1, 0.9000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 2, -0.2000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 3, 0.1000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 4, 0.8000d, sharedDelta);
+            //Time not last dimension here, with time holes
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank1a.json;");
+            Helper_AssertPx(true);
 
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 1, 5.2000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 2, 6.0000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 3, 5.5000d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 4, 5.2000d, sharedDelta);
-
-
-
-
+            //Time not last dimension here, with time holes
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank2a.json;");
+            Helper_AssertPx(true);
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
@@ -8289,8 +8286,44 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("option freq w;");
             I("time 2020 2021;");
-            I("DOWNLOAD 'https://api.statbank.dk/v1/data' eksp02.json;");            
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' eksp02.json;");
             _AssertSeries(First(), "eksp02_BNOEGLE_30!w", EFreq.W, 2020, 1, 12158d, sharedDelta);
+        }
+
+        private static void Helper_AssertPx(bool holes)
+        {
+            double d = 1d;
+            if (holes) d = double.NaN;
+
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 1, 149.9000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 2, 149.9000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 3, 151.5000d * d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2012, 4, 150.4000d, sharedDelta);
+
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 1, 0d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 2, 0d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 3, 1.1000d * d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_200!m", EFreq.M, 2012, 4, -0.7000d, sharedDelta);
+
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 1, 6.8000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 2, 5.8000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 3, 6.3000d * d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011100_enhed_300!m", EFreq.M, 2012, 4, 4.6000d, sharedDelta);
+
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 1, 114.7000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 2, 114.5000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 3, 114.6000d * d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2012, 4, 115.5000d, sharedDelta);
+
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 1, 0.9000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 2, -0.2000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 3, 0.1000d * d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_200!m", EFreq.M, 2012, 4, 0.8000d, sharedDelta);
+
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 1, 5.2000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 2, 6.0000d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 3, 5.5000d * d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGR_011200_enhed_300!m", EFreq.M, 2012, 4, 5.2000d, sharedDelta);
         }
 
         [TestMethod]
