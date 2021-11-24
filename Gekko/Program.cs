@@ -5369,18 +5369,11 @@ namespace Gekko
                                         factor = factor * codesIncludingTime[i].Count;
                                     }
                                 }
-                                //string s5 = foundNumberOfDataInPxFile + "       ";
-                                //for (int i = 0; i < codesIncludingTime.Count; i++)
-                                //{
-                                //    s5 += indexes[i] + ", ";
-                                //}
-                                                  
+                                
                                 int ii5 = indexes[timeDimensionIncodesIncludingTime];
                                 int holesii5 = 0;
                                 if (holes != null) holesii5 = holes[ii5];
                                 x = ii5 + holesii5 + jj5 * totalDatesIncludingHoles;
-
-                                //new Writeln(s5 + " --> " + x);
                             }
                             else
                             {
