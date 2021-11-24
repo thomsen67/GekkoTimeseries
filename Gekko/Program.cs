@@ -5384,9 +5384,18 @@ namespace Gekko
                             if (x >= data.Length)
                             {
                                 new Error("More than " + data.Length + " (= " + codesCombi.Count + " x " + totalDatesIncludingHoles + ") numbers found in data section");
-                            }                            
+                            }
+
+                            if (!double.IsNaN(data[x]))
+                            {
+                                //Cannot overwrite already existing value --> in that case we have a bug
+                                //This check is fast, in principle there is the problem of a position being actively filled with a NaN from the px, but never mind. This catches gross problems.
+                                //The check can be removed at some point, for instance in 2024. But maybe just keep it for safety.
+                                new Error("Something went wrong regarding .px file reading. Technical detail: the element data[" + x + "] already has a value that cannot be overwritten.");
+                            }
+
                             data[x] = value;  //ii is date, jj is variable
-                            foundNumberOfDataInPxFile++;
+                            foundNumberOfDataInPxFile++;                            
 
                             //ii counts dates as they are. If dates are 2021m1d7, 2020m2d8, 2020m2d11, 2020m2d12
                             //ii will be 0, 1, 2, 3 here.
