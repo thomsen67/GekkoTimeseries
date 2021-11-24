@@ -5112,7 +5112,9 @@ namespace Gekko
         /// Read the .px data file format (used by Statistics Denmark and others)
         /// </summary>
         public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out string numberOfDataPointsWarning, out GekkoTime perStart, out GekkoTime perEnd)
-        {            
+        {
+            bool pxAllowAnyTimeDimensionIndex = false;  //starts out false. May become true if time dimension is not last
+
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
 
             bool hyphenFound = false;
@@ -5253,8 +5255,7 @@ namespace Gekko
                     
                     if (!hasSeenTimeDefinition)
                     {
-                        string extra = " If the px file originates from a {a{DOWNLOAD¤download.htm}a}, make sure to include a \"code\": \"tid\" or \"code\": \"time\" field last in your .json file.";                        
-                        new Error("It does not seem that the px file contains a time dimension, since CODES(\"tid\") or CODES(\"time\") does not seem to be present." + extra);
+                        new Error("It does not seem that the px file contains a time dimension, since CODES(\"tid\") or CODES(\"time\") does not seem to be present. If the px file originates from a {a{DOWNLOAD¤download.htm}a}, make sure to include a \"code\": \"tid\" or \"code\": \"time\" field last in your .json file.");
                     }
 
                     if (firstLine)
@@ -5275,7 +5276,7 @@ namespace Gekko
                             codesHeader2.Add("TID");  //will be removed again below!
                         }
 
-                        if (Globals.pxAllowAnyTimeDimensionIndex)
+                        if (pxAllowAnyTimeDimensionIndex)
                         {
                             List<string> temp = new List<string>();
                             foreach (string s5 in codesHeader2)
@@ -5295,7 +5296,7 @@ namespace Gekko
                         }
 
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        WalkPxCombinations(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", timeDimensionIncodesIncludingTime, ref hyphenFound, ref underscoreFound);
+                        WalkPxCombinations(pxAllowAnyTimeDimensionIndex, isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", timeDimensionIncodesIncludingTime, ref hyphenFound, ref underscoreFound);
 
                         //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                         //also handles holes in dates, for instance for daily observations if there is no data for weekends
@@ -5351,7 +5352,7 @@ namespace Gekko
 
                             int x = -12345;
 
-                            if (Globals.pxAllowAnyTimeDimensionIndex)
+                            if (pxAllowAnyTimeDimensionIndex)
                             {
                                 int jj5 = 0;
                                 int factor = 1;
@@ -5433,28 +5434,13 @@ namespace Gekko
                     if (s.StartsWith(codeTimeString, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString.Length);
                     else if (s.StartsWith(codeTimeString2, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString2.Length);
 
-                    string[] ss = null;
-                    if (Globals.fixPxProblem)
-                    {
-                        ss = G.SplitCsv(s).ToArray();
-                    }
-                    else
-                    {
-                        ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    }
+                    string[] ss = ss = G.SplitCsv(s).ToArray();                    
 
                     foreach (string s2 in ss)
                     {
                         string s3 = s2;
-
-                        if (Globals.fixPxProblem)
-                        {
-                            s3 = s3.Trim();
-                        }
-                        else
-                        {
-                            s3 = s2.Substring(1, s2.Length - 2);
-                        }
+                        
+                        s3 = s3.Trim();                        
 
                         if (s3.IndexOf("m", StringComparison.OrdinalIgnoreCase) != -1)
                         {
@@ -5548,15 +5534,16 @@ namespace Gekko
                     //  CODES("s?sonkorrigering og faktiske tal")="10";
                     //
 
-                    if (hasSeenTimeDefinition)
+                    if (hasSeenTimeDefinition && !pxAllowAnyTimeDimensionIndex)
                     {
+                        pxAllowAnyTimeDimensionIndex = true;
                         using (Warning txt = new Warning())
                         {
-                            txt.MainAdd("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
-                            txt.MainAdd("If the px file originates from a {a{DOWNLOAD¤download.htm}a}, please put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.");
-                            txt.MoreAdd("If the requirement that .px files must have time as the last element (dimension) is annoying, please contact the Gekko editor. This would be easy to fix, but for now the requirement has its advantages regarding .px reading (faster speed and less memory usage, because Gekko timeseries data are aligned in the time dimension). So the requirement may pay off in the long run, if people start to download really large tables, where it would be beneficial that the px data are aligned in the time dimension.");
-                            txt.MoreNewLine();
-                            txt.MoreAdd("If an existing .json file causes problems due to the time dimension not being stated as the last dimension, you can simply move the time section in the .json file so that it becomes the last of the codes.");                            
+                            txt.MainAdd("Because time dimension is not defined last, experimental code is used.");
+                            txt.MoreAdd("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
+                            txt.MoreAdd("If the px file originates from a {a{DOWNLOAD¤download.htm}a}, you may put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.");
+                            txt.MoreAdd("When the time dimension is defined last, Gekko uses stable code internally that has been running for a number of years.");
+                            txt.MoreAdd("When the time dimension is not last, experimental internal code is used instead. This code has not been tested a lot yet, so please check the results carefully!");                            
                         }
                     }
 
@@ -5572,29 +5559,14 @@ namespace Gekko
 
                     string s = line777.Substring(i + 1);
 
-                    string[] ss = null;
-                    if (Globals.fixPxProblem)
-                    {
-                        ss = G.SplitCsv(s).ToArray();
-                    }
-                    else
-                    {
-                        ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    }
-
+                    string[] ss = ss = G.SplitCsv(s).ToArray();
 
                     List<string> names2 = new List<string>();
                     foreach (string s2 in ss)
                     {
                         string s4 = s2;
-                        if (Globals.fixPxProblem)
-                        {
-                            s4 = s4.Trim();
-                        }
-                        else
-                        {
-                            s4 = s2.Substring(1, s2.Length - 2);
-                        }
+                        
+                        s4 = s4.Trim();                        
 
                         names2.Add(s4);
                     }
@@ -5620,28 +5592,14 @@ namespace Gekko
                     string s = line5.Substring(i + 1);
                     //if (s.EndsWith(";")) s = s.Substring(0, s.Length - 1);
 
-                    string[] ss = null;
-                    if (Globals.fixPxProblem)
-                    {
-                        ss = G.SplitCsv(s).ToArray();
-                    }
-                    else
-                    {
-                        ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    }
+                    string[] ss = ss = G.SplitCsv(s).ToArray();                    
 
                     List<string> values2 = new List<string>();
                     foreach (string s2 in ss)
                     {
                         string s5 = s2;
-                        if (Globals.fixPxProblem)
-                        {
-                            s5 = s5.Trim();
-                        }
-                        else
-                        {
-                            s5 = s2.Substring(1, s2.Length - 2);
-                        }
+                        
+                        s5 = s5.Trim();
 
                         values2.Add(s5);
                     }
@@ -5861,127 +5819,66 @@ namespace Gekko
         /// <param name="sValues"></param>
         /// <param name="hyphenFound"></param>
         /// <param name="underscoreFound"></param>
-        private static void WalkPxCombinations(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, int timeDimension, ref bool hyphenFound, ref bool underscoreFound)
+        private static void WalkPxCombinations(bool pxAllowAnyTimeDimensionIndex, bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, int timeDimension, ref bool hyphenFound, ref bool underscoreFound)
         {
-            if (Globals.pxAllowAnyTimeDimensionIndex)
-            {   
+            //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
+            if (depth > codes.Count - 1)
+            {
+                if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
+                if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
 
-                //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
-                if (depth > codes.Count - 1)
+                string name2 = null;
+
+                string temp = table + sCodes;
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < temp.Length; i++)
                 {
-                    if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
-                    if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
-
-                    string name2 = null;
-
-                    string temp = table + sCodes;
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < temp.Length; i++)
+                    char tempi = temp[i];
+                    if (!isArray) //accept funny strings for arrays
                     {
-                        char tempi = temp[i];
-                        if (!isArray) //accept funny strings for arrays
+                        if (tempi == '-')
                         {
-                            if (tempi == '-')
-                            {
-                                hyphenFound = true;
-                            }
-                            else if (tempi == '_')
-                            {
-                                underscoreFound = true;
-                            }
+                            hyphenFound = true;
                         }
-
-                        if (tempi == 'æ') sb.Append("ae");
-                        else if (tempi == 'ø') sb.Append("oe");
-                        else if (tempi == 'å') sb.Append("aa");
-                        else if (tempi == 'Æ') sb.Append("AE");
-                        else if (tempi == 'Ø') sb.Append("OE");
-                        else if (tempi == 'Å') sb.Append("AA");
-                        else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == Globals.pxInternalDelimiter))  //for non-arrays, only letter or digit is allowed, everything else is thrown out
+                        else if (tempi == '_')
                         {
-                            //ignore it
-                        }
-                        else
-                        {
-                            sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
+                            underscoreFound = true;
                         }
                     }
-                    name2 = sb.ToString();
 
-                    codesCombi.Add(name2);
-                    valuesCombi.Add(sValues);
-                    return;
-                }
-
-                if (G.Equal(codesHeader[depth], "tid") || G.Equal(codesHeader[depth], "time"))
-                {
-                    WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodes, sValues, timeDimension, ref hyphenFound, ref underscoreFound);
-                }
-                else
-                {
-                    for (int i = 0; i < codes[depth].Count; i++)
+                    if (tempi == 'æ') sb.Append("ae");
+                    else if (tempi == 'ø') sb.Append("oe");
+                    else if (tempi == 'å') sb.Append("aa");
+                    else if (tempi == 'Æ') sb.Append("AE");
+                    else if (tempi == 'Ø') sb.Append("OE");
+                    else if (tempi == 'Å') sb.Append("AA");
+                    else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == Globals.pxInternalDelimiter))  //for non-arrays, only letter or digit is allowed, everything else is thrown out
                     {
-                        string sCodesTemp = sCodes + Globals.pxInternalDelimiter + codesHeader[depth] + Globals.pxInternalDelimiter + codes[depth][i];
-                        string sValuesTemp = sValues + ", " + values[depth][i];
-                        WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, timeDimension, ref hyphenFound, ref underscoreFound);
+                        //ignore it
+                    }
+                    else
+                    {
+                        sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
                     }
                 }
+                name2 = sb.ToString();
+
+                codesCombi.Add(name2);
+                valuesCombi.Add(sValues);
+                return;
+            }
+
+            if (pxAllowAnyTimeDimensionIndex && (G.Equal(codesHeader[depth], "tid") || G.Equal(codesHeader[depth], "time")))
+            {
+                WalkPxCombinations(pxAllowAnyTimeDimensionIndex, isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodes, sValues, timeDimension, ref hyphenFound, ref underscoreFound);
             }
             else
             {
-
-                //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
-                if (depth > codes.Count - 1)
-                {
-                    if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
-                    if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
-
-                    string name2 = null;
-
-                    string temp = table + sCodes;
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < temp.Length; i++)
-                    {
-                        char tempi = temp[i];
-                        if (!isArray) //accept funny strings for arrays
-                        {
-                            if (tempi == '-')
-                            {
-                                hyphenFound = true;
-                            }
-                            else if (tempi == '_')
-                            {
-                                underscoreFound = true;
-                            }
-                        }
-
-                        if (tempi == 'æ') sb.Append("ae");
-                        else if (tempi == 'ø') sb.Append("oe");
-                        else if (tempi == 'å') sb.Append("aa");
-                        else if (tempi == 'Æ') sb.Append("AE");
-                        else if (tempi == 'Ø') sb.Append("OE");
-                        else if (tempi == 'Å') sb.Append("AA");
-                        else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == Globals.pxInternalDelimiter))  //for non-arrays, only letter or digit is allowed, everything else is thrown out
-                        {
-                            //ignore it
-                        }
-                        else
-                        {
-                            sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
-                        }
-                    }
-                    name2 = sb.ToString();
-
-                    codesCombi.Add(name2);
-                    valuesCombi.Add(sValues);
-                    return;
-                }
-
                 for (int i = 0; i < codes[depth].Count; i++)
                 {
                     string sCodesTemp = sCodes + Globals.pxInternalDelimiter + codesHeader[depth] + Globals.pxInternalDelimiter + codes[depth][i];
                     string sValuesTemp = sValues + ", " + values[depth][i];
-                    WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, timeDimension, ref hyphenFound, ref underscoreFound);
+                    WalkPxCombinations(pxAllowAnyTimeDimensionIndex, isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, timeDimension, ref hyphenFound, ref underscoreFound);
                 }
             }
         }

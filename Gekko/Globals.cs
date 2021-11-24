@@ -44,9 +44,7 @@ namespace Gekko
         public static bool HANDLE_LIBRARY = false;
         public const string tempFileStart = "tempfile";
         public const string tempFileEnd = ".tmp";
-        public const string zip = ".zip";
-
-        public const bool pxAllowAnyTimeDimensionIndex = true; 
+        public const string zip = ".zip";        
 
         public static DayOfWeek weeklyWeekDayDefaultTsd = DayOfWeek.Friday;
         public static DayOfWeek weeklyFirstDayWhenPrinting = DayOfWeek.Monday;
@@ -82,8 +80,6 @@ namespace Gekko
         public const string functionSpecialName2 = "O.FunctionLookupNew";
 
         public static string versionInternal = "";
-        
-        public static bool fixPxProblem = true;
 
         public static bool if_old_helper = false;
 
