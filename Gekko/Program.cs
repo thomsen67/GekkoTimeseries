@@ -5275,8 +5275,26 @@ namespace Gekko
                             codesHeader2.Add("TID");  //will be removed again below!
                         }
 
+                        if (Globals.pxAllowAnyTimeDimensionIndex)
+                        {
+                            List<string> temp = new List<string>();
+                            foreach (string s5 in codesHeader2)
+                            {
+                                if (G.Equal(s5, "tid") || G.Equal(s5, "time"))
+                                {
+                                    //skip
+                                }
+                                else
+                                {
+                                    temp.Add(s5);
+                                }
+                            }
+                            temp.Insert(timeDimensionIncodesIncludingTime, "tid");
+                            codesHeader2 = temp;
+                        }
+
                         //we are using codesHeaderJson instead of codesHeader (these are more verbose)
-                        WalkPxCombinations(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", ref hyphenFound, ref underscoreFound);
+                        WalkPxCombinations(isArray, tableName, codesHeader2, codes, codesCombi, values, valuesCombi, 0, "", "", timeDimensionIncodesIncludingTime, ref hyphenFound, ref underscoreFound);
 
                         //fill it with NaN for safety. Statistikbanken sometimes return only a subset of the data (and the subset is zeroes)
                         //also handles holes in dates, for instance for daily observations if there is no data for weekends
@@ -5332,7 +5350,7 @@ namespace Gekko
 
                             int x = -12345;
 
-                            if (Globals.fixPxDim)
+                            if (Globals.pxAllowAnyTimeDimensionIndex)
                             {
                                 int jj5 = 0;
                                 int factor = 1;
@@ -5350,18 +5368,18 @@ namespace Gekko
                                         factor = factor * codesIncludingTime[i].Count;
                                     }
                                 }
-                                string s5 = foundNumberOfDataInPxFile + "       ";
-                                for (int i = 0; i < codesIncludingTime.Count; i++)
-                                {
-                                    s5 += indexes[i] + ", ";
-                                }
+                                //string s5 = foundNumberOfDataInPxFile + "       ";
+                                //for (int i = 0; i < codesIncludingTime.Count; i++)
+                                //{
+                                //    s5 += indexes[i] + ", ";
+                                //}
                                                   
                                 int ii5 = indexes[timeDimensionIncodesIncludingTime];
                                 int holesii5 = 0;
                                 if (holes != null) holesii5 = holes[ii5];
                                 x = ii5 + holesii5 + jj5 * totalDatesIncludingHoles;
 
-                                new Writeln(s5 + " --> " + x);
+                                //new Writeln(s5 + " --> " + x);
                             }
                             else
                             {
@@ -5849,60 +5867,128 @@ namespace Gekko
         /// <param name="sValues"></param>
         /// <param name="hyphenFound"></param>
         /// <param name="underscoreFound"></param>
-        private static void WalkPxCombinations(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, ref bool hyphenFound, ref bool underscoreFound)
+        private static void WalkPxCombinations(bool isArray, string table, List<string> codesHeader, List<List<string>> codes, List<string> codesCombi, List<List<string>> values, List<string> valuesCombi, int depth, string sCodes, string sValues, int timeDimension, ref bool hyphenFound, ref bool underscoreFound)
         {
-            //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
-            if (depth > codes.Count - 1)
-            {
-                if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
-                if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
+            if (Globals.pxAllowAnyTimeDimensionIndex)
+            {   
 
-                string name2 = null;
-
-                string temp = table + sCodes;
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < temp.Length; i++)
+                //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
+                if (depth > codes.Count - 0)
                 {
-                    char tempi = temp[i];
-                    if (!isArray) //accept funny strings for arrays
-                    {
-                        if (tempi == '-')
-                        {
-                            hyphenFound = true;
-                        }
-                        else if (tempi == '_')
-                        {
-                            underscoreFound = true;
-                        }
-                    }
+                    if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
+                    if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
 
-                    if (tempi == 'æ') sb.Append("ae");
-                    else if (tempi == 'ø') sb.Append("oe");
-                    else if (tempi == 'å') sb.Append("aa");
-                    else if (tempi == 'Æ') sb.Append("AE");
-                    else if (tempi == 'Ø') sb.Append("OE");
-                    else if (tempi == 'Å') sb.Append("AA");
-                    else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == Globals.pxInternalDelimiter))  //for non-arrays, only letter or digit is allowed, everything else is thrown out
+                    string name2 = null;
+
+                    string temp = table + sCodes;
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < temp.Length; i++)
                     {
-                        //ignore it
+                        char tempi = temp[i];
+                        if (!isArray) //accept funny strings for arrays
+                        {
+                            if (tempi == '-')
+                            {
+                                hyphenFound = true;
+                            }
+                            else if (tempi == '_')
+                            {
+                                underscoreFound = true;
+                            }
+                        }
+
+                        if (tempi == 'æ') sb.Append("ae");
+                        else if (tempi == 'ø') sb.Append("oe");
+                        else if (tempi == 'å') sb.Append("aa");
+                        else if (tempi == 'Æ') sb.Append("AE");
+                        else if (tempi == 'Ø') sb.Append("OE");
+                        else if (tempi == 'Å') sb.Append("AA");
+                        else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == Globals.pxInternalDelimiter))  //for non-arrays, only letter or digit is allowed, everything else is thrown out
+                        {
+                            //ignore it
+                        }
+                        else
+                        {
+                            sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
+                        }
                     }
-                    else
+                    name2 = sb.ToString();
+
+                    codesCombi.Add(name2);
+                    valuesCombi.Add(sValues);
+                    return;
+                }
+
+                if (G.Equal(codesHeader[depth], "tid") || G.Equal(codesHeader[depth], "time"))
+                {
+                    WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodes, sValues, timeDimension, ref hyphenFound, ref underscoreFound);
+                }
+                else
+                {
+                    for (int i = 0; i < codes[depth].Count; i++)
                     {
-                        sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
+                        string sCodesTemp = sCodes + Globals.pxInternalDelimiter + codesHeader[depth] + Globals.pxInternalDelimiter + codes[depth][i];
+                        string sValuesTemp = sValues + ", " + values[depth][i];
+                        WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, timeDimension, ref hyphenFound, ref underscoreFound);
                     }
                 }
-                name2 = sb.ToString();
-
-                codesCombi.Add(name2);
-                valuesCombi.Add(sValues);
-                return;
             }
-
-            for (int i = 0; i < codes[depth].Count; i++)
+            else
             {
-                string sCodesTemp = sCodes + Globals.pxInternalDelimiter + codesHeader[depth] + Globals.pxInternalDelimiter + codes[depth][i];
-                string sValuesTemp = sValues + ", " + values[depth][i];
-                WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, ref hyphenFound, ref underscoreFound);
+
+                //Hmmm what if a table name or column has a name with '_' inside? Probably not probable.
+                if (depth > codes.Count - 1)
+                {
+                    if (sCodes.EndsWith(Globals.pxInternalDelimiter.ToString())) sCodes = sCodes.Substring(0, sCodes.Length - 1);
+                    if (sValues.StartsWith(", ")) sValues = sValues.Substring(2);
+
+                    string name2 = null;
+
+                    string temp = table + sCodes;
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < temp.Length; i++)
+                    {
+                        char tempi = temp[i];
+                        if (!isArray) //accept funny strings for arrays
+                        {
+                            if (tempi == '-')
+                            {
+                                hyphenFound = true;
+                            }
+                            else if (tempi == '_')
+                            {
+                                underscoreFound = true;
+                            }
+                        }
+
+                        if (tempi == 'æ') sb.Append("ae");
+                        else if (tempi == 'ø') sb.Append("oe");
+                        else if (tempi == 'å') sb.Append("aa");
+                        else if (tempi == 'Æ') sb.Append("AE");
+                        else if (tempi == 'Ø') sb.Append("OE");
+                        else if (tempi == 'Å') sb.Append("AA");
+                        else if (!isArray && !(G.IsLetterOrDigit(tempi) || tempi == Globals.pxInternalDelimiter))  //for non-arrays, only letter or digit is allowed, everything else is thrown out
+                        {
+                            //ignore it
+                        }
+                        else
+                        {
+                            sb.Append(tempi);  //here we know that it is englishletter or digit or underscore
+                        }
+                    }
+                    name2 = sb.ToString();
+
+                    codesCombi.Add(name2);
+                    valuesCombi.Add(sValues);
+                    return;
+                }
+
+                for (int i = 0; i < codes[depth].Count; i++)
+                {
+                    string sCodesTemp = sCodes + Globals.pxInternalDelimiter + codesHeader[depth] + Globals.pxInternalDelimiter + codes[depth][i];
+                    string sValuesTemp = sValues + ", " + values[depth][i];
+                    WalkPxCombinations(isArray, table, codesHeader, codes, codesCombi, values, valuesCombi, depth + 1, sCodesTemp, sValuesTemp, timeDimension, ref hyphenFound, ref underscoreFound);
+                }
             }
         }
         

@@ -24451,15 +24451,15 @@ print(df2)
                 _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
             }
 
-            if (Globals.fixPxDim)
+            if (Globals.pxAllowAnyTimeDimensionIndex)
             {
-                I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px';");
-                I("IMPORT <px all> data1b.px;");
-                _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
-                _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
-                _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
-                _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
+                //I("RESET;");
+                //I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\px';");
+                //I("IMPORT <px all> data1b.px;");
+                //_AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
+                //_AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
+                //_AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
+                //_AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
             }
 
 
@@ -24568,8 +24568,6 @@ print(df2)
             I("read <px> pxfile;");
             I("read <px> data2;");
         }
-
-
 
         [TestMethod]
         public void _Test_ExportR()
