@@ -5534,18 +5534,10 @@ namespace Gekko
                     //  CODES("s?sonkorrigering og faktiske tal")="10";
                     //
 
-                    if (hasSeenTimeDefinition && !pxAllowAnyTimeDimensionIndex)
+                    if (hasSeenTimeDefinition)
                     {
                         pxAllowAnyTimeDimensionIndex = true;
-                        using (Warning txt = new Warning())
-                        {
-                            txt.MainAdd("Because time dimension is not defined last, experimental code is used.");
-                            txt.MoreAdd("It does not seem that the time dimension is defined last in the px file, since CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
-                            txt.MoreAdd("If the px file originates from a {a{DOWNLOAD¤download.htm}a}, you may put the \"code\": \"tid\" or \"code\": \"time\" element last in your .json file.");
-                            txt.MoreAdd("When the time dimension is defined last, Gekko uses stable code internally that has been running for a number of years.");
-                            txt.MoreAdd("When the time dimension is not last, experimental internal code is used instead. This code has not been tested a lot yet, so please check the results carefully!");                            
-                        }
-                    }
+                    }                    
 
                     string line777 = lineHelper.ToString();
                     int i = line777.IndexOf("=");
@@ -5738,7 +5730,23 @@ namespace Gekko
             vars = codesCombi.Count;
             perStart = gt0;
             perEnd = gt1;
-            
+
+            if (pxAllowAnyTimeDimensionIndex)
+            {            
+                using (Warning txt = new Warning())
+                {
+                    txt.MainAdd("The time dimension is not defined last in the .px file, and therefore an experimental module is used.");
+                    txt.MoreAdd("The time dimension is not defined last in the .px file, since either CODES(\"tid\") or CODES(\"time\") does not seem to be the last CODES(...) element.");
+                    txt.MoreAdd("When the time dimension is not defined last, an experimental Gekko module for px file reading is used (written in November 2021).");
+                    txt.MoreAdd("In contrast to the original px file module, which has been running for a number of years, the new experimental module has not been tested a lot yet. So please check the results carefully!");                    
+                    txt.MoreAdd("If you are uncertain about using the above-mentioned experimental px file module, and if the px file originates from a {a{DOWNLOAD¤download.htm}a} command, you may reorder the .json file:");
+                    txt.MoreAdd("In your .json file, move the \"code\": \"tid\" or \"code\": \"time\" element last in the file. After this, the warning should go away.");
+                    txt.MoreNewLine();
+                    txt.MoreAdd("Note: If the new experimental px file module really turns out to contain bugs, these will probably be immediately visible,");
+                    txt.MoreAdd("because the timeseries will look fundamentally scrambled. Expect the new px file module to be tested enough to eliminate this warning around spring 2022.");
+                }
+            }
+
             if (hyphenFound)
             {
                 //Only for !isArray
