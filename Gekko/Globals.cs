@@ -91,8 +91,14 @@ namespace Gekko
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
 
         //Must be near the top of Globals.cs
+        //do not move localTempFilesLocation below here!
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
+        public static readonly Random random777 = new Random();
+        public static readonly object randomSyncLock = new object();
+        public static int tempVarIndexCounter = 0;
+        public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
         public static int tempFilesCounter = 0;  //used when unzipping files. Do not set to 0 for reset: it is better that it is only set to 0 when Gekko starts up (because then the previous files are probably not blocked).
+        public static string tempFiles = Program.CreateTempFolderPath("tempfiles");  //used with tempFilesCounter
 
         public static ItemHandler itemHandler = null;  //hack
 
@@ -431,8 +437,6 @@ namespace Gekko
 
         public static bool pipe2 = false;
         public static PipeFileHelper pipeFileHelper2 = new PipeFileHelper();  //pipe 2 is for printing etc. when user choses "p fy file=myfile.txt"
-
-        public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
         
         public static int guiTextPaddingLeft = 6;
         public static int guiTextPaddingVertical = 6;
@@ -501,11 +505,7 @@ namespace Gekko
         public static string tableOption = "";
 
         public static int modelRandomID = 12345678;  //used in order to make a unique name for a temp folder that is later zipped (and the folder is deleted)
-
-        public static readonly Random random777 = new Random();
-        public static readonly object randomSyncLock = new object();
-        public static int tempVarIndexCounter = 0;
-
+        
         public static Random random = new Random();  //for reuse in functions runif() and rnorm()
 
         public static string[] convergenceCheckVariables = new string[1];
@@ -817,7 +817,7 @@ namespace Gekko
 
         public static bool isAutoExec = true;
         public static string sessionMemorySnapshot = null;
-        public static string sessionMemoryHistory = null;
+        public static string sessionMemoryHistory = null;        
 
         public static WindowIntellisense windowIntellisense = null;
 

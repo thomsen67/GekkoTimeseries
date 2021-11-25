@@ -3512,7 +3512,7 @@ namespace Gekko
 
             readInfo.databankVersion = "";
             //try to unzip it here
-            tempTsdxPath = GetTempGbkFolderPath();
+            tempTsdxPath = CreateTempFolderPath("temptsdxfolder");
             if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
             {
                 Directory.CreateDirectory(tempTsdxPath);
@@ -15915,20 +15915,33 @@ namespace Gekko
                 if (!File.Exists(zipFileWithPath)) new Error("Zip file '" + zipFileWithoutPath + "' does not seem to exist. Trying to unzip this file, because it is part of the path '" + fileNameWithPath + "'.");
                 ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
                 ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
-                string tempFileName = Globals.localTempFilesLocation + "\\" + Globals.tempFileStart + ++Globals.tempFilesCounter + Globals.tempFileEnd;
-                if (File.Exists(tempFileName)) WaitForFileDelete(tempFileName);  //if it exists, it is from an older session, so probably easy to delete without problems
                 if (entry == null)
                 {
                     string s = null;
                     if (pathInsideZip.ToLower().Contains(Globals.zip)) s = ". Note that nested zip files are not yet supported.";
                     new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "'" + s);
                 }
-                entry.ExtractToFile(tempFileName, true);
+                string tempFileNameWithPath = ExtractZipFileEntryToTempFile(entry);
                 //cannot yet be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv
-                rv_fileName = tempFileName;
+                rv_fileName = tempFileNameWithPath;
             }
 
             return rv_fileName;
+        }
+
+        /// <summary>
+        /// Small helper method to extract an existing C# ZipArchiveEntry into a temporary file (the filename is returned)
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public static string ExtractZipFileEntryToTempFile(ZipArchiveEntry entry)
+        {
+            //When Gekko starts up, the folder Globals.tempFiles (with random name) is created, and 
+            //Globals.tempFilesCounter is never reset to 0. So file locks should be impossible.
+            string tempFileName = Globals.tempFiles + "\\" + Globals.tempFileStart + ++Globals.tempFilesCounter + Globals.tempFileEnd;
+            if (File.Exists(tempFileName)) WaitForFileDelete(tempFileName);  //if it exists, it is from an older session, so probably easy to delete without problems                
+            entry.ExtractToFile(tempFileName, true);
+            return tempFileName;
         }
 
         /// <summary>
@@ -17612,7 +17625,7 @@ namespace Gekko
             string tsdxVersion = "1.2"; //Gekko 3.0
 
             //try to zip it to this local folder
-            tempTsdxPath = GetTempGbkFolderPath();
+            tempTsdxPath = CreateTempFolderPath("temptsdxfolder");
             if (!Directory.Exists(tempTsdxPath))  //should almost never exist, since name is random
             {
                 Directory.CreateDirectory(tempTsdxPath);
@@ -27042,12 +27055,12 @@ namespace Gekko
         /// Helper for ReadGbk() and WriteGbk().
         /// </summary>
         /// <returns></returns>
-        public static string GetTempGbkFolderPath()
+        public static string CreateTempFolderPath(string s)
         {
             //put in local files on user pc
             //Random r = new Random();
             int random = Program.RandomInt(11111111, 99999999);
-            string path = Globals.localTempFilesLocation + "\\" + "temptsdxfolder" + "_" + random;
+            string path = Globals.localTempFilesLocation + "\\" + s + "_" + random;
             return path;
         }
 

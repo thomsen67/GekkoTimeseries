@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using ProtoBuf;
 using ProtoBuf.Meta;
+using System.IO.Compression;
 
 namespace Gekko
 {
@@ -518,31 +519,12 @@ namespace Gekko
                     }
                     else
                     {
-                        //We have to parse it
-
-                        string tempPath = Program.GetTempGbkFolderPath();
-                        if (!Directory.Exists(tempPath))  //should almost never exist, since name is random
-                        {
-                            Directory.CreateDirectory(tempPath);
-                        }
-                        else
-                        {
-                            Directory.Delete(tempPath, true);  //in the very rare case, any files here will be deleted first
-                        }
-
-                        Program.WaitForZipRead(tempPath, fileNameWithPath);
+                        //We have to parse it                        
+                        //Program.WaitForZipRead(tempPath, fileNameWithPath);
                         library = new Library(libraryName, fileNameWithPath, stamp);
-                        library.LibraryExtractor(tempPath, tempPath, fileNameWithPath);
-
-                        try
-                        {
-                            G.DeleteFolder(tempPath, true);
-                        }
-                        catch
-                        {
-                            //not catastrofic if this fails
-                        }                        
-
+                        library.LibraryExtractor(fileNameWithPath);
+                        //library.LibraryExtractor2(tempPath, tempPath, fileNameWithPath);
+                        
                         try //not the end of world if it fails
                         {                            
                             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
@@ -814,80 +796,148 @@ namespace Gekko
             return rv;
         }        
 
+        ///// <summary>
+        ///// Finds all .gcm files in a folder structure, and extracts functions/procedures. Is recursive.
+        ///// Will also catalogue all "external" files from the \data subfolder.
+        ///// </summary>
+        ///// <param name="targetDirectory"></param>
+        //public void LibraryExtractor2(string targetDirectory, string originalDirectory, string zipFileName)
+        //{
+        //    // Process the list of files found in the directory.
+        //    string[] fileEntries = Directory.GetFiles(targetDirectory);
+        //    string relativePath = targetDirectory.Replace(originalDirectory, "");          
+
+        //    foreach (string fileName in fileEntries)
+        //    {
+        //        if (relativePath.ToLower() == "\\" + Globals.dataLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.dataLibraryString + "\\"))
+        //        {
+        //            //Normal external files. These are not extracted: just recorded.
+        //            if (this.dataFiles.ContainsKey(Path.GetFileName(fileName)))
+        //            {
+        //                using (var txt = new Error())
+        //                {
+        //                    string ss = this.dataFiles[Path.GetFileName(fileName)];
+        //                    txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\data subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
+        //                    txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+        //                }
+        //            }
+        //            else
+        //            {
+        //                this.dataFiles.Add(Path.GetFileName(fileName), relativePath);
+        //            }
+        //        }
+        //        else if (relativePath.ToLower() == "\\" + Globals.metaLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.metaLibraryString + "\\"))
+        //        {
+        //            //Normal external files with metadata. These are not extracted: just recorded.
+        //            if (this.metaFiles.ContainsKey(Path.GetFileName(fileName)))
+        //            {
+        //                using (var txt = new Error())
+        //                {
+        //                    string ss = this.dataFiles[Path.GetFileName(fileName)];
+        //                    txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\meta subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
+        //                    txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+        //                }
+        //            }
+        //            else
+        //            {
+        //                this.metaFiles.Add(Path.GetFileName(fileName), relativePath);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //.gcm files with functions/procedures for lazy loading
+        //            if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
+        //            {
+        //                this.LibraryExtractorHandleGcmFile(fileName, originalDirectory, zipFileName);
+        //            }
+        //            else
+        //            {
+        //                //non-gcm files are just skipped here.
+        //            }
+        //        }                
+        //    }
+
+        //    // Recurse into subdirectories of this directory.
+        //    string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+        //    foreach (string subdirectory in subdirectoryEntries)
+        //    {
+        //        this.LibraryExtractor2(subdirectory, originalDirectory, zipFileName);
+        //    }
+        //}
+
         /// <summary>
         /// Finds all .gcm files in a folder structure, and extracts functions/procedures. Is recursive.
         /// Will also catalogue all "external" files from the \data subfolder.
-        /// </summary>
-        /// <param name="targetDirectory"></param>
-        public void LibraryExtractor(string targetDirectory, string originalDirectory, string zipFileName)
+        /// </summary>        
+        public void LibraryExtractor(string zipFileNameWithPath)
         {
             // Process the list of files found in the directory.
-            string[] fileEntries = Directory.GetFiles(targetDirectory);
-            string relativePath = targetDirectory.Replace(originalDirectory, "");          
 
-            foreach (string fileName in fileEntries)
+            //GekkoDictionary<string, string> gcmDictionary = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            using (ZipArchive archive = ZipFile.OpenRead(fileNameWithPath))
             {
-                if (relativePath.ToLower() == "\\" + Globals.dataLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.dataLibraryString + "\\"))
+                foreach (ZipArchiveEntry entry in archive.Entries)
                 {
-                    //Normal external files. These are not extracted: just recorded.
-                    if (this.dataFiles.ContainsKey(Path.GetFileName(fileName)))
+                    string fileNameWithRelativePath = entry.FullName.Replace("/", "\\");
+                    string fileNameWithoutPath = entry.Name;
+                    if (fileNameWithRelativePath.EndsWith("\\") && fileNameWithoutPath == "") continue;  //represents a folder. If not skipped, it would create an empty file ---> weird!
+                    string relativePath = fileNameWithRelativePath.Replace(fileNameWithoutPath, "");
+                    if (relativePath.EndsWith("\\")) relativePath = relativePath.Substring(0, relativePath.Length - 1);
+                    fileNameWithRelativePath = "\\" + fileNameWithRelativePath;
+                    relativePath = "\\" + relativePath;
+
+                    if (G.Equal(relativePath, "\\"+ Globals.dataLibraryString))
                     {
-                        using (var txt = new Error())
+                        //Normal external files. These are not extracted: just recorded.
+                        if (this.dataFiles.ContainsKey(fileNameWithoutPath))
                         {
-                            string ss = this.dataFiles[Path.GetFileName(fileName)];
-                            txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\data subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
-                            txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+                            using (var txt = new Error())
+                            {
+                                string ss = this.dataFiles[fileNameWithoutPath];
+                                txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\data subfolder, there are duplicate versions of the file " + fileNameWithoutPath + ".");
+                                txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+                            }
+                        }
+                        else
+                        {
+                            this.dataFiles.Add(fileNameWithoutPath, relativePath);
+                        }
+                    }
+                    else if (G.Equal(relativePath, "\\" + Globals.metaLibraryString))                    
+                    {
+                        //Normal external files with metadata. These are not extracted: just recorded.
+                        if (this.metaFiles.ContainsKey(fileNameWithoutPath))
+                        {
+                            using (var txt = new Error())
+                            {
+                                string ss = this.metaFiles[fileNameWithoutPath];
+                                txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\meta subfolder, there are duplicate versions of the file " + fileNameWithoutPath + ".");
+                                txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+                            }
+                        }
+                        else
+                        {
+                            this.metaFiles.Add(fileNameWithoutPath, relativePath);
                         }
                     }
                     else
                     {
-                        this.dataFiles.Add(Path.GetFileName(fileName), relativePath);
-                    }
-                }
-                else if (relativePath.ToLower() == "\\" + Globals.metaLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.metaLibraryString + "\\"))
-                {
-                    //Normal external files with metadata. These are not extracted: just recorded.
-                    if (this.metaFiles.ContainsKey(Path.GetFileName(fileName)))
-                    {
-                        using (var txt = new Error())
-                        {
-                            string ss = this.dataFiles[Path.GetFileName(fileName)];
-                            txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\meta subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
-                            txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
+                        if (fileNameWithRelativePath.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
+                        {                            
+                            string tempFileNameWithPath = Program.ExtractZipFileEntryToTempFile(entry);
+                            LibraryExtractorHandleGcmFile(tempFileNameWithPath, zipFileNameWithPath, fileNameWithRelativePath);
                         }
                     }
-                    else
-                    {
-                        this.metaFiles.Add(Path.GetFileName(fileName), relativePath);
-                    }
                 }
-                else
-                {
-                    //.gcm files with functions/procedures for lazy loading
-                    if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.LibraryExtractorHandleGcmFile(fileName, originalDirectory, zipFileName);
-                    }
-                    else
-                    {
-                        //non-gcm files are just skipped here.
-                    }
-                }                
-            }
-
-            // Recurse into subdirectories of this directory.
-            string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
-            foreach (string subdirectory in subdirectoryEntries)
-            {
-                this.LibraryExtractor(subdirectory, originalDirectory, zipFileName);
-            }
+            }            
         }
 
         /// <summary>
-        /// Extract function/procedure code as text.
+        /// Extract function/procedure code as text. The last two strings are only for putting text info on location etc. if there are errors
         /// </summary>
-        /// <param name="file"></param>
-        private void LibraryExtractorHandleGcmFile(string file, string targetDirectory, string zipFileName)
+        /// <param name="extractedFile"></param>
+        private void LibraryExtractorHandleGcmFile(string extractedFile, string zipFileName, string fileNameWithRelativePath)
         {
             // ...
             // ...
@@ -918,9 +968,9 @@ namespace Gekko
 
             //It basically cuts before second "function" and so on.
 
-            string pathToFileInsideZip = zipFileName + file.Replace(targetDirectory, "");
+            string pathToFileInsideZip = zipFileName + fileNameWithRelativePath;
 
-            string s = Program.GetTextFromFileWithWait(file);
+            string s = Program.GetTextFromFileWithWait(extractedFile);
             int fat = 5;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };

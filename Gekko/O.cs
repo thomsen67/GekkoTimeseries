@@ -5266,7 +5266,8 @@ namespace Gekko
         private static void UfunctionErroMessage(string libraryName, string functionName, int i)
         {
             if (libraryName == null || Libraries.IsReservedName(libraryName)) return;  //no error, just overwrite the function
-            new Error("Function '" + functionName + "' with " + Math.Max(0, i - 2) + " arguments exists as dublet in library '" + libraryName + "'");
+            string s = G.FromLibraryToFunctionProcedureName(functionName, 4);
+            new Error(s + " with " + Math.Max(0, i - 2) + " arguments exists as dublet in library '" + libraryName + "'. Try LIBRARY? and locate the function/procedure to see its versions.");
         }
 
         // ====================================================

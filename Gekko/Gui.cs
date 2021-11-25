@@ -352,6 +352,15 @@ namespace Gekko
 
             Program.InitUfunctionsAndArithmeticsAndMore();
 
+            if (!Directory.Exists(Globals.tempFiles))  //should almost never exist, since name is random
+            {
+                Directory.CreateDirectory(Globals.tempFiles);
+            }
+            else
+            {
+                Directory.Delete(Globals.tempFiles, true);  //in the very rare case, any files here will be deleted first
+            }
+
             //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
             StartupExeAndIniStuff();
             CrossThreadStuff.Mode();
