@@ -887,7 +887,7 @@ namespace Gekko
                     fileNameWithRelativePath = "\\" + fileNameWithRelativePath;
                     relativePath = "\\" + relativePath;
 
-                    if (G.Equal(relativePath, "\\"+ Globals.dataLibraryString))
+                    if (relativePath.ToLower() == "\\" + Globals.dataLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.dataLibraryString + "\\"))
                     {
                         //Normal external files. These are not extracted: just recorded.
                         if (this.dataFiles.ContainsKey(fileNameWithoutPath))
@@ -904,7 +904,7 @@ namespace Gekko
                             this.dataFiles.Add(fileNameWithoutPath, relativePath);
                         }
                     }
-                    else if (G.Equal(relativePath, "\\" + Globals.metaLibraryString))                    
+                    else if (relativePath.ToLower() == "\\" + Globals.metaLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.metaLibraryString + "\\"))
                     {
                         //Normal external files with metadata. These are not extracted: just recorded.
                         if (this.metaFiles.ContainsKey(fileNameWithoutPath))

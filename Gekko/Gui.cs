@@ -294,6 +294,11 @@ namespace Gekko
             Rekur(d);
         }
 
+        /// <summary>
+        /// This method gets run at Gekko startup (not RESET/RESTART, real GUI startup).
+        /// Beware that if something must also be availible for unit tests and Gekcel,
+        /// put it in InitUfunctionsAndArithmeticsAndMore().
+        /// </summary>
         private void GuiAutoExecStuff()
         {
             //#7980345743573
@@ -351,15 +356,6 @@ namespace Gekko
             CrossThreadStuff.Zoom();
 
             Program.InitUfunctionsAndArithmeticsAndMore();
-
-            if (!Directory.Exists(Globals.tempFiles))  //should almost never exist, since name is random
-            {
-                Directory.CreateDirectory(Globals.tempFiles);
-            }
-            else
-            {
-                Directory.Delete(Globals.tempFiles, true);  //in the very rare case, any files here will be deleted first
-            }
 
             //gekko.exe parameters are read first, and then afterwards any gekko.ini local file
             StartupExeAndIniStuff();
@@ -446,6 +442,8 @@ namespace Gekko
             // Determine whether the directory exists, else create it (used for temporary files)
             if (track) MessageBox.Show("5");
             Program.CreateTempFilesFolder();
+            Program.CreateTempFilesFolder2();
+
             if (track) MessageBox.Show("6");
             Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
             if (track) MessageBox.Show("7");
@@ -564,7 +562,8 @@ namespace Gekko
                             }
                         }
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         //May fail if xml file is corrupted
                         //var s10 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming);
                         string s11 = e.InnerException.Message;
@@ -693,7 +692,7 @@ namespace Gekko
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-        }
+        }        
 
         /// <summary>
         /// Helper to delete temporary file that tests if folder is read-only

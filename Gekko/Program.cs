@@ -19149,6 +19149,10 @@ namespace Gekko
             StartPulse();
         }
 
+        /// <summary>
+        /// Initialization for Gekko, but also for unit tests, and probably also Gekcel.
+        /// So stuff that gets set up at start should be here.
+        /// </summary>
         public static void InitUfunctionsAndArithmeticsAndMore()
         {
             Program.libraries = new Libraries();
@@ -19180,7 +19184,7 @@ namespace Gekko
             for (int i = Globals.timeStringsStart; i <= Globals.timeStringsEnd; i++)
             {
                 Globals.timeStrings[i - Globals.timeStringsStart] = i.ToString();
-            }            
+            }
         }
 
         public static List<string> Add2Lists(List<string> x1, List<string> x2)
@@ -26989,6 +26993,15 @@ namespace Gekko
             {
                 Directory.CreateDirectory(Globals.localTempFilesLocation);
             }
+        }
+
+        public static void CreateTempFilesFolder2()
+        {
+            if (Directory.Exists(Globals.tempFiles))  //should almost never exist, since name is random            
+            {
+                Directory.Delete(Globals.tempFiles, true);  //in the very rare case, any files here will be deleted first
+            }
+            Directory.CreateDirectory(Globals.tempFiles);
         }
 
         /// <summary>

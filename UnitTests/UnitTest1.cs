@@ -142,8 +142,10 @@ namespace UnitTests
             Program.databanks.storage.Add(new Databank(Globals.Ref));
 
             Program.CreateTempFilesFolder();
+            Program.CreateTempFilesFolder2();
 
             string s = Globals.localTempFilesLocation;
+            
             if (!(s.Contains("AppData") && s.Contains("tempfiles")))
             {
                 MessageBox.Show("Tried to delete this folder: " + s + "\nBUT WE DO NOT ALLOW THAT (does not contain 'AppData')");
