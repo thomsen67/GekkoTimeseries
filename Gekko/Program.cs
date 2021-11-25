@@ -18165,13 +18165,7 @@ namespace Gekko
         /// <param name="zipFileNameAndPath"></param>
         public static void WaitForZipRead(string folderToUseForOutput, string zipFileNameAndPath)
         {
-            //is not actually waiting...
-            int gap = Globals.waitFileGap;  //1 second
-            int totalTime = Globals.waitFileTotalTime;  //600 seconds
-            int repeats = totalTime / gap;
-            string tsdFile = "";
-            DirectoryInfo folderInfo = new DirectoryInfo(folderToUseForOutput);
-            if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
+            //is not actually waiting...            
             //try-catch is not used here: normally a zip-file can be read even if blocked by others (not so for writing)            
 
             try
