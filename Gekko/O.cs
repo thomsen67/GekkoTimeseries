@@ -5301,17 +5301,21 @@ namespace Gekko
 
             if (number > 13)
             {
-                new Error("More than 13 user function/procedure arguments is not allowed at the moment. You may consider using a MAP argument to work around this restriction.");
+                new Error("More than 13 user function/procedure arguments is not allowed at the moment. You may consider using a MAP argument to work around this restriction (" + G.FromLibraryToFunctionProcedureName(name, 4) + ").");
             }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
-                new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko function. Please use another name.");
+                new Error("Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of an in-built Gekko function/procedure. For now, this is not allowed.");
             }
-            foreach (string s in Globals.commandNames)
+            if (name.StartsWith(Globals.procedure))
             {
-                if (G.Equal(s, name))
+                foreach (string s in Globals.commandNames)
                 {
-                    new Error("Loading of user function/procedure '" + name + "' failed, since this is also the name of an in-built Gekko command. Please use another name.");
+                    if (G.Equal(s, name.Substring(Globals.procedure.Length)))
+                    {
+                        //But you cannot even define a procedure with a Gekko command name...
+                        new Error("Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of a Gekko command. For now, this is not allowed.");
+                    }
                 }
             }
         }

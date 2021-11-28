@@ -819,7 +819,7 @@ namespace Gekko
             return new ScalarString(rv);
         }
 
-        //!NOTE: do not delete, use for unit tests
+        //!NOTE: do not delete, use for unit tests. Must be lowercase, used in a unit test .gcm file.
         public static IVariable helper_error(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             string s = O.ConvertToString(x);
@@ -830,12 +830,11 @@ namespace Gekko
             return Globals.scalarVal0;
         }
 
-        //!NOTE: do not delete, use for unit tests
+        //!NOTE: do not delete, used for unit tests (maybe not...)
         public static IVariable helper_period(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             //y <2004 2005> = f(<2003 2006>, f(<2002 2007>, x));
-
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             Series ts = new Series(ESeriesType.Light, t1, t2);
             return ts;
         }
@@ -918,7 +917,7 @@ namespace Gekko
 
         public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             IVariable result = Program.Laspeyres("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
             return result;
         }
@@ -931,7 +930,7 @@ namespace Gekko
 
         public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             IVariable result = Program.Laspeyres("laspfixed", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
             return result;
         }
@@ -961,7 +960,7 @@ namespace Gekko
 
         public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable ilambda, IVariable ilog)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             int obs = GekkoTime.Observations(t1, t2);
 
@@ -1113,7 +1112,7 @@ namespace Gekko
         //Converts timeseries to matrix
         public static IVariable pack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             int offset = 0;
             if (_t1 == null && _t2 == null && ((vars[0].Type() == EVariableType.Date || vars[0].Type() == EVariableType.Val) && (vars[1].Type() == EVariableType.Date || vars[1].Type() == EVariableType.Val)))
             {
@@ -1200,7 +1199,7 @@ namespace Gekko
             //series('a') normal annual series
             //series(3) 3-dim series with current freq
             //series('a', 3) 3-dim annual series            
-            Series ts = HELPER_seriesAndTimeless("series", x);
+            Series ts = helper_seriesAndTimeless("series", x);
             return ts;
         }
 
@@ -1210,11 +1209,11 @@ namespace Gekko
             //timeless(200) normal timeless with value 200
             //timeless('a') normal annual timeless            
             //timeless('a', 200) annual timeless with value 200
-            Series ts = HELPER_seriesAndTimeless("timeless", x);
+            Series ts = helper_seriesAndTimeless("timeless", x);
             return ts;
         }
 
-        private static Series HELPER_seriesAndTimeless(string type, IVariable[] x)
+        private static Series helper_seriesAndTimeless(string type, IVariable[] x)
         {
             Series ts = null;
             if (G.Equal(type, "series"))
@@ -1396,7 +1395,7 @@ namespace Gekko
         public static IVariable truncate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //overlapping windows of dates
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             GekkoTime dx1 = x1.ConvertToDate(O.GetDateChoices.Strict);
             GekkoTime dx2 = x2.ConvertToDate(O.GetDateChoices.Strict);
             if (dx1.StrictlyLargerThan(dx2))
@@ -1440,7 +1439,7 @@ namespace Gekko
         /// <param name="a">Normal function, like (x1, x2) => x1 - x2</param>
         /// <param name="aSwapped">Swapped function, like (x1, x2) => x2 - x1. Just swap varnames on rhs only.</param>
         /// <returns></returns>
-        public static IVariable Helper_GeneralFunction(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2, Func<double, double, double> a, Func<double, double, double> aSwapped)
+        public static IVariable helper_GeneralFunction(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2, Func<double, double, double> a, Func<double, double, double> aSwapped)
         {
             if (iv1.Type() == EVariableType.Series)
             {
@@ -1509,7 +1508,7 @@ namespace Gekko
                 for (int i = 1; i < items.Length; i++)
                 {
                     //accumulate
-                    total = Helper_GeneralFunction(smpl, _t1, _t2, total, items[i], (x1, x2) => Math.Min(x1, x2), (x1, x2) => Math.Min(x2, x1));
+                    total = helper_GeneralFunction(smpl, _t1, _t2, total, items[i], (x1, x2) => Math.Min(x1, x2), (x1, x2) => Math.Min(x2, x1));
                 }
                 return total;
             }
@@ -1553,7 +1552,7 @@ namespace Gekko
                 for (int i = 1; i < items.Length; i++)
                 {
                     //accumulate
-                    total = Helper_GeneralFunction(smpl, _t1, _t2, total, items[i], (x1, x2) => Math.Max(x1, x2), (x1, x2) => Math.Max(x2, x1));
+                    total = helper_GeneralFunction(smpl, _t1, _t2, total, items[i], (x1, x2) => Math.Max(x1, x2), (x1, x2) => Math.Max(x2, x1));
                 }
                 return total;
             }
@@ -1658,7 +1657,7 @@ namespace Gekko
                         new Error("Expected 'all' option");
                         //throw new GekkoException();
                     }
-                    Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+                    helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
                 }
 
                 Series rv = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
@@ -1862,7 +1861,7 @@ namespace Gekko
         //Converts matrix to timeseries
         public static IVariable unpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             //from matrix to timeseries            
 
@@ -1887,7 +1886,7 @@ namespace Gekko
 
         }
 
-        private static int Helper_Pack(IVariable[] vars, ref GekkoTime gt1, ref GekkoTime gt2, ref int offset)
+        private static int helper_Pack(IVariable[] vars, ref GekkoTime gt1, ref GekkoTime gt2, ref int offset)
         {
             if (vars.Length > 2)  //must be at least 1 variable
             {
@@ -1903,7 +1902,6 @@ namespace Gekko
             if (obs < 1)
             {
                 new Error("Number of observations is " + obs);
-                //throw new GekkoException();
             }
             return obs;
         }
@@ -2350,7 +2348,7 @@ namespace Gekko
 
         public static IVariable sum(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
         {
-            IVariable tsl2 = HelperSum(smpl.t0, smpl.t3, items, false);
+            IVariable tsl2 = helper_Sum(smpl.t0, smpl.t3, items, false);
             return tsl2;
         }
 
@@ -2362,7 +2360,7 @@ namespace Gekko
 
         public static IVariable sumt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
             IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
@@ -2382,7 +2380,7 @@ namespace Gekko
 
         public static IVariable avgt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
             IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
@@ -2394,7 +2392,7 @@ namespace Gekko
             return new ScalarVal(d / GekkoTime.Observations(smplHere.t1, smplHere.t2));
         }
 
-        private static void Helper_TimeOptionField(GekkoSmpl smpl, IVariable _t1, IVariable _t2, out GekkoTime t1, out GekkoTime t2)
+        private static void helper_TimeOptionField(GekkoSmpl smpl, IVariable _t1, IVariable _t2, out GekkoTime t1, out GekkoTime t2)
         {
             t1 = smpl.t1;
             t2 = smpl.t2;
@@ -2412,11 +2410,11 @@ namespace Gekko
 
         public static IVariable avg(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
         {
-            IVariable tsl2 = HelperSum(smpl.t0, smpl.t3, items, true);
+            IVariable tsl2 = helper_Sum(smpl.t0, smpl.t3, items, true);
             return tsl2;
         }
 
-        private static IVariable HelperSum(GekkoTime t0, GekkoTime t3, IVariable[] items, bool avg)
+        private static IVariable helper_Sum(GekkoTime t0, GekkoTime t3, IVariable[] items, bool avg)
         {
             List m = O.FlattenIVariables(new List(items));
 
@@ -2553,7 +2551,7 @@ namespace Gekko
 
         public static IVariable time(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             Series x = new Series(ESeriesType.Light, smpl.t0.freq, null);
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
@@ -2696,7 +2694,7 @@ namespace Gekko
             List m = new List();
             foreach (string s2 in ss)
             {
-                double d = Functions.HelperValConvertFromString(s2);
+                double d = Functions.helper_ValConvertFromString(s2);
                 m.Add(new ScalarVal(d));
             }
             return m;
@@ -3433,7 +3431,7 @@ namespace Gekko
 
         public static IVariable mod(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable iv1, IVariable iv2)
         {
-            return Helper_GeneralFunction(smpl, _t1, _t2, iv1, iv2, (x1, x2) => x1 % x2, (x1, x2) => x2 % x1);
+            return helper_GeneralFunction(smpl, _t1, _t2, iv1, iv2, (x1, x2) => x1 % x2, (x1, x2) => x2 % x1);
         }
 
 
@@ -3838,7 +3836,7 @@ namespace Gekko
             if (ths.Type() == EVariableType.String)
             {
                 string s1 = O.ConvertToString(ths);
-                bool b = Helper_IsUpper(s1);
+                bool b = helper_IsUpper(s1);
                 if (b) return new ScalarVal(1d);
                 else return new ScalarVal(0d);
             }
@@ -3854,7 +3852,7 @@ namespace Gekko
             if (ths.Type() == EVariableType.String)
             {
                 string s1 = O.ConvertToString(ths);
-                bool b = Helper_IsLower(s1);
+                bool b = helper_IsLower(s1);
                 if (b) return new ScalarVal(1d);
                 else return new ScalarVal(0d);
             }
@@ -3870,7 +3868,7 @@ namespace Gekko
             if (ths.Type() == EVariableType.String)
             {
                 string s1 = O.ConvertToString(ths);
-                bool b = Helper_IsLetter(s1);
+                bool b = helper_IsLetter(s1);
                 if (b) return new ScalarVal(1d);
                 else return new ScalarVal(0d);
             }
@@ -3886,7 +3884,7 @@ namespace Gekko
             if (ths.Type() == EVariableType.String)
             {
                 string s1 = O.ConvertToString(ths);
-                bool b = Helper_IsDigit(s1);
+                bool b = helper_IsDigit(s1);
                 if (b) return new ScalarVal(1d);
                 else return new ScalarVal(0d);
             }
@@ -3897,7 +3895,7 @@ namespace Gekko
             }
         }
 
-        public static bool Helper_IsUpper(string value)
+        public static bool helper_IsUpper(string value)
         {
             // Consider string to be uppercase if it has no lowercase letters.
             for (int i = 0; i < value.Length; i++)
@@ -3910,7 +3908,7 @@ namespace Gekko
             return true;
         }
 
-        public static bool Helper_IsLower(string value)
+        public static bool helper_IsLower(string value)
         {
             // Consider string to be lowercase if it has no uppercase letters.
             for (int i = 0; i < value.Length; i++)
@@ -3923,7 +3921,7 @@ namespace Gekko
             return true;
         }
 
-        public static bool Helper_IsLetter(string value)
+        public static bool helper_IsLetter(string value)
         {
             // Consider string to be lowercase if it has no uppercase letters.
             for (int i = 0; i < value.Length; i++)
@@ -3936,7 +3934,7 @@ namespace Gekko
             return true;
         }
 
-        public static bool Helper_IsDigit(string value)
+        public static bool helper_IsDigit(string value)
         {
             // Consider string to be lowercase if it has no uppercase letters.
             for (int i = 0; i < value.Length; i++)
@@ -4204,7 +4202,7 @@ namespace Gekko
             else if (x1.Type() == EVariableType.String)
             {
                 string s = ((ScalarString)x1).string2;
-                v = HelperValConvertFromString(s);
+                v = helper_ValConvertFromString(s);
             }
             else if (x1.Type() == EVariableType.List)
             {
@@ -4227,7 +4225,7 @@ namespace Gekko
             return new ScalarVal(v);
         }
 
-        public static double HelperValConvertFromString(string s)
+        public static double helper_ValConvertFromString(string s)
         {
             double v;
             s = s.Trim();
@@ -4556,7 +4554,7 @@ namespace Gekko
 
         public static IVariable fromseries(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             Series ts = null;
 
@@ -4866,7 +4864,7 @@ namespace Gekko
 
             RootHelper rootHelper = new RootHelper();
             rootHelper.rootFileName = rootFileName;
-            HELPER_root(new DirectoryInfo(startFolder), rootHelper);
+            helper_root(new DirectoryInfo(startFolder), rootHelper);
 
             if (rootHelper.roots.Count == 0)
             {
@@ -4896,7 +4894,7 @@ namespace Gekko
             return null;  //because of errors we never get here
         }
 
-        private static void HELPER_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
+        private static void helper_root(DirectoryInfo directoryInfo, RootHelper rootHelper)
         {
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
@@ -4908,7 +4906,7 @@ namespace Gekko
             }
             DirectoryInfo parent = directoryInfo.Parent;
             if (parent == null) return;
-            HELPER_root(parent, rootHelper);
+            helper_root(parent, rootHelper);
         }
 
 

@@ -724,12 +724,12 @@ namespace Gekko
                     if (s.StartsWith("s", StringComparison.Ordinal))
                     {
                         string s2 = s.Substring("s".Length);
-                        flatStart.Add(G.ConvertToInt(Functions.HelperValConvertFromString(s2)));
+                        flatStart.Add(G.ConvertToInt(Functions.helper_ValConvertFromString(s2)));
                     }
                     else if (s.StartsWith("e", StringComparison.Ordinal))
                     {
                         string s2 = s.Substring("e".Length);
-                        flatEnd.Add(G.ConvertToInt(Functions.HelperValConvertFromString(s2)));
+                        flatEnd.Add(G.ConvertToInt(Functions.helper_ValConvertFromString(s2)));
                     }
                     else
                     {
@@ -748,7 +748,7 @@ namespace Gekko
                     new Error("xtrend: only 1 element is allowed");
                     //throw new GekkoException();
                 }
-                polydf = G.ConvertToInt(Functions.HelperValConvertFromString(xtrend[0]));
+                polydf = G.ConvertToInt(Functions.helper_ValConvertFromString(xtrend[0]));
                 if ((polydf < 0))
                 {
                     new Error("xtrend: polynomium cannot be negative");

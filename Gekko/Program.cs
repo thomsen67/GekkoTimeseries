@@ -5356,7 +5356,11 @@ namespace Gekko
                             {
                                 int jj5 = 0;
                                 int factor = 1;
-                                if (foundNumberOfDataInPxFile > 0) indexes[codesIncludingTime.Count - 1]++;
+                                if (foundNumberOfDataInPxFile > 0) indexes[codesIncludingTime.Count - 1]++; //not for the first
+                                //This is a bit like counting. 
+                                //If we have 799 and add 1 to that.
+                                //Then we get 7 10 0, and then afterwards 8 0 0.
+                                //Only here, it is not a 10-number system, but the dimensions have different sizes.
                                 for (int i = codesIncludingTime.Count - 1; i >= 0; i--)
                                 {                                    
                                     if (indexes[i] >= codesIncludingTime[i].Count)
@@ -5617,7 +5621,7 @@ namespace Gekko
             }  //for each line            
             
             G.Writeln("    All data read and prepared, now putting into series");
-
+            
             if (expectedNumberOfDataInPxFile != foundNumberOfDataInPxFile)
             {
                 string s5 = "";
@@ -19225,6 +19229,10 @@ namespace Gekko
             CrossThreadStuff.Pulse();
         }
 
+        /// <summary>
+        /// Finds built in functions. Does not need to be GekkoDictionary
+        /// </summary>
+        /// <returns></returns>
         public static Dictionary<string, string> FindGekkoInbuiltFunctions()
         {
             Dictionary<string, string> gekkoBuiltInFunctions = new Dictionary<string, string>();
@@ -19233,19 +19241,27 @@ namespace Gekko
             for (int i = 0; i < myArrayMethodInfo.Length; i++)
             {
                 MethodInfo myMethodInfo = (MethodInfo)myArrayMethodInfo[i];
-
-                //foreach(ParameterInfo pi in myMethodInfo.GetParameters())
-                //{
-                //    if(G.Equal(pi.Name, "xxx") { };
-                //}
-                
                 string name = myMethodInfo.Name.ToLower();  //should be superfluous
                 string meta = null;
                 object[] metaInfo = myMethodInfo.GetCustomAttributes(false);
-                if (metaInfo.Length > 0) meta = ((MyCustomAttribute)(metaInfo[0])).Lag;                
-                if (!gekkoBuiltInFunctions.ContainsKey(name))
+                if (metaInfo.Length > 0) meta = ((MyCustomAttribute)(metaInfo[0])).Lag;
+
+                //if(name.ToLower().Contains("helper_error"))
+                //{
+
+                //}
+
+                if (name.StartsWith("HELPER_", StringComparison.OrdinalIgnoreCase) && !G.Equal(name, "HELPER_error"))
                 {
-                    gekkoBuiltInFunctions.Add(name, meta);  //meta contains info on lags etc.         
+                    //keep helper_error(), which is used for unit tests.
+                    //but discard all other helper_... functions.
+                }
+                else
+                {
+                    if (!gekkoBuiltInFunctions.ContainsKey(name))
+                    {
+                        gekkoBuiltInFunctions.Add(name, meta);  //meta contains info on lags etc.         
+                    }
                 }
             }
 
