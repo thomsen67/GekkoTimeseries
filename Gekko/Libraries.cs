@@ -519,11 +519,9 @@ namespace Gekko
                     }
                     else
                     {
-                        //We have to parse it                        
-                        //Program.WaitForZipRead(tempPath, fileNameWithPath);
+                        //We have to parse it
                         library = new Library(libraryName, fileNameWithPath, stamp);
                         library.LibraryExtractor(fileNameWithPath);
-                        //library.LibraryExtractor2(tempPath, tempPath, fileNameWithPath);
                         
                         try //not the end of world if it fails
                         {                            
@@ -795,76 +793,7 @@ namespace Gekko
             }
             return rv;
         }        
-
-        ///// <summary>
-        ///// Finds all .gcm files in a folder structure, and extracts functions/procedures. Is recursive.
-        ///// Will also catalogue all "external" files from the \data subfolder.
-        ///// </summary>
-        ///// <param name="targetDirectory"></param>
-        //public void LibraryExtractor2(string targetDirectory, string originalDirectory, string zipFileName)
-        //{
-        //    // Process the list of files found in the directory.
-        //    string[] fileEntries = Directory.GetFiles(targetDirectory);
-        //    string relativePath = targetDirectory.Replace(originalDirectory, "");          
-
-        //    foreach (string fileName in fileEntries)
-        //    {
-        //        if (relativePath.ToLower() == "\\" + Globals.dataLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.dataLibraryString + "\\"))
-        //        {
-        //            //Normal external files. These are not extracted: just recorded.
-        //            if (this.dataFiles.ContainsKey(Path.GetFileName(fileName)))
-        //            {
-        //                using (var txt = new Error())
-        //                {
-        //                    string ss = this.dataFiles[Path.GetFileName(fileName)];
-        //                    txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\data subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
-        //                    txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
-        //                }
-        //            }
-        //            else
-        //            {
-        //                this.dataFiles.Add(Path.GetFileName(fileName), relativePath);
-        //            }
-        //        }
-        //        else if (relativePath.ToLower() == "\\" + Globals.metaLibraryString || relativePath.ToLower().StartsWith("\\" + Globals.metaLibraryString + "\\"))
-        //        {
-        //            //Normal external files with metadata. These are not extracted: just recorded.
-        //            if (this.metaFiles.ContainsKey(Path.GetFileName(fileName)))
-        //            {
-        //                using (var txt = new Error())
-        //                {
-        //                    string ss = this.dataFiles[Path.GetFileName(fileName)];
-        //                    txt.MainAdd("In the zip archive " + this.fileNameWithPath + ", in the \\meta subfolder, there are duplicate versions of the file " + Path.GetFileName(fileName) + ".");
-        //                    txt.MainAdd("It seems the file is both present in the subfolder " + ss + " and in the subfolder " + relativePath + ".");
-        //                }
-        //            }
-        //            else
-        //            {
-        //                this.metaFiles.Add(Path.GetFileName(fileName), relativePath);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            //.gcm files with functions/procedures for lazy loading
-        //            if (fileName.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
-        //            {
-        //                this.LibraryExtractorHandleGcmFile(fileName, originalDirectory, zipFileName);
-        //            }
-        //            else
-        //            {
-        //                //non-gcm files are just skipped here.
-        //            }
-        //        }                
-        //    }
-
-        //    // Recurse into subdirectories of this directory.
-        //    string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
-        //    foreach (string subdirectory in subdirectoryEntries)
-        //    {
-        //        this.LibraryExtractor2(subdirectory, originalDirectory, zipFileName);
-        //    }
-        //}
-
+        
         /// <summary>
         /// Finds all .gcm files in a folder structure, and extracts functions/procedures. Is recursive.
         /// Will also catalogue all "external" files from the \data subfolder.
@@ -1015,16 +944,33 @@ namespace Gekko
                         }
 
                         functionCounter++;
-
+                        
                         if (isFunction)
                         {
                             TokenHelper temp2 = t2.subnodes[i].SiblingAfter(2, true);  //skips comments, newlines, etc.
-                            functionNamesLower.Add(temp2.s.ToLower());
+                            string name = temp2.s.ToLower();
+                            functionNamesLower.Add(name);
+                            if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
+                            {
+                                using (Warning text = new Warning())
+                                {
+                                    O.SameFunctionOrProcedureNameWarning(text, name);
+                                }
+                            }
                         }
                         else
                         {
                             TokenHelper temp2 = t2.subnodes[i].SiblingAfter(1, true);  //skips comments, newlines, etc.
-                            functionNamesLower.Add(Globals.procedure + temp2.s.ToLower());
+                            string name = temp2.s.ToLower();
+                            functionNamesLower.Add(Globals.procedure + name);
+                            foreach (string s5 in Globals.commandNames)
+                            {
+                                if (G.Equal(s5, name))
+                                {
+                                    //But you cannot even define a procedure with a Gekko command name...
+                                    new Warning("Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
+                                }
+                            }
                         }
 
                         if (functionCounter >= 2)

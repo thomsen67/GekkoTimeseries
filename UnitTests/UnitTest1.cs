@@ -13928,14 +13928,14 @@ namespace UnitTests
 
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
                 I("reset;");
-                FAIL("function val abs(val %x); return 1; end;"); //error: already exists as in-built
+                I("function val abs(val %x); return 1; end;"); //will give warning
                 if (i == 0) Program.Flush(); //wipes out existing cached libs
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Libraries';");
                 I("library p6;");
                 I("%y1 = abs(-100);");
                 _AssertScalarVal(First(), "%y1", 100d);  //will take in-built
-                FAIL("%y2 = p6:abs(-100);");  //error: already exists as in-built
+                I("%y2 = p6:abs(-100);");  //will issue warning
 
                 // ------------------------------------------------------------
                 // get a file from the \data subfolder in i library

@@ -5305,7 +5305,10 @@ namespace Gekko
             }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
-                new Error("Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of an in-built Gekko function/procedure. For now, this is not allowed.");
+                using (Warning text = new Warning())
+                {
+                    SameFunctionOrProcedureNameWarning(text, name);
+                }
             }
             if (name.StartsWith(Globals.procedure))
             {
@@ -5314,14 +5317,24 @@ namespace Gekko
                     if (G.Equal(s, name.Substring(Globals.procedure.Length)))
                     {
                         //But you cannot even define a procedure with a Gekko command name...
-                        new Error("Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of a Gekko command. For now, this is not allowed.");
+                        new Warning("Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of a Gekko command. The Gekko command will take precedence.");
                     }
                 }
             }
         }
 
+        public static void SameFunctionOrProcedureNameWarning(Warning text, string name)
+        {
+            text.MainAdd("Beware that user " + G.FromLibraryToFunctionProcedureName(name, 4) + " is also the name of an in-built Gekko function/procedure, and the in-built version will take precedence unless library name is indicated.");
+            text.MoreAdd("If a function 'f()' or procedure 'f' exists as an in-built Gekko function/procedure, calling 'f()' or 'f' will always result in Gekko using the in-built version.");
+            text.MoreAdd("However, you may indicate a library name, for instance 'local:f()' or 'local:f' if the function/procedure is a normal user-defined function, or 'lib1:f()' or 'lib1:f' if the function/procedure");
+            text.MoreAdd("is defined in the library 'lib1'. In general, if you are developing a new function or procedure and get this warning, please use ");
+            text.MoreAdd("a different name to avoid confusion. If this warning arises because you are upgrading your Gekko version, the best advice is to change ");
+            text.MoreAdd("the name of your function/procedure in your exiting command files and libraries.");
+        }
+
         // --------------------------------
-        
+
         /// <summary>
         /// Used for Gekko user-defined functions.
         /// </summary>
