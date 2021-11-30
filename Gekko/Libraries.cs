@@ -943,7 +943,7 @@ namespace Gekko
                             i1 = th1.id + 1;  //the node after the ";"
                         }
 
-                        functionCounter++;
+                        functionCounter++; 
                         
                         if (isFunction)
                         {
