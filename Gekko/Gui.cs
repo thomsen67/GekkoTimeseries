@@ -2412,7 +2412,7 @@ namespace Gekko
             }
             string orignialFileName = fileName;
 
-            FindFileHelper ffh = Program.FindFile(fileName, folders, Gui.gui.p, true, true);  //calls CreateFullPathAndFileName(). Hmm, is Gui.gui.p really working? Probably...
+            FindFileHelper ffh = Program.FindFile(fileName, folders, true, true, Gui.gui.p);  //calls CreateFullPathAndFileName(). Hmm, is Gui.gui.p really working? Probably...
             fileName = ffh.realPathAndFileName;
 
             if (fileName != null)

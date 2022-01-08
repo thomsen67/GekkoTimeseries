@@ -35,6 +35,56 @@ namespace Gekko
 
     public static class SolveCommon
     {
+        public static DenseVector DenseVector(double[] input)
+        {
+            DenseVector output = new DenseVector(input.Length);
+            for (int i = 0; i < input.Length; i++) output.SetValue(i, input[i]);
+            return output;
+        }
+
+        public static double RSS(double[] input)
+        {
+            double rss = 0d;
+            for (int i = 0; i < input.Length; i++)
+            {
+                double v = input[i];
+                rss += v * v;
+            }
+            return rss;
+        }
+
+        public static double RSS(DenseVector input)
+        {
+            double rss = 0d;
+            for (int i = 0; i < input.Length; i++)
+            {
+                double v = input.GetValue(i);
+                rss += v * v;
+            }
+            return rss;
+        }
+
+        public static DenseVector Negative(DenseVector input)
+        {
+            DenseVector output = new DenseVector(input.Length);
+            for (int i = 0; i < input.Length; i++)
+            {
+                output.SetValue(i, -input.GetValue(i));
+            }
+            return output;
+        }
+
+        public static DenseVector Add(DenseVector x1, DenseVector x2)
+        {
+            if (x1.Length != x2.Length) throw new GekkoException();
+            DenseVector output = new DenseVector(x1.Length);
+            for (int i = 0; i < x1.Length; i++)
+            {
+                output.SetValue(i, x1.GetValue(i) + x2.GetValue(i));
+            }
+            return output;
+        }
+
         public static void InitEndoNoLag(Program.ErrorContainer ec, double[,] a, int tInt, ref GekkoTime t, SimOptions so, ref double val, Series ts, int yy)
         {
             bool endoInitUsesLag = false;
@@ -2883,6 +2933,53 @@ namespace Gekko
 
     }
 
+    public static class SolveGMRES
+    {
+        public static GMRESSolverOutput SolveGMRESAlgorithm(double[] x_input, Func<double[], GMRESSolverInput, double[]> func, GMRESSolverInput input)
+        {
+            int n = x_input.Length;
+
+            GMRESSolverOutput output = new GMRESSolverOutput();            
+
+            double[] x0 = new double[n];
+            Array.Copy(x_input, x0, x_input.Length);
+
+            double[] y0 = func(x0, input);  //TODO: speed
+
+            SparseRowMatrix a0 = new SparseRowMatrix(n, n);  //TODO: better with column??
+            for (int j = 0; j < n; j++)
+            {
+                double mem = x0[j];
+                x0[j] += input.delta;
+                double[] y0_delta = func(x0, input);  //TODO: speed
+                for (int i = 0; i < n; i++)
+                {
+                    a0.AddValue(i, j, (y0_delta[i] - y0[i]) / input.delta);
+                }
+                x0[j] = mem;
+            }
+
+            ILinearSolver solver = new GMRESSolver();            
+            DefaultLinearIteration iter = new DefaultLinearIteration();
+            iter.SetParameters(Globals.invertRelativeConvergence, Globals.invertAbsoluteConvergence, 1e+5, Globals.invertIterations);  //first param is relative convergence, which is OR'ed with absolute convergence (which we keep pretty strict)
+            IPreconditioner M = new IdentityPreconditioner();  //TODO: partial lu?
+            M.Setup(a0);
+            solver.Preconditioner = M;
+            solver.Iteration = iter;
+
+            DenseVector dx = new DenseVector(n);
+            DenseVector dx1 = (DenseVector)solver.Solve(a0, SolveCommon.Negative(SolveCommon.DenseVector(y0)), dx);
+            DenseVector x1 = SolveCommon.Add(SolveCommon.DenseVector(x0), dx1);
+            double[] y1 = func(x1.Data, input);
+            double rss = SolveCommon.RSS(y1);
+
+            output.x = x1;
+            output.f = rss;
+
+            return output;
+        }
+    }
+
     public static class SolveGradientDescent
     {
 
@@ -3915,7 +4012,7 @@ namespace Gekko
                 Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber].Add(varNumber);
                 Program.model.modelGekko.m2.sparseInfoLeftRightSeparated[eh.equationNumber].AddRange(temp);
             }
-        }
+        }        
 
         public static void FeedbackOrderingStuff(ECompiledModelType modelType, bool isCalledFromModelStatement)
         {

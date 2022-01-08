@@ -383,6 +383,9 @@ namespace Gekko
         {
             for (int i = 0; i < o.files.Count; i++)
             {
+                DateTime dt0 = DateTime.Now;
+                string type = "[unknown]";  //file | cache | ram
+
                 string fileName3 = O.ConvertToString(o.files[i]);
                 string fileName2 = G.AddExtension(fileName3, Globals.zip);
                 string libraryName = Path.GetFileNameWithoutExtension(fileName2);
@@ -413,7 +416,8 @@ namespace Gekko
                 folders.Add(Program.options.folder_command);
                 folders.Add(Program.options.folder_command1);
                 folders.Add(Program.options.folder_command2);
-                string fileNameWithPath = Program.FindFile(fileName2, folders);  //also calls CreateFullPathAndFileName()
+                FindFileHelper ffh = Program.FindFile(fileName2, folders, true, false, null);  //also calls CreateFullPathAndFileName()
+                string fileNameWithPath = ffh.realPathAndFileName;
                 if (fileNameWithPath == null)
                 {
                     new Error("Could not find library file: " + fileName2);
@@ -468,6 +472,7 @@ namespace Gekko
                     //It is not legal to open the same zip file as two different libraries, so there should be no dangers here.
                     //When setting this name, it is changed both in .library and .libraryCache, since it is the same object.
                     library.SetName(libraryName);
+                    type = "ram";
                 }
                 else
                 {
@@ -475,6 +480,11 @@ namespace Gekko
                     //Now we try the disk cache.                    
                     //We only allow a match if it is BOTH the same bytes in the file, AND the filepath + alias is the same.
                     //This makes file references easier, less to think about. So two identical libs may be parsed two times if the are in two different file locations (or a different alias is used)
+
+                    //TODO: This may be slow: first the network file is read and UTF-converted, then MD5.
+                    //      Maybe faster to do local copy of whole file first (if copylocal?...), and then find some
+                    //      fast MD5 (and salt with filename etc.).
+
                     string s = Program.GetTextFromFileWithWait(fileNameWithPath, false);
                     string ss = s + G.NL + "Filename: " + fileNameWithPath + "Alias: " + libraryName;
                     string libHash = Program.GetMD5Hash(ss); //Pretty unlikely that two different libs could produce the same hash.
@@ -486,8 +496,7 @@ namespace Gekko
                         if (File.Exists(libFileNameAndPath))
                         {
                             try
-                            {
-                                DateTime dt1 = DateTime.Now;
+                            {                                
                                 using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, Program.GekkoFileReadOrWrite.Read))
                                 {
                                     library = Serializer.Deserialize<Library>(fs);
@@ -506,6 +515,7 @@ namespace Gekko
                                     loadedFromProtobuf = false;
                                 }
                             }
+                            type = "cache";
                         }
                     }
                     else
@@ -540,6 +550,7 @@ namespace Gekko
                         {
                             //do nothing, not the end of the world if it fails
                         }
+                        type = "file";
                     }
 
                     //all files loaded from .zip end up here, and the cache only grows (cannot shrink).
@@ -555,7 +566,14 @@ namespace Gekko
                 {
                     more = " (" + G.GetLinkAction("info", new GekkoAction(EGekkoActionTypes.Unknown, null, QHelperActions(library, functions, procedures, files))) + ")";
                 }
-                new Writeln("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + more + ". Library path: " + fileNameWithPath);
+
+                using (Writeln txt = new Writeln())
+                {
+                    txt.MainAdd("Loaded library '" + libraryName + "' with " + G.AddS(functions.Count, "function") + ", " + G.AddS(procedures.Count, "procedure") + ", " + G.AddS(files.Count, "file") + more + ".");
+                    txt.MainNewLineTight();
+                    txt.MainAdd("Library path: " + fileNameWithPath + ", ");
+                    txt.MainAdd("loaded from " + type + " in: " + G.SecondsFormat((DateTime.Now - dt0).TotalMilliseconds) + ".");
+                }
             }
         }
 

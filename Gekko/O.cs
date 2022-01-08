@@ -1805,8 +1805,8 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(G.GetProgramDir());
-            FindFileHelper ffh = Program.FindFile(s, folders, p, false, false);  //also calls CreateFullPathAndFileName()
-            string fileName2 = ffh.realPathAndFileName;
+            FindFileHelper ffh1 = Program.FindFile(s, folders, false, false, null);  //also calls CreateFullPathAndFileName()
+            string fileName2 = ffh1.realPathAndFileName;
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
@@ -1824,7 +1824,10 @@ namespace Gekko
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
-            fileName2 = Program.FindFile(s, folders); //also calls CreateFullPathAndFileName(), library files not allowed
+
+            FindFileHelper ffh2 = Program.FindFile(s, folders, true, false, null); //also calls CreateFullPathAndFileName(), library files not allowed
+            fileName2 = ffh2.realPathAndFileName;
+
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
@@ -2048,7 +2051,8 @@ namespace Gekko
             folders.Add(Program.options.folder_help);  //looks here first, will actually before anything else look in working folder (which should not contain any help files)
             folders.Add(Application.StartupPath + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
 
-            string path = Program.FindFile("gekko.chm", folders);  //calls CreateFullPathAndFileName()
+            FindFileHelper ffh = Program.FindFile("gekko.chm", folders, true, false, null);  //calls CreateFullPathAndFileName()
+            string path = ffh.realPathAndFileName;
 
             if (path == null)
             {                
@@ -2511,7 +2515,7 @@ namespace Gekko
                 Globals.datopgek_errors.Add("Reading this listfile: " + fileName);
             }
             List<string> folders = new List<string>();
-            FindFileHelper ffh = Program.FindFile(fileName, folders, p, true, true);
+            FindFileHelper ffh = Program.FindFile(fileName, folders, true, true, p);
             if (ffh.realPathAndFileName == null)
             {
                 new Error("Listfile '" + ffh.prettyPathAndFileName + "' could not be found");
@@ -9463,7 +9467,7 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
-                FindFileHelper ffh = Program.FindFile(this.fileName, null, this.p, true, true);
+                FindFileHelper ffh = Program.FindFile(this.fileName, null, true, true, this.p);
                 if (ffh.realPathAndFileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
                 Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(ffh.realPathAndFileName));
             }

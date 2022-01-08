@@ -89,7 +89,7 @@ namespace Gekko
                 {
                     string fileName = Program.options.plot_using;
                     fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);                    
-                    FindFileHelper ffh = Program.FindFile(fileName, null, pp, true, true);
+                    FindFileHelper ffh = Program.FindFile(fileName, null, true, true, pp);
                     fileName = ffh.realPathAndFileName;
                     if (fileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
 
@@ -118,7 +118,7 @@ namespace Gekko
                     if (cancel) return;
 
                     fileName = G.AddExtension(fileName, "." + Globals.extensionPlot);                    
-                    FindFileHelper ffh = Program.FindFile(fileName, null, pp, true, true);
+                    FindFileHelper ffh = Program.FindFile(fileName, null, true, true, pp);
                     fileName = ffh.realPathAndFileName;
                     if (fileName == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
 

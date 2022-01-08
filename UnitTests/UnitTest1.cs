@@ -12471,6 +12471,26 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_SolverGMRES()
+        {
+            double[] Function(double[] x, GMRESSolverInput input_function)
+            {
+                double[] rv = new double[3];  //TODO: speed
+                rv[0] = -2 * x[0] + 1 * x[1] + 7 * x[2] - 6;
+                rv[1] = 3 * x[0] + 4 * x[1] - 8 * x[2] - 5;
+                rv[2] = 9 * x[0] + 10 * x[1] + 11 * x[2] - 12;
+                input_function.evals++;
+                return rv;
+            }
+            
+            double[] xstart = new double[] { -1d, -1d, -1d };
+            GMRESSolverInput input = new GMRESSolverInput();            
+            input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2                    
+            GMRESSolverOutput output = SolveGMRES.SolveGMRESAlgorithm(xstart, Function, input);
+            Assert.IsTrue(output.f < 0.001d);
+        }
+
+        [TestMethod]
         public void _Test_SolverConjugateGradientRosenbrock()
         {
             double Function(double[] x_function, CGSolverInput input_function)

@@ -64,10 +64,8 @@ namespace Gekko.Parser.Frm
             {
                 EmitCsCodeAndCompileModel(ECompiledModelType.Gauss, isCalledFromModelStatement);  //This method is only called from here
             }
-
             
-            EmitCsCodeAndCompileModel(modelType, isCalledFromModelStatement);  //This method is only called from here
-            
+            EmitCsCodeAndCompileModel(modelType, isCalledFromModelStatement);  //This method is only called from here            
 
             G.WritelnGray("¤¤¤ Hash: " + cacheKey);
 
@@ -962,7 +960,7 @@ namespace Gekko.Parser.Frm
                 //try to find it externally, look also in model path!
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_model);
-                FindFileHelper ffh = Program.FindFile("varlist.dat", folders, p, true, true);
+                FindFileHelper ffh = Program.FindFile("varlist.dat", folders, true, true, p);
                 fileNameTemp = ffh.realPathAndFileName;
                 if (fileNameTemp != null)
                 {

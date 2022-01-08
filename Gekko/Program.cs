@@ -351,6 +351,22 @@ namespace Gekko
         public int evals = 0;
     }
 
+    public class GMRESSolverOutput
+    {
+        public int iterations = -12345;
+        public double f = double.NaN;
+        public DenseVector x = null;
+        public int evals = 0;
+    }
+
+    public class GMRESSolverInput
+    {        
+        public double krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
+        public double delta = Globals.jacobiDeltaProbe;
+        // -------------
+        public int evals = 0;  //!!!!!!! do not change
+    }
+
     public class CGSolverInput
     {
         public double deltaGradient = 1e-8;
@@ -1608,9 +1624,105 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
-                
+
+                //maybe buffer not larger then 1 mio.
+
+                int i = 0;
+                if (text.Contains("i1")) i = 1;
+                else if (text.Contains("i2")) i = 2;
+                else if (text.Contains("i3")) i = 3;
+                else if (text.Contains("i4")) i = 4;
+                else if (text.Contains("i5")) i = 5;
+                else if (text.Contains("i6")) i = 6;
+                else if (text.Contains("i7")) i = 7;
+                else if (text.Contains("i8")) i = 8;
+
+                string file = @"c:\Tools\Nibbler\sletmig.zip";
+                DateTime dt0 = DateTime.Now;
+
+                int buf = 4096;
+                buf = int.Parse(text);
+
+                if (false)
+                {
+
+
+                    if (i == 1)
+                    {
+                        using (FileStream stream = File.OpenRead(file))
+                        {
+                            SHA256Managed sha = new SHA256Managed();
+                            byte[] checksum = sha.ComputeHash(stream);
+                            string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                        }
+                    }
+                    else if (i == 2)
+                    {
+                        using (var stream = new BufferedStream(File.OpenRead(file), 1200000))
+                        {
+                            SHA256Managed sha = new SHA256Managed();
+                            byte[] checksum = sha.ComputeHash(stream);
+                            string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                        }
+                    }
+                    else if (i == 3)
+                    {
+                        using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
+                        {
+                            SHA256Managed sha = new SHA256Managed();
+                            byte[] checksum = sha.ComputeHash(stream);
+                            string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                        }
+                    }
+                    else if (i == 4)
+                    {
+                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file, false));
+                    }
+                    else if (i == 5)
+                    {
+                        string s = Program.GetMD5Hash(GetTextFromFileWithWait(file, true));
+                    }
+                    else if (i == 6)
+                    {
+                        WaitForFileCopy(file, "c:\\tools\\slet\\sletmig.data");
+                    }
+                    else if (i == 7)
+                    {
+                        string folder = CreateTempFolderPath("temptsdxfolder");
+                        if (!Directory.Exists(folder))  //should almost never exist, since name is random
+                        {
+                            Directory.CreateDirectory(folder);
+                        }
+                        else
+                        {
+                            //in the very rare case, any files here will be overwritten
+                        }
+                        ZipFile.ExtractToDirectory(file, folder);
+                    }
+                    else if (i == 8)
+                    {
+                        using (var stream = Program.WaitForFileStream(file, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
+                        {
+                            SHA256Managed sha = new SHA256Managed();
+                            byte[] checksum = sha.ComputeHash(stream);
+                            string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                        }
+                    }
+                }
+                else
+                {
+                    using (var stream = Program.WaitForFileStream(file, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
+                    {
+                        SHA256Managed sha = new SHA256Managed();
+                        byte[] checksum = sha.ComputeHash(stream);
+                        string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
+                    }
+                }
+
+                new Writeln("Alternative " + i + ", time ms = " + (DateTime.Now - dt0).TotalMilliseconds);
+
 
                 if (text == "arrow")
                 {
@@ -1774,7 +1886,8 @@ namespace Gekko
                         
             string freqHere = G.ConvertFreq(Program.options.freq);
 
-            string fullFileNameAndPath = Program.FindFile(file, null);
+            FindFileHelper ffh = Program.FindFile(file, null, true, false, null);
+            string fullFileNameAndPath = ffh.realPathAndFileName;
 
             if (fullFileNameAndPath == null)
             {
@@ -3269,7 +3382,7 @@ namespace Gekko
             //do copylocal
             string fileName = o.fileName;
             fileName = G.AddExtension(fileName, ".xlsx");
-            FindFileHelper ffh = Program.FindFile(fileName, null, o.p, true, true);
+            FindFileHelper ffh = Program.FindFile(fileName, null, true, true, o.p);
             fileName = ffh.realPathAndFileName;
                         
             if (Globals.pink && fileName != null && (fileName.ToLower().Contains("g:\\datopgek\\") || fileName.ToLower().Contains("g:/datopgek/")))
@@ -7374,7 +7487,7 @@ namespace Gekko
             {
                 //called in the new way
                 Globals.r_fileContent = null;
-                FindFileHelper ffh = Program.FindFile(o.fileName, null, o.p, true, true);
+                FindFileHelper ffh = Program.FindFile(o.fileName, null, true, true, o.p);
                 string file = ffh.realPathAndFileName;
                 if (file == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
                 Globals.r_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file));
@@ -7615,7 +7728,7 @@ namespace Gekko
             if (true)
             {
                 Globals.python_fileContent = null;
-                FindFileHelper ffh = Program.FindFile(o.fileName, null, o.p, true, true);
+                FindFileHelper ffh = Program.FindFile(o.fileName, null, true, true, o.p);
                 string file = ffh.realPathAndFileName;
                 if (file == null) new Error("The file does not exist: " + ffh.prettyPathAndFileName);
                 Globals.python_fileContent = Stringlist.ExtractLinesFromText(Program.GetTextFromFileWithWait(file)); 
@@ -11655,7 +11768,7 @@ namespace Gekko
             if (G.Equal(o.opt_cols, "yes")) isTranspose = true;
 
             string s2 = G.AddExtension(o.fileName, "." + x);
-            FindFileHelper ffh = Program.FindFile(s2, null, o.p, true, true);
+            FindFileHelper ffh = Program.FindFile(s2, null, true, true, o.p);
             string fn = ffh.realPathAndFileName;
             if (fn == null) new Error("Could not find file '" + ffh.prettyPathAndFileName + "'");
 
@@ -11952,6 +12065,7 @@ namespace Gekko
         {
             // step 1, calculate MD5 hash from input
             MD5 md5 = System.Security.Cryptography.MD5.Create();
+
             byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);  //UTF8 seems best choice
             byte[] hash = md5.ComputeHash(inputBytes);
             // step 2, convert byte array to hex string
@@ -12162,7 +12276,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
 
-            FindFileHelper ffh = FindFile(s, folders, o.p, true, true);  //also calls CreateFullPathAndFileName()
+            FindFileHelper ffh = FindFile(s, folders, true, true, o.p);  //also calls CreateFullPathAndFileName()
             string fileName2 = ffh.realPathAndFileName;
 
             if (fileName2 == null)
@@ -14912,7 +15026,7 @@ namespace Gekko
             
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder            
-            FindFileHelper ffh = FindFile(fileName, folders, o.p, true, true);  //calls CreateFullPathAndFileName()
+            FindFileHelper ffh = FindFile(fileName, folders, true, true, o.p);  //calls CreateFullPathAndFileName()
             fileName = ffh.realPathAndFileName;
 
             Globals.modelPathAndFileName = ffh.prettyPathAndFileName;  //always contains a path            
@@ -15651,7 +15765,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                ffh = FindFile(fileName, folders, p, true, true);
+                ffh = FindFile(fileName, folders, true, true, p);
                 fileName = ffh.realPathAndFileName;
             }
 
@@ -15677,26 +15791,17 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Overload. Includes working folder and excludes libraries. Returns null if no file is found.
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="folders"></param>
-        /// <returns></returns>
-        public static string FindFile(string fileName, List<string> folders)
-        {
-            //When called with folders == null, this is the same as CreateFullPathAndFileName(),
-            //but with the difference that it returns null if the file does not exist.
-            return FindFile(fileName, folders, null, true, false).realPathAndFileName;  //no P p here, since allowLibrary is false anyway
-        }
-
-        /// <summary>
-        /// Find a file, may indicate folders to look in, and may include working folder and may include libraries. Will return null if no file is found (no file exists)
+        /// Find a file, may indicate folders to look in, and may include working folder and may include libraries. 
+        /// Will return null if no file is found (no file exists), but if return is non-null, the object will
+        /// include the real path of the file (maybe copied or unzipped with a temp name) together with the pretty name
+        /// for human use.
+        /// Note that when allowLibrary == true, p must point to P object. If allowLibrary == false, p may be null.
         /// </summary>
         /// <param name="filenameMaybeWithoutPath"></param>
         /// <param name="folders"></param>
         /// <param name="includeWorkingFolder"></param>
         /// <returns></returns>
-        public static FindFileHelper FindFile(string filenameMaybeWithoutPath, List<string> folders, P p, bool includeWorkingFolder, bool allowLibrary)
+        public static FindFileHelper FindFile(string filenameMaybeWithoutPath, List<string> folders, bool includeWorkingFolder, bool allowLibrary, P p)
         {
             // +--------------- #kja890adsfjkaas1 ------------------+
             // |                                                    |
@@ -18174,41 +18279,47 @@ namespace Gekko
 
             return tsdFile;
         }
-
-        /// <summary>
-        /// Extract the contents of a zip file.
-        /// </summary>
-        /// <param name="folderToUseForOutput"></param>
-        /// <param name="zipFileNameAndPath"></param>
-        public static void WaitForZipRead(string folderToUseForOutput, string zipFileNameAndPath)
-        {
-            //is not actually waiting...            
-            //try-catch is not used here: normally a zip-file can be read even if blocked by others (not so for writing)            
-
-            try
-            {
-                ZipFile.ExtractToDirectory(zipFileNameAndPath, folderToUseForOutput);
-            }
-            catch (Exception e)
-            {
-                new Error("Zip extraction failed: " + e.InnerException + " " + e.Message, false);
-            }
-
-            return;
-        }
-
+        
         public static void AbortingReset()
         {
             Globals.threadIsInProcessOfAborting = false;  //clearing this
             Globals.applicationIsInProcessOfAborting = false;  //clearing this
         }
 
+        /// <summary>
+        /// See called method
+        /// </summary>
+        /// <param name="pathAndFilename"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type)
         {
-            return WaitForFileStream(pathAndFilename, type, false);
+            return WaitForFileStream(pathAndFilename, type, false, -12345);
         }
 
-        public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen)
+        /// <summary>
+        /// /// See called method
+        /// </summary>
+        /// <param name="pathAndFilename"></param>
+        /// <param name="type"></param>
+        /// <param name="bufferSize"></param>
+        /// <returns></returns>
+        public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, int bufferSize)
+        {
+            return WaitForFileStream(pathAndFilename, type, false, bufferSize);
+        }
+
+        /// <summary>
+        /// Set bufferSize to -12345 to make it default (4096 at the moment). For a lot of file reading, 4096 (bytes) is probably fine
+        /// and small and fits cache etc. But when the Stream is fed to a hash code generator like SHA256, using 
+        /// 1200000 bytes for bufferSize (1.2 MB) may speed up around 20%.
+        /// </summary>
+        /// <param name="pathAndFilename"></param>
+        /// <param name="type"></param>
+        /// <param name="printAnyExceptionOnScreen"></param>
+        /// <param name="bufferSize"></param>
+        /// <returns></returns>
+        public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen, int bufferSize)
         {
             if (type != GekkoFileReadOrWrite.Read)
             {
@@ -18286,7 +18397,18 @@ namespace Gekko
 
                 try
                 {
-                    fs = File.Open(pathAndFilename, fm, fa, fsh);
+                    //We used to use this:
+                    //fs = File.Open(pathAndFilename, fm, fa, fsh);
+                    //But according to this: https://stackoverflow.com/questions/2375369/difference-between-file-open-and-new-filestream
+                    //we can use FileStream to also set a buffer
+                    if (bufferSize == -12345)
+                    {
+                        fs = new FileStream(pathAndFilename, fm, fa, fsh); //default: 4096
+                    }
+                    else
+                    {
+                        fs = new FileStream(pathAndFilename, fm, fa, fsh, bufferSize); //default: 4096
+                    }
                 }
                 catch (UnauthorizedAccessException e)
                 {                    
@@ -23213,14 +23335,15 @@ namespace Gekko
                         DefaultLinearIteration iter = null;
                         try
                         {
+                            ILinearSolver solver = null;
                             //IElementalAccessVector gradient = new DenseVector(x.Length);
                             //Blas.Default.TransMult(jacobyMatrix, residuals, gradient);  //checked that it MUST be transposed -- else wrong
                             //ILinearSolver solver = new BiCGSolver();  //1.00, BiCG family supposed to be unstable
                             //ILinearSolver solver = new BiCGstabSolver(); //0.47, supposed to be unstable
                             //ILinearSolver solver = new CGSSolver();  //0.46, supposed to be unstable, should have double spped of BiCG, seems unstable
                             //ILinearSolver solver = new IRSolver();  //not conv
-                            //ILinearSolver solver = new GMRESSolver();  //1.01, supposed to be stable
-                            ILinearSolver solver = new QMRSolver();  //USED: 1.24, more robust versoin of BiCG
+                            if (Globals.runningOnTTComputer) solver = new GMRESSolver();  //1.01, supposed to be stable
+                            else solver = new QMRSolver();  //USED: 1.24, more robust versoin of BiCG
 
                             IPreconditioner M = new IdentityPreconditioner();
                             iter = new DefaultLinearIteration();
@@ -27854,7 +27977,7 @@ namespace Gekko
                 inputFileName = Path.GetFileName(inputFileName);
             }
 
-            FindFileHelper ffh = FindFile(inputFileName, folders, p, true, true);
+            FindFileHelper ffh = FindFile(inputFileName, folders, true, true, p);
             string fileNameTemp = ffh.realPathAndFileName;
 
             if (fileNameTemp == null)
