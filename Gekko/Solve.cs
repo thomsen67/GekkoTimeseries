@@ -42,6 +42,13 @@ namespace Gekko
             return output;
         }
 
+        public static DenseVector DenseVectorClone(DenseVector input)
+        {
+            DenseVector output = new DenseVector(input.Length);
+            for (int i = 0; i < input.Length; i++) output.SetValue(i, input.GetValue(i));
+            return output;
+        }
+
         public static double RSS(double[] input)
         {
             double rss = 0d;
@@ -2935,46 +2942,69 @@ namespace Gekko
 
     public static class SolveGMRES
     {
-        public static GMRESSolverOutput SolveGMRESAlgorithm(double[] x_input, Func<double[], GMRESSolverInput, double[]> func, GMRESSolverInput input)
+        public static GMRESSolverOutput SolveGMRESAlgorithm(double[] x_guess, Func<double[], GMRESSolverInput, double[]> func, GMRESSolverInput input)
         {
-            int n = x_input.Length;
+            int n = x_guess.Length;
+            int kMax = 100;
+            double krit = 0.0001d;
 
-            GMRESSolverOutput output = new GMRESSolverOutput();            
+            GMRESSolverOutput output = new GMRESSolverOutput();
 
-            double[] x0 = new double[n];
-            Array.Copy(x_input, x0, x_input.Length);
+            DenseVector x0 = SolveCommon.DenseVector(x_guess);
+            DenseVector y0 = SolveCommon.DenseVector(func(x0.Data, input));  //TODO: speed
+            double rss0 = SolveCommon.RSS(y0);
 
-            double[] y0 = func(x0, input);  //TODO: speed
+            DenseVector x1 = SolveCommon.DenseVectorClone(x0);
+            DenseVector y1 = SolveCommon.DenseVectorClone(y0);
+            double rss1 = rss0;
 
-            SparseRowMatrix a0 = new SparseRowMatrix(n, n);  //TODO: better with column??
-            for (int j = 0; j < n; j++)
+            DenseVector x2 = null;
+            DenseVector y2 = null;
+            double rss2 = double.NaN;
+                        
+            for (int k = 0; k < kMax; k++)
             {
-                double mem = x0[j];
-                x0[j] += input.delta;
-                double[] y0_delta = func(x0, input);  //TODO: speed
-                for (int i = 0; i < n; i++)
+                SparseRowMatrix a1 = new SparseRowMatrix(n, n);  //TODO: better with column??
+                for (int j = 0; j < n; j++)
                 {
-                    a0.AddValue(i, j, (y0_delta[i] - y0[i]) / input.delta);
+                    double mem = x1.GetValue(j);
+                    x1.AddValue(j, input.delta);
+                    double[] y1_shock = func(x1.Data, input);  //TODO: speed
+                    for (int i = 0; i < n; i++)
+                    {
+                        a1.SetValue(i, j, (y1_shock[i] - y1.GetValue(i)) / input.delta);
+                    }
+                    x1.SetValue(j, mem);  //revert
                 }
-                x0[j] = mem;
-            }
 
-            ILinearSolver solver = new GMRESSolver();            
-            DefaultLinearIteration iter = new DefaultLinearIteration();
-            iter.SetParameters(Globals.invertRelativeConvergence, Globals.invertAbsoluteConvergence, 1e+5, Globals.invertIterations);  //first param is relative convergence, which is OR'ed with absolute convergence (which we keep pretty strict)
-            IPreconditioner M = new IdentityPreconditioner();  //TODO: partial lu?
-            M.Setup(a0);
-            solver.Preconditioner = M;
-            solver.Iteration = iter;
+                ILinearSolver solver = new GMRESSolver();  //TODO: speed
+                DefaultLinearIteration iteration = new DefaultLinearIteration();
+                iteration.SetParameters(Globals.invertRelativeConvergence, Globals.invertAbsoluteConvergence, 1e+5, Globals.invertIterations);  //first param is relative convergence, which is OR'ed with absolute convergence (which we keep pretty strict)
+                IPreconditioner M = new IdentityPreconditioner();  //TODO: partial lu?
+                M.Setup(a1);
+                solver.Preconditioner = M;
+                solver.Iteration = iteration;
 
-            DenseVector dx = new DenseVector(n);
-            DenseVector dx1 = (DenseVector)solver.Solve(a0, SolveCommon.Negative(SolveCommon.DenseVector(y0)), dx);
-            DenseVector x1 = SolveCommon.Add(SolveCommon.DenseVector(x0), dx1);
-            double[] y1 = func(x1.Data, input);
-            double rss = SolveCommon.RSS(y1);
+                DenseVector dx_guess = new DenseVector(n); //What should this be? Now it is 0. Beware that dx_guess gets changed!
+                DenseVector dx1 = (DenseVector)solver.Solve(a1, SolveCommon.Negative(y1), dx_guess);
 
-            output.x = x1;
-            output.f = rss;
+                x2 = SolveCommon.Add(x1, dx1);
+                y2 = SolveCommon.DenseVector(func(x2.Data, input));
+                rss2 = SolveCommon.RSS(y2);
+
+                if (rss2 < Math.Pow(krit, 2))
+                {
+                    output.x = x2;
+                    output.f = rss2;
+                    output.iterations = k;
+                    output.evals = input.evals;
+                    break;
+                }
+
+                x1 = SolveCommon.DenseVectorClone(x2);
+                y1 = SolveCommon.DenseVectorClone(y2);
+                rss1 = rss2;
+            }            
 
             return output;
         }

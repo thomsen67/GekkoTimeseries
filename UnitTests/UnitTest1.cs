@@ -12477,7 +12477,7 @@ namespace UnitTests
             {
                 double[] rv = new double[3];  //TODO: speed
                 rv[0] = -2 * x[0] + 1 * x[1] + 7 * x[2] - 6;
-                rv[1] = 3 * x[0] + 4 * x[1] - 8 * x[2] - 5;
+                rv[1] = 3 * x[0] + 4 * x[1] * x[1] - 8 * x[2] - 5;
                 rv[2] = 9 * x[0] + 10 * x[1] + 11 * x[2] - 12;
                 input_function.evals++;
                 return rv;
