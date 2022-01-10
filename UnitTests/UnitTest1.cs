@@ -12486,8 +12486,10 @@ namespace UnitTests
             double[] xstart = new double[] { -1d, -1d, -1d };
             GMRESSolverInput input = new GMRESSolverInput();            
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2                    
-            GMRESSolverOutput output = SolveGMRES.SolveGMRESAlgorithm(xstart, Function, input);
-            Assert.IsTrue(output.f < 0.001d);
+            GMRESSolverOutput output = SolveGMRES.SolveGMRESAlgorithm(xstart, Function, input);            
+            Assert.IsTrue(output.evals == 17);
+            Assert.IsTrue(output.iterations == 3);
+            Assert.IsTrue(Math.Abs(output.f / 1.5420E-14 - 1d) < 0.01d);  //within 1%
         }
 
         [TestMethod]

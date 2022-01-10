@@ -2961,20 +2961,27 @@ namespace Gekko
             DenseVector x2 = null;
             DenseVector y2 = null;
             double rss2 = double.NaN;
-                        
+
+            SparseRowMatrix a1 = new SparseRowMatrix(n, n);  //TODO: better with column??
+
             for (int k = 0; k < kMax; k++)
             {
-                SparseRowMatrix a1 = new SparseRowMatrix(n, n);  //TODO: better with column??
-                for (int j = 0; j < n; j++)
+                bool updateJacobi = false;
+                if (true || k == 0) updateJacobi = true;  //maybe does not need to update every time
+
+                if (updateJacobi)
                 {
-                    double mem = x1.GetValue(j);
-                    x1.AddValue(j, input.delta);
-                    double[] y1_shock = func(x1.Data, input);  //TODO: speed
-                    for (int i = 0; i < n; i++)
+                    for (int j = 0; j < n; j++)
                     {
-                        a1.SetValue(i, j, (y1_shock[i] - y1.GetValue(i)) / input.delta);
+                        double mem = x1.GetValue(j);
+                        x1.AddValue(j, input.delta);
+                        double[] y1_shock = func(x1.Data, input);  //TODO: speed
+                        for (int i = 0; i < n; i++)
+                        {
+                            a1.SetValue(i, j, (y1_shock[i] - y1.GetValue(i)) / input.delta);
+                        }
+                        x1.SetValue(j, mem);  //revert
                     }
-                    x1.SetValue(j, mem);  //revert
                 }
 
                 ILinearSolver solver = new GMRESSolver();  //TODO: speed
@@ -2984,7 +2991,6 @@ namespace Gekko
                 M.Setup(a1);
                 solver.Preconditioner = M;
                 solver.Iteration = iteration;
-
                 DenseVector dx_guess = new DenseVector(n); //What should this be? Now it is 0. Beware that dx_guess gets changed!
                 DenseVector dx1 = (DenseVector)solver.Solve(a1, SolveCommon.Negative(y1), dx_guess);
 
