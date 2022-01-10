@@ -92,6 +92,31 @@ namespace Gekko
             return output;
         }
 
+        public static void Flatten(double[] output, double[][] input)
+        {
+            int n = output.Length;
+            int n1 = input.Length;
+            int n2 = input[0].Length;
+            if (n != n1 * n2) new Error("Dims not compatible");
+            for (int t = 0; t < n1; t++)
+            {
+                System.Array.Copy(input[t], 0, output, t * n2, n2);
+            }
+        }
+
+        public static void Unflatten(double[][] output, double[] input)
+        {
+            int n = input.Length;
+            int n1 = output.Length;  //periods
+            int n2 = output[0].Length;  //dim
+            if (n != n1 * n2) new Error("Dims not compatible");
+            for (int t = 0; t < n1; t++)
+            {
+                System.Array.Copy(input, t * n2, output[t], 0, n2);
+            }
+        }
+
+
         public static void InitEndoNoLag(Program.ErrorContainer ec, double[,] a, int tInt, ref GekkoTime t, SimOptions so, ref double val, Series ts, int yy)
         {
             bool endoInitUsesLag = false;
@@ -2942,6 +2967,7 @@ namespace Gekko
 
     public static class SolveGMRES
     {
+        
         public static GMRESSolverOutput SolveGMRESAlgorithm(double[] x_guess, double[] exo, Func<double[], double[], GMRESSolverInput, double[]> func, GMRESSolverInput input)
         {
             int n = x_guess.Length;
