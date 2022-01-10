@@ -2942,7 +2942,7 @@ namespace Gekko
 
     public static class SolveGMRES
     {
-        public static GMRESSolverOutput SolveGMRESAlgorithm(double[] x_guess, Func<double[], GMRESSolverInput, double[]> func, GMRESSolverInput input)
+        public static GMRESSolverOutput SolveGMRESAlgorithm(double[] x_guess, double[] exo, Func<double[], double[], GMRESSolverInput, double[]> func, GMRESSolverInput input)
         {
             int n = x_guess.Length;
             int kMax = 100;
@@ -2951,7 +2951,7 @@ namespace Gekko
             GMRESSolverOutput output = new GMRESSolverOutput();
 
             DenseVector x0 = SolveCommon.DenseVector(x_guess);
-            DenseVector y0 = SolveCommon.DenseVector(func(x0.Data, input));  //TODO: speed
+            DenseVector y0 = SolveCommon.DenseVector(func(x0.Data, exo, input));  //TODO: speed
             double rss0 = SolveCommon.RSS(y0);
 
             DenseVector x1 = SolveCommon.DenseVectorClone(x0);
@@ -2975,7 +2975,7 @@ namespace Gekko
                     {
                         double mem = x1.GetValue(j);
                         x1.AddValue(j, input.delta);
-                        double[] y1_shock = func(x1.Data, input);  //TODO: speed
+                        double[] y1_shock = func(x1.Data, exo, input);  //TODO: speed
                         for (int i = 0; i < n; i++)
                         {
                             a1.SetValue(i, j, (y1_shock[i] - y1.GetValue(i)) / input.delta);
@@ -2995,7 +2995,7 @@ namespace Gekko
                 DenseVector dx1 = (DenseVector)solver.Solve(a1, SolveCommon.Negative(y1), dx_guess);
 
                 x2 = SolveCommon.Add(x1, dx1);
-                y2 = SolveCommon.DenseVector(func(x2.Data, input));
+                y2 = SolveCommon.DenseVector(func(x2.Data, exo, input));
                 rss2 = SolveCommon.RSS(y2);
 
                 if (rss2 < Math.Pow(krit, 2))

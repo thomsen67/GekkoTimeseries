@@ -12473,23 +12473,30 @@ namespace UnitTests
         [TestMethod]
         public void _Test_SolverGMRES()
         {
-            double[] Function(double[] x, GMRESSolverInput input_function)
-            {
-                double[] rv = new double[3];  //TODO: speed
-                rv[0] = -2 * x[0] + 1 * x[1] + 7 * x[2] - 6;
-                rv[1] = 3 * x[0] + 4 * x[1] * x[1] - 8 * x[2] - 5;
-                rv[2] = 9 * x[0] + 10 * x[1] + 11 * x[2] - 12;
+            int dim = 2;
+            double[] xstart = new double[dim];
+            for (int i = 0; i < xstart.Length; i++) xstart[i] = -1d;
+            double[] exostart = new double[4];
+            exostart[0] = 1d;
+            exostart[1] = 1d;
+            exostart[2] = 2d;
+            exostart[3] = 1d;
+
+            double[] Function(double[] x, double[] exo, GMRESSolverInput input_function)
+            {                
+                double[] rv = new double[dim];  //TODO: speed
+                rv[0] = Math.Pow(x[0] - exo[0], 2) + Math.Pow(x[1] - exo[1], 2) - 1d;
+                rv[1] = Math.Pow(x[0] - exo[2], 2) + Math.Pow(x[1] - exo[3], 2) - 1d;
                 input_function.evals++;
                 return rv;
-            }
-            
-            double[] xstart = new double[] { -1d, -1d, -1d };
+            }            
+
             GMRESSolverInput input = new GMRESSolverInput();            
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2                    
-            GMRESSolverOutput output = SolveGMRES.SolveGMRESAlgorithm(xstart, Function, input);            
-            Assert.IsTrue(output.evals == 17);
-            Assert.IsTrue(output.iterations == 3);
-            Assert.IsTrue(Math.Abs(output.f / 1.5420E-14 - 1d) < 0.01d);  //within 1%
+            GMRESSolverOutput output = SolveGMRES.SolveGMRESAlgorithm(xstart, exostart, Function, input);            
+            Assert.IsTrue(output.evals == 19);
+            Assert.IsTrue(output.iterations == 5);
+            //Assert.IsTrue(Math.Abs(output.f / 1.5420E-14 - 1d) < 0.01d);  //within 1%
         }
 
         [TestMethod]
