@@ -129,7 +129,7 @@ namespace Gekko
 
         public void EquationBrowserSetLabel(string variableName)
         {
-            List<string> ss = Program.GetVariableExplanation(variableName, true, true, _t1, _t2, null);
+            List<string> ss = Program.GetVariableExplanation(variableName, variableName, true, true, _t1, _t2, null);
             this.windowEquationBrowserLabel.Inlines.Clear();
             foreach (string s in ss)
             {

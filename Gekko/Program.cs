@@ -8306,27 +8306,27 @@ namespace Gekko
         /// <summary>
         /// Get name, label, source, unit, etc. for a timeseries (will also get lines from external varlist.dat file if present: these lines are shown right after name)
         /// </summary>
-        /// <param name="variableName"></param>
+        /// <param name="varnameWithoutFreq"></param>
         /// <param name="printName"></param>
         /// <param name="printData"></param>
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanation(string variableName, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
+        public static List<string> GetVariableExplanation(string varnameWithoutFreq, string varnameMaybeWithFreq, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
         {
             bool danish = false;
             if (htmlBrowserSettings != null && htmlBrowserSettings.isDanish) danish = true;
 
             List<string> rv = new List<string>();
-            IVariable iv = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReturnNull, false);
+            IVariable iv = O.GetIVariableFromString(varnameMaybeWithFreq, O.ECreatePossibilities.NoneReturnNull, false);
             Series ts = null;
             if (iv != null) ts = iv as Series;
             if (printName)
             {
-                rv.Add("Series: " + variableName);
+                rv.Add("Series: " + varnameMaybeWithFreq);
             }
 
-            List<string> explanationsFromExternalFile = Program.GetVariableExplanationFromExternalFile(variableName);
+            List<string> explanationsFromExternalFile = Program.GetVariableExplanationFromExternalFile(varnameWithoutFreq);
             foreach (string line in explanationsFromExternalFile)
             {
                 if (line != "")
@@ -8442,7 +8442,7 @@ namespace Gekko
         {
             string ss = "";
             string var2 = G.ExtractOnlyVariableIgnoreLag(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
-            List<string> ss2 = Program.GetVariableExplanation(var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
+            List<string> ss2 = Program.GetVariableExplanation(var2, var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
             return ss2;
         }
 
@@ -12571,28 +12571,26 @@ namespace Gekko
 
                     seriesCounter++;
 
-                    string var = null;
+                    string variableMaybeWithFreq = null;
                     string bank = null;
                     if (name == null)
                     {
-                        var = ts.GetName();
+                        variableMaybeWithFreq = ts.GetName();
                         bank = ts.GetParentDatabank().name;
                     }
                     else
                     {
-                        var = name;
+                        variableMaybeWithFreq = name;
                         bank = ts.GetParentDatabank().name;
-                    }
-
-                    string varnameWithoutFreq = G.Chop_RemoveFreq(var);
+                    }                    
 
                     if (G.Equal(Program.options.model_type, "gams"))
                     {
-                        DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, var, bank, varnameWithoutFreq);
+                        DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, variableMaybeWithFreq, bank);
                     }
                     else
                     {
-                        DispNonGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts, bank, varnameWithoutFreq);
+                        DispNonGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, ts, variableMaybeWithFreq, bank);
                     }
                 }                
             }
@@ -12634,9 +12632,11 @@ namespace Gekko
         /// <param name="ts"></param>
         /// <param name="bank"></param>
         /// <param name="varnameWithoutFreq"></param>
-        private static void DispNonGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, string bank, string varnameWithoutFreq)
+        private static void DispNonGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, string varnameMaybeWithFreq, string bank)
         {
             //ADAM-style, normal timeseries
+
+            string varnameWithoutFreq = G.Chop_RemoveFreq(varnameMaybeWithFreq);
 
             string note = null;
 
@@ -12696,7 +12696,7 @@ namespace Gekko
                     }
                 }
 
-                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+                List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
                 foreach (string expl in expls) G.Writeln(expl);
 
                 bool eqsPrinted = false;
@@ -12839,11 +12839,13 @@ namespace Gekko
         /// <param name="clickedLink"></param>
         /// <param name="gamsToGekko"></param>
         /// <param name="ts"></param>
-        /// <param name="var"></param>
+        /// <param name="variableMaybeWithFreq"></param>
         /// <param name="bank"></param>
         /// <param name="varnameWithoutFreq"></param>
-        private static void DispGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, bool gamsToGekko, Series ts, string var, string bank, string varnameWithoutFreq)
+        private static void DispGams(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, bool gamsToGekko, Series ts, string variableMaybeWithFreq, string bank)
         {
+            string varnameWithoutFreq = G.Chop_RemoveFreq(variableMaybeWithFreq);
+
             string note = null;
 
             string s2 = "[" + Stringlist.GetListWithCommas(ts.meta.domains) + "]";
@@ -12856,7 +12858,7 @@ namespace Gekko
             G.Writeln2("==========================================================================================");
             G.Writeln(ss + " " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
 
-            List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+            List<string> expls = Program.GetVariableExplanation(varnameWithoutFreq, varnameWithoutFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
             foreach (string expl in expls) G.Writeln(expl);
             
             if (ts.type == ESeriesType.ArraySuper)
@@ -12910,7 +12912,7 @@ namespace Gekko
             {
                 if (Program.model.modelGams.equationsByVarname != null)
                 {
-                    eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, gamsToGekko, var, varnameWithoutFreq, eqsPrinted);
+                    eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, gamsToGekko, variableMaybeWithFreq, varnameWithoutFreq, eqsPrinted);
                 }
             }
             else
