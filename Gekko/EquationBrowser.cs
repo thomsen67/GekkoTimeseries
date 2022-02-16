@@ -251,10 +251,17 @@ namespace Gekko
                 vars.Clear();
                 foreach (string s14 in temp.Keys) vars.Add(s14);
             }
-            
+
             if (Globals.browserLimit)
             {
-                vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon", "phk2", "phk3", "JNTPPIK" };  //phk2 is t-type, phk3 is p-type and JNTPPIK is y-type. The y-type is not shown
+                if (settings_index_filename.ToLower().Contains("mona"))
+                {
+                    vars = new List<string> { "FY", "FCB", "PCB_LA", "FCH", "PCH_LA", "FCQ", "PCQ_LA", "PCOV_LA", "FCOV", "PCOW_LA", "FCOW", "PIOV_LA", "FIOV", "FIPMXE", "PIPMXE_LA", "FIY", "PIY_LA", "FIEM", "PIEM_LA", "FIH", "PIH_LA", "FMY", "PMY_LA", "PY_LA" };
+                }
+                else
+                {                    
+                    vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon", "phk2", "phk3", "JNTPPIK" };  //phk2 is t-type, phk3 is p-type and JNTPPIK is y-type. The y-type is not shown
+                }
                 Globals.browserLimit = false;  //for safety
             }
             else if (Globals.runningOnTTComputer)
@@ -324,7 +331,7 @@ namespace Gekko
                         string depLine = lines[listI + 1].Trim();
                         depLine = depLine.Replace(Globals.ols2, "").Trim();
                         List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
-                        
+
                         string varLine = null;
                         for (int i2 = 0; i2 < a.Count; i2++)
                         {
@@ -365,23 +372,27 @@ namespace Gekko
                 }
             }
 
-            foreach (string var in vars)
+            string modelFrequencyString = GetModelFreq(vars);
+            Program.options.freq = G.ConvertFreq(modelFrequencyString); //sets global freq
+
+            foreach (string varnameWithoutFreq in vars)
             {
+                string varnameWithFreq = varnameWithoutFreq + "!" + modelFrequencyString;
                 StringBuilder sb = new StringBuilder();
-                Series ts1 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
+                Series ts1 = Program.databanks.GetFirst().GetIVariable(varnameWithFreq) as Series;
 
                 if (ts1 == null)
                 {
-                    new Error("Could not find series " + var + " in databank " + Program.databanks.GetFirst().name);
+                    new Error("Could not find series " + varnameWithFreq + " in databank " + Program.databanks.GetFirst().name);
                 }
 
-                Series ts2 = Program.databanks.GetRef().GetIVariable(var + "!a") as Series;
+                Series ts2 = Program.databanks.GetRef().GetIVariable(varnameWithFreq) as Series;
                 string jName = null;  //name of possible j-led
                 bool jNameAutoGen = false;
 
                 sb.AppendLine("<table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`>");
                 sb.AppendLine("<tr>");
-                sb.AppendLine("<td width = `80%`><big><b> " + var + "</b></big></td>");
+                sb.AppendLine("<td width = `80%`><big><b> " + varnameWithoutFreq + "</b></big></td>");
                 sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_find_filename + "`>Søg</a></td>");
                 sb.AppendLine("<td width = `10%`><a href=`..\\" + settings_index_filename + "`>Hjem</a></td>");
                 sb.AppendLine("</tr>");
@@ -394,11 +405,11 @@ namespace Gekko
                 HtmlBrowserSettings htmlBrowserSettings = new HtmlBrowserSettings();
                 htmlBrowserSettings.isDanish = true;
                 htmlBrowserSettings.show_source = settings_show_source;
-                List<string> varExpl = Program.GetVariableExplanationAugmented(var, htmlBrowserSettings);
+                List<string> varExpl = Program.GetVariableExplanationAugmented(varnameWithFreq, htmlBrowserSettings);
                 foreach (string line in varExpl)
                 {
                     if (line != "")
-                    {                        
+                    {
                         WriteHtmlColor(sb, Program.SpecialXmlChars(line));
                     }
                 }
@@ -412,17 +423,17 @@ namespace Gekko
                 {
                     foreach (string varExpl2 in varExpl)
                     {
-                        if (varExpl2.Trim().StartsWith("Series: " + var, StringComparison.OrdinalIgnoreCase)) continue;  //not interesting here
+                        if (varExpl2.Trim().StartsWith("Series: " + varnameWithoutFreq, StringComparison.OrdinalIgnoreCase)) continue;  //not interesting here
                         explanation += G.HandleQuoteInQuote(varExpl2, true) + ". ";  //see also #324lkj2342
                     }
                 }
-                vars2.Add(var + "¤" + explanation);
+                vars2.Add(varnameWithoutFreq + "¤" + explanation);
 
                 // --------------------------------
                 // html print info on ENDO/EXO, freq, data period
                 // --------------------------------
 
-                EEndoOrExo type1 = Program.VariableTypeEndoExo(var);
+                EEndoOrExo type1 = Program.VariableTypeEndoExo(varnameWithFreq);
                 string type = "";
                 if (type1 == EEndoOrExo.Exo) type = "Eksogen, ";
                 else if (type1 == EEndoOrExo.Endo) type = "Endogen, ";
@@ -533,7 +544,7 @@ namespace Gekko
                 // print link(s) to possible external documentation files
                 // --------------------------------
 
-                List<Tuple<string, string>> tuples = null; doc.TryGetValue(var, out tuples);
+                List<Tuple<string, string>> tuples = null; doc.TryGetValue(varnameWithoutFreq, out tuples);
                 if (tuples != null)
                 {
                     int counter = -1;
@@ -555,16 +566,16 @@ namespace Gekko
                 // html print dependents etc.
                 // --------------------------------
 
-                BrowserDependents(var, sb, ref jName, ref jNameAutoGen);
+                BrowserDependents(varnameWithFreq, sb, ref jName, ref jNameAutoGen);
 
                 // --------------------------------
                 // html print estimation output etc.
                 // --------------------------------
 
                 string xxx = null;
-                if (est2.ContainsKey(var))
+                if (est2.ContainsKey(varnameWithoutFreq))
                 {
-                    List<string> xx = est2[var];
+                    List<string> xx = est2[varnameWithoutFreq];
                     foreach (string s in xx)
                     {
                         xxx += s + G.NL;
@@ -581,7 +592,7 @@ namespace Gekko
                 // html print data generation info
                 // --------------------------------
 
-                List<string> datagen2 = null; datagen.TryGetValue(var, out datagen2);
+                List<string> datagen2 = null; datagen.TryGetValue(varnameWithoutFreq, out datagen2);
                 if (datagen2 != null)
                 {
                     WriteHtml(sb, "Datagenerering:");
@@ -602,27 +613,27 @@ namespace Gekko
                 // make plots
                 // --------------------------------
 
-                string l1 = bank1.ToLower().Replace(".gbk", "") + ":" + var;
-                string l2 = bank2.ToLower().Replace(".gbk", "") + ":" + var;
+                string l1 = bank1.ToLower().Replace(".gbk", "") + ":" + varnameWithoutFreq;
+                string l2 = bank2.ToLower().Replace(".gbk", "") + ":" + varnameWithoutFreq;
 
                 if (ts2 == null)
                 {
                     //only plot the series from Work
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", "", 0, new P());
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", "", 0, new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
                 }
                 else
                 {
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", "", 0, new P());
-                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", "", 0, new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + ".svg;", "", 0, new P());
+                    Program.RunGekkoCommands("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + varnameWithoutFreq + " '" + l2 + "' <type = lines dashtype = '3'>, " + varnameWithoutFreq + " '" + l1 + "' file=" + subFolder + "\\" + varnameWithoutFreq.ToLower() + "___p" + ".svg;", "", 0, new P());
                 }
 
-                sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
+                sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + ".svg" + "`>");
 
                 sb.AppendLine("<p/>");
 
                 FoldingButtonStart(sb, "Vækst %");
-                sb.AppendLine("<img src = `" + var.ToLower() + "___p.svg" + "`>");
+                sb.AppendLine("<img src = `" + varnameWithoutFreq.ToLower() + "___p.svg" + "`>");
                 FoldingButtonEnd(sb);
 
                 if (jName != null)
@@ -637,11 +648,12 @@ namespace Gekko
                 // --------------------------------
 
                 StringBuilder sb3 = new StringBuilder();
-                sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + bank2);
+                string extra = ""; if (modelFrequencyString != "a") extra = "  ";  //for instance, 2020q3 is 6 chars, 2020 is only 4. Will not work good for months...
+                sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + extra + bank2);
                 sb3.AppendLine();
-                sb3.AppendLine("Period        value        %  " + G.Blanks(gap) + "Period        value        %  ");
-                int counter6 = 0;
-                foreach (GekkoTime gt in new GekkoTimeIterator(print_start, print_end))
+                sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
+                int counter6 = 0;                
+                foreach (GekkoTime gt in new GekkoTimeIterator(GekkoTime.ConvertFreqsFirst(G.ConvertFreq(modelFrequencyString), print_start, null), GekkoTime.ConvertFreqsLast(G.ConvertFreq(modelFrequencyString), print_end)))
                 {
                     counter6++;
                     if (hasFilter)  //some periods are set via TIMEFILTER
@@ -665,6 +677,8 @@ namespace Gekko
                     }
 
                     sb3.AppendLine();
+                    if (gt.freq == EFreq.Q && gt.sub == Globals.freqQSubperiods) sb3.AppendLine();  //prettier
+                    if (gt.freq == EFreq.M && gt.sub == Globals.freqMSubperiods) sb3.AppendLine();  //prettier
                 }
 
                 WriteHtmlPreCode(sb, sb3.ToString());
@@ -676,7 +690,7 @@ namespace Gekko
                 x.AppendLine("    <link rel=`stylesheet` href=`..\\" + settings_css_filename + @"` type=`text/css`>");
                 x.AppendLine("    <link rel = `shortcut icon` href = `..\\" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
                 x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
-                x.AppendLine("    <title>" + var + "</title>");
+                x.AppendLine("    <title>" + varnameWithoutFreq + "</title>");
                 x.AppendLine("  </head>");
 
                 x.AppendLine("  <script LANGUAGE = `JavaScript`> <!--");
@@ -699,7 +713,7 @@ namespace Gekko
                 x.AppendLine("  </body>");
                 x.AppendLine("</html>");
 
-                string pathAndFilename = subFolder + "\\" + var.ToLower() + ".html";
+                string pathAndFilename = subFolder + "\\" + varnameWithoutFreq.ToLower() + ".html";
                 using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
@@ -736,14 +750,14 @@ namespace Gekko
                 List<string> varExpl = Program.GetVariableExplanationFromExternalFile(var2);
                 string expl = "";
                 if (varExpl != null && varExpl.Count > 0) expl = varExpl[0];
-                if (expl != null) expl = expl.Trim();                
-                Series ts1 = Program.databanks.GetFirst().GetIVariable(var2 + "!a") as Series;
+                if (expl != null) expl = expl.Trim();
+                Series ts1 = Program.databanks.GetFirst().GetIVariable(var2 + "!" + modelFrequencyString) as Series;
                 if (ts1 != null && ts1.meta != null && !string.IsNullOrWhiteSpace(ts1.meta.label))
                 {
                     if (!string.IsNullOrWhiteSpace(expl)) expl += ". "; //see also #324lkj2342
                     expl += ts1.meta.label;
                 }
-                expl = Program.SpecialXmlChars(expl);                
+                expl = Program.SpecialXmlChars(expl);
 
                 x2.Append("<tr>");
                 x2.Append("<td width = `20%`>");
@@ -834,7 +848,7 @@ namespace Gekko
                     {
                         fundet = true;
 
-                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
                         " + write + @"(`<br>` + beskriv[i] + `<br><hr><br>`);
                     } //endif
                 } //endfor
@@ -847,7 +861,7 @@ namespace Gekko
                         if (tekst1.toUpperCase() != tekst.toUpperCase())
                         {
                             fundet = true;
-                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
                             " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
                         } //endif
                     } //endif
@@ -886,7 +900,7 @@ namespace Gekko
                 if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
                 {
                     fundet = true;
-                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i].toLowerCase() + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
                     " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
                 } //endif
             } //endfor
@@ -943,14 +957,41 @@ namespace Gekko
 
         }
 
-        private static void BrowserDependents(string var, StringBuilder sb, ref string jName, ref bool jNameAutoGen)
+        /// <summary>
+        /// Gets the frequency of the model by means of looking at the databank (frequencies there).
+        /// This is in principle approximate, in practice pretty waterproof, and so we do not need
+        /// an additional frequency setting in the .json.
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
+        private static string GetModelFreq(List<string> vars)
         {
+            //We taste the variables in order to know the probable frequency of
+            //the model.
+            List<string> allFreqs = new List<string>() { "a", "q", "m", "w", "d", "u" };
+            int[] allFreqsCounter = new int[allFreqs.Count];
+            for (int i = 0; i < allFreqs.Count; i++)
+            {
+                foreach (string var in vars)
+                {
+                    Series ts1 = Program.databanks.GetFirst().GetIVariable(var + "!" + allFreqs[i]) as Series;
+                    if (ts1 != null) allFreqsCounter[i]++;
+                }
+            }
+            int maxValue = allFreqsCounter.Max();
+            int maxIndex = allFreqsCounter.ToList().IndexOf(maxValue);
+            return allFreqs[maxIndex];
+        }
+
+        private static void BrowserDependents(string varnameMaybeWithFreq, StringBuilder sb, ref string jName, ref bool jNameAutoGen)
+        {
+            string varnameWithoutFreq = G.Chop_RemoveFreq(varnameMaybeWithFreq);
             if (G.HasModelGekko())
             {
                 List<string> list = new List<string>();
-                if (Program.model.modelGekko.dependents.ContainsKey(var))
+                if (Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
                 {
-                    Dictionary<string, string> d2 = Program.model.modelGekko.dependents[var].storage;
+                    Dictionary<string, string> d2 = Program.model.modelGekko.dependents[varnameWithoutFreq].storage;
                     if (d2 != null)
                     {
                         foreach (string d3 in d2.Keys)
@@ -961,14 +1002,14 @@ namespace Gekko
                     list.Sort(StringComparer.InvariantCulture);
                 }
 
-                EquationHelper eq = Program.FindEquationByMeansOfVariableName(var);
+                EquationHelper eq = Program.FindEquationByMeansOfVariableName(varnameWithoutFreq);
 
                 if (eq == null)
                 {
                     for (int i = 0; i < Program.model.modelGekko.equationsReverted.Count; i++)
                     {
                         EquationHelper eh = Program.model.modelGekko.equationsReverted[i];
-                        if (G.Equal(var, eh.lhs))
+                        if (G.Equal(varnameWithoutFreq, eh.lhs))
                         {
                             eq = eh;
                             break;
@@ -981,7 +1022,7 @@ namespace Gekko
                     for (int i = 0; i < Program.model.modelGekko.equationsNotRunAtAll.Count; i++)
                     {
                         EquationHelper eh = Program.model.modelGekko.equationsNotRunAtAll[i];
-                        if (G.Equal(var, eh.lhs))
+                        if (G.Equal(varnameWithoutFreq, eh.lhs))
                         {
                             eq = eh;
                             break;
@@ -998,7 +1039,7 @@ namespace Gekko
                         G.ExtractVariableAndLag(s, out jvar, out lag);
                         if (jvar.StartsWith("j", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (G.Contains(jvar, var))
+                            if (G.Contains(jvar, varnameWithoutFreq))
                             {
                                 jName = jvar;
                                 if (!G.Contains(eq.equationText, jvar))

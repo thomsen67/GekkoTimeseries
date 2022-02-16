@@ -8443,7 +8443,7 @@ namespace Gekko
         {
             string ss = "";
             string var2 = G.ExtractOnlyVariableIgnoreLag(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
-            List<string> ss2 = Program.GetVariableExplanation(var2, var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
+            List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
             return ss2;
         }
 
@@ -13510,8 +13510,9 @@ namespace Gekko
         /// </summary>
         /// <param name="var"></param>
         /// <returns></returns>
-        public static EEndoOrExo VariableTypeEndoExo(string var)
+        public static EEndoOrExo VariableTypeEndoExo(string varnameMaybeWithFreq)
         {
+            string var = G.Chop_RemoveFreq(varnameMaybeWithFreq);
             EEndoOrExo type = EEndoOrExo.Unknown;
             if (var == null) return type;
             if (G.HasModelGekko())
