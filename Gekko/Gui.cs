@@ -442,7 +442,7 @@ namespace Gekko
             // Determine whether the directory exists, else create it (used for temporary files)
             if (track) MessageBox.Show("5");
             Program.CreateTempFilesFolder();
-            Program.CreateTempFilesFolder2();
+            Program.CreateTempFilesFolder2(0);
 
             if (track) MessageBox.Show("6");
             Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion

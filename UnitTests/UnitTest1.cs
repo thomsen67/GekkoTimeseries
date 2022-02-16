@@ -142,7 +142,7 @@ namespace UnitTests
             Program.databanks.storage.Add(new Databank(Globals.Ref));
 
             Program.CreateTempFilesFolder();
-            Program.CreateTempFilesFolder2();
+            Program.CreateTempFilesFolder2(0);
 
             string s = Globals.localTempFilesLocation;
             
