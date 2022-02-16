@@ -872,7 +872,7 @@ namespace Gekko
                     {
                         if (fileNameWithRelativePath.EndsWith("." + Globals.extensionCommand, StringComparison.OrdinalIgnoreCase))
                         {                            
-                            string tempFileNameWithPath = Program.ExtractZipFileEntryToTempFile(entry);
+                            string tempFileNameWithPath = Program.ExtractZipFileEntryToTempFile(entry, fileNameWithPath);
                             LibraryExtractorHandleGcmFile(tempFileNameWithPath, zipFileNameWithPath, fileNameWithRelativePath);
                         }
                     }

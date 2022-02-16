@@ -16032,7 +16032,7 @@ namespace Gekko
                     if (pathInsideZip.ToLower().Contains(Globals.zip)) s = ". Note that nested zip files are not yet supported.";
                     new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "'" + s);
                 }
-                string tempFileNameWithPath = ExtractZipFileEntryToTempFile(entry);
+                string tempFileNameWithPath = ExtractZipFileEntryToTempFile(entry, zipFileWithPath);
                 //cannot yet be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv
                 rv_fileName = tempFileNameWithPath;
             }
@@ -16041,17 +16041,44 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Small helper method to extract an existing C# ZipArchiveEntry into a temporary file (the filename is returned)
+        /// Small helper method to extract an existing C# ZipArchiveEntry into a temporary file (the filename is returned).
+        /// The string zipFileWithPath is only used for error messages.
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
-        public static string ExtractZipFileEntryToTempFile(ZipArchiveEntry entry)
+        public static string ExtractZipFileEntryToTempFile(ZipArchiveEntry entry, string zipFileWithPath)
         {
             //When Gekko starts up, the folder Globals.tempFiles (with random name) is created, and 
             //Globals.tempFilesCounter is never reset to 0. So file locks should be impossible.
             string tempFileName = Globals.tempFiles + "\\" + Globals.tempFileStart + ++Globals.tempFilesCounter + Globals.tempFileEnd;
             if (File.Exists(tempFileName)) WaitForFileDelete(tempFileName);  //if it exists, it is from an older session, so probably easy to delete without problems                
-            entry.ExtractToFile(tempFileName, true);
+            try
+            {
+                entry.ExtractToFile(tempFileName, true);
+            }
+            catch (Exception e)
+            {
+                using (Error error = new Error())
+                {
+                    error.MainAdd("Gekko encountered a problem while extracting a file from a (library) zip file. The problem is probably not related to the zip file itself, but with the placement of the extracted file.");
+                    error.MainAdd("Closing and reopening the Gekko main window normally fixes the issue. The issue is being investigated.");
+                    // ---
+                    error.MoreAdd("Gekko is trying to extract the file '" + entry.FullName + "' from the library");
+                    error.MoreAdd("zip file '" + zipFileWithPath + "' into a");
+                    error.MoreAdd("temporary file with the name '" + tempFileName + "'. This fails, and you may want to check");
+                    error.MoreAdd("whether the temporary file is already existing and blocked (which would be very unusual).");
+                    error.MoreAdd("Additionally, check that the folder that the temporary file is supposed to be put into exists, which it should.");
+                    error.MoreNewLine();
+                    error.MoreAdd("Closing and reopening the Gekko main window normally fixes the issue. The issue is being investigated");
+                    error.MoreAdd("and may have to do with issues in the Windows file system. If the issue is frequent, please");
+                    error.MoreAdd("contact the Gekko editor.");
+                    error.MoreNewLine();
+                    error.MoreAdd("The internal error is the following:");
+                    error.MoreNewLineTight();
+                    error.MoreAdd(e.Message + " " + e.InnerException);
+                }
+                throw;
+            }
             return tempFileName;
         }
 
@@ -19425,7 +19452,7 @@ namespace Gekko
                     {
                         e.MainAdd("The databank '" + removed.name + "' was opened from inside a zip file ('" + removed.FileNameWithPathPretty + "').");
                         e.MainAdd("The databank has been altered, but the changes cannot be written back to the zip file, ");
-                        e.MainAdd("because such zip files are consideres read-only.");
+                        e.MainAdd("because such zip files are considered read-only.");
                         e.MainAdd("(If the databank was opened with OPEN<edit>, you may use WRITE to write the ");
                         e.MainAdd("databank to a normal file).");
                     }
