@@ -1406,8 +1406,10 @@ namespace Gekko
         
         private static void BrowserWritePrintLine(Series ts, StringBuilder sb3, GekkoTime gt)
         {
-            if (Program.options.freq == EFreq.A) sb3.Append((gt.super) + " ");
-            else sb3.Append(gt.super + ts.freq.ToString() + gt.sub + " ");
+            //freq location
+            //if (Program.options.freq == EFreq.A) sb3.Append((gt.super) + " ");
+            //else sb3.Append(gt.super + ts.freq.ToString() + gt.sub + " ");
+            sb3.Append(gt.ToString() + " ");            
 
             double n1 = ts.GetDataSimple(gt);
             double n0 = ts.GetDataSimple(gt.Add(-1));
