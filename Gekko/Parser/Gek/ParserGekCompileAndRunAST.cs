@@ -109,6 +109,12 @@ namespace Gekko.Parser.Gek
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
                 compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
             }
+            else if (Globals.hideGui)
+            {
+                string xx = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
+            }
             else if (G.IsUnitTesting())
             {
                 //if running test cases, use this absolute path, this will never be run by users                

@@ -221,7 +221,7 @@ namespace Gekko
             //args can be tested in VS, see Gekko project options, debug.
             string noini = null;
             string folder = null;
-            string nogui = null;
+            string hideGui = null;
             try
             {
                 if (args != null && args.Length > 0)
@@ -236,9 +236,9 @@ namespace Gekko
                             noini = "true";
                             continue;
                         }
-                        if (trim.ToLower() == "-nogui")
+                        if (trim.ToLower() == "-hide")
                         {
-                            nogui = "true";
+                            hideGui = "true";
                             continue;
                         }
                         if (trim.ToLower().StartsWith("-folder:"))
@@ -258,7 +258,7 @@ namespace Gekko
 
             try
             {
-                GuiStuff(folder, noini, nogui);
+                GuiStuff(folder, noini, hideGui);
             }
             catch (Exception e2)
             {
@@ -383,7 +383,7 @@ namespace Gekko
             this.StartThread(Globals.iniFileSecretName, true); //This "command" gets handled in handleObeyFiles. Better 'run' than 'add', since RUN looks in cmd/cmd1/cmd2 folders also. Run2 ignores if the file is not found
         }
 
-        private static void GuiStuff(string folder, string noini, string nogui)
+        private static void GuiStuff(string folder, string noini, string hideGui)
         {
             if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
             {
@@ -448,6 +448,8 @@ namespace Gekko
             if (track) MessageBox.Show("7");
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             if (track) MessageBox.Show("8");
+
+
             gui = new Gui();
             if (track) MessageBox.Show("9");
 
@@ -602,6 +604,8 @@ namespace Gekko
                 if (track) MessageBox.Show("16.7");
                 if (exc == false) break;
             }
+
+            //See also #89aos8dbjdfjkdsf
             if (track) MessageBox.Show("17");
             Databank work = new Databank(Globals.Work);
             if (track) MessageBox.Show("18");
@@ -635,14 +639,23 @@ namespace Gekko
             if (noini != null && noini == "true")
             {
                 Globals.noini = true;  //has to be put in here, to be fetched later on by GuiAutoExecStuff
-            }
-
-            //Running in silent mode is probably done here.
-            //We probably need to call this.StartThread(" ", true), but problem is that 'this' does not exist.            
+            }            
 
             try
             {
-                Application.Run(gui);
+                //Running in hidden mode is probably done here.
+                //We probably need to call this.StartThread(" ", true), but problem is that 'this' does not exist.            
+                //What about Program.RunGekkoCommands(commands, "", 0, new P());
+                if (hideGui != null)
+                {
+                    Globals.hideGui = true;
+                    MessageBox.Show(Globals.gekkoExeParameters);
+                    Program.RunGekkoCommands(Globals.gekkoExeParameters, "", 0, new P());
+                }
+                else
+                {
+                    Application.Run(gui);
+                }
             }
             catch
             {

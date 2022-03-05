@@ -531,7 +531,6 @@ namespace Gekko
                 }
                 else
                 {
-
                     int widthRemember = Program.options.print_width;
                     Program.options.print_width = int.MaxValue;
                     try

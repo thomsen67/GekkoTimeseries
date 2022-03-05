@@ -137,40 +137,27 @@ namespace UnitTests
                 else Globals.unitTestIntegration = true;
             }
 
+            //See also #89aos8dbjdfjkdsf
             Program.databanks.storage = new List<Databank>();
             Program.databanks.storage.Add(new Databank(Globals.Work));
             Program.databanks.storage.Add(new Databank(Globals.Ref));
-
             Program.CreateTempFilesFolder();
             Program.CreateTempFilesFolder2(0);
-
-            string s = Globals.localTempFilesLocation;
-            
+            string s = Globals.localTempFilesLocation;            
             if (!(s.Contains("AppData") && s.Contains("tempfiles")))
             {
                 MessageBox.Show("Tried to delete this folder: " + s + "\nBUT WE DO NOT ALLOW THAT (does not contain 'AppData')");
             }
             else
-            {
-                if (true)  //sometimes good to try setting temporary to false, to force running models on cached files.
-                {
-                    G.DeleteFolder(Globals.localTempFilesLocation, true);
-                }
-                else
-                {
-                    MessageBox.Show("HOVHOV - skal denne ikke slås fra........??");
-                }
+            {                
+                G.DeleteFolder(Globals.localTempFilesLocation, true);                
             }
-
             //We set a default regarding this folder -- not good if the string is empty
             //and we try to write a file etc.
             Program.options.folder_working = Globals.ttPath2 + @"\regres\working";
-
             Globals.globalPeriodStart = new GekkoTime(EFreq.A, 2000, 1);
             Globals.globalPeriodEnd = new GekkoTime(EFreq.A, 2010, 1);
-
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
-
             Program.InitUfunctionsAndArithmeticsAndMore();
             
         }

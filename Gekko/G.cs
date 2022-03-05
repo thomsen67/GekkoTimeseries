@@ -4254,13 +4254,14 @@ namespace Gekko
         }
 
         /// <summary>
-        /// For developer use/debugging. Will also be true if ExcelDna is active.
+        /// For developer use/debugging. Will also be true if ExcelDna or hiding GUI is active.
         /// </summary>
         public static bool IsUnitTesting()  
-        {            
+        {
+            if (Globals.hideGui) return true;
             if (Globals.excelDna) return true;            
             if ((Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32_40.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe"))) return true;
-            else return false;
+            return false;
         }
 
         /// <summary>
@@ -4456,6 +4457,10 @@ namespace Gekko
                         {
                             if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);
                         }
+                        else if (Globals.hideGui)
+                        {
+                            Console.WriteLine(s);
+                        }
                         else
                         {
                             Globals.unitTestScreenOutput.AppendLine(s);
@@ -4467,6 +4472,10 @@ namespace Gekko
                         if (Globals.excelDna)
                         {
                             if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                        }
+                        else if (Globals.hideGui)
+                        {
+                            Console.Write(s);
                         }
                         else
                         {
@@ -4804,6 +4813,10 @@ namespace Gekko
                     if (Globals.excelDna)
                     {
                         if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                    }
+                    else if (Globals.hideGui)
+                    {
+                        Console.Write(s);
                     }
                     else
                     {

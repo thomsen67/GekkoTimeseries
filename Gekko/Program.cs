@@ -1770,7 +1770,7 @@ namespace Gekko
         //ok that it is not referenced to, is used in Gekcel
         public static void PrepareExcelDna(string xllPath)
         {
-            if (Globals.runningOnTTComputer && File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna() called with: " + xllPath);
+            //if (Globals.runningOnTTComputer && File.Exists(@"c:\tools\dnb.txt")) MessageBox.Show("PrepareExcelDna() called with: " + xllPath);
             Globals.excelDna = true;
             Globals.excelDnaPath = xllPath;
         }
@@ -1812,24 +1812,12 @@ namespace Gekko
                     {
                         Program.options.folder_working = desktop;
                         note = "Gekcel working folder set to desktop folder, because Excel workbook folder seems to be read-only.";
-                    }                    
+                    }
                     Gui.GuiReadOnlyHelper(false);  //delete any funny file
                 }
             }
 
-            Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
-
-            Program.databanks.storage.Clear();
-            Program.databanks.storage.Add(new Databank("Work"));
-            Program.databanks.storage.Add(new Databank("Ref"));
-            Program.databanks.local.Clear();
-            Program.databanks.global.Clear();
-            Program.databanks.localGlobal = new LocalGlobal();
-            Globals.commandMemory = new CommandMemory();
-            Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
-            Program.InitUfunctionsAndArithmeticsAndMore();
-            Program.model = new Gekko.Model();
-            Program.GetStartingPeriod();
+            SetupGekkoForNonGuiUse();
 
             //The stuff below does not get printed in Gekcel: wonder why?
             if (true)
@@ -1842,7 +1830,27 @@ namespace Gekko
                 new Writeln(G.GekkoInfo("short4"));
             }
         }
-        
+
+        /// <summary>
+        /// Sets some objects up that are necessary when running Gekko without a GUI
+        /// </summary>
+        private static void SetupGekkoForNonGuiUse()
+        {
+            //See also #89aos8dbjdfjkdsf
+            Program.GetVersionAndGekkoExeLocationFromAssembly();  //goes into Globals.gekkoVersion
+            Program.databanks.storage.Clear();
+            Program.databanks.storage.Add(new Databank(Globals.Work));
+            Program.databanks.storage.Add(new Databank(Globals.Ref));
+            Program.databanks.local.Clear();
+            Program.databanks.global.Clear();
+            Program.databanks.localGlobal = new LocalGlobal();
+            Globals.commandMemory = new CommandMemory();
+            Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();
+            Program.InitUfunctionsAndArithmeticsAndMore();
+            Program.model = new Gekko.Model();
+            Program.GetStartingPeriod();
+        }
+
         /// <summary>
         /// s must be of form "var¤-1", multiple Globals.lagIndicator not allowed.
         /// if "var¤-1¤-1", .s1 is ok but .s2 not.
