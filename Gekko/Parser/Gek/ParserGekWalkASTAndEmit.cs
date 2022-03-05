@@ -1941,7 +1941,6 @@ namespace Gekko.Parser.Gek
                             O.ELoopType loopType = LoopType(node, 0);
 
                             string type = node[0][0][0][0].Text;
-
                             CheckTypeInFunctionDefProcedureDefForDef("for-loop", type, varnames[0]);
 
                             int i = 0;
@@ -1964,13 +1963,18 @@ namespace Gekko.Parser.Gek
                             node.Code.A("List<List<IVariable>> " + listsname + " = new List<List<IVariable>>()").End();
                             for (int i = 0; i < node[0].ChildrenCount(); i++)
                             {
-                                O.ELoopType loopType = LoopType(node, 0);
+                                O.ELoopType loopType = O.ELoopType.List;
+                                try  //remove try in Gekko 3.2
+                                {
+                                    loopType = LoopType(node, i);
+                                }
+                                catch { };
+
                                 string codeStart, codeEnd2, codeStep;
                                 GetCodes(node, i, out codeStart, out codeEnd2, out codeStep);
                                 if (loopType == O.ELoopType.ForTo)
                                 {
-                                    new Error("You cannot use TO or STEP/BY in a parallel loop");
-                                    //throw new GekkoException();
+                                    new Error("You cannot use TO or STEP/BY in a parallel loop. If you need to use a sequence in a parallel loop, consider using the seq() function like for instance '...val %v = seq(1, 100)...' to define the sequence(s).");
                                 }
                                 node.Code.A(listsname + ".Add(O.ConvertToList(" + codeStart + "))").End();
                             }
@@ -1984,7 +1988,17 @@ namespace Gekko.Parser.Gek
                             for (int i = 0; i < node[0].ChildrenCount(); i++)
                             {
                                 node.Code.A("IVariable ").A(node.forLoop[i].Item2).A(" = ").A(listsname).A("[" + i + "]").A("[" + iname + "]").End();
+
+                                string type = null;
+                                try  //remove try in Gekko 3.2
+                                {
+                                    type = node[0][i][0][0].Text;
+                                    CheckTypeInFunctionDefProcedureDefForDef("for-loop", type, varnames[i]);
+                                    node.Code.A("O.TypeCheck_" + type.ToLower() + "(" + node.forLoop[i].Item2 + ", 0);" + G.NL);
+                                }
+                                catch { };
                             }
+
                             node.Code.A(node[1].Code);
 
                             node.Code.A("}").End();
@@ -5336,7 +5350,6 @@ ASTPLACEHOLDER [0]
                 if (G.Chop_HasSigil(s))
                 {
                     new Error("Did not expect '" + s[0] + "' on variable " + s + x);
-                    //throw new GekkoException();
                 }
             }
             else if (G.Equal(type, "val") || G.Equal(type, "date") || G.Equal(type, "string"))
@@ -5344,7 +5357,6 @@ ASTPLACEHOLDER [0]
                 if (s[0] != Globals.symbolScalar)
                 {
                     new Error("Expected '" + Globals.symbolScalar + "' on variable " + s + x);
-                    //throw new GekkoException();
                 }
             }
             else if (G.Equal(type, "list") || G.Equal(type, "map") || G.Equal(type, "matrix"))
@@ -5352,7 +5364,6 @@ ASTPLACEHOLDER [0]
                 if (s[0] != Globals.symbolCollection)
                 {
                     new Error("Expected '" + Globals.symbolCollection + "' on variable " + s + x);
-                    //throw new GekkoException();
                 }
             }
         }

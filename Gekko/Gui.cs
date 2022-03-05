@@ -303,13 +303,7 @@ namespace Gekko
         {
             //#7980345743573
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
-
-            if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
-            {
-                Globals.runningOnTTComputer = true;  //for some debugging                
-                G.WritelnGray("DEBUGGING: Seems to be running on TT computer -- some debugging is switched on");
-            }
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;            
 
             this.StartThread(" ", true);  //to get a worker thread started
             CrossThreadStuff.SetTab("main", false);
@@ -391,6 +385,11 @@ namespace Gekko
 
         private static void GuiStuff(string folder, string noini, string nogui)
         {
+            if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
+            {
+                Globals.runningOnTTComputer = true;  //for some debugging                
+                G.WritelnGray("DEBUGGING: Seems to be running on TT computer -- some debugging is switched on");
+            }
 
             bool track = false;
             if (File.Exists(@"c:\test\testing1234.txt"))

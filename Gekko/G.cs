@@ -4257,7 +4257,7 @@ namespace Gekko
         /// For developer use/debugging. Will also be true if ExcelDna is active.
         /// </summary>
         public static bool IsUnitTesting()  
-        {
+        {            
             if (Globals.excelDna) return true;            
             if ((Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32_40.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe"))) return true;
             else return false;

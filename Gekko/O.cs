@@ -6422,28 +6422,29 @@ namespace Gekko
         /// <param name="type"></param>
         /// <returns></returns>
         private static void TypeErrorString(int position, string type, string inputType)
-        {            
+        {
+            string extra = "You may use the functions string(), date() or val() to convert a scalar to another type, or strings(), dates() or vals() to do the same on all elements inside a list.";
             if (position == -1)
             {
-                new Error("The type of the right-hand side is " + inputType + " type, but should be " + type + " type");
+                new Error("The type of the right-hand side is " + inputType + " type, but was expected to be " + type + " type. " + extra);
             }
             else if (position == 0)
             {
-                new Error("The type is " + inputType + " type, but should be " + type + " type");
+                new Error("Expected a variable of " + type + " type, but got a variable of " + inputType + " type. " + extra);
             }
             else if (position == 1)
             {
-                new Error("The start date %t1 in a f(<%t1 %t2>, ...) call is " + inputType + " type, but should be " + type + " type");
+                new Error("The start date %t1 in a f(<%t1 %t2>, ...) call is " + inputType + " type, but should be " + type + " type. " + extra);
             }
             else if (position == 2)
             {
-                new Error("The end date %t2 in a f(<%t1 %t2>, ...) call is " + inputType + " type, but should be " + type + " type");
+                new Error("The end date %t2 in a f(<%t1 %t2>, ...) call is " + inputType + " type, but should be " + type + " type. " + extra);
             }
             else  //3 or larger, corresponding to argument 1 and so on. However, using UFCS, position = 3 is the variable before dot, and position = 4, 5, 6... are the first, second etc. arguments inside the parenthesis.
             {
                 using (Error e = new Error())
                 {
-                    e.MainAdd("Argument #" + (position - 2) + " is " + inputType + " type, but should be " + type + " type");
+                    e.MainAdd("Argument #" + (position - 2) + " is " + inputType + " type, but should be " + type + " type. " + extra);
                     e.MoreAdd("When counting arguments, a function like f(x1, x2, x3) is simple in the sense that x1 is argument #1, x2 is argument #2, and so on. But Gekko supports so-called UFCS (Uniform Function Call Syntax), so the function may be written as x1.f(x2, x3) instead. If written in that way, argument #1 is the variable or expression to the left of the dot (here: x1), whereas argument #2 is the first argument after the left parenthesis (here: x2), and so on. Another thing to keep in mind is that optional time period arguments inside <...> are ignored regarding the argument number count, so in a function call like f(<%t1 %t2>, x1, x2, x3) or equivalently x1.f(<%t1 %t2>, x2, x3), argument #1 is still x1, argument #2 is still x2, and so on.");
                 }                
             }

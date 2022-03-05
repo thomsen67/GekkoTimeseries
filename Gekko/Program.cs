@@ -16060,9 +16060,10 @@ namespace Gekko
             }
             catch (Exception e)
             {
+                //see also #7jksdf788sdf3jlkty
                 using (Error error = new Error())
                 {
-                    error.MainAdd("Gekko encountered a problem while extracting a file from a zip file. The problem is probably not related to the zip file itself, but with the placement of the extracted file.");
+                    error.MainAdd("Gekko encountered a problem while extracting a file from inside of a zip file. The problem is probably not related to the zip file itself, but with the placement of the extracted file.");
                     error.MainAdd("Closing and reopening the Gekko main window normally fixes the issue. The issue is being investigated.");
                     // ---
                     error.MoreAdd("Gekko is trying to extract the file '" + entry.FullName + "' from the library");
@@ -27182,6 +27183,7 @@ namespace Gekko
                 if (Directory.Exists(Globals.tempFiles))
                 {
                     good = true;
+                    if (Globals.runningOnTTComputer) MessageBox.Show("TEMP DIR OK --> counter = " + counter + ", i = " + i);
                     break;
                 }
                 else
@@ -27190,13 +27192,21 @@ namespace Gekko
                 }
             }
 
-            if (!good) 
+            if (!good)
             {
                 if (counter < 1)
                 {
                     //we try a new folder name, but just 1 time more
-                    Globals.tempFiles = Program.CreateTempFolderPath("tempfiles");  
+                    Globals.tempFiles = Program.CreateTempFolderPath("tempfiles");
                     Program.CreateTempFilesFolder2(counter + 1);
+                }
+                else
+                {
+                    //see also #7jksdf788sdf3jlkty
+                    using (Warning txt = new Warning())
+                    {
+                        txt.MainAdd("Gekko seems to have a file system issue creating an internal folder for temporary files.");
+                    }
                 }
             }
         }
