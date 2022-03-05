@@ -6544,7 +6544,15 @@ namespace Gekko
             //#98073245298345
             //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
 
-            if (Globals.excelDna || Globals.hideGui) Globals.excelDnaOutput = new StringBuilder();  //clears, and records everything from now on for use in Excel window            
+            if (Globals.excelDna || Globals.hideGui)
+            {
+                if (!Globals.nolog)
+                {
+                    //if the below object is null, nothing is printed/written to it afterwards
+                    //.nolog will be false for Gekcel, but may be true for gekko.exe call.
+                    Globals.excelDnaOutput = new StringBuilder();  //clears, and records everything from now on for use in Excel window            
+                }
+            }
 
             int max = 1;
             if (G.Equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)

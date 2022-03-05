@@ -222,6 +222,7 @@ namespace Gekko
             string noini = null;
             string folder = null;
             string hideGui = null;
+            string nolog = null;
             try
             {
                 if (args != null && args.Length > 0)
@@ -241,6 +242,11 @@ namespace Gekko
                             hideGui = "true";
                             continue;
                         }
+                        if (trim.ToLower() == "-nolog")
+                        {
+                            nolog = "true";
+                            continue;
+                        }
                         if (trim.ToLower().StartsWith("-folder:"))
                         {
                             folder = trim.Substring(8).Trim();
@@ -258,7 +264,7 @@ namespace Gekko
 
             try
             {
-                GuiStuff(folder, noini, hideGui);
+                GuiStuff(folder, noini, hideGui, nolog);
             }
             catch (Exception e2)
             {
@@ -383,7 +389,7 @@ namespace Gekko
             this.StartThread(Globals.iniFileSecretName, true); //This "command" gets handled in handleObeyFiles. Better 'run' than 'add', since RUN looks in cmd/cmd1/cmd2 folders also. Run2 ignores if the file is not found
         }
 
-        private static void GuiStuff(string folder, string noini, string hideGui)
+        private static void GuiStuff(string folder, string noini, string hideGui, string nolog)
         {
             if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
             {
@@ -639,7 +645,12 @@ namespace Gekko
             if (noini != null && noini == "true")
             {
                 Globals.noini = true;  //has to be put in here, to be fetched later on by GuiAutoExecStuff
-            }            
+            }
+
+            if (nolog != null && nolog == "true")
+            {
+                Globals.nolog = true;
+            }
 
             try
             {                

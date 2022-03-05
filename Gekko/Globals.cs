@@ -109,6 +109,7 @@ namespace Gekko
         
         public static List<string> unitTestsPromtingHelper = null;
 
+        public static bool nolog = false;      //-nolog parameter for gekko.exe
         public static bool hideGui = false;    //true for use without GUI window
         public static bool excelDna = false;  //true for use with ExcelDna solution
         public static StringBuilder excelDnaOutput = null;
