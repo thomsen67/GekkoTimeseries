@@ -4453,14 +4453,10 @@ namespace Gekko
                 {
                     if (newline)
                     {
-                        if (Globals.excelDna)
+                        if (Globals.excelDna || Globals.hideGui)
                         {
                             if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);
-                        }
-                        else if (Globals.hideGui)
-                        {
-                            Console.WriteLine(s);
-                        }
+                        }                        
                         else
                         {
                             Globals.unitTestScreenOutput.AppendLine(s);
@@ -4469,13 +4465,9 @@ namespace Gekko
                     }
                     else
                     {
-                        if (Globals.excelDna)
+                        if (Globals.excelDna || Globals.hideGui)
                         {
                             if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
-                        }
-                        else if (Globals.hideGui)
-                        {
-                            Console.Write(s);
                         }
                         else
                         {
@@ -4810,13 +4802,9 @@ namespace Gekko
             {
                 if (G.IsUnitTesting())
                 {
-                    if (Globals.excelDna)
+                    if (Globals.excelDna || Globals.hideGui)
                     {
                         if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
-                    }
-                    else if (Globals.hideGui)
-                    {
-                        Console.Write(s);
                     }
                     else
                     {

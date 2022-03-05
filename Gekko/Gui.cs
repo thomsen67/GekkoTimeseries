@@ -642,14 +642,10 @@ namespace Gekko
             }            
 
             try
-            {
-                //Running in hidden mode is probably done here.
-                //We probably need to call this.StartThread(" ", true), but problem is that 'this' does not exist.            
-                //What about Program.RunGekkoCommands(commands, "", 0, new P());
+            {                
                 if (hideGui != null)
                 {
                     Globals.hideGui = true;
-                    MessageBox.Show(Globals.gekkoExeParameters);
                     Program.RunGekkoCommands(Globals.gekkoExeParameters, "", 0, new P());
                 }
                 else
@@ -663,6 +659,18 @@ namespace Gekko
             }
             finally  //makes sure usersettings are always saved no matter what (for instance chosen working folder etc.)
             {
+                if (hideGui != null)
+                {
+                    if (Globals.excelDnaOutput != null)
+                    {
+                        try
+                        {
+                            File.WriteAllText(Path.Combine(Program.options.folder_working, "gekkooutput.txt"), Globals.excelDnaOutput.ToString());
+                        }
+                        catch { }
+                    }
+                }
+
                 Globals.applicationIsInProcessOfDying = true;
                 //#3452345523
                 //Maybe just here, and not in EXIT and altF4.
