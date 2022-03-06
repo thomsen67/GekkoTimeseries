@@ -16247,7 +16247,7 @@ print(df2)
 
             // ---
             
-            I("RESET;");
+            I("RESET; time 2011 2021;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             Globals.unitTestScreenOutput.Clear();
