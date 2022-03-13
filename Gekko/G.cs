@@ -4286,7 +4286,7 @@ namespace Gekko
         /// This is the "real" method actually doing the printing
         /// </summary>
         public static void WriteAbstract2(Object o)
-        {           
+        {
             Program.WorkerThreadHelper2 helper = (Program.WorkerThreadHelper2)o;
             
             Color color = helper.color;
@@ -4445,17 +4445,17 @@ namespace Gekko
                     MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper2.pipeFileFileWithPath);
                     throw new GekkoException();
                 }
-            }      
+            }            
 
             if (!(isPiping || isMuting) || mustAlsoPrintOnScreen)
-            {
+            {                
                 if (G.IsUnitTesting())
-                {
+                {                    
                     if (newline)
-                    {
+                    {                        
                         if (Globals.excelDna || Globals.hideGui)
-                        {
-                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);
+                        {                            
+                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.AppendLine(s);                         
                         }                        
                         else
                         {
@@ -4466,8 +4466,8 @@ namespace Gekko
                     else
                     {
                         if (Globals.excelDna || Globals.hideGui)
-                        {
-                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);
+                        {                            
+                            if (Globals.excelDnaOutput != null) Globals.excelDnaOutput.Append(s);                         
                         }
                         else
                         {
@@ -4477,7 +4477,7 @@ namespace Gekko
                     }
                 }
                 else
-                {
+                {                    
                     if (tab == ETabs.Main) textBox = Gui.gui.textBoxMainTabUpper;
                     else if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
                     else throw new GekkoException();

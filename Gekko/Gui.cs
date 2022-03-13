@@ -69,7 +69,6 @@ namespace Gekko
         public Image red = null;
         public Image yellow = null;
         public Image green = null;
-        //public Image gray = null;
         public Image target = null;
 
         public RichTextBoxEx textBoxMainTabUpper = new RichTextBoxEx();
@@ -190,10 +189,13 @@ namespace Gekko
             this.Text = "Gekko " + version + pink;
             this.Name = "Gekko " + version + pink;
 
-            green = Image.FromFile(Application.StartupPath + "\\images\\green.png");
-            yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");
-            red = Image.FromFile(Application.StartupPath + "\\images\\red.png");
-            target = Image.FromFile(Application.StartupPath + "\\images\\target.png");
+            if (true)
+            {
+                green = Image.FromFile(Application.StartupPath + "\\images\\green.png");
+                yellow = Image.FromFile(Application.StartupPath + "\\images\\yellow.png");
+                red = Image.FromFile(Application.StartupPath + "\\images\\red.png");
+                target = Image.FromFile(Application.StartupPath + "\\images\\target.png");
+            }
 
             this.textBoxMainTabUpper.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxMainTabUpper_LinkClicked);
             this.textBoxOutputTab.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.textBoxOutputTab_LinkClicked);
@@ -219,10 +221,11 @@ namespace Gekko
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
 
             //args can be tested in VS, see Gekko project options, debug.
-            string noini = null;
+            bool noini = false;
             string folder = null;
-            string hideGui = null;
-            string nolog = null;
+            bool hideGui = false;
+            bool nolog = false;
+
             try
             {
                 if (args != null && args.Length > 0)
@@ -234,17 +237,17 @@ namespace Gekko
                         string trim = argument.Trim();
                         if (trim.ToLower() == "-noini")
                         {
-                            noini = "true";
+                            noini = true;
                             continue;
                         }
                         if (trim.ToLower() == "-hide")
                         {
-                            hideGui = "true";
+                            hideGui = true;
                             continue;
                         }
                         if (trim.ToLower() == "-nolog")
                         {
-                            nolog = "true";
+                            nolog = true;
                             continue;
                         }
                         if (trim.ToLower().StartsWith("-folder:"))
@@ -259,6 +262,8 @@ namespace Gekko
                 }
             }
             catch { };
+
+            if (hideGui) Globals.hideGui = true;
 
             Application.EnableVisualStyles();
 
@@ -389,7 +394,7 @@ namespace Gekko
             this.StartThread(Globals.iniFileSecretName, true); //This "command" gets handled in handleObeyFiles. Better 'run' than 'add', since RUN looks in cmd/cmd1/cmd2 folders also. Run2 ignores if the file is not found
         }
 
-        private static void GuiStuff(string folder, string noini, string hideGui, string nolog)
+        private static void GuiStuff(string folder, bool noini, bool hideGui, bool nolog)
         {
             if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
             {
@@ -454,17 +459,26 @@ namespace Gekko
             if (track) MessageBox.Show("7");
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             if (track) MessageBox.Show("8");
-
-
-            gui = new Gui();
+            
+            if (hideGui)  //for 3.2 --> include Globals.excelDna here, does not use GUI either
+            {
+                gui = null;
+            }
+            else
+            {
+                gui = new Gui();
+            }
             if (track) MessageBox.Show("9");
 
-            gui.textBoxOutputTab.Text = "";
-            gui.textBoxOutputTab.AppendText("This window is used to show output from the main window, when \n");
-            gui.textBoxOutputTab.AppendText("this output is large in volume, or the details may not be of \n");
-            gui.textBoxOutputTab.AppendText("crucial interest to the user. When relevant, this kind of extra \n");
-            gui.textBoxOutputTab.AppendText("output will be accessible via a clickable link in the main window. \n");
-            gui.textBoxOutputTab.AppendText("\n");
+            if (gui != null)
+            {
+                gui.textBoxOutputTab.Text = "";
+                gui.textBoxOutputTab.AppendText("This window is used to show output from the main window, when \n");
+                gui.textBoxOutputTab.AppendText("this output is large in volume, or the details may not be of \n");
+                gui.textBoxOutputTab.AppendText("crucial interest to the user. When relevant, this kind of extra \n");
+                gui.textBoxOutputTab.AppendText("output will be accessible via a clickable link in the main window. \n");
+                gui.textBoxOutputTab.AppendText("\n");
+            }
 
             if (track) MessageBox.Show("10");
 
@@ -528,18 +542,20 @@ namespace Gekko
                 G.Writeln("General cleanup of temporary Gekko files (" + G.Seconds(t1) + ") -- done occasionally");
             }
 
-
-            if (track) MessageBox.Show("11");
             UserSettings us = null;
-            try
+            if (gui != null)
             {
-                us = LoadUserSettings();
+                if (track) MessageBox.Show("11");                
+                try
+                {
+                    us = LoadUserSettings();
+                }
+                catch (Exception e)
+                {
+                    us = new UserSettings();
+                }
+                if (track) MessageBox.Show("12");
             }
-            catch (Exception e)
-            {
-                us = new UserSettings();
-            }
-            if (track) MessageBox.Show("12");
 
 
             if (folder != null)
@@ -555,30 +571,35 @@ namespace Gekko
             if (track) MessageBox.Show("15");
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             if (track) MessageBox.Show("15.1");
-            if (folder == null)
+
+            if (gui != null)
             {
-                if (G.Equal(s1, s2))  //It happens that the we get c:\\... in one of them, and C:\\ in the other, so we use case-insensitive compare
+                if (folder == null)
                 {
-                    try
+                    if (G.Equal(s1, s2))  //It happens that the we get c:\\... in one of them, and C:\\ in the other, so we use case-insensitive compare
                     {
-                        if (Globals.userSettings.WorkingFolder != "")
+                        try
                         {
-                            if (Directory.Exists(Globals.userSettings.WorkingFolder))
+                            if (Globals.userSettings.WorkingFolder != "")
                             {
-                                Program.options.folder_working = Globals.userSettings.WorkingFolder;
+                                if (Directory.Exists(Globals.userSettings.WorkingFolder))
+                                {
+                                    Program.options.folder_working = Globals.userSettings.WorkingFolder;
+                                }
                             }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        //May fail if xml file is corrupted
-                        //var s10 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming);
-                        string s11 = e.InnerException.Message;
-                        MessageBox.Show("Gekko: The user settings file seems corrupted. Working folder set to desktop folder: " + desktop + "\n\nYou may consider deleting the user settings file, cf. this message:\n" + s11);
-                        Program.options.folder_working = desktop;
+                        catch (Exception e)
+                        {
+                            //May fail if xml file is corrupted
+                            //var s10 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming);
+                            string s11 = e.InnerException.Message;
+                            MessageBox.Show("Gekko: The user settings file seems corrupted. Working folder set to desktop folder: " + desktop + "\n\nYou may consider deleting the user settings file, cf. this message:\n" + s11);
+                            Program.options.folder_working = desktop;
+                        }
                     }
                 }
             }
+
             if (track) MessageBox.Show("16");
             for (int i = 0; i < 2; i++)
             {
@@ -634,29 +655,31 @@ namespace Gekko
             if (track) MessageBox.Show("24");
             G.Writeln();
 
-            if (track) MessageBox.Show("25");
-            Globals.guiRecentFoldersCache[Program.options.folder_working] = Program.options.folder_working;
-            if (track) MessageBox.Show("26");
-            GuiUpdateRecentFilesMenu();
-            if (track) MessageBox.Show("27");
+            if (gui != null)
+            {
+                if (track) MessageBox.Show("25");
+                Globals.guiRecentFoldersCache[Program.options.folder_working] = Program.options.folder_working;
+                if (track) MessageBox.Show("26");
+                GuiUpdateRecentFilesMenu();
+                if (track) MessageBox.Show("27");
+            }
 
             Globals.gekkoInbuiltFunctions = Program.FindGekkoInbuiltFunctions();  //uses reflection to do this
 
-            if (noini != null && noini == "true")
+            if (noini)
             {
                 Globals.noini = true;  //has to be put in here, to be fetched later on by GuiAutoExecStuff
             }
 
-            if (nolog != null && nolog == "true")
+            if (nolog)
             {
                 Globals.nolog = true;
             }
 
             try
             {                
-                if (hideGui != null)
-                {
-                    Globals.hideGui = true;
+                if (gui == null)
+                {                    
                     Program.RunGekkoCommands(Globals.gekkoExeParameters, "", 0, new P());
                 }
                 else
@@ -670,7 +693,7 @@ namespace Gekko
             }
             finally  //makes sure usersettings are always saved no matter what (for instance chosen working folder etc.)
             {
-                if (hideGui != null)
+                if (gui == null)
                 {
                     if (Globals.excelDnaOutput != null)
                     {
@@ -702,9 +725,12 @@ namespace Gekko
                 }
 
                 if (track) MessageBox.Show("29");
-                if (Globals.doNotSaveUserSettings == false)
+                if (gui != null)
                 {
-                    SaveUserSettings(us);
+                    if (Globals.doNotSaveUserSettings == false)
+                    {
+                        SaveUserSettings(us);
+                    }
                 }
                 if (track) MessageBox.Show("30");
 

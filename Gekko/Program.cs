@@ -27199,7 +27199,7 @@ namespace Gekko
                 if (Directory.Exists(Globals.tempFiles))
                 {
                     good = true;
-                    if (Globals.runningOnTTComputer) MessageBox.Show("TEMP DIR OK --> counter = " + counter + ", i = " + i);
+                    //if (Globals.runningOnTTComputer) MessageBox.Show("TEMP DIR OK --> counter = " + counter + ", i = " + i);
                     break;
                 }
                 else
