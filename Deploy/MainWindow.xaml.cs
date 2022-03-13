@@ -246,7 +246,7 @@ namespace Deploy
             string version = GetVersion();
             if (version == null)
             {
-                MessageBox.Show("Could not zip source, illegal version number");
+                MessageBox.Show("Could not zip source, illegal version number"); 
                 return;
             }
             try
