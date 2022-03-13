@@ -142,7 +142,7 @@ namespace UnitTests
             Program.databanks.storage.Add(new Databank(Globals.Work));
             Program.databanks.storage.Add(new Databank(Globals.Ref));
             Program.CreateTempFilesFolder();
-            Program.CreateTempFilesFolder2(0);
+            Program.CreateTempFilesFolder2();
             string s = Globals.localTempFilesLocation;            
             if (!(s.Contains("AppData") && s.Contains("tempfiles")))
             {

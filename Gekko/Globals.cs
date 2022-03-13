@@ -732,10 +732,9 @@ namespace Gekko
 
         public static Excel.Application objApp = null;  //used for the Excel PIA interface (not used much anymore, after EPPlus).
         public static int excelLastThreadID = int.MinValue;
-
-        public static int waitFileTotalTime = 600;  //600 s = 10 min
+                
+        public static int waitFileTotalTime = 600;             //600 s = 10 min
         public static int waitFileGap = 2;
-
 
         public static int guiMainLinePosition = 0;
 
