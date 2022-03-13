@@ -253,12 +253,12 @@ namespace Deploy
             {
                 string dir = @"c:\Thomas\Gekko\GekkoCS\";
                 string zip = @"c:\Thomas\Gekko\" + version + ".zip";
-                if(File.Exists(zip))
+                if (File.Exists(zip))
                 {
                     MessageBox.Show("File " + zip + " already exists, aborting");
                     return;
                 }                
-                ZipHelper.CreateFromDirectory(dir, zip, fileName => !(fileName.Contains(@"\.vs\") || fileName.Contains(@"\.git\") || fileName.Contains(@"\TestResults\")));
+                ZipHelper.CreateFromDirectory(dir, zip, fileName => !(fileName.Contains(@"\.vs\") || fileName.Contains(@"\.git\") || fileName.Contains(@"\TestResults\") || fileName.Contains(@"\bin\") || fileName.Contains(@"\.bin\") || fileName.Contains(@"\obj\") || fileName.Contains(@"\.obj\")));
             }
             catch (Exception ee)
             {                
