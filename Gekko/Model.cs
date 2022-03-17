@@ -439,7 +439,7 @@ namespace Gekko
         [ProtoMember(6)]
         public string rhsGams = null;
 
-        // Gekko variant ----------------------------------
+        // Gekko variant 1 (Gekko syntax) ----------------------------------
 
         [ProtoMember(7)]
         public string conditionals = null;
@@ -448,15 +448,33 @@ namespace Gekko
         public string lhs = null;
 
         [ProtoMember(9)]
-        public string rhs = null;
+        public string rhs = null;        
+
+        [ProtoMember(10)]
+        public List<EquationVariablesGams> expressionVariablesWithSets = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
+        
+        // Gekko variant 2 (C# syntax) ----------------------------------
+
+        [ProtoMember(11)]
+        public string conditionalsCs = null;
+
+        [ProtoMember(12)]
+        public string lhsCs = null;
+
+        [ProtoMember(13)]
+        public string rhsCs = null;
+
+        [ProtoMember(14)]
+        public List<EquationVariablesGams> expressionVariablesWithSetsCs = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
+        
+        // ===========================================
+        // ===========================================
+        // ===========================================
 
         public TokenHelper lhsTokensGams = null;
         public TokenHelper rhsTokensGams = null;
 
         public List<Func<GekkoSmpl, IVariable>> expressions = new List<Func<GekkoSmpl, IVariable>>();
-
-        [ProtoMember(10)]
-        public List<EquationVariablesGams> expressionVariablesWithSets = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
 
     }
 

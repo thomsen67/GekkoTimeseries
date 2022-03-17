@@ -6423,7 +6423,7 @@ namespace Gekko
         /// <returns></returns>
         private static void TypeErrorString(int position, string type, string inputType)
         {
-            string extra = "You may use the functions string(), date() or val() to convert a scalar to another type, or strings(), dates() or vals() to do the same on all elements inside a list.";
+            string extra = "You may use the functions string(), date() or val() to convert a scalar to another type. In a FOR loop, you may use the functions strings(), dates() or vals() to convert list elements, for instance FOR string %i = strings(#m); ... ; END;.";
             if (position == -1)
             {
                 new Error("The type of the right-hand side is " + inputType + " type, but was expected to be " + type + " type. " + extra);
