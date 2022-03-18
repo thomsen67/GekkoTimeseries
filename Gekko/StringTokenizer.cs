@@ -757,20 +757,29 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get text as string, including left-blanks. Takes an interval.
+        /// Get text as string, including left-blanks. Takes an interval. Best to use with recursive = true, else subnodes are skipped.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="a1"></param>
         /// <param name="a2"></param>
         /// <returns></returns>
-        public static string GetTextFromLeftBlanksTokens(List<TokenHelper> a, int a1, int a2)
+        public static string GetTextFromLeftBlanksTokens(List<TokenHelper> a, int a1, int a2, bool recursive)
         {
             string s2 = null;
-            for (int i = a1; i <= a2; i++)
+            if (recursive)
             {
-                s2 += G.Blanks(a[i].leftblanks) + a[i].s;
+                for (int i = a1; i <= a2; i++)
+                {
+                    s2 += a[i].ToString();
+                }
             }
-
+            else
+            {
+                for (int i = a1; i <= a2; i++)
+                {
+                    s2 += G.Blanks(a[i].leftblanks) + a[i].s;
+                }
+            }
             return s2;
         }
 

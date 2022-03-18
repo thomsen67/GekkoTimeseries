@@ -208,13 +208,33 @@ namespace Gekko
         public TableLight tableLight = null; //when transferring from current sheet to Gekko databank
     }
 
+    /// <summary>
+    /// A class that contains info on combinations regarding controlled sets. For instance, sum(i, x[i] + sum(j, y[i, j]))
+    /// runs over combinations of i and j (in that case, .names would be "i" and "j" when inside the innermost sum(...)).
+    /// </summary>
+    public class Controlled
+    {
+        public List<string> names = new List<string>();
+        public List<string> elements = new List<string>();
+
+        public Controlled Clone()
+        {
+            Controlled clone = new Controlled();
+            clone.names = new List<string>();
+            clone.elements = new List<string>();
+            clone.names.AddRange(this.names);
+            clone.elements.AddRange(this.elements);
+            return clone;
+        }
+    }
+
     public class WalkTokensHelper
     {
         public string t = "t";
         public string tBase = "tBase";
         public bool checkIfVariableIsASet = false;
         public bool replaceSuitableIntInLastPositionWithFixedYear = false;
-        public GekkoDictionary<string, List<int>> lagsLeads = new GekkoDictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, List<int>> lagsLeads = new GekkoDictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);        
     }
 
     /// <summary>

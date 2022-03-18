@@ -290,7 +290,7 @@ namespace Gekko
                         TokenHelper conditionalsTokensCs = tok3.DeepClone(null);
                         WalkTokensHandleParentheses(conditionalsTokensCs); //changes '[' and '{' into '('
                         WalkTokensHelper temp = new WalkTokensHelper();
-                        WalkTokensCsSyntax(conditionalsTokensCs, temp);
+                        WalkTokensCsSyntax(conditionalsTokensCs, temp, null);
                         conditionalsCs = conditionalsTokensCs.ToStringTrim();
                     }
 
@@ -440,13 +440,15 @@ namespace Gekko
             TokenHelper lhsTokensCs = equation.lhsTokensGams.DeepClone(null);
             WalkTokensHandleParentheses(lhsTokensCs); //changes '[' and '{' into '('
             WalkTokensHelper wt1Cs= new WalkTokensHelper();
-            WalkTokensCsSyntax(lhsTokensCs, wt1Cs);
+            Controlled controlledLhs = new Controlled();
+            WalkTokensCsSyntax(lhsTokensCs, wt1Cs, controlledLhs);
             string lhsCs = lhsTokensCs.ToStringTrim();
 
             TokenHelper rhsTokensCs = equation.rhsTokensGams.DeepClone(null);
             WalkTokensHandleParentheses(rhsTokensCs); //changes '[' and '{' into '('
             WalkTokensHelper wt2Cs = new WalkTokensHelper();
-            WalkTokensCsSyntax(rhsTokensCs, wt2Cs);
+            Controlled controlledRhs = new Controlled();
+            WalkTokensCsSyntax(rhsTokensCs, wt2Cs, controlledRhs);
             string rhsCs = rhsTokensCs.ToStringTrim();
 
             if (true)
@@ -1257,7 +1259,7 @@ namespace Gekko
         /// </summary>
         /// <param name="node"></param>
         /// <param name="th"></param>
-        public static void WalkTokensCsSyntax(TokenHelper node, WalkTokensHelper th)
+        public static void WalkTokensCsSyntax(TokenHelper node, WalkTokensHelper th, Controlled controlled)
         {
             //Performs these transformations:
             //- GAMS functions are not touched (log, etc)
@@ -1309,8 +1311,10 @@ namespace Gekko
                             //"sum(" or "log(" or "exp(" etc.
                             if (G.Equal(node.s, "sum"))
                             {
-                                List<string> controlled1 = new List<string>();
-                                List<List<string>> controlled2 = new List<List<string>>();
+                                List<string> names = new List<string>();
+                                List<List<string>> elements = new List<List<string>>();
+                                string condition = null;
+                                string content = null;
 
                                 if (nextNode.subnodes.Count() > 0)
                                 {
@@ -1319,38 +1323,42 @@ namespace Gekko
                                         //stuff like "sum(i, x(i))"
                                         if (nextNode.subnodes[1].type == ETokenType.Word && (G.Equal(nextNode.subnodes[2].s, ",") || G.Equal(nextNode.subnodes[2].s, "$")))
                                         {
-                                            //checks that it has "sum(x," or sum(x$" pattern
-                                            string name = nextNode.subnodes[1].s;
-                                            IVariable m = O.GetIVariableFromString("#" + name, O.ECreatePossibilities.NoneReturnNull);
-                                            if (m == null) new Error("Cannot find the list #" + name + " (representing the GAMS set " + name + ")");                                            
-                                            controlled1.Add(name);
-                                            controlled2.Add(new List<string>());
-                                            foreach (IVariable iv in O.ConvertToList(m))
+                                            //if it has "sum(x," or sum(x$" pattern                                            
+                                            if (G.Equal(nextNode.subnodes[2].s, "$"))
                                             {
-                                                controlled2[controlled2.Count - 1].Add(O.ConvertToString(iv));
+                                                int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");
+                                                condition = StringTokenizer.GetTextFromLeftBlanksTokens(nextNode.subnodes.storage, 3, i - 1, true).Trim();                                               
                                             }
+                                            WalkTokensCsSyntaxHelper1(names, elements, nextNode.subnodes[1].s);
+                                            
                                         }
                                     }
                                     else
                                     {
                                         //stuff like "sum((i, j), x(i, j))"
-                                        List<TokenHelperComma> list2 = nextNode.subnodes[1].SplitCommas(true);
-                                        foreach (TokenHelperComma item in list2)
-                                        {                                            
-                                            if (item.list.Count() == 1 && item.list[0].type == ETokenType.Word)
-                                            {                                                
-                                                string name = item.list[0].s;
-                                                IVariable m = O.GetIVariableFromString("#" + name, O.ECreatePossibilities.NoneReturnNull);
-                                                if (m == null) new Error("Cannot find the list #" + name + " (representing the GAMS set " + name + ")");
-                                                controlled1.Add(name);
-                                                controlled2.Add(new List<string>());
-                                                foreach (IVariable iv in O.ConvertToList(m))
+                                        if (G.Equal(nextNode.subnodes[2].s, ",") || G.Equal(nextNode.subnodes[2].s, "$"))
+                                        {
+                                            if (G.Equal(nextNode.subnodes[2].s, "$"))
+                                            {
+                                                int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");
+                                                condition = StringTokenizer.GetTextFromLeftBlanksTokens(nextNode.subnodes.storage, 3, i - 1, true).Trim();
+                                            }
+                                            List<TokenHelperComma> list2 = nextNode.subnodes[1].SplitCommas(true);
+                                            foreach (TokenHelperComma item in list2)
+                                            {
+                                                if (item.list.Count() == 1 && item.list[0].type == ETokenType.Word)
                                                 {
-                                                    controlled2[controlled2.Count - 1].Add(O.ConvertToString(iv));
+                                                    WalkTokensCsSyntaxHelper1(names, elements, item.list[0].s);
                                                 }
                                             }
                                         }
                                     }
+
+                                    //Now, we do the combinations ... + ... + ... + ...
+                                                                        
+                                    Controlled controlledNew = controlled.Clone();
+                                    int depth = 0;
+                                    Loop(depth, names, elements, controlledNew);
                                 }
                                 else
                                 {
@@ -1617,8 +1625,47 @@ namespace Gekko
                 //an empty node with children
                 for (int i = 0; i < node.subnodes.storage.Count; i++)  //the count may increase, because subnodes may be added dynamically (translating x[i, t-1] into x[#i][-1])
                 {
-                    WalkTokensCsSyntax(node.subnodes.storage[i], th);
+                    WalkTokensCsSyntax(node.subnodes.storage[i], th, controlled);
                 }
+            }
+        }
+
+        public static void Loop(int depth, List<string> names, List<List<string>> elements, Controlled controlled)
+        {
+            for (int i = 0; i < elements[depth].Count; i++)
+            {
+                controlled.names.Add(names[depth]);
+                controlled.elements.Add(elements[depth][i]);
+                if (depth + 1 < names.Count)
+                {
+                    Loop(depth + 1, names, elements, controlled);
+                }
+                else
+                {
+                    //walk......
+
+                    new Writeln(Stringlist.GetListWithCommas(controlled.names) + " ----- " + Stringlist.GetListWithCommas(controlled.elements));
+
+                    controlled.names.RemoveAt(controlled.names.Count - 1);
+                    controlled.elements.RemoveAt(controlled.elements.Count - 1);
+                }
+            }
+            if (depth > 0)
+            {
+                controlled.names.RemoveAt(controlled.names.Count - 1);
+                controlled.elements.RemoveAt(controlled.elements.Count - 1);
+            }
+        }
+
+        private static void WalkTokensCsSyntaxHelper1(List<string> controlled1, List<List<string>> controlled2, string name)
+        {
+            IVariable m = O.GetIVariableFromString("#" + name, O.ECreatePossibilities.NoneReturnNull);
+            if (m == null) new Error("Cannot find the list #" + name + " (representing the GAMS set " + name + ")");
+            controlled1.Add(name);
+            controlled2.Add(new List<string>());
+            foreach (IVariable iv in O.ConvertToList(m))
+            {
+                controlled2[controlled2.Count - 1].Add(O.ConvertToString(iv));
             }
         }
 
