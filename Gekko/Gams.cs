@@ -10,6 +10,7 @@ using System.Drawing;
 using GAMS;
 using ProtoBuf;
 using ProtoBuf.Meta;
+using System.Text.RegularExpressions;
 
 namespace Gekko
 {
@@ -1313,7 +1314,7 @@ namespace Gekko
                             {
                                 List<string> names = new List<string>();
                                 List<List<string>> elements = new List<List<string>>();
-                                string condition = null;
+                                List<TokenHelper> condition = null;
                                 string content = null;
 
                                 if (nextNode.subnodes.Count() > 0)
@@ -1327,7 +1328,7 @@ namespace Gekko
                                             if (G.Equal(nextNode.subnodes[2].s, "$"))
                                             {
                                                 int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");
-                                                condition = StringTokenizer.GetTextFromLeftBlanksTokens(nextNode.subnodes.storage, 3, i - 1, true).Trim();                                               
+                                                condition = nextNode.subnodes.storage.GetRange(3, i - 3);
                                             }
                                             WalkTokensCsSyntaxHelper1(names, elements, nextNode.subnodes[1].s);
                                             
@@ -1340,8 +1341,8 @@ namespace Gekko
                                         {
                                             if (G.Equal(nextNode.subnodes[2].s, "$"))
                                             {
-                                                int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");
-                                                condition = StringTokenizer.GetTextFromLeftBlanksTokens(nextNode.subnodes.storage, 3, i - 1, true).Trim();
+                                                int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");                                                
+                                                condition = nextNode.subnodes.storage.GetRange(3, i - 3);
                                             }
                                             List<TokenHelperComma> list2 = nextNode.subnodes[1].SplitCommas(true);
                                             foreach (TokenHelperComma item in list2)
@@ -1358,7 +1359,39 @@ namespace Gekko
                                                                         
                                     Controlled controlledNew = controlled.Clone();
                                     int depth = 0;
-                                    Loop(depth, names, elements, controlledNew);
+
+                                    //Split according to "and"
+                                    List<List<TokenHelper>> sss = null;
+                                    List<TokenHelper> start = new List<TokenHelper>();
+                                    
+                                    if (condition != null)
+                                    {
+                                        List<TokenHelper> condition2 = condition;
+                                        if (condition[0].SubnodesType() == "(")
+                                        {
+                                            condition2 = condition[0].subnodes.storage.GetRange(1, condition[0].subnodes.storage.Count - 2);
+                                        }
+                                        sss = new List<List<TokenHelper>>();
+                                        foreach (TokenHelper th2 in condition2)
+                                        {
+                                            if (G.Equal(th2.s, "and"))
+                                            {
+                                                sss.Add(start);
+                                                start = new List<TokenHelper>();
+                                                continue;
+                                            }
+                                            start.Add(th2);
+                                        }
+                                        sss.Add(start);
+                                    }                                   
+
+                                    //string[] ss = Regex.Split(condition, " and ", RegexOptions.IgnoreCase);
+                                    //foreach (string s in ss)
+                                    //{
+
+                                    //}
+
+                                    Loop(depth, names, elements, condition, controlledNew);
                                 }
                                 else
                                 {
@@ -1630,7 +1663,7 @@ namespace Gekko
             }
         }
 
-        public static void Loop(int depth, List<string> names, List<List<string>> elements, Controlled controlled)
+        public static void Loop(int depth, List<string> names, List<List<string>> elements, List<TokenHelper> condition, Controlled controlled)
         {
             for (int i = 0; i < elements[depth].Count; i++)
             {
@@ -1638,7 +1671,7 @@ namespace Gekko
                 controlled.elements.Add(elements[depth][i]);
                 if (depth + 1 < names.Count)
                 {
-                    Loop(depth + 1, names, elements, controlled);
+                    Loop(depth + 1, names, elements, condition, controlled);
                 }
                 else
                 {

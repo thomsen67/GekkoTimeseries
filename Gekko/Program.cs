@@ -228,6 +228,33 @@ namespace Gekko
         }
     }
 
+    public class Conditions
+    {
+        public List<Condition> conditions = new List<Condition>();
+    }
+
+    public enum ConditionType
+    {
+        None,
+        Set,  //special
+        SmallerThan,
+        SmallerThanOrEqual,
+        Equal,
+        NonEqual,
+        LargerThanOrEqual,
+        LargerThan
+    }
+
+    public class Condition
+    {
+        public bool invert = false;
+        public string setOrVarname = null;
+        public List<string> indexes = new List<string>();
+        public double xDouble = double.NaN;
+        public string xString = null;
+        public ConditionType conditionType = ConditionType.None;        
+    }
+
     public class WalkTokensHelper
     {
         public string t = "t";
