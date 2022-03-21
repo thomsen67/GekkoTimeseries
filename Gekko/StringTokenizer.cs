@@ -312,6 +312,7 @@ namespace Gekko
         /// Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
         /// Note that the commas are preserved as the second part of the tuple.
         /// The last item (or the 1 item if there is only 1) will have null as second part of tuple.
+        /// With omitParentheses = true, the enclosing parentheses are omitted.
         /// </summary>
         /// <returns></returns>           
         public List<TokenHelperComma> SplitCommas(bool omitParentheses)
@@ -757,27 +758,34 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Get text as string, including left-blanks. Best to use with recursive = true, else subnodes are skipped.
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <param name="recursive"></param>
+        /// <returns></returns>
+        public static string GetTextFromLeftBlanksTokens(List<TokenHelper> tokens, bool recursive)
+        {
+            return GetTextFromLeftBlanksTokens(tokens, 0, tokens.Count - 1, recursive);
+        }
+
+        /// <summary>
         /// Get text as string, including left-blanks. Takes an interval. Best to use with recursive = true, else subnodes are skipped.
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="a1"></param>
-        /// <param name="a2"></param>
-        /// <returns></returns>
-        public static string GetTextFromLeftBlanksTokens(List<TokenHelper> a, int a1, int a2, bool recursive)
+        public static string GetTextFromLeftBlanksTokens(List<TokenHelper> tokens, int i1, int i2, bool recursive)
         {
             string s2 = null;
             if (recursive)
             {
-                for (int i = a1; i <= a2; i++)
+                for (int i = i1; i <= i2; i++)
                 {
-                    s2 += a[i].ToString();
+                    s2 += tokens[i].ToString();
                 }
             }
             else
             {
-                for (int i = a1; i <= a2; i++)
+                for (int i = i1; i <= i2; i++)
                 {
-                    s2 += G.Blanks(a[i].leftblanks) + a[i].s;
+                    s2 += G.Blanks(tokens[i].leftblanks) + tokens[i].s;
                 }
             }
             return s2;

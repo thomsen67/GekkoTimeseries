@@ -785,8 +785,7 @@ namespace Gekko
         {
             if (Program.model.modelGams.equationsByEqname == null || Program.model.modelGams.equationsByEqname.Count == 0)
             {
-                new Error("No GAMS equations found");
-                //throw new GekkoException();
+                new Error("No GAMS equations found. Did you omit a MODEL<gms> statement?");
             }
             List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
             return eqs;
@@ -796,8 +795,7 @@ namespace Gekko
         {
             if (Program.model.modelGams.equationsByVarname == null || Program.model.modelGams.equationsByVarname.Count == 0)
             {
-                new Error("No GAMS equations found");
-                //throw new GekkoException();
+                new Error("No GAMS equations found. Did you omit a MODEL<gms> statement?");
             }
             List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
             return eqs;
@@ -1314,8 +1312,9 @@ namespace Gekko
                             {
                                 List<string> names = new List<string>();
                                 List<List<string>> elements = new List<List<string>>();
-                                List<TokenHelper> condition = null;
+                                List<TokenHelper> tokensCondition = null;
                                 string content = null;
+                                Conditions conditions = new Conditions();                                
 
                                 if (nextNode.subnodes.Count() > 0)
                                 {
@@ -1328,7 +1327,7 @@ namespace Gekko
                                             if (G.Equal(nextNode.subnodes[2].s, "$"))
                                             {
                                                 int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");
-                                                condition = nextNode.subnodes.storage.GetRange(3, i - 3);
+                                                tokensCondition = nextNode.subnodes.storage.GetRange(3, i - 3);
                                             }
                                             WalkTokensCsSyntaxHelper1(names, elements, nextNode.subnodes[1].s);
                                             
@@ -1342,7 +1341,7 @@ namespace Gekko
                                             if (G.Equal(nextNode.subnodes[2].s, "$"))
                                             {
                                                 int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");                                                
-                                                condition = nextNode.subnodes.storage.GetRange(3, i - 3);
+                                                tokensCondition = nextNode.subnodes.storage.GetRange(3, i - 3);
                                             }
                                             List<TokenHelperComma> list2 = nextNode.subnodes[1].SplitCommas(true);
                                             foreach (TokenHelperComma item in list2)
@@ -1364,12 +1363,12 @@ namespace Gekko
                                     List<List<TokenHelper>> sss = null;
                                     List<TokenHelper> start = new List<TokenHelper>();
                                     
-                                    if (condition != null)
+                                    if (tokensCondition != null)
                                     {
-                                        List<TokenHelper> condition2 = condition;
-                                        if (condition[0].SubnodesType() == "(")
+                                        List<TokenHelper> condition2 = tokensCondition;
+                                        if (tokensCondition[0].SubnodesType() == "(")
                                         {
-                                            condition2 = condition[0].subnodes.storage.GetRange(1, condition[0].subnodes.storage.Count - 2);
+                                            condition2 = tokensCondition[0].subnodes.storage.GetRange(1, tokensCondition[0].subnodes.storage.Count - 2);
                                         }
                                         sss = new List<List<TokenHelper>>();
                                         foreach (TokenHelper th2 in condition2)
@@ -1383,15 +1382,53 @@ namespace Gekko
                                             start.Add(th2);
                                         }
                                         sss.Add(start);
-                                    }                                   
+                                    }
 
-                                    //string[] ss = Regex.Split(condition, " and ", RegexOptions.IgnoreCase);
-                                    //foreach (string s in ss)
-                                    //{
+                                    if (sss != null)
+                                    {
+                                        foreach (List<TokenHelper> th3 in sss)
+                                        {
+                                            int not = 0;
+                                            int n = th3.Count;
+                                            if (n + not < 2) GamsModelCsError(th3, "");
+                                            if (th3[0 + not].type == ETokenType.Word)
+                                            {
+                                                if (th3[1 + not].leftblanks == 0 && th3[1 + not].SubnodesType() == "(")
+                                                {
+                                                    //m(a, b, c)
+                                                    //m(a, b, c) > 15
+                                                    Condition condition = new Condition();
+                                                    condition.conditionType = EConditionType.Set;
+                                                    if (not == 1) condition.invert = true;
+                                                    condition.setOrVarname = th3[0 + not].s;
+                                                    List<TokenHelperComma> comma = th3[1 + not].SplitCommas(true);
+                                                    foreach (TokenHelperComma thc in comma)
+                                                    {
+                                                        condition.indexes.Add(thc.list.ToString());
+                                                    }
 
-                                    //}
+                                                    int offset = -12345; string value = null;
+                                                    GetLogicalOperator(out offset, th3, condition, 2 + not);
+                                                    conditions.conditions.Add(condition);
+                                                }
+                                                else if (n + not >= 3 && th3[1 + not].leftblanks == 0 && th3[2 + not].s == "." && G.Equal(th3[3 + not].s, "val"))
+                                                {
+                                                    //a.val > 15
+                                                    Condition condition = new Condition();
+                                                    int i = 3 + not;
+                                                    int offset = -12345;
+                                                    GetLogicalOperator(out offset, th3, condition, i);
+                                                    string rest = StringTokenizer.GetTextFromLeftBlanksTokens(th3, i + offset, th3.Count - 1, true);
+                                                }
+                                                else
+                                                {
+                                                    GamsModelCsError(th3, "");
+                                                }
+                                            }
+                                        }
+                                    }
 
-                                    Loop(depth, names, elements, condition, controlledNew);
+                                    Loop(depth, names, elements, conditions, controlledNew);
                                 }
                                 else
                                 {
@@ -1663,7 +1700,73 @@ namespace Gekko
             }
         }
 
-        public static void Loop(int depth, List<string> names, List<List<string>> elements, List<TokenHelper> condition, Controlled controlled)
+        /// <summary>
+        /// Finds operators &lt;, &lt;=, ==, &lt;&gt;, &gt;, &gt;=. Beware condition.conditionType is changed.
+        /// </summary>
+        private static void GetLogicalOperator(out int offset, List<TokenHelper> th3, Condition condition, int i)
+        {
+            offset = 0;
+            string x0 = StringTokenizer.GetS(th3, i);
+            string x1 = StringTokenizer.GetS(th3, i + 1);
+            if (x0 == "<")
+            {
+                if (x1 == "=")
+                {
+                    offset++;
+                    condition.conditionType = EConditionType.SmallerThanOrEqual;
+                }
+                else if (x1 == ">")
+                {
+                    offset++;
+                    condition.conditionType = EConditionType.NonEqual;
+                }
+                else
+                {
+                    condition.conditionType = EConditionType.SmallerThan;
+                }
+            }
+            else if (x0 == ">")
+            {
+                if (x1 == "=")
+                {
+                    offset++;
+                    condition.conditionType = EConditionType.LargerThanOrEqual;
+                }
+                else
+                {
+                    condition.conditionType = EConditionType.LargerThan;
+                }
+            }
+            else if (x0 == "=")
+            {
+                if (x1 == "=")
+                {
+                    offset++;
+                    condition.conditionType = EConditionType.Equal;
+                }
+                else GamsModelCsError(th3, "");
+            }
+            string value = StringTokenizer.GetTextFromLeftBlanksTokens(th3, i + offset + 1, th3.Count - 1, true);
+            double ii = double.NaN;
+            if (double.TryParse(value, out ii))
+            {
+                condition.xDouble = ii;
+            }
+            else
+            {
+                condition.xString = value;
+            }
+
+        }
+
+        private static Error GamsModelCsError(List<TokenHelper> tokens, string error)
+        {
+            string s = null;
+            if (tokens != null) s = StringTokenizer.GetTextFromLeftBlanksTokens(tokens, true);
+            return new Error("Cannot understand this $ condition: " + error + s);
+        }
+
+        public static void Loop(int depth, List<string> names, List<List<string>> elements, Conditions conditions, Controlled controlled)
         {
             for (int i = 0; i < elements[depth].Count; i++)
             {
@@ -1671,11 +1774,32 @@ namespace Gekko
                 controlled.elements.Add(elements[depth][i]);
                 if (depth + 1 < names.Count)
                 {
-                    Loop(depth + 1, names, elements, condition, controlled);
+                    Loop(depth + 1, names, elements, conditions, controlled);
                 }
                 else
                 {
                     //walk......
+
+                    bool good = true;
+                    foreach (Condition condition in conditions.conditions)
+                    {
+                        //try set (#list)
+                        if (condition.setOrVarObject == null)
+                        {
+                            condition.setOrVarObject = O.GetIVariableFromString("#" + condition.setOrVarname, O.ECreatePossibilities.NoneReturnNull);
+                            //try a variable
+                            if (condition.setOrVarObject == null) condition.setOrVarObject = O.GetIVariableFromString(condition.setOrVarname, O.ECreatePossibilities.NoneReturnNull);
+                            if (condition.setOrVarObject == null) GamsModelCsError(null, "Cannot find the set or variable '" + condition.setOrVarname + "' in the first-position databank");
+                        }
+
+                        for (int ii = 0; ii < controlled.names.Count; ii++)
+                        {
+                            string name = controlled.names[ii];
+                            string element = controlled.elements[ii];
+                        }
+
+                        if (good == false) break;
+                    }
 
                     new Writeln(Stringlist.GetListWithCommas(controlled.names) + " ----- " + Stringlist.GetListWithCommas(controlled.elements));
 

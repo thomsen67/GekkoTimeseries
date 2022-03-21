@@ -217,6 +217,11 @@ namespace Gekko
         public List<string> names = new List<string>();
         public List<string> elements = new List<string>();
 
+        public int Count()
+        {
+            return names.Count;
+        }
+
         public Controlled Clone()
         {
             Controlled clone = new Controlled();
@@ -233,7 +238,7 @@ namespace Gekko
         public List<Condition> conditions = new List<Condition>();
     }
 
-    public enum ConditionType
+    public enum EConditionType
     {
         None,
         Set,  //special
@@ -249,10 +254,11 @@ namespace Gekko
     {
         public bool invert = false;
         public string setOrVarname = null;
+        public IVariable setOrVarObject = null;
         public List<string> indexes = new List<string>();
         public double xDouble = double.NaN;
         public string xString = null;
-        public ConditionType conditionType = ConditionType.None;        
+        public EConditionType conditionType = EConditionType.None;        
     }
 
     public class WalkTokensHelper
