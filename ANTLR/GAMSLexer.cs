@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-03-23 17:49:48
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-03-24 00:13:39
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -16,77 +16,90 @@ using Stack 		= Antlr.Runtime.Collections.StackList;
 namespace  Gekko 
 {
 public partial class GAMSLexer : Lexer {
-    public const int ASTPOW = 25;
-    public const int RB = 11;
-    public const int ASTSIMPLEFUNCTION = 21;
-    public const int ASTVARIABLE = 26;
-    public const int RP = 12;
-    public const int LETTER = 38;
-    public const int MOD = 32;
-    public const int LOG = 4;
-    public const int ASTFUNCTION = 22;
-    public const int Exponent = 37;
+    public const int DOLLAR = 42;
+    public const int ASTPOW = 15;
+    public const int RB = 50;
+    public const int ASTVARIABLE = 16;
+    public const int MOD = 45;
+    public const int LETTER = 54;
+    public const int ASTFUNCTION = 12;
+    public const int ASTINDEXES1 = 18;
+    public const int ASTCONDITIONAL = 25;
+    public const int Exponent = 53;
+    public const int DOUBLEDOT = 28;
+    public const int R2 = 34;
+    public const int ASTINDEXES3 = 20;
+    public const int R3 = 36;
+    public const int ASTINDEXES2 = 19;
+    public const int SUM = 27;
     public const int EOF = -1;
-    public const int ASTINTEGER = 23;
-    public const int ASTFRMLCODE = 19;
-    public const int EXP = 5;
-    public const int Comment = 43;
-    public const int ASTEND = 27;
-    public const int PLUS = 6;
-    public const int FRML = 28;
-    public const int DIGIT = 36;
-    public const int DOT = 13;
-    public const int D = 48;
-    public const int Double = 30;
-    public const int E = 49;
-    public const int F = 50;
-    public const int G = 51;
-    public const int A = 45;
-    public const int B = 46;
-    public const int C = 47;
-    public const int L = 56;
-    public const int M = 57;
-    public const int N = 58;
-    public const int NESTED_ML_COMMENT = 44;
-    public const int O = 59;
-    public const int H = 52;
-    public const int I = 53;
-    public const int J = 54;
-    public const int NEWLINE2 = 41;
-    public const int K = 55;
-    public const int NEWLINE3 = 42;
-    public const int U = 65;
-    public const int T = 64;
-    public const int WHITESPACE = 39;
-    public const int NEGATE = 16;
-    public const int W = 67;
-    public const int V = 66;
-    public const int Q = 61;
-    public const int P = 60;
-    public const int ASTFRML = 17;
-    public const int S = 63;
-    public const int MINUS = 7;
-    public const int MULT = 8;
-    public const int R = 62;
-    public const int SEMI = 29;
-    public const int TRUE = 14;
-    public const int Y = 69;
-    public const int X = 68;
-    public const int Z = 70;
-    public const int T__71 = 71;
-    public const int ASTLEFTSIDE = 18;
-    public const int T__72 = 72;
-    public const int NEWLINE = 40;
-    public const int Ident = 33;
-    public const int ASTEXPRESSION = 20;
-    public const int Doubledot = 35;
-    public const int STARS = 34;
-    public const int LB = 10;
-    public const int ASTDOUBLE = 24;
-    public const int DIV = 9;
-    public const int FALSE = 15;
-    public const int T__73 = 73;
-    public const int Integer = 31;
+    public const int ASTINTEGER = 13;
+    public const int ASTFRMLCODE = 7;
+    public const int Comment = 59;
+    public const int COMMA = 37;
+    public const int R1 = 32;
+    public const int ASTSIMPLEFUNCTION1 = 9;
+    public const int EQUAL = 29;
+    public const int ASTSIMPLEFUNCTION2 = 10;
+    public const int ASTSIMPLEFUNCTION3 = 11;
+    public const int ASTEND = 17;
+    public const int PLUS = 38;
+    public const int FRML = 48;
+    public const int DIGIT = 52;
+    public const int DOT = 51;
+    public const int D = 64;
+    public const int ASTEXPRESSION2 = 22;
+    public const int Double = 41;
+    public const int E = 65;
+    public const int ASTEXPRESSION3 = 23;
+    public const int F = 66;
+    public const int G = 67;
+    public const int A = 61;
+    public const int B = 62;
+    public const int C = 63;
+    public const int L = 72;
+    public const int M = 73;
+    public const int NESTED_ML_COMMENT = 60;
+    public const int N = 74;
+    public const int O = 75;
+    public const int H = 68;
+    public const int I = 69;
+    public const int NEWLINE2 = 57;
+    public const int J = 70;
+    public const int ASTEXPRESSION1 = 21;
+    public const int NEWLINE3 = 58;
+    public const int K = 71;
+    public const int U = 81;
+    public const int T = 80;
+    public const int NEGATE = 4;
+    public const int WHITESPACE = 55;
+    public const int W = 83;
+    public const int V = 82;
+    public const int Q = 77;
+    public const int P = 76;
+    public const int ASTFRML = 5;
+    public const int S = 79;
+    public const int MULT = 43;
+    public const int MINUS = 40;
+    public const int R = 78;
+    public const int SEMI = 30;
+    public const int Y = 85;
+    public const int X = 84;
+    public const int Z = 86;
+    public const int L1 = 31;
+    public const int L2 = 33;
+    public const int L3 = 35;
+    public const int ASTLEFTSIDE = 6;
+    public const int NEWLINE = 56;
+    public const int Ident = 46;
+    public const int ASTEXPRESSION = 8;
+    public const int STARS = 47;
+    public const int LB = 49;
+    public const int ASTDOUBLE = 14;
+    public const int ASTSUM = 26;
+    public const int DIV = 44;
+    public const int ASTDEFINITION = 24;
+    public const int Integer = 39;
 
       public override void ReportError(RecognitionException e) {
             string hdr = GetErrorHeader(e);
@@ -98,10 +111,9 @@ public partial class GAMSLexer : Lexer {
 
       public static System.Collections.Generic.Dictionary<string, int> GetKw()
       {
-         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-         d.Add("EXP"                    ,   EXP                     );                                        
-         d.Add("LOG"                    ,   LOG                     );
+         System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);     
     	 d.Add("FRML"                    ,   FRML                     );
+    	 d.Add("SUM"                    ,   SUM                     );
          return d;
       }    
       
@@ -136,17 +148,17 @@ public partial class GAMSLexer : Lexer {
     	get { return "GAMS.g";} 
     }
 
-    // $ANTLR start "LOG"
-    public void mLOG() // throws RecognitionException [2]
+    // $ANTLR start "FRML"
+    public void mFRML() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = LOG;
+            int _type = FRML;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:36:5: ( 'LOG' )
-            // GAMS.g:36:7: 'LOG'
+            // GAMS.g:202:6: ( 'FRML' )
+            // GAMS.g:202:8: 'FRML'
             {
-            	Match("LOG"); 
+            	Match("FRML"); 
 
 
             }
@@ -158,19 +170,19 @@ public partial class GAMSLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "LOG"
+    // $ANTLR end "FRML"
 
-    // $ANTLR start "EXP"
-    public void mEXP() // throws RecognitionException [2]
+    // $ANTLR start "SUM"
+    public void mSUM() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = EXP;
+            int _type = SUM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:37:5: ( 'EXP' )
-            // GAMS.g:37:7: 'EXP'
+            // GAMS.g:203:5: ( 'SUM' )
+            // GAMS.g:203:7: 'SUM'
             {
-            	Match("EXP"); 
+            	Match("SUM"); 
 
 
             }
@@ -182,7 +194,7 @@ public partial class GAMSLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "EXP"
+    // $ANTLR end "SUM"
 
     // $ANTLR start "LB"
     public void mLB() // throws RecognitionException [2]
@@ -191,8 +203,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = LB;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:38:4: ( '<' )
-            // GAMS.g:38:6: '<'
+            // GAMS.g:205:9: ( '<' )
+            // GAMS.g:205:11: '<'
             {
             	Match('<'); 
 
@@ -214,8 +226,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = RB;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:39:4: ( '>' )
-            // GAMS.g:39:6: '>'
+            // GAMS.g:206:9: ( '>' )
+            // GAMS.g:206:11: '>'
             {
             	Match('>'); 
 
@@ -230,29 +242,6 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "RB"
 
-    // $ANTLR start "RP"
-    public void mRP() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = RP;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:40:4: ( ')' )
-            // GAMS.g:40:6: ')'
-            {
-            	Match(')'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "RP"
-
     // $ANTLR start "DOT"
     public void mDOT() // throws RecognitionException [2]
     {
@@ -260,8 +249,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = DOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:41:5: ( '.' )
-            // GAMS.g:41:7: '.'
+            // GAMS.g:207:9: ( '.' )
+            // GAMS.g:207:11: '.'
             {
             	Match('.'); 
 
@@ -276,123 +265,6 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "DOT"
 
-    // $ANTLR start "TRUE"
-    public void mTRUE() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = TRUE;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:42:6: ( 'true' )
-            // GAMS.g:42:8: 'true'
-            {
-            	Match("true"); 
-
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "TRUE"
-
-    // $ANTLR start "FALSE"
-    public void mFALSE() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = FALSE;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:43:7: ( 'false' )
-            // GAMS.g:43:9: 'false'
-            {
-            	Match("false"); 
-
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "FALSE"
-
-    // $ANTLR start "T__71"
-    public void mT__71() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = T__71;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:44:7: ( '=' )
-            // GAMS.g:44:9: '='
-            {
-            	Match('='); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "T__71"
-
-    // $ANTLR start "T__72"
-    public void mT__72() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = T__72;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:45:7: ( '(' )
-            // GAMS.g:45:9: '('
-            {
-            	Match('('); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "T__72"
-
-    // $ANTLR start "T__73"
-    public void mT__73() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = T__73;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:46:7: ( ',' )
-            // GAMS.g:46:9: ','
-            {
-            	Match(','); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "T__73"
-
     // $ANTLR start "PLUS"
     public void mPLUS() // throws RecognitionException [2]
     {
@@ -400,8 +272,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:174:6: ( '+' )
-            // GAMS.g:174:8: '+'
+            // GAMS.g:209:6: ( '+' )
+            // GAMS.g:209:8: '+'
             {
             	Match('+'); 
 
@@ -423,8 +295,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:175:7: ( '-' )
-            // GAMS.g:175:9: '-'
+            // GAMS.g:210:7: ( '-' )
+            // GAMS.g:210:9: '-'
             {
             	Match('-'); 
 
@@ -446,8 +318,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = SEMI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:176:6: ( ';' )
-            // GAMS.g:176:8: ';'
+            // GAMS.g:211:6: ( ';' )
+            // GAMS.g:211:8: ';'
             {
             	Match(';'); 
 
@@ -469,8 +341,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = MULT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:177:6: ( '*' )
-            // GAMS.g:177:8: '*'
+            // GAMS.g:212:6: ( '*' )
+            // GAMS.g:212:8: '*'
             {
             	Match('*'); 
 
@@ -492,8 +364,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:178:5: ( '/' )
-            // GAMS.g:178:7: '/'
+            // GAMS.g:213:5: ( '/' )
+            // GAMS.g:213:7: '/'
             {
             	Match('/'); 
 
@@ -515,8 +387,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = MOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:179:5: ( '%' )
-            // GAMS.g:179:7: '%'
+            // GAMS.g:214:5: ( '%' )
+            // GAMS.g:214:7: '%'
             {
             	Match('%'); 
 
@@ -531,18 +403,17 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "MOD"
 
-    // $ANTLR start "FRML"
-    public void mFRML() // throws RecognitionException [2]
+    // $ANTLR start "COMMA"
+    public void mCOMMA() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = FRML;
+            int _type = COMMA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:180:6: ( 'FRML' )
-            // GAMS.g:180:8: 'FRML'
+            // GAMS.g:215:7: ( ',' )
+            // GAMS.g:215:9: ','
             {
-            	Match("FRML"); 
-
+            	Match(','); 
 
             }
 
@@ -553,7 +424,7 @@ public partial class GAMSLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "FRML"
+    // $ANTLR end "COMMA"
 
     // $ANTLR start "STARS"
     public void mSTARS() // throws RecognitionException [2]
@@ -562,8 +433,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:183:10: ( '**' )
-            // GAMS.g:183:17: '**'
+            // GAMS.g:218:10: ( '**' )
+            // GAMS.g:218:17: '**'
             {
             	Match("**"); 
 
@@ -579,15 +450,15 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "STARS"
 
-    // $ANTLR start "Doubledot"
-    public void mDoubledot() // throws RecognitionException [2]
+    // $ANTLR start "DOUBLEDOT"
+    public void mDOUBLEDOT() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = Doubledot;
+            int _type = DOUBLEDOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:195:11: ( '..' )
-            // GAMS.g:195:13: '..'
+            // GAMS.g:220:11: ( '..' )
+            // GAMS.g:220:13: '..'
             {
             	Match(".."); 
 
@@ -601,7 +472,7 @@ public partial class GAMSLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "Doubledot"
+    // $ANTLR end "DOUBLEDOT"
 
     // $ANTLR start "Integer"
     public void mInteger() // throws RecognitionException [2]
@@ -610,10 +481,10 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:197:9: ( ( DIGIT )+ )
-            // GAMS.g:197:11: ( DIGIT )+
+            // GAMS.g:222:9: ( ( DIGIT )+ )
+            // GAMS.g:222:11: ( DIGIT )+
             {
-            	// GAMS.g:197:11: ( DIGIT )+
+            	// GAMS.g:222:11: ( DIGIT )+
             	int cnt1 = 0;
             	do 
             	{
@@ -629,7 +500,7 @@ public partial class GAMSLexer : Lexer {
             	    switch (alt1) 
             		{
             			case 1 :
-            			    // GAMS.g:197:12: DIGIT
+            			    // GAMS.g:222:12: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -667,15 +538,15 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:200:5: ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
+            // GAMS.g:225:5: ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
             int alt8 = 3;
             alt8 = dfa8.Predict(input);
             switch (alt8) 
             {
                 case 1 :
-                    // GAMS.g:201:8: ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )?
+                    // GAMS.g:226:8: ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )?
                     {
-                    	// GAMS.g:201:8: ( '0' .. '9' )+
+                    	// GAMS.g:226:8: ( '0' .. '9' )+
                     	int cnt2 = 0;
                     	do 
                     	{
@@ -691,7 +562,7 @@ public partial class GAMSLexer : Lexer {
                     	    switch (alt2) 
                     		{
                     			case 1 :
-                    			    // GAMS.g:201:9: '0' .. '9'
+                    			    // GAMS.g:226:9: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -711,7 +582,7 @@ public partial class GAMSLexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop2' has no statements
 
                     	mDOT(); 
-                    	// GAMS.g:201:26: ( '0' .. '9' )*
+                    	// GAMS.g:226:26: ( '0' .. '9' )*
                     	do 
                     	{
                     	    int alt3 = 2;
@@ -726,7 +597,7 @@ public partial class GAMSLexer : Lexer {
                     	    switch (alt3) 
                     		{
                     			case 1 :
-                    			    // GAMS.g:201:27: '0' .. '9'
+                    			    // GAMS.g:226:27: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -741,7 +612,7 @@ public partial class GAMSLexer : Lexer {
                     	loop3:
                     		;	// Stops C# compiler whining that label 'loop3' has no statements
 
-                    	// GAMS.g:201:40: ( Exponent )?
+                    	// GAMS.g:226:40: ( Exponent )?
                     	int alt4 = 2;
                     	int LA4_0 = input.LA(1);
 
@@ -752,7 +623,7 @@ public partial class GAMSLexer : Lexer {
                     	switch (alt4) 
                     	{
                     	    case 1 :
-                    	        // GAMS.g:201:40: Exponent
+                    	        // GAMS.g:226:40: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -765,10 +636,10 @@ public partial class GAMSLexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // GAMS.g:202:9: DOT ( '0' .. '9' )+ ( Exponent )?
+                    // GAMS.g:227:9: DOT ( '0' .. '9' )+ ( Exponent )?
                     {
                     	mDOT(); 
-                    	// GAMS.g:202:13: ( '0' .. '9' )+
+                    	// GAMS.g:227:13: ( '0' .. '9' )+
                     	int cnt5 = 0;
                     	do 
                     	{
@@ -784,7 +655,7 @@ public partial class GAMSLexer : Lexer {
                     	    switch (alt5) 
                     		{
                     			case 1 :
-                    			    // GAMS.g:202:15: '0' .. '9'
+                    			    // GAMS.g:227:15: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -803,7 +674,7 @@ public partial class GAMSLexer : Lexer {
                     	loop5:
                     		;	// Stops C# compiler whining that label 'loop5' has no statements
 
-                    	// GAMS.g:202:29: ( Exponent )?
+                    	// GAMS.g:227:29: ( Exponent )?
                     	int alt6 = 2;
                     	int LA6_0 = input.LA(1);
 
@@ -814,7 +685,7 @@ public partial class GAMSLexer : Lexer {
                     	switch (alt6) 
                     	{
                     	    case 1 :
-                    	        // GAMS.g:202:29: Exponent
+                    	        // GAMS.g:227:29: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -827,9 +698,9 @@ public partial class GAMSLexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // GAMS.g:203:8: ( '0' .. '9' )+ Exponent
+                    // GAMS.g:228:8: ( '0' .. '9' )+ Exponent
                     {
-                    	// GAMS.g:203:8: ( '0' .. '9' )+
+                    	// GAMS.g:228:8: ( '0' .. '9' )+
                     	int cnt7 = 0;
                     	do 
                     	{
@@ -845,7 +716,7 @@ public partial class GAMSLexer : Lexer {
                     	    switch (alt7) 
                     		{
                     			case 1 :
-                    			    // GAMS.g:203:9: '0' .. '9'
+                    			    // GAMS.g:228:9: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -884,8 +755,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:208:5: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // GAMS.g:208:9: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // GAMS.g:233:5: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // GAMS.g:233:9: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -898,7 +769,7 @@ public partial class GAMSLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// GAMS.g:208:23: ( '+' | '-' )?
+            	// GAMS.g:233:23: ( '+' | '-' )?
             	int alt9 = 2;
             	int LA9_0 = input.LA(1);
 
@@ -928,7 +799,7 @@ public partial class GAMSLexer : Lexer {
 
             	}
 
-            	// GAMS.g:208:38: ( '0' .. '9' )+
+            	// GAMS.g:233:38: ( '0' .. '9' )+
             	int cnt10 = 0;
             	do 
             	{
@@ -944,7 +815,7 @@ public partial class GAMSLexer : Lexer {
             	    switch (alt10) 
             		{
             			case 1 :
-            			    // GAMS.g:208:40: '0' .. '9'
+            			    // GAMS.g:233:40: '0' .. '9'
             			    {
             			    	MatchRange('0','9'); 
 
@@ -980,8 +851,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:211:7: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // GAMS.g:211:9: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // GAMS.g:236:7: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // GAMS.g:236:9: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -994,7 +865,7 @@ public partial class GAMSLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// GAMS.g:211:22: ( DIGIT | LETTER | '_' )*
+            	// GAMS.g:236:22: ( DIGIT | LETTER | '_' )*
             	do 
             	{
             	    int alt11 = 2;
@@ -1054,10 +925,10 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:213:12: ( ( '\\t' | ' ' | '\\u000C' )+ )
-            // GAMS.g:213:14: ( '\\t' | ' ' | '\\u000C' )+
+            // GAMS.g:238:12: ( ( '\\t' | ' ' | '\\u000C' )+ )
+            // GAMS.g:238:14: ( '\\t' | ' ' | '\\u000C' )+
             {
-            	// GAMS.g:213:14: ( '\\t' | ' ' | '\\u000C' )+
+            	// GAMS.g:238:14: ( '\\t' | ' ' | '\\u000C' )+
             	int cnt12 = 0;
             	do 
             	{
@@ -1122,13 +993,13 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = NEWLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:215:12: ( ( ( '\\r' )? '\\n' ) )
-            // GAMS.g:215:16: ( ( '\\r' )? '\\n' )
+            // GAMS.g:240:12: ( ( ( '\\r' )? '\\n' ) )
+            // GAMS.g:240:16: ( ( '\\r' )? '\\n' )
             {
-            	// GAMS.g:215:16: ( ( '\\r' )? '\\n' )
-            	// GAMS.g:215:17: ( '\\r' )? '\\n'
+            	// GAMS.g:240:16: ( ( '\\r' )? '\\n' )
+            	// GAMS.g:240:17: ( '\\r' )? '\\n'
             	{
-            		// GAMS.g:215:17: ( '\\r' )?
+            		// GAMS.g:240:17: ( '\\r' )?
             		int alt13 = 2;
             		int LA13_0 = input.LA(1);
 
@@ -1139,7 +1010,7 @@ public partial class GAMSLexer : Lexer {
             		switch (alt13) 
             		{
             		    case 1 :
-            		        // GAMS.g:215:18: '\\r'
+            		        // GAMS.g:240:18: '\\r'
             		        {
             		        	Match('\r'); 
 
@@ -1172,10 +1043,10 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Comment;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:217:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
-            // GAMS.g:217:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            // GAMS.g:242:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // GAMS.g:242:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
-            	// GAMS.g:217:14: ( '()' | '//' )
+            	// GAMS.g:242:14: ( '()' | '//' )
             	int alt14 = 2;
             	int LA14_0 = input.LA(1);
 
@@ -1197,7 +1068,7 @@ public partial class GAMSLexer : Lexer {
             	switch (alt14) 
             	{
             	    case 1 :
-            	        // GAMS.g:217:15: '()'
+            	        // GAMS.g:242:15: '()'
             	        {
             	        	Match("()"); 
 
@@ -1205,7 +1076,7 @@ public partial class GAMSLexer : Lexer {
             	        }
             	        break;
             	    case 2 :
-            	        // GAMS.g:217:22: '//'
+            	        // GAMS.g:242:22: '//'
             	        {
             	        	Match("//"); 
 
@@ -1215,7 +1086,7 @@ public partial class GAMSLexer : Lexer {
 
             	}
 
-            	// GAMS.g:217:28: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	// GAMS.g:242:28: (~ ( NEWLINE2 | NEWLINE3 ) )*
             	do 
             	{
             	    int alt15 = 2;
@@ -1230,7 +1101,7 @@ public partial class GAMSLexer : Lexer {
             	    switch (alt15) 
             		{
             			case 1 :
-            			    // GAMS.g:217:29: ~ ( NEWLINE2 | NEWLINE3 )
+            			    // GAMS.g:242:29: ~ ( NEWLINE2 | NEWLINE3 )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -1275,12 +1146,12 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = NESTED_ML_COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:221:5: ( '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/' )
-            // GAMS.g:221:9: '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/'
+            // GAMS.g:246:5: ( '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/' )
+            // GAMS.g:246:9: '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/'
             {
             	Match("/*"); 
 
-            	// GAMS.g:222:9: ( options {greedy=false; } : NESTED_ML_COMMENT | . )*
+            	// GAMS.g:247:9: ( options {greedy=false; } : NESTED_ML_COMMENT | . )*
             	do 
             	{
             	    int alt16 = 3;
@@ -1325,14 +1196,14 @@ public partial class GAMSLexer : Lexer {
             	    switch (alt16) 
             		{
             			case 1 :
-            			    // GAMS.g:222:36: NESTED_ML_COMMENT
+            			    // GAMS.g:247:36: NESTED_ML_COMMENT
             			    {
             			    	mNESTED_ML_COMMENT(); 
 
             			    }
             			    break;
             			case 2 :
-            			    // GAMS.g:222:56: .
+            			    // GAMS.g:247:56: .
             			    {
             			    	MatchAny(); 
 
@@ -1362,13 +1233,241 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "NESTED_ML_COMMENT"
 
+    // $ANTLR start "L1"
+    public void mL1() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = L1;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:251:4: ( '(' )
+            // GAMS.g:251:6: '('
+            {
+            	Match('('); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "L1"
+
+    // $ANTLR start "R1"
+    public void mR1() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = R1;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:252:4: ( ')' )
+            // GAMS.g:252:6: ')'
+            {
+            	Match(')'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "R1"
+
+    // $ANTLR start "L2"
+    public void mL2() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = L2;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:253:4: ( '[' )
+            // GAMS.g:253:6: '['
+            {
+            	Match('['); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "L2"
+
+    // $ANTLR start "R2"
+    public void mR2() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = R2;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:254:4: ( ']' )
+            // GAMS.g:254:6: ']'
+            {
+            	Match(']'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "R2"
+
+    // $ANTLR start "L3"
+    public void mL3() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = L3;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:255:4: ( '{' )
+            // GAMS.g:255:6: '{'
+            {
+            	Match('{'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "L3"
+
+    // $ANTLR start "R3"
+    public void mR3() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = R3;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:256:4: ( '}' )
+            // GAMS.g:256:6: '}'
+            {
+            	Match('}'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "R3"
+
+    // $ANTLR start "EQUAL"
+    public void mEQUAL() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = EQUAL;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:258:7: ( '=e=' | '=E=' )
+            int alt17 = 2;
+            int LA17_0 = input.LA(1);
+
+            if ( (LA17_0 == '=') )
+            {
+                int LA17_1 = input.LA(2);
+
+                if ( (LA17_1 == 'e') )
+                {
+                    alt17 = 1;
+                }
+                else if ( (LA17_1 == 'E') )
+                {
+                    alt17 = 2;
+                }
+                else 
+                {
+                    NoViableAltException nvae_d17s1 =
+                        new NoViableAltException("", 17, 1, input);
+
+                    throw nvae_d17s1;
+                }
+            }
+            else 
+            {
+                NoViableAltException nvae_d17s0 =
+                    new NoViableAltException("", 17, 0, input);
+
+                throw nvae_d17s0;
+            }
+            switch (alt17) 
+            {
+                case 1 :
+                    // GAMS.g:258:9: '=e='
+                    {
+                    	Match("=e="); 
+
+
+                    }
+                    break;
+                case 2 :
+                    // GAMS.g:258:17: '=E='
+                    {
+                    	Match("=E="); 
+
+
+                    }
+                    break;
+
+            }
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "EQUAL"
+
+    // $ANTLR start "DOLLAR"
+    public void mDOLLAR() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = DOLLAR;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:259:7: ( '$' )
+            // GAMS.g:259:9: '$'
+            {
+            	Match('$'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "DOLLAR"
+
     // $ANTLR start "NEWLINE2"
     public void mNEWLINE2() // throws RecognitionException [2]
     {
     		try
     		{
-            // GAMS.g:226:19: ( '\\n' )
-            // GAMS.g:226:21: '\\n'
+            // GAMS.g:261:19: ( '\\n' )
+            // GAMS.g:261:21: '\\n'
             {
             	Match('\n'); 
 
@@ -1386,8 +1485,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:227:19: ( '\\r\\n' )
-            // GAMS.g:227:21: '\\r\\n'
+            // GAMS.g:262:19: ( '\\r\\n' )
+            // GAMS.g:262:21: '\\r\\n'
             {
             	Match("\r\n"); 
 
@@ -1406,8 +1505,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:228:16: ( '0' .. '9' )
-            // GAMS.g:228:18: '0' .. '9'
+            // GAMS.g:263:16: ( '0' .. '9' )
+            // GAMS.g:263:18: '0' .. '9'
             {
             	MatchRange('0','9'); 
 
@@ -1425,7 +1524,7 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:229:16: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // GAMS.g:264:16: ( 'a' .. 'z' | 'A' .. 'Z' )
             // GAMS.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
@@ -1454,8 +1553,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:231:11: ( ( 'a' | 'A' ) )
-            // GAMS.g:231:12: ( 'a' | 'A' )
+            // GAMS.g:266:11: ( ( 'a' | 'A' ) )
+            // GAMS.g:266:12: ( 'a' | 'A' )
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -1483,8 +1582,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:232:11: ( ( 'b' | 'B' ) )
-            // GAMS.g:232:12: ( 'b' | 'B' )
+            // GAMS.g:267:11: ( ( 'b' | 'B' ) )
+            // GAMS.g:267:12: ( 'b' | 'B' )
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -1512,8 +1611,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:233:11: ( ( 'c' | 'C' ) )
-            // GAMS.g:233:12: ( 'c' | 'C' )
+            // GAMS.g:268:11: ( ( 'c' | 'C' ) )
+            // GAMS.g:268:12: ( 'c' | 'C' )
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -1541,8 +1640,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:234:11: ( ( 'd' | 'D' ) )
-            // GAMS.g:234:12: ( 'd' | 'D' )
+            // GAMS.g:269:11: ( ( 'd' | 'D' ) )
+            // GAMS.g:269:12: ( 'd' | 'D' )
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -1570,8 +1669,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:235:11: ( ( 'e' | 'E' ) )
-            // GAMS.g:235:12: ( 'e' | 'E' )
+            // GAMS.g:270:11: ( ( 'e' | 'E' ) )
+            // GAMS.g:270:12: ( 'e' | 'E' )
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -1599,8 +1698,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:236:11: ( ( 'f' | 'F' ) )
-            // GAMS.g:236:12: ( 'f' | 'F' )
+            // GAMS.g:271:11: ( ( 'f' | 'F' ) )
+            // GAMS.g:271:12: ( 'f' | 'F' )
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -1628,8 +1727,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:237:11: ( ( 'g' | 'G' ) )
-            // GAMS.g:237:12: ( 'g' | 'G' )
+            // GAMS.g:272:11: ( ( 'g' | 'G' ) )
+            // GAMS.g:272:12: ( 'g' | 'G' )
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -1657,8 +1756,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:238:11: ( ( 'h' | 'H' ) )
-            // GAMS.g:238:12: ( 'h' | 'H' )
+            // GAMS.g:273:11: ( ( 'h' | 'H' ) )
+            // GAMS.g:273:12: ( 'h' | 'H' )
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -1686,8 +1785,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:239:11: ( ( 'i' | 'I' ) )
-            // GAMS.g:239:12: ( 'i' | 'I' )
+            // GAMS.g:274:11: ( ( 'i' | 'I' ) )
+            // GAMS.g:274:12: ( 'i' | 'I' )
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -1715,8 +1814,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:240:11: ( ( 'j' | 'J' ) )
-            // GAMS.g:240:12: ( 'j' | 'J' )
+            // GAMS.g:275:11: ( ( 'j' | 'J' ) )
+            // GAMS.g:275:12: ( 'j' | 'J' )
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -1744,8 +1843,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:241:11: ( ( 'k' | 'K' ) )
-            // GAMS.g:241:12: ( 'k' | 'K' )
+            // GAMS.g:276:11: ( ( 'k' | 'K' ) )
+            // GAMS.g:276:12: ( 'k' | 'K' )
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -1773,8 +1872,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:242:11: ( ( 'l' | 'L' ) )
-            // GAMS.g:242:12: ( 'l' | 'L' )
+            // GAMS.g:277:11: ( ( 'l' | 'L' ) )
+            // GAMS.g:277:12: ( 'l' | 'L' )
             {
             	if ( input.LA(1) == 'L' || input.LA(1) == 'l' ) 
             	{
@@ -1802,8 +1901,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:243:11: ( ( 'm' | 'M' ) )
-            // GAMS.g:243:12: ( 'm' | 'M' )
+            // GAMS.g:278:11: ( ( 'm' | 'M' ) )
+            // GAMS.g:278:12: ( 'm' | 'M' )
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -1831,8 +1930,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:244:11: ( ( 'n' | 'N' ) )
-            // GAMS.g:244:12: ( 'n' | 'N' )
+            // GAMS.g:279:11: ( ( 'n' | 'N' ) )
+            // GAMS.g:279:12: ( 'n' | 'N' )
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -1860,8 +1959,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:245:11: ( ( 'o' | 'O' ) )
-            // GAMS.g:245:12: ( 'o' | 'O' )
+            // GAMS.g:280:11: ( ( 'o' | 'O' ) )
+            // GAMS.g:280:12: ( 'o' | 'O' )
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -1889,8 +1988,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:246:11: ( ( 'p' | 'P' ) )
-            // GAMS.g:246:12: ( 'p' | 'P' )
+            // GAMS.g:281:11: ( ( 'p' | 'P' ) )
+            // GAMS.g:281:12: ( 'p' | 'P' )
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -1918,8 +2017,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:247:11: ( ( 'q' | 'Q' ) )
-            // GAMS.g:247:12: ( 'q' | 'Q' )
+            // GAMS.g:282:11: ( ( 'q' | 'Q' ) )
+            // GAMS.g:282:12: ( 'q' | 'Q' )
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -1947,8 +2046,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:248:11: ( ( 'r' | 'R' ) )
-            // GAMS.g:248:12: ( 'r' | 'R' )
+            // GAMS.g:283:11: ( ( 'r' | 'R' ) )
+            // GAMS.g:283:12: ( 'r' | 'R' )
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -1976,8 +2075,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:249:11: ( ( 's' | 'S' ) )
-            // GAMS.g:249:12: ( 's' | 'S' )
+            // GAMS.g:284:11: ( ( 's' | 'S' ) )
+            // GAMS.g:284:12: ( 's' | 'S' )
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -2005,8 +2104,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:250:11: ( ( 't' | 'T' ) )
-            // GAMS.g:250:12: ( 't' | 'T' )
+            // GAMS.g:285:11: ( ( 't' | 'T' ) )
+            // GAMS.g:285:12: ( 't' | 'T' )
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -2034,8 +2133,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:251:11: ( ( 'u' | 'U' ) )
-            // GAMS.g:251:12: ( 'u' | 'U' )
+            // GAMS.g:286:11: ( ( 'u' | 'U' ) )
+            // GAMS.g:286:12: ( 'u' | 'U' )
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -2063,8 +2162,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:252:11: ( ( 'v' | 'V' ) )
-            // GAMS.g:252:12: ( 'v' | 'V' )
+            // GAMS.g:287:11: ( ( 'v' | 'V' ) )
+            // GAMS.g:287:12: ( 'v' | 'V' )
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -2092,8 +2191,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:253:11: ( ( 'w' | 'W' ) )
-            // GAMS.g:253:12: ( 'w' | 'W' )
+            // GAMS.g:288:11: ( ( 'w' | 'W' ) )
+            // GAMS.g:288:12: ( 'w' | 'W' )
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -2121,8 +2220,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:254:11: ( ( 'x' | 'X' ) )
-            // GAMS.g:254:12: ( 'x' | 'X' )
+            // GAMS.g:289:11: ( ( 'x' | 'X' ) )
+            // GAMS.g:289:12: ( 'x' | 'X' )
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -2150,8 +2249,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:255:11: ( ( 'y' | 'Y' ) )
-            // GAMS.g:255:12: ( 'y' | 'Y' )
+            // GAMS.g:290:11: ( ( 'y' | 'Y' ) )
+            // GAMS.g:290:12: ( 'y' | 'Y' )
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -2179,8 +2278,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:256:11: ( ( 'z' | 'Z' ) )
-            // GAMS.g:256:12: ( 'z' | 'Z' )
+            // GAMS.g:291:11: ( ( 'z' | 'Z' ) )
+            // GAMS.g:291:12: ( 'z' | 'Z' )
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -2205,197 +2304,211 @@ public partial class GAMSLexer : Lexer {
 
     override public void mTokens() // throws RecognitionException 
     {
-        // GAMS.g:1:8: ( LOG | EXP | LB | RB | RP | DOT | TRUE | FALSE | T__71 | T__72 | T__73 | PLUS | MINUS | SEMI | MULT | DIV | MOD | FRML | STARS | Doubledot | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT )
-        int alt17 = 27;
-        alt17 = dfa17.Predict(input);
-        switch (alt17) 
+        // GAMS.g:1:8: ( FRML | SUM | LB | RB | DOT | PLUS | MINUS | SEMI | MULT | DIV | MOD | COMMA | STARS | DOUBLEDOT | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT | L1 | R1 | L2 | R2 | L3 | R3 | EQUAL | DOLLAR )
+        int alt18 = 29;
+        alt18 = dfa18.Predict(input);
+        switch (alt18) 
         {
             case 1 :
-                // GAMS.g:1:10: LOG
+                // GAMS.g:1:10: FRML
                 {
-                	mLOG(); 
+                	mFRML(); 
 
                 }
                 break;
             case 2 :
-                // GAMS.g:1:14: EXP
+                // GAMS.g:1:15: SUM
                 {
-                	mEXP(); 
+                	mSUM(); 
 
                 }
                 break;
             case 3 :
-                // GAMS.g:1:18: LB
+                // GAMS.g:1:19: LB
                 {
                 	mLB(); 
 
                 }
                 break;
             case 4 :
-                // GAMS.g:1:21: RB
+                // GAMS.g:1:22: RB
                 {
                 	mRB(); 
 
                 }
                 break;
             case 5 :
-                // GAMS.g:1:24: RP
-                {
-                	mRP(); 
-
-                }
-                break;
-            case 6 :
-                // GAMS.g:1:27: DOT
+                // GAMS.g:1:25: DOT
                 {
                 	mDOT(); 
 
                 }
                 break;
-            case 7 :
-                // GAMS.g:1:31: TRUE
-                {
-                	mTRUE(); 
-
-                }
-                break;
-            case 8 :
-                // GAMS.g:1:36: FALSE
-                {
-                	mFALSE(); 
-
-                }
-                break;
-            case 9 :
-                // GAMS.g:1:42: T__71
-                {
-                	mT__71(); 
-
-                }
-                break;
-            case 10 :
-                // GAMS.g:1:48: T__72
-                {
-                	mT__72(); 
-
-                }
-                break;
-            case 11 :
-                // GAMS.g:1:54: T__73
-                {
-                	mT__73(); 
-
-                }
-                break;
-            case 12 :
-                // GAMS.g:1:60: PLUS
+            case 6 :
+                // GAMS.g:1:29: PLUS
                 {
                 	mPLUS(); 
 
                 }
                 break;
-            case 13 :
-                // GAMS.g:1:65: MINUS
+            case 7 :
+                // GAMS.g:1:34: MINUS
                 {
                 	mMINUS(); 
 
                 }
                 break;
-            case 14 :
-                // GAMS.g:1:71: SEMI
+            case 8 :
+                // GAMS.g:1:40: SEMI
                 {
                 	mSEMI(); 
 
                 }
                 break;
-            case 15 :
-                // GAMS.g:1:76: MULT
+            case 9 :
+                // GAMS.g:1:45: MULT
                 {
                 	mMULT(); 
 
                 }
                 break;
-            case 16 :
-                // GAMS.g:1:81: DIV
+            case 10 :
+                // GAMS.g:1:50: DIV
                 {
                 	mDIV(); 
 
                 }
                 break;
-            case 17 :
-                // GAMS.g:1:85: MOD
+            case 11 :
+                // GAMS.g:1:54: MOD
                 {
                 	mMOD(); 
 
                 }
                 break;
-            case 18 :
-                // GAMS.g:1:89: FRML
+            case 12 :
+                // GAMS.g:1:58: COMMA
                 {
-                	mFRML(); 
+                	mCOMMA(); 
 
                 }
                 break;
-            case 19 :
-                // GAMS.g:1:94: STARS
+            case 13 :
+                // GAMS.g:1:64: STARS
                 {
                 	mSTARS(); 
 
                 }
                 break;
-            case 20 :
-                // GAMS.g:1:100: Doubledot
+            case 14 :
+                // GAMS.g:1:70: DOUBLEDOT
                 {
-                	mDoubledot(); 
+                	mDOUBLEDOT(); 
 
                 }
                 break;
-            case 21 :
-                // GAMS.g:1:110: Integer
+            case 15 :
+                // GAMS.g:1:80: Integer
                 {
                 	mInteger(); 
 
                 }
                 break;
-            case 22 :
-                // GAMS.g:1:118: Double
+            case 16 :
+                // GAMS.g:1:88: Double
                 {
                 	mDouble(); 
 
                 }
                 break;
-            case 23 :
-                // GAMS.g:1:125: Ident
+            case 17 :
+                // GAMS.g:1:95: Ident
                 {
                 	mIdent(); 
 
                 }
                 break;
-            case 24 :
-                // GAMS.g:1:131: WHITESPACE
+            case 18 :
+                // GAMS.g:1:101: WHITESPACE
                 {
                 	mWHITESPACE(); 
 
                 }
                 break;
-            case 25 :
-                // GAMS.g:1:142: NEWLINE
+            case 19 :
+                // GAMS.g:1:112: NEWLINE
                 {
                 	mNEWLINE(); 
 
                 }
                 break;
-            case 26 :
-                // GAMS.g:1:150: Comment
+            case 20 :
+                // GAMS.g:1:120: Comment
                 {
                 	mComment(); 
 
                 }
                 break;
-            case 27 :
-                // GAMS.g:1:158: NESTED_ML_COMMENT
+            case 21 :
+                // GAMS.g:1:128: NESTED_ML_COMMENT
                 {
                 	mNESTED_ML_COMMENT(); 
+
+                }
+                break;
+            case 22 :
+                // GAMS.g:1:146: L1
+                {
+                	mL1(); 
+
+                }
+                break;
+            case 23 :
+                // GAMS.g:1:149: R1
+                {
+                	mR1(); 
+
+                }
+                break;
+            case 24 :
+                // GAMS.g:1:152: L2
+                {
+                	mL2(); 
+
+                }
+                break;
+            case 25 :
+                // GAMS.g:1:155: R2
+                {
+                	mR2(); 
+
+                }
+                break;
+            case 26 :
+                // GAMS.g:1:158: L3
+                {
+                	mL3(); 
+
+                }
+                break;
+            case 27 :
+                // GAMS.g:1:161: R3
+                {
+                	mR3(); 
+
+                }
+                break;
+            case 28 :
+                // GAMS.g:1:164: EQUAL
+                {
+                	mEQUAL(); 
+
+                }
+                break;
+            case 29 :
+                // GAMS.g:1:170: DOLLAR
+                {
+                	mDOLLAR(); 
 
                 }
                 break;
@@ -2406,11 +2519,11 @@ public partial class GAMSLexer : Lexer {
 
 
     protected DFA8 dfa8;
-    protected DFA17 dfa17;
+    protected DFA18 dfa18;
 	private void InitializeCyclicDFAs()
 	{
 	    this.dfa8 = new DFA8(this);
-	    this.dfa17 = new DFA17(this);
+	    this.dfa18 = new DFA18(this);
 
 
 	}
@@ -2424,13 +2537,13 @@ public partial class GAMSLexer : Lexer {
     const string DFA8_maxS =
         "\x01\x39\x01\x65\x03\uffff";
     const string DFA8_acceptS =
-        "\x02\uffff\x01\x02\x01\x03\x01\x01";
+        "\x02\uffff\x01\x02\x01\x01\x01\x03";
     const string DFA8_specialS =
         "\x05\uffff}>";
     static readonly string[] DFA8_transitionS = {
             "\x01\x02\x01\uffff\x0a\x01",
-            "\x01\x04\x01\uffff\x0a\x01\x0b\uffff\x01\x03\x1f\uffff\x01"+
-            "\x03",
+            "\x01\x03\x01\uffff\x0a\x01\x0b\uffff\x01\x04\x1f\uffff\x01"+
+            "\x04",
             "",
             "",
             ""
@@ -2462,133 +2575,113 @@ public partial class GAMSLexer : Lexer {
 
         override public string Description
         {
-            get { return "199:1: Double : ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent );"; }
+            get { return "224:1: Double : ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent );"; }
         }
 
     }
 
-    const string DFA17_eotS =
-        "\x01\uffff\x02\x14\x03\uffff\x01\x1a\x02\x14\x01\uffff\x01\x1f"+
-        "\x04\uffff\x01\x21\x01\x23\x01\uffff\x01\x14\x01\x25\x03\uffff\x02"+
-        "\x14\x03\uffff\x02\x14\x06\uffff\x01\x14\x01\uffff\x01\x2b\x01\x2c"+
-        "\x03\x14\x02\uffff\x01\x30\x01\x14\x01\x32\x01\uffff\x01\x33\x02"+
-        "\uffff";
-    const string DFA17_eofS =
-        "\x34\uffff";
-    const string DFA17_minS =
-        "\x01\x09\x01\x4f\x01\x58\x03\uffff\x01\x2e\x01\x72\x01\x61\x01"+
-        "\uffff\x01\x29\x04\uffff\x02\x2a\x01\uffff\x01\x52\x01\x2e\x03\uffff"+
-        "\x01\x47\x01\x50\x03\uffff\x01\x75\x01\x6c\x06\uffff\x01\x4d\x01"+
-        "\uffff\x02\x30\x01\x65\x01\x73\x01\x4c\x02\uffff\x01\x30\x01\x65"+
-        "\x01\x30\x01\uffff\x01\x30\x02\uffff";
-    const string DFA17_maxS =
-        "\x01\x7a\x01\x4f\x01\x58\x03\uffff\x01\x39\x01\x72\x01\x61\x01"+
-        "\uffff\x01\x29\x04\uffff\x01\x2a\x01\x2f\x01\uffff\x01\x52\x01\x65"+
-        "\x03\uffff\x01\x47\x01\x50\x03\uffff\x01\x75\x01\x6c\x06\uffff\x01"+
-        "\x4d\x01\uffff\x02\x7a\x01\x65\x01\x73\x01\x4c\x02\uffff\x01\x7a"+
-        "\x01\x65\x01\x7a\x01\uffff\x01\x7a\x02\uffff";
-    const string DFA17_acceptS =
-        "\x03\uffff\x01\x03\x01\x04\x01\x05\x03\uffff\x01\x09\x01\uffff"+
-        "\x01\x0b\x01\x0c\x01\x0d\x01\x0e\x02\uffff\x01\x11\x02\uffff\x01"+
-        "\x17\x01\x18\x01\x19\x02\uffff\x01\x14\x01\x06\x01\x16\x02\uffff"+
-        "\x01\x1a\x01\x0a\x01\x13\x01\x0f\x01\x1b\x01\x10\x01\uffff\x01\x15"+
-        "\x05\uffff\x01\x01\x01\x02\x03\uffff\x01\x07\x01\uffff\x01\x12\x01"+
-        "\x08";
-    const string DFA17_specialS =
-        "\x34\uffff}>";
-    static readonly string[] DFA17_transitionS = {
-            "\x01\x15\x01\x16\x01\uffff\x01\x15\x01\x16\x12\uffff\x01\x15"+
-            "\x04\uffff\x01\x11\x02\uffff\x01\x0a\x01\x05\x01\x0f\x01\x0c"+
-            "\x01\x0b\x01\x0d\x01\x06\x01\x10\x0a\x13\x01\uffff\x01\x0e\x01"+
-            "\x03\x01\x09\x01\x04\x02\uffff\x04\x14\x01\x02\x01\x12\x05\x14"+
-            "\x01\x01\x0e\x14\x04\uffff\x01\x14\x01\uffff\x05\x14\x01\x08"+
-            "\x0d\x14\x01\x07\x06\x14",
-            "\x01\x17",
-            "\x01\x18",
+    const string DFA18_eotS =
+        "\x01\uffff\x02\x0e\x02\uffff\x01\x1c\x03\uffff\x01\x1f\x01\x22"+
+        "\x02\uffff\x01\x23\x03\uffff\x01\x24\x07\uffff\x02\x0e\x0a\uffff"+
+        "\x01\x0e\x01\x28\x01\x29\x02\uffff";
+    const string DFA18_eofS =
+        "\x2a\uffff";
+    const string DFA18_minS =
+        "\x01\x09\x01\x52\x01\x55\x02\uffff\x01\x2e\x03\uffff\x02\x2a\x02"+
+        "\uffff\x01\x2e\x03\uffff\x01\x29\x07\uffff\x02\x4d\x0a\uffff\x01"+
+        "\x4c\x02\x30\x02\uffff";
+    const string DFA18_maxS =
+        "\x01\x7d\x01\x52\x01\x55\x02\uffff\x01\x39\x03\uffff\x01\x2a\x01"+
+        "\x2f\x02\uffff\x01\x65\x03\uffff\x01\x29\x07\uffff\x02\x4d\x0a\uffff"+
+        "\x01\x4c\x02\x7a\x02\uffff";
+    const string DFA18_acceptS =
+        "\x03\uffff\x01\x03\x01\x04\x01\uffff\x01\x06\x01\x07\x01\x08\x02"+
+        "\uffff\x01\x0b\x01\x0c\x01\uffff\x01\x11\x01\x12\x01\x13\x01\uffff"+
+        "\x01\x17\x01\x18\x01\x19\x01\x1a\x01\x1b\x01\x1c\x01\x1d\x02\uffff"+
+        "\x01\x0e\x01\x05\x01\x10\x01\x0d\x01\x09\x01\x14\x01\x15\x01\x0a"+
+        "\x01\x0f\x01\x16\x03\uffff\x01\x02\x01\x01";
+    const string DFA18_specialS =
+        "\x2a\uffff}>";
+    static readonly string[] DFA18_transitionS = {
+            "\x01\x0f\x01\x10\x01\uffff\x01\x0f\x01\x10\x12\uffff\x01\x0f"+
+            "\x03\uffff\x01\x18\x01\x0b\x02\uffff\x01\x11\x01\x12\x01\x09"+
+            "\x01\x06\x01\x0c\x01\x07\x01\x05\x01\x0a\x0a\x0d\x01\uffff\x01"+
+            "\x08\x01\x03\x01\x17\x01\x04\x02\uffff\x05\x0e\x01\x01\x0c\x0e"+
+            "\x01\x02\x07\x0e\x01\x13\x01\uffff\x01\x14\x01\uffff\x01\x0e"+
+            "\x01\uffff\x1a\x0e\x01\x15\x01\uffff\x01\x16",
+            "\x01\x19",
+            "\x01\x1a",
             "",
             "",
+            "\x01\x1b\x01\uffff\x0a\x1d",
             "",
-            "\x01\x19\x01\uffff\x0a\x1b",
-            "\x01\x1c",
-            "\x01\x1d",
+            "",
             "",
             "\x01\x1e",
+            "\x01\x21\x04\uffff\x01\x20",
             "",
+            "",
+            "\x01\x1d\x01\uffff\x0a\x0d\x0b\uffff\x01\x1d\x1f\uffff\x01"+
+            "\x1d",
             "",
             "",
             "",
             "\x01\x20",
-            "\x01\x22\x04\uffff\x01\x1e",
-            "",
-            "\x01\x24",
-            "\x01\x1b\x01\uffff\x0a\x13\x0b\uffff\x01\x1b\x1f\uffff\x01"+
-            "\x1b",
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "\x01\x25",
             "\x01\x26",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\x01\x27",
-            "",
-            "",
-            "",
-            "\x01\x28",
-            "\x01\x29",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\x01\x2a",
-            "",
-            "\x0a\x14\x07\uffff\x1a\x14\x04\uffff\x01\x14\x01\uffff\x1a"+
-            "\x14",
-            "\x0a\x14\x07\uffff\x1a\x14\x04\uffff\x01\x14\x01\uffff\x1a"+
-            "\x14",
-            "\x01\x2d",
-            "\x01\x2e",
-            "\x01\x2f",
-            "",
-            "",
-            "\x0a\x14\x07\uffff\x1a\x14\x04\uffff\x01\x14\x01\uffff\x1a"+
-            "\x14",
-            "\x01\x31",
-            "\x0a\x14\x07\uffff\x1a\x14\x04\uffff\x01\x14\x01\uffff\x1a"+
-            "\x14",
-            "",
-            "\x0a\x14\x07\uffff\x1a\x14\x04\uffff\x01\x14\x01\uffff\x1a"+
-            "\x14",
+            "\x0a\x0e\x07\uffff\x1a\x0e\x04\uffff\x01\x0e\x01\uffff\x1a"+
+            "\x0e",
+            "\x0a\x0e\x07\uffff\x1a\x0e\x04\uffff\x01\x0e\x01\uffff\x1a"+
+            "\x0e",
             "",
             ""
     };
 
-    static readonly short[] DFA17_eot = DFA.UnpackEncodedString(DFA17_eotS);
-    static readonly short[] DFA17_eof = DFA.UnpackEncodedString(DFA17_eofS);
-    static readonly char[] DFA17_min = DFA.UnpackEncodedStringToUnsignedChars(DFA17_minS);
-    static readonly char[] DFA17_max = DFA.UnpackEncodedStringToUnsignedChars(DFA17_maxS);
-    static readonly short[] DFA17_accept = DFA.UnpackEncodedString(DFA17_acceptS);
-    static readonly short[] DFA17_special = DFA.UnpackEncodedString(DFA17_specialS);
-    static readonly short[][] DFA17_transition = DFA.UnpackEncodedStringArray(DFA17_transitionS);
+    static readonly short[] DFA18_eot = DFA.UnpackEncodedString(DFA18_eotS);
+    static readonly short[] DFA18_eof = DFA.UnpackEncodedString(DFA18_eofS);
+    static readonly char[] DFA18_min = DFA.UnpackEncodedStringToUnsignedChars(DFA18_minS);
+    static readonly char[] DFA18_max = DFA.UnpackEncodedStringToUnsignedChars(DFA18_maxS);
+    static readonly short[] DFA18_accept = DFA.UnpackEncodedString(DFA18_acceptS);
+    static readonly short[] DFA18_special = DFA.UnpackEncodedString(DFA18_specialS);
+    static readonly short[][] DFA18_transition = DFA.UnpackEncodedStringArray(DFA18_transitionS);
 
-    protected class DFA17 : DFA
+    protected class DFA18 : DFA
     {
-        public DFA17(BaseRecognizer recognizer)
+        public DFA18(BaseRecognizer recognizer)
         {
             this.recognizer = recognizer;
-            this.decisionNumber = 17;
-            this.eot = DFA17_eot;
-            this.eof = DFA17_eof;
-            this.min = DFA17_min;
-            this.max = DFA17_max;
-            this.accept = DFA17_accept;
-            this.special = DFA17_special;
-            this.transition = DFA17_transition;
+            this.decisionNumber = 18;
+            this.eot = DFA18_eot;
+            this.eof = DFA18_eof;
+            this.min = DFA18_min;
+            this.max = DFA18_max;
+            this.accept = DFA18_accept;
+            this.special = DFA18_special;
+            this.transition = DFA18_transition;
 
         }
 
         override public string Description
         {
-            get { return "1:1: Tokens : ( LOG | EXP | LB | RB | RP | DOT | TRUE | FALSE | T__71 | T__72 | T__73 | PLUS | MINUS | SEMI | MULT | DIV | MOD | FRML | STARS | Doubledot | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT );"; }
+            get { return "1:1: Tokens : ( FRML | SUM | LB | RB | DOT | PLUS | MINUS | SEMI | MULT | DIV | MOD | COMMA | STARS | DOUBLEDOT | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT | L1 | R1 | L2 | R2 | L3 | R3 | EQUAL | DOLLAR );"; }
         }
 
     }
