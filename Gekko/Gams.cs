@@ -11,11 +11,255 @@ using GAMS;
 using ProtoBuf;
 using ProtoBuf.Meta;
 using System.Text.RegularExpressions;
+using Antlr.Runtime;
+using Antlr.Runtime.Tree;
+using Antlr.Runtime.Debug;
+using System.Collections;
 
 namespace Gekko
 {
     public static class GamsModel
     {
+        public static void ParserGAMSCreateASTHelper(string textInput, string modelName)
+        {            
+            ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
+
+            List<string> errors = null;
+            CommonTree t = null;
+
+            // Create a lexer attached to that input
+            GAMSLexer lexer = new GAMSLexer(input);
+            // Create a stream of tokens pulled from the lexer
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            // Create a parser attached to the token stream
+            GAMSParser parser = new GAMSParser(tokens);
+            // Invoke the program rule in get return value
+            GAMSParser.expr_return r = null;
+            DateTime t0 = DateTime.Now;
+
+            r = parser.expr();
+
+            errors = parser.GetErrors();
+            t = (CommonTree)r.Tree;
+
+            bool print = true;
+            ASTNodeGAMS root = new ASTNodeGAMS(null);
+            CreateASTNodesForGAMS(t, root, 0, tokens, print);            
+
+            if (errors.Count > 0)
+            {
+                new Error("GAMS parse error");
+            }
+            else
+            {
+                //G.Writeln("No errors when parsing");
+            }
+            
+            return;
+        }
+
+        private static bool DetectNullNode(CommonTree ast)
+        {
+            return ast.Text == null && !(ast.Children != null && ast.Children.Count > 0);
+        }
+
+        public static void CreateASTNodesForGAMS(CommonTree ast, ASTNodeGAMS cmdNode, int depth, CommonTokenStream tokens, bool print)
+        {
+            if (DetectNullNode(ast))
+            {
+                //not sure why this happens in ANTLR: some empty CommonTree nodes
+                //we filter them out: otherwise they just create empty
+                //lines in the generated C# code (with linenumber=0 which is no good either)
+                //No children = we are not cutting anything real from the AST tree anyway
+                return;
+            }
+
+            cmdNode.Text = ast.Text;            
+            cmdNode.Line = ast.Line;
+
+            CommonTree xx = (CommonTree)ast;
+            int iStart = xx.TokenStartIndex;
+            if (iStart - 1 >= 0)
+            {
+                CommonToken xxx = (CommonToken)tokens.Get(iStart - 1);
+                if (xxx.Text.Trim() == "")
+                {
+                    cmdNode.leftBlanks = xxx.Text;
+                }
+            }
+
+            if (print)
+            {
+                int length = 0;
+                if (cmdNode.leftBlanks != null) length = cmdNode.leftBlanks.Length;
+                new Writeln("|" + G.Blanks(depth * 2) + cmdNode.Text + "     [" + length + "]");
+            }
+
+            if (ast.Children == null)
+            {
+                return;
+            }
+
+            int num = ast.Children.Count;
+            cmdNode.CreateChildren(num);
+            for (int i = 0; i < num; ++i)
+            {
+                CommonTree d = (CommonTree)(ast.Children[i]);
+                if (DetectNullNode(d)) continue;
+                ASTNodeGAMS cmdNodeChild = new ASTNodeGAMS(null);  //unknown text
+                cmdNodeChild.Parent = cmdNode;
+                cmdNode.Add(cmdNodeChild);
+                CreateASTNodesForGAMS(d, cmdNodeChild, depth + 1, tokens, print);
+            }
+        }
+
+        public class ASTNodeGAMS
+        {
+            /// <summary>
+            /// See comments for very similar and more complicated ASTNode class for .gcm file reading.
+            /// </summary>
+            /// <returns></returns>
+            
+            private List<ASTNodeGAMS> children = null; //private so that the implementation might change (for instance LinkedList etc.)                                                                           
+            public Parser.Gek.GekkoSB Code = new Parser.Gek.GekkoSB(); //the C# code produced while walking the tree                        
+            public ASTNodeGAMS Parent = null;
+            public string Text = null;  //ANTLR decoration of the node (for instance 'ASTPRT' or '1.45').        
+            public int Line = 0;
+            public int Number = 0;  //used to check position among siblings            
+            public string leftBlanks = null;
+
+            public IEnumerable ChildrenIterator()
+            {
+                if (this.children != null)
+                {
+                    foreach (ASTNodeGAMS child in this.children)
+                    {
+                        yield return child;
+                    }
+                }
+            }
+
+            public void RemoveLast()
+            {
+                this.children.RemoveAt(this.children.Count - 1);
+            }
+
+
+            public ASTNodeGAMS GetChild(string s)
+            {
+                foreach (ASTNodeGAMS child in this.ChildrenIterator())
+                {
+                    if (child.Text == s) return child;
+                }
+                return null;
+            }
+
+            public ASTNodeGAMS this[int i]
+            {
+                get
+                {
+                    return this.GetChild(i);
+                }
+                set
+                {
+                    this.children[i] = value;
+                }
+            }
+
+            public int ChildrenCount()
+            {
+                if (children == null) return 0;
+                return children.Count;
+            }
+
+            //Gets the C# code of child i.
+            public Parser.Gek.GekkoSB GetChildCode(int i)
+            {
+                ASTNodeGAMS child = this.GetChild(i);
+                if (child == null)
+                {
+                    Parser.Gek.GekkoSB xx = new Parser.Gek.GekkoSB();
+                    return xx;
+                }
+                else return child.Code;
+            }
+
+            //Prepares an AST node to have children
+            public void CreateChildren(int n)
+            {
+                this.children = new List<ASTNodeGAMS>(n);
+            }
+
+            public bool IsLastChild()
+            {
+                if (this.Parent == null) return true;
+                if (this.Number == this.Parent.ChildrenCount() - 1) return true;  //should not be possible to be >
+                return false;
+            }
+
+            public bool IsFirstChild()
+            {
+                if (this.Parent == null) return true;
+                if (this.Number == 0) return true;
+                return false;
+            }
+
+            //Sets the text of the AST node
+            public ASTNodeGAMS(string text)
+            {
+                this.Text = text;
+            }
+
+            //Sets the text of the AST node
+            public ASTNodeGAMS(string text, string leftBlanks)
+            {
+                this.Text = text;
+                this.leftBlanks = leftBlanks;
+            }
+
+            //Sets the text of the AST node, and augments with children.
+            public ASTNodeGAMS(string text, bool withChildren)
+            {
+                this.Text = text;
+                if (withChildren)
+                {
+                    this.children = new List<ASTNodeGAMS>();
+                }
+            }
+            
+            public ASTNodeGAMS GetChild(int i)
+            {
+                if (this.children == null) return null;
+                if (i >= this.children.Count) return null;  //does not exist
+                return this.children[i];
+            }
+
+            public void Add(ASTNodeGAMS child)
+            {
+                this.children.Add(child);
+                child.Parent = this;
+                child.Number = children.Count - 1;
+            }
+
+            public string ToString()
+            {
+                return this.Text;
+            }
+
+            public void PrintAST2(ASTNodeGAMS node, int depth)
+            {
+                G.Writeln(G.Blanks(depth * 2) + node.Text);
+                if (node.children != null)
+                {
+                    for (int i = 0; i < node.children.Count; ++i)
+                    {
+                        ASTNodeGAMS child = (ASTNodeGAMS)(node.children[i]);
+                        PrintAST2(child, depth + 1);
+                    }
+                }
+            }
+        }
+
         public static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
         {
 
@@ -129,6 +373,12 @@ namespace Gekko
         /// <param name="o"></param>
         private static void ReadGamsModelHelper(string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, O.Model o)
         {
+            if (Globals.runningOnTTComputer)
+            {
+                ParserGAMSCreateASTHelper(textInputRaw, fileName);
+                return;
+            }
+
             StringBuilder sb1 = new StringBuilder();
             sb1.AppendLine();
 

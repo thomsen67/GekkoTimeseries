@@ -134,12 +134,15 @@
     <Compile Include="Cmd2Parser.cs" />
     <Compile Include="Cmd3Lexer.cs" />
     <Compile Include="Cmd3Parser.cs" />
+    <Compile Include="GAMSLexer.cs" />
+    <Compile Include="GAMSParser.cs" />
     <Compile Include="ModelLexer.cs" />
     <Compile Include="ModelParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cmd3.g" />
+    <None Include="GAMS.g" />
     <None Include="Model.g" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
