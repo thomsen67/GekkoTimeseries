@@ -459,13 +459,7 @@ namespace Gekko
         public string conditionalsCs = null;
 
         [ProtoMember(12)]
-        public string lhsCs = null;
-
-        [ProtoMember(13)]
-        public string rhsCs = null;
-
-        [ProtoMember(14)]
-        public List<EquationVariablesGams> expressionVariablesWithSetsCs = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
+        public string allCs = null;       
         
         // ===========================================
         // ===========================================
@@ -473,6 +467,7 @@ namespace Gekko
 
         public TokenHelper lhsTokensGams = null;
         public TokenHelper rhsTokensGams = null;
+        public TokenHelper allTokensGams = null;
 
         public List<Func<GekkoSmpl, IVariable>> expressions = new List<Func<GekkoSmpl, IVariable>>();
 

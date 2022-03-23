@@ -90,7 +90,7 @@ namespace Gekko
             {
 
                 ReadGamsModelHelper(textInputRaw, fileName, dependents, o);
-                if (Globals.runningOnTTComputer) Sniff2();
+                if (false && Globals.runningOnTTComputer) Sniff2();
 
                 DateTime t1 = DateTime.Now;
 
@@ -209,6 +209,9 @@ namespace Gekko
         /// </summary>
         private static int ReadGamsEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, bool dump)
         {
+            bool translateToCsSyntax = true;
+            if (!Globals.runningOnTTComputer) translateToCsSyntax = false;
+
             WalkTokensHelper wh = new WalkTokensHelper();
 
             int iEqStart = 0;
@@ -254,8 +257,10 @@ namespace Gekko
             List<string> setsGamsList = new List<string>();
             string lhsGams = null;
             string rhsGams = null;
+            TokenHelper allTokensGams = null;
             TokenHelper lhsTokensGams = null;
             TokenHelper rhsTokensGams = null;
+            List<TokenHelper> conditionalsTokensGams = null;
 
             string dollar = null;
 
@@ -286,13 +291,17 @@ namespace Gekko
                     {
                         //Gekko syntax
                         conditionalsGams = tok3.subnodes.ToString();
-                        
-                        //C# syntax
-                        TokenHelper conditionalsTokensCs = tok3.DeepClone(null);
-                        WalkTokensHandleParentheses(conditionalsTokensCs); //changes '[' and '{' into '('
-                        WalkTokensHelper temp = new WalkTokensHelper();
-                        WalkTokensCsSyntax(conditionalsTokensCs, temp, null);
-                        conditionalsCs = conditionalsTokensCs.ToStringTrim();
+                        conditionalsTokensGams = tok3.subnodes.storage;
+
+                        if (translateToCsSyntax)
+                        {
+                            //C# syntax
+                            TokenHelper conditionalsTokensCs = tok3.DeepClone(null);
+                            WalkTokensHandleParentheses(conditionalsTokensCs); //changes '[' and '{' into '('
+                            WalkTokensHelper temp = new WalkTokensHelper();
+                            WalkTokensCsSyntax(conditionalsTokensCs, temp, null);
+                            conditionalsCs = conditionalsTokensCs.ToStringTrim();
+                        }
                     }
 
                     // see also #9872034985732, removing stray " and"
@@ -400,6 +409,8 @@ namespace Gekko
             rhsGams = tok.OffsetInterval(i2Start, iSemi - 1).ToString().Trim();
             rhsTokensGams = tok.OffsetInterval(i2Start, iSemi - 1);
 
+            allTokensGams = tok.OffsetInterval(i1Start, iSemi - 1);
+
             eqCounter++;
 
             if (false && eqCounter < 10)
@@ -421,6 +432,7 @@ namespace Gekko
             equation.rhsGams = rhsGams;
             equation.lhsTokensGams = lhsTokensGams;
             equation.rhsTokensGams = rhsTokensGams;
+            equation.allTokensGams = allTokensGams;  //sum of the 2 above
 
             //Gekko syntax
 
@@ -438,19 +450,19 @@ namespace Gekko
 
             //C# syntax
 
-            TokenHelper lhsTokensCs = equation.lhsTokensGams.DeepClone(null);
-            WalkTokensHandleParentheses(lhsTokensCs); //changes '[' and '{' into '('
-            WalkTokensHelper wt1Cs= new WalkTokensHelper();
-            Controlled controlledLhs = new Controlled();
-            WalkTokensCsSyntax(lhsTokensCs, wt1Cs, controlledLhs);
-            string lhsCs = lhsTokensCs.ToStringTrim();
-
-            TokenHelper rhsTokensCs = equation.rhsTokensGams.DeepClone(null);
-            WalkTokensHandleParentheses(rhsTokensCs); //changes '[' and '{' into '('
-            WalkTokensHelper wt2Cs = new WalkTokensHelper();
-            Controlled controlledRhs = new Controlled();
-            WalkTokensCsSyntax(rhsTokensCs, wt2Cs, controlledRhs);
-            string rhsCs = rhsTokensCs.ToStringTrim();
+            string allCs = null;
+            if (translateToCsSyntax)
+            {
+                TokenHelper allTokensCs = equation.allTokensGams.DeepClone(null);
+                WalkTokensHandleParentheses(allTokensCs); //changes '[' and '{' into '('
+                WalkTokensHelper wt1Cs = new WalkTokensHelper();
+                Controlled controlledAll = new Controlled();
+                var xx1 = conditionalsTokensGams;
+                var xx2 = equation.setsGamsList;
+                WalkTokensCsSyntax(allTokensCs, wt1Cs, controlledAll);
+               
+                allCs = allTokensCs.ToStringTrim();
+            }
 
             if (true)
             {
@@ -508,8 +520,7 @@ namespace Gekko
                 equation.lhs = lhsGekko;
                 equation.rhs = rhsGekko;
 
-                equation.lhsCs = lhsCs;
-                equation.rhsCs = rhsCs;
+                equation.allCs = allCs;
                 equation.conditionalsCs = conditionalsCs;
 
                 // ------------- conditionals ---------------
@@ -1275,7 +1286,7 @@ namespace Gekko
 
             if (node.HasNoChildren())
             {
-                //not a sub-node
+                //not a '(' or '[' etc.
                 if (node.s != "" && node.type == ETokenType.Word)
                 {
                     //an IDENT-type leaf node, not symbols etc.

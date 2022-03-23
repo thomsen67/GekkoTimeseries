@@ -14877,7 +14877,35 @@ namespace UnitTests
             _AssertScalarString(First(), "%y5", "abo");
             _AssertScalarString(First(), "%y6", "aop");
         }
-        
+
+        [TestMethod]
+        public void _Test_GAMS_eq_simple_disp()
+        {
+            bool b = Globals.UNITTESTFOLLOWUP;
+            //Just a simple test that DISP prints out something for GAMS equations
+            //The translated equation is wrong...
+            Program.Flush();
+            for (int i = 0; i < 2; i++)  //test with and without flush
+            {
+                I("RESET;");
+                I("OPTION folder working " + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM\take2;");
+                I("option model type = gams;");
+                I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+                I("read <first> d3a;");
+                I("read <gdx first merge> sets\\sets;");
+                I("work:%tBase = work:#tBase[1].val();");  //else it becomes a string which is bad
+                I("option series array calc missing = zero;");
+                I("model <gms> small.gms;");
+                I("time 2015 2018;");
+                Globals.unitTestScreenOutput.Clear();
+                I("disp qy;");
+                //faktisk forkert oversat, GAMS eq er dette: qY[s,t] = sum(d$d1IOy[d,s,t], vIO_y[d,s,t]/pIO_y[d,s,t]);
+                //så det skal ikke være qY[#s] = sum(#d$(d1IOy[#d,#s])[#d,#s], vIO_y[#d,#s]/pIO_y[#d,#s])
+                //men qY[#s] = sum(#d$(d1IOy[#d,#s]), vIO_y[#d,#s]/pIO_y[#d,#s])
+                string s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("qY[#s] = sum(d$(d1IOy[#d,#s])[#d,#s], vIO_y[#d,#s]/pIO_y[#d,#s]);"));
+            }
+        }
 
         [TestMethod]
         public void _Test_Arrow1()
