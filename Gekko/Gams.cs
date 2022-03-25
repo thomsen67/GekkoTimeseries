@@ -20,7 +20,7 @@ namespace Gekko
 {
     public static class GamsModel
     {
-        public static void ParserGAMSCreateASTHelper(string textInput, string modelName)
+        public static void ParserGAMSCreateASTHelper(string textInput)
         {            
             ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
 
@@ -37,22 +37,27 @@ namespace Gekko
             GAMSParser.expr_return r = null;
             DateTime t0 = DateTime.Now;
 
-            r = parser.expr();
-
-            errors = parser.GetErrors();
-            t = (CommonTree)r.Tree;
-
-            bool print = true;
-            ASTNodeGAMS root = new ASTNodeGAMS(null);
-            CreateASTNodesForGAMS(t, root, 0, tokens, print);            
-
-            if (errors.Count > 0)
+            try
             {
-                new Error("GAMS parse error");
+                r = parser.expr();
+
+                errors = parser.GetErrors();
+                t = (CommonTree)r.Tree;
+
+                bool print = false;
+                ASTNodeGAMS root = new ASTNodeGAMS(null);
+                CreateASTNodesForGAMS(t, root, 0, tokens, print);
+
+                if (errors.Count > 0)
+                {
+                    new Writeln(textInput);
+                    new Warning("GAMS parse error");
+                }
             }
-            else
+            catch
             {
-                //G.Writeln("No errors when parsing");
+                new Writeln(textInput);
+                new Warning("GAMS other error");
             }
             
             return;
@@ -373,12 +378,6 @@ namespace Gekko
         /// <param name="o"></param>
         private static void ReadGamsModelHelper(string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, O.Model o)
         {
-            if (Globals.runningOnTTComputer)
-            {
-                ParserGAMSCreateASTHelper(textInputRaw, fileName);
-                return;
-            }
-
             StringBuilder sb1 = new StringBuilder();
             sb1.AppendLine();
 
@@ -460,7 +459,7 @@ namespace Gekko
         private static int ReadGamsEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, bool dump)
         {
             bool translateToCsSyntax = true;
-            if (!Globals.runningOnTTComputer) translateToCsSyntax = false;
+            if (!Globals.runningOnTTComputer) translateToCsSyntax = false;            
 
             WalkTokensHelper wh = new WalkTokensHelper();
 
@@ -475,6 +474,15 @@ namespace Gekko
                     iEqStart = i2 + 1;
                     break;
                 }
+            }
+
+            if (Globals.runningOnTTComputer)
+            {
+                int i1 = iEqStart;
+                int i2 = tok.Search(i1, new List<string>() { ";" }, false, false);
+                string ss = StringTokenizer.GetTextFromLeftBlanksTokens(tok.parent.subnodes.storage, tok.id + i1, tok.id + i2, true);
+                ParserGAMSCreateASTHelper(ss);
+                return -12345;
             }
 
             int i = iEqStart;

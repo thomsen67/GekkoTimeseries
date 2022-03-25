@@ -19439,6 +19439,7 @@ namespace Gekko
             Globals.arithmentics1[5] = (x1) => Math.Truncate(x1); //same as (int)x1, but handles larger numbers 
             Globals.arithmentics1[6] = (x1) => Math.Floor(x1); //floor(-1.5) = -2, truncate(-1.5) = -1
             Globals.arithmentics1[7] = (x1) => Math.Ceiling(x1); //see above.
+            Globals.arithmentics1[8] = (x1) => Math.Tanh(x1);  //hyperbolic tangens
 
             Globals.timeStrings = new string[Globals.timeStringsEnd - Globals.timeStringsStart + 1];
             for (int i = Globals.timeStringsStart; i <= Globals.timeStringsEnd; i++)

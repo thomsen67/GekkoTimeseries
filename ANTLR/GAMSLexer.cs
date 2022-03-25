@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-03-24 00:13:39
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-03-25 12:05:31
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -16,90 +16,112 @@ using Stack 		= Antlr.Runtime.Collections.StackList;
 namespace  Gekko 
 {
 public partial class GAMSLexer : Lexer {
-    public const int DOLLAR = 42;
     public const int ASTPOW = 15;
-    public const int RB = 50;
+    public const int COMMENT1 = 73;
+    public const int COMMENT2 = 74;
+    public const int ASTFUNCTION3 = 29;
+    public const int ASTFUNCTION2 = 28;
     public const int ASTVARIABLE = 16;
-    public const int MOD = 45;
-    public const int LETTER = 54;
-    public const int ASTFUNCTION = 12;
+    public const int ASTFUNCTION1 = 27;
+    public const int MOD = 62;
+    public const int LETTER = 78;
+    public const int LOG = 36;
     public const int ASTINDEXES1 = 18;
     public const int ASTCONDITIONAL = 25;
-    public const int Exponent = 53;
-    public const int DOUBLEDOT = 28;
-    public const int R2 = 34;
+    public const int DOUBLEDOT = 43;
+    public const int NOT = 33;
     public const int ASTINDEXES3 = 20;
-    public const int R3 = 36;
     public const int ASTINDEXES2 = 19;
-    public const int SUM = 27;
     public const int EOF = -1;
+    public const int NONEQUAL = 63;
     public const int ASTINTEGER = 13;
-    public const int ASTFRMLCODE = 7;
-    public const int Comment = 59;
-    public const int COMMA = 37;
-    public const int R1 = 32;
+    public const int TANH = 41;
+    public const int ASTEQU = 5;
+    public const int Comment = 81;
+    public const int EXP = 35;
+    public const int EEQUAL = 44;
+    public const int SQR = 40;
+    public const int GREATERTHANOREQUAL = 65;
+    public const int GREATERTHAN = 68;
+    public const int D = 86;
+    public const int Double = 58;
+    public const int E = 87;
+    public const int F = 88;
+    public const int G = 89;
+    public const int A = 83;
+    public const int B = 84;
+    public const int C = 85;
+    public const int L = 94;
+    public const int M = 95;
+    public const int NESTED_ML_COMMENT = 82;
+    public const int N = 96;
+    public const int O = 97;
+    public const int H = 90;
+    public const int I = 91;
+    public const int J = 92;
+    public const int NEWLINE2 = 71;
+    public const int K = 93;
+    public const int NEWLINE3 = 72;
+    public const int U = 103;
+    public const int T = 102;
+    public const int W = 105;
+    public const int POWER = 39;
+    public const int WHITESPACE = 79;
+    public const int V = 104;
+    public const int Q = 99;
+    public const int P = 98;
+    public const int S = 101;
+    public const int R = 100;
+    public const int MULT = 60;
+    public const int Y = 107;
+    public const int X = 106;
+    public const int Z = 108;
+    public const int ABS = 34;
+    public const int Ident = 69;
+    public const int OR = 32;
+    public const int ASTEXPRESSION = 8;
+    public const int StringInQuotes = 54;
+    public const int ASTSUM = 26;
+    public const int ASTDEFINITION = 24;
+    public const int DOLLAR = 59;
+    public const int ASTFUNCTION = 12;
+    public const int ASTEQUCODE = 7;
+    public const int MAX = 37;
+    public const int Exponent = 77;
+    public const int R2 = 49;
+    public const int R3 = 51;
+    public const int AND = 31;
+    public const int SUM = 30;
+    public const int COMMA = 52;
+    public const int R1 = 47;
     public const int ASTSIMPLEFUNCTION1 = 9;
-    public const int EQUAL = 29;
+    public const int EQUAL = 66;
     public const int ASTSIMPLEFUNCTION2 = 10;
     public const int ASTSIMPLEFUNCTION3 = 11;
+    public const int LESSTHANOREQUAL = 64;
     public const int ASTEND = 17;
-    public const int PLUS = 38;
-    public const int FRML = 48;
-    public const int DIGIT = 52;
-    public const int DOT = 51;
-    public const int D = 64;
+    public const int PLUS = 55;
+    public const int DIGIT = 76;
+    public const int DOT = 53;
     public const int ASTEXPRESSION2 = 22;
-    public const int Double = 41;
-    public const int E = 65;
     public const int ASTEXPRESSION3 = 23;
-    public const int F = 66;
-    public const int G = 67;
-    public const int A = 61;
-    public const int B = 62;
-    public const int C = 63;
-    public const int L = 72;
-    public const int M = 73;
-    public const int NESTED_ML_COMMENT = 60;
-    public const int N = 74;
-    public const int O = 75;
-    public const int H = 68;
-    public const int I = 69;
-    public const int NEWLINE2 = 57;
-    public const int J = 70;
+    public const int LESSTHAN = 67;
     public const int ASTEXPRESSION1 = 21;
-    public const int NEWLINE3 = 58;
-    public const int K = 71;
-    public const int U = 81;
-    public const int T = 80;
     public const int NEGATE = 4;
-    public const int WHITESPACE = 55;
-    public const int W = 83;
-    public const int V = 82;
-    public const int Q = 77;
-    public const int P = 76;
-    public const int ASTFRML = 5;
-    public const int S = 79;
-    public const int MULT = 43;
-    public const int MINUS = 40;
-    public const int R = 78;
-    public const int SEMI = 30;
-    public const int Y = 85;
-    public const int X = 84;
-    public const int Z = 86;
-    public const int L1 = 31;
-    public const int L2 = 33;
-    public const int L3 = 35;
+    public const int SAMEAS = 42;
+    public const int MIN = 38;
+    public const int MINUS = 57;
+    public const int SEMI = 45;
+    public const int L1 = 46;
+    public const int L2 = 48;
+    public const int L3 = 50;
     public const int ASTLEFTSIDE = 6;
-    public const int NEWLINE = 56;
-    public const int Ident = 46;
-    public const int ASTEXPRESSION = 8;
-    public const int STARS = 47;
-    public const int LB = 49;
+    public const int NEWLINE = 80;
+    public const int EQU = 75;
+    public const int STARS = 70;
     public const int ASTDOUBLE = 14;
-    public const int ASTSUM = 26;
-    public const int DIV = 44;
-    public const int ASTDEFINITION = 24;
-    public const int Integer = 39;
+    public const int DIV = 61;
+    public const int Integer = 56;
 
       public override void ReportError(RecognitionException e) {
             string hdr = GetErrorHeader(e);
@@ -112,8 +134,21 @@ public partial class GAMSLexer : Lexer {
       public static System.Collections.Generic.Dictionary<string, int> GetKw()
       {
          System.Collections.Generic.Dictionary<string, int> d = new System.Collections.Generic.Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);     
-    	 d.Add("FRML"                    ,   FRML                     );
+    	 d.Add("EQU"                    ,   EQU                     );
     	 d.Add("SUM"                    ,   SUM                     );
+    	 d.Add("OR"                    ,   OR                     );
+    	 d.Add("AND"                    ,   AND                     );
+    	 d.Add("NOT"                    ,   NOT                     );
+    	 d.Add("ABS"                    ,   ABS                     );
+    	 d.Add("EXP"                    ,   EXP                     );
+    	 d.Add("LOG"                    ,   LOG                     );
+    	 d.Add("MAX"                    ,   MAX                     );
+    	 d.Add("MIN"                    ,   MIN                     );
+    	 d.Add("POWER"                    ,   POWER                     );
+    	 d.Add("SQR"                    ,   SQR                     );
+    	 d.Add("TANH"                    ,   TANH                     );
+    	 d.Add("SAMEAS"                    ,   SAMEAS                     );
+
          return d;
       }    
       
@@ -148,17 +183,158 @@ public partial class GAMSLexer : Lexer {
     	get { return "GAMS.g";} 
     }
 
-    // $ANTLR start "FRML"
-    public void mFRML() // throws RecognitionException [2]
+    // $ANTLR start "COMMENT1"
+    public void mCOMMENT1() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = FRML;
+            int _type = COMMENT1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:202:6: ( 'FRML' )
-            // GAMS.g:202:8: 'FRML'
+            // GAMS.g:277:9: ( ( '#' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // GAMS.g:277:30: ( '#' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
-            	Match("FRML"); 
+            	// GAMS.g:277:30: ( '#' )
+            	// GAMS.g:277:31: '#'
+            	{
+            		Match('#'); 
+
+            	}
+
+            	// GAMS.g:277:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	do 
+            	{
+            	    int alt1 = 2;
+            	    int LA1_0 = input.LA(1);
+
+            	    if ( ((LA1_0 >= '\u0000' && LA1_0 <= '\t') || (LA1_0 >= '\u000B' && LA1_0 <= '\uFFFF')) )
+            	    {
+            	        alt1 = 1;
+            	    }
+
+
+            	    switch (alt1) 
+            		{
+            			case 1 :
+            			    // GAMS.g:277:37: ~ ( NEWLINE2 | NEWLINE3 )
+            			    {
+            			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
+            			    	{
+            			    	    input.Consume();
+
+            			    	}
+            			    	else 
+            			    	{
+            			    	    MismatchedSetException mse = new MismatchedSetException(null,input);
+            			    	    Recover(mse);
+            			    	    throw mse;}
+
+
+            			    }
+            			    break;
+
+            			default:
+            			    goto loop1;
+            	    }
+            	} while (true);
+
+            	loop1:
+            		;	// Stops C# compiler whining that label 'loop1' has no statements
+
+            	 _channel=HIDDEN; 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "COMMENT1"
+
+    // $ANTLR start "COMMENT2"
+    public void mCOMMENT2() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = COMMENT2;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:278:9: ( ( '!!' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // GAMS.g:278:30: ( '!!' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            {
+            	// GAMS.g:278:30: ( '!!' )
+            	// GAMS.g:278:31: '!!'
+            	{
+            		Match("!!"); 
+
+
+            	}
+
+            	// GAMS.g:278:37: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	do 
+            	{
+            	    int alt2 = 2;
+            	    int LA2_0 = input.LA(1);
+
+            	    if ( ((LA2_0 >= '\u0000' && LA2_0 <= '\t') || (LA2_0 >= '\u000B' && LA2_0 <= '\uFFFF')) )
+            	    {
+            	        alt2 = 1;
+            	    }
+
+
+            	    switch (alt2) 
+            		{
+            			case 1 :
+            			    // GAMS.g:278:38: ~ ( NEWLINE2 | NEWLINE3 )
+            			    {
+            			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
+            			    	{
+            			    	    input.Consume();
+
+            			    	}
+            			    	else 
+            			    	{
+            			    	    MismatchedSetException mse = new MismatchedSetException(null,input);
+            			    	    Recover(mse);
+            			    	    throw mse;}
+
+
+            			    }
+            			    break;
+
+            			default:
+            			    goto loop2;
+            	    }
+            	} while (true);
+
+            	loop2:
+            		;	// Stops C# compiler whining that label 'loop2' has no statements
+
+            	 _channel=HIDDEN; 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "COMMENT2"
+
+    // $ANTLR start "EQU"
+    public void mEQU() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = EQU;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:282:5: ( 'EQU' )
+            // GAMS.g:282:7: 'EQU'
+            {
+            	Match("EQU"); 
 
 
             }
@@ -170,7 +346,7 @@ public partial class GAMSLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "FRML"
+    // $ANTLR end "EQU"
 
     // $ANTLR start "SUM"
     public void mSUM() // throws RecognitionException [2]
@@ -179,8 +355,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = SUM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:203:5: ( 'SUM' )
-            // GAMS.g:203:7: 'SUM'
+            // GAMS.g:283:5: ( 'SUM' )
+            // GAMS.g:283:7: 'SUM'
             {
             	Match("SUM"); 
 
@@ -196,17 +372,18 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "SUM"
 
-    // $ANTLR start "LB"
-    public void mLB() // throws RecognitionException [2]
+    // $ANTLR start "OR"
+    public void mOR() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = LB;
+            int _type = OR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:205:9: ( '<' )
-            // GAMS.g:205:11: '<'
+            // GAMS.g:284:3: ( 'OR' )
+            // GAMS.g:284:5: 'OR'
             {
-            	Match('<'); 
+            	Match("OR"); 
+
 
             }
 
@@ -217,19 +394,20 @@ public partial class GAMSLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "LB"
+    // $ANTLR end "OR"
 
-    // $ANTLR start "RB"
-    public void mRB() // throws RecognitionException [2]
+    // $ANTLR start "AND"
+    public void mAND() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = RB;
+            int _type = AND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:206:9: ( '>' )
-            // GAMS.g:206:11: '>'
+            // GAMS.g:285:4: ( 'AND' )
+            // GAMS.g:285:6: 'AND'
             {
-            	Match('>'); 
+            	Match("AND"); 
+
 
             }
 
@@ -240,7 +418,247 @@ public partial class GAMSLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "RB"
+    // $ANTLR end "AND"
+
+    // $ANTLR start "NOT"
+    public void mNOT() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = NOT;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:286:4: ( 'NOT' )
+            // GAMS.g:286:6: 'NOT'
+            {
+            	Match("NOT"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "NOT"
+
+    // $ANTLR start "ABS"
+    public void mABS() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = ABS;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:287:4: ( 'ABS' )
+            // GAMS.g:287:6: 'ABS'
+            {
+            	Match("ABS"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "ABS"
+
+    // $ANTLR start "EXP"
+    public void mEXP() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = EXP;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:288:4: ( 'EXP' )
+            // GAMS.g:288:6: 'EXP'
+            {
+            	Match("EXP"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "EXP"
+
+    // $ANTLR start "LOG"
+    public void mLOG() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = LOG;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:289:4: ( 'LOG' )
+            // GAMS.g:289:6: 'LOG'
+            {
+            	Match("LOG"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "LOG"
+
+    // $ANTLR start "MAX"
+    public void mMAX() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = MAX;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:290:4: ( 'MAX' )
+            // GAMS.g:290:6: 'MAX'
+            {
+            	Match("MAX"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "MAX"
+
+    // $ANTLR start "MIN"
+    public void mMIN() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = MIN;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:291:4: ( 'MIN' )
+            // GAMS.g:291:6: 'MIN'
+            {
+            	Match("MIN"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "MIN"
+
+    // $ANTLR start "POWER"
+    public void mPOWER() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = POWER;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:292:6: ( 'POWER' )
+            // GAMS.g:292:8: 'POWER'
+            {
+            	Match("POWER"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "POWER"
+
+    // $ANTLR start "SQR"
+    public void mSQR() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = SQR;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:293:4: ( 'SQR' )
+            // GAMS.g:293:6: 'SQR'
+            {
+            	Match("SQR"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "SQR"
+
+    // $ANTLR start "SAMEAS"
+    public void mSAMEAS() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = SAMEAS;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:294:7: ( 'SAMEAS' )
+            // GAMS.g:294:9: 'SAMEAS'
+            {
+            	Match("SAMEAS"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "SAMEAS"
+
+    // $ANTLR start "TANH"
+    public void mTANH() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = TANH;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:295:5: ( 'TANH' )
+            // GAMS.g:295:7: 'TANH'
+            {
+            	Match("TANH"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "TANH"
 
     // $ANTLR start "DOT"
     public void mDOT() // throws RecognitionException [2]
@@ -249,8 +667,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = DOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:207:9: ( '.' )
-            // GAMS.g:207:11: '.'
+            // GAMS.g:297:9: ( '.' )
+            // GAMS.g:297:11: '.'
             {
             	Match('.'); 
 
@@ -272,8 +690,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:209:6: ( '+' )
-            // GAMS.g:209:8: '+'
+            // GAMS.g:299:6: ( '+' )
+            // GAMS.g:299:8: '+'
             {
             	Match('+'); 
 
@@ -295,8 +713,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:210:7: ( '-' )
-            // GAMS.g:210:9: '-'
+            // GAMS.g:300:7: ( '-' )
+            // GAMS.g:300:9: '-'
             {
             	Match('-'); 
 
@@ -318,8 +736,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = SEMI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:211:6: ( ';' )
-            // GAMS.g:211:8: ';'
+            // GAMS.g:301:6: ( ';' )
+            // GAMS.g:301:8: ';'
             {
             	Match(';'); 
 
@@ -341,8 +759,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = MULT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:212:6: ( '*' )
-            // GAMS.g:212:8: '*'
+            // GAMS.g:302:6: ( '*' )
+            // GAMS.g:302:8: '*'
             {
             	Match('*'); 
 
@@ -364,8 +782,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:213:5: ( '/' )
-            // GAMS.g:213:7: '/'
+            // GAMS.g:303:5: ( '/' )
+            // GAMS.g:303:7: '/'
             {
             	Match('/'); 
 
@@ -387,8 +805,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = MOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:214:5: ( '%' )
-            // GAMS.g:214:7: '%'
+            // GAMS.g:304:5: ( '%' )
+            // GAMS.g:304:7: '%'
             {
             	Match('%'); 
 
@@ -410,8 +828,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = COMMA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:215:7: ( ',' )
-            // GAMS.g:215:9: ','
+            // GAMS.g:305:7: ( ',' )
+            // GAMS.g:305:9: ','
             {
             	Match(','); 
 
@@ -426,6 +844,214 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "COMMA"
 
+    // $ANTLR start "EEQUAL"
+    public void mEEQUAL() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = EEQUAL;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:307:8: ( '=e=' | '=E=' )
+            int alt3 = 2;
+            int LA3_0 = input.LA(1);
+
+            if ( (LA3_0 == '=') )
+            {
+                int LA3_1 = input.LA(2);
+
+                if ( (LA3_1 == 'e') )
+                {
+                    alt3 = 1;
+                }
+                else if ( (LA3_1 == 'E') )
+                {
+                    alt3 = 2;
+                }
+                else 
+                {
+                    NoViableAltException nvae_d3s1 =
+                        new NoViableAltException("", 3, 1, input);
+
+                    throw nvae_d3s1;
+                }
+            }
+            else 
+            {
+                NoViableAltException nvae_d3s0 =
+                    new NoViableAltException("", 3, 0, input);
+
+                throw nvae_d3s0;
+            }
+            switch (alt3) 
+            {
+                case 1 :
+                    // GAMS.g:307:10: '=e='
+                    {
+                    	Match("=e="); 
+
+
+                    }
+                    break;
+                case 2 :
+                    // GAMS.g:307:18: '=E='
+                    {
+                    	Match("=E="); 
+
+
+                    }
+                    break;
+
+            }
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "EEQUAL"
+
+    // $ANTLR start "NONEQUAL"
+    public void mNONEQUAL() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = NONEQUAL;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:308:9: ( '<>' )
+            // GAMS.g:308:11: '<>'
+            {
+            	Match("<>"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "NONEQUAL"
+
+    // $ANTLR start "LESSTHANOREQUAL"
+    public void mLESSTHANOREQUAL() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = LESSTHANOREQUAL;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:309:16: ( '<=' )
+            // GAMS.g:309:18: '<='
+            {
+            	Match("<="); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "LESSTHANOREQUAL"
+
+    // $ANTLR start "GREATERTHANOREQUAL"
+    public void mGREATERTHANOREQUAL() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = GREATERTHANOREQUAL;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:310:19: ( '>=' )
+            // GAMS.g:310:21: '>='
+            {
+            	Match(">="); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "GREATERTHANOREQUAL"
+
+    // $ANTLR start "EQUAL"
+    public void mEQUAL() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = EQUAL;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:311:7: ( '=' )
+            // GAMS.g:311:9: '='
+            {
+            	Match('='); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "EQUAL"
+
+    // $ANTLR start "LESSTHAN"
+    public void mLESSTHAN() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = LESSTHAN;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:312:9: ( '<' )
+            // GAMS.g:312:11: '<'
+            {
+            	Match('<'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "LESSTHAN"
+
+    // $ANTLR start "GREATERTHAN"
+    public void mGREATERTHAN() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = GREATERTHAN;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:313:12: ( '>' )
+            // GAMS.g:313:14: '>'
+            {
+            	Match('>'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "GREATERTHAN"
+
     // $ANTLR start "STARS"
     public void mSTARS() // throws RecognitionException [2]
     {
@@ -433,8 +1059,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:218:10: ( '**' )
-            // GAMS.g:218:17: '**'
+            // GAMS.g:316:10: ( '**' )
+            // GAMS.g:316:17: '**'
             {
             	Match("**"); 
 
@@ -457,8 +1083,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = DOUBLEDOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:220:11: ( '..' )
-            // GAMS.g:220:13: '..'
+            // GAMS.g:318:11: ( '..' )
+            // GAMS.g:318:13: '..'
             {
             	Match(".."); 
 
@@ -481,26 +1107,26 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:222:9: ( ( DIGIT )+ )
-            // GAMS.g:222:11: ( DIGIT )+
+            // GAMS.g:320:9: ( ( DIGIT )+ )
+            // GAMS.g:320:11: ( DIGIT )+
             {
-            	// GAMS.g:222:11: ( DIGIT )+
-            	int cnt1 = 0;
+            	// GAMS.g:320:11: ( DIGIT )+
+            	int cnt4 = 0;
             	do 
             	{
-            	    int alt1 = 2;
-            	    int LA1_0 = input.LA(1);
+            	    int alt4 = 2;
+            	    int LA4_0 = input.LA(1);
 
-            	    if ( ((LA1_0 >= '0' && LA1_0 <= '9')) )
+            	    if ( ((LA4_0 >= '0' && LA4_0 <= '9')) )
             	    {
-            	        alt1 = 1;
+            	        alt4 = 1;
             	    }
 
 
-            	    switch (alt1) 
+            	    switch (alt4) 
             		{
             			case 1 :
-            			    // GAMS.g:222:12: DIGIT
+            			    // GAMS.g:320:12: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -508,16 +1134,16 @@ public partial class GAMSLexer : Lexer {
             			    break;
 
             			default:
-            			    if ( cnt1 >= 1 ) goto loop1;
-            		            EarlyExitException eee1 =
-            		                new EarlyExitException(1, input);
-            		            throw eee1;
+            			    if ( cnt4 >= 1 ) goto loop4;
+            		            EarlyExitException eee4 =
+            		                new EarlyExitException(4, input);
+            		            throw eee4;
             	    }
-            	    cnt1++;
+            	    cnt4++;
             	} while (true);
 
-            	loop1:
-            		;	// Stops C# compiler whining that label 'loop1' has no statements
+            	loop4:
+            		;	// Stops C# compiler whining that label 'loop4' has no statements
 
 
             }
@@ -538,108 +1164,15 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:225:5: ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
-            int alt8 = 3;
-            alt8 = dfa8.Predict(input);
-            switch (alt8) 
+            // GAMS.g:323:5: ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
+            int alt11 = 3;
+            alt11 = dfa11.Predict(input);
+            switch (alt11) 
             {
                 case 1 :
-                    // GAMS.g:226:8: ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )?
+                    // GAMS.g:324:8: ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )?
                     {
-                    	// GAMS.g:226:8: ( '0' .. '9' )+
-                    	int cnt2 = 0;
-                    	do 
-                    	{
-                    	    int alt2 = 2;
-                    	    int LA2_0 = input.LA(1);
-
-                    	    if ( ((LA2_0 >= '0' && LA2_0 <= '9')) )
-                    	    {
-                    	        alt2 = 1;
-                    	    }
-
-
-                    	    switch (alt2) 
-                    		{
-                    			case 1 :
-                    			    // GAMS.g:226:9: '0' .. '9'
-                    			    {
-                    			    	MatchRange('0','9'); 
-
-                    			    }
-                    			    break;
-
-                    			default:
-                    			    if ( cnt2 >= 1 ) goto loop2;
-                    		            EarlyExitException eee2 =
-                    		                new EarlyExitException(2, input);
-                    		            throw eee2;
-                    	    }
-                    	    cnt2++;
-                    	} while (true);
-
-                    	loop2:
-                    		;	// Stops C# compiler whining that label 'loop2' has no statements
-
-                    	mDOT(); 
-                    	// GAMS.g:226:26: ( '0' .. '9' )*
-                    	do 
-                    	{
-                    	    int alt3 = 2;
-                    	    int LA3_0 = input.LA(1);
-
-                    	    if ( ((LA3_0 >= '0' && LA3_0 <= '9')) )
-                    	    {
-                    	        alt3 = 1;
-                    	    }
-
-
-                    	    switch (alt3) 
-                    		{
-                    			case 1 :
-                    			    // GAMS.g:226:27: '0' .. '9'
-                    			    {
-                    			    	MatchRange('0','9'); 
-
-                    			    }
-                    			    break;
-
-                    			default:
-                    			    goto loop3;
-                    	    }
-                    	} while (true);
-
-                    	loop3:
-                    		;	// Stops C# compiler whining that label 'loop3' has no statements
-
-                    	// GAMS.g:226:40: ( Exponent )?
-                    	int alt4 = 2;
-                    	int LA4_0 = input.LA(1);
-
-                    	if ( (LA4_0 == 'E' || LA4_0 == 'e') )
-                    	{
-                    	    alt4 = 1;
-                    	}
-                    	switch (alt4) 
-                    	{
-                    	    case 1 :
-                    	        // GAMS.g:226:40: Exponent
-                    	        {
-                    	        	mExponent(); 
-
-                    	        }
-                    	        break;
-
-                    	}
-
-
-                    }
-                    break;
-                case 2 :
-                    // GAMS.g:227:9: DOT ( '0' .. '9' )+ ( Exponent )?
-                    {
-                    	mDOT(); 
-                    	// GAMS.g:227:13: ( '0' .. '9' )+
+                    	// GAMS.g:324:8: ( '0' .. '9' )+
                     	int cnt5 = 0;
                     	do 
                     	{
@@ -655,7 +1188,7 @@ public partial class GAMSLexer : Lexer {
                     	    switch (alt5) 
                     		{
                     			case 1 :
-                    			    // GAMS.g:227:15: '0' .. '9'
+                    			    // GAMS.g:324:9: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -674,18 +1207,111 @@ public partial class GAMSLexer : Lexer {
                     	loop5:
                     		;	// Stops C# compiler whining that label 'loop5' has no statements
 
-                    	// GAMS.g:227:29: ( Exponent )?
-                    	int alt6 = 2;
-                    	int LA6_0 = input.LA(1);
-
-                    	if ( (LA6_0 == 'E' || LA6_0 == 'e') )
+                    	mDOT(); 
+                    	// GAMS.g:324:26: ( '0' .. '9' )*
+                    	do 
                     	{
-                    	    alt6 = 1;
+                    	    int alt6 = 2;
+                    	    int LA6_0 = input.LA(1);
+
+                    	    if ( ((LA6_0 >= '0' && LA6_0 <= '9')) )
+                    	    {
+                    	        alt6 = 1;
+                    	    }
+
+
+                    	    switch (alt6) 
+                    		{
+                    			case 1 :
+                    			    // GAMS.g:324:27: '0' .. '9'
+                    			    {
+                    			    	MatchRange('0','9'); 
+
+                    			    }
+                    			    break;
+
+                    			default:
+                    			    goto loop6;
+                    	    }
+                    	} while (true);
+
+                    	loop6:
+                    		;	// Stops C# compiler whining that label 'loop6' has no statements
+
+                    	// GAMS.g:324:40: ( Exponent )?
+                    	int alt7 = 2;
+                    	int LA7_0 = input.LA(1);
+
+                    	if ( (LA7_0 == 'E' || LA7_0 == 'e') )
+                    	{
+                    	    alt7 = 1;
                     	}
-                    	switch (alt6) 
+                    	switch (alt7) 
                     	{
                     	    case 1 :
-                    	        // GAMS.g:227:29: Exponent
+                    	        // GAMS.g:324:40: Exponent
+                    	        {
+                    	        	mExponent(); 
+
+                    	        }
+                    	        break;
+
+                    	}
+
+
+                    }
+                    break;
+                case 2 :
+                    // GAMS.g:325:9: DOT ( '0' .. '9' )+ ( Exponent )?
+                    {
+                    	mDOT(); 
+                    	// GAMS.g:325:13: ( '0' .. '9' )+
+                    	int cnt8 = 0;
+                    	do 
+                    	{
+                    	    int alt8 = 2;
+                    	    int LA8_0 = input.LA(1);
+
+                    	    if ( ((LA8_0 >= '0' && LA8_0 <= '9')) )
+                    	    {
+                    	        alt8 = 1;
+                    	    }
+
+
+                    	    switch (alt8) 
+                    		{
+                    			case 1 :
+                    			    // GAMS.g:325:15: '0' .. '9'
+                    			    {
+                    			    	MatchRange('0','9'); 
+
+                    			    }
+                    			    break;
+
+                    			default:
+                    			    if ( cnt8 >= 1 ) goto loop8;
+                    		            EarlyExitException eee8 =
+                    		                new EarlyExitException(8, input);
+                    		            throw eee8;
+                    	    }
+                    	    cnt8++;
+                    	} while (true);
+
+                    	loop8:
+                    		;	// Stops C# compiler whining that label 'loop8' has no statements
+
+                    	// GAMS.g:325:29: ( Exponent )?
+                    	int alt9 = 2;
+                    	int LA9_0 = input.LA(1);
+
+                    	if ( (LA9_0 == 'E' || LA9_0 == 'e') )
+                    	{
+                    	    alt9 = 1;
+                    	}
+                    	switch (alt9) 
+                    	{
+                    	    case 1 :
+                    	        // GAMS.g:325:29: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -698,25 +1324,25 @@ public partial class GAMSLexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // GAMS.g:228:8: ( '0' .. '9' )+ Exponent
+                    // GAMS.g:326:8: ( '0' .. '9' )+ Exponent
                     {
-                    	// GAMS.g:228:8: ( '0' .. '9' )+
-                    	int cnt7 = 0;
+                    	// GAMS.g:326:8: ( '0' .. '9' )+
+                    	int cnt10 = 0;
                     	do 
                     	{
-                    	    int alt7 = 2;
-                    	    int LA7_0 = input.LA(1);
+                    	    int alt10 = 2;
+                    	    int LA10_0 = input.LA(1);
 
-                    	    if ( ((LA7_0 >= '0' && LA7_0 <= '9')) )
+                    	    if ( ((LA10_0 >= '0' && LA10_0 <= '9')) )
                     	    {
-                    	        alt7 = 1;
+                    	        alt10 = 1;
                     	    }
 
 
-                    	    switch (alt7) 
+                    	    switch (alt10) 
                     		{
                     			case 1 :
-                    			    // GAMS.g:228:9: '0' .. '9'
+                    			    // GAMS.g:326:9: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -724,16 +1350,16 @@ public partial class GAMSLexer : Lexer {
                     			    break;
 
                     			default:
-                    			    if ( cnt7 >= 1 ) goto loop7;
-                    		            EarlyExitException eee7 =
-                    		                new EarlyExitException(7, input);
-                    		            throw eee7;
+                    			    if ( cnt10 >= 1 ) goto loop10;
+                    		            EarlyExitException eee10 =
+                    		                new EarlyExitException(10, input);
+                    		            throw eee10;
                     	    }
-                    	    cnt7++;
+                    	    cnt10++;
                     	} while (true);
 
-                    	loop7:
-                    		;	// Stops C# compiler whining that label 'loop7' has no statements
+                    	loop10:
+                    		;	// Stops C# compiler whining that label 'loop10' has no statements
 
                     	mExponent(); 
 
@@ -755,8 +1381,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:233:5: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // GAMS.g:233:9: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // GAMS.g:331:5: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // GAMS.g:331:9: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -769,15 +1395,15 @@ public partial class GAMSLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// GAMS.g:233:23: ( '+' | '-' )?
-            	int alt9 = 2;
-            	int LA9_0 = input.LA(1);
+            	// GAMS.g:331:23: ( '+' | '-' )?
+            	int alt12 = 2;
+            	int LA12_0 = input.LA(1);
 
-            	if ( (LA9_0 == '+' || LA9_0 == '-') )
+            	if ( (LA12_0 == '+' || LA12_0 == '-') )
             	{
-            	    alt9 = 1;
+            	    alt12 = 1;
             	}
-            	switch (alt9) 
+            	switch (alt12) 
             	{
             	    case 1 :
             	        // GAMS.g:
@@ -799,23 +1425,23 @@ public partial class GAMSLexer : Lexer {
 
             	}
 
-            	// GAMS.g:233:38: ( '0' .. '9' )+
-            	int cnt10 = 0;
+            	// GAMS.g:331:38: ( '0' .. '9' )+
+            	int cnt13 = 0;
             	do 
             	{
-            	    int alt10 = 2;
-            	    int LA10_0 = input.LA(1);
+            	    int alt13 = 2;
+            	    int LA13_0 = input.LA(1);
 
-            	    if ( ((LA10_0 >= '0' && LA10_0 <= '9')) )
+            	    if ( ((LA13_0 >= '0' && LA13_0 <= '9')) )
             	    {
-            	        alt10 = 1;
+            	        alt13 = 1;
             	    }
 
 
-            	    switch (alt10) 
+            	    switch (alt13) 
             		{
             			case 1 :
-            			    // GAMS.g:233:40: '0' .. '9'
+            			    // GAMS.g:331:40: '0' .. '9'
             			    {
             			    	MatchRange('0','9'); 
 
@@ -823,16 +1449,16 @@ public partial class GAMSLexer : Lexer {
             			    break;
 
             			default:
-            			    if ( cnt10 >= 1 ) goto loop10;
-            		            EarlyExitException eee10 =
-            		                new EarlyExitException(10, input);
-            		            throw eee10;
+            			    if ( cnt13 >= 1 ) goto loop13;
+            		            EarlyExitException eee13 =
+            		                new EarlyExitException(13, input);
+            		            throw eee13;
             	    }
-            	    cnt10++;
+            	    cnt13++;
             	} while (true);
 
-            	loop10:
-            		;	// Stops C# compiler whining that label 'loop10' has no statements
+            	loop13:
+            		;	// Stops C# compiler whining that label 'loop13' has no statements
 
 
             }
@@ -851,8 +1477,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:236:7: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // GAMS.g:236:9: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // GAMS.g:334:7: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // GAMS.g:334:9: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -865,19 +1491,19 @@ public partial class GAMSLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// GAMS.g:236:22: ( DIGIT | LETTER | '_' )*
+            	// GAMS.g:334:22: ( DIGIT | LETTER | '_' )*
             	do 
             	{
-            	    int alt11 = 2;
-            	    int LA11_0 = input.LA(1);
+            	    int alt14 = 2;
+            	    int LA14_0 = input.LA(1);
 
-            	    if ( ((LA11_0 >= '0' && LA11_0 <= '9') || (LA11_0 >= 'A' && LA11_0 <= 'Z') || LA11_0 == '_' || (LA11_0 >= 'a' && LA11_0 <= 'z')) )
+            	    if ( ((LA14_0 >= '0' && LA14_0 <= '9') || (LA14_0 >= 'A' && LA14_0 <= 'Z') || LA14_0 == '_' || (LA14_0 >= 'a' && LA14_0 <= 'z')) )
             	    {
-            	        alt11 = 1;
+            	        alt14 = 1;
             	    }
 
 
-            	    switch (alt11) 
+            	    switch (alt14) 
             		{
             			case 1 :
             			    // GAMS.g:
@@ -898,12 +1524,12 @@ public partial class GAMSLexer : Lexer {
             			    break;
 
             			default:
-            			    goto loop11;
+            			    goto loop14;
             	    }
             	} while (true);
 
-            	loop11:
-            		;	// Stops C# compiler whining that label 'loop11' has no statements
+            	loop14:
+            		;	// Stops C# compiler whining that label 'loop14' has no statements
 
             	 _type = CheckKeywordsTable(Text); 
 
@@ -925,23 +1551,23 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:238:12: ( ( '\\t' | ' ' | '\\u000C' )+ )
-            // GAMS.g:238:14: ( '\\t' | ' ' | '\\u000C' )+
+            // GAMS.g:336:12: ( ( '\\t' | ' ' | '\\u000C' )+ )
+            // GAMS.g:336:14: ( '\\t' | ' ' | '\\u000C' )+
             {
-            	// GAMS.g:238:14: ( '\\t' | ' ' | '\\u000C' )+
-            	int cnt12 = 0;
+            	// GAMS.g:336:14: ( '\\t' | ' ' | '\\u000C' )+
+            	int cnt15 = 0;
             	do 
             	{
-            	    int alt12 = 2;
-            	    int LA12_0 = input.LA(1);
+            	    int alt15 = 2;
+            	    int LA15_0 = input.LA(1);
 
-            	    if ( (LA12_0 == '\t' || LA12_0 == '\f' || LA12_0 == ' ') )
+            	    if ( (LA15_0 == '\t' || LA15_0 == '\f' || LA15_0 == ' ') )
             	    {
-            	        alt12 = 1;
+            	        alt15 = 1;
             	    }
 
 
-            	    switch (alt12) 
+            	    switch (alt15) 
             		{
             			case 1 :
             			    // GAMS.g:
@@ -962,16 +1588,16 @@ public partial class GAMSLexer : Lexer {
             			    break;
 
             			default:
-            			    if ( cnt12 >= 1 ) goto loop12;
-            		            EarlyExitException eee12 =
-            		                new EarlyExitException(12, input);
-            		            throw eee12;
+            			    if ( cnt15 >= 1 ) goto loop15;
+            		            EarlyExitException eee15 =
+            		                new EarlyExitException(15, input);
+            		            throw eee15;
             	    }
-            	    cnt12++;
+            	    cnt15++;
             	} while (true);
 
-            	loop12:
-            		;	// Stops C# compiler whining that label 'loop12' has no statements
+            	loop15:
+            		;	// Stops C# compiler whining that label 'loop15' has no statements
 
             	 _channel=HIDDEN; 
 
@@ -993,24 +1619,24 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = NEWLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:240:12: ( ( ( '\\r' )? '\\n' ) )
-            // GAMS.g:240:16: ( ( '\\r' )? '\\n' )
+            // GAMS.g:338:12: ( ( ( '\\r' )? '\\n' ) )
+            // GAMS.g:338:16: ( ( '\\r' )? '\\n' )
             {
-            	// GAMS.g:240:16: ( ( '\\r' )? '\\n' )
-            	// GAMS.g:240:17: ( '\\r' )? '\\n'
+            	// GAMS.g:338:16: ( ( '\\r' )? '\\n' )
+            	// GAMS.g:338:17: ( '\\r' )? '\\n'
             	{
-            		// GAMS.g:240:17: ( '\\r' )?
-            		int alt13 = 2;
-            		int LA13_0 = input.LA(1);
+            		// GAMS.g:338:17: ( '\\r' )?
+            		int alt16 = 2;
+            		int LA16_0 = input.LA(1);
 
-            		if ( (LA13_0 == '\r') )
+            		if ( (LA16_0 == '\r') )
             		{
-            		    alt13 = 1;
+            		    alt16 = 1;
             		}
-            		switch (alt13) 
+            		switch (alt16) 
             		{
             		    case 1 :
-            		        // GAMS.g:240:18: '\\r'
+            		        // GAMS.g:338:18: '\\r'
             		        {
             		        	Match('\r'); 
 
@@ -1043,32 +1669,32 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = Comment;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:242:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
-            // GAMS.g:242:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            // GAMS.g:340:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // GAMS.g:340:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
-            	// GAMS.g:242:14: ( '()' | '//' )
-            	int alt14 = 2;
-            	int LA14_0 = input.LA(1);
+            	// GAMS.g:340:14: ( '()' | '//' )
+            	int alt17 = 2;
+            	int LA17_0 = input.LA(1);
 
-            	if ( (LA14_0 == '(') )
+            	if ( (LA17_0 == '(') )
             	{
-            	    alt14 = 1;
+            	    alt17 = 1;
             	}
-            	else if ( (LA14_0 == '/') )
+            	else if ( (LA17_0 == '/') )
             	{
-            	    alt14 = 2;
+            	    alt17 = 2;
             	}
             	else 
             	{
-            	    NoViableAltException nvae_d14s0 =
-            	        new NoViableAltException("", 14, 0, input);
+            	    NoViableAltException nvae_d17s0 =
+            	        new NoViableAltException("", 17, 0, input);
 
-            	    throw nvae_d14s0;
+            	    throw nvae_d17s0;
             	}
-            	switch (alt14) 
+            	switch (alt17) 
             	{
             	    case 1 :
-            	        // GAMS.g:242:15: '()'
+            	        // GAMS.g:340:15: '()'
             	        {
             	        	Match("()"); 
 
@@ -1076,7 +1702,7 @@ public partial class GAMSLexer : Lexer {
             	        }
             	        break;
             	    case 2 :
-            	        // GAMS.g:242:22: '//'
+            	        // GAMS.g:340:22: '//'
             	        {
             	        	Match("//"); 
 
@@ -1086,22 +1712,22 @@ public partial class GAMSLexer : Lexer {
 
             	}
 
-            	// GAMS.g:242:28: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	// GAMS.g:340:28: (~ ( NEWLINE2 | NEWLINE3 ) )*
             	do 
             	{
-            	    int alt15 = 2;
-            	    int LA15_0 = input.LA(1);
+            	    int alt18 = 2;
+            	    int LA18_0 = input.LA(1);
 
-            	    if ( ((LA15_0 >= '\u0000' && LA15_0 <= '\t') || (LA15_0 >= '\u000B' && LA15_0 <= '\uFFFF')) )
+            	    if ( ((LA18_0 >= '\u0000' && LA18_0 <= '\t') || (LA18_0 >= '\u000B' && LA18_0 <= '\uFFFF')) )
             	    {
-            	        alt15 = 1;
+            	        alt18 = 1;
             	    }
 
 
-            	    switch (alt15) 
+            	    switch (alt18) 
             		{
             			case 1 :
-            			    // GAMS.g:242:29: ~ ( NEWLINE2 | NEWLINE3 )
+            			    // GAMS.g:340:29: ~ ( NEWLINE2 | NEWLINE3 )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -1119,12 +1745,12 @@ public partial class GAMSLexer : Lexer {
             			    break;
 
             			default:
-            			    goto loop15;
+            			    goto loop18;
             	    }
             	} while (true);
 
-            	loop15:
-            		;	// Stops C# compiler whining that label 'loop15' has no statements
+            	loop18:
+            		;	// Stops C# compiler whining that label 'loop18' has no statements
 
             	 _channel=HIDDEN; 
 
@@ -1146,64 +1772,64 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = NESTED_ML_COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:246:5: ( '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/' )
-            // GAMS.g:246:9: '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/'
+            // GAMS.g:344:5: ( '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/' )
+            // GAMS.g:344:9: '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/'
             {
             	Match("/*"); 
 
-            	// GAMS.g:247:9: ( options {greedy=false; } : NESTED_ML_COMMENT | . )*
+            	// GAMS.g:345:9: ( options {greedy=false; } : NESTED_ML_COMMENT | . )*
             	do 
             	{
-            	    int alt16 = 3;
-            	    int LA16_0 = input.LA(1);
+            	    int alt19 = 3;
+            	    int LA19_0 = input.LA(1);
 
-            	    if ( (LA16_0 == '*') )
+            	    if ( (LA19_0 == '*') )
             	    {
-            	        int LA16_1 = input.LA(2);
+            	        int LA19_1 = input.LA(2);
 
-            	        if ( (LA16_1 == '/') )
+            	        if ( (LA19_1 == '/') )
             	        {
-            	            alt16 = 3;
+            	            alt19 = 3;
             	        }
-            	        else if ( ((LA16_1 >= '\u0000' && LA16_1 <= '.') || (LA16_1 >= '0' && LA16_1 <= '\uFFFF')) )
+            	        else if ( ((LA19_1 >= '\u0000' && LA19_1 <= '.') || (LA19_1 >= '0' && LA19_1 <= '\uFFFF')) )
             	        {
-            	            alt16 = 2;
+            	            alt19 = 2;
             	        }
 
 
             	    }
-            	    else if ( (LA16_0 == '/') )
+            	    else if ( (LA19_0 == '/') )
             	    {
-            	        int LA16_2 = input.LA(2);
+            	        int LA19_2 = input.LA(2);
 
-            	        if ( (LA16_2 == '*') )
+            	        if ( (LA19_2 == '*') )
             	        {
-            	            alt16 = 1;
+            	            alt19 = 1;
             	        }
-            	        else if ( ((LA16_2 >= '\u0000' && LA16_2 <= ')') || (LA16_2 >= '+' && LA16_2 <= '\uFFFF')) )
+            	        else if ( ((LA19_2 >= '\u0000' && LA19_2 <= ')') || (LA19_2 >= '+' && LA19_2 <= '\uFFFF')) )
             	        {
-            	            alt16 = 2;
+            	            alt19 = 2;
             	        }
 
 
             	    }
-            	    else if ( ((LA16_0 >= '\u0000' && LA16_0 <= ')') || (LA16_0 >= '+' && LA16_0 <= '.') || (LA16_0 >= '0' && LA16_0 <= '\uFFFF')) )
+            	    else if ( ((LA19_0 >= '\u0000' && LA19_0 <= ')') || (LA19_0 >= '+' && LA19_0 <= '.') || (LA19_0 >= '0' && LA19_0 <= '\uFFFF')) )
             	    {
-            	        alt16 = 2;
+            	        alt19 = 2;
             	    }
 
 
-            	    switch (alt16) 
+            	    switch (alt19) 
             		{
             			case 1 :
-            			    // GAMS.g:247:36: NESTED_ML_COMMENT
+            			    // GAMS.g:345:36: NESTED_ML_COMMENT
             			    {
             			    	mNESTED_ML_COMMENT(); 
 
             			    }
             			    break;
             			case 2 :
-            			    // GAMS.g:247:56: .
+            			    // GAMS.g:345:56: .
             			    {
             			    	MatchAny(); 
 
@@ -1211,12 +1837,12 @@ public partial class GAMSLexer : Lexer {
             			    break;
 
             			default:
-            			    goto loop16;
+            			    goto loop19;
             	    }
             	} while (true);
 
-            	loop16:
-            		;	// Stops C# compiler whining that label 'loop16' has no statements
+            	loop19:
+            		;	// Stops C# compiler whining that label 'loop19' has no statements
 
             	Match("*/"); 
 
@@ -1240,8 +1866,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = L1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:251:4: ( '(' )
-            // GAMS.g:251:6: '('
+            // GAMS.g:349:4: ( '(' )
+            // GAMS.g:349:6: '('
             {
             	Match('('); 
 
@@ -1263,8 +1889,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = R1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:252:4: ( ')' )
-            // GAMS.g:252:6: ')'
+            // GAMS.g:350:4: ( ')' )
+            // GAMS.g:350:6: ')'
             {
             	Match(')'); 
 
@@ -1286,8 +1912,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = L2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:253:4: ( '[' )
-            // GAMS.g:253:6: '['
+            // GAMS.g:351:4: ( '[' )
+            // GAMS.g:351:6: '['
             {
             	Match('['); 
 
@@ -1309,8 +1935,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = R2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:254:4: ( ']' )
-            // GAMS.g:254:6: ']'
+            // GAMS.g:352:4: ( ']' )
+            // GAMS.g:352:6: ']'
             {
             	Match(']'); 
 
@@ -1332,8 +1958,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = L3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:255:4: ( '{' )
-            // GAMS.g:255:6: '{'
+            // GAMS.g:353:4: ( '{' )
+            // GAMS.g:353:6: '{'
             {
             	Match('{'); 
 
@@ -1355,8 +1981,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = R3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:256:4: ( '}' )
-            // GAMS.g:256:6: '}'
+            // GAMS.g:354:4: ( '}' )
+            // GAMS.g:354:6: '}'
             {
             	Match('}'); 
 
@@ -1371,73 +1997,6 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "R3"
 
-    // $ANTLR start "EQUAL"
-    public void mEQUAL() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = EQUAL;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:258:7: ( '=e=' | '=E=' )
-            int alt17 = 2;
-            int LA17_0 = input.LA(1);
-
-            if ( (LA17_0 == '=') )
-            {
-                int LA17_1 = input.LA(2);
-
-                if ( (LA17_1 == 'e') )
-                {
-                    alt17 = 1;
-                }
-                else if ( (LA17_1 == 'E') )
-                {
-                    alt17 = 2;
-                }
-                else 
-                {
-                    NoViableAltException nvae_d17s1 =
-                        new NoViableAltException("", 17, 1, input);
-
-                    throw nvae_d17s1;
-                }
-            }
-            else 
-            {
-                NoViableAltException nvae_d17s0 =
-                    new NoViableAltException("", 17, 0, input);
-
-                throw nvae_d17s0;
-            }
-            switch (alt17) 
-            {
-                case 1 :
-                    // GAMS.g:258:9: '=e='
-                    {
-                    	Match("=e="); 
-
-
-                    }
-                    break;
-                case 2 :
-                    // GAMS.g:258:17: '=E='
-                    {
-                    	Match("=E="); 
-
-
-                    }
-                    break;
-
-            }
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "EQUAL"
-
     // $ANTLR start "DOLLAR"
     public void mDOLLAR() // throws RecognitionException [2]
     {
@@ -1445,8 +2004,8 @@ public partial class GAMSLexer : Lexer {
     		{
             int _type = DOLLAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // GAMS.g:259:7: ( '$' )
-            // GAMS.g:259:9: '$'
+            // GAMS.g:356:7: ( '$' )
+            // GAMS.g:356:9: '$'
             {
             	Match('$'); 
 
@@ -1461,13 +2020,83 @@ public partial class GAMSLexer : Lexer {
     }
     // $ANTLR end "DOLLAR"
 
+    // $ANTLR start "StringInQuotes"
+    public void mStringInQuotes() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = StringInQuotes;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // GAMS.g:358:15: ( ( '\\'' (~ ( '\\'' ) )* '\\'' ) )
+            // GAMS.g:358:29: ( '\\'' (~ ( '\\'' ) )* '\\'' )
+            {
+            	// GAMS.g:358:29: ( '\\'' (~ ( '\\'' ) )* '\\'' )
+            	// GAMS.g:358:30: '\\'' (~ ( '\\'' ) )* '\\''
+            	{
+            		Match('\''); 
+            		// GAMS.g:358:35: (~ ( '\\'' ) )*
+            		do 
+            		{
+            		    int alt20 = 2;
+            		    int LA20_0 = input.LA(1);
+
+            		    if ( ((LA20_0 >= '\u0000' && LA20_0 <= '&') || (LA20_0 >= '(' && LA20_0 <= '\uFFFF')) )
+            		    {
+            		        alt20 = 1;
+            		    }
+
+
+            		    switch (alt20) 
+            			{
+            				case 1 :
+            				    // GAMS.g:358:36: ~ ( '\\'' )
+            				    {
+            				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= '\uFFFF') ) 
+            				    	{
+            				    	    input.Consume();
+
+            				    	}
+            				    	else 
+            				    	{
+            				    	    MismatchedSetException mse = new MismatchedSetException(null,input);
+            				    	    Recover(mse);
+            				    	    throw mse;}
+
+
+            				    }
+            				    break;
+
+            				default:
+            				    goto loop20;
+            		    }
+            		} while (true);
+
+            		loop20:
+            			;	// Stops C# compiler whining that label 'loop20' has no statements
+
+            		Match('\''); 
+
+            	}
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "StringInQuotes"
+
     // $ANTLR start "NEWLINE2"
     public void mNEWLINE2() // throws RecognitionException [2]
     {
     		try
     		{
-            // GAMS.g:261:19: ( '\\n' )
-            // GAMS.g:261:21: '\\n'
+            // GAMS.g:360:19: ( '\\n' )
+            // GAMS.g:360:21: '\\n'
             {
             	Match('\n'); 
 
@@ -1485,8 +2114,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:262:19: ( '\\r\\n' )
-            // GAMS.g:262:21: '\\r\\n'
+            // GAMS.g:361:19: ( '\\r\\n' )
+            // GAMS.g:361:21: '\\r\\n'
             {
             	Match("\r\n"); 
 
@@ -1505,8 +2134,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:263:16: ( '0' .. '9' )
-            // GAMS.g:263:18: '0' .. '9'
+            // GAMS.g:362:16: ( '0' .. '9' )
+            // GAMS.g:362:18: '0' .. '9'
             {
             	MatchRange('0','9'); 
 
@@ -1524,7 +2153,7 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:264:16: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // GAMS.g:363:16: ( 'a' .. 'z' | 'A' .. 'Z' )
             // GAMS.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
@@ -1553,8 +2182,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:266:11: ( ( 'a' | 'A' ) )
-            // GAMS.g:266:12: ( 'a' | 'A' )
+            // GAMS.g:365:11: ( ( 'a' | 'A' ) )
+            // GAMS.g:365:12: ( 'a' | 'A' )
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -1582,8 +2211,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:267:11: ( ( 'b' | 'B' ) )
-            // GAMS.g:267:12: ( 'b' | 'B' )
+            // GAMS.g:366:11: ( ( 'b' | 'B' ) )
+            // GAMS.g:366:12: ( 'b' | 'B' )
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -1611,8 +2240,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:268:11: ( ( 'c' | 'C' ) )
-            // GAMS.g:268:12: ( 'c' | 'C' )
+            // GAMS.g:367:11: ( ( 'c' | 'C' ) )
+            // GAMS.g:367:12: ( 'c' | 'C' )
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -1640,8 +2269,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:269:11: ( ( 'd' | 'D' ) )
-            // GAMS.g:269:12: ( 'd' | 'D' )
+            // GAMS.g:368:11: ( ( 'd' | 'D' ) )
+            // GAMS.g:368:12: ( 'd' | 'D' )
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -1669,8 +2298,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:270:11: ( ( 'e' | 'E' ) )
-            // GAMS.g:270:12: ( 'e' | 'E' )
+            // GAMS.g:369:11: ( ( 'e' | 'E' ) )
+            // GAMS.g:369:12: ( 'e' | 'E' )
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -1698,8 +2327,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:271:11: ( ( 'f' | 'F' ) )
-            // GAMS.g:271:12: ( 'f' | 'F' )
+            // GAMS.g:370:11: ( ( 'f' | 'F' ) )
+            // GAMS.g:370:12: ( 'f' | 'F' )
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -1727,8 +2356,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:272:11: ( ( 'g' | 'G' ) )
-            // GAMS.g:272:12: ( 'g' | 'G' )
+            // GAMS.g:371:11: ( ( 'g' | 'G' ) )
+            // GAMS.g:371:12: ( 'g' | 'G' )
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -1756,8 +2385,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:273:11: ( ( 'h' | 'H' ) )
-            // GAMS.g:273:12: ( 'h' | 'H' )
+            // GAMS.g:372:11: ( ( 'h' | 'H' ) )
+            // GAMS.g:372:12: ( 'h' | 'H' )
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -1785,8 +2414,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:274:11: ( ( 'i' | 'I' ) )
-            // GAMS.g:274:12: ( 'i' | 'I' )
+            // GAMS.g:373:11: ( ( 'i' | 'I' ) )
+            // GAMS.g:373:12: ( 'i' | 'I' )
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -1814,8 +2443,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:275:11: ( ( 'j' | 'J' ) )
-            // GAMS.g:275:12: ( 'j' | 'J' )
+            // GAMS.g:374:11: ( ( 'j' | 'J' ) )
+            // GAMS.g:374:12: ( 'j' | 'J' )
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -1843,8 +2472,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:276:11: ( ( 'k' | 'K' ) )
-            // GAMS.g:276:12: ( 'k' | 'K' )
+            // GAMS.g:375:11: ( ( 'k' | 'K' ) )
+            // GAMS.g:375:12: ( 'k' | 'K' )
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -1872,8 +2501,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:277:11: ( ( 'l' | 'L' ) )
-            // GAMS.g:277:12: ( 'l' | 'L' )
+            // GAMS.g:376:11: ( ( 'l' | 'L' ) )
+            // GAMS.g:376:12: ( 'l' | 'L' )
             {
             	if ( input.LA(1) == 'L' || input.LA(1) == 'l' ) 
             	{
@@ -1901,8 +2530,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:278:11: ( ( 'm' | 'M' ) )
-            // GAMS.g:278:12: ( 'm' | 'M' )
+            // GAMS.g:377:11: ( ( 'm' | 'M' ) )
+            // GAMS.g:377:12: ( 'm' | 'M' )
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -1930,8 +2559,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:279:11: ( ( 'n' | 'N' ) )
-            // GAMS.g:279:12: ( 'n' | 'N' )
+            // GAMS.g:378:11: ( ( 'n' | 'N' ) )
+            // GAMS.g:378:12: ( 'n' | 'N' )
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -1959,8 +2588,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:280:11: ( ( 'o' | 'O' ) )
-            // GAMS.g:280:12: ( 'o' | 'O' )
+            // GAMS.g:379:11: ( ( 'o' | 'O' ) )
+            // GAMS.g:379:12: ( 'o' | 'O' )
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -1988,8 +2617,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:281:11: ( ( 'p' | 'P' ) )
-            // GAMS.g:281:12: ( 'p' | 'P' )
+            // GAMS.g:380:11: ( ( 'p' | 'P' ) )
+            // GAMS.g:380:12: ( 'p' | 'P' )
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -2017,8 +2646,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:282:11: ( ( 'q' | 'Q' ) )
-            // GAMS.g:282:12: ( 'q' | 'Q' )
+            // GAMS.g:381:11: ( ( 'q' | 'Q' ) )
+            // GAMS.g:381:12: ( 'q' | 'Q' )
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -2046,8 +2675,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:283:11: ( ( 'r' | 'R' ) )
-            // GAMS.g:283:12: ( 'r' | 'R' )
+            // GAMS.g:382:11: ( ( 'r' | 'R' ) )
+            // GAMS.g:382:12: ( 'r' | 'R' )
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -2075,8 +2704,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:284:11: ( ( 's' | 'S' ) )
-            // GAMS.g:284:12: ( 's' | 'S' )
+            // GAMS.g:383:11: ( ( 's' | 'S' ) )
+            // GAMS.g:383:12: ( 's' | 'S' )
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -2104,8 +2733,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:285:11: ( ( 't' | 'T' ) )
-            // GAMS.g:285:12: ( 't' | 'T' )
+            // GAMS.g:384:11: ( ( 't' | 'T' ) )
+            // GAMS.g:384:12: ( 't' | 'T' )
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -2133,8 +2762,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:286:11: ( ( 'u' | 'U' ) )
-            // GAMS.g:286:12: ( 'u' | 'U' )
+            // GAMS.g:385:11: ( ( 'u' | 'U' ) )
+            // GAMS.g:385:12: ( 'u' | 'U' )
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -2162,8 +2791,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:287:11: ( ( 'v' | 'V' ) )
-            // GAMS.g:287:12: ( 'v' | 'V' )
+            // GAMS.g:386:11: ( ( 'v' | 'V' ) )
+            // GAMS.g:386:12: ( 'v' | 'V' )
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -2191,8 +2820,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:288:11: ( ( 'w' | 'W' ) )
-            // GAMS.g:288:12: ( 'w' | 'W' )
+            // GAMS.g:387:11: ( ( 'w' | 'W' ) )
+            // GAMS.g:387:12: ( 'w' | 'W' )
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -2220,8 +2849,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:289:11: ( ( 'x' | 'X' ) )
-            // GAMS.g:289:12: ( 'x' | 'X' )
+            // GAMS.g:388:11: ( ( 'x' | 'X' ) )
+            // GAMS.g:388:12: ( 'x' | 'X' )
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -2249,8 +2878,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:290:11: ( ( 'y' | 'Y' ) )
-            // GAMS.g:290:12: ( 'y' | 'Y' )
+            // GAMS.g:389:11: ( ( 'y' | 'Y' ) )
+            // GAMS.g:389:12: ( 'y' | 'Y' )
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -2278,8 +2907,8 @@ public partial class GAMSLexer : Lexer {
     {
     		try
     		{
-            // GAMS.g:291:11: ( ( 'z' | 'Z' ) )
-            // GAMS.g:291:12: ( 'z' | 'Z' )
+            // GAMS.g:390:11: ( ( 'z' | 'Z' ) )
+            // GAMS.g:390:12: ( 'z' | 'Z' )
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -2304,211 +2933,344 @@ public partial class GAMSLexer : Lexer {
 
     override public void mTokens() // throws RecognitionException 
     {
-        // GAMS.g:1:8: ( FRML | SUM | LB | RB | DOT | PLUS | MINUS | SEMI | MULT | DIV | MOD | COMMA | STARS | DOUBLEDOT | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT | L1 | R1 | L2 | R2 | L3 | R3 | EQUAL | DOLLAR )
-        int alt18 = 29;
-        alt18 = dfa18.Predict(input);
-        switch (alt18) 
+        // GAMS.g:1:8: ( COMMENT1 | COMMENT2 | EQU | SUM | OR | AND | NOT | ABS | EXP | LOG | MAX | MIN | POWER | SQR | SAMEAS | TANH | DOT | PLUS | MINUS | SEMI | MULT | DIV | MOD | COMMA | EEQUAL | NONEQUAL | LESSTHANOREQUAL | GREATERTHANOREQUAL | EQUAL | LESSTHAN | GREATERTHAN | STARS | DOUBLEDOT | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT | L1 | R1 | L2 | R2 | L3 | R3 | DOLLAR | StringInQuotes )
+        int alt21 = 48;
+        alt21 = dfa21.Predict(input);
+        switch (alt21) 
         {
             case 1 :
-                // GAMS.g:1:10: FRML
+                // GAMS.g:1:10: COMMENT1
                 {
-                	mFRML(); 
+                	mCOMMENT1(); 
 
                 }
                 break;
             case 2 :
-                // GAMS.g:1:15: SUM
+                // GAMS.g:1:19: COMMENT2
+                {
+                	mCOMMENT2(); 
+
+                }
+                break;
+            case 3 :
+                // GAMS.g:1:28: EQU
+                {
+                	mEQU(); 
+
+                }
+                break;
+            case 4 :
+                // GAMS.g:1:32: SUM
                 {
                 	mSUM(); 
 
                 }
                 break;
-            case 3 :
-                // GAMS.g:1:19: LB
-                {
-                	mLB(); 
-
-                }
-                break;
-            case 4 :
-                // GAMS.g:1:22: RB
-                {
-                	mRB(); 
-
-                }
-                break;
             case 5 :
-                // GAMS.g:1:25: DOT
+                // GAMS.g:1:36: OR
+                {
+                	mOR(); 
+
+                }
+                break;
+            case 6 :
+                // GAMS.g:1:39: AND
+                {
+                	mAND(); 
+
+                }
+                break;
+            case 7 :
+                // GAMS.g:1:43: NOT
+                {
+                	mNOT(); 
+
+                }
+                break;
+            case 8 :
+                // GAMS.g:1:47: ABS
+                {
+                	mABS(); 
+
+                }
+                break;
+            case 9 :
+                // GAMS.g:1:51: EXP
+                {
+                	mEXP(); 
+
+                }
+                break;
+            case 10 :
+                // GAMS.g:1:55: LOG
+                {
+                	mLOG(); 
+
+                }
+                break;
+            case 11 :
+                // GAMS.g:1:59: MAX
+                {
+                	mMAX(); 
+
+                }
+                break;
+            case 12 :
+                // GAMS.g:1:63: MIN
+                {
+                	mMIN(); 
+
+                }
+                break;
+            case 13 :
+                // GAMS.g:1:67: POWER
+                {
+                	mPOWER(); 
+
+                }
+                break;
+            case 14 :
+                // GAMS.g:1:73: SQR
+                {
+                	mSQR(); 
+
+                }
+                break;
+            case 15 :
+                // GAMS.g:1:77: SAMEAS
+                {
+                	mSAMEAS(); 
+
+                }
+                break;
+            case 16 :
+                // GAMS.g:1:84: TANH
+                {
+                	mTANH(); 
+
+                }
+                break;
+            case 17 :
+                // GAMS.g:1:89: DOT
                 {
                 	mDOT(); 
 
                 }
                 break;
-            case 6 :
-                // GAMS.g:1:29: PLUS
+            case 18 :
+                // GAMS.g:1:93: PLUS
                 {
                 	mPLUS(); 
 
                 }
                 break;
-            case 7 :
-                // GAMS.g:1:34: MINUS
+            case 19 :
+                // GAMS.g:1:98: MINUS
                 {
                 	mMINUS(); 
 
                 }
                 break;
-            case 8 :
-                // GAMS.g:1:40: SEMI
+            case 20 :
+                // GAMS.g:1:104: SEMI
                 {
                 	mSEMI(); 
 
                 }
                 break;
-            case 9 :
-                // GAMS.g:1:45: MULT
+            case 21 :
+                // GAMS.g:1:109: MULT
                 {
                 	mMULT(); 
 
                 }
                 break;
-            case 10 :
-                // GAMS.g:1:50: DIV
+            case 22 :
+                // GAMS.g:1:114: DIV
                 {
                 	mDIV(); 
 
                 }
                 break;
-            case 11 :
-                // GAMS.g:1:54: MOD
+            case 23 :
+                // GAMS.g:1:118: MOD
                 {
                 	mMOD(); 
 
                 }
                 break;
-            case 12 :
-                // GAMS.g:1:58: COMMA
+            case 24 :
+                // GAMS.g:1:122: COMMA
                 {
                 	mCOMMA(); 
 
                 }
                 break;
-            case 13 :
-                // GAMS.g:1:64: STARS
-                {
-                	mSTARS(); 
-
-                }
-                break;
-            case 14 :
-                // GAMS.g:1:70: DOUBLEDOT
-                {
-                	mDOUBLEDOT(); 
-
-                }
-                break;
-            case 15 :
-                // GAMS.g:1:80: Integer
-                {
-                	mInteger(); 
-
-                }
-                break;
-            case 16 :
-                // GAMS.g:1:88: Double
-                {
-                	mDouble(); 
-
-                }
-                break;
-            case 17 :
-                // GAMS.g:1:95: Ident
-                {
-                	mIdent(); 
-
-                }
-                break;
-            case 18 :
-                // GAMS.g:1:101: WHITESPACE
-                {
-                	mWHITESPACE(); 
-
-                }
-                break;
-            case 19 :
-                // GAMS.g:1:112: NEWLINE
-                {
-                	mNEWLINE(); 
-
-                }
-                break;
-            case 20 :
-                // GAMS.g:1:120: Comment
-                {
-                	mComment(); 
-
-                }
-                break;
-            case 21 :
-                // GAMS.g:1:128: NESTED_ML_COMMENT
-                {
-                	mNESTED_ML_COMMENT(); 
-
-                }
-                break;
-            case 22 :
-                // GAMS.g:1:146: L1
-                {
-                	mL1(); 
-
-                }
-                break;
-            case 23 :
-                // GAMS.g:1:149: R1
-                {
-                	mR1(); 
-
-                }
-                break;
-            case 24 :
-                // GAMS.g:1:152: L2
-                {
-                	mL2(); 
-
-                }
-                break;
             case 25 :
-                // GAMS.g:1:155: R2
+                // GAMS.g:1:128: EEQUAL
                 {
-                	mR2(); 
+                	mEEQUAL(); 
 
                 }
                 break;
             case 26 :
-                // GAMS.g:1:158: L3
+                // GAMS.g:1:135: NONEQUAL
                 {
-                	mL3(); 
+                	mNONEQUAL(); 
 
                 }
                 break;
             case 27 :
-                // GAMS.g:1:161: R3
+                // GAMS.g:1:144: LESSTHANOREQUAL
                 {
-                	mR3(); 
+                	mLESSTHANOREQUAL(); 
 
                 }
                 break;
             case 28 :
-                // GAMS.g:1:164: EQUAL
+                // GAMS.g:1:160: GREATERTHANOREQUAL
+                {
+                	mGREATERTHANOREQUAL(); 
+
+                }
+                break;
+            case 29 :
+                // GAMS.g:1:179: EQUAL
                 {
                 	mEQUAL(); 
 
                 }
                 break;
-            case 29 :
-                // GAMS.g:1:170: DOLLAR
+            case 30 :
+                // GAMS.g:1:185: LESSTHAN
+                {
+                	mLESSTHAN(); 
+
+                }
+                break;
+            case 31 :
+                // GAMS.g:1:194: GREATERTHAN
+                {
+                	mGREATERTHAN(); 
+
+                }
+                break;
+            case 32 :
+                // GAMS.g:1:206: STARS
+                {
+                	mSTARS(); 
+
+                }
+                break;
+            case 33 :
+                // GAMS.g:1:212: DOUBLEDOT
+                {
+                	mDOUBLEDOT(); 
+
+                }
+                break;
+            case 34 :
+                // GAMS.g:1:222: Integer
+                {
+                	mInteger(); 
+
+                }
+                break;
+            case 35 :
+                // GAMS.g:1:230: Double
+                {
+                	mDouble(); 
+
+                }
+                break;
+            case 36 :
+                // GAMS.g:1:237: Ident
+                {
+                	mIdent(); 
+
+                }
+                break;
+            case 37 :
+                // GAMS.g:1:243: WHITESPACE
+                {
+                	mWHITESPACE(); 
+
+                }
+                break;
+            case 38 :
+                // GAMS.g:1:254: NEWLINE
+                {
+                	mNEWLINE(); 
+
+                }
+                break;
+            case 39 :
+                // GAMS.g:1:262: Comment
+                {
+                	mComment(); 
+
+                }
+                break;
+            case 40 :
+                // GAMS.g:1:270: NESTED_ML_COMMENT
+                {
+                	mNESTED_ML_COMMENT(); 
+
+                }
+                break;
+            case 41 :
+                // GAMS.g:1:288: L1
+                {
+                	mL1(); 
+
+                }
+                break;
+            case 42 :
+                // GAMS.g:1:291: R1
+                {
+                	mR1(); 
+
+                }
+                break;
+            case 43 :
+                // GAMS.g:1:294: L2
+                {
+                	mL2(); 
+
+                }
+                break;
+            case 44 :
+                // GAMS.g:1:297: R2
+                {
+                	mR2(); 
+
+                }
+                break;
+            case 45 :
+                // GAMS.g:1:300: L3
+                {
+                	mL3(); 
+
+                }
+                break;
+            case 46 :
+                // GAMS.g:1:303: R3
+                {
+                	mR3(); 
+
+                }
+                break;
+            case 47 :
+                // GAMS.g:1:306: DOLLAR
                 {
                 	mDOLLAR(); 
+
+                }
+                break;
+            case 48 :
+                // GAMS.g:1:313: StringInQuotes
+                {
+                	mStringInQuotes(); 
 
                 }
                 break;
@@ -2518,124 +3280,163 @@ public partial class GAMSLexer : Lexer {
     }
 
 
-    protected DFA8 dfa8;
-    protected DFA18 dfa18;
+    protected DFA11 dfa11;
+    protected DFA21 dfa21;
 	private void InitializeCyclicDFAs()
 	{
-	    this.dfa8 = new DFA8(this);
-	    this.dfa18 = new DFA18(this);
+	    this.dfa11 = new DFA11(this);
+	    this.dfa21 = new DFA21(this);
 
 
 	}
 
-    const string DFA8_eotS =
+    const string DFA11_eotS =
         "\x05\uffff";
-    const string DFA8_eofS =
+    const string DFA11_eofS =
         "\x05\uffff";
-    const string DFA8_minS =
+    const string DFA11_minS =
         "\x02\x2e\x03\uffff";
-    const string DFA8_maxS =
+    const string DFA11_maxS =
         "\x01\x39\x01\x65\x03\uffff";
-    const string DFA8_acceptS =
-        "\x02\uffff\x01\x02\x01\x01\x01\x03";
-    const string DFA8_specialS =
+    const string DFA11_acceptS =
+        "\x02\uffff\x01\x02\x01\x03\x01\x01";
+    const string DFA11_specialS =
         "\x05\uffff}>";
-    static readonly string[] DFA8_transitionS = {
+    static readonly string[] DFA11_transitionS = {
             "\x01\x02\x01\uffff\x0a\x01",
-            "\x01\x03\x01\uffff\x0a\x01\x0b\uffff\x01\x04\x1f\uffff\x01"+
-            "\x04",
+            "\x01\x04\x01\uffff\x0a\x01\x0b\uffff\x01\x03\x1f\uffff\x01"+
+            "\x03",
             "",
             "",
             ""
     };
 
-    static readonly short[] DFA8_eot = DFA.UnpackEncodedString(DFA8_eotS);
-    static readonly short[] DFA8_eof = DFA.UnpackEncodedString(DFA8_eofS);
-    static readonly char[] DFA8_min = DFA.UnpackEncodedStringToUnsignedChars(DFA8_minS);
-    static readonly char[] DFA8_max = DFA.UnpackEncodedStringToUnsignedChars(DFA8_maxS);
-    static readonly short[] DFA8_accept = DFA.UnpackEncodedString(DFA8_acceptS);
-    static readonly short[] DFA8_special = DFA.UnpackEncodedString(DFA8_specialS);
-    static readonly short[][] DFA8_transition = DFA.UnpackEncodedStringArray(DFA8_transitionS);
+    static readonly short[] DFA11_eot = DFA.UnpackEncodedString(DFA11_eotS);
+    static readonly short[] DFA11_eof = DFA.UnpackEncodedString(DFA11_eofS);
+    static readonly char[] DFA11_min = DFA.UnpackEncodedStringToUnsignedChars(DFA11_minS);
+    static readonly char[] DFA11_max = DFA.UnpackEncodedStringToUnsignedChars(DFA11_maxS);
+    static readonly short[] DFA11_accept = DFA.UnpackEncodedString(DFA11_acceptS);
+    static readonly short[] DFA11_special = DFA.UnpackEncodedString(DFA11_specialS);
+    static readonly short[][] DFA11_transition = DFA.UnpackEncodedStringArray(DFA11_transitionS);
 
-    protected class DFA8 : DFA
+    protected class DFA11 : DFA
     {
-        public DFA8(BaseRecognizer recognizer)
+        public DFA11(BaseRecognizer recognizer)
         {
             this.recognizer = recognizer;
-            this.decisionNumber = 8;
-            this.eot = DFA8_eot;
-            this.eof = DFA8_eof;
-            this.min = DFA8_min;
-            this.max = DFA8_max;
-            this.accept = DFA8_accept;
-            this.special = DFA8_special;
-            this.transition = DFA8_transition;
+            this.decisionNumber = 11;
+            this.eot = DFA11_eot;
+            this.eof = DFA11_eof;
+            this.min = DFA11_min;
+            this.max = DFA11_max;
+            this.accept = DFA11_accept;
+            this.special = DFA11_special;
+            this.transition = DFA11_transition;
 
         }
 
         override public string Description
         {
-            get { return "224:1: Double : ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent );"; }
+            get { return "322:1: Double : ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent );"; }
         }
 
     }
 
-    const string DFA18_eotS =
-        "\x01\uffff\x02\x0e\x02\uffff\x01\x1c\x03\uffff\x01\x1f\x01\x22"+
-        "\x02\uffff\x01\x23\x03\uffff\x01\x24\x07\uffff\x02\x0e\x0a\uffff"+
-        "\x01\x0e\x01\x28\x01\x29\x02\uffff";
-    const string DFA18_eofS =
-        "\x2a\uffff";
-    const string DFA18_minS =
-        "\x01\x09\x01\x52\x01\x55\x02\uffff\x01\x2e\x03\uffff\x02\x2a\x02"+
-        "\uffff\x01\x2e\x03\uffff\x01\x29\x07\uffff\x02\x4d\x0a\uffff\x01"+
-        "\x4c\x02\x30\x02\uffff";
-    const string DFA18_maxS =
-        "\x01\x7d\x01\x52\x01\x55\x02\uffff\x01\x39\x03\uffff\x01\x2a\x01"+
-        "\x2f\x02\uffff\x01\x65\x03\uffff\x01\x29\x07\uffff\x02\x4d\x0a\uffff"+
-        "\x01\x4c\x02\x7a\x02\uffff";
-    const string DFA18_acceptS =
-        "\x03\uffff\x01\x03\x01\x04\x01\uffff\x01\x06\x01\x07\x01\x08\x02"+
-        "\uffff\x01\x0b\x01\x0c\x01\uffff\x01\x11\x01\x12\x01\x13\x01\uffff"+
-        "\x01\x17\x01\x18\x01\x19\x01\x1a\x01\x1b\x01\x1c\x01\x1d\x02\uffff"+
-        "\x01\x0e\x01\x05\x01\x10\x01\x0d\x01\x09\x01\x14\x01\x15\x01\x0a"+
-        "\x01\x0f\x01\x16\x03\uffff\x01\x02\x01\x01";
-    const string DFA18_specialS =
-        "\x2a\uffff}>";
-    static readonly string[] DFA18_transitionS = {
-            "\x01\x0f\x01\x10\x01\uffff\x01\x0f\x01\x10\x12\uffff\x01\x0f"+
-            "\x03\uffff\x01\x18\x01\x0b\x02\uffff\x01\x11\x01\x12\x01\x09"+
-            "\x01\x06\x01\x0c\x01\x07\x01\x05\x01\x0a\x0a\x0d\x01\uffff\x01"+
-            "\x08\x01\x03\x01\x17\x01\x04\x02\uffff\x05\x0e\x01\x01\x0c\x0e"+
-            "\x01\x02\x07\x0e\x01\x13\x01\uffff\x01\x14\x01\uffff\x01\x0e"+
-            "\x01\uffff\x1a\x0e\x01\x15\x01\uffff\x01\x16",
-            "\x01\x19",
-            "\x01\x1a",
-            "",
-            "",
-            "\x01\x1b\x01\uffff\x0a\x1d",
-            "",
-            "",
-            "",
-            "\x01\x1e",
-            "\x01\x21\x04\uffff\x01\x20",
-            "",
-            "",
-            "\x01\x1d\x01\uffff\x0a\x0d\x0b\uffff\x01\x1d\x1f\uffff\x01"+
-            "\x1d",
-            "",
-            "",
-            "",
+    const string DFA21_eotS =
+        "\x03\uffff\x09\x18\x01\x32\x03\uffff\x01\x35\x01\x38\x02\uffff"+
+        "\x01\x3a\x01\x3d\x01\x3f\x01\x40\x03\uffff\x01\x41\x07\uffff\x05"+
+        "\x18\x01\x47\x08\x18\x11\uffff\x01\x50\x01\x51\x01\x52\x01\x53\x01"+
+        "\x18\x01\uffff\x01\x55\x01\x56\x01\x57\x01\x58\x01\x59\x01\x5a\x02"+
+        "\x18\x04\uffff\x01\x18\x06\uffff\x01\x18\x01\x5f\x01\x18\x01\x61"+
+        "\x01\uffff\x01\x62\x02\uffff";
+    const string DFA21_eofS =
+        "\x63\uffff";
+    const string DFA21_minS =
+        "\x01\x09\x02\uffff\x01\x51\x01\x41\x01\x52\x01\x42\x02\x4f\x01"+
+        "\x41\x01\x4f\x01\x41\x01\x2e\x03\uffff\x02\x2a\x02\uffff\x01\x45"+
+        "\x02\x3d\x01\x2e\x03\uffff\x01\x29\x07\uffff\x01\x55\x01\x50\x01"+
+        "\x4d\x01\x52\x01\x4d\x01\x30\x01\x44\x01\x53\x01\x54\x01\x47\x01"+
+        "\x58\x01\x4e\x01\x57\x01\x4e\x11\uffff\x04\x30\x01\x45\x01\uffff"+
+        "\x06\x30\x01\x45\x01\x48\x04\uffff\x01\x41\x06\uffff\x01\x52\x01"+
+        "\x30\x01\x53\x01\x30\x01\uffff\x01\x30\x02\uffff";
+    const string DFA21_maxS =
+        "\x01\x7d\x02\uffff\x01\x58\x01\x55\x01\x52\x01\x4e\x02\x4f\x01"+
+        "\x49\x01\x4f\x01\x41\x01\x39\x03\uffff\x01\x2a\x01\x2f\x02\uffff"+
+        "\x01\x65\x01\x3e\x01\x3d\x01\x65\x03\uffff\x01\x29\x07\uffff\x01"+
+        "\x55\x01\x50\x01\x4d\x01\x52\x01\x4d\x01\x7a\x01\x44\x01\x53\x01"+
+        "\x54\x01\x47\x01\x58\x01\x4e\x01\x57\x01\x4e\x11\uffff\x04\x7a\x01"+
+        "\x45\x01\uffff\x06\x7a\x01\x45\x01\x48\x04\uffff\x01\x41\x06\uffff"+
+        "\x01\x52\x01\x7a\x01\x53\x01\x7a\x01\uffff\x01\x7a\x02\uffff";
+    const string DFA21_acceptS =
+        "\x01\uffff\x01\x01\x01\x02\x0a\uffff\x01\x12\x01\x13\x01\x14\x02"+
+        "\uffff\x01\x17\x01\x18\x04\uffff\x01\x24\x01\x25\x01\x26\x01\uffff"+
+        "\x01\x2a\x01\x2b\x01\x2c\x01\x2d\x01\x2e\x01\x2f\x01\x30\x0e\uffff"+
+        "\x01\x21\x01\x11\x01\x23\x01\x20\x01\x15\x01\x27\x01\x28\x01\x16"+
+        "\x01\x19\x01\x1d\x01\x1a\x01\x1b\x01\x1e\x01\x1c\x01\x1f\x01\x22"+
+        "\x01\x29\x05\uffff\x01\x05\x08\uffff\x01\x03\x01\x09\x01\x04\x01"+
+        "\x0e\x01\uffff\x01\x06\x01\x08\x01\x07\x01\x0a\x01\x0b\x01\x0c\x04"+
+        "\uffff\x01\x10\x01\uffff\x01\x0d\x01\x0f";
+    const string DFA21_specialS =
+        "\x63\uffff}>";
+    static readonly string[] DFA21_transitionS = {
+            "\x01\x19\x01\x1a\x01\uffff\x01\x19\x01\x1a\x12\uffff\x01\x19"+
+            "\x01\x02\x01\uffff\x01\x01\x01\x21\x01\x12\x01\uffff\x01\x22"+
+            "\x01\x1b\x01\x1c\x01\x10\x01\x0d\x01\x13\x01\x0e\x01\x0c\x01"+
+            "\x11\x0a\x17\x01\uffff\x01\x0f\x01\x15\x01\x14\x01\x16\x02\uffff"+
+            "\x01\x06\x03\x18\x01\x03\x06\x18\x01\x08\x01\x09\x01\x07\x01"+
+            "\x05\x01\x0a\x02\x18\x01\x04\x01\x0b\x06\x18\x01\x1d\x01\uffff"+
+            "\x01\x1e\x01\uffff\x01\x18\x01\uffff\x1a\x18\x01\x1f\x01\uffff"+
             "\x01\x20",
             "",
             "",
+            "\x01\x23\x06\uffff\x01\x24",
+            "\x01\x27\x0f\uffff\x01\x26\x03\uffff\x01\x25",
+            "\x01\x28",
+            "\x01\x2a\x0b\uffff\x01\x29",
+            "\x01\x2b",
+            "\x01\x2c",
+            "\x01\x2d\x07\uffff\x01\x2e",
+            "\x01\x2f",
+            "\x01\x30",
+            "\x01\x31\x01\uffff\x0a\x33",
+            "",
+            "",
+            "",
+            "\x01\x34",
+            "\x01\x37\x04\uffff\x01\x36",
+            "",
+            "",
+            "\x01\x39\x1f\uffff\x01\x39",
+            "\x01\x3c\x01\x3b",
+            "\x01\x3e",
+            "\x01\x33\x01\uffff\x0a\x17\x0b\uffff\x01\x33\x1f\uffff\x01"+
+            "\x33",
+            "",
+            "",
+            "",
+            "\x01\x36",
             "",
             "",
             "",
             "",
             "",
-            "\x01\x25",
-            "\x01\x26",
+            "",
+            "",
+            "\x01\x42",
+            "\x01\x43",
+            "\x01\x44",
+            "\x01\x45",
+            "\x01\x46",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x01\x48",
+            "\x01\x49",
+            "\x01\x4a",
+            "\x01\x4b",
+            "\x01\x4c",
+            "\x01\x4d",
+            "\x01\x4e",
+            "\x01\x4f",
             "",
             "",
             "",
@@ -2646,42 +3447,88 @@ public partial class GAMSLexer : Lexer {
             "",
             "",
             "",
-            "\x01\x27",
-            "\x0a\x0e\x07\uffff\x1a\x0e\x04\uffff\x01\x0e\x01\uffff\x1a"+
-            "\x0e",
-            "\x0a\x0e\x07\uffff\x1a\x0e\x04\uffff\x01\x0e\x01\uffff\x1a"+
-            "\x0e",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x01\x54",
+            "",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x01\x5b",
+            "\x01\x5c",
+            "",
+            "",
+            "",
+            "",
+            "\x01\x5d",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\x01\x5e",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "\x01\x60",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
+            "",
+            "\x0a\x18\x07\uffff\x1a\x18\x04\uffff\x01\x18\x01\uffff\x1a"+
+            "\x18",
             "",
             ""
     };
 
-    static readonly short[] DFA18_eot = DFA.UnpackEncodedString(DFA18_eotS);
-    static readonly short[] DFA18_eof = DFA.UnpackEncodedString(DFA18_eofS);
-    static readonly char[] DFA18_min = DFA.UnpackEncodedStringToUnsignedChars(DFA18_minS);
-    static readonly char[] DFA18_max = DFA.UnpackEncodedStringToUnsignedChars(DFA18_maxS);
-    static readonly short[] DFA18_accept = DFA.UnpackEncodedString(DFA18_acceptS);
-    static readonly short[] DFA18_special = DFA.UnpackEncodedString(DFA18_specialS);
-    static readonly short[][] DFA18_transition = DFA.UnpackEncodedStringArray(DFA18_transitionS);
+    static readonly short[] DFA21_eot = DFA.UnpackEncodedString(DFA21_eotS);
+    static readonly short[] DFA21_eof = DFA.UnpackEncodedString(DFA21_eofS);
+    static readonly char[] DFA21_min = DFA.UnpackEncodedStringToUnsignedChars(DFA21_minS);
+    static readonly char[] DFA21_max = DFA.UnpackEncodedStringToUnsignedChars(DFA21_maxS);
+    static readonly short[] DFA21_accept = DFA.UnpackEncodedString(DFA21_acceptS);
+    static readonly short[] DFA21_special = DFA.UnpackEncodedString(DFA21_specialS);
+    static readonly short[][] DFA21_transition = DFA.UnpackEncodedStringArray(DFA21_transitionS);
 
-    protected class DFA18 : DFA
+    protected class DFA21 : DFA
     {
-        public DFA18(BaseRecognizer recognizer)
+        public DFA21(BaseRecognizer recognizer)
         {
             this.recognizer = recognizer;
-            this.decisionNumber = 18;
-            this.eot = DFA18_eot;
-            this.eof = DFA18_eof;
-            this.min = DFA18_min;
-            this.max = DFA18_max;
-            this.accept = DFA18_accept;
-            this.special = DFA18_special;
-            this.transition = DFA18_transition;
+            this.decisionNumber = 21;
+            this.eot = DFA21_eot;
+            this.eof = DFA21_eof;
+            this.min = DFA21_min;
+            this.max = DFA21_max;
+            this.accept = DFA21_accept;
+            this.special = DFA21_special;
+            this.transition = DFA21_transition;
 
         }
 
         override public string Description
         {
-            get { return "1:1: Tokens : ( FRML | SUM | LB | RB | DOT | PLUS | MINUS | SEMI | MULT | DIV | MOD | COMMA | STARS | DOUBLEDOT | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT | L1 | R1 | L2 | R2 | L3 | R3 | EQUAL | DOLLAR );"; }
+            get { return "1:1: Tokens : ( COMMENT1 | COMMENT2 | EQU | SUM | OR | AND | NOT | ABS | EXP | LOG | MAX | MIN | POWER | SQR | SAMEAS | TANH | DOT | PLUS | MINUS | SEMI | MULT | DIV | MOD | COMMA | EEQUAL | NONEQUAL | LESSTHANOREQUAL | GREATERTHANOREQUAL | EQUAL | LESSTHAN | GREATERTHAN | STARS | DOUBLEDOT | Integer | Double | Ident | WHITESPACE | NEWLINE | Comment | NESTED_ML_COMMENT | L1 | R1 | L2 | R2 | L3 | R3 | DOLLAR | StringInQuotes );"; }
         }
 
     }

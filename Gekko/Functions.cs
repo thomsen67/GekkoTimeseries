@@ -2504,6 +2504,7 @@ namespace Gekko
                         m2.data[i, j] = Math.Abs(m.data[i, j]);
                     }
                 }
+                rv = m2;
             }
             else
             {
@@ -2749,12 +2750,47 @@ namespace Gekko
                         m2.data[i, j] = Math.Log(m.data[i, j]);
                     }
                 }
+                rv = m2;
             }
             else
             {
                 string s = null;
                 if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
                 new Error("log(): type " + x1.Type().ToString() + " not supported" + s);
+            }
+            return rv;
+        }
+
+        public static IVariable tanh(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
+        {
+            if (G.IsGekkoNull(x1)) return x1;
+            IVariable rv = null;
+            if (x1.Type() == EVariableType.Val)
+            {
+                rv = new ScalarVal(Math.Tanh(x1.ConvertToVal()));
+            }
+            else if (x1.Type() == EVariableType.Series)
+            {
+                return Series.ArithmeticsSeries(smpl, x1 as Series, Globals.arithmentics1[8]); // (x1) => Math.Tanh(x1);
+            }
+            else if (x1.Type() == EVariableType.Matrix)
+            {
+                Matrix m = O.ConvertToMatrix(x1);
+                Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
+                for (int i = 0; i < m.data.GetLength(0); i++)
+                {
+                    for (int j = 0; j < m.data.GetLength(1); j++)
+                    {
+                        m2.data[i, j] = Math.Tanh(m.data[i, j]);
+                    }
+                }
+                rv = m2;
+            }
+            else
+            {
+                string s = null;
+                if (x1.Type() == EVariableType.String) s += ". " + Globals.stringConversionNote;
+                new Error("tanh(): type " + x1.Type().ToString() + " not supported" + s);
             }
             return rv;
         }
@@ -2783,6 +2819,7 @@ namespace Gekko
                         m2.data[i, j] = Math.Exp(m.data[i, j]);
                     }
                 }
+                rv = m2;
             }
             else
             {
