@@ -37,15 +37,16 @@ namespace Gekko
             GAMSParser.expr_return r = null;
             DateTime t0 = DateTime.Now;
 
+            bool print = true;
+            ASTNodeGAMS root = new ASTNodeGAMS(null);
+
             try
             {
                 r = parser.expr();
 
                 errors = parser.GetErrors();
                 t = (CommonTree)r.Tree;
-
-                bool print = false;
-                ASTNodeGAMS root = new ASTNodeGAMS(null);
+                
                 CreateASTNodesForGAMS(t, root, 0, tokens, print);
 
                 if (errors.Count > 0)
@@ -54,11 +55,14 @@ namespace Gekko
                     new Warning("GAMS parse error");
                 }
             }
-            catch
+            catch (Exception e)
             {
                 new Writeln(textInput);
                 new Warning("GAMS other error");
             }
+
+            WalkHelper wh = new WalkHelper();
+            WalkASTAndEmit(root, 0, wh);
             
             return;
         }
@@ -118,6 +122,56 @@ namespace Gekko
             }
         }
 
+        public class WalkHelper
+        {
+
+        }
+
+        public static void WalkASTAndEmit(ASTNodeGAMS node, int depth, WalkHelper wh)
+        {
+
+            WalkASTAndEmitBefore(node, wh);
+
+            foreach (ASTNodeGAMS child in node.ChildrenIterator())
+            {
+                WalkASTAndEmit(child, depth + 1, wh);
+            }
+            
+            WalkASTAndEmitAfter(node, wh);
+
+        }
+
+        private static void WalkASTAndEmitBefore(ASTNodeGAMS node, WalkHelper wh)
+        {
+            //Before sub-nodes
+            switch (node.Text)
+            {
+
+                case "XXXXXXX":
+                    {
+                        //w.wh.seriesHelper = WalkHelper.seriesType.SeriesLhs;
+                    }
+                    break;
+            }
+        }
+
+        private static void WalkASTAndEmitAfter(ASTNodeGAMS node, WalkHelper wh)
+        {
+            switch (node.Text)
+            {
+                case "+":
+                    {
+                        node.Code.CA("GAMS.Add(" + node[0].Code + ", " + node[1].Code + ")");
+                    }
+                    break;
+                case "-":
+                    {
+                        node.Code.CA("GAMS.Subtract(" + node[0].Code + ", " + node[1].Code + ")");
+                    }
+                    break;
+            }
+        }
+
         public class ASTNodeGAMS
         {
             /// <summary>
@@ -127,6 +181,8 @@ namespace Gekko
             
             private List<ASTNodeGAMS> children = null; //private so that the implementation might change (for instance LinkedList etc.)                                                                           
             public Parser.Gek.GekkoSB Code = new Parser.Gek.GekkoSB(); //the C# code produced while walking the tree                        
+            public Parser.Gek.GekkoSB Gekko = new Parser.Gek.GekkoSB(); //the Gekko code produced while walking the tree                        
+            public Parser.Gek.GekkoSB GAMS = new Parser.Gek.GekkoSB(); //the unfolded GAMS code produced while walking the tree                        
             public ASTNodeGAMS Parent = null;
             public string Text = null;  //ANTLR decoration of the node (for instance 'ASTPRT' or '1.45').        
             public int Line = 0;
@@ -148,7 +204,6 @@ namespace Gekko
             {
                 this.children.RemoveAt(this.children.Count - 1);
             }
-
 
             public ASTNodeGAMS GetChild(string s)
             {
