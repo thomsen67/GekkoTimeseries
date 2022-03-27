@@ -62,7 +62,8 @@ namespace Gekko
             }
 
             WalkHelper wh = new WalkHelper();
-            WalkASTAndEmit(root, 0, wh);
+            Controlled controlled = new Controlled();
+            WalkASTAndEmit(root, 0, wh, controlled);
             
             return;
         }
@@ -124,24 +125,30 @@ namespace Gekko
 
         public class WalkHelper
         {
-
+            
         }
 
-        public static void WalkASTAndEmit(ASTNodeGAMS node, int depth, WalkHelper wh)
+        public static void WalkASTAndEmit(ASTNodeGAMS node, int depth, WalkHelper wh, Controlled controlled)
         {
+            WalkASTAndEmitBefore(node, wh, controlled);
 
-            WalkASTAndEmitBefore(node, wh);
+            if (false)
+            {
+                controlled = controlled.Clone();
+                controlled.names.Add("a");
+                controlled.elements.Add("55");
+            }
 
             foreach (ASTNodeGAMS child in node.ChildrenIterator())
             {
-                WalkASTAndEmit(child, depth + 1, wh);
+                WalkASTAndEmit(child, depth + 1, wh, controlled);
             }
             
-            WalkASTAndEmitAfter(node, wh);
+            WalkASTAndEmitAfter(node, wh, controlled);
 
         }
 
-        private static void WalkASTAndEmitBefore(ASTNodeGAMS node, WalkHelper wh)
+        private static void WalkASTAndEmitBefore(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
         {
             //Before sub-nodes
             switch (node.Text)
@@ -155,18 +162,22 @@ namespace Gekko
             }
         }
 
-        private static void WalkASTAndEmitAfter(ASTNodeGAMS node, WalkHelper wh)
+        private static void WalkASTAndEmitAfter(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
         {
             switch (node.Text)
             {
                 case "+":
                     {
-                        node.Code.CA("GAMS.Add(" + node[0].Code + ", " + node[1].Code + ")");
+                        node.Code.A("GAMS.Add(" + node[0].Code + ", " + node[1].Code + ")");
+                        node.GAMS.A(node[0].Code + "+" + node[1].Code);
+                        node.Gekko.A(node[0].Code + "+" + node[1].Code);
                     }
                     break;
                 case "-":
                     {
                         node.Code.CA("GAMS.Subtract(" + node[0].Code + ", " + node[1].Code + ")");
+                        node.GAMS.A(node[0].Code + "-" + node[1].Code);
+                        node.Gekko.A(node[0].Code + "-" + node[1].Code);
                     }
                     break;
             }
