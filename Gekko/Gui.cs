@@ -324,7 +324,8 @@ namespace Gekko
             if (Globals.gekkoVersion == "3.1.12" || Globals.gekkoVersion == "3.1.13" || Globals.gekkoVersion == "3.1.14")
             {
                 using (Note note = new Note())
-                    {
+                {
+
                     note.MainAdd("Breaking change: from Gekko 3.1.13 on, collapsing/aggregating from daily frequency to lower frequencies is strict, ");
                     note.MainAdd("implying that missing values (missing days) will result in missing values in the collapsed series. ");
                     note.MainAdd("See the link for more explanation and options to circumvent the change ");
@@ -339,8 +340,8 @@ namespace Gekko
                     note.MoreAdd("To remedy this quickly, just set 'option collapse missing d = flex;' and your programs should run like before");
                     note.MoreAdd("(or alternatively use the local option COLLAPSE <missing=flex>).");
                     note.MoreNewLine();
-                    note.MoreAdd("Regarding mixed mode, this is the most general mode, and the change should have no concequences for existing Gekko 3.x programs.");                    
-                    note.MoreAdd("Per default, the status bar at the bottom of the main window is now yellow because of this change.");                    
+                    note.MoreAdd("Regarding mixed mode, this is the most general mode, and the change should have no concequences for existing Gekko 3.x programs.");
+                    note.MoreAdd("Per default, the status bar at the bottom of the main window is now yellow because of this change.");
                     note.MoreAdd("Gekko has three {a{modes¤mode.htm}a}: mixed-mode (the most general), data-mode (for data management), and sim-mode (for modeling).");
                     note.MoreAdd("The most particular of these three modes is sim-mode, where you must use {a{CREATE¤create.htm}a} to define a non-model timeseries,");
                     note.MoreAdd("and where databank searching is deactivated. The other two modes are more similar, and the differences between data-mode and mixed-mode");

@@ -12,13 +12,12 @@ namespace Gekko
     /// </summary>
     public class WrapHelper5
     {
-        public int linesAtStart = 1;
+        public int linesAtStart = 1;  //see also the method MainOmitVeryFirstNewLine()
         public List<string> storage = new List<string>();
         public string consolidated = null;
 
         public WrapHelper5()
         {
-
         }
 
         public WrapHelper5(int linesAtStart)
@@ -83,6 +82,16 @@ namespace Gekko
         public void MainNewLine()
         {
             this.storageMain.Add(new WrapHelper5());
+        }
+
+        /// <summary>
+        /// Remove starting line before the first section of 
+        /// </summary>
+        public void MainOmitVeryFirstNewLine()
+        {
+            WrapHelper5 wh = null;
+            if (this.storageMain != null && this.storageMain.Count > 0) wh = this.storageMain[0];
+            wh.linesAtStart = 0;
         }
 
         /// <summary>
@@ -501,16 +510,6 @@ namespace Gekko
             if (throwExceptionForError == false) this.ThrowNoException();
             this.Exe1();
         }
-
-        ///// <summary>
-        ///// Do not use this normally: this is for a few special cases. Calling this method means that the error is shown immediately, as if it was just printed, and no further
-        ///// actions were taken (including throwing an execption). 
-        ///// </summary>
-        //public void ShowImmediatelyAndDoNotThrowException()
-        //{
-
-        //}
-
     }
 
     /// <summary>
@@ -612,7 +611,7 @@ namespace Gekko
             Helper(indent, lineWidth, color, mustAlsoWriteToScreen, tab);
             this.MainAdd(s);
             this.Exe1();
-        }
+        }        
 
         private void Helper(string indent, int lineWidth, Color color, bool mustAlsoWriteToScreen, ETabs tab)
         {
@@ -622,7 +621,7 @@ namespace Gekko
             this.tab = tab;
             this.mustAlsoPrintToScreen = mustAlsoWriteToScreen;
         }
-    }
+    }    
 }
 
 

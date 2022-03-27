@@ -99,10 +99,14 @@ namespace Gekko
             }
 
             if (print)
-            {
+            {                
                 int length = 0;
                 if (cmdNode.leftBlanks != null) length = cmdNode.leftBlanks.Length;
-                new Writeln("|" + G.Blanks(depth * 2) + cmdNode.Text + "     [" + length + "]");
+                using (Writeln text = new Writeln())
+                {
+                    text.MainAdd("|" + G.Blanks(depth * 2) + cmdNode.Text + "     [" + length + "]");
+                    text.MainOmitVeryFirstNewLine();
+                }
             }
 
             if (ast.Children == null)
