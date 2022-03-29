@@ -567,9 +567,13 @@ namespace Gekko
                 
         public static bool doNotSaveUserSettings = false; 
 
-        public static string ols1 = "OLS estimation";
-        public static string ols2 = "Dep. variable = ";
-                
+        public const string ols1 = "OLS estimation";
+        public const string ols2 = "Dep. variable = ";
+        public const string ols3a = "R2:";
+        public const string ols3b = "SEE:";
+        public const string ols3c = "DW:";
+
+
         public static string compilerOptions32 = "/optimize /platform:x86";  //does this mean it runs under WoW on a 64-bit machine?
         public static string compilerOptions64 = "/optimize /platform:x64";
         

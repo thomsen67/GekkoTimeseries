@@ -154,8 +154,9 @@ namespace Gekko
 
         private static void WalkASTAndEmitBefore(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
         {
+            
             //Before sub-nodes
-            switch (node.Text)
+            switch (node.Text?.ToUpper())
             {
 
                 case "XXXXXXX":
@@ -168,25 +169,195 @@ namespace Gekko
 
         private static void WalkASTAndEmitAfter(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
         {
-            switch (node.Text)
+            switch (node.Text?.ToUpper())
             {
+                
+                case "ASTEQU":
+                    {
+                    }
+                    break;
+                case "ASTVARWI":
+                    {
+                        if (node.Parent.Text == "ASTEQU1")
+                        {
+                            List<string> sets = new List<string>();
+                            //equation definition, defining sets that the eq is looping over
+                            string eqName = node[1].Text;  //[2] is not used here
+                            ASTNodeGAMS child = node?[3]?[0]?[1]?[1];
+                            if (child != null && child.ChildrenCount() > 0)
+                            {
+                                //the equation has indexes (controlled sets)
+                                foreach (ASTNodeGAMS child2 in child.ChildrenIterator())
+                                {
+                                    if (child2.ChildrenCount() != 1)
+                                    {
+                                        new Error("In equation '" + eqName + "': expected simple all controlled sets to be simple names");
+                                    }
+                                    string s = child2?[0].Text;
+                                    if (G.IsIdent(s))
+                                    {
+                                        sets.Add(s);
+                                    }
+                                    else
+                                    {
+                                        new Error("Expected simple set name, not this: " + s);
+                                    }
+                                }
+                            }
+                            ASTNodeGAMS childDollar = node?[4]?[0]?[1];
+
+                            //Imagine we have e1[i, j] $ (i0(i) and (i.val > 30 or j.val > 40)) .. 
+                            //The logical values are backed up, resulting into for instance
+                            //true and (false or true)
+
+
+                            //maybe get this as C# code, depending on i and j sets and returning true/false.
+                            //from List<string>sets, we can get the combinations of i and j elements.
+
+
+                        }
+                        else
+                        {
+                            //defining a variable or parameter (or even set condition like tx0(t))
+                        }
+                    }
+                    break;
+                case "ASTIDX":
+                    {
+                    }
+                    break;
+                case "ASTIDXELEMENTS":
+                    {
+                    }
+                    break;
+                case "ASTVARIABLEANDLEAD":
+                    {
+                        if (node.ChildrenCount() > 1)
+                        {
+                            //x[a+1], x[a-1]
+                            //control...
+                        }
+                        else
+                        {
+                            if (node.Text.StartsWith("'") || node.Text.StartsWith("\""))
+                            {
+                                //x['a'], x["a"]
+                                node.Code.A(node.Text.Substring(1, node.Text.Length - 2));
+                            }
+                            else
+                            {
+                                //control...
+                            }                            
+                        }
+                    }
+                    break;
+                case "ASTCONDITIONAL":
+                    {
+                    }
+                    break;
+                case "OR":
+                    {
+                    }
+                    break;
+                case "AND":
+                    {
+                    }
+                    break;
+                case "NOT":
+                    {
+                    }
+                    break;
+                case "NONEQUAL":
+                    {
+                    }
+                    break;
+                case "LESSTHANOREQUAL":
+                    {
+                    }
+                    break;
+                case "GREATERTHANOREQUAL":
+                    {
+                    }
+                    break;
+                case "EQUAL":
+                    {
+                    }
+                    break;
+                case "LESSTHAN":
+                    {
+                    }
+                    break;
+                case "GREATERTHAN":
+                    {
+                    }
+                    break;
                 case "+":
                     {
-                        node.Code.A("GAMS.Add(" + node[0].Code + ", " + node[1].Code + ")");
-                        node.GAMS.A(node[0].Code + "+" + node[1].Code);
-                        node.Gekko.A(node[0].Code + "+" + node[1].Code);
+                        //node.Code.A("GAMS.Add(" + node[0].Code + ", " + node[1].Code + ")");
+                        //node.GAMS.A(node[0].Code + "+" + node[1].Code);
+                        //node.Gekko.A(node[0].Code + "+" + node[1].Code);
                     }
                     break;
                 case "-":
                     {
-                        node.Code.CA("GAMS.Subtract(" + node[0].Code + ", " + node[1].Code + ")");
-                        node.GAMS.A(node[0].Code + "-" + node[1].Code);
-                        node.Gekko.A(node[0].Code + "-" + node[1].Code);
                     }
                     break;
+                case "*":
+                    {
+                    }
+                    break;
+                case "/":
+                    {
+                    }
+                    break;
+                case "**":
+                    {
+                    }
+                    break;
+                case "NEGATE":
+                    {
+                    }
+                    break;
+                case "ASTDOLLAREXPRESSION":
+                    {
+                    }
+                    break;
+                case "ASTEXPRESSION1":
+                    {
+                    }
+                    break;
+                case "ASTEXPRESSION2":
+                    {
+                    }
+                    break;
+                case "ASTEXPRESSION3":
+                    {
+                    }
+                    break;
+                case "ASTVALUE":
+                    {
+                    }
+                    break;
+                case "ASTFUNCTION":
+                    {
+                    }
+                    break;
+                case "ASTFUNCTIONELEMENTS":
+                    {
+                    }
+                    break;
+                case "ASTSUM":
+                    {
+                    }
+                    break;
+                case "ASTSUMCONTROLLED":
+                    {
+                    }
+                    break;
+
             }
         }
-
+    
         public class ASTNodeGAMS
         {
             /// <summary>

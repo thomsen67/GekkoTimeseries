@@ -880,7 +880,7 @@ namespace Gekko
 
         private static string OLSFormatHelper(OLSResults ols)
         {
-            return "R2: " + Math.Round(ols.r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + Program.RoundToSignificantDigits(ols.see, 6) + "    " + "DW: " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero);
+            return Globals.ols3a + " " + Math.Round(ols.r2, 6, MidpointRounding.AwayFromZero) + "    " + Globals.ols3b + " " + Program.RoundToSignificantDigits(ols.see, 6) + "    " + Globals.ols3c + " " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero);
         }
 
         private static OLSResults OLSHelper(GekkoTime t1, GekkoTime t2, double[] y, double[,] x, double[,] xOriginal, double[,] restrict_input, double[] scaling, int n, int m, int k, int df, bool calledFromRecursive)

@@ -259,7 +259,7 @@ namespace Gekko
                     vars = new List<string> { "FY", "FCB", "PCB_LA", "FCH", "PCH_LA", "FCQ", "PCQ_LA", "PCOV_LA", "FCOV", "PCOW_LA", "FCOW", "PIOV_LA", "FIOV", "FIPMXE", "PIPMXE_LA", "FIY", "PIY_LA", "FIEM", "PIEM_LA", "FIH", "PIH_LA", "FMY", "PMY_LA", "PY_LA" };
                 }
                 else
-                {                    
+                {
                     vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon", "phk2", "phk3", "JNTPPIK" };  //phk2 is t-type, phk3 is p-type and JNTPPIK is y-type. The y-type is not shown
                 }
                 Globals.browserLimit = false;  //for safety
@@ -317,60 +317,44 @@ namespace Gekko
             GekkoDictionary<string, List<string>> est2 = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             string est = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + settings_est_filename);
             List<string> lines = Stringlist.ExtractLinesFromText(est);
-            int listI = -12345;
+
             for (int i = 0; i < lines.Count; i++)
             {
+                //must be first
                 if (lines[i].Trim().StartsWith(Globals.ols1))
                 {
-                    if (listI != -12345)
+                    int fat = 5;
+                    var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                    var tags2 = new List<string>() { "//" };
+                    string depLine = lines[i + 1].Trim();
+                    depLine = depLine.Replace(Globals.ols2, "").Trim();
+                    List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
+                    string varLine = BrowserGetVariable(a);
+
+                    List<string> olsLines = new List<string>();
+                    for (int j = i; j < lines.Count; j++)
                     {
-
-                        int fat = 5;
-                        var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
-                        var tags2 = new List<string>() { "//" };
-                        string depLine = lines[listI + 1].Trim();
-                        depLine = depLine.Replace(Globals.ols2, "").Trim();
-                        List<TokenHelper> a = StringTokenizer.GetTokensWithLeftBlanks(depLine, fat, tags1, tags2, null, null).storage;
-
-                        string varLine = null;
-                        for (int i2 = 0; i2 < a.Count; i2++)
+                        olsLines.Add(lines[j]);
+                        if (lines[j].Contains(Globals.ols3a) && lines[j].Contains(Globals.ols3b) && lines[j].Contains(Globals.ols3c))
                         {
-                            if (a[i2].type == ETokenType.Word)
+                            if (est2.ContainsKey(varLine))
                             {
-                                if (i2 - 1 >= 0 && a[i2].leftblanks == 0 && (a[i2 - 1].s == Globals.symbolCollection.ToString() || a[i2 - 1].s == Globals.symbolScalar.ToString()))
-                                {
-                                    //skip a #x or %x                                 }
-                                    continue;
-                                }
-                                if (a[i2 + 1].s == "(")
-                                {
-                                    //function call, skip it
-                                    continue;
-                                }
-                                varLine = a[i2].s;
-                                break;
+                                List<string> lines2 = est2[varLine];
+                                lines2.Add("");
+                                lines2.AddRange(olsLines);
                             }
-                        }
+                            else
+                            {
+                                est2.Add(varLine, olsLines);
+                            }
 
-                        List<string> xx = new List<string>();
-                        for (int ii = listI; ii < i; ii++)
-                        {
-                            xx.Add(lines[ii]);
-                        }
-                        if (est2.ContainsKey(varLine))
-                        {
-                            List<string> lines2 = est2[varLine];
-                            lines2.Add("");
-                            lines2.AddRange(xx);
-                        }
-                        else
-                        {
-                            est2.Add(varLine, xx);
+                            i = j;  //then i will start at j+1 next time
+                            break;
                         }
                     }
-                    listI = i;
                 }
             }
+
 
             string modelFrequencyString = GetModelFreq(vars);
             Program.options.freq = G.ConvertFreq(modelFrequencyString); //sets global freq
@@ -652,7 +636,7 @@ namespace Gekko
                 sb3.AppendLine(bank1 + G.Blanks(30 - bank1.Length + gap) + extra + bank2);
                 sb3.AppendLine();
                 sb3.AppendLine("Period" + extra + "        value        %  " + G.Blanks(gap) + "Period" + extra + "        value        %  ");
-                int counter6 = 0;                
+                int counter6 = 0;
                 foreach (GekkoTime gt in new GekkoTimeIterator(GekkoTime.ConvertFreqsFirst(G.ConvertFreq(modelFrequencyString), print_start, null), GekkoTime.ConvertFreqsLast(G.ConvertFreq(modelFrequencyString), print_end)))
                 {
                     counter6++;
@@ -955,6 +939,31 @@ namespace Gekko
 
             G.Writeln2("End of html browser generation, " + G.Seconds(dt0));
 
+        }
+
+        private static string BrowserGetVariable(List<TokenHelper> a)
+        {
+            string varLine = null;
+            for (int i2 = 0; i2 < a.Count; i2++)
+            {
+                if (a[i2].type == ETokenType.Word)
+                {
+                    if (i2 - 1 >= 0 && a[i2].leftblanks == 0 && (a[i2 - 1].s == Globals.symbolCollection.ToString() || a[i2 - 1].s == Globals.symbolScalar.ToString()))
+                    {
+                        //skip a #x or %x                                 }
+                        continue;
+                    }
+                    if (a[i2 + 1].s == "(")
+                    {
+                        //function call, skip it
+                        continue;
+                    }
+                    varLine = a[i2].s;
+                    break;
+                }
+            }
+
+            return varLine;
         }
 
         /// <summary>
@@ -1354,7 +1363,7 @@ namespace Gekko
                             }
                             else
                             {
-                                
+
                             }
                         }
                     }
@@ -1403,13 +1412,13 @@ namespace Gekko
             sb.AppendLine("<p><font color=\"#009933\">" + s + "</font></p>");
         }
 
-        
+
         private static void BrowserWritePrintLine(Series ts, StringBuilder sb3, GekkoTime gt)
         {
             //freq location
             //if (Program.options.freq == EFreq.A) sb3.Append((gt.super) + " ");
             //else sb3.Append(gt.super + ts.freq.ToString() + gt.sub + " ");
-            sb3.Append(gt.ToString() + " ");            
+            sb3.Append(gt.ToString() + " ");
 
             double n1 = ts.GetDataSimple(gt);
             double n0 = ts.GetDataSimple(gt.Add(-1));
@@ -1446,7 +1455,7 @@ namespace Gekko
             int widthRemember = -12345;
             if (!html)
             {
-                widthRemember = Program.options.print_width;                
+                widthRemember = Program.options.print_width;
                 Program.options.print_width = int.MaxValue;
             }
             try
@@ -1509,14 +1518,9 @@ namespace Gekko
                 if (!html)
                 {
                     //resetting, also if there is an error
-                    Program.options.print_width = widthRemember;                    
+                    Program.options.print_width = widthRemember;
                 }
             }
         }
-
-
-
-
-
     }
 }
