@@ -171,6 +171,8 @@ namespace Gekko
     {
         public static void ParserGAMSCreateASTHelper(string textInput)
         {
+            DateTime dt0 = DateTime.Now;
+            new Writeln("111");
             List<string> lines = Stringlist.ExtractLinesFromText(textInput);
             StringBuilder sb = new StringBuilder();
             foreach (string line in lines)
@@ -179,6 +181,7 @@ namespace Gekko
                 else sb.AppendLine(line);
             }
             string textInput2 = sb.ToString();
+            new Writeln("222 " + G.Seconds(dt0));
 
             ANTLRStringStream input = new ANTLRStringStream(textInput2 + "\n");  //a newline for ease of use of ANTLR
 
@@ -195,17 +198,21 @@ namespace Gekko
             GAMSParser.expr_return r = null;
             DateTime t0 = DateTime.Now;
 
-            bool print = true;
+            bool print = false;
             ASTNodeGAMS root = new ASTNodeGAMS(null);
 
             try
             {
                 r = parser.expr();
 
+                new Writeln("333 " + G.Seconds(dt0));
+
                 errors = parser.GetErrors();
                 t = (CommonTree)r.Tree;
 
                 CreateASTNodesForGAMS(t, root, 0, tokens, print);
+
+                new Writeln("444 " + G.Seconds(dt0));
 
                 if (errors.Count > 0)
                 {
@@ -516,9 +523,9 @@ namespace Gekko
 
         public static void Xxx()
         {
-            if(true)
+            if (true)
             {
-                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\test.gms";
+                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
                 string s = Program.GetTextFromFileWithWait(file);
                 ParserGAMSCreateASTHelper(s);
             }
