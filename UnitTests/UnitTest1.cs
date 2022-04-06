@@ -14899,11 +14899,11 @@ namespace UnitTests
                 I("time 2015 2018;");
                 Globals.unitTestScreenOutput.Clear();
                 I("disp qy;");
-                //faktisk forkert oversat, GAMS eq er dette: qY[s,t] = sum(d$d1IOy[d,s,t], vIO_y[d,s,t]/pIO_y[d,s,t]);
+                //faktisk forkert oversat, GAMS eq er dette: qY[s,t] =e= sum(d$d1IOy[d,s,t], vIO_y[d,s,t]/pIO_y[d,s,t]);
                 //så det skal ikke være qY[#s] = sum(#d$(d1IOy[#d,#s])[#d,#s], vIO_y[#d,#s]/pIO_y[#d,#s])
                 //men qY[#s] = sum(#d$(d1IOy[#d,#s]), vIO_y[#d,#s]/pIO_y[#d,#s])
                 string s = Globals.unitTestScreenOutput.ToString();
-                Assert.IsTrue(s.Contains("qY[#s] = sum(d$(d1IOy[#d,#s])[#d,#s], vIO_y[#d,#s]/pIO_y[#d,#s]);"));
+                Assert.IsTrue(s.Contains("qY[#s] = sum(#d$(d1IOy[#d,#s])[#d,#s], vIO_y[#d,#s]/pIO_y[#d,#s]);"));
             }
         }
 

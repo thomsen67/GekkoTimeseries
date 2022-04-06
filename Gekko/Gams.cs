@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,16 +10,165 @@ using System.Drawing;
 using GAMS;
 using ProtoBuf;
 using ProtoBuf.Meta;
-using System.Text.RegularExpressions;
 using Antlr.Runtime;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime.Debug;
 using System.Collections;
+using System.Windows.Forms;
 
 namespace Gekko
 {
+    public class ASTNodeGAMS
+    {
+        /// <summary>
+        /// See comments for very similar and more complicated ASTNode class for .gcm file reading.
+        /// </summary>
+        /// <returns></returns>
+
+        private List<ASTNodeGAMS> children = null; //private so that the implementation might change (for instance LinkedList etc.)
+        public Parser.Gek.GekkoSB Code = new Parser.Gek.GekkoSB(); //the C# code produced while walking the tree
+        public Parser.Gek.GekkoSB Gekko = new Parser.Gek.GekkoSB(); //the Gekko code produced while walking the tree
+        public Parser.Gek.GekkoSB GAMS = new Parser.Gek.GekkoSB(); //the unfolded GAMS code produced while walking the tree
+        public ASTNodeGAMS Parent = null;
+        public string Text = null;  //ANTLR decoration of the node (for instance 'ASTPRT' or '1.45').
+        public int Line = 0;
+        public int Number = 0;  //used to check position among siblings
+        public string leftBlanks = null;
+
+        public IEnumerable ChildrenIterator()
+        {
+            if (this.children != null)
+            {
+                foreach (ASTNodeGAMS child in this.children)
+                {
+                    yield return child;
+                }
+            }
+        }
+
+        public void RemoveLast()
+        {
+            this.children.RemoveAt(this.children.Count - 1);
+        }
+
+        public ASTNodeGAMS GetChild(string s)
+        {
+            foreach (ASTNodeGAMS child in this.ChildrenIterator())
+            {
+                if (child.Text == s) return child;
+            }
+            return null;
+        }
+
+        public ASTNodeGAMS this[int i]
+        {
+            get
+            {
+                return this.GetChild(i);
+            }
+            set
+            {
+                this.children[i] = value;
+            }
+        }
+
+        public int ChildrenCount()
+        {
+            if (children == null) return 0;
+            return children.Count;
+        }
+
+        //Gets the C# code of child i.
+        public Parser.Gek.GekkoSB GetChildCode(int i)
+        {
+            ASTNodeGAMS child = this.GetChild(i);
+            if (child == null)
+            {
+                Parser.Gek.GekkoSB xx = new Parser.Gek.GekkoSB();
+                return xx;
+            }
+            else return child.Code;
+        }
+
+        //Prepares an AST node to have children
+        public void CreateChildren(int n)
+        {
+            this.children = new List<ASTNodeGAMS>(n);
+        }
+
+        public bool IsLastChild()
+        {
+            if (this.Parent == null) return true;
+            if (this.Number == this.Parent.ChildrenCount() - 1) return true;  //should not be possible to be >
+            return false;
+        }
+
+        public bool IsFirstChild()
+        {
+            if (this.Parent == null) return true;
+            if (this.Number == 0) return true;
+            return false;
+        }
+
+        //Sets the text of the AST node
+        public ASTNodeGAMS(string text)
+        {
+            this.Text = text;
+        }
+
+        //Sets the text of the AST node
+        public ASTNodeGAMS(string text, string leftBlanks)
+        {
+            this.Text = text;
+            this.leftBlanks = leftBlanks;
+        }
+
+        //Sets the text of the AST node, and augments with children.
+        public ASTNodeGAMS(string text, bool withChildren)
+        {
+            this.Text = text;
+            if (withChildren)
+            {
+                this.children = new List<ASTNodeGAMS>();
+            }
+        }
+
+        public ASTNodeGAMS GetChild(int i)
+        {
+            if (this.children == null) return null;
+            if (i >= this.children.Count) return null;  //does not exist
+            return this.children[i];
+        }
+
+        public void Add(ASTNodeGAMS child)
+        {
+            this.children.Add(child);
+            child.Parent = this;
+            child.Number = children.Count - 1;
+        }
+
+        public string ToString()
+        {
+            return this.Text;
+        }
+
+        public void PrintAST2(ASTNodeGAMS node, int depth)
+        {
+            G.Writeln(G.Blanks(depth * 2) + node.Text);
+            if (node.children != null)
+            {
+                for (int i = 0; i < node.children.Count; ++i)
+                {
+                    ASTNodeGAMS child = (ASTNodeGAMS)(node.children[i]);
+                    PrintAST2(child, depth + 1);
+                }
+            }
+        }
+    }
+
     public static class GamsModel
     {
+
         public static void ParserGAMSCreateASTHelper(string textInput)
         {
 
@@ -208,7 +357,7 @@ namespace Gekko
                             }
                             ASTNodeGAMS childDollar = node?[4]?[0]?[1];
 
-                            //Imagine we have e1[i, j] $ (i0(i) and (i.val > 30 or j.val > 40)) .. 
+                            //Imagine we have e1[i, j] $ (i0(i) and (i.val > 30 or j.val > 40)) ..
                             //The logical values are backed up, resulting into for instance
                             //true and (false or true)
 
@@ -360,150 +509,40 @@ namespace Gekko
             }
         }
 
-        public class ASTNodeGAMS
+        
+
+        public static void Xxx()
         {
-            /// <summary>
-            /// See comments for very similar and more complicated ASTNode class for .gcm file reading.
-            /// </summary>
-            /// <returns></returns>
-
-            private List<ASTNodeGAMS> children = null; //private so that the implementation might change (for instance LinkedList etc.)                                                                           
-            public Parser.Gek.GekkoSB Code = new Parser.Gek.GekkoSB(); //the C# code produced while walking the tree                        
-            public Parser.Gek.GekkoSB Gekko = new Parser.Gek.GekkoSB(); //the Gekko code produced while walking the tree                        
-            public Parser.Gek.GekkoSB GAMS = new Parser.Gek.GekkoSB(); //the unfolded GAMS code produced while walking the tree                        
-            public ASTNodeGAMS Parent = null;
-            public string Text = null;  //ANTLR decoration of the node (for instance 'ASTPRT' or '1.45').        
-            public int Line = 0;
-            public int Number = 0;  //used to check position among siblings            
-            public string leftBlanks = null;
-
-            public IEnumerable ChildrenIterator()
+            if (true)
             {
-                if (this.children != null)
+                string msg2 = null;
+                string gams = @"c:\Program Files\GAMS\38\";
+                //string gams = @"c:\Program Files(x86)\GAMS\29.1\";
+                Directory.SetCurrentDirectory(gams);  //necessary for some odd reason
+                string control = @"c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\225a\gamscntr.dat";
+                gevmcs gev = new gevmcs(gams, ref msg2);
+                gev.gevInitEnvironmentLegacy(control);
+                gmomcs gmo = new gmomcs(gams, ref msg2);
+                gmo.gmoRegisterEnvironment(gev.GetgevPtr(), ref msg2);
+                gmo.gmoLoadDataLegacy(ref msg2);
+
+                int ncols = gmo.gmoN();
+                double[] x = new double[ncols];
+                gmo.gmoGetVarL(ref x);
+                for (int i = 0; i < ncols; i++)
                 {
-                    foreach (ASTNodeGAMS child in this.children)
-                    {
-                        yield return child;
-                    }
+                    string varname = gmo.gmoGetVarNameOne(i);
                 }
-            }
 
-            public void RemoveLast()
-            {
-                this.children.RemoveAt(this.children.Count - 1);
-            }
-
-            public ASTNodeGAMS GetChild(string s)
-            {
-                foreach (ASTNodeGAMS child in this.ChildrenIterator())
+                int nrows = gmo.gmoM();
+                int numerr = -12345;
+                double lhs = double.NaN;
+                for (int i = 0; i < nrows; i++)
                 {
-                    if (child.Text == s) return child;
-                }
-                return null;
-            }
-
-            public ASTNodeGAMS this[int i]
-            {
-                get
-                {
-                    return this.GetChild(i);
-                }
-                set
-                {
-                    this.children[i] = value;
-                }
-            }
-
-            public int ChildrenCount()
-            {
-                if (children == null) return 0;
-                return children.Count;
-            }
-
-            //Gets the C# code of child i.
-            public Parser.Gek.GekkoSB GetChildCode(int i)
-            {
-                ASTNodeGAMS child = this.GetChild(i);
-                if (child == null)
-                {
-                    Parser.Gek.GekkoSB xx = new Parser.Gek.GekkoSB();
-                    return xx;
-                }
-                else return child.Code;
-            }
-
-            //Prepares an AST node to have children
-            public void CreateChildren(int n)
-            {
-                this.children = new List<ASTNodeGAMS>(n);
-            }
-
-            public bool IsLastChild()
-            {
-                if (this.Parent == null) return true;
-                if (this.Number == this.Parent.ChildrenCount() - 1) return true;  //should not be possible to be >
-                return false;
-            }
-
-            public bool IsFirstChild()
-            {
-                if (this.Parent == null) return true;
-                if (this.Number == 0) return true;
-                return false;
-            }
-
-            //Sets the text of the AST node
-            public ASTNodeGAMS(string text)
-            {
-                this.Text = text;
-            }
-
-            //Sets the text of the AST node
-            public ASTNodeGAMS(string text, string leftBlanks)
-            {
-                this.Text = text;
-                this.leftBlanks = leftBlanks;
-            }
-
-            //Sets the text of the AST node, and augments with children.
-            public ASTNodeGAMS(string text, bool withChildren)
-            {
-                this.Text = text;
-                if (withChildren)
-                {
-                    this.children = new List<ASTNodeGAMS>();
-                }
-            }
-
-            public ASTNodeGAMS GetChild(int i)
-            {
-                if (this.children == null) return null;
-                if (i >= this.children.Count) return null;  //does not exist
-                return this.children[i];
-            }
-
-            public void Add(ASTNodeGAMS child)
-            {
-                this.children.Add(child);
-                child.Parent = this;
-                child.Number = children.Count - 1;
-            }
-
-            public string ToString()
-            {
-                return this.Text;
-            }
-
-            public void PrintAST2(ASTNodeGAMS node, int depth)
-            {
-                G.Writeln(G.Blanks(depth * 2) + node.Text);
-                if (node.children != null)
-                {
-                    for (int i = 0; i < node.children.Count; ++i)
-                    {
-                        ASTNodeGAMS child = (ASTNodeGAMS)(node.children[i]);
-                        PrintAST2(child, depth + 1);
-                    }
+                    gmo.gmoEvalFunc(i, x, ref lhs, ref numerr);
+                    double rhs = gmo.gmoGetRhsOne(i);
+                    double residual = lhs - rhs;
+                    string eqname = gmo.gmoGetEquNameOne(i);
                 }
             }
         }
@@ -594,7 +633,7 @@ namespace Gekko
                     RuntimeTypeModel serializer = TypeModel.Create();
                     serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
 
-                    // ----- SERIALIZE                    
+                    // ----- SERIALIZE
                     string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
                     using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
@@ -629,7 +668,7 @@ namespace Gekko
 
             int eqCounter = 0;
 
-            //GAMS comments: star as first char, $ontext/offtext, # as end of line, /* */, 
+            //GAMS comments: star as first char, $ontext/offtext, # as end of line, /* */,
 
             //string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
             string txt = textInputRaw;
@@ -701,9 +740,6 @@ namespace Gekko
         /// </summary>
         private static int ReadGamsEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string> problems, bool dump)
         {
-            bool translateToCsSyntax = true;
-            if (!Globals.runningOnTTComputer) translateToCsSyntax = false;
-
             WalkTokensHelper wh = new WalkTokensHelper();
 
             int iEqStart = 0;
@@ -717,15 +753,6 @@ namespace Gekko
                     iEqStart = i2 + 1;
                     break;
                 }
-            }
-
-            if (Globals.runningOnTTComputer)
-            {
-                int i1 = iEqStart;
-                int i2 = tok.Search(i1, new List<string>() { ";" }, false, false);
-                string ss = StringTokenizer.GetTextFromLeftBlanksTokens(tok.parent.subnodes.storage, tok.id + i1, tok.id + i2, true);
-                ParserGAMSCreateASTHelper(ss);
-                return -12345;
             }
 
             int i = iEqStart;
@@ -758,10 +785,8 @@ namespace Gekko
             List<string> setsGamsList = new List<string>();
             string lhsGams = null;
             string rhsGams = null;
-            TokenHelper allTokensGams = null;
             TokenHelper lhsTokensGams = null;
             TokenHelper rhsTokensGams = null;
-            List<TokenHelper> conditionalsTokensGams = null;
 
             string dollar = null;
 
@@ -792,17 +817,13 @@ namespace Gekko
                     {
                         //Gekko syntax
                         conditionalsGams = tok3.subnodes.ToString();
-                        conditionalsTokensGams = tok3.subnodes.storage;
 
-                        if (translateToCsSyntax)
-                        {
-                            //C# syntax
-                            TokenHelper conditionalsTokensCs = tok3.DeepClone(null);
-                            WalkTokensHandleParentheses(conditionalsTokensCs); //changes '[' and '{' into '('
-                            WalkTokensHelper temp = new WalkTokensHelper();
-                            WalkTokensCsSyntax(conditionalsTokensCs, temp, null);
-                            conditionalsCs = conditionalsTokensCs.ToStringTrim();
-                        }
+                        //C# syntax
+                        TokenHelper conditionalsTokensCs = tok3.DeepClone(null);
+                        WalkTokensHandleParentheses(conditionalsTokensCs); //changes '[' and '{' into '('
+                        WalkTokensHelper temp = new WalkTokensHelper();
+                        WalkTokensCsSyntax(conditionalsTokensCs, temp, null);
+                        conditionalsCs = conditionalsTokensCs.ToStringTrim();
                     }
 
                     // see also #9872034985732, removing stray " and"
@@ -910,8 +931,6 @@ namespace Gekko
             rhsGams = tok.OffsetInterval(i2Start, iSemi - 1).ToString().Trim();
             rhsTokensGams = tok.OffsetInterval(i2Start, iSemi - 1);
 
-            allTokensGams = tok.OffsetInterval(i1Start, iSemi - 1);
-
             eqCounter++;
 
             if (false && eqCounter < 10)
@@ -933,7 +952,6 @@ namespace Gekko
             equation.rhsGams = rhsGams;
             equation.lhsTokensGams = lhsTokensGams;
             equation.rhsTokensGams = rhsTokensGams;
-            equation.allTokensGams = allTokensGams;  //sum of the 2 above
 
             //Gekko syntax
 
@@ -949,21 +967,21 @@ namespace Gekko
             WalkTokensGekkoSyntax(rhsTokensGekko, wt2Gekko);
             string rhsGekko = rhsTokensGekko.ToStringTrim();
 
-            //C# syntax
+            ////C# syntax
 
-            string allCs = null;
-            if (translateToCsSyntax)
-            {
-                TokenHelper allTokensCs = equation.allTokensGams.DeepClone(null);
-                WalkTokensHandleParentheses(allTokensCs); //changes '[' and '{' into '('
-                WalkTokensHelper wt1Cs = new WalkTokensHelper();
-                Controlled controlledAll = new Controlled();
-                var xx1 = conditionalsTokensGams;
-                var xx2 = equation.setsGamsList;
-                WalkTokensCsSyntax(allTokensCs, wt1Cs, controlledAll);
+            //TokenHelper lhsTokensCs = equation.lhsTokensGams.DeepClone(null);
+            //WalkTokensHandleParentheses(lhsTokensCs); //changes '[' and '{' into '('
+            //WalkTokensHelper wt1Cs= new WalkTokensHelper();
+            //Controlled controlledLhs = new Controlled();
+            //WalkTokensCsSyntax(lhsTokensCs, wt1Cs, controlledLhs);
+            //string lhsCs = lhsTokensCs.ToStringTrim();
 
-                allCs = allTokensCs.ToStringTrim();
-            }
+            //TokenHelper rhsTokensCs = equation.rhsTokensGams.DeepClone(null);
+            //WalkTokensHandleParentheses(rhsTokensCs); //changes '[' and '{' into '('
+            //WalkTokensHelper wt2Cs = new WalkTokensHelper();
+            //Controlled controlledRhs = new Controlled();
+            //WalkTokensCsSyntax(rhsTokensCs, wt2Cs, controlledRhs);
+            //string rhsCs = rhsTokensCs.ToStringTrim();
 
             if (true)
             {
@@ -1021,7 +1039,8 @@ namespace Gekko
                 equation.lhs = lhsGekko;
                 equation.rhs = rhsGekko;
 
-                equation.allCs = allCs;
+                //equation.lhsCs = lhsCs;
+                //equation.rhsCs = rhsCs;
                 equation.conditionalsCs = conditionalsCs;
 
                 // ------------- conditionals ---------------
@@ -1106,7 +1125,7 @@ namespace Gekko
             {
                 if (equationsByVarname.ContainsKey(varnameFound))
                 {
-                    equationsByVarname[varnameFound].Add(e);  //can have more than one eq with same lhs variable                
+                    equationsByVarname[varnameFound].Add(e);  //can have more than one eq with same lhs variable
                 }
                 else
                 {
@@ -1147,7 +1166,7 @@ namespace Gekko
                 {
                     new Error("Internal error #809735208375", false);
                 }
-                found = eqs[0];  //pick the first one, probably always only one here, cf. #820948324: 
+                found = eqs[0];  //pick the first one, probably always only one here, cf. #820948324:
             }
             else
             {
@@ -1243,7 +1262,7 @@ namespace Gekko
 
                         //Function call start --------------
                         //O.AdjustSmplForDecomp(smpl, 0);
-                        //TODO: can be deleted, #p24234oi32      
+                        //TODO: can be deleted, #p24234oi32
 
                         try
                         {
@@ -1271,7 +1290,7 @@ namespace Gekko
                         catch (Exception e)
                         {
                             counterError2++;
-                            eq.expressionVariablesWithSets.Add(null); //keep alignment                            
+                            eq.expressionVariablesWithSets.Add(null); //keep alignment
                             if (e.Message.Contains("System.OutOfMemoryException"))
                             {
                                 G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
@@ -1297,7 +1316,8 @@ namespace Gekko
         {
             if (Program.model.modelGams.equationsByEqname == null || Program.model.modelGams.equationsByEqname.Count == 0)
             {
-                new Error("No GAMS equations found. Did you omit a MODEL<gms> statement?");
+                new Error("No GAMS equations found");
+                //throw new GekkoException();
             }
             List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
             return eqs;
@@ -1307,7 +1327,8 @@ namespace Gekko
         {
             if (Program.model.modelGams.equationsByVarname == null || Program.model.modelGams.equationsByVarname.Count == 0)
             {
-                new Error("No GAMS equations found. Did you omit a MODEL<gms> statement?");
+                new Error("No GAMS equations found");
+                //throw new GekkoException();
             }
             List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
             return eqs;
@@ -1447,7 +1468,7 @@ namespace Gekko
                     TokenHelper nextNode = node.Offset(1);
                     if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == 0)
                     {
-                        //a pattern like "x(" with no blanks in between                    
+                        //a pattern like "x(" with no blanks in between
 
                         if (G.Equal(node.s, "sameas"))
                         {
@@ -1551,7 +1572,7 @@ namespace Gekko
                                                 else
                                                 {
                                                     //tBase
-                                                    //x(i, tBase) --> x[#i][%tBase]                                                
+                                                    //x(i, tBase) --> x[#i][%tBase]
                                                     //we need to transform one []-subnode into two consequtive
                                                     //see also #89075203489
 
@@ -1583,7 +1604,7 @@ namespace Gekko
                                                     parent.subnodes.storage.RemoveAt(id);
                                                     parent.subnodes.storage.Insert(id, nextNode2);
                                                     parent.subnodes.storage.Insert(id, nextNode1);
-                                                    parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok                                                   
+                                                    parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
 
                                                 }
                                             }
@@ -1605,7 +1626,7 @@ namespace Gekko
                                         //the ... argument in (... , ... , ... , ...) is an expression, for instance t-1 etc.
                                         if (helper.list[0].type == ETokenType.Word)
                                         {
-                                            //if (iSplit == split.Count - 1 && helper.list[0].s == "t")                                        
+                                            //if (iSplit == split.Count - 1 && helper.list[0].s == "t")
                                             if (true)
                                             {
                                                 //does not need to be last. Can be "t" in "x(a, 'b', t-1)", but also "a" in "x(y, a-1, t)"
@@ -1729,7 +1750,7 @@ namespace Gekko
                     }
                     else
                     {
-                        node.s = "==";  //stuff like ... $ (a.val = 15) 
+                        node.s = "==";  //stuff like ... $ (a.val = 15)
                     }
                 }
                 else if (node.s == "$")
@@ -1787,7 +1808,7 @@ namespace Gekko
 
             if (node.HasNoChildren())
             {
-                //not a '(' or '[' etc.
+                //not a sub-node
                 if (node.s != "" && node.type == ETokenType.Word)
                 {
                     //an IDENT-type leaf node, not symbols etc.
@@ -1798,7 +1819,7 @@ namespace Gekko
                     TokenHelper nextNode = node.Offset(1);
                     if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == 0)
                     {
-                        //a pattern like "x(" with no blanks in between                    
+                        //a pattern like "x(" with no blanks in between
 
                         if (G.Equal(node.s, "sameas"))
                         {
@@ -1824,9 +1845,8 @@ namespace Gekko
                             {
                                 List<string> names = new List<string>();
                                 List<List<string>> elements = new List<List<string>>();
-                                List<TokenHelper> tokensCondition = null;
+                                string condition = null;
                                 string content = null;
-                                Conditions conditions = new Conditions();
 
                                 if (nextNode.subnodes.Count() > 0)
                                 {
@@ -1835,11 +1855,11 @@ namespace Gekko
                                         //stuff like "sum(i, x(i))"
                                         if (nextNode.subnodes[1].type == ETokenType.Word && (G.Equal(nextNode.subnodes[2].s, ",") || G.Equal(nextNode.subnodes[2].s, "$")))
                                         {
-                                            //if it has "sum(x," or sum(x$" pattern                                            
+                                            //if it has "sum(x," or sum(x$" pattern
                                             if (G.Equal(nextNode.subnodes[2].s, "$"))
                                             {
                                                 int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");
-                                                tokensCondition = nextNode.subnodes.storage.GetRange(3, i - 3);
+                                                condition = StringTokenizer.GetTextFromLeftBlanksTokens(nextNode.subnodes.storage, 3, i - 1, true).Trim();
                                             }
                                             WalkTokensCsSyntaxHelper1(names, elements, nextNode.subnodes[1].s);
 
@@ -1853,7 +1873,7 @@ namespace Gekko
                                             if (G.Equal(nextNode.subnodes[2].s, "$"))
                                             {
                                                 int i = StringTokenizer.FindS(nextNode.subnodes.storage, 3, ",");
-                                                tokensCondition = nextNode.subnodes.storage.GetRange(3, i - 3);
+                                                condition = StringTokenizer.GetTextFromLeftBlanksTokens(nextNode.subnodes.storage, 3, i - 1, true).Trim();
                                             }
                                             List<TokenHelperComma> list2 = nextNode.subnodes[1].SplitCommas(true);
                                             foreach (TokenHelperComma item in list2)
@@ -1870,77 +1890,7 @@ namespace Gekko
 
                                     Controlled controlledNew = controlled.Clone();
                                     int depth = 0;
-
-                                    //Split according to "and"
-                                    List<List<TokenHelper>> sss = null;
-                                    List<TokenHelper> start = new List<TokenHelper>();
-
-                                    if (tokensCondition != null)
-                                    {
-                                        List<TokenHelper> condition2 = tokensCondition;
-                                        if (tokensCondition[0].SubnodesType() == "(")
-                                        {
-                                            condition2 = tokensCondition[0].subnodes.storage.GetRange(1, tokensCondition[0].subnodes.storage.Count - 2);
-                                        }
-                                        sss = new List<List<TokenHelper>>();
-                                        foreach (TokenHelper th2 in condition2)
-                                        {
-                                            if (G.Equal(th2.s, "and"))
-                                            {
-                                                sss.Add(start);
-                                                start = new List<TokenHelper>();
-                                                continue;
-                                            }
-                                            start.Add(th2);
-                                        }
-                                        sss.Add(start);
-                                    }
-
-                                    if (sss != null)
-                                    {
-                                        foreach (List<TokenHelper> th3 in sss)
-                                        {
-                                            int not = 0;
-                                            int n = th3.Count;
-                                            if (n + not < 2) GamsModelCsError(th3, "");
-                                            if (th3[0 + not].type == ETokenType.Word)
-                                            {
-                                                if (th3[1 + not].leftblanks == 0 && th3[1 + not].SubnodesType() == "(")
-                                                {
-                                                    //m(a, b, c)
-                                                    //m(a, b, c) > 15
-                                                    Condition condition = new Condition();
-                                                    condition.conditionType = EConditionType.Set;
-                                                    if (not == 1) condition.invert = true;
-                                                    condition.setOrVarname = th3[0 + not].s;
-                                                    List<TokenHelperComma> comma = th3[1 + not].SplitCommas(true);
-                                                    foreach (TokenHelperComma thc in comma)
-                                                    {
-                                                        condition.indexes.Add(thc.list.ToString());
-                                                    }
-
-                                                    int offset = -12345; string value = null;
-                                                    GetLogicalOperator(out offset, th3, condition, 2 + not);
-                                                    conditions.conditions.Add(condition);
-                                                }
-                                                else if (n + not >= 3 && th3[1 + not].leftblanks == 0 && th3[2 + not].s == "." && G.Equal(th3[3 + not].s, "val"))
-                                                {
-                                                    //a.val > 15
-                                                    Condition condition = new Condition();
-                                                    int i = 3 + not;
-                                                    int offset = -12345;
-                                                    GetLogicalOperator(out offset, th3, condition, i);
-                                                    string rest = StringTokenizer.GetTextFromLeftBlanksTokens(th3, i + offset, th3.Count - 1, true);
-                                                }
-                                                else
-                                                {
-                                                    GamsModelCsError(th3, "");
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Loop(depth, names, elements, conditions, controlledNew);
+                                    Loop(depth, names, elements, controlledNew);
                                 }
                                 else
                                 {
@@ -1998,7 +1948,7 @@ namespace Gekko
                                                 else
                                                 {
                                                     //tBase
-                                                    //x(i, tBase) --> x[#i][%tBase]                                                
+                                                    //x(i, tBase) --> x[#i][%tBase]
                                                     //we need to transform one []-subnode into two consequtive
                                                     //see also #89075203489
 
@@ -2030,7 +1980,7 @@ namespace Gekko
                                                     parent.subnodes.storage.RemoveAt(id);
                                                     parent.subnodes.storage.Insert(id, nextNode2);
                                                     parent.subnodes.storage.Insert(id, nextNode1);
-                                                    parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok                                                   
+                                                    parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
 
                                                 }
                                             }
@@ -2052,7 +2002,7 @@ namespace Gekko
                                         //the ... argument in (... , ... , ... , ...) is an expression, for instance t-1 etc.
                                         if (helper.list[0].type == ETokenType.Word)
                                         {
-                                            //if (iSplit == split.Count - 1 && helper.list[0].s == "t")                                        
+                                            //if (iSplit == split.Count - 1 && helper.list[0].s == "t")
                                             if (true)
                                             {
                                                 //does not need to be last. Can be "t" in "x(a, 'b', t-1)", but also "a" in "x(y, a-1, t)"
@@ -2176,7 +2126,7 @@ namespace Gekko
                     }
                     else
                     {
-                        node.s = "==";  //stuff like ... $ (a.val = 15) 
+                        node.s = "==";  //stuff like ... $ (a.val = 15)
                     }
                 }
                 else if (node.s == "$")
@@ -2212,73 +2162,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>
-        /// Finds operators &lt;, &lt;=, ==, &lt;&gt;, &gt;, &gt;=. Beware condition.conditionType is changed.
-        /// </summary>
-        private static void GetLogicalOperator(out int offset, List<TokenHelper> th3, Condition condition, int i)
-        {
-            offset = 0;
-            string x0 = StringTokenizer.GetS(th3, i);
-            string x1 = StringTokenizer.GetS(th3, i + 1);
-            if (x0 == "<")
-            {
-                if (x1 == "=")
-                {
-                    offset++;
-                    condition.conditionType = EConditionType.SmallerThanOrEqual;
-                }
-                else if (x1 == ">")
-                {
-                    offset++;
-                    condition.conditionType = EConditionType.NonEqual;
-                }
-                else
-                {
-                    condition.conditionType = EConditionType.SmallerThan;
-                }
-            }
-            else if (x0 == ">")
-            {
-                if (x1 == "=")
-                {
-                    offset++;
-                    condition.conditionType = EConditionType.LargerThanOrEqual;
-                }
-                else
-                {
-                    condition.conditionType = EConditionType.LargerThan;
-                }
-            }
-            else if (x0 == "=")
-            {
-                if (x1 == "=")
-                {
-                    offset++;
-                    condition.conditionType = EConditionType.Equal;
-                }
-                else GamsModelCsError(th3, "");
-            }
-            string value = StringTokenizer.GetTextFromLeftBlanksTokens(th3, i + offset + 1, th3.Count - 1, true);
-            double ii = double.NaN;
-            if (double.TryParse(value, out ii))
-            {
-                condition.xDouble = ii;
-            }
-            else
-            {
-                condition.xString = value;
-            }
-
-        }
-
-        private static Error GamsModelCsError(List<TokenHelper> tokens, string error)
-        {
-            string s = null;
-            if (tokens != null) s = StringTokenizer.GetTextFromLeftBlanksTokens(tokens, true);
-            return new Error("Cannot understand this $ condition: " + error + s);
-        }
-
-        public static void Loop(int depth, List<string> names, List<List<string>> elements, Conditions conditions, Controlled controlled)
+        public static void Loop(int depth, List<string> names, List<List<string>> elements, Controlled controlled)
         {
             for (int i = 0; i < elements[depth].Count; i++)
             {
@@ -2286,32 +2170,11 @@ namespace Gekko
                 controlled.elements.Add(elements[depth][i]);
                 if (depth + 1 < names.Count)
                 {
-                    Loop(depth + 1, names, elements, conditions, controlled);
+                    Loop(depth + 1, names, elements, controlled);
                 }
                 else
                 {
                     //walk......
-
-                    bool good = true;
-                    foreach (Condition condition in conditions.conditions)
-                    {
-                        //try set (#list)
-                        if (condition.setOrVarObject == null)
-                        {
-                            condition.setOrVarObject = O.GetIVariableFromString("#" + condition.setOrVarname, O.ECreatePossibilities.NoneReturnNull);
-                            //try a variable
-                            if (condition.setOrVarObject == null) condition.setOrVarObject = O.GetIVariableFromString(condition.setOrVarname, O.ECreatePossibilities.NoneReturnNull);
-                            if (condition.setOrVarObject == null) GamsModelCsError(null, "Cannot find the set or variable '" + condition.setOrVarname + "' in the first-position databank");
-                        }
-
-                        for (int ii = 0; ii < controlled.names.Count; ii++)
-                        {
-                            string name = controlled.names[ii];
-                            string element = controlled.elements[ii];
-                        }
-
-                        if (good == false) break;
-                    }
 
                     new Writeln(Stringlist.GetListWithCommas(controlled.names) + " ----- " + Stringlist.GetListWithCommas(controlled.elements));
 
@@ -2467,42 +2330,6 @@ namespace Gekko
 
         }
 
-        public static void Xxx()
-        {
-            if (true)
-            {
-                //try to read a model
-
-                string msg2 = null;
-                gevmcs gev = new gevmcs(ref msg2);
-                gev.gevInitEnvironmentLegacy(@"c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\225a");  //gamscntr.dat
-                gmomcs gmo = new gmomcs(ref msg2);
-                gmo.gmoRegisterEnvironment(gev.GetgevPtr(), ref msg2);
-                gmo.gmoLoadDataLegacy(ref msg2);
-
-                string varnameXXX = gmo.gmoGetVarNameOne(0);
-
-                int ncols = gmo.gmoN();
-                double[] x2 = null;
-                gmo.gmoGetVarL(ref x2);
-                for (int i = 0; i < ncols; i++)
-                {
-                    string varname = gmo.gmoGetVarNameOne(i);
-                }
-
-                int nrows = gmo.gmoM();
-                double[] x = null;
-                int numerr = -12345;
-                double f = double.NaN;
-                for (int i = 0; i < nrows; i++)
-                {
-                    gmo.gmoEvalFunc(i, x, ref f, ref numerr);
-                    string eqname = gmo.gmoGetEquNameOne(i);
-                }
-
-            }
-        }
-
         private static void ReadGdxFast(Databank databank, string prefix, bool hasPrefix, string file, int offset, ref int skippedSets, ref int importedSets, ref int counterVariables, ref int counterParameters, ref int yearMax, ref int yearMin, EFreq freq, ref string gamsDir)
         {
             if (Program.options.gams_time_detect_auto)
@@ -2535,8 +2362,7 @@ namespace Gekko
                     new Error("Could not load GDX library. Message: " + msg, false);
                     GdxErrorMessage();
                     throw new GekkoException();
-                }                
-
+                }
                 if (true)
                 {
                     rc = gdx.gdxOpenRead(file, ref errNr);
@@ -2561,7 +2387,7 @@ namespace Gekko
                         string s = null;
                         int error = -1;
                         int error2 = gdx.gdxUMUelGet(u, ref s, ref error);
-                        uel[u] = s;  //remember that uel[0] is empty and not meaningful                     
+                        uel[u] = s;  //remember that uel[0] is empty and not meaningful
                     }
 
                     timeIndex = -12345; gdx.gdxFindSymbol(Program.options.gams_time_set, ref timeIndex);
@@ -2594,7 +2420,7 @@ namespace Gekko
                             //  ======================================
                             //              sets
                             //  ======================================
-                            //                  
+                            //
 
                             if (gdxDimensions != 1)
                             {
@@ -2687,7 +2513,7 @@ namespace Gekko
                             }
                             else
                             {
-                                //Zero-dimensional timeseries (that is, normal timeseries)                                    
+                                //Zero-dimensional timeseries (that is, normal timeseries)
                                 //A zero-dim timeseries in the Gekko sense can be timeless (scalar) or non-timeless (normal timeseries)
                                 //in this case, we just construct a normal timeseries
                                 if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
@@ -2864,7 +2690,7 @@ namespace Gekko
                                     }
                                 }
 
-                                oldDims = dims; //ok to point, dims will be created from scratch at beginning of loop                                 
+                                oldDims = dims; //ok to point, dims will be created from scratch at beginning of loop
                             }  //end of records/dimensions for the variable or parameter
 
                             gdx.gdxDataReadDone();
@@ -3157,7 +2983,7 @@ namespace Gekko
 
         public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
         {
-            //TODO: try-catch if writing fails    
+            //TODO: try-catch if writing fails
 
             bool usePrefix = false;
             if (Program.options.gams_time_prefix.Length > 0) usePrefix = true;
@@ -3258,7 +3084,7 @@ namespace Gekko
                 {
                     gdxValues[gamsglobals.val_level] = ts2.GetTimelessData();
                     gdx.gdxDataWriteStr(ss, gdxValues);
-                    //gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location   
+                    //gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location
                 }
                 catch
                 {
@@ -3335,7 +3161,7 @@ namespace Gekko
             {
                 try
                 {
-                    gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location   
+                    gvar.AddRecord(ss).Level = ts2.GetTimelessData();  //timeless data location
                 }
                 catch
                 {
@@ -3383,7 +3209,7 @@ namespace Gekko
 
         private static bool CompareDims(List<string> oldDims, List<string> dims)
         {
-            //no test if they are null            
+            //no test if they are null
             if (dims.Count != oldDims.Count) return false;
             for (int i = 0; i < dims.Count; i++)
             {
@@ -3418,7 +3244,7 @@ namespace Gekko
         {
             gamsDir = Program.options.gams_exe_folder.Trim();
             if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
-            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on                        
+            if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on
             if (Program.options.gams_fast && gamsDir != null)
             {
                 //do nothing
@@ -3495,6 +3321,9 @@ namespace Gekko
 
             return timeDimNr;
         }
+
+
+
     }
 
     // C#  procedure wrapper generated by apiwrapper for GAMS Version 34.2.0
@@ -20424,5 +20253,5 @@ namespace Gekko
         }
 
     }
-
 }
+

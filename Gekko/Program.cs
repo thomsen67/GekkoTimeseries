@@ -1677,7 +1677,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (Globals.runningOnTTComputer) GamsData.Xxx();
+            if (Globals.runningOnTTComputer) GamsModel.Xxx();
 
             if (false && Globals.runningOnTTComputer)
             {
