@@ -8414,7 +8414,7 @@ namespace Gekko
                 {
                     string label_string = "Label: ";
                     string source_string = "Source: "; if (danish) source_string = "Kilde: ";
-                    string units_string = "Units: "; if (danish) source_string = "Enheder: ";
+                    string units_string = "Units: "; if (danish) units_string = "Enheder: ";
 
                     if (!G.NullOrBlanks(ts.meta.label))
                     {

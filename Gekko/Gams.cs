@@ -523,16 +523,33 @@ namespace Gekko
 
         public static void Xxx()
         {
-            if (true)
+            if (false)
             {
+                //about 20 s for only equation (..) part of gams.gms
+                DateTime dt0 = DateTime.Now;
                 string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
                 string s = Program.GetTextFromFileWithWait(file);
                 ParserGAMSCreateASTHelper(s);
+                new Writeln(G.Seconds(dt0));
             }
 
             if (false)
             {
                 string file = @"c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\gams.gms";
+            }
+
+            if (true)
+            {
+                //about 20 s to read the xml file
+                //Probably has to be XmlDocument, not XmlReader if we need to walk the nodes easily 
+                DateTime dt0 = DateTime.Now;
+                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\osil.xml";
+                var doc = new XmlDocument();
+                doc.Load(file);
+                // Load xml document.
+                new Writeln(G.Seconds(dt0));
+                TraverseNodes(doc.ChildNodes);
+                new Writeln(G.Seconds(dt0));
             }
 
             if (false)
@@ -599,6 +616,15 @@ namespace Gekko
                     double residual = lhs - rhs;
                     string eqname = gmo.gmoGetEquNameOne(i);
                 }
+            }
+        }
+
+        private static void TraverseNodes(XmlNodeList nodes)
+        {
+            foreach (XmlNode node in nodes)
+            {
+                // Do something with the node.
+                TraverseNodes(node.ChildNodes);
             }
         }
 
