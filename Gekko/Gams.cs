@@ -16,6 +16,8 @@ using System.Windows.Forms;
 using GAMS;
 using System.Xml;
 using System.Threading.Tasks;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 
 namespace Gekko
 {
@@ -219,7 +221,44 @@ namespace Gekko
             Controlled controlled = new Controlled();
             WalkASTAndEmit(root, 0, wh, controlled);
             int n = wh.a.Count;
+            EmitCsCodeAndCompile(root.Code.ToString());
             return;
+        }
+
+        private static void EmitCsCodeAndCompile(string eqs)
+        {
+            DateTime t0 = DateTime.Now;
+            bool failSafe = false;
+                        
+            StringBuilder code = new StringBuilder();
+
+            code.AppendLine("using System;");
+            code.AppendLine("using System.Collections.Generic;");
+            code.AppendLine("using System.Text;");
+            code.AppendLine("namespace Gekko");
+            code.AppendLine("{");
+            code.AppendLine("public class TimeEquations");
+            code.AppendLine("{");
+            code.AppendLine("public static void Residuals(double[][] a, double[] r)");
+            code.AppendLine("{");
+            code.AppendLine(eqs);
+            code.AppendLine("}");
+            code.AppendLine("}");
+            code.AppendLine("}");
+
+            CompilerParameters compilerParams = new CompilerParameters();
+            compilerParams = new CompilerParameters();
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
+            compilerParams.GenerateInMemory = true;
+            compilerParams.IncludeDebugInformation = false;
+            compilerParams.ReferencedAssemblies.Add("system.dll");
+            //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);  --> no need to reference Gekko?
+            Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
+            compilerParams.GenerateExecutable = false;
+            string s = code.ToString();
+            CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
+
+
         }
 
         private static bool DetectNullNode(CommonTree ast)
