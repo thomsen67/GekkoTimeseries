@@ -172,7 +172,7 @@ namespace Gekko
 
     public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static void ParserGAMSCreateASTHelper(string textInput, string[] dictEqs, string[] dictVars)
+        public static Assembly ParserGAMSCreateASTHelper(string textInput, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
         {
             DateTime dt0 = DateTime.Now;
 
@@ -188,7 +188,7 @@ namespace Gekko
             // Create a parser attached to the token stream
             GAMSParser parser = new GAMSParser(tokens);
             // Invoke the program rule in get return value
-            GAMSParser.gams_return r = null;
+            GAMSParser.gams_return gams = null;
             DateTime t0 = DateTime.Now;
 
             bool print = true;
@@ -196,13 +196,10 @@ namespace Gekko
 
             try
             {
-                r = parser.gams();                
-
+                gams = parser.gams();                
                 errors = parser.GetErrors();
-                t = (CommonTree)r.Tree;
-
-                CreateASTNodesForGAMS(t, root, 0, tokens, print);
-                
+                t = (CommonTree)gams.Tree;
+                CreateASTNodesForGAMS(t, root, 0, tokens, print);                
                 if (errors.Count > 0)
                 {
                     new Writeln(textInput);
@@ -218,15 +215,16 @@ namespace Gekko
             WalkHelper wh = new WalkHelper();
             wh.dictEqs = dictEqs;
             wh.dictVars = dictVars;
-            wh.time0 = new GekkoTime(EFreq.A, 2027, 1);
+            wh.time0 = time0;
+            wh.dictA = dictA;
             Controlled controlled = new Controlled();
             WalkASTAndEmit(root, 0, wh, controlled);
-            int n = wh.a.Count;
-            EmitCsCodeAndCompile(root.Code.ToString());
-            return;
+            int n = wh.dictA.Count;
+            Assembly assembly = EmitCsCodeAndCompile(root.Code.ToString());
+            return assembly;
         }
 
-        private static void EmitCsCodeAndCompile(string eqs)
+        private static Assembly EmitCsCodeAndCompile(string eqs)
         {
             DateTime t0 = DateTime.Now;
             bool failSafe = false;
@@ -259,16 +257,8 @@ namespace Gekko
             string s = code.ToString();
             CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
             Assembly assembly = cr.CompiledAssembly;
-            Object[] args = new Object[2];
-            double[][] a = new double[3][];
-            a[0] = new double[1] { 10 };  //<-------- get these from real data
-            a[1] = new double[1] { 20 };
-            a[2] = new double[1] { 30 };
-            double[] r = new double[3];
-            args[0] = a;
-            args[1] = r;
-            Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
-            tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
+            return assembly;
+            
             
 
         }
@@ -449,68 +439,25 @@ namespace Gekko
                             if (wh.dictVars != null)
                             {
                                 varname2 = wh.dictVars[int.Parse(varname.Substring(1))];
-                            }                            
+                            }
 
                             GekkoTime time = GekkoTime.tNull;
                             string resultingFullName = null;
-                            int i = varname2.IndexOf('(');
-                            if (i >= 1)
+                            ExtractTimeDimension(varname2, ref time, ref resultingFullName);
+
+                            if (wh.time1.IsNull() || (time.StrictlySmallerThan(wh.time1))) wh.time1 = time;
+                            if (wh.time2.IsNull() || (time.StrictlyLargerThan(wh.time2))) wh.time2 = time;
+                            int i1 = (GekkoTime.Observations(wh.time0, time) - 1);
+                            int i2 = wh.dictA.Count;
+                            if (!wh.dictA.ContainsKey(resultingFullName))
                             {
-                                //with index (...)                                    
-                                string start = varname2.Substring(0, i).Trim();
-                                string rest = varname2.Substring(i).Trim();
-                                string rest2 = rest.Substring(1, rest.Length - 2);
-                                string[] ss = rest2.Split(',');
-                                int int2 = -12345;
-                                List<string> fullName = new List<string>();
-                                for (int j = 0; j < ss.Length; j++)
-                                {
-                                    string s = ss[j].Trim();
-                                    if (G.IsInteger(s))
-                                    {
-                                        int2 = int.Parse(s);
-                                        if (int2 > 1900 && int2 < 4000)  //!!!!! is this a water tight test???
-                                        {
-                                            //Time is in this index
-                                            if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname2 + "'");
-                                            time = new GekkoTime(EFreq.A, int2, 1);
-                                        }
-                                    }
-                                    if (time.IsNull())
-                                    {
-                                        fullName.Add(s);
-                                    }
-                                    else
-                                    {
-
-                                        //not part of indexes
-                                    }
-                                }
-
-                                if (time.IsNull()) new Error("Unexpected");
-
-                                resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
-
-                                int number = wh.a.Count;
-                                if (!wh.a.ContainsKey(resultingFullName))
-                                {
-                                    wh.a.Add(resultingFullName, number);
-                                }
-                                else
-                                {
-                                    number = wh.a[resultingFullName];
-                                }
-
-                                if (wh.time1.IsNull() || (time.StrictlySmallerThan(wh.time1))) wh.time1 = time;
-                                if (wh.time2.IsNull() || (time.StrictlyLargerThan(wh.time2))) wh.time2 = time;
-
-                                node.Code.A("a[" + (GekkoTime.Observations(wh.time0, time) - 1) + "][" + number + "]");  //time can be tNull for timeless
+                                wh.dictA.Add(resultingFullName, i2);
                             }
                             else
                             {
-                                //without index
-                                new Error("Unexpected");
+                                i2 = wh.dictA[resultingFullName];
                             }
+                            node.Code.A("a[" + i1 + "][" + i2 + "]");  //time can be tNull for timeless
                         }
                     }
                     break;
@@ -684,7 +631,58 @@ namespace Gekko
             }
         }
 
-        
+        /// <summary>
+        /// From a varname like x(i,j,2025) it extracts GekkoTime 2025a1 and the resulting name x[i,j].
+        /// </summary>
+        /// <param name="varname2"></param>
+        /// <param name="time"></param>
+        /// <param name="resultingFullName"></param>
+        private static void ExtractTimeDimension(string varname2, ref GekkoTime time, ref string resultingFullName)
+        {
+            int i = varname2.IndexOf('(');
+            if (i >= 1)
+            {
+                //with index (...)                                    
+                string start = varname2.Substring(0, i).Trim();
+                string rest = varname2.Substring(i).Trim();
+                string rest2 = rest.Substring(1, rest.Length - 2);
+                string[] ss = rest2.Split(',');
+                int int2 = -12345;
+                List<string> fullName = new List<string>();
+                for (int j = 0; j < ss.Length; j++)
+                {
+                    string s = ss[j].Trim();
+                    if (G.IsInteger(s))
+                    {
+                        int2 = int.Parse(s);
+                        if (int2 > 1900 && int2 < 4000)  //!!!!! is this a water tight test???
+                        {
+                            //Time is in this index
+                            if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname2 + "'");
+                            time = new GekkoTime(EFreq.A, int2, 1);
+                        }
+                    }
+                    if (time.IsNull())
+                    {
+                        fullName.Add(s);
+                    }
+                    else
+                    {
+                        //not part of indexes
+                    }
+                }
+
+                if (time.IsNull()) new Error("Unexpected");
+                resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+
+            }
+            else
+            {
+                //without index
+                new Error("Unexpected");
+            }
+        }
+
 
         public static void Xxx()
         {
@@ -697,6 +695,7 @@ namespace Gekko
                 DateTime dt0 = DateTime.Now;
                 string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
                 string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
+                GekkoTime time0 = new GekkoTime(EFreq.A, 2027, 1);
 
                 string s = Program.GetTextFromFileWithWait(file);
                 string[] split = new string[] { ".l", "=", ";" };
@@ -787,29 +786,10 @@ namespace Gekko
                     {
                         end.Add(line);
                     }
-                }                
-
-                foreach (string line in values)
-                {
-                    if (line.Trim() == "" || line.StartsWith("*")) continue;
-                    string[] ss = line.Split(split, StringSplitOptions.None);
-                    int id = int.Parse(ss[0].Substring(1));
-                    double d;
-                    if (ss[1].Trim() == "")
-                    {
-                        //probably always so
-                        d = double.Parse(ss[2]);
-                    }
-                    else
-                    {                        
-                        d = double.Parse(ss[1]);
-                    }
-                    double dd = d;
                 }
-                new Writeln("Values: " + G.Seconds(dt0));                
 
-                string[] eqsDict = new string[eqCounts + 1];    //slot [0] is not used!
-                string[] varsDict = new string[eqCounts + 1];   //slot [0] is not used!
+                string[] dictEqs = new string[eqCounts + 1];    //slot [0] is not used!
+                string[] dictVars = new string[eqCounts + 1];   //slot [0] is not used!
 
                 string s2 = Program.GetTextFromFileWithWait(file2);
                 List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
@@ -871,25 +851,64 @@ namespace Gekko
                         string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                         int n = int.Parse(ss[0].Substring(1));
                         string ss2 = ss[1];
-                        eqsDict[n] = ss2;
+                        dictEqs[n] = ss2;
                     }
                     else if (status2 == 2)
                     {
                         string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                         int n = int.Parse(ss[0].Substring(1));
                         string ss2 = ss[1];
-                        varsDict[n] = ss2;
+                        dictVars[n] = ss2;
                     }
                 }
                 new Writeln("Dict: " + G.Seconds(dt0));
 
-                ParserGAMSCreateASTHelper(Stringlist.ExtractTextFromLines(eqs).ToString(), eqsDict, varsDict);
+                GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Assembly assembly = ParserGAMSCreateASTHelper(Stringlist.ExtractTextFromLines(eqs).ToString(), dictEqs, dictVars, dictA, time0);
                 new Writeln("Eqs: " + G.Seconds(dt0));
+
+                double[][] a = new double[3][];
+                a[0] = new double[1];
+                a[1] = new double[1];
+                a[2] = new double[1];
+
+                foreach (string line in values)
+                {
+                    if (line.Trim() == "" || line.StartsWith("*")) continue;
+                    string[] ss = line.Split(split, StringSplitOptions.None);
+                    int id = int.Parse(ss[0].Substring(1));
+                    string inputName = dictVars[id];
+                    GekkoTime t = GekkoTime.tNull;
+                    string outputName = null;
+                    ExtractTimeDimension(inputName, ref t, ref outputName);
+                    int aNumber = dictA[outputName];
+                    int i1 = GekkoTime.Observations(time0, t) - 1;
+                    int i2 = aNumber;
+                    double d;
+                    if (ss[1].Trim() == "")
+                    {
+                        //probably always so
+                        d = double.Parse(ss[2]);
+                    }
+                    else
+                    {                        
+                        d = double.Parse(ss[1]);
+                    }
+                    a[i1][i2] = d;
+                }
+                new Writeln("Values: " + G.Seconds(dt0));                                                
 
                 new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts+ ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
                 if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
                 if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
                 if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
+
+                Object[] args = new Object[2];                
+                double[] r = new double[3];
+                args[0] = a;
+                args[1] = r;
+                Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
+                tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
 
                 //36 sec in all
 
@@ -2693,7 +2712,7 @@ namespace Gekko
         public class WalkHelper
         {
             public List<string> eqNames = new List<string>();
-            public GekkoDictionary<string, int> a = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            public GekkoDictionary<string, int> dictA = null;
             public string[] dictEqs = null;
             public string[] dictVars = null;
             public GekkoTime time0 = GekkoTime.tNull;  //corresponds to index 0, a[0][...]
