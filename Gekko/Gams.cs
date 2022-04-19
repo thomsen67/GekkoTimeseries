@@ -18,6 +18,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Reflection;
 
 namespace Gekko
 {
@@ -237,7 +238,7 @@ namespace Gekko
             code.AppendLine("using System.Text;");
             code.AppendLine("namespace Gekko");
             code.AppendLine("{");
-            code.AppendLine("public class TimeEquations");
+            code.AppendLine("public class Equations");
             code.AppendLine("{");
             code.AppendLine("public static void Residuals(double[][] a, double[] r)");
             code.AppendLine("{");
@@ -257,7 +258,18 @@ namespace Gekko
             compilerParams.GenerateExecutable = false;
             string s = code.ToString();
             CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
-
+            Assembly assembly = cr.CompiledAssembly;
+            Object[] args = new Object[2];
+            double[][] a = new double[3][];
+            a[0] = new double[1] { 10 };  //<-------- get these from real data
+            a[1] = new double[1] { 20 };
+            a[2] = new double[1] { 30 };
+            double[] r = new double[3];
+            args[0] = a;
+            args[1] = r;
+            Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
+            tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
+            
 
         }
 
