@@ -169,21 +169,11 @@ namespace Gekko
 
     public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static void ParserGAMSCreateASTHelper(string textInput)
+        public static void ParserGAMSCreateASTHelper(string textInput, string[] eqsDict, string[] varsDict)
         {
             DateTime dt0 = DateTime.Now;
-            new Writeln("111");
-            List<string> lines = Stringlist.ExtractLinesFromText(textInput);
-            StringBuilder sb = new StringBuilder();
-            foreach (string line in lines)
-            {
-                if (line.StartsWith("*")) sb.AppendLine("// " + line);
-                else sb.AppendLine(line);
-            }
-            string textInput2 = sb.ToString();
-            new Writeln("222 " + G.Seconds(dt0));
 
-            ANTLRStringStream input = new ANTLRStringStream(textInput2 + "\n");  //a newline for ease of use of ANTLR
+            ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
 
             List<string> errors = null;
             CommonTree t = null;
@@ -195,25 +185,21 @@ namespace Gekko
             // Create a parser attached to the token stream
             GAMSParser parser = new GAMSParser(tokens);
             // Invoke the program rule in get return value
-            GAMSParser.expr_return r = null;
+            GAMSParser.gams_return r = null;
             DateTime t0 = DateTime.Now;
 
-            bool print = false;
+            bool print = true;
             ASTNodeGAMS root = new ASTNodeGAMS(null);
 
             try
             {
-                r = parser.expr();
-
-                new Writeln("333 " + G.Seconds(dt0));
+                r = parser.gams();                
 
                 errors = parser.GetErrors();
                 t = (CommonTree)r.Tree;
 
                 CreateASTNodesForGAMS(t, root, 0, tokens, print);
-
-                new Writeln("444 " + G.Seconds(dt0));
-
+                
                 if (errors.Count > 0)
                 {
                     new Writeln(textInput);
@@ -227,6 +213,8 @@ namespace Gekko
             }
 
             WalkHelper wh = new WalkHelper();
+            wh.eqssDict = eqsDict;
+            wh.varsDict = varsDict;            
             Controlled controlled = new Controlled();
             WalkASTAndEmit(root, 0, wh, controlled);
 
@@ -296,12 +284,12 @@ namespace Gekko
         {
             WalkASTAndEmitBefore(node, wh, controlled);
 
-            if (false)
-            {
-                controlled = controlled.Clone();
-                controlled.names.Add("a");
-                controlled.elements.Add("55");
-            }
+            //if (false)
+            //{
+            //    controlled = controlled.Clone();
+            //    controlled.names.Add("a");
+            //    controlled.elements.Add("55");
+            //}
 
             foreach (ASTNodeGAMS child in node.ChildrenIterator())
             {
@@ -371,15 +359,68 @@ namespace Gekko
                             //The logical values are backed up, resulting into for instance
                             //true and (false or true)
 
-
                             //maybe get this as C# code, depending on i and j sets and returning true/false.
                             //from List<string>sets, we can get the combinations of i and j elements.
-
 
                         }
                         else
                         {
                             //defining a variable or parameter (or even set condition like tx0(t))
+                            string varname = node[1][0].Text.Trim();
+                            if (wh.varsDict != null)
+                            {
+                                string varname2 = wh.varsDict[int.Parse(varname.Substring(1))];
+                                string[] indexes = null;
+
+                                GekkoTime time = GekkoTime.tNull;
+                                string resultingFullName = null;
+                                int i = varname2.IndexOf('(');
+                                if (i >= 1)
+                                {
+                                    //with index (...)                                    
+                                    string start = varname2.Substring(0, i).Trim();
+                                    string rest = varname2.Substring(i).Trim();
+                                    string rest2 = rest.Substring(1, rest.Length - 2);
+                                    string[] ss = rest2.Split(',');
+                                    int int2 = -12345;
+                                    List<string> fullName = new List<string>();
+                                    for (int j = 0; j < ss.Length; j++)
+                                    {                                        
+                                        string s = ss[j].Trim();
+                                        if (G.IsInteger(s))
+                                        {
+                                            int2 = int.Parse(s);
+                                            if (int2 > 1900 && int2 < 4000)  //!!!!! is this a water tight test???
+                                            {
+                                                //Time is in this index
+                                                if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname2 + "'");
+                                                time = new GekkoTime(EFreq.A, int2, 1);
+                                            }
+                                        }
+                                        if (time.IsNull())
+                                        {
+                                            fullName.Add(s);
+                                        }
+                                        else
+                                        {
+
+                                            //not part of indexes
+                                        }
+                                    }
+                                    resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+                                }
+                                else
+                                {
+                                    //without index
+                                    resultingFullName = varname2;
+                                }
+
+                            }
+                            else
+                            {
+                                new Error("TODO");
+                                //todo
+                            }
                         }
                     }
                     break;
@@ -523,14 +564,211 @@ namespace Gekko
 
         public static void Xxx()
         {
-            if (false)
+            if (true)
             {
+                //TODO: Maybe loop line by line without putting into RAM! Like px reader.
+                //      But prepare for parallel...
+                
                 //about 20 s for only equation (..) part of gams.gms
                 DateTime dt0 = DateTime.Now;
                 string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
+                string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
+
                 string s = Program.GetTextFromFileWithWait(file);
-                ParserGAMSCreateASTHelper(s);
-                new Writeln(G.Seconds(dt0));
+                string[] split = new string[] { ".l", "=", ";" };
+                string[] split2 = new string[] { " " };
+                List<string> lines = Stringlist.ExtractLinesFromText(s);
+                List<string> start = new List<string>();    //0
+                List<string> eqs = new List<string>();      //1
+                List<string> values = new List<string>();   //2
+                List<string> end = new List<string>();      //3
+                int status = 0;
+                int substatus = 0;
+                int eqCounts = -12345;
+                int varCounts = -12345;
+
+                foreach (string line in lines)
+                {
+                    if (status == 0)
+                    {
+                        if (line.Contains(".."))
+                        {
+                            eqs.Add(line);
+                            status = 1;
+                        }
+                        else
+                        {
+                            start.Add(line);
+                            if (line.ToLower().Contains("equation counts"))
+                            {
+                                substatus = 1;
+                            }
+                            else if (line.ToLower().Contains("variable counts"))
+                            {
+                                substatus = 2;
+                            }
+                            if (substatus == 1)
+                            {
+                                string[] ss= line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (string sx in ss)
+                                {
+                                    if (G.IsInteger(sx))
+                                    {
+                                        eqCounts = int.Parse(sx);
+                                        substatus = 0;
+                                        break;
+                                    }
+                                }                                
+                            }
+                            else if (substatus == 2)
+                            {
+                                string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (string sx in ss)
+                                {
+                                    if (G.IsInteger(sx))
+                                    {
+                                        varCounts = int.Parse(sx);
+                                        substatus = 0;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (status == 1)
+                    {
+                        if (line.ToLower().StartsWith("* set")) //* set non-default levels
+                        {
+                            values.Add(line);
+                            status = 2;
+                        }
+                        else
+                        {
+                            eqs.Add(line);
+                        }
+                    }
+                    else if (status == 2)
+                    {
+                        if (line.ToLower().StartsWith("model ")) //model m / all /;
+                        {
+                            end.Add(line);
+                            status = 3;
+                        }
+                        else
+                        {
+                            values.Add(line);
+                        }
+                    }
+                    else
+                    {
+                        end.Add(line);
+                    }
+                }                
+
+                foreach (string line in values)
+                {
+                    if (line.Trim() == "" || line.StartsWith("*")) continue;
+                    string[] ss = line.Split(split, StringSplitOptions.None);
+                    int id = int.Parse(ss[0].Substring(1));
+                    double d;
+                    if (ss[1].Trim() == "")
+                    {
+                        //probably always so
+                        d = double.Parse(ss[2]);
+                    }
+                    else
+                    {                        
+                        d = double.Parse(ss[1]);
+                    }
+                    double dd = d;
+                }
+                new Writeln("Values: " + G.Seconds(dt0));                
+
+                string[] eqsDict = new string[eqCounts + 1];    //slot [0] is not used!
+                string[] varsDict = new string[eqCounts + 1];   //slot [0] is not used!
+
+                string s2 = Program.GetTextFromFileWithWait(file2);
+                List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
+                int status2 = 0;
+                int substatus2 = 0;
+                int eqCounts2 = -12345;
+                int varCounts2 = -12345;
+                foreach (string line in lines2)
+                {
+                    if (line.Trim() == "") continue;
+                    if (line.ToLower().Contains("equation counts"))
+                    {
+                        substatus2 = 1;
+                    }
+                    else if (line.ToLower().Contains("variable counts"))
+                    {
+                        substatus2 = 2;
+                    }
+
+                    if (substatus2 == 1)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string sx in ss)
+                        {
+                            if (G.IsInteger(sx))
+                            {
+                                eqCounts2 = int.Parse(sx);
+                                substatus2 = 0;
+                                break;
+                            }
+                        }
+                    }
+                    else if (substatus2 == 2)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string sx in ss)
+                        {
+                            if (G.IsInteger(sx))
+                            {
+                                varCounts2 = int.Parse(sx);
+                                substatus2 = 0;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (line.ToLower().StartsWith("equations "))
+                    {
+                        status2 = 1;
+                        continue;
+                    }
+                    else if (line.ToLower().StartsWith("variables "))
+                    {
+                        status2 = 2;
+                        continue;
+                    }
+                    if (status2 == 1)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        int n = int.Parse(ss[0].Substring(1));
+                        string ss2 = ss[1];
+                        eqsDict[n] = ss2;
+                    }
+                    else if (status2 == 2)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        int n = int.Parse(ss[0].Substring(1));
+                        string ss2 = ss[1];
+                        varsDict[n] = ss2;
+                    }
+                }
+                new Writeln("Dict: " + G.Seconds(dt0));
+
+                ParserGAMSCreateASTHelper(Stringlist.ExtractTextFromLines(eqs).ToString(), eqsDict, varsDict);
+                new Writeln("Eqs: " + G.Seconds(dt0));
+
+                new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts+ ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
+                if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
+                if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
+                if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
+
+                //36 sec in all
+
             }
 
             if (false)
@@ -538,7 +776,7 @@ namespace Gekko
                 string file = @"c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\gams.gms";
             }
 
-            if (true)
+            if (false)
             {
                 //about 20 s to read the xml file
                 //Probably has to be XmlDocument, not XmlReader if we need to walk the nodes easily 
@@ -2330,7 +2568,9 @@ namespace Gekko
 
         public class WalkHelper
         {
-
+            public Dictionary<string, int> a = new Dictionary<string, int>();
+            public string[] eqssDict = null;
+            public string[] varsDict = null;            
         }
     }
 
