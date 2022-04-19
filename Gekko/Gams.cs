@@ -191,7 +191,7 @@ namespace Gekko
             GAMSParser.gams_return gams = null;
             DateTime t0 = DateTime.Now;
 
-            bool print = true;
+            bool print = false;
             ASTNodeGAMS root = new ASTNodeGAMS(null);
 
             try
@@ -325,14 +325,7 @@ namespace Gekko
         public static void WalkASTAndEmit(ASTNodeGAMS node, int depth, WalkHelper wh, Controlled controlled)
         {
             WalkASTAndEmitBefore(node, wh, controlled);
-
-            //if (false)
-            //{
-            //    controlled = controlled.Clone();
-            //    controlled.names.Add("a");
-            //    controlled.elements.Add("55");
-            //}
-
+            
             foreach (ASTNodeGAMS child in node.ChildrenIterator())
             {
                 WalkASTAndEmit(child, depth + 1, wh, controlled);
@@ -706,8 +699,10 @@ namespace Gekko
                 
                 //about 20 s for only equation (..) part of gams.gms
                 DateTime dt0 = DateTime.Now;
-                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
-                string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
+                //string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
+                //string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
+                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
+                string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
                 GekkoTime time0 = new GekkoTime(EFreq.A, 2027, 1);
 
                 string s = Program.GetTextFromFileWithWait(file);
