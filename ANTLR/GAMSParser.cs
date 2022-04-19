@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-04-18 18:21:48
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-04-19 16:42:51
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -29,6 +29,7 @@ public partial class GAMSParser : Parser
 		"<UP>", 
 		"NEGATE", 
 		"ASTEXPR", 
+		"ASTGAMS", 
 		"ASTVARWISIMPLE", 
 		"ASTVARDEF", 
 		"ASTVARDEF0", 
@@ -177,155 +178,156 @@ public partial class GAMSParser : Parser
 		"Z"
     };
 
-    public const int ASTPOW = 21;
-    public const int ASTFUNCTIONELEMENTS1 = 60;
-    public const int COMMENT1 = 117;
-    public const int COMMENT2 = 118;
-    public const int ASTFUNCTION3 = 35;
-    public const int ASTFUNCTION2 = 34;
-    public const int ASTVARIABLE = 22;
-    public const int LETTER = 124;
-    public const int MOD = 121;
-    public const int ASTFUNCTION1 = 33;
-    public const int ASTIDX = 39;
-    public const int ASTFUNCTION0 = 57;
-    public const int LOG = 75;
-    public const int EQUATIONS = 85;
-    public const int ASTINDEXES1 = 24;
-    public const int ASTCONDITIONAL = 31;
-    public const int DOUBLEDOT = 86;
-    public const int ASTINDEXES3 = 26;
-    public const int NOT = 72;
-    public const int ASTVAR = 36;
-    public const int ASTINDEXES2 = 25;
+    public const int ASTPOW = 22;
+    public const int ASTFUNCTIONELEMENTS1 = 61;
+    public const int COMMENT1 = 118;
+    public const int COMMENT2 = 119;
+    public const int ASTFUNCTION3 = 36;
+    public const int ASTFUNCTION2 = 35;
+    public const int ASTVARIABLE = 23;
+    public const int LETTER = 125;
+    public const int MOD = 122;
+    public const int ASTFUNCTION1 = 34;
+    public const int ASTIDX = 40;
+    public const int ASTFUNCTION0 = 58;
+    public const int LOG = 76;
+    public const int EQUATIONS = 86;
+    public const int ASTINDEXES1 = 25;
+    public const int ASTCONDITIONAL = 32;
+    public const int DOUBLEDOT = 87;
+    public const int ASTINDEXES3 = 27;
+    public const int NOT = 73;
+    public const int ASTVAR = 37;
+    public const int ASTINDEXES2 = 26;
     public const int EOF = -1;
-    public const int NONEQUAL = 106;
-    public const int ASTINTEGER = 19;
-    public const int TANH = 80;
-    public const int ASTEQU = 11;
-    public const int Comment = 115;
-    public const int EXP = 74;
-    public const int ASTDOLLAREXPRESSION = 55;
-    public const int EEQUAL = 87;
-    public const int SQR = 79;
-    public const int GREATERTHANOREQUAL = 108;
-    public const int ASTFUNCTIONELEMENTS0 = 59;
-    public const int GREATERTHAN = 110;
-    public const int D = 129;
-    public const int Double = 111;
-    public const int ASTEQU1 = 41;
-    public const int E = 130;
-    public const int ASTEQU2 = 42;
-    public const int F = 131;
-    public const int G = 132;
-    public const int ASTEQU0 = 40;
-    public const int A = 126;
-    public const int B = 127;
-    public const int ASTEQU3 = 43;
+    public const int NONEQUAL = 107;
+    public const int ASTINTEGER = 20;
+    public const int TANH = 81;
+    public const int ASTEQU = 12;
+    public const int Comment = 116;
+    public const int EXP = 75;
+    public const int ASTDOLLAREXPRESSION = 56;
+    public const int EEQUAL = 88;
+    public const int SQR = 80;
+    public const int GREATERTHANOREQUAL = 109;
+    public const int ASTFUNCTIONELEMENTS0 = 60;
+    public const int GREATERTHAN = 111;
+    public const int D = 130;
+    public const int Double = 112;
+    public const int ASTEQU1 = 42;
+    public const int E = 131;
+    public const int ASTEQU2 = 43;
+    public const int F = 132;
+    public const int G = 133;
+    public const int ASTEQU0 = 41;
+    public const int A = 127;
+    public const int B = 128;
     public const int ASTEXPR = 5;
-    public const int C = 128;
-    public const int L = 137;
-    public const int M = 138;
-    public const int N = 139;
-    public const int NESTED_ML_COMMENT = 116;
-    public const int ASTVARWI4 = 49;
-    public const int O = 140;
-    public const int ASTVARWI3 = 48;
-    public const int H = 133;
-    public const int ASTVARWI2 = 47;
-    public const int ASTFUNCTIONELEMENTS = 58;
-    public const int I = 134;
-    public const int ASTVARWISIMPLE = 6;
-    public const int ASTVARWI1 = 46;
-    public const int J = 135;
-    public const int NEWLINE2 = 113;
-    public const int ASTVARWI0 = 45;
-    public const int K = 136;
-    public const int NEWLINE3 = 114;
-    public const int U = 146;
-    public const int T = 145;
-    public const int W = 148;
-    public const int WHITESPACE = 119;
-    public const int POWER = 78;
-    public const int V = 147;
-    public const int Q = 142;
-    public const int P = 141;
-    public const int S = 144;
-    public const int R = 143;
-    public const int MULT = 104;
-    public const int ASTVARWI = 44;
-    public const int Y = 150;
-    public const int ASTIDXELEMENTS1 = 52;
-    public const int X = 149;
-    public const int ASTIDXELEMENTS0 = 53;
-    public const int Z = 151;
-    public const int ABS = 73;
-    public const int Ident = 112;
-    public const int ASTEXPRESSION = 14;
-    public const int OR = 71;
-    public const int StringInQuotes = 99;
-    public const int ASTSUM = 32;
-    public const int ASTDEFINITION = 30;
-    public const int SOLVE = 82;
-    public const int DOLLAR = 103;
-    public const int ASTFUNCTION = 18;
-    public const int ASTEQUCODE = 13;
-    public const int MAX = 76;
-    public const int Exponent = 123;
-    public const int R2 = 96;
-    public const int R3 = 98;
-    public const int SUM = 69;
-    public const int AND = 70;
-    public const int COMMA = 90;
-    public const int R1 = 94;
-    public const int ASTSIMPLEFUNCTION1 = 15;
-    public const int EQUAL = 89;
-    public const int ASTSIMPLEFUNCTION2 = 16;
-    public const int LESSTHANOREQUAL = 107;
-    public const int ASTSIMPLEFUNCTION3 = 17;
-    public const int PLUS = 100;
-    public const int ASTEND = 23;
-    public const int MODEL = 81;
-    public const int DIGIT = 122;
-    public const int DOT = 92;
-    public const int ASTSUMCONTROLLED = 66;
-    public const int ASTSUMCONTROLLEDSIMPLE = 65;
-    public const int ASTEXPRESSION2 = 28;
-    public const int ASTEXPRESSION3 = 29;
-    public const int ASTIDXELEMENTS = 51;
-    public const int LESSTHAN = 109;
-    public const int ASTVALUE = 56;
-    public const int ASTVARIABLEWITHINDEXERETC = 37;
-    public const int ASTVARDEF = 7;
-    public const int ASTIDX0 = 50;
-    public const int ASTEXPRESSION1 = 27;
+    public const int ASTEQU3 = 44;
+    public const int C = 129;
+    public const int L = 138;
+    public const int M = 139;
+    public const int N = 140;
+    public const int NESTED_ML_COMMENT = 117;
+    public const int ASTVARWI4 = 50;
+    public const int O = 141;
+    public const int ASTVARWI3 = 49;
+    public const int H = 134;
+    public const int ASTVARWI2 = 48;
+    public const int ASTFUNCTIONELEMENTS = 59;
+    public const int I = 135;
+    public const int ASTVARWISIMPLE = 7;
+    public const int ASTVARWI1 = 47;
+    public const int J = 136;
+    public const int NEWLINE2 = 114;
+    public const int ASTVARWI0 = 46;
+    public const int K = 137;
+    public const int NEWLINE3 = 115;
+    public const int U = 147;
+    public const int T = 146;
+    public const int W = 149;
+    public const int WHITESPACE = 120;
+    public const int POWER = 79;
+    public const int V = 148;
+    public const int Q = 143;
+    public const int P = 142;
+    public const int S = 145;
+    public const int R = 144;
+    public const int MULT = 105;
+    public const int ASTVARWI = 45;
+    public const int Y = 151;
+    public const int ASTIDXELEMENTS1 = 53;
+    public const int X = 150;
+    public const int ASTIDXELEMENTS0 = 54;
+    public const int Z = 152;
+    public const int ABS = 74;
+    public const int Ident = 113;
+    public const int ASTEXPRESSION = 15;
+    public const int OR = 72;
+    public const int StringInQuotes = 100;
+    public const int ASTSUM = 33;
+    public const int ASTDEFINITION = 31;
+    public const int SOLVE = 83;
+    public const int DOLLAR = 104;
+    public const int ASTFUNCTION = 19;
+    public const int ASTEQUCODE = 14;
+    public const int MAX = 77;
+    public const int Exponent = 124;
+    public const int R2 = 97;
+    public const int R3 = 99;
+    public const int SUM = 70;
+    public const int AND = 71;
+    public const int COMMA = 91;
+    public const int R1 = 95;
+    public const int ASTSIMPLEFUNCTION1 = 16;
+    public const int EQUAL = 90;
+    public const int ASTSIMPLEFUNCTION2 = 17;
+    public const int LESSTHANOREQUAL = 108;
+    public const int ASTSIMPLEFUNCTION3 = 18;
+    public const int PLUS = 101;
+    public const int ASTEND = 24;
+    public const int MODEL = 82;
+    public const int DIGIT = 123;
+    public const int DOT = 93;
+    public const int ASTSUMCONTROLLED = 67;
+    public const int ASTSUMCONTROLLEDSIMPLE = 66;
+    public const int ASTGAMS = 6;
+    public const int ASTEXPRESSION2 = 29;
+    public const int ASTEXPRESSION3 = 30;
+    public const int ASTIDXELEMENTS = 52;
+    public const int LESSTHAN = 110;
+    public const int ASTVALUE = 57;
+    public const int ASTVARIABLEWITHINDEXERETC = 38;
+    public const int ASTVARDEF = 8;
+    public const int ASTIDX0 = 51;
+    public const int ASTEXPRESSION1 = 28;
     public const int NEGATE = 4;
-    public const int SAMEAS = 83;
-    public const int MIN = 77;
-    public const int MINUS = 102;
-    public const int ASTVARDEF0 = 8;
-    public const int ASTVARDEF1 = 9;
-    public const int ASTVARIABLEANDLEAD = 54;
-    public const int ASTVARDEF2 = 10;
-    public const int SEMI = 88;
-    public const int L1 = 93;
-    public const int L2 = 95;
-    public const int ASTSUM0 = 61;
-    public const int L3 = 97;
-    public const int ASTLEFTSIDE = 12;
-    public const int NEWLINE = 125;
-    public const int ASTSUM2 = 63;
-    public const int ASTSUMCONTROLLED2 = 68;
-    public const int ASTSUM1 = 62;
-    public const int ASTSUMCONTROLLED0 = 67;
-    public const int ASTSUM3 = 64;
-    public const int VARIABLES = 84;
-    public const int EQU = 120;
-    public const int STARS = 105;
-    public const int ASTDOUBLE = 20;
-    public const int DIV = 91;
-    public const int Integer = 101;
-    public const int ASTDOT = 38;
+    public const int SAMEAS = 84;
+    public const int MIN = 78;
+    public const int MINUS = 103;
+    public const int ASTVARDEF0 = 9;
+    public const int ASTVARDEF1 = 10;
+    public const int ASTVARIABLEANDLEAD = 55;
+    public const int ASTVARDEF2 = 11;
+    public const int SEMI = 89;
+    public const int L1 = 94;
+    public const int L2 = 96;
+    public const int ASTSUM0 = 62;
+    public const int L3 = 98;
+    public const int ASTLEFTSIDE = 13;
+    public const int NEWLINE = 126;
+    public const int ASTSUM2 = 64;
+    public const int ASTSUMCONTROLLED2 = 69;
+    public const int ASTSUM1 = 63;
+    public const int ASTSUMCONTROLLED0 = 68;
+    public const int ASTSUM3 = 65;
+    public const int VARIABLES = 85;
+    public const int EQU = 121;
+    public const int STARS = 106;
+    public const int ASTDOUBLE = 21;
+    public const int DIV = 92;
+    public const int Integer = 102;
+    public const int ASTDOT = 39;
 
     // delegates
     // delegators
@@ -339,7 +341,7 @@ public partial class GAMSParser : Parser
         public GAMSParser(ITokenStream input, RecognizerSharedState state)
     		: base(input, state) {
             InitializeCyclicDFAs();
-            this.state.ruleMemo = new Hashtable[114+1];
+            this.state.ruleMemo = new Hashtable[116+1];
              
              
         }
@@ -390,7 +392,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "extraTokens"
-    // GAMS.g:170:1: extraTokens : ( SUM | AND | OR | NOT | ABS | EXP | LOG | MAX | MIN | POWER | SQR | TANH | MODEL | SOLVE | SAMEAS | VARIABLES | EQUATIONS );
+    // GAMS.g:171:1: extraTokens : ( SUM | AND | OR | NOT | ABS | EXP | LOG | MAX | MIN | POWER | SQR | TANH | MODEL | SOLVE | SAMEAS | VARIABLES | EQUATIONS );
     public GAMSParser.extraTokens_return extraTokens() // throws RecognitionException [1]
     {   
         GAMSParser.extraTokens_return retval = new GAMSParser.extraTokens_return();
@@ -408,7 +410,7 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:170:13: ( SUM | AND | OR | NOT | ABS | EXP | LOG | MAX | MIN | POWER | SQR | TANH | MODEL | SOLVE | SAMEAS | VARIABLES | EQUATIONS )
+            // GAMS.g:171:13: ( SUM | AND | OR | NOT | ABS | EXP | LOG | MAX | MIN | POWER | SQR | TANH | MODEL | SOLVE | SAMEAS | VARIABLES | EQUATIONS )
             // GAMS.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
@@ -466,7 +468,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "gams"
-    // GAMS.g:194:1: gams : ( expr )* EOF -> ^( ASTEXPR ( expr )* ) ;
+    // GAMS.g:195:1: gams : ( expr )* EOF -> ^( ASTGAMS ( expr )* ) ;
     public GAMSParser.gams_return gams() // throws RecognitionException [1]
     {   
         GAMSParser.gams_return retval = new GAMSParser.gams_return();
@@ -487,10 +489,10 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:194:5: ( ( expr )* EOF -> ^( ASTEXPR ( expr )* ) )
-            // GAMS.g:194:7: ( expr )* EOF
+            // GAMS.g:195:5: ( ( expr )* EOF -> ^( ASTGAMS ( expr )* ) )
+            // GAMS.g:195:7: ( expr )* EOF
             {
-            	// GAMS.g:194:7: ( expr )*
+            	// GAMS.g:195:7: ( expr )*
             	do 
             	{
             	    int alt1 = 2;
@@ -507,7 +509,7 @@ public partial class GAMSParser : Parser
             			case 1 :
             			    // GAMS.g:0:0: expr
             			    {
-            			    	PushFollow(FOLLOW_expr_in_gams493);
+            			    	PushFollow(FOLLOW_expr_in_gams497);
             			    	expr2 = expr();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -524,7 +526,7 @@ public partial class GAMSParser : Parser
             	loop1:
             		;	// Stops C# compiler whining that label 'loop1' has no statements
 
-            	EOF3=(IToken)Match(input,EOF,FOLLOW_EOF_in_gams496); if (state.failed) return retval; 
+            	EOF3=(IToken)Match(input,EOF,FOLLOW_EOF_in_gams500); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_EOF.Add(EOF3);
 
 
@@ -541,14 +543,14 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 194:17: -> ^( ASTEXPR ( expr )* )
+            	// 195:17: -> ^( ASTGAMS ( expr )* )
             	{
-            	    // GAMS.g:194:20: ^( ASTEXPR ( expr )* )
+            	    // GAMS.g:195:20: ^( ASTGAMS ( expr )* )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
-            	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPR, "ASTEXPR"), root_1);
+            	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTGAMS, "ASTGAMS"), root_1);
 
-            	    // GAMS.g:194:30: ( expr )*
+            	    // GAMS.g:195:30: ( expr )*
             	    while ( stream_expr.HasNext() )
             	    {
             	        adaptor.AddChild(root_1, stream_expr.NextTree());
@@ -600,7 +602,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "expr"
-    // GAMS.g:196:1: expr : ( equ | vardef | variables | equations | model | solve );
+    // GAMS.g:197:1: expr : ( equ -> ^( ASTEXPRESSION equ ) | vardef -> ^( ASTEXPRESSION vardef ) | variables -> ^( ASTEXPRESSION variables ) | equations -> ^( ASTEXPRESSION equations ) | model -> ^( ASTEXPRESSION model ) | solve -> ^( ASTEXPRESSION solve ) );
     public GAMSParser.expr_return expr() // throws RecognitionException [1]
     {   
         GAMSParser.expr_return retval = new GAMSParser.expr_return();
@@ -621,94 +623,255 @@ public partial class GAMSParser : Parser
         GAMSParser.solve_return solve9 = default(GAMSParser.solve_return);
 
 
-
+        RewriteRuleSubtreeStream stream_solve = new RewriteRuleSubtreeStream(adaptor,"rule solve");
+        RewriteRuleSubtreeStream stream_model = new RewriteRuleSubtreeStream(adaptor,"rule model");
+        RewriteRuleSubtreeStream stream_equ = new RewriteRuleSubtreeStream(adaptor,"rule equ");
+        RewriteRuleSubtreeStream stream_vardef = new RewriteRuleSubtreeStream(adaptor,"rule vardef");
+        RewriteRuleSubtreeStream stream_equations = new RewriteRuleSubtreeStream(adaptor,"rule equations");
+        RewriteRuleSubtreeStream stream_variables = new RewriteRuleSubtreeStream(adaptor,"rule variables");
         try 
     	{
     	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 3) ) 
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:196:5: ( equ | vardef | variables | equations | model | solve )
+            // GAMS.g:197:5: ( equ -> ^( ASTEXPRESSION equ ) | vardef -> ^( ASTEXPRESSION vardef ) | variables -> ^( ASTEXPRESSION variables ) | equations -> ^( ASTEXPRESSION equations ) | model -> ^( ASTEXPRESSION model ) | solve -> ^( ASTEXPRESSION solve ) )
             int alt2 = 6;
             alt2 = dfa2.Predict(input);
             switch (alt2) 
             {
                 case 1 :
-                    // GAMS.g:196:7: equ
+                    // GAMS.g:197:7: equ
                     {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	PushFollow(FOLLOW_equ_in_expr517);
+                    	PushFollow(FOLLOW_equ_in_expr521);
                     	equ4 = equ();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, equ4.Tree);
+                    	if ( (state.backtracking==0) ) stream_equ.Add(equ4.Tree);
 
+
+                    	// AST REWRITE
+                    	// elements:          equ
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 197:11: -> ^( ASTEXPRESSION equ )
+                    	{
+                    	    // GAMS.g:197:14: ^( ASTEXPRESSION equ )
+                    	    {
+                    	    object root_1 = (object)adaptor.GetNilNode();
+                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION, "ASTEXPRESSION"), root_1);
+
+                    	    adaptor.AddChild(root_1, stream_equ.NextTree());
+
+                    	    adaptor.AddChild(root_0, root_1);
+                    	    }
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
                     }
                     break;
                 case 2 :
-                    // GAMS.g:197:9: vardef
+                    // GAMS.g:198:9: vardef
                     {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	PushFollow(FOLLOW_vardef_in_expr527);
+                    	PushFollow(FOLLOW_vardef_in_expr539);
                     	vardef5 = vardef();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, vardef5.Tree);
+                    	if ( (state.backtracking==0) ) stream_vardef.Add(vardef5.Tree);
 
+
+                    	// AST REWRITE
+                    	// elements:          vardef
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 198:16: -> ^( ASTEXPRESSION vardef )
+                    	{
+                    	    // GAMS.g:198:19: ^( ASTEXPRESSION vardef )
+                    	    {
+                    	    object root_1 = (object)adaptor.GetNilNode();
+                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION, "ASTEXPRESSION"), root_1);
+
+                    	    adaptor.AddChild(root_1, stream_vardef.NextTree());
+
+                    	    adaptor.AddChild(root_0, root_1);
+                    	    }
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
                     }
                     break;
                 case 3 :
-                    // GAMS.g:198:6: variables
+                    // GAMS.g:199:6: variables
                     {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	PushFollow(FOLLOW_variables_in_expr534);
+                    	PushFollow(FOLLOW_variables_in_expr554);
                     	variables6 = variables();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, variables6.Tree);
+                    	if ( (state.backtracking==0) ) stream_variables.Add(variables6.Tree);
 
+
+                    	// AST REWRITE
+                    	// elements:          variables
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 199:16: -> ^( ASTEXPRESSION variables )
+                    	{
+                    	    // GAMS.g:199:19: ^( ASTEXPRESSION variables )
+                    	    {
+                    	    object root_1 = (object)adaptor.GetNilNode();
+                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION, "ASTEXPRESSION"), root_1);
+
+                    	    adaptor.AddChild(root_1, stream_variables.NextTree());
+
+                    	    adaptor.AddChild(root_0, root_1);
+                    	    }
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
                     }
                     break;
                 case 4 :
-                    // GAMS.g:199:6: equations
+                    // GAMS.g:200:6: equations
                     {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	PushFollow(FOLLOW_equations_in_expr541);
+                    	PushFollow(FOLLOW_equations_in_expr569);
                     	equations7 = equations();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, equations7.Tree);
+                    	if ( (state.backtracking==0) ) stream_equations.Add(equations7.Tree);
 
+
+                    	// AST REWRITE
+                    	// elements:          equations
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 200:16: -> ^( ASTEXPRESSION equations )
+                    	{
+                    	    // GAMS.g:200:19: ^( ASTEXPRESSION equations )
+                    	    {
+                    	    object root_1 = (object)adaptor.GetNilNode();
+                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION, "ASTEXPRESSION"), root_1);
+
+                    	    adaptor.AddChild(root_1, stream_equations.NextTree());
+
+                    	    adaptor.AddChild(root_0, root_1);
+                    	    }
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
                     }
                     break;
                 case 5 :
-                    // GAMS.g:200:6: model
+                    // GAMS.g:201:6: model
                     {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	PushFollow(FOLLOW_model_in_expr548);
+                    	PushFollow(FOLLOW_model_in_expr584);
                     	model8 = model();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, model8.Tree);
+                    	if ( (state.backtracking==0) ) stream_model.Add(model8.Tree);
 
+
+                    	// AST REWRITE
+                    	// elements:          model
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 201:12: -> ^( ASTEXPRESSION model )
+                    	{
+                    	    // GAMS.g:201:15: ^( ASTEXPRESSION model )
+                    	    {
+                    	    object root_1 = (object)adaptor.GetNilNode();
+                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION, "ASTEXPRESSION"), root_1);
+
+                    	    adaptor.AddChild(root_1, stream_model.NextTree());
+
+                    	    adaptor.AddChild(root_0, root_1);
+                    	    }
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
                     }
                     break;
                 case 6 :
-                    // GAMS.g:201:6: solve
+                    // GAMS.g:202:6: solve
                     {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	PushFollow(FOLLOW_solve_in_expr555);
+                    	PushFollow(FOLLOW_solve_in_expr599);
                     	solve9 = solve();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, solve9.Tree);
+                    	if ( (state.backtracking==0) ) stream_solve.Add(solve9.Tree);
 
+
+                    	// AST REWRITE
+                    	// elements:          solve
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 202:12: -> ^( ASTEXPRESSION solve )
+                    	{
+                    	    // GAMS.g:202:15: ^( ASTEXPRESSION solve )
+                    	    {
+                    	    object root_1 = (object)adaptor.GetNilNode();
+                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION, "ASTEXPRESSION"), root_1);
+
+                    	    adaptor.AddChild(root_1, stream_solve.NextTree());
+
+                    	    adaptor.AddChild(root_0, root_1);
+                    	    }
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
                     }
                     break;
 
@@ -749,7 +912,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "equ"
-    // GAMS.g:204:1: equ : variableWithIndexerSimple DOUBLEDOT expression EEQUAL expression SEMI -> ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) ) ;
+    // GAMS.g:205:1: equ : variableWithIndexerSimple DOUBLEDOT expression EEQUAL expression SEMI -> ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) ) ;
     public GAMSParser.equ_return equ() // throws RecognitionException [1]
     {   
         GAMSParser.equ_return retval = new GAMSParser.equ_return();
@@ -781,31 +944,31 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:204:4: ( variableWithIndexerSimple DOUBLEDOT expression EEQUAL expression SEMI -> ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) ) )
-            // GAMS.g:204:9: variableWithIndexerSimple DOUBLEDOT expression EEQUAL expression SEMI
+            // GAMS.g:205:4: ( variableWithIndexerSimple DOUBLEDOT expression EEQUAL expression SEMI -> ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) ) )
+            // GAMS.g:205:9: variableWithIndexerSimple DOUBLEDOT expression EEQUAL expression SEMI
             {
-            	PushFollow(FOLLOW_variableWithIndexerSimple_in_equ569);
+            	PushFollow(FOLLOW_variableWithIndexerSimple_in_equ621);
             	variableWithIndexerSimple10 = variableWithIndexerSimple();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_variableWithIndexerSimple.Add(variableWithIndexerSimple10.Tree);
-            	DOUBLEDOT11=(IToken)Match(input,DOUBLEDOT,FOLLOW_DOUBLEDOT_in_equ571); if (state.failed) return retval; 
+            	DOUBLEDOT11=(IToken)Match(input,DOUBLEDOT,FOLLOW_DOUBLEDOT_in_equ623); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_DOUBLEDOT.Add(DOUBLEDOT11);
 
-            	PushFollow(FOLLOW_expression_in_equ573);
+            	PushFollow(FOLLOW_expression_in_equ625);
             	expression12 = expression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_expression.Add(expression12.Tree);
-            	EEQUAL13=(IToken)Match(input,EEQUAL,FOLLOW_EEQUAL_in_equ575); if (state.failed) return retval; 
+            	EEQUAL13=(IToken)Match(input,EEQUAL,FOLLOW_EEQUAL_in_equ627); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_EEQUAL.Add(EEQUAL13);
 
-            	PushFollow(FOLLOW_expression_in_equ577);
+            	PushFollow(FOLLOW_expression_in_equ629);
             	expression14 = expression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_expression.Add(expression14.Tree);
-            	SEMI15=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_equ579); if (state.failed) return retval; 
+            	SEMI15=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_equ631); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_SEMI.Add(SEMI15);
 
             	if ( (state.backtracking==0) )
@@ -815,7 +978,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          DOUBLEDOT, expression, EEQUAL, SEMI, variableWithIndexerSimple, expression
+            	// elements:          expression, expression, SEMI, DOUBLEDOT, variableWithIndexerSimple, EEQUAL
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -826,14 +989,14 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 205:3: -> ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) )
+            	// 206:3: -> ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) )
             	{
-            	    // GAMS.g:205:6: ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) )
+            	    // GAMS.g:206:6: ^( ASTEQU ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI ) ^( ASTEQU1 variableWithIndexerSimple ) ^( ASTEQU2 expression ) ^( ASTEQU3 expression ) )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEQU, "ASTEQU"), root_1);
 
-            	    // GAMS.g:205:15: ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI )
+            	    // GAMS.g:206:15: ^( ASTEQU0 DOUBLEDOT EEQUAL SEMI )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEQU0, "ASTEQU0"), root_2);
@@ -844,7 +1007,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:205:48: ^( ASTEQU1 variableWithIndexerSimple )
+            	    // GAMS.g:206:48: ^( ASTEQU1 variableWithIndexerSimple )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEQU1, "ASTEQU1"), root_2);
@@ -853,7 +1016,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:205:85: ^( ASTEQU2 expression )
+            	    // GAMS.g:206:85: ^( ASTEQU2 expression )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEQU2, "ASTEQU2"), root_2);
@@ -862,7 +1025,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:205:107: ^( ASTEQU3 expression )
+            	    // GAMS.g:206:107: ^( ASTEQU3 expression )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEQU3, "ASTEQU3"), root_2);
@@ -916,7 +1079,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "vardef"
-    // GAMS.g:207:1: vardef : variableWithIndexerEtc EQUAL expression SEMI -> ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) ) ;
+    // GAMS.g:208:1: vardef : variableWithIndexerEtc EQUAL expression SEMI -> ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) ) ;
     public GAMSParser.vardef_return vardef() // throws RecognitionException [1]
     {   
         GAMSParser.vardef_return retval = new GAMSParser.vardef_return();
@@ -943,29 +1106,29 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:207:7: ( variableWithIndexerEtc EQUAL expression SEMI -> ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) ) )
-            // GAMS.g:207:11: variableWithIndexerEtc EQUAL expression SEMI
+            // GAMS.g:208:7: ( variableWithIndexerEtc EQUAL expression SEMI -> ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) ) )
+            // GAMS.g:208:11: variableWithIndexerEtc EQUAL expression SEMI
             {
-            	PushFollow(FOLLOW_variableWithIndexerEtc_in_vardef627);
+            	PushFollow(FOLLOW_variableWithIndexerEtc_in_vardef679);
             	variableWithIndexerEtc16 = variableWithIndexerEtc();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_variableWithIndexerEtc.Add(variableWithIndexerEtc16.Tree);
-            	EQUAL17=(IToken)Match(input,EQUAL,FOLLOW_EQUAL_in_vardef629); if (state.failed) return retval; 
+            	EQUAL17=(IToken)Match(input,EQUAL,FOLLOW_EQUAL_in_vardef681); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_EQUAL.Add(EQUAL17);
 
-            	PushFollow(FOLLOW_expression_in_vardef631);
+            	PushFollow(FOLLOW_expression_in_vardef683);
             	expression18 = expression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_expression.Add(expression18.Tree);
-            	SEMI19=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_vardef633); if (state.failed) return retval; 
+            	SEMI19=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_vardef685); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_SEMI.Add(SEMI19);
 
 
 
             	// AST REWRITE
-            	// elements:          SEMI, EQUAL, expression, variableWithIndexerEtc
+            	// elements:          EQUAL, variableWithIndexerEtc, SEMI, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -976,14 +1139,14 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 208:3: -> ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) )
+            	// 209:3: -> ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) )
             	{
-            	    // GAMS.g:208:6: ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) )
+            	    // GAMS.g:209:6: ^( ASTVARDEF ^( ASTVARDEF0 EQUAL SEMI ) ^( ASTVARDEF1 variableWithIndexerEtc ) ^( ASTVARDEF2 expression ) )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARDEF, "ASTVARDEF"), root_1);
 
-            	    // GAMS.g:208:18: ^( ASTVARDEF0 EQUAL SEMI )
+            	    // GAMS.g:209:18: ^( ASTVARDEF0 EQUAL SEMI )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARDEF0, "ASTVARDEF0"), root_2);
@@ -993,7 +1156,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:208:43: ^( ASTVARDEF1 variableWithIndexerEtc )
+            	    // GAMS.g:209:43: ^( ASTVARDEF1 variableWithIndexerEtc )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARDEF1, "ASTVARDEF1"), root_2);
@@ -1002,7 +1165,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:208:80: ^( ASTVARDEF2 expression )
+            	    // GAMS.g:209:80: ^( ASTVARDEF2 expression )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARDEF2, "ASTVARDEF2"), root_2);
@@ -1056,7 +1219,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "variables"
-    // GAMS.g:210:1: variables : VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ ;
+    // GAMS.g:211:1: variables : VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ ;
     public GAMSParser.variables_return variables() // throws RecognitionException [1]
     {   
         GAMSParser.variables_return retval = new GAMSParser.variables_return();
@@ -1085,18 +1248,18 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:210:10: ( VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ )
-            // GAMS.g:210:12: VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI
+            // GAMS.g:211:10: ( VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ )
+            // GAMS.g:211:12: VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI
             {
-            	VARIABLES20=(IToken)Match(input,VARIABLES,FOLLOW_VARIABLES_in_variables669); if (state.failed) return retval; 
+            	VARIABLES20=(IToken)Match(input,VARIABLES,FOLLOW_VARIABLES_in_variables721); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_VARIABLES.Add(VARIABLES20);
 
-            	PushFollow(FOLLOW_variableWithIndexerSimple_in_variables671);
+            	PushFollow(FOLLOW_variableWithIndexerSimple_in_variables723);
             	variableWithIndexerSimple21 = variableWithIndexerSimple();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_variableWithIndexerSimple.Add(variableWithIndexerSimple21.Tree);
-            	// GAMS.g:210:48: ( COMMA variableWithIndexerSimple )*
+            	// GAMS.g:211:48: ( COMMA variableWithIndexerSimple )*
             	do 
             	{
             	    int alt3 = 2;
@@ -1111,12 +1274,12 @@ public partial class GAMSParser : Parser
             	    switch (alt3) 
             		{
             			case 1 :
-            			    // GAMS.g:210:49: COMMA variableWithIndexerSimple
+            			    // GAMS.g:211:49: COMMA variableWithIndexerSimple
             			    {
-            			    	COMMA22=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_variables674); if (state.failed) return retval; 
+            			    	COMMA22=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_variables726); if (state.failed) return retval; 
             			    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA22);
 
-            			    	PushFollow(FOLLOW_variableWithIndexerSimple_in_variables676);
+            			    	PushFollow(FOLLOW_variableWithIndexerSimple_in_variables728);
             			    	variableWithIndexerSimple23 = variableWithIndexerSimple();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -1133,7 +1296,7 @@ public partial class GAMSParser : Parser
             	loop3:
             		;	// Stops C# compiler whining that label 'loop3' has no statements
 
-            	SEMI24=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_variables680); if (state.failed) return retval; 
+            	SEMI24=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_variables732); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_SEMI.Add(SEMI24);
 
 
@@ -1150,7 +1313,7 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 210:88: -> ( variableWithIndexerSimple )+
+            	// 211:88: -> ( variableWithIndexerSimple )+
             	{
             	    if ( !(stream_variableWithIndexerSimple.HasNext()) ) {
             	        throw new RewriteEarlyExitException();
@@ -1203,7 +1366,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "equations"
-    // GAMS.g:212:1: equations : VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ ;
+    // GAMS.g:213:1: equations : VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ ;
     public GAMSParser.equations_return equations() // throws RecognitionException [1]
     {   
         GAMSParser.equations_return retval = new GAMSParser.equations_return();
@@ -1232,18 +1395,18 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:212:10: ( VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ )
-            // GAMS.g:212:12: VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI
+            // GAMS.g:213:10: ( VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI -> ( variableWithIndexerSimple )+ )
+            // GAMS.g:213:12: VARIABLES variableWithIndexerSimple ( COMMA variableWithIndexerSimple )* SEMI
             {
-            	VARIABLES25=(IToken)Match(input,VARIABLES,FOLLOW_VARIABLES_in_equations692); if (state.failed) return retval; 
+            	VARIABLES25=(IToken)Match(input,VARIABLES,FOLLOW_VARIABLES_in_equations744); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_VARIABLES.Add(VARIABLES25);
 
-            	PushFollow(FOLLOW_variableWithIndexerSimple_in_equations694);
+            	PushFollow(FOLLOW_variableWithIndexerSimple_in_equations746);
             	variableWithIndexerSimple26 = variableWithIndexerSimple();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_variableWithIndexerSimple.Add(variableWithIndexerSimple26.Tree);
-            	// GAMS.g:212:48: ( COMMA variableWithIndexerSimple )*
+            	// GAMS.g:213:48: ( COMMA variableWithIndexerSimple )*
             	do 
             	{
             	    int alt4 = 2;
@@ -1258,12 +1421,12 @@ public partial class GAMSParser : Parser
             	    switch (alt4) 
             		{
             			case 1 :
-            			    // GAMS.g:212:49: COMMA variableWithIndexerSimple
+            			    // GAMS.g:213:49: COMMA variableWithIndexerSimple
             			    {
-            			    	COMMA27=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_equations697); if (state.failed) return retval; 
+            			    	COMMA27=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_equations749); if (state.failed) return retval; 
             			    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA27);
 
-            			    	PushFollow(FOLLOW_variableWithIndexerSimple_in_equations699);
+            			    	PushFollow(FOLLOW_variableWithIndexerSimple_in_equations751);
             			    	variableWithIndexerSimple28 = variableWithIndexerSimple();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -1280,7 +1443,7 @@ public partial class GAMSParser : Parser
             	loop4:
             		;	// Stops C# compiler whining that label 'loop4' has no statements
 
-            	SEMI29=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_equations703); if (state.failed) return retval; 
+            	SEMI29=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_equations755); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_SEMI.Add(SEMI29);
 
 
@@ -1297,7 +1460,7 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 212:88: -> ( variableWithIndexerSimple )+
+            	// 213:88: -> ( variableWithIndexerSimple )+
             	{
             	    if ( !(stream_variableWithIndexerSimple.HasNext()) ) {
             	        throw new RewriteEarlyExitException();
@@ -1350,7 +1513,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "model"
-    // GAMS.g:214:1: model : MODEL ( ident | DIV )* SEMI ->;
+    // GAMS.g:215:1: model : MODEL ( ident | DIV )* SEMI ->;
     public GAMSParser.model_return model() // throws RecognitionException [1]
     {   
         GAMSParser.model_return retval = new GAMSParser.model_return();
@@ -1377,13 +1540,13 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:214:6: ( MODEL ( ident | DIV )* SEMI ->)
-            // GAMS.g:214:8: MODEL ( ident | DIV )* SEMI
+            // GAMS.g:215:6: ( MODEL ( ident | DIV )* SEMI ->)
+            // GAMS.g:215:8: MODEL ( ident | DIV )* SEMI
             {
-            	MODEL30=(IToken)Match(input,MODEL,FOLLOW_MODEL_in_model715); if (state.failed) return retval; 
+            	MODEL30=(IToken)Match(input,MODEL,FOLLOW_MODEL_in_model767); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_MODEL.Add(MODEL30);
 
-            	// GAMS.g:214:14: ( ident | DIV )*
+            	// GAMS.g:215:14: ( ident | DIV )*
             	do 
             	{
             	    int alt5 = 3;
@@ -1402,9 +1565,9 @@ public partial class GAMSParser : Parser
             	    switch (alt5) 
             		{
             			case 1 :
-            			    // GAMS.g:214:15: ident
+            			    // GAMS.g:215:15: ident
             			    {
-            			    	PushFollow(FOLLOW_ident_in_model718);
+            			    	PushFollow(FOLLOW_ident_in_model770);
             			    	ident31 = ident();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -1413,9 +1576,9 @@ public partial class GAMSParser : Parser
             			    }
             			    break;
             			case 2 :
-            			    // GAMS.g:214:23: DIV
+            			    // GAMS.g:215:23: DIV
             			    {
-            			    	DIV32=(IToken)Match(input,DIV,FOLLOW_DIV_in_model722); if (state.failed) return retval; 
+            			    	DIV32=(IToken)Match(input,DIV,FOLLOW_DIV_in_model774); if (state.failed) return retval; 
             			    	if ( (state.backtracking==0) ) stream_DIV.Add(DIV32);
 
 
@@ -1430,7 +1593,7 @@ public partial class GAMSParser : Parser
             	loop5:
             		;	// Stops C# compiler whining that label 'loop5' has no statements
 
-            	SEMI33=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_model726); if (state.failed) return retval; 
+            	SEMI33=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_model778); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_SEMI.Add(SEMI33);
 
 
@@ -1447,7 +1610,7 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 214:34: ->
+            	// 215:34: ->
             	{
             	    root_0 = null;
             	}
@@ -1491,7 +1654,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "solve"
-    // GAMS.g:216:1: solve : SOLVE ( ident )* SEMI ->;
+    // GAMS.g:217:1: solve : SOLVE ( ident )* SEMI ->;
     public GAMSParser.solve_return solve() // throws RecognitionException [1]
     {   
         GAMSParser.solve_return retval = new GAMSParser.solve_return();
@@ -1515,13 +1678,13 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:216:6: ( SOLVE ( ident )* SEMI ->)
-            // GAMS.g:216:8: SOLVE ( ident )* SEMI
+            // GAMS.g:217:6: ( SOLVE ( ident )* SEMI ->)
+            // GAMS.g:217:8: SOLVE ( ident )* SEMI
             {
-            	SOLVE34=(IToken)Match(input,SOLVE,FOLLOW_SOLVE_in_solve736); if (state.failed) return retval; 
+            	SOLVE34=(IToken)Match(input,SOLVE,FOLLOW_SOLVE_in_solve788); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_SOLVE.Add(SOLVE34);
 
-            	// GAMS.g:216:14: ( ident )*
+            	// GAMS.g:217:14: ( ident )*
             	do 
             	{
             	    int alt6 = 2;
@@ -1538,7 +1701,7 @@ public partial class GAMSParser : Parser
             			case 1 :
             			    // GAMS.g:0:0: ident
             			    {
-            			    	PushFollow(FOLLOW_ident_in_solve738);
+            			    	PushFollow(FOLLOW_ident_in_solve790);
             			    	ident35 = ident();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -1555,7 +1718,7 @@ public partial class GAMSParser : Parser
             	loop6:
             		;	// Stops C# compiler whining that label 'loop6' has no statements
 
-            	SEMI36=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_solve741); if (state.failed) return retval; 
+            	SEMI36=(IToken)Match(input,SEMI,FOLLOW_SEMI_in_solve793); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_SEMI.Add(SEMI36);
 
 
@@ -1572,7 +1735,7 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 216:26: ->
+            	// 217:26: ->
             	{
             	    root_0 = null;
             	}
@@ -1616,7 +1779,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "variableWithIndexerSimple"
-    // GAMS.g:222:1: variableWithIndexerSimple : variable ( idx )? -> ^( ASTVARWISIMPLE variable ( idx )? ) ;
+    // GAMS.g:223:1: variableWithIndexerSimple : variable ( idx )? -> ^( ASTVARWISIMPLE variable ( idx )? ) ;
     public GAMSParser.variableWithIndexerSimple_return variableWithIndexerSimple() // throws RecognitionException [1]
     {   
         GAMSParser.variableWithIndexerSimple_return retval = new GAMSParser.variableWithIndexerSimple_return();
@@ -1637,15 +1800,15 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:222:26: ( variable ( idx )? -> ^( ASTVARWISIMPLE variable ( idx )? ) )
-            // GAMS.g:222:28: variable ( idx )?
+            // GAMS.g:223:26: ( variable ( idx )? -> ^( ASTVARWISIMPLE variable ( idx )? ) )
+            // GAMS.g:223:28: variable ( idx )?
             {
-            	PushFollow(FOLLOW_variable_in_variableWithIndexerSimple755);
+            	PushFollow(FOLLOW_variable_in_variableWithIndexerSimple807);
             	variable37 = variable();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_variable.Add(variable37.Tree);
-            	// GAMS.g:222:37: ( idx )?
+            	// GAMS.g:223:37: ( idx )?
             	int alt7 = 2;
             	int LA7_0 = input.LA(1);
 
@@ -1658,7 +1821,7 @@ public partial class GAMSParser : Parser
             	    case 1 :
             	        // GAMS.g:0:0: idx
             	        {
-            	        	PushFollow(FOLLOW_idx_in_variableWithIndexerSimple757);
+            	        	PushFollow(FOLLOW_idx_in_variableWithIndexerSimple809);
             	        	idx38 = idx();
             	        	state.followingStackPointer--;
             	        	if (state.failed) return retval;
@@ -1672,7 +1835,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          idx, variable
+            	// elements:          variable, idx
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1683,15 +1846,15 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 222:42: -> ^( ASTVARWISIMPLE variable ( idx )? )
+            	// 223:42: -> ^( ASTVARWISIMPLE variable ( idx )? )
             	{
-            	    // GAMS.g:222:45: ^( ASTVARWISIMPLE variable ( idx )? )
+            	    // GAMS.g:223:45: ^( ASTVARWISIMPLE variable ( idx )? )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARWISIMPLE, "ASTVARWISIMPLE"), root_1);
 
             	    adaptor.AddChild(root_1, stream_variable.NextTree());
-            	    // GAMS.g:222:71: ( idx )?
+            	    // GAMS.g:223:71: ( idx )?
             	    if ( stream_idx.HasNext() )
             	    {
             	        adaptor.AddChild(root_1, stream_idx.NextTree());
@@ -1743,7 +1906,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "variableWithIndexerEtc"
-    // GAMS.g:224:1: variableWithIndexerEtc : variable ( DOT variable )? ( idx )? ( conditional )? -> ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) ) ;
+    // GAMS.g:225:1: variableWithIndexerEtc : variable ( DOT variable )? ( idx )? ( conditional )? -> ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) ) ;
     public GAMSParser.variableWithIndexerEtc_return variableWithIndexerEtc() // throws RecognitionException [1]
     {   
         GAMSParser.variableWithIndexerEtc_return retval = new GAMSParser.variableWithIndexerEtc_return();
@@ -1772,26 +1935,26 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:224:23: ( variable ( DOT variable )? ( idx )? ( conditional )? -> ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) ) )
-            // GAMS.g:224:25: variable ( DOT variable )? ( idx )? ( conditional )?
+            // GAMS.g:225:23: ( variable ( DOT variable )? ( idx )? ( conditional )? -> ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) ) )
+            // GAMS.g:225:25: variable ( DOT variable )? ( idx )? ( conditional )?
             {
-            	PushFollow(FOLLOW_variable_in_variableWithIndexerEtc776);
+            	PushFollow(FOLLOW_variable_in_variableWithIndexerEtc828);
             	variable39 = variable();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_variable.Add(variable39.Tree);
-            	// GAMS.g:224:34: ( DOT variable )?
+            	// GAMS.g:225:34: ( DOT variable )?
             	int alt8 = 2;
             	alt8 = dfa8.Predict(input);
             	switch (alt8) 
             	{
             	    case 1 :
-            	        // GAMS.g:224:35: DOT variable
+            	        // GAMS.g:225:35: DOT variable
             	        {
-            	        	DOT40=(IToken)Match(input,DOT,FOLLOW_DOT_in_variableWithIndexerEtc779); if (state.failed) return retval; 
+            	        	DOT40=(IToken)Match(input,DOT,FOLLOW_DOT_in_variableWithIndexerEtc831); if (state.failed) return retval; 
             	        	if ( (state.backtracking==0) ) stream_DOT.Add(DOT40);
 
-            	        	PushFollow(FOLLOW_variable_in_variableWithIndexerEtc781);
+            	        	PushFollow(FOLLOW_variable_in_variableWithIndexerEtc833);
             	        	variable41 = variable();
             	        	state.followingStackPointer--;
             	        	if (state.failed) return retval;
@@ -1802,7 +1965,7 @@ public partial class GAMSParser : Parser
 
             	}
 
-            	// GAMS.g:224:50: ( idx )?
+            	// GAMS.g:225:50: ( idx )?
             	int alt9 = 2;
             	alt9 = dfa9.Predict(input);
             	switch (alt9) 
@@ -1810,7 +1973,7 @@ public partial class GAMSParser : Parser
             	    case 1 :
             	        // GAMS.g:0:0: idx
             	        {
-            	        	PushFollow(FOLLOW_idx_in_variableWithIndexerEtc785);
+            	        	PushFollow(FOLLOW_idx_in_variableWithIndexerEtc837);
             	        	idx42 = idx();
             	        	state.followingStackPointer--;
             	        	if (state.failed) return retval;
@@ -1821,7 +1984,7 @@ public partial class GAMSParser : Parser
 
             	}
 
-            	// GAMS.g:224:55: ( conditional )?
+            	// GAMS.g:225:55: ( conditional )?
             	int alt10 = 2;
             	alt10 = dfa10.Predict(input);
             	switch (alt10) 
@@ -1829,7 +1992,7 @@ public partial class GAMSParser : Parser
             	    case 1 :
             	        // GAMS.g:0:0: conditional
             	        {
-            	        	PushFollow(FOLLOW_conditional_in_variableWithIndexerEtc788);
+            	        	PushFollow(FOLLOW_conditional_in_variableWithIndexerEtc840);
             	        	conditional43 = conditional();
             	        	state.followingStackPointer--;
             	        	if (state.failed) return retval;
@@ -1843,7 +2006,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          idx, variable, variable, conditional, DOT
+            	// elements:          conditional, DOT, variable, idx, variable
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1854,19 +2017,19 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 225:3: -> ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) )
+            	// 226:3: -> ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) )
             	{
-            	    // GAMS.g:225:6: ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) )
+            	    // GAMS.g:226:6: ^( ASTVARWI ^( ASTVARWI0 ( DOT )? ) ^( ASTVARWI1 variable ) ^( ASTVARWI2 ( variable )? ) ^( ASTVARWI3 ( idx )? ) ^( ASTVARWI4 ( conditional )? ) )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARWI, "ASTVARWI"), root_1);
 
-            	    // GAMS.g:225:17: ^( ASTVARWI0 ( DOT )? )
+            	    // GAMS.g:226:17: ^( ASTVARWI0 ( DOT )? )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARWI0, "ASTVARWI0"), root_2);
 
-            	    // GAMS.g:225:29: ( DOT )?
+            	    // GAMS.g:226:29: ( DOT )?
             	    if ( stream_DOT.HasNext() )
             	    {
             	        adaptor.AddChild(root_2, stream_DOT.NextNode());
@@ -1876,7 +2039,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:225:35: ^( ASTVARWI1 variable )
+            	    // GAMS.g:226:35: ^( ASTVARWI1 variable )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARWI1, "ASTVARWI1"), root_2);
@@ -1885,12 +2048,12 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:225:57: ^( ASTVARWI2 ( variable )? )
+            	    // GAMS.g:226:57: ^( ASTVARWI2 ( variable )? )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARWI2, "ASTVARWI2"), root_2);
 
-            	    // GAMS.g:225:69: ( variable )?
+            	    // GAMS.g:226:69: ( variable )?
             	    if ( stream_variable.HasNext() )
             	    {
             	        adaptor.AddChild(root_2, stream_variable.NextTree());
@@ -1900,12 +2063,12 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:225:80: ^( ASTVARWI3 ( idx )? )
+            	    // GAMS.g:226:80: ^( ASTVARWI3 ( idx )? )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARWI3, "ASTVARWI3"), root_2);
 
-            	    // GAMS.g:225:92: ( idx )?
+            	    // GAMS.g:226:92: ( idx )?
             	    if ( stream_idx.HasNext() )
             	    {
             	        adaptor.AddChild(root_2, stream_idx.NextTree());
@@ -1915,12 +2078,12 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:225:98: ^( ASTVARWI4 ( conditional )? )
+            	    // GAMS.g:226:98: ^( ASTVARWI4 ( conditional )? )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARWI4, "ASTVARWI4"), root_2);
 
-            	    // GAMS.g:225:110: ( conditional )?
+            	    // GAMS.g:226:110: ( conditional )?
             	    if ( stream_conditional.HasNext() )
             	    {
             	        adaptor.AddChild(root_2, stream_conditional.NextTree());
@@ -1975,7 +2138,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "variable"
-    // GAMS.g:227:1: variable : ident ;
+    // GAMS.g:228:1: variable : ident ;
     public GAMSParser.variable_return variable() // throws RecognitionException [1]
     {   
         GAMSParser.variable_return retval = new GAMSParser.variable_return();
@@ -1993,12 +2156,12 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:227:10: ( ident )
-            // GAMS.g:227:12: ident
+            // GAMS.g:228:10: ( ident )
+            // GAMS.g:228:12: ident
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_ident_in_variable839);
+            	PushFollow(FOLLOW_ident_in_variable891);
             	ident44 = ident();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
@@ -2042,7 +2205,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "idx"
-    // GAMS.g:229:1: idx : ( L1 indexerElements R1 -> ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements ) | L2 indexerElements R2 -> ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements ) | L3 indexerElements R3 -> ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements ) );
+    // GAMS.g:230:1: idx : ( L1 indexerElements R1 -> ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements ) | L2 indexerElements R2 -> ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements ) | L3 indexerElements R3 -> ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements ) );
     public GAMSParser.idx_return idx() // throws RecognitionException [1]
     {   
         GAMSParser.idx_return retval = new GAMSParser.idx_return();
@@ -2082,7 +2245,7 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:229:4: ( L1 indexerElements R1 -> ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements ) | L2 indexerElements R2 -> ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements ) | L3 indexerElements R3 -> ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements ) )
+            // GAMS.g:230:4: ( L1 indexerElements R1 -> ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements ) | L2 indexerElements R2 -> ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements ) | L3 indexerElements R3 -> ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements ) )
             int alt11 = 3;
             switch ( input.LA(1) ) 
             {
@@ -2112,17 +2275,17 @@ public partial class GAMSParser : Parser
             switch (alt11) 
             {
                 case 1 :
-                    // GAMS.g:229:6: L1 indexerElements R1
+                    // GAMS.g:230:6: L1 indexerElements R1
                     {
-                    	L145=(IToken)Match(input,L1,FOLLOW_L1_in_idx846); if (state.failed) return retval; 
+                    	L145=(IToken)Match(input,L1,FOLLOW_L1_in_idx898); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_L1.Add(L145);
 
-                    	PushFollow(FOLLOW_indexerElements_in_idx848);
+                    	PushFollow(FOLLOW_indexerElements_in_idx900);
                     	indexerElements46 = indexerElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements46.Tree);
-                    	R147=(IToken)Match(input,R1,FOLLOW_R1_in_idx850); if (state.failed) return retval; 
+                    	R147=(IToken)Match(input,R1,FOLLOW_R1_in_idx902); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_R1.Add(R147);
 
 
@@ -2139,14 +2302,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 229:28: -> ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements )
+                    	// 230:28: -> ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements )
                     	{
-                    	    // GAMS.g:229:31: ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements )
+                    	    // GAMS.g:230:31: ^( ASTIDX ^( ASTIDX0 L1 R1 ) indexerElements )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDX, "ASTIDX"), root_1);
 
-                    	    // GAMS.g:229:40: ^( ASTIDX0 L1 R1 )
+                    	    // GAMS.g:230:40: ^( ASTIDX0 L1 R1 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDX0, "ASTIDX0"), root_2);
@@ -2167,17 +2330,17 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:230:6: L2 indexerElements R2
+                    // GAMS.g:231:6: L2 indexerElements R2
                     {
-                    	L248=(IToken)Match(input,L2,FOLLOW_L2_in_idx873); if (state.failed) return retval; 
+                    	L248=(IToken)Match(input,L2,FOLLOW_L2_in_idx925); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_L2.Add(L248);
 
-                    	PushFollow(FOLLOW_indexerElements_in_idx875);
+                    	PushFollow(FOLLOW_indexerElements_in_idx927);
                     	indexerElements49 = indexerElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements49.Tree);
-                    	R250=(IToken)Match(input,R2,FOLLOW_R2_in_idx877); if (state.failed) return retval; 
+                    	R250=(IToken)Match(input,R2,FOLLOW_R2_in_idx929); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_R2.Add(R250);
 
 
@@ -2194,14 +2357,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 230:28: -> ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements )
+                    	// 231:28: -> ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements )
                     	{
-                    	    // GAMS.g:230:31: ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements )
+                    	    // GAMS.g:231:31: ^( ASTIDX ^( ASTIDX0 L2 R2 ) indexerElements )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDX, "ASTIDX"), root_1);
 
-                    	    // GAMS.g:230:40: ^( ASTIDX0 L2 R2 )
+                    	    // GAMS.g:231:40: ^( ASTIDX0 L2 R2 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDX0, "ASTIDX0"), root_2);
@@ -2222,23 +2385,23 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 3 :
-                    // GAMS.g:231:6: L3 indexerElements R3
+                    // GAMS.g:232:6: L3 indexerElements R3
                     {
-                    	L351=(IToken)Match(input,L3,FOLLOW_L3_in_idx900); if (state.failed) return retval; 
+                    	L351=(IToken)Match(input,L3,FOLLOW_L3_in_idx952); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_L3.Add(L351);
 
-                    	PushFollow(FOLLOW_indexerElements_in_idx902);
+                    	PushFollow(FOLLOW_indexerElements_in_idx954);
                     	indexerElements52 = indexerElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements52.Tree);
-                    	R353=(IToken)Match(input,R3,FOLLOW_R3_in_idx904); if (state.failed) return retval; 
+                    	R353=(IToken)Match(input,R3,FOLLOW_R3_in_idx956); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_R3.Add(R353);
 
 
 
                     	// AST REWRITE
-                    	// elements:          R3, indexerElements, L3
+                    	// elements:          indexerElements, L3, R3
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -2249,14 +2412,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 231:28: -> ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements )
+                    	// 232:28: -> ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements )
                     	{
-                    	    // GAMS.g:231:31: ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements )
+                    	    // GAMS.g:232:31: ^( ASTIDX ^( ASTIDX0 L3 R3 ) indexerElements )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDX, "ASTIDX"), root_1);
 
-                    	    // GAMS.g:231:40: ^( ASTIDX0 L3 R3 )
+                    	    // GAMS.g:232:40: ^( ASTIDX0 L3 R3 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDX0, "ASTIDX0"), root_2);
@@ -2314,7 +2477,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "indexerElements"
-    // GAMS.g:234:1: indexerElements : variableLagLead ( COMMA variableLagLead )* -> ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) ) ;
+    // GAMS.g:235:1: indexerElements : variableLagLead ( COMMA variableLagLead )* -> ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) ) ;
     public GAMSParser.indexerElements_return indexerElements() // throws RecognitionException [1]
     {   
         GAMSParser.indexerElements_return retval = new GAMSParser.indexerElements_return();
@@ -2337,15 +2500,15 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:234:16: ( variableLagLead ( COMMA variableLagLead )* -> ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) ) )
-            // GAMS.g:234:18: variableLagLead ( COMMA variableLagLead )*
+            // GAMS.g:235:16: ( variableLagLead ( COMMA variableLagLead )* -> ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) ) )
+            // GAMS.g:235:18: variableLagLead ( COMMA variableLagLead )*
             {
-            	PushFollow(FOLLOW_variableLagLead_in_indexerElements928);
+            	PushFollow(FOLLOW_variableLagLead_in_indexerElements980);
             	variableLagLead54 = variableLagLead();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( (state.backtracking==0) ) stream_variableLagLead.Add(variableLagLead54.Tree);
-            	// GAMS.g:234:34: ( COMMA variableLagLead )*
+            	// GAMS.g:235:34: ( COMMA variableLagLead )*
             	do 
             	{
             	    int alt12 = 2;
@@ -2360,12 +2523,12 @@ public partial class GAMSParser : Parser
             	    switch (alt12) 
             		{
             			case 1 :
-            			    // GAMS.g:234:35: COMMA variableLagLead
+            			    // GAMS.g:235:35: COMMA variableLagLead
             			    {
-            			    	COMMA55=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_indexerElements931); if (state.failed) return retval; 
+            			    	COMMA55=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_indexerElements983); if (state.failed) return retval; 
             			    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA55);
 
-            			    	PushFollow(FOLLOW_variableLagLead_in_indexerElements933);
+            			    	PushFollow(FOLLOW_variableLagLead_in_indexerElements985);
             			    	variableLagLead56 = variableLagLead();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -2396,19 +2559,19 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 235:3: -> ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) )
+            	// 236:3: -> ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) )
             	{
-            	    // GAMS.g:235:6: ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) )
+            	    // GAMS.g:236:6: ^( ASTIDXELEMENTS ^( ASTIDXELEMENTS0 ( COMMA )* ) ^( ASTIDXELEMENTS1 ( variableLagLead )+ ) )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDXELEMENTS, "ASTIDXELEMENTS"), root_1);
 
-            	    // GAMS.g:235:23: ^( ASTIDXELEMENTS0 ( COMMA )* )
+            	    // GAMS.g:236:23: ^( ASTIDXELEMENTS0 ( COMMA )* )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDXELEMENTS0, "ASTIDXELEMENTS0"), root_2);
 
-            	    // GAMS.g:235:41: ( COMMA )*
+            	    // GAMS.g:236:41: ( COMMA )*
             	    while ( stream_COMMA.HasNext() )
             	    {
             	        adaptor.AddChild(root_2, stream_COMMA.NextNode());
@@ -2418,7 +2581,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:235:49: ^( ASTIDXELEMENTS1 ( variableLagLead )+ )
+            	    // GAMS.g:236:49: ^( ASTIDXELEMENTS1 ( variableLagLead )+ )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTIDXELEMENTS1, "ASTIDXELEMENTS1"), root_2);
@@ -2480,7 +2643,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "variableLagLead"
-    // GAMS.g:237:1: variableLagLead : ( StringInQuotes -> ^( ASTVARIABLEANDLEAD StringInQuotes ) | variable PLUS Integer -> ^( ASTVARIABLEANDLEAD variable PLUS Integer ) | variable MINUS Integer -> ^( ASTVARIABLEANDLEAD variable MINUS Integer ) | variable -> ^( ASTVARIABLEANDLEAD variable ) );
+    // GAMS.g:238:1: variableLagLead : ( StringInQuotes -> ^( ASTVARIABLEANDLEAD StringInQuotes ) | variable PLUS Integer -> ^( ASTVARIABLEANDLEAD variable PLUS Integer ) | variable MINUS Integer -> ^( ASTVARIABLEANDLEAD variable MINUS Integer ) | variable -> ^( ASTVARIABLEANDLEAD variable ) );
     public GAMSParser.variableLagLead_return variableLagLead() // throws RecognitionException [1]
     {   
         GAMSParser.variableLagLead_return retval = new GAMSParser.variableLagLead_return();
@@ -2516,15 +2679,15 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:237:16: ( StringInQuotes -> ^( ASTVARIABLEANDLEAD StringInQuotes ) | variable PLUS Integer -> ^( ASTVARIABLEANDLEAD variable PLUS Integer ) | variable MINUS Integer -> ^( ASTVARIABLEANDLEAD variable MINUS Integer ) | variable -> ^( ASTVARIABLEANDLEAD variable ) )
+            // GAMS.g:238:16: ( StringInQuotes -> ^( ASTVARIABLEANDLEAD StringInQuotes ) | variable PLUS Integer -> ^( ASTVARIABLEANDLEAD variable PLUS Integer ) | variable MINUS Integer -> ^( ASTVARIABLEANDLEAD variable MINUS Integer ) | variable -> ^( ASTVARIABLEANDLEAD variable ) )
             int alt13 = 4;
             alt13 = dfa13.Predict(input);
             switch (alt13) 
             {
                 case 1 :
-                    // GAMS.g:237:18: StringInQuotes
+                    // GAMS.g:238:18: StringInQuotes
                     {
-                    	StringInQuotes57=(IToken)Match(input,StringInQuotes,FOLLOW_StringInQuotes_in_variableLagLead965); if (state.failed) return retval; 
+                    	StringInQuotes57=(IToken)Match(input,StringInQuotes,FOLLOW_StringInQuotes_in_variableLagLead1017); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_StringInQuotes.Add(StringInQuotes57);
 
 
@@ -2541,9 +2704,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 237:43: -> ^( ASTVARIABLEANDLEAD StringInQuotes )
+                    	// 238:43: -> ^( ASTVARIABLEANDLEAD StringInQuotes )
                     	{
-                    	    // GAMS.g:237:46: ^( ASTVARIABLEANDLEAD StringInQuotes )
+                    	    // GAMS.g:238:46: ^( ASTVARIABLEANDLEAD StringInQuotes )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARIABLEANDLEAD, "ASTVARIABLEANDLEAD"), root_1);
@@ -2559,23 +2722,23 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:238:18: variable PLUS Integer
+                    // GAMS.g:239:18: variable PLUS Integer
                     {
-                    	PushFollow(FOLLOW_variable_in_variableLagLead1014);
+                    	PushFollow(FOLLOW_variable_in_variableLagLead1066);
                     	variable58 = variable();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_variable.Add(variable58.Tree);
-                    	PLUS59=(IToken)Match(input,PLUS,FOLLOW_PLUS_in_variableLagLead1016); if (state.failed) return retval; 
+                    	PLUS59=(IToken)Match(input,PLUS,FOLLOW_PLUS_in_variableLagLead1068); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_PLUS.Add(PLUS59);
 
-                    	Integer60=(IToken)Match(input,Integer,FOLLOW_Integer_in_variableLagLead1018); if (state.failed) return retval; 
+                    	Integer60=(IToken)Match(input,Integer,FOLLOW_Integer_in_variableLagLead1070); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_Integer.Add(Integer60);
 
 
 
                     	// AST REWRITE
-                    	// elements:          PLUS, Integer, variable
+                    	// elements:          variable, PLUS, Integer
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -2586,9 +2749,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 238:43: -> ^( ASTVARIABLEANDLEAD variable PLUS Integer )
+                    	// 239:43: -> ^( ASTVARIABLEANDLEAD variable PLUS Integer )
                     	{
-                    	    // GAMS.g:238:46: ^( ASTVARIABLEANDLEAD variable PLUS Integer )
+                    	    // GAMS.g:239:46: ^( ASTVARIABLEANDLEAD variable PLUS Integer )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARIABLEANDLEAD, "ASTVARIABLEANDLEAD"), root_1);
@@ -2606,23 +2769,23 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 3 :
-                    // GAMS.g:239:18: variable MINUS Integer
+                    // GAMS.g:240:18: variable MINUS Integer
                     {
-                    	PushFollow(FOLLOW_variable_in_variableLagLead1064);
+                    	PushFollow(FOLLOW_variable_in_variableLagLead1116);
                     	variable61 = variable();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_variable.Add(variable61.Tree);
-                    	MINUS62=(IToken)Match(input,MINUS,FOLLOW_MINUS_in_variableLagLead1066); if (state.failed) return retval; 
+                    	MINUS62=(IToken)Match(input,MINUS,FOLLOW_MINUS_in_variableLagLead1118); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_MINUS.Add(MINUS62);
 
-                    	Integer63=(IToken)Match(input,Integer,FOLLOW_Integer_in_variableLagLead1068); if (state.failed) return retval; 
+                    	Integer63=(IToken)Match(input,Integer,FOLLOW_Integer_in_variableLagLead1120); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_Integer.Add(Integer63);
 
 
 
                     	// AST REWRITE
-                    	// elements:          variable, MINUS, Integer
+                    	// elements:          variable, Integer, MINUS
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -2633,9 +2796,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 239:43: -> ^( ASTVARIABLEANDLEAD variable MINUS Integer )
+                    	// 240:43: -> ^( ASTVARIABLEANDLEAD variable MINUS Integer )
                     	{
-                    	    // GAMS.g:239:46: ^( ASTVARIABLEANDLEAD variable MINUS Integer )
+                    	    // GAMS.g:240:46: ^( ASTVARIABLEANDLEAD variable MINUS Integer )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARIABLEANDLEAD, "ASTVARIABLEANDLEAD"), root_1);
@@ -2653,9 +2816,9 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 4 :
-                    // GAMS.g:240:9: variable
+                    // GAMS.g:241:9: variable
                     {
-                    	PushFollow(FOLLOW_variable_in_variableLagLead1104);
+                    	PushFollow(FOLLOW_variable_in_variableLagLead1156);
                     	variable64 = variable();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -2674,9 +2837,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 240:34: -> ^( ASTVARIABLEANDLEAD variable )
+                    	// 241:34: -> ^( ASTVARIABLEANDLEAD variable )
                     	{
-                    	    // GAMS.g:240:37: ^( ASTVARIABLEANDLEAD variable )
+                    	    // GAMS.g:241:37: ^( ASTVARIABLEANDLEAD variable )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARIABLEANDLEAD, "ASTVARIABLEANDLEAD"), root_1);
@@ -2729,7 +2892,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "conditional"
-    // GAMS.g:243:1: conditional : DOLLAR expression -> ^( ASTCONDITIONAL DOLLAR expression ) ;
+    // GAMS.g:244:1: conditional : DOLLAR expression -> ^( ASTCONDITIONAL DOLLAR expression ) ;
     public GAMSParser.conditional_return conditional() // throws RecognitionException [1]
     {   
         GAMSParser.conditional_return retval = new GAMSParser.conditional_return();
@@ -2750,13 +2913,13 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:243:12: ( DOLLAR expression -> ^( ASTCONDITIONAL DOLLAR expression ) )
-            // GAMS.g:243:14: DOLLAR expression
+            // GAMS.g:244:12: ( DOLLAR expression -> ^( ASTCONDITIONAL DOLLAR expression ) )
+            // GAMS.g:244:14: DOLLAR expression
             {
-            	DOLLAR65=(IToken)Match(input,DOLLAR,FOLLOW_DOLLAR_in_conditional1148); if (state.failed) return retval; 
+            	DOLLAR65=(IToken)Match(input,DOLLAR,FOLLOW_DOLLAR_in_conditional1200); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_DOLLAR.Add(DOLLAR65);
 
-            	PushFollow(FOLLOW_expression_in_conditional1150);
+            	PushFollow(FOLLOW_expression_in_conditional1202);
             	expression66 = expression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
@@ -2775,9 +2938,9 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 243:32: -> ^( ASTCONDITIONAL DOLLAR expression )
+            	// 244:32: -> ^( ASTCONDITIONAL DOLLAR expression )
             	{
-            	    // GAMS.g:243:35: ^( ASTCONDITIONAL DOLLAR expression )
+            	    // GAMS.g:244:35: ^( ASTCONDITIONAL DOLLAR expression )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTCONDITIONAL, "ASTCONDITIONAL"), root_1);
@@ -2829,7 +2992,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "expression"
-    // GAMS.g:261:1: expression : andExpression ( OR andExpression )* ;
+    // GAMS.g:262:1: expression : andExpression ( OR andExpression )* ;
     public GAMSParser.expression_return expression() // throws RecognitionException [1]
     {   
         GAMSParser.expression_return retval = new GAMSParser.expression_return();
@@ -2851,17 +3014,17 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:261:11: ( andExpression ( OR andExpression )* )
-            // GAMS.g:261:13: andExpression ( OR andExpression )*
+            // GAMS.g:262:11: ( andExpression ( OR andExpression )* )
+            // GAMS.g:262:13: andExpression ( OR andExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_andExpression_in_expression1183);
+            	PushFollow(FOLLOW_andExpression_in_expression1235);
             	andExpression67 = andExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, andExpression67.Tree);
-            	// GAMS.g:261:27: ( OR andExpression )*
+            	// GAMS.g:262:27: ( OR andExpression )*
             	do 
             	{
             	    int alt14 = 2;
@@ -2869,14 +3032,14 @@ public partial class GAMSParser : Parser
             	    switch (alt14) 
             		{
             			case 1 :
-            			    // GAMS.g:261:28: OR andExpression
+            			    // GAMS.g:262:28: OR andExpression
             			    {
-            			    	OR68=(IToken)Match(input,OR,FOLLOW_OR_in_expression1186); if (state.failed) return retval;
+            			    	OR68=(IToken)Match(input,OR,FOLLOW_OR_in_expression1238); if (state.failed) return retval;
             			    	if ( state.backtracking == 0 )
             			    	{OR68_tree = (object)adaptor.Create(OR68);
             			    		root_0 = (object)adaptor.BecomeRoot(OR68_tree, root_0);
             			    	}
-            			    	PushFollow(FOLLOW_andExpression_in_expression1189);
+            			    	PushFollow(FOLLOW_andExpression_in_expression1241);
             			    	andExpression69 = andExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -2932,7 +3095,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "andExpression"
-    // GAMS.g:263:1: andExpression : notExpression ( AND notExpression )* ;
+    // GAMS.g:264:1: andExpression : notExpression ( AND notExpression )* ;
     public GAMSParser.andExpression_return andExpression() // throws RecognitionException [1]
     {   
         GAMSParser.andExpression_return retval = new GAMSParser.andExpression_return();
@@ -2954,17 +3117,17 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:263:14: ( notExpression ( AND notExpression )* )
-            // GAMS.g:263:16: notExpression ( AND notExpression )*
+            // GAMS.g:264:14: ( notExpression ( AND notExpression )* )
+            // GAMS.g:264:16: notExpression ( AND notExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_notExpression_in_andExpression1198);
+            	PushFollow(FOLLOW_notExpression_in_andExpression1250);
             	notExpression70 = notExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, notExpression70.Tree);
-            	// GAMS.g:263:30: ( AND notExpression )*
+            	// GAMS.g:264:30: ( AND notExpression )*
             	do 
             	{
             	    int alt15 = 2;
@@ -2972,14 +3135,14 @@ public partial class GAMSParser : Parser
             	    switch (alt15) 
             		{
             			case 1 :
-            			    // GAMS.g:263:31: AND notExpression
+            			    // GAMS.g:264:31: AND notExpression
             			    {
-            			    	AND71=(IToken)Match(input,AND,FOLLOW_AND_in_andExpression1201); if (state.failed) return retval;
+            			    	AND71=(IToken)Match(input,AND,FOLLOW_AND_in_andExpression1253); if (state.failed) return retval;
             			    	if ( state.backtracking == 0 )
             			    	{AND71_tree = (object)adaptor.Create(AND71);
             			    		root_0 = (object)adaptor.BecomeRoot(AND71_tree, root_0);
             			    	}
-            			    	PushFollow(FOLLOW_notExpression_in_andExpression1204);
+            			    	PushFollow(FOLLOW_notExpression_in_andExpression1256);
             			    	notExpression72 = notExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -3035,7 +3198,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "notExpression"
-    // GAMS.g:265:1: notExpression : ( NOT logicalExpression -> ^( NOT logicalExpression ) | logicalExpression );
+    // GAMS.g:266:1: notExpression : ( NOT logicalExpression -> ^( NOT logicalExpression ) | logicalExpression );
     public GAMSParser.notExpression_return notExpression() // throws RecognitionException [1]
     {   
         GAMSParser.notExpression_return retval = new GAMSParser.notExpression_return();
@@ -3058,18 +3221,18 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:265:14: ( NOT logicalExpression -> ^( NOT logicalExpression ) | logicalExpression )
+            // GAMS.g:266:14: ( NOT logicalExpression -> ^( NOT logicalExpression ) | logicalExpression )
             int alt16 = 2;
             alt16 = dfa16.Predict(input);
             switch (alt16) 
             {
                 case 1 :
-                    // GAMS.g:265:16: NOT logicalExpression
+                    // GAMS.g:266:16: NOT logicalExpression
                     {
-                    	NOT73=(IToken)Match(input,NOT,FOLLOW_NOT_in_notExpression1215); if (state.failed) return retval; 
+                    	NOT73=(IToken)Match(input,NOT,FOLLOW_NOT_in_notExpression1267); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_NOT.Add(NOT73);
 
-                    	PushFollow(FOLLOW_logicalExpression_in_notExpression1217);
+                    	PushFollow(FOLLOW_logicalExpression_in_notExpression1269);
                     	logicalExpression74 = logicalExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -3088,9 +3251,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 265:38: -> ^( NOT logicalExpression )
+                    	// 266:38: -> ^( NOT logicalExpression )
                     	{
-                    	    // GAMS.g:265:41: ^( NOT logicalExpression )
+                    	    // GAMS.g:266:41: ^( NOT logicalExpression )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot(stream_NOT.NextNode(), root_1);
@@ -3106,11 +3269,11 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:266:10: logicalExpression
+                    // GAMS.g:267:10: logicalExpression
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_logicalExpression_in_notExpression1237);
+                    	PushFollow(FOLLOW_logicalExpression_in_notExpression1289);
                     	logicalExpression75 = logicalExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -3156,7 +3319,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "logicalExpression"
-    // GAMS.g:268:1: logicalExpression : additiveExpression ( logical additiveExpression )* ;
+    // GAMS.g:269:1: logicalExpression : additiveExpression ( logical additiveExpression )* ;
     public GAMSParser.logicalExpression_return logicalExpression() // throws RecognitionException [1]
     {   
         GAMSParser.logicalExpression_return retval = new GAMSParser.logicalExpression_return();
@@ -3178,17 +3341,17 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:268:18: ( additiveExpression ( logical additiveExpression )* )
-            // GAMS.g:268:21: additiveExpression ( logical additiveExpression )*
+            // GAMS.g:269:18: ( additiveExpression ( logical additiveExpression )* )
+            // GAMS.g:269:21: additiveExpression ( logical additiveExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_additiveExpression_in_logicalExpression1245);
+            	PushFollow(FOLLOW_additiveExpression_in_logicalExpression1297);
             	additiveExpression76 = additiveExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, additiveExpression76.Tree);
-            	// GAMS.g:268:40: ( logical additiveExpression )*
+            	// GAMS.g:269:40: ( logical additiveExpression )*
             	do 
             	{
             	    int alt17 = 2;
@@ -3196,14 +3359,14 @@ public partial class GAMSParser : Parser
             	    switch (alt17) 
             		{
             			case 1 :
-            			    // GAMS.g:268:41: logical additiveExpression
+            			    // GAMS.g:269:41: logical additiveExpression
             			    {
-            			    	PushFollow(FOLLOW_logical_in_logicalExpression1248);
+            			    	PushFollow(FOLLOW_logical_in_logicalExpression1300);
             			    	logical77 = logical();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
             			    	if ( state.backtracking == 0 ) root_0 = (object)adaptor.BecomeRoot(logical77.Tree, root_0);
-            			    	PushFollow(FOLLOW_additiveExpression_in_logicalExpression1251);
+            			    	PushFollow(FOLLOW_additiveExpression_in_logicalExpression1303);
             			    	additiveExpression78 = additiveExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -3259,7 +3422,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "additiveExpression"
-    // GAMS.g:270:1: additiveExpression : multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* ;
+    // GAMS.g:271:1: additiveExpression : multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* ;
     public GAMSParser.additiveExpression_return additiveExpression() // throws RecognitionException [1]
     {   
         GAMSParser.additiveExpression_return retval = new GAMSParser.additiveExpression_return();
@@ -3281,17 +3444,17 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:270:19: ( multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* )
-            // GAMS.g:270:21: multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )*
+            // GAMS.g:271:19: ( multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* )
+            // GAMS.g:271:21: multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression1260);
+            	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression1312);
             	multiplicativeExpression79 = multiplicativeExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, multiplicativeExpression79.Tree);
-            	// GAMS.g:270:46: ( ( PLUS | MINUS ) multiplicativeExpression )*
+            	// GAMS.g:271:46: ( ( PLUS | MINUS ) multiplicativeExpression )*
             	do 
             	{
             	    int alt18 = 2;
@@ -3299,7 +3462,7 @@ public partial class GAMSParser : Parser
             	    switch (alt18) 
             		{
             			case 1 :
-            			    // GAMS.g:270:48: ( PLUS | MINUS ) multiplicativeExpression
+            			    // GAMS.g:271:48: ( PLUS | MINUS ) multiplicativeExpression
             			    {
             			    	set80=(IToken)input.LT(1);
             			    	set80 = (IToken)input.LT(1);
@@ -3316,7 +3479,7 @@ public partial class GAMSParser : Parser
             			    	    throw mse;
             			    	}
 
-            			    	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression1271);
+            			    	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression1323);
             			    	multiplicativeExpression81 = multiplicativeExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -3372,7 +3535,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "multiplicativeExpression"
-    // GAMS.g:272:1: multiplicativeExpression : powerExpression ( ( MULT | DIV ) powerExpression )* ;
+    // GAMS.g:273:1: multiplicativeExpression : powerExpression ( ( MULT | DIV ) powerExpression )* ;
     public GAMSParser.multiplicativeExpression_return multiplicativeExpression() // throws RecognitionException [1]
     {   
         GAMSParser.multiplicativeExpression_return retval = new GAMSParser.multiplicativeExpression_return();
@@ -3394,17 +3557,17 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:272:25: ( powerExpression ( ( MULT | DIV ) powerExpression )* )
-            // GAMS.g:272:27: powerExpression ( ( MULT | DIV ) powerExpression )*
+            // GAMS.g:273:25: ( powerExpression ( ( MULT | DIV ) powerExpression )* )
+            // GAMS.g:273:27: powerExpression ( ( MULT | DIV ) powerExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression1281);
+            	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression1333);
             	powerExpression82 = powerExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, powerExpression82.Tree);
-            	// GAMS.g:272:43: ( ( MULT | DIV ) powerExpression )*
+            	// GAMS.g:273:43: ( ( MULT | DIV ) powerExpression )*
             	do 
             	{
             	    int alt19 = 2;
@@ -3412,7 +3575,7 @@ public partial class GAMSParser : Parser
             	    switch (alt19) 
             		{
             			case 1 :
-            			    // GAMS.g:272:45: ( MULT | DIV ) powerExpression
+            			    // GAMS.g:273:45: ( MULT | DIV ) powerExpression
             			    {
             			    	set83=(IToken)input.LT(1);
             			    	set83 = (IToken)input.LT(1);
@@ -3429,7 +3592,7 @@ public partial class GAMSParser : Parser
             			    	    throw mse;
             			    	}
 
-            			    	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression1292);
+            			    	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression1344);
             			    	powerExpression84 = powerExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -3485,7 +3648,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "powerExpression"
-    // GAMS.g:274:1: powerExpression : unaryExpression ( STARS unaryExpression )* ;
+    // GAMS.g:275:1: powerExpression : unaryExpression ( STARS unaryExpression )* ;
     public GAMSParser.powerExpression_return powerExpression() // throws RecognitionException [1]
     {   
         GAMSParser.powerExpression_return retval = new GAMSParser.powerExpression_return();
@@ -3507,17 +3670,17 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:274:16: ( unaryExpression ( STARS unaryExpression )* )
-            // GAMS.g:274:18: unaryExpression ( STARS unaryExpression )*
+            // GAMS.g:275:16: ( unaryExpression ( STARS unaryExpression )* )
+            // GAMS.g:275:18: unaryExpression ( STARS unaryExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_unaryExpression_in_powerExpression1302);
+            	PushFollow(FOLLOW_unaryExpression_in_powerExpression1354);
             	unaryExpression85 = unaryExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
             	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, unaryExpression85.Tree);
-            	// GAMS.g:274:34: ( STARS unaryExpression )*
+            	// GAMS.g:275:34: ( STARS unaryExpression )*
             	do 
             	{
             	    int alt20 = 2;
@@ -3525,14 +3688,14 @@ public partial class GAMSParser : Parser
             	    switch (alt20) 
             		{
             			case 1 :
-            			    // GAMS.g:274:36: STARS unaryExpression
+            			    // GAMS.g:275:36: STARS unaryExpression
             			    {
-            			    	STARS86=(IToken)Match(input,STARS,FOLLOW_STARS_in_powerExpression1306); if (state.failed) return retval;
+            			    	STARS86=(IToken)Match(input,STARS,FOLLOW_STARS_in_powerExpression1358); if (state.failed) return retval;
             			    	if ( state.backtracking == 0 )
             			    	{STARS86_tree = (object)adaptor.Create(STARS86);
             			    		root_0 = (object)adaptor.BecomeRoot(STARS86_tree, root_0);
             			    	}
-            			    	PushFollow(FOLLOW_unaryExpression_in_powerExpression1309);
+            			    	PushFollow(FOLLOW_unaryExpression_in_powerExpression1361);
             			    	unaryExpression87 = unaryExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
@@ -3588,7 +3751,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "unaryExpression"
-    // GAMS.g:276:1: unaryExpression : ( MINUS dollarExpression -> ^( NEGATE dollarExpression ) | dollarExpression );
+    // GAMS.g:277:1: unaryExpression : ( MINUS dollarExpression -> ^( NEGATE dollarExpression ) | dollarExpression );
     public GAMSParser.unaryExpression_return unaryExpression() // throws RecognitionException [1]
     {   
         GAMSParser.unaryExpression_return retval = new GAMSParser.unaryExpression_return();
@@ -3611,18 +3774,18 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:276:16: ( MINUS dollarExpression -> ^( NEGATE dollarExpression ) | dollarExpression )
+            // GAMS.g:277:16: ( MINUS dollarExpression -> ^( NEGATE dollarExpression ) | dollarExpression )
             int alt21 = 2;
             alt21 = dfa21.Predict(input);
             switch (alt21) 
             {
                 case 1 :
-                    // GAMS.g:276:18: MINUS dollarExpression
+                    // GAMS.g:277:18: MINUS dollarExpression
                     {
-                    	MINUS88=(IToken)Match(input,MINUS,FOLLOW_MINUS_in_unaryExpression1320); if (state.failed) return retval; 
+                    	MINUS88=(IToken)Match(input,MINUS,FOLLOW_MINUS_in_unaryExpression1372); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_MINUS.Add(MINUS88);
 
-                    	PushFollow(FOLLOW_dollarExpression_in_unaryExpression1322);
+                    	PushFollow(FOLLOW_dollarExpression_in_unaryExpression1374);
                     	dollarExpression89 = dollarExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -3641,9 +3804,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 276:41: -> ^( NEGATE dollarExpression )
+                    	// 277:41: -> ^( NEGATE dollarExpression )
                     	{
-                    	    // GAMS.g:276:44: ^( NEGATE dollarExpression )
+                    	    // GAMS.g:277:44: ^( NEGATE dollarExpression )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(NEGATE, "NEGATE"), root_1);
@@ -3659,11 +3822,11 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:277:11: dollarExpression
+                    // GAMS.g:278:11: dollarExpression
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_dollarExpression_in_unaryExpression1343);
+                    	PushFollow(FOLLOW_dollarExpression_in_unaryExpression1395);
                     	dollarExpression90 = dollarExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -3709,7 +3872,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "dollarExpression"
-    // GAMS.g:285:1: dollarExpression : ( primaryExpression conditional -> ^( ASTDOLLAREXPRESSION primaryExpression conditional ) | primaryExpression );
+    // GAMS.g:286:1: dollarExpression : ( primaryExpression conditional -> ^( ASTDOLLAREXPRESSION primaryExpression conditional ) | primaryExpression );
     public GAMSParser.dollarExpression_return dollarExpression() // throws RecognitionException [1]
     {   
         GAMSParser.dollarExpression_return retval = new GAMSParser.dollarExpression_return();
@@ -3732,20 +3895,20 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:285:17: ( primaryExpression conditional -> ^( ASTDOLLAREXPRESSION primaryExpression conditional ) | primaryExpression )
+            // GAMS.g:286:17: ( primaryExpression conditional -> ^( ASTDOLLAREXPRESSION primaryExpression conditional ) | primaryExpression )
             int alt22 = 2;
             alt22 = dfa22.Predict(input);
             switch (alt22) 
             {
                 case 1 :
-                    // GAMS.g:286:9: primaryExpression conditional
+                    // GAMS.g:287:9: primaryExpression conditional
                     {
-                    	PushFollow(FOLLOW_primaryExpression_in_dollarExpression1368);
+                    	PushFollow(FOLLOW_primaryExpression_in_dollarExpression1420);
                     	primaryExpression91 = primaryExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_primaryExpression.Add(primaryExpression91.Tree);
-                    	PushFollow(FOLLOW_conditional_in_dollarExpression1370);
+                    	PushFollow(FOLLOW_conditional_in_dollarExpression1422);
                     	conditional92 = conditional();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -3764,9 +3927,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 286:39: -> ^( ASTDOLLAREXPRESSION primaryExpression conditional )
+                    	// 287:39: -> ^( ASTDOLLAREXPRESSION primaryExpression conditional )
                     	{
-                    	    // GAMS.g:286:42: ^( ASTDOLLAREXPRESSION primaryExpression conditional )
+                    	    // GAMS.g:287:42: ^( ASTDOLLAREXPRESSION primaryExpression conditional )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTDOLLAREXPRESSION, "ASTDOLLAREXPRESSION"), root_1);
@@ -3783,11 +3946,11 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:287:9: primaryExpression
+                    // GAMS.g:288:9: primaryExpression
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_primaryExpression_in_dollarExpression1390);
+                    	PushFollow(FOLLOW_primaryExpression_in_dollarExpression1442);
                     	primaryExpression93 = primaryExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -3833,7 +3996,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "primaryExpression"
-    // GAMS.g:290:1: primaryExpression : ( L1 expression R1 -> ^( ASTEXPRESSION1 expression ) | L2 expression R2 -> ^( ASTEXPRESSION2 expression ) | L3 expression R3 -> ^( ASTEXPRESSION3 expression ) | value );
+    // GAMS.g:291:1: primaryExpression : ( L1 expression R1 -> ^( ASTEXPRESSION1 expression ) | L2 expression R2 -> ^( ASTEXPRESSION2 expression ) | L3 expression R3 -> ^( ASTEXPRESSION3 expression ) | value );
     public GAMSParser.primaryExpression_return primaryExpression() // throws RecognitionException [1]
     {   
         GAMSParser.primaryExpression_return retval = new GAMSParser.primaryExpression_return();
@@ -3875,23 +4038,23 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:290:18: ( L1 expression R1 -> ^( ASTEXPRESSION1 expression ) | L2 expression R2 -> ^( ASTEXPRESSION2 expression ) | L3 expression R3 -> ^( ASTEXPRESSION3 expression ) | value )
+            // GAMS.g:291:18: ( L1 expression R1 -> ^( ASTEXPRESSION1 expression ) | L2 expression R2 -> ^( ASTEXPRESSION2 expression ) | L3 expression R3 -> ^( ASTEXPRESSION3 expression ) | value )
             int alt23 = 4;
             alt23 = dfa23.Predict(input);
             switch (alt23) 
             {
                 case 1 :
-                    // GAMS.g:291:5: L1 expression R1
+                    // GAMS.g:292:5: L1 expression R1
                     {
-                    	L194=(IToken)Match(input,L1,FOLLOW_L1_in_primaryExpression1411); if (state.failed) return retval; 
+                    	L194=(IToken)Match(input,L1,FOLLOW_L1_in_primaryExpression1463); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_L1.Add(L194);
 
-                    	PushFollow(FOLLOW_expression_in_primaryExpression1413);
+                    	PushFollow(FOLLOW_expression_in_primaryExpression1465);
                     	expression95 = expression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_expression.Add(expression95.Tree);
-                    	R196=(IToken)Match(input,R1,FOLLOW_R1_in_primaryExpression1415); if (state.failed) return retval; 
+                    	R196=(IToken)Match(input,R1,FOLLOW_R1_in_primaryExpression1467); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_R1.Add(R196);
 
 
@@ -3908,9 +4071,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 291:22: -> ^( ASTEXPRESSION1 expression )
+                    	// 292:22: -> ^( ASTEXPRESSION1 expression )
                     	{
-                    	    // GAMS.g:291:25: ^( ASTEXPRESSION1 expression )
+                    	    // GAMS.g:292:25: ^( ASTEXPRESSION1 expression )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION1, "ASTEXPRESSION1"), root_1);
@@ -3926,17 +4089,17 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:292:6: L2 expression R2
+                    // GAMS.g:293:6: L2 expression R2
                     {
-                    	L297=(IToken)Match(input,L2,FOLLOW_L2_in_primaryExpression1430); if (state.failed) return retval; 
+                    	L297=(IToken)Match(input,L2,FOLLOW_L2_in_primaryExpression1482); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_L2.Add(L297);
 
-                    	PushFollow(FOLLOW_expression_in_primaryExpression1432);
+                    	PushFollow(FOLLOW_expression_in_primaryExpression1484);
                     	expression98 = expression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_expression.Add(expression98.Tree);
-                    	R299=(IToken)Match(input,R2,FOLLOW_R2_in_primaryExpression1434); if (state.failed) return retval; 
+                    	R299=(IToken)Match(input,R2,FOLLOW_R2_in_primaryExpression1486); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_R2.Add(R299);
 
 
@@ -3953,9 +4116,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 292:23: -> ^( ASTEXPRESSION2 expression )
+                    	// 293:23: -> ^( ASTEXPRESSION2 expression )
                     	{
-                    	    // GAMS.g:292:26: ^( ASTEXPRESSION2 expression )
+                    	    // GAMS.g:293:26: ^( ASTEXPRESSION2 expression )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION2, "ASTEXPRESSION2"), root_1);
@@ -3971,17 +4134,17 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 3 :
-                    // GAMS.g:293:8: L3 expression R3
+                    // GAMS.g:294:8: L3 expression R3
                     {
-                    	L3100=(IToken)Match(input,L3,FOLLOW_L3_in_primaryExpression1451); if (state.failed) return retval; 
+                    	L3100=(IToken)Match(input,L3,FOLLOW_L3_in_primaryExpression1503); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_L3.Add(L3100);
 
-                    	PushFollow(FOLLOW_expression_in_primaryExpression1453);
+                    	PushFollow(FOLLOW_expression_in_primaryExpression1505);
                     	expression101 = expression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
                     	if ( (state.backtracking==0) ) stream_expression.Add(expression101.Tree);
-                    	R3102=(IToken)Match(input,R3,FOLLOW_R3_in_primaryExpression1455); if (state.failed) return retval; 
+                    	R3102=(IToken)Match(input,R3,FOLLOW_R3_in_primaryExpression1507); if (state.failed) return retval; 
                     	if ( (state.backtracking==0) ) stream_R3.Add(R3102);
 
 
@@ -3998,9 +4161,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 293:25: -> ^( ASTEXPRESSION3 expression )
+                    	// 294:25: -> ^( ASTEXPRESSION3 expression )
                     	{
-                    	    // GAMS.g:293:28: ^( ASTEXPRESSION3 expression )
+                    	    // GAMS.g:294:28: ^( ASTEXPRESSION3 expression )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTEXPRESSION3, "ASTEXPRESSION3"), root_1);
@@ -4016,11 +4179,11 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 4 :
-                    // GAMS.g:294:6: value
+                    // GAMS.g:295:6: value
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_value_in_primaryExpression1470);
+                    	PushFollow(FOLLOW_value_in_primaryExpression1522);
                     	value103 = value();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -4066,7 +4229,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "logical"
-    // GAMS.g:296:1: logical : ( NONEQUAL | LESSTHANOREQUAL | GREATERTHANOREQUAL | EQUAL | LESSTHAN | GREATERTHAN );
+    // GAMS.g:297:1: logical : ( NONEQUAL | LESSTHANOREQUAL | GREATERTHANOREQUAL | EQUAL | LESSTHAN | GREATERTHAN );
     public GAMSParser.logical_return logical() // throws RecognitionException [1]
     {   
         GAMSParser.logical_return retval = new GAMSParser.logical_return();
@@ -4084,7 +4247,7 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:296:8: ( NONEQUAL | LESSTHANOREQUAL | GREATERTHANOREQUAL | EQUAL | LESSTHAN | GREATERTHAN )
+            // GAMS.g:297:8: ( NONEQUAL | LESSTHANOREQUAL | GREATERTHANOREQUAL | EQUAL | LESSTHAN | GREATERTHAN )
             // GAMS.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
@@ -4142,7 +4305,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "value"
-    // GAMS.g:298:1: value : ( Integer -> ^( ASTVALUE Integer ) | Double -> ^( ASTVALUE Double ) | sum -> ^( ASTVALUE sum ) | function -> ^( ASTVALUE function ) | variableWithIndexerEtc -> ^( ASTVALUE variableWithIndexerEtc ) );
+    // GAMS.g:299:1: value : ( integer2 -> ^( ASTVALUE integer2 ) | double2 -> ^( ASTVALUE double2 ) | sum -> ^( ASTVALUE sum ) | function -> ^( ASTVALUE function ) | variableWithIndexerEtc -> ^( ASTVALUE variableWithIndexerEtc ) );
     public GAMSParser.value_return value() // throws RecognitionException [1]
     {   
         GAMSParser.value_return retval = new GAMSParser.value_return();
@@ -4150,8 +4313,10 @@ public partial class GAMSParser : Parser
         int value_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken Integer105 = null;
-        IToken Double106 = null;
+        GAMSParser.integer2_return integer2105 = default(GAMSParser.integer2_return);
+
+        GAMSParser.double2_return double2106 = default(GAMSParser.double2_return);
+
         GAMSParser.sum_return sum107 = default(GAMSParser.sum_return);
 
         GAMSParser.function_return function108 = default(GAMSParser.function_return);
@@ -4159,12 +4324,10 @@ public partial class GAMSParser : Parser
         GAMSParser.variableWithIndexerEtc_return variableWithIndexerEtc109 = default(GAMSParser.variableWithIndexerEtc_return);
 
 
-        object Integer105_tree=null;
-        object Double106_tree=null;
-        RewriteRuleTokenStream stream_Double = new RewriteRuleTokenStream(adaptor,"token Double");
-        RewriteRuleTokenStream stream_Integer = new RewriteRuleTokenStream(adaptor,"token Integer");
         RewriteRuleSubtreeStream stream_variableWithIndexerEtc = new RewriteRuleSubtreeStream(adaptor,"rule variableWithIndexerEtc");
+        RewriteRuleSubtreeStream stream_integer2 = new RewriteRuleSubtreeStream(adaptor,"rule integer2");
         RewriteRuleSubtreeStream stream_sum = new RewriteRuleSubtreeStream(adaptor,"rule sum");
+        RewriteRuleSubtreeStream stream_double2 = new RewriteRuleSubtreeStream(adaptor,"rule double2");
         RewriteRuleSubtreeStream stream_function = new RewriteRuleSubtreeStream(adaptor,"rule function");
         try 
     	{
@@ -4172,21 +4335,23 @@ public partial class GAMSParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:299:2: ( Integer -> ^( ASTVALUE Integer ) | Double -> ^( ASTVALUE Double ) | sum -> ^( ASTVALUE sum ) | function -> ^( ASTVALUE function ) | variableWithIndexerEtc -> ^( ASTVALUE variableWithIndexerEtc ) )
+            // GAMS.g:300:2: ( integer2 -> ^( ASTVALUE integer2 ) | double2 -> ^( ASTVALUE double2 ) | sum -> ^( ASTVALUE sum ) | function -> ^( ASTVALUE function ) | variableWithIndexerEtc -> ^( ASTVALUE variableWithIndexerEtc ) )
             int alt24 = 5;
             alt24 = dfa24.Predict(input);
             switch (alt24) 
             {
                 case 1 :
-                    // GAMS.g:299:5: Integer
+                    // GAMS.g:300:5: integer2
                     {
-                    	Integer105=(IToken)Match(input,Integer,FOLLOW_Integer_in_value1511); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_Integer.Add(Integer105);
-
+                    	PushFollow(FOLLOW_integer2_in_value1563);
+                    	integer2105 = integer2();
+                    	state.followingStackPointer--;
+                    	if (state.failed) return retval;
+                    	if ( (state.backtracking==0) ) stream_integer2.Add(integer2105.Tree);
 
 
                     	// AST REWRITE
-                    	// elements:          Integer
+                    	// elements:          integer2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -4197,14 +4362,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 299:31: -> ^( ASTVALUE Integer )
+                    	// 300:31: -> ^( ASTVALUE integer2 )
                     	{
-                    	    // GAMS.g:299:34: ^( ASTVALUE Integer )
+                    	    // GAMS.g:300:34: ^( ASTVALUE integer2 )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVALUE, "ASTVALUE"), root_1);
 
-                    	    adaptor.AddChild(root_1, stream_Integer.NextNode());
+                    	    adaptor.AddChild(root_1, stream_integer2.NextTree());
 
                     	    adaptor.AddChild(root_0, root_1);
                     	    }
@@ -4215,15 +4380,17 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:300:4: Double
+                    // GAMS.g:301:4: double2
                     {
-                    	Double106=(IToken)Match(input,Double,FOLLOW_Double_in_value1542); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_Double.Add(Double106);
-
+                    	PushFollow(FOLLOW_double2_in_value1593);
+                    	double2106 = double2();
+                    	state.followingStackPointer--;
+                    	if (state.failed) return retval;
+                    	if ( (state.backtracking==0) ) stream_double2.Add(double2106.Tree);
 
 
                     	// AST REWRITE
-                    	// elements:          Double
+                    	// elements:          double2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -4234,14 +4401,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 300:30: -> ^( ASTVALUE Double )
+                    	// 301:30: -> ^( ASTVALUE double2 )
                     	{
-                    	    // GAMS.g:300:33: ^( ASTVALUE Double )
+                    	    // GAMS.g:301:33: ^( ASTVALUE double2 )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVALUE, "ASTVALUE"), root_1);
 
-                    	    adaptor.AddChild(root_1, stream_Double.NextNode());
+                    	    adaptor.AddChild(root_1, stream_double2.NextTree());
 
                     	    adaptor.AddChild(root_0, root_1);
                     	    }
@@ -4252,9 +4419,9 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 3 :
-                    // GAMS.g:301:6: sum
+                    // GAMS.g:302:6: sum
                     {
-                    	PushFollow(FOLLOW_sum_in_value1576);
+                    	PushFollow(FOLLOW_sum_in_value1626);
                     	sum107 = sum();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -4273,9 +4440,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 301:32: -> ^( ASTVALUE sum )
+                    	// 302:32: -> ^( ASTVALUE sum )
                     	{
-                    	    // GAMS.g:301:35: ^( ASTVALUE sum )
+                    	    // GAMS.g:302:35: ^( ASTVALUE sum )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVALUE, "ASTVALUE"), root_1);
@@ -4291,9 +4458,9 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 4 :
-                    // GAMS.g:302:6: function
+                    // GAMS.g:303:6: function
                     {
-                    	PushFollow(FOLLOW_function_in_value1613);
+                    	PushFollow(FOLLOW_function_in_value1663);
                     	function108 = function();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -4312,9 +4479,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 302:32: -> ^( ASTVALUE function )
+                    	// 303:32: -> ^( ASTVALUE function )
                     	{
-                    	    // GAMS.g:302:35: ^( ASTVALUE function )
+                    	    // GAMS.g:303:35: ^( ASTVALUE function )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVALUE, "ASTVALUE"), root_1);
@@ -4330,9 +4497,9 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 5 :
-                    // GAMS.g:303:4: variableWithIndexerEtc
+                    // GAMS.g:304:4: variableWithIndexerEtc
                     {
-                    	PushFollow(FOLLOW_variableWithIndexerEtc_in_value1661);
+                    	PushFollow(FOLLOW_variableWithIndexerEtc_in_value1711);
                     	variableWithIndexerEtc109 = variableWithIndexerEtc();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
@@ -4351,9 +4518,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 303:30: -> ^( ASTVALUE variableWithIndexerEtc )
+                    	// 304:30: -> ^( ASTVALUE variableWithIndexerEtc )
                     	{
-                    	    // GAMS.g:303:33: ^( ASTVALUE variableWithIndexerEtc )
+                    	    // GAMS.g:304:33: ^( ASTVALUE variableWithIndexerEtc )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVALUE, "ASTVALUE"), root_1);
@@ -4395,6 +4562,190 @@ public partial class GAMSParser : Parser
     }
     // $ANTLR end "value"
 
+    public class integer2_return : ParserRuleReturnScope
+    {
+        private object tree;
+        override public object Tree
+        {
+        	get { return tree; }
+        	set { tree = (object) value; }
+        }
+    };
+
+    // $ANTLR start "integer2"
+    // GAMS.g:307:1: integer2 : Integer -> ^( ASTINTEGER Integer ) ;
+    public GAMSParser.integer2_return integer2() // throws RecognitionException [1]
+    {   
+        GAMSParser.integer2_return retval = new GAMSParser.integer2_return();
+        retval.Start = input.LT(1);
+        int integer2_StartIndex = input.Index();
+        object root_0 = null;
+
+        IToken Integer110 = null;
+
+        object Integer110_tree=null;
+        RewriteRuleTokenStream stream_Integer = new RewriteRuleTokenStream(adaptor,"token Integer");
+
+        try 
+    	{
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 29) ) 
+    	    {
+    	    	return retval; 
+    	    }
+            // GAMS.g:307:9: ( Integer -> ^( ASTINTEGER Integer ) )
+            // GAMS.g:307:11: Integer
+            {
+            	Integer110=(IToken)Match(input,Integer,FOLLOW_Integer_in_integer21735); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_Integer.Add(Integer110);
+
+
+
+            	// AST REWRITE
+            	// elements:          Integer
+            	// token labels:      
+            	// rule labels:       retval
+            	// token list labels: 
+            	// rule list labels:  
+            	// wildcard labels: 
+            	if ( (state.backtracking==0) ) {
+            	retval.Tree = root_0;
+            	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+            	root_0 = (object)adaptor.GetNilNode();
+            	// 307:19: -> ^( ASTINTEGER Integer )
+            	{
+            	    // GAMS.g:307:22: ^( ASTINTEGER Integer )
+            	    {
+            	    object root_1 = (object)adaptor.GetNilNode();
+            	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTINTEGER, "ASTINTEGER"), root_1);
+
+            	    adaptor.AddChild(root_1, stream_Integer.NextNode());
+
+            	    adaptor.AddChild(root_0, root_1);
+            	    }
+
+            	}
+
+            	retval.Tree = root_0;retval.Tree = root_0;}
+            }
+
+            retval.Stop = input.LT(-1);
+
+            if ( (state.backtracking==0) )
+            {	retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+            	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);}
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+    	// Conversion of the second argument necessary, but harmless
+    	retval.Tree = (object)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
+
+        }
+        finally 
+    	{
+            if ( state.backtracking > 0 ) 
+            {
+            	Memoize(input, 29, integer2_StartIndex); 
+            }
+        }
+        return retval;
+    }
+    // $ANTLR end "integer2"
+
+    public class double2_return : ParserRuleReturnScope
+    {
+        private object tree;
+        override public object Tree
+        {
+        	get { return tree; }
+        	set { tree = (object) value; }
+        }
+    };
+
+    // $ANTLR start "double2"
+    // GAMS.g:308:1: double2 : Double -> ^( ASTDOUBLE Double ) ;
+    public GAMSParser.double2_return double2() // throws RecognitionException [1]
+    {   
+        GAMSParser.double2_return retval = new GAMSParser.double2_return();
+        retval.Start = input.LT(1);
+        int double2_StartIndex = input.Index();
+        object root_0 = null;
+
+        IToken Double111 = null;
+
+        object Double111_tree=null;
+        RewriteRuleTokenStream stream_Double = new RewriteRuleTokenStream(adaptor,"token Double");
+
+        try 
+    	{
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 30) ) 
+    	    {
+    	    	return retval; 
+    	    }
+            // GAMS.g:308:8: ( Double -> ^( ASTDOUBLE Double ) )
+            // GAMS.g:308:10: Double
+            {
+            	Double111=(IToken)Match(input,Double,FOLLOW_Double_in_double21749); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_Double.Add(Double111);
+
+
+
+            	// AST REWRITE
+            	// elements:          Double
+            	// token labels:      
+            	// rule labels:       retval
+            	// token list labels: 
+            	// rule list labels:  
+            	// wildcard labels: 
+            	if ( (state.backtracking==0) ) {
+            	retval.Tree = root_0;
+            	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+            	root_0 = (object)adaptor.GetNilNode();
+            	// 308:17: -> ^( ASTDOUBLE Double )
+            	{
+            	    // GAMS.g:308:20: ^( ASTDOUBLE Double )
+            	    {
+            	    object root_1 = (object)adaptor.GetNilNode();
+            	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTDOUBLE, "ASTDOUBLE"), root_1);
+
+            	    adaptor.AddChild(root_1, stream_Double.NextNode());
+
+            	    adaptor.AddChild(root_0, root_1);
+            	    }
+
+            	}
+
+            	retval.Tree = root_0;retval.Tree = root_0;}
+            }
+
+            retval.Stop = input.LT(-1);
+
+            if ( (state.backtracking==0) )
+            {	retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+            	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);}
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+    	// Conversion of the second argument necessary, but harmless
+    	retval.Tree = (object)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
+
+        }
+        finally 
+    	{
+            if ( state.backtracking > 0 ) 
+            {
+            	Memoize(input, 30, double2_StartIndex); 
+            }
+        }
+        return retval;
+    }
+    // $ANTLR end "double2"
+
     public class function_return : ParserRuleReturnScope
     {
         private object tree;
@@ -4406,7 +4757,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "function"
-    // GAMS.g:310:1: function : ( functionName L1 functionElements R1 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L2 functionElements R2 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L3 functionElements R3 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) );
+    // GAMS.g:314:1: function : ( functionName L1 functionElements R1 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L2 functionElements R2 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L3 functionElements R3 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) );
     public GAMSParser.function_return function() // throws RecognitionException [1]
     {   
         GAMSParser.function_return retval = new GAMSParser.function_return();
@@ -4414,31 +4765,31 @@ public partial class GAMSParser : Parser
         int function_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken L1111 = null;
-        IToken R1113 = null;
-        IToken L2115 = null;
-        IToken R2117 = null;
-        IToken L3119 = null;
-        IToken R3121 = null;
-        GAMSParser.functionName_return functionName110 = default(GAMSParser.functionName_return);
+        IToken L1113 = null;
+        IToken R1115 = null;
+        IToken L2117 = null;
+        IToken R2119 = null;
+        IToken L3121 = null;
+        IToken R3123 = null;
+        GAMSParser.functionName_return functionName112 = default(GAMSParser.functionName_return);
 
-        GAMSParser.functionElements_return functionElements112 = default(GAMSParser.functionElements_return);
+        GAMSParser.functionElements_return functionElements114 = default(GAMSParser.functionElements_return);
 
-        GAMSParser.functionName_return functionName114 = default(GAMSParser.functionName_return);
+        GAMSParser.functionName_return functionName116 = default(GAMSParser.functionName_return);
 
-        GAMSParser.functionElements_return functionElements116 = default(GAMSParser.functionElements_return);
+        GAMSParser.functionElements_return functionElements118 = default(GAMSParser.functionElements_return);
 
-        GAMSParser.functionName_return functionName118 = default(GAMSParser.functionName_return);
+        GAMSParser.functionName_return functionName120 = default(GAMSParser.functionName_return);
 
-        GAMSParser.functionElements_return functionElements120 = default(GAMSParser.functionElements_return);
+        GAMSParser.functionElements_return functionElements122 = default(GAMSParser.functionElements_return);
 
 
-        object L1111_tree=null;
-        object R1113_tree=null;
-        object L2115_tree=null;
-        object R2117_tree=null;
-        object L3119_tree=null;
-        object R3121_tree=null;
+        object L1113_tree=null;
+        object R1115_tree=null;
+        object L2117_tree=null;
+        object R2119_tree=null;
+        object L3121_tree=null;
+        object R3123_tree=null;
         RewriteRuleTokenStream stream_L1 = new RewriteRuleTokenStream(adaptor,"token L1");
         RewriteRuleTokenStream stream_L2 = new RewriteRuleTokenStream(adaptor,"token L2");
         RewriteRuleTokenStream stream_L3 = new RewriteRuleTokenStream(adaptor,"token L3");
@@ -4449,11 +4800,11 @@ public partial class GAMSParser : Parser
         RewriteRuleSubtreeStream stream_functionElements = new RewriteRuleSubtreeStream(adaptor,"rule functionElements");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 29) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 31) ) 
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:310:9: ( functionName L1 functionElements R1 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L2 functionElements R2 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L3 functionElements R3 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) )
+            // GAMS.g:314:9: ( functionName L1 functionElements R1 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L2 functionElements R2 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) | functionName L3 functionElements R3 -> ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) ) )
             int alt25 = 3;
             int LA25_0 = input.LA(1);
 
@@ -4466,14 +4817,14 @@ public partial class GAMSParser : Parser
                     alt25 = 3;
                     }
                     break;
-                case L1:
-                	{
-                    alt25 = 1;
-                    }
-                    break;
                 case L2:
                 	{
                     alt25 = 2;
+                    }
+                    break;
+                case L1:
+                	{
+                    alt25 = 1;
                     }
                     break;
                 	default:
@@ -4496,28 +4847,28 @@ public partial class GAMSParser : Parser
             switch (alt25) 
             {
                 case 1 :
-                    // GAMS.g:310:15: functionName L1 functionElements R1
+                    // GAMS.g:314:15: functionName L1 functionElements R1
                     {
-                    	PushFollow(FOLLOW_functionName_in_function1693);
-                    	functionName110 = functionName();
+                    	PushFollow(FOLLOW_functionName_in_function1772);
+                    	functionName112 = functionName();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_functionName.Add(functionName110.Tree);
-                    	L1111=(IToken)Match(input,L1,FOLLOW_L1_in_function1695); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L1.Add(L1111);
+                    	if ( (state.backtracking==0) ) stream_functionName.Add(functionName112.Tree);
+                    	L1113=(IToken)Match(input,L1,FOLLOW_L1_in_function1774); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L1.Add(L1113);
 
-                    	PushFollow(FOLLOW_functionElements_in_function1697);
-                    	functionElements112 = functionElements();
+                    	PushFollow(FOLLOW_functionElements_in_function1776);
+                    	functionElements114 = functionElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_functionElements.Add(functionElements112.Tree);
-                    	R1113=(IToken)Match(input,R1,FOLLOW_R1_in_function1699); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R1.Add(R1113);
+                    	if ( (state.backtracking==0) ) stream_functionElements.Add(functionElements114.Tree);
+                    	R1115=(IToken)Match(input,R1,FOLLOW_R1_in_function1778); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R1.Add(R1115);
 
 
 
                     	// AST REWRITE
-                    	// elements:          R1, L1, functionElements, functionName
+                    	// elements:          functionName, R1, functionElements, L1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -4528,14 +4879,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 310:51: -> ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
+                    	// 314:51: -> ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
                     	{
-                    	    // GAMS.g:310:54: ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
+                    	    // GAMS.g:314:54: ^( ASTFUNCTION ^( ASTFUNCTION0 L1 R1 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION, "ASTFUNCTION"), root_1);
 
-                    	    // GAMS.g:310:68: ^( ASTFUNCTION0 L1 R1 )
+                    	    // GAMS.g:314:68: ^( ASTFUNCTION0 L1 R1 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION0, "ASTFUNCTION0"), root_2);
@@ -4545,7 +4896,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:310:90: ^( ASTFUNCTION1 functionName )
+                    	    // GAMS.g:314:90: ^( ASTFUNCTION1 functionName )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION1, "ASTFUNCTION1"), root_2);
@@ -4554,7 +4905,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:310:119: ^( ASTFUNCTION2 functionElements )
+                    	    // GAMS.g:314:119: ^( ASTFUNCTION2 functionElements )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION2, "ASTFUNCTION2"), root_2);
@@ -4573,28 +4924,28 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:311:15: functionName L2 functionElements R2
+                    // GAMS.g:315:15: functionName L2 functionElements R2
                     {
-                    	PushFollow(FOLLOW_functionName_in_function1741);
-                    	functionName114 = functionName();
+                    	PushFollow(FOLLOW_functionName_in_function1820);
+                    	functionName116 = functionName();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_functionName.Add(functionName114.Tree);
-                    	L2115=(IToken)Match(input,L2,FOLLOW_L2_in_function1743); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L2.Add(L2115);
+                    	if ( (state.backtracking==0) ) stream_functionName.Add(functionName116.Tree);
+                    	L2117=(IToken)Match(input,L2,FOLLOW_L2_in_function1822); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L2.Add(L2117);
 
-                    	PushFollow(FOLLOW_functionElements_in_function1745);
-                    	functionElements116 = functionElements();
+                    	PushFollow(FOLLOW_functionElements_in_function1824);
+                    	functionElements118 = functionElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_functionElements.Add(functionElements116.Tree);
-                    	R2117=(IToken)Match(input,R2,FOLLOW_R2_in_function1747); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R2.Add(R2117);
+                    	if ( (state.backtracking==0) ) stream_functionElements.Add(functionElements118.Tree);
+                    	R2119=(IToken)Match(input,R2,FOLLOW_R2_in_function1826); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R2.Add(R2119);
 
 
 
                     	// AST REWRITE
-                    	// elements:          functionElements, R2, functionName, L2
+                    	// elements:          L2, functionElements, R2, functionName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -4605,14 +4956,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 311:51: -> ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
+                    	// 315:51: -> ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
                     	{
-                    	    // GAMS.g:311:54: ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
+                    	    // GAMS.g:315:54: ^( ASTFUNCTION ^( ASTFUNCTION0 L2 R2 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION, "ASTFUNCTION"), root_1);
 
-                    	    // GAMS.g:311:68: ^( ASTFUNCTION0 L2 R2 )
+                    	    // GAMS.g:315:68: ^( ASTFUNCTION0 L2 R2 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION0, "ASTFUNCTION0"), root_2);
@@ -4622,7 +4973,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:311:90: ^( ASTFUNCTION1 functionName )
+                    	    // GAMS.g:315:90: ^( ASTFUNCTION1 functionName )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION1, "ASTFUNCTION1"), root_2);
@@ -4631,7 +4982,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:311:119: ^( ASTFUNCTION2 functionElements )
+                    	    // GAMS.g:315:119: ^( ASTFUNCTION2 functionElements )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION2, "ASTFUNCTION2"), root_2);
@@ -4650,28 +5001,28 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 3 :
-                    // GAMS.g:312:15: functionName L3 functionElements R3
+                    // GAMS.g:316:15: functionName L3 functionElements R3
                     {
-                    	PushFollow(FOLLOW_functionName_in_function1789);
-                    	functionName118 = functionName();
+                    	PushFollow(FOLLOW_functionName_in_function1868);
+                    	functionName120 = functionName();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_functionName.Add(functionName118.Tree);
-                    	L3119=(IToken)Match(input,L3,FOLLOW_L3_in_function1791); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L3.Add(L3119);
+                    	if ( (state.backtracking==0) ) stream_functionName.Add(functionName120.Tree);
+                    	L3121=(IToken)Match(input,L3,FOLLOW_L3_in_function1870); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L3.Add(L3121);
 
-                    	PushFollow(FOLLOW_functionElements_in_function1793);
-                    	functionElements120 = functionElements();
+                    	PushFollow(FOLLOW_functionElements_in_function1872);
+                    	functionElements122 = functionElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_functionElements.Add(functionElements120.Tree);
-                    	R3121=(IToken)Match(input,R3,FOLLOW_R3_in_function1795); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R3.Add(R3121);
+                    	if ( (state.backtracking==0) ) stream_functionElements.Add(functionElements122.Tree);
+                    	R3123=(IToken)Match(input,R3,FOLLOW_R3_in_function1874); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R3.Add(R3123);
 
 
 
                     	// AST REWRITE
-                    	// elements:          functionName, L3, R3, functionElements
+                    	// elements:          functionElements, R3, functionName, L3
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -4682,14 +5033,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 312:51: -> ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
+                    	// 316:51: -> ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
                     	{
-                    	    // GAMS.g:312:54: ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
+                    	    // GAMS.g:316:54: ^( ASTFUNCTION ^( ASTFUNCTION0 L3 R3 ) ^( ASTFUNCTION1 functionName ) ^( ASTFUNCTION2 functionElements ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION, "ASTFUNCTION"), root_1);
 
-                    	    // GAMS.g:312:68: ^( ASTFUNCTION0 L3 R3 )
+                    	    // GAMS.g:316:68: ^( ASTFUNCTION0 L3 R3 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION0, "ASTFUNCTION0"), root_2);
@@ -4699,7 +5050,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:312:90: ^( ASTFUNCTION1 functionName )
+                    	    // GAMS.g:316:90: ^( ASTFUNCTION1 functionName )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION1, "ASTFUNCTION1"), root_2);
@@ -4708,7 +5059,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:312:119: ^( ASTFUNCTION2 functionElements )
+                    	    // GAMS.g:316:119: ^( ASTFUNCTION2 functionElements )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION2, "ASTFUNCTION2"), root_2);
@@ -4746,7 +5097,7 @@ public partial class GAMSParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 29, function_StartIndex); 
+            	Memoize(input, 31, function_StartIndex); 
             }
         }
         return retval;
@@ -4764,7 +5115,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "functionName"
-    // GAMS.g:315:1: functionName : ( ABS | EXP | LOG | MAX | MIN | POWER | SQR | SAMEAS | TANH );
+    // GAMS.g:319:1: functionName : ( ABS | EXP | LOG | MAX | MIN | POWER | SQR | SAMEAS | TANH );
     public GAMSParser.functionName_return functionName() // throws RecognitionException [1]
     {   
         GAMSParser.functionName_return retval = new GAMSParser.functionName_return();
@@ -4772,26 +5123,26 @@ public partial class GAMSParser : Parser
         int functionName_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken set122 = null;
+        IToken set124 = null;
 
-        object set122_tree=null;
+        object set124_tree=null;
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 30) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 32) ) 
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:315:13: ( ABS | EXP | LOG | MAX | MIN | POWER | SQR | SAMEAS | TANH )
+            // GAMS.g:319:13: ( ABS | EXP | LOG | MAX | MIN | POWER | SQR | SAMEAS | TANH )
             // GAMS.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	set122 = (IToken)input.LT(1);
+            	set124 = (IToken)input.LT(1);
             	if ( (input.LA(1) >= ABS && input.LA(1) <= TANH) || input.LA(1) == SAMEAS ) 
             	{
             	    input.Consume();
-            	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set122));
+            	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set124));
             	    state.errorRecovery = false;state.failed = false;
             	}
             	else 
@@ -4822,7 +5173,7 @@ public partial class GAMSParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 30, functionName_StartIndex); 
+            	Memoize(input, 32, functionName_StartIndex); 
             }
         }
         return retval;
@@ -4840,7 +5191,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "functionElements"
-    // GAMS.g:317:1: functionElements : expression ( COMMA expression )* -> ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) ) ;
+    // GAMS.g:321:1: functionElements : expression ( COMMA expression )* -> ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) ) ;
     public GAMSParser.functionElements_return functionElements() // throws RecognitionException [1]
     {   
         GAMSParser.functionElements_return retval = new GAMSParser.functionElements_return();
@@ -4848,30 +5199,30 @@ public partial class GAMSParser : Parser
         int functionElements_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken COMMA124 = null;
-        GAMSParser.expression_return expression123 = default(GAMSParser.expression_return);
-
+        IToken COMMA126 = null;
         GAMSParser.expression_return expression125 = default(GAMSParser.expression_return);
 
+        GAMSParser.expression_return expression127 = default(GAMSParser.expression_return);
 
-        object COMMA124_tree=null;
+
+        object COMMA126_tree=null;
         RewriteRuleTokenStream stream_COMMA = new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_expression = new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 31) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 33) ) 
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:317:17: ( expression ( COMMA expression )* -> ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) ) )
-            // GAMS.g:317:19: expression ( COMMA expression )*
+            // GAMS.g:321:17: ( expression ( COMMA expression )* -> ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) ) )
+            // GAMS.g:321:19: expression ( COMMA expression )*
             {
-            	PushFollow(FOLLOW_expression_in_functionElements1870);
-            	expression123 = expression();
+            	PushFollow(FOLLOW_expression_in_functionElements1949);
+            	expression125 = expression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( (state.backtracking==0) ) stream_expression.Add(expression123.Tree);
-            	// GAMS.g:317:30: ( COMMA expression )*
+            	if ( (state.backtracking==0) ) stream_expression.Add(expression125.Tree);
+            	// GAMS.g:321:30: ( COMMA expression )*
             	do 
             	{
             	    int alt26 = 2;
@@ -4886,16 +5237,16 @@ public partial class GAMSParser : Parser
             	    switch (alt26) 
             		{
             			case 1 :
-            			    // GAMS.g:317:31: COMMA expression
+            			    // GAMS.g:321:31: COMMA expression
             			    {
-            			    	COMMA124=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_functionElements1873); if (state.failed) return retval; 
-            			    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA124);
+            			    	COMMA126=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_functionElements1952); if (state.failed) return retval; 
+            			    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA126);
 
-            			    	PushFollow(FOLLOW_expression_in_functionElements1875);
-            			    	expression125 = expression();
+            			    	PushFollow(FOLLOW_expression_in_functionElements1954);
+            			    	expression127 = expression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
-            			    	if ( (state.backtracking==0) ) stream_expression.Add(expression125.Tree);
+            			    	if ( (state.backtracking==0) ) stream_expression.Add(expression127.Tree);
 
             			    }
             			    break;
@@ -4911,7 +5262,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, COMMA
+            	// elements:          COMMA, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -4922,19 +5273,19 @@ public partial class GAMSParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 318:3: -> ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) )
+            	// 322:3: -> ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) )
             	{
-            	    // GAMS.g:318:6: ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) )
+            	    // GAMS.g:322:6: ^( ASTFUNCTIONELEMENTS ^( ASTFUNCTIONELEMENTS0 ( COMMA )* ) ^( ASTFUNCTIONELEMENTS1 ( expression )+ ) )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTIONELEMENTS, "ASTFUNCTIONELEMENTS"), root_1);
 
-            	    // GAMS.g:318:28: ^( ASTFUNCTIONELEMENTS0 ( COMMA )* )
+            	    // GAMS.g:322:28: ^( ASTFUNCTIONELEMENTS0 ( COMMA )* )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTIONELEMENTS0, "ASTFUNCTIONELEMENTS0"), root_2);
 
-            	    // GAMS.g:318:51: ( COMMA )*
+            	    // GAMS.g:322:51: ( COMMA )*
             	    while ( stream_COMMA.HasNext() )
             	    {
             	        adaptor.AddChild(root_2, stream_COMMA.NextNode());
@@ -4944,7 +5295,7 @@ public partial class GAMSParser : Parser
 
             	    adaptor.AddChild(root_1, root_2);
             	    }
-            	    // GAMS.g:318:59: ^( ASTFUNCTIONELEMENTS1 ( expression )+ )
+            	    // GAMS.g:322:59: ^( ASTFUNCTIONELEMENTS1 ( expression )+ )
             	    {
             	    object root_2 = (object)adaptor.GetNilNode();
             	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTIONELEMENTS1, "ASTFUNCTIONELEMENTS1"), root_2);
@@ -4988,7 +5339,7 @@ public partial class GAMSParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 31, functionElements_StartIndex); 
+            	Memoize(input, 33, functionElements_StartIndex); 
             }
         }
         return retval;
@@ -5006,7 +5357,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "sum"
-    // GAMS.g:320:1: sum : ( SUM L1 sumControlled ( conditional )? COMMA expression R1 -> ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L2 sumControlled ( conditional )? COMMA expression R2 -> ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L3 sumControlled ( conditional )? COMMA expression R3 -> ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) );
+    // GAMS.g:324:1: sum : ( SUM L1 sumControlled ( conditional )? COMMA expression R1 -> ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L2 sumControlled ( conditional )? COMMA expression R2 -> ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L3 sumControlled ( conditional )? COMMA expression R3 -> ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) );
     public GAMSParser.sum_return sum() // throws RecognitionException [1]
     {   
         GAMSParser.sum_return retval = new GAMSParser.sum_return();
@@ -5014,49 +5365,49 @@ public partial class GAMSParser : Parser
         int sum_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken SUM126 = null;
-        IToken L1127 = null;
-        IToken COMMA130 = null;
-        IToken R1132 = null;
-        IToken SUM133 = null;
-        IToken L2134 = null;
-        IToken COMMA137 = null;
-        IToken R2139 = null;
-        IToken SUM140 = null;
-        IToken L3141 = null;
-        IToken COMMA144 = null;
-        IToken R3146 = null;
-        GAMSParser.sumControlled_return sumControlled128 = default(GAMSParser.sumControlled_return);
+        IToken SUM128 = null;
+        IToken L1129 = null;
+        IToken COMMA132 = null;
+        IToken R1134 = null;
+        IToken SUM135 = null;
+        IToken L2136 = null;
+        IToken COMMA139 = null;
+        IToken R2141 = null;
+        IToken SUM142 = null;
+        IToken L3143 = null;
+        IToken COMMA146 = null;
+        IToken R3148 = null;
+        GAMSParser.sumControlled_return sumControlled130 = default(GAMSParser.sumControlled_return);
 
-        GAMSParser.conditional_return conditional129 = default(GAMSParser.conditional_return);
+        GAMSParser.conditional_return conditional131 = default(GAMSParser.conditional_return);
 
-        GAMSParser.expression_return expression131 = default(GAMSParser.expression_return);
+        GAMSParser.expression_return expression133 = default(GAMSParser.expression_return);
 
-        GAMSParser.sumControlled_return sumControlled135 = default(GAMSParser.sumControlled_return);
+        GAMSParser.sumControlled_return sumControlled137 = default(GAMSParser.sumControlled_return);
 
-        GAMSParser.conditional_return conditional136 = default(GAMSParser.conditional_return);
+        GAMSParser.conditional_return conditional138 = default(GAMSParser.conditional_return);
 
-        GAMSParser.expression_return expression138 = default(GAMSParser.expression_return);
+        GAMSParser.expression_return expression140 = default(GAMSParser.expression_return);
 
-        GAMSParser.sumControlled_return sumControlled142 = default(GAMSParser.sumControlled_return);
+        GAMSParser.sumControlled_return sumControlled144 = default(GAMSParser.sumControlled_return);
 
-        GAMSParser.conditional_return conditional143 = default(GAMSParser.conditional_return);
+        GAMSParser.conditional_return conditional145 = default(GAMSParser.conditional_return);
 
-        GAMSParser.expression_return expression145 = default(GAMSParser.expression_return);
+        GAMSParser.expression_return expression147 = default(GAMSParser.expression_return);
 
 
-        object SUM126_tree=null;
-        object L1127_tree=null;
-        object COMMA130_tree=null;
-        object R1132_tree=null;
-        object SUM133_tree=null;
-        object L2134_tree=null;
-        object COMMA137_tree=null;
-        object R2139_tree=null;
-        object SUM140_tree=null;
-        object L3141_tree=null;
-        object COMMA144_tree=null;
-        object R3146_tree=null;
+        object SUM128_tree=null;
+        object L1129_tree=null;
+        object COMMA132_tree=null;
+        object R1134_tree=null;
+        object SUM135_tree=null;
+        object L2136_tree=null;
+        object COMMA139_tree=null;
+        object R2141_tree=null;
+        object SUM142_tree=null;
+        object L3143_tree=null;
+        object COMMA146_tree=null;
+        object R3148_tree=null;
         RewriteRuleTokenStream stream_L1 = new RewriteRuleTokenStream(adaptor,"token L1");
         RewriteRuleTokenStream stream_L2 = new RewriteRuleTokenStream(adaptor,"token L2");
         RewriteRuleTokenStream stream_L3 = new RewriteRuleTokenStream(adaptor,"token L3");
@@ -5070,11 +5421,11 @@ public partial class GAMSParser : Parser
         RewriteRuleSubtreeStream stream_conditional = new RewriteRuleSubtreeStream(adaptor,"rule conditional");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 32) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 34) ) 
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:320:4: ( SUM L1 sumControlled ( conditional )? COMMA expression R1 -> ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L2 sumControlled ( conditional )? COMMA expression R2 -> ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L3 sumControlled ( conditional )? COMMA expression R3 -> ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) )
+            // GAMS.g:324:4: ( SUM L1 sumControlled ( conditional )? COMMA expression R1 -> ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L2 sumControlled ( conditional )? COMMA expression R2 -> ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) | SUM L3 sumControlled ( conditional )? COMMA expression R3 -> ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) ) )
             int alt30 = 3;
             int LA30_0 = input.LA(1);
 
@@ -5117,20 +5468,20 @@ public partial class GAMSParser : Parser
             switch (alt30) 
             {
                 case 1 :
-                    // GAMS.g:320:7: SUM L1 sumControlled ( conditional )? COMMA expression R1
+                    // GAMS.g:324:7: SUM L1 sumControlled ( conditional )? COMMA expression R1
                     {
-                    	SUM126=(IToken)Match(input,SUM,FOLLOW_SUM_in_sum1908); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_SUM.Add(SUM126);
+                    	SUM128=(IToken)Match(input,SUM,FOLLOW_SUM_in_sum1987); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_SUM.Add(SUM128);
 
-                    	L1127=(IToken)Match(input,L1,FOLLOW_L1_in_sum1910); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L1.Add(L1127);
+                    	L1129=(IToken)Match(input,L1,FOLLOW_L1_in_sum1989); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L1.Add(L1129);
 
-                    	PushFollow(FOLLOW_sumControlled_in_sum1912);
-                    	sumControlled128 = sumControlled();
+                    	PushFollow(FOLLOW_sumControlled_in_sum1991);
+                    	sumControlled130 = sumControlled();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_sumControlled.Add(sumControlled128.Tree);
-                    	// GAMS.g:320:28: ( conditional )?
+                    	if ( (state.backtracking==0) ) stream_sumControlled.Add(sumControlled130.Tree);
+                    	// GAMS.g:324:28: ( conditional )?
                     	int alt27 = 2;
                     	int LA27_0 = input.LA(1);
 
@@ -5143,32 +5494,32 @@ public partial class GAMSParser : Parser
                     	    case 1 :
                     	        // GAMS.g:0:0: conditional
                     	        {
-                    	        	PushFollow(FOLLOW_conditional_in_sum1914);
-                    	        	conditional129 = conditional();
+                    	        	PushFollow(FOLLOW_conditional_in_sum1993);
+                    	        	conditional131 = conditional();
                     	        	state.followingStackPointer--;
                     	        	if (state.failed) return retval;
-                    	        	if ( (state.backtracking==0) ) stream_conditional.Add(conditional129.Tree);
+                    	        	if ( (state.backtracking==0) ) stream_conditional.Add(conditional131.Tree);
 
                     	        }
                     	        break;
 
                     	}
 
-                    	COMMA130=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_sum1917); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA130);
+                    	COMMA132=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_sum1996); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA132);
 
-                    	PushFollow(FOLLOW_expression_in_sum1919);
-                    	expression131 = expression();
+                    	PushFollow(FOLLOW_expression_in_sum1998);
+                    	expression133 = expression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_expression.Add(expression131.Tree);
-                    	R1132=(IToken)Match(input,R1,FOLLOW_R1_in_sum1921); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R1.Add(R1132);
+                    	if ( (state.backtracking==0) ) stream_expression.Add(expression133.Tree);
+                    	R1134=(IToken)Match(input,R1,FOLLOW_R1_in_sum2000); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R1.Add(R1134);
 
 
 
                     	// AST REWRITE
-                    	// elements:          expression, L1, COMMA, sumControlled, R1, conditional
+                    	// elements:          conditional, L1, R1, sumControlled, expression, COMMA
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5179,14 +5530,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 320:61: -> ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
+                    	// 324:61: -> ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
                     	{
-                    	    // GAMS.g:320:64: ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
+                    	    // GAMS.g:324:64: ^( ASTSUM ^( ASTSUM0 L1 COMMA R1 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM, "ASTSUM"), root_1);
 
-                    	    // GAMS.g:320:73: ^( ASTSUM0 L1 COMMA R1 )
+                    	    // GAMS.g:324:73: ^( ASTSUM0 L1 COMMA R1 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM0, "ASTSUM0"), root_2);
@@ -5197,7 +5548,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:320:96: ^( ASTSUM1 sumControlled )
+                    	    // GAMS.g:324:96: ^( ASTSUM1 sumControlled )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM1, "ASTSUM1"), root_2);
@@ -5206,12 +5557,12 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:320:121: ^( ASTSUM2 ( conditional )? )
+                    	    // GAMS.g:324:121: ^( ASTSUM2 ( conditional )? )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM2, "ASTSUM2"), root_2);
 
-                    	    // GAMS.g:320:131: ( conditional )?
+                    	    // GAMS.g:324:131: ( conditional )?
                     	    if ( stream_conditional.HasNext() )
                     	    {
                     	        adaptor.AddChild(root_2, stream_conditional.NextTree());
@@ -5221,7 +5572,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:320:146: ^( ASTSUM3 expression )
+                    	    // GAMS.g:324:146: ^( ASTSUM3 expression )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM3, "ASTSUM3"), root_2);
@@ -5240,20 +5591,20 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:321:7: SUM L2 sumControlled ( conditional )? COMMA expression R2
+                    // GAMS.g:325:7: SUM L2 sumControlled ( conditional )? COMMA expression R2
                     {
-                    	SUM133=(IToken)Match(input,SUM,FOLLOW_SUM_in_sum1965); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_SUM.Add(SUM133);
+                    	SUM135=(IToken)Match(input,SUM,FOLLOW_SUM_in_sum2044); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_SUM.Add(SUM135);
 
-                    	L2134=(IToken)Match(input,L2,FOLLOW_L2_in_sum1967); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L2.Add(L2134);
+                    	L2136=(IToken)Match(input,L2,FOLLOW_L2_in_sum2046); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L2.Add(L2136);
 
-                    	PushFollow(FOLLOW_sumControlled_in_sum1969);
-                    	sumControlled135 = sumControlled();
+                    	PushFollow(FOLLOW_sumControlled_in_sum2048);
+                    	sumControlled137 = sumControlled();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_sumControlled.Add(sumControlled135.Tree);
-                    	// GAMS.g:321:28: ( conditional )?
+                    	if ( (state.backtracking==0) ) stream_sumControlled.Add(sumControlled137.Tree);
+                    	// GAMS.g:325:28: ( conditional )?
                     	int alt28 = 2;
                     	int LA28_0 = input.LA(1);
 
@@ -5266,32 +5617,32 @@ public partial class GAMSParser : Parser
                     	    case 1 :
                     	        // GAMS.g:0:0: conditional
                     	        {
-                    	        	PushFollow(FOLLOW_conditional_in_sum1971);
-                    	        	conditional136 = conditional();
+                    	        	PushFollow(FOLLOW_conditional_in_sum2050);
+                    	        	conditional138 = conditional();
                     	        	state.followingStackPointer--;
                     	        	if (state.failed) return retval;
-                    	        	if ( (state.backtracking==0) ) stream_conditional.Add(conditional136.Tree);
+                    	        	if ( (state.backtracking==0) ) stream_conditional.Add(conditional138.Tree);
 
                     	        }
                     	        break;
 
                     	}
 
-                    	COMMA137=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_sum1974); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA137);
+                    	COMMA139=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_sum2053); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA139);
 
-                    	PushFollow(FOLLOW_expression_in_sum1976);
-                    	expression138 = expression();
+                    	PushFollow(FOLLOW_expression_in_sum2055);
+                    	expression140 = expression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_expression.Add(expression138.Tree);
-                    	R2139=(IToken)Match(input,R2,FOLLOW_R2_in_sum1978); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R2.Add(R2139);
+                    	if ( (state.backtracking==0) ) stream_expression.Add(expression140.Tree);
+                    	R2141=(IToken)Match(input,R2,FOLLOW_R2_in_sum2057); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R2.Add(R2141);
 
 
 
                     	// AST REWRITE
-                    	// elements:          COMMA, L2, sumControlled, R2, expression, conditional
+                    	// elements:          conditional, expression, COMMA, L2, sumControlled, R2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5302,14 +5653,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 321:61: -> ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
+                    	// 325:61: -> ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
                     	{
-                    	    // GAMS.g:321:64: ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
+                    	    // GAMS.g:325:64: ^( ASTSUM ^( ASTSUM0 L2 COMMA R2 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM, "ASTSUM"), root_1);
 
-                    	    // GAMS.g:321:73: ^( ASTSUM0 L2 COMMA R2 )
+                    	    // GAMS.g:325:73: ^( ASTSUM0 L2 COMMA R2 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM0, "ASTSUM0"), root_2);
@@ -5320,7 +5671,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:321:96: ^( ASTSUM1 sumControlled )
+                    	    // GAMS.g:325:96: ^( ASTSUM1 sumControlled )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM1, "ASTSUM1"), root_2);
@@ -5329,12 +5680,12 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:321:121: ^( ASTSUM2 ( conditional )? )
+                    	    // GAMS.g:325:121: ^( ASTSUM2 ( conditional )? )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM2, "ASTSUM2"), root_2);
 
-                    	    // GAMS.g:321:131: ( conditional )?
+                    	    // GAMS.g:325:131: ( conditional )?
                     	    if ( stream_conditional.HasNext() )
                     	    {
                     	        adaptor.AddChild(root_2, stream_conditional.NextTree());
@@ -5344,7 +5695,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:321:146: ^( ASTSUM3 expression )
+                    	    // GAMS.g:325:146: ^( ASTSUM3 expression )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM3, "ASTSUM3"), root_2);
@@ -5363,20 +5714,20 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 3 :
-                    // GAMS.g:322:7: SUM L3 sumControlled ( conditional )? COMMA expression R3
+                    // GAMS.g:326:7: SUM L3 sumControlled ( conditional )? COMMA expression R3
                     {
-                    	SUM140=(IToken)Match(input,SUM,FOLLOW_SUM_in_sum2022); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_SUM.Add(SUM140);
+                    	SUM142=(IToken)Match(input,SUM,FOLLOW_SUM_in_sum2101); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_SUM.Add(SUM142);
 
-                    	L3141=(IToken)Match(input,L3,FOLLOW_L3_in_sum2024); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L3.Add(L3141);
+                    	L3143=(IToken)Match(input,L3,FOLLOW_L3_in_sum2103); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L3.Add(L3143);
 
-                    	PushFollow(FOLLOW_sumControlled_in_sum2026);
-                    	sumControlled142 = sumControlled();
+                    	PushFollow(FOLLOW_sumControlled_in_sum2105);
+                    	sumControlled144 = sumControlled();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_sumControlled.Add(sumControlled142.Tree);
-                    	// GAMS.g:322:28: ( conditional )?
+                    	if ( (state.backtracking==0) ) stream_sumControlled.Add(sumControlled144.Tree);
+                    	// GAMS.g:326:28: ( conditional )?
                     	int alt29 = 2;
                     	int LA29_0 = input.LA(1);
 
@@ -5389,32 +5740,32 @@ public partial class GAMSParser : Parser
                     	    case 1 :
                     	        // GAMS.g:0:0: conditional
                     	        {
-                    	        	PushFollow(FOLLOW_conditional_in_sum2028);
-                    	        	conditional143 = conditional();
+                    	        	PushFollow(FOLLOW_conditional_in_sum2107);
+                    	        	conditional145 = conditional();
                     	        	state.followingStackPointer--;
                     	        	if (state.failed) return retval;
-                    	        	if ( (state.backtracking==0) ) stream_conditional.Add(conditional143.Tree);
+                    	        	if ( (state.backtracking==0) ) stream_conditional.Add(conditional145.Tree);
 
                     	        }
                     	        break;
 
                     	}
 
-                    	COMMA144=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_sum2031); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA144);
+                    	COMMA146=(IToken)Match(input,COMMA,FOLLOW_COMMA_in_sum2110); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_COMMA.Add(COMMA146);
 
-                    	PushFollow(FOLLOW_expression_in_sum2033);
-                    	expression145 = expression();
+                    	PushFollow(FOLLOW_expression_in_sum2112);
+                    	expression147 = expression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_expression.Add(expression145.Tree);
-                    	R3146=(IToken)Match(input,R3,FOLLOW_R3_in_sum2035); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R3.Add(R3146);
+                    	if ( (state.backtracking==0) ) stream_expression.Add(expression147.Tree);
+                    	R3148=(IToken)Match(input,R3,FOLLOW_R3_in_sum2114); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R3.Add(R3148);
 
 
 
                     	// AST REWRITE
-                    	// elements:          COMMA, sumControlled, R3, expression, conditional, L3
+                    	// elements:          expression, R3, conditional, COMMA, L3, sumControlled
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5425,14 +5776,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 322:61: -> ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
+                    	// 326:61: -> ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
                     	{
-                    	    // GAMS.g:322:64: ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
+                    	    // GAMS.g:326:64: ^( ASTSUM ^( ASTSUM0 L3 COMMA R3 ) ^( ASTSUM1 sumControlled ) ^( ASTSUM2 ( conditional )? ) ^( ASTSUM3 expression ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM, "ASTSUM"), root_1);
 
-                    	    // GAMS.g:322:73: ^( ASTSUM0 L3 COMMA R3 )
+                    	    // GAMS.g:326:73: ^( ASTSUM0 L3 COMMA R3 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM0, "ASTSUM0"), root_2);
@@ -5443,7 +5794,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:322:96: ^( ASTSUM1 sumControlled )
+                    	    // GAMS.g:326:96: ^( ASTSUM1 sumControlled )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM1, "ASTSUM1"), root_2);
@@ -5452,12 +5803,12 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:322:121: ^( ASTSUM2 ( conditional )? )
+                    	    // GAMS.g:326:121: ^( ASTSUM2 ( conditional )? )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM2, "ASTSUM2"), root_2);
 
-                    	    // GAMS.g:322:131: ( conditional )?
+                    	    // GAMS.g:326:131: ( conditional )?
                     	    if ( stream_conditional.HasNext() )
                     	    {
                     	        adaptor.AddChild(root_2, stream_conditional.NextTree());
@@ -5467,7 +5818,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:322:146: ^( ASTSUM3 expression )
+                    	    // GAMS.g:326:146: ^( ASTSUM3 expression )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUM3, "ASTSUM3"), root_2);
@@ -5505,7 +5856,7 @@ public partial class GAMSParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 32, sum_StartIndex); 
+            	Memoize(input, 34, sum_StartIndex); 
             }
         }
         return retval;
@@ -5523,7 +5874,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "sumControlled"
-    // GAMS.g:325:1: sumControlled : ( variable -> ^( ASTSUMCONTROLLEDSIMPLE variable ) | L1 indexerElements R1 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L2 indexerElements R2 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L3 indexerElements R3 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) );
+    // GAMS.g:329:1: sumControlled : ( variable -> ^( ASTSUMCONTROLLEDSIMPLE variable ) | L1 indexerElements R1 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L2 indexerElements R2 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L3 indexerElements R3 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) );
     public GAMSParser.sumControlled_return sumControlled() // throws RecognitionException [1]
     {   
         GAMSParser.sumControlled_return retval = new GAMSParser.sumControlled_return();
@@ -5531,27 +5882,27 @@ public partial class GAMSParser : Parser
         int sumControlled_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken L1148 = null;
-        IToken R1150 = null;
-        IToken L2151 = null;
-        IToken R2153 = null;
-        IToken L3154 = null;
-        IToken R3156 = null;
-        GAMSParser.variable_return variable147 = default(GAMSParser.variable_return);
+        IToken L1150 = null;
+        IToken R1152 = null;
+        IToken L2153 = null;
+        IToken R2155 = null;
+        IToken L3156 = null;
+        IToken R3158 = null;
+        GAMSParser.variable_return variable149 = default(GAMSParser.variable_return);
 
-        GAMSParser.indexerElements_return indexerElements149 = default(GAMSParser.indexerElements_return);
+        GAMSParser.indexerElements_return indexerElements151 = default(GAMSParser.indexerElements_return);
 
-        GAMSParser.indexerElements_return indexerElements152 = default(GAMSParser.indexerElements_return);
+        GAMSParser.indexerElements_return indexerElements154 = default(GAMSParser.indexerElements_return);
 
-        GAMSParser.indexerElements_return indexerElements155 = default(GAMSParser.indexerElements_return);
+        GAMSParser.indexerElements_return indexerElements157 = default(GAMSParser.indexerElements_return);
 
 
-        object L1148_tree=null;
-        object R1150_tree=null;
-        object L2151_tree=null;
-        object R2153_tree=null;
-        object L3154_tree=null;
-        object R3156_tree=null;
+        object L1150_tree=null;
+        object R1152_tree=null;
+        object L2153_tree=null;
+        object R2155_tree=null;
+        object L3156_tree=null;
+        object R3158_tree=null;
         RewriteRuleTokenStream stream_L1 = new RewriteRuleTokenStream(adaptor,"token L1");
         RewriteRuleTokenStream stream_L2 = new RewriteRuleTokenStream(adaptor,"token L2");
         RewriteRuleTokenStream stream_L3 = new RewriteRuleTokenStream(adaptor,"token L3");
@@ -5562,11 +5913,11 @@ public partial class GAMSParser : Parser
         RewriteRuleSubtreeStream stream_variable = new RewriteRuleSubtreeStream(adaptor,"rule variable");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 33) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 35) ) 
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:325:14: ( variable -> ^( ASTSUMCONTROLLEDSIMPLE variable ) | L1 indexerElements R1 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L2 indexerElements R2 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L3 indexerElements R3 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) )
+            // GAMS.g:329:14: ( variable -> ^( ASTSUMCONTROLLEDSIMPLE variable ) | L1 indexerElements R1 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L2 indexerElements R2 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) | L3 indexerElements R3 -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) ) )
             int alt31 = 4;
             switch ( input.LA(1) ) 
             {
@@ -5618,13 +5969,13 @@ public partial class GAMSParser : Parser
             switch (alt31) 
             {
                 case 1 :
-                    // GAMS.g:326:11: variable
+                    // GAMS.g:330:11: variable
                     {
-                    	PushFollow(FOLLOW_variable_in_sumControlled2090);
-                    	variable147 = variable();
+                    	PushFollow(FOLLOW_variable_in_sumControlled2169);
+                    	variable149 = variable();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_variable.Add(variable147.Tree);
+                    	if ( (state.backtracking==0) ) stream_variable.Add(variable149.Tree);
 
 
                     	// AST REWRITE
@@ -5639,9 +5990,9 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 326:33: -> ^( ASTSUMCONTROLLEDSIMPLE variable )
+                    	// 330:33: -> ^( ASTSUMCONTROLLEDSIMPLE variable )
                     	{
-                    	    // GAMS.g:326:36: ^( ASTSUMCONTROLLEDSIMPLE variable )
+                    	    // GAMS.g:330:36: ^( ASTSUMCONTROLLEDSIMPLE variable )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLEDSIMPLE, "ASTSUMCONTROLLEDSIMPLE"), root_1);
@@ -5657,23 +6008,23 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 2 :
-                    // GAMS.g:327:5: L1 indexerElements R1
+                    // GAMS.g:331:5: L1 indexerElements R1
                     {
-                    	L1148=(IToken)Match(input,L1,FOLLOW_L1_in_sumControlled2117); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L1.Add(L1148);
+                    	L1150=(IToken)Match(input,L1,FOLLOW_L1_in_sumControlled2196); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L1.Add(L1150);
 
-                    	PushFollow(FOLLOW_indexerElements_in_sumControlled2119);
-                    	indexerElements149 = indexerElements();
+                    	PushFollow(FOLLOW_indexerElements_in_sumControlled2198);
+                    	indexerElements151 = indexerElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements149.Tree);
-                    	R1150=(IToken)Match(input,R1,FOLLOW_R1_in_sumControlled2121); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R1.Add(R1150);
+                    	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements151.Tree);
+                    	R1152=(IToken)Match(input,R1,FOLLOW_R1_in_sumControlled2200); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R1.Add(R1152);
 
 
 
                     	// AST REWRITE
-                    	// elements:          R1, L1, indexerElements
+                    	// elements:          indexerElements, R1, L1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5684,14 +6035,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 327:27: -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
+                    	// 331:27: -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
                     	{
-                    	    // GAMS.g:327:30: ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
+                    	    // GAMS.g:331:30: ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L1 R1 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED, "ASTSUMCONTROLLED"), root_1);
 
-                    	    // GAMS.g:327:49: ^( ASTSUMCONTROLLED0 L1 R1 )
+                    	    // GAMS.g:331:49: ^( ASTSUMCONTROLLED0 L1 R1 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED0, "ASTSUMCONTROLLED0"), root_2);
@@ -5701,7 +6052,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:327:76: ^( ASTSUMCONTROLLED2 indexerElements )
+                    	    // GAMS.g:331:76: ^( ASTSUMCONTROLLED2 indexerElements )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED2, "ASTSUMCONTROLLED2"), root_2);
@@ -5720,23 +6071,23 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 3 :
-                    // GAMS.g:328:5: L2 indexerElements R2
+                    // GAMS.g:332:5: L2 indexerElements R2
                     {
-                    	L2151=(IToken)Match(input,L2,FOLLOW_L2_in_sumControlled2147); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L2.Add(L2151);
+                    	L2153=(IToken)Match(input,L2,FOLLOW_L2_in_sumControlled2226); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L2.Add(L2153);
 
-                    	PushFollow(FOLLOW_indexerElements_in_sumControlled2149);
-                    	indexerElements152 = indexerElements();
+                    	PushFollow(FOLLOW_indexerElements_in_sumControlled2228);
+                    	indexerElements154 = indexerElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements152.Tree);
-                    	R2153=(IToken)Match(input,R2,FOLLOW_R2_in_sumControlled2151); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R2.Add(R2153);
+                    	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements154.Tree);
+                    	R2155=(IToken)Match(input,R2,FOLLOW_R2_in_sumControlled2230); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R2.Add(R2155);
 
 
 
                     	// AST REWRITE
-                    	// elements:          indexerElements, L2, R2
+                    	// elements:          L2, indexerElements, R2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5747,14 +6098,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 328:27: -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
+                    	// 332:27: -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
                     	{
-                    	    // GAMS.g:328:30: ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
+                    	    // GAMS.g:332:30: ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L2 R2 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED, "ASTSUMCONTROLLED"), root_1);
 
-                    	    // GAMS.g:328:49: ^( ASTSUMCONTROLLED0 L2 R2 )
+                    	    // GAMS.g:332:49: ^( ASTSUMCONTROLLED0 L2 R2 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED0, "ASTSUMCONTROLLED0"), root_2);
@@ -5764,7 +6115,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:328:76: ^( ASTSUMCONTROLLED2 indexerElements )
+                    	    // GAMS.g:332:76: ^( ASTSUMCONTROLLED2 indexerElements )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED2, "ASTSUMCONTROLLED2"), root_2);
@@ -5783,23 +6134,23 @@ public partial class GAMSParser : Parser
                     }
                     break;
                 case 4 :
-                    // GAMS.g:329:5: L3 indexerElements R3
+                    // GAMS.g:333:5: L3 indexerElements R3
                     {
-                    	L3154=(IToken)Match(input,L3,FOLLOW_L3_in_sumControlled2177); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_L3.Add(L3154);
+                    	L3156=(IToken)Match(input,L3,FOLLOW_L3_in_sumControlled2256); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_L3.Add(L3156);
 
-                    	PushFollow(FOLLOW_indexerElements_in_sumControlled2179);
-                    	indexerElements155 = indexerElements();
+                    	PushFollow(FOLLOW_indexerElements_in_sumControlled2258);
+                    	indexerElements157 = indexerElements();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements155.Tree);
-                    	R3156=(IToken)Match(input,R3,FOLLOW_R3_in_sumControlled2181); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_R3.Add(R3156);
+                    	if ( (state.backtracking==0) ) stream_indexerElements.Add(indexerElements157.Tree);
+                    	R3158=(IToken)Match(input,R3,FOLLOW_R3_in_sumControlled2260); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_R3.Add(R3158);
 
 
 
                     	// AST REWRITE
-                    	// elements:          R3, indexerElements, L3
+                    	// elements:          L3, indexerElements, R3
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5810,14 +6161,14 @@ public partial class GAMSParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 329:27: -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
+                    	// 333:27: -> ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
                     	{
-                    	    // GAMS.g:329:30: ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
+                    	    // GAMS.g:333:30: ^( ASTSUMCONTROLLED ^( ASTSUMCONTROLLED0 L3 R3 ) ^( ASTSUMCONTROLLED2 indexerElements ) )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED, "ASTSUMCONTROLLED"), root_1);
 
-                    	    // GAMS.g:329:49: ^( ASTSUMCONTROLLED0 L3 R3 )
+                    	    // GAMS.g:333:49: ^( ASTSUMCONTROLLED0 L3 R3 )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED0, "ASTSUMCONTROLLED0"), root_2);
@@ -5827,7 +6178,7 @@ public partial class GAMSParser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    // GAMS.g:329:76: ^( ASTSUMCONTROLLED2 indexerElements )
+                    	    // GAMS.g:333:76: ^( ASTSUMCONTROLLED2 indexerElements )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
                     	    root_2 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSUMCONTROLLED2, "ASTSUMCONTROLLED2"), root_2);
@@ -5865,7 +6216,7 @@ public partial class GAMSParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 33, sumControlled_StartIndex); 
+            	Memoize(input, 35, sumControlled_StartIndex); 
             }
         }
         return retval;
@@ -5883,7 +6234,7 @@ public partial class GAMSParser : Parser
     };
 
     // $ANTLR start "ident"
-    // GAMS.g:336:1: ident : ( Ident | extraTokens );
+    // GAMS.g:340:1: ident : ( Ident | extraTokens );
     public GAMSParser.ident_return ident() // throws RecognitionException [1]
     {   
         GAMSParser.ident_return retval = new GAMSParser.ident_return();
@@ -5891,19 +6242,19 @@ public partial class GAMSParser : Parser
         int ident_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken Ident157 = null;
-        GAMSParser.extraTokens_return extraTokens158 = default(GAMSParser.extraTokens_return);
+        IToken Ident159 = null;
+        GAMSParser.extraTokens_return extraTokens160 = default(GAMSParser.extraTokens_return);
 
 
-        object Ident157_tree=null;
+        object Ident159_tree=null;
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 34) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 36) ) 
     	    {
     	    	return retval; 
     	    }
-            // GAMS.g:336:9: ( Ident | extraTokens )
+            // GAMS.g:340:9: ( Ident | extraTokens )
             int alt32 = 2;
             int LA32_0 = input.LA(1);
 
@@ -5926,28 +6277,28 @@ public partial class GAMSParser : Parser
             switch (alt32) 
             {
                 case 1 :
-                    // GAMS.g:336:12: Ident
+                    // GAMS.g:340:12: Ident
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	Ident157=(IToken)Match(input,Ident,FOLLOW_Ident_in_ident2217); if (state.failed) return retval;
+                    	Ident159=(IToken)Match(input,Ident,FOLLOW_Ident_in_ident2296); if (state.failed) return retval;
                     	if ( state.backtracking == 0 )
-                    	{Ident157_tree = (object)adaptor.Create(Ident157);
-                    		adaptor.AddChild(root_0, Ident157_tree);
+                    	{Ident159_tree = (object)adaptor.Create(Ident159);
+                    		adaptor.AddChild(root_0, Ident159_tree);
                     	}
 
                     }
                     break;
                 case 2 :
-                    // GAMS.g:336:20: extraTokens
+                    // GAMS.g:340:20: extraTokens
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_extraTokens_in_ident2221);
-                    	extraTokens158 = extraTokens();
+                    	PushFollow(FOLLOW_extraTokens_in_ident2300);
+                    	extraTokens160 = extraTokens();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, extraTokens158.Tree);
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, extraTokens160.Tree);
 
                     }
                     break;
@@ -5971,7 +6322,7 @@ public partial class GAMSParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 34, ident_StartIndex); 
+            	Memoize(input, 36, ident_StartIndex); 
             }
         }
         return retval;
@@ -5980,10 +6331,10 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred18_GAMS"
     public void synpred18_GAMS_fragment() {
-        // GAMS.g:196:7: ( equ )
-        // GAMS.g:196:7: equ
+        // GAMS.g:197:7: ( equ )
+        // GAMS.g:197:7: equ
         {
-        	PushFollow(FOLLOW_equ_in_synpred18_GAMS517);
+        	PushFollow(FOLLOW_equ_in_synpred18_GAMS521);
         	equ();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -5994,10 +6345,10 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred19_GAMS"
     public void synpred19_GAMS_fragment() {
-        // GAMS.g:197:9: ( vardef )
-        // GAMS.g:197:9: vardef
+        // GAMS.g:198:9: ( vardef )
+        // GAMS.g:198:9: vardef
         {
-        	PushFollow(FOLLOW_vardef_in_synpred19_GAMS527);
+        	PushFollow(FOLLOW_vardef_in_synpred19_GAMS539);
         	vardef();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6008,10 +6359,10 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred20_GAMS"
     public void synpred20_GAMS_fragment() {
-        // GAMS.g:198:6: ( variables )
-        // GAMS.g:198:6: variables
+        // GAMS.g:199:6: ( variables )
+        // GAMS.g:199:6: variables
         {
-        	PushFollow(FOLLOW_variables_in_synpred20_GAMS534);
+        	PushFollow(FOLLOW_variables_in_synpred20_GAMS554);
         	variables();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6022,10 +6373,10 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred21_GAMS"
     public void synpred21_GAMS_fragment() {
-        // GAMS.g:199:6: ( equations )
-        // GAMS.g:199:6: equations
+        // GAMS.g:200:6: ( equations )
+        // GAMS.g:200:6: equations
         {
-        	PushFollow(FOLLOW_equations_in_synpred21_GAMS541);
+        	PushFollow(FOLLOW_equations_in_synpred21_GAMS569);
         	equations();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6036,10 +6387,10 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred31_GAMS"
     public void synpred31_GAMS_fragment() {
-        // GAMS.g:224:55: ( conditional )
-        // GAMS.g:224:55: conditional
+        // GAMS.g:225:55: ( conditional )
+        // GAMS.g:225:55: conditional
         {
-        	PushFollow(FOLLOW_conditional_in_synpred31_GAMS788);
+        	PushFollow(FOLLOW_conditional_in_synpred31_GAMS840);
         	conditional();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6050,11 +6401,11 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred38_GAMS"
     public void synpred38_GAMS_fragment() {
-        // GAMS.g:261:28: ( OR andExpression )
-        // GAMS.g:261:28: OR andExpression
+        // GAMS.g:262:28: ( OR andExpression )
+        // GAMS.g:262:28: OR andExpression
         {
-        	Match(input,OR,FOLLOW_OR_in_synpred38_GAMS1186); if (state.failed) return ;
-        	PushFollow(FOLLOW_andExpression_in_synpred38_GAMS1189);
+        	Match(input,OR,FOLLOW_OR_in_synpred38_GAMS1238); if (state.failed) return ;
+        	PushFollow(FOLLOW_andExpression_in_synpred38_GAMS1241);
         	andExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6065,11 +6416,11 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred39_GAMS"
     public void synpred39_GAMS_fragment() {
-        // GAMS.g:263:31: ( AND notExpression )
-        // GAMS.g:263:31: AND notExpression
+        // GAMS.g:264:31: ( AND notExpression )
+        // GAMS.g:264:31: AND notExpression
         {
-        	Match(input,AND,FOLLOW_AND_in_synpred39_GAMS1201); if (state.failed) return ;
-        	PushFollow(FOLLOW_notExpression_in_synpred39_GAMS1204);
+        	Match(input,AND,FOLLOW_AND_in_synpred39_GAMS1253); if (state.failed) return ;
+        	PushFollow(FOLLOW_notExpression_in_synpred39_GAMS1256);
         	notExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6080,11 +6431,11 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred40_GAMS"
     public void synpred40_GAMS_fragment() {
-        // GAMS.g:265:16: ( NOT logicalExpression )
-        // GAMS.g:265:16: NOT logicalExpression
+        // GAMS.g:266:16: ( NOT logicalExpression )
+        // GAMS.g:266:16: NOT logicalExpression
         {
-        	Match(input,NOT,FOLLOW_NOT_in_synpred40_GAMS1215); if (state.failed) return ;
-        	PushFollow(FOLLOW_logicalExpression_in_synpred40_GAMS1217);
+        	Match(input,NOT,FOLLOW_NOT_in_synpred40_GAMS1267); if (state.failed) return ;
+        	PushFollow(FOLLOW_logicalExpression_in_synpred40_GAMS1269);
         	logicalExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6095,14 +6446,14 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred41_GAMS"
     public void synpred41_GAMS_fragment() {
-        // GAMS.g:268:41: ( logical additiveExpression )
-        // GAMS.g:268:41: logical additiveExpression
+        // GAMS.g:269:41: ( logical additiveExpression )
+        // GAMS.g:269:41: logical additiveExpression
         {
-        	PushFollow(FOLLOW_logical_in_synpred41_GAMS1248);
+        	PushFollow(FOLLOW_logical_in_synpred41_GAMS1300);
         	logical();
         	state.followingStackPointer--;
         	if (state.failed) return ;
-        	PushFollow(FOLLOW_additiveExpression_in_synpred41_GAMS1251);
+        	PushFollow(FOLLOW_additiveExpression_in_synpred41_GAMS1303);
         	additiveExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6113,8 +6464,8 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred43_GAMS"
     public void synpred43_GAMS_fragment() {
-        // GAMS.g:270:48: ( ( PLUS | MINUS ) multiplicativeExpression )
-        // GAMS.g:270:48: ( PLUS | MINUS ) multiplicativeExpression
+        // GAMS.g:271:48: ( ( PLUS | MINUS ) multiplicativeExpression )
+        // GAMS.g:271:48: ( PLUS | MINUS ) multiplicativeExpression
         {
         	if ( input.LA(1) == PLUS || input.LA(1) == MINUS ) 
         	{
@@ -6128,7 +6479,7 @@ public partial class GAMSParser : Parser
         	    throw mse;
         	}
 
-        	PushFollow(FOLLOW_multiplicativeExpression_in_synpred43_GAMS1271);
+        	PushFollow(FOLLOW_multiplicativeExpression_in_synpred43_GAMS1323);
         	multiplicativeExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6139,8 +6490,8 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred45_GAMS"
     public void synpred45_GAMS_fragment() {
-        // GAMS.g:272:45: ( ( MULT | DIV ) powerExpression )
-        // GAMS.g:272:45: ( MULT | DIV ) powerExpression
+        // GAMS.g:273:45: ( ( MULT | DIV ) powerExpression )
+        // GAMS.g:273:45: ( MULT | DIV ) powerExpression
         {
         	if ( input.LA(1) == DIV || input.LA(1) == MULT ) 
         	{
@@ -6154,7 +6505,7 @@ public partial class GAMSParser : Parser
         	    throw mse;
         	}
 
-        	PushFollow(FOLLOW_powerExpression_in_synpred45_GAMS1292);
+        	PushFollow(FOLLOW_powerExpression_in_synpred45_GAMS1344);
         	powerExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6165,11 +6516,11 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred46_GAMS"
     public void synpred46_GAMS_fragment() {
-        // GAMS.g:274:36: ( STARS unaryExpression )
-        // GAMS.g:274:36: STARS unaryExpression
+        // GAMS.g:275:36: ( STARS unaryExpression )
+        // GAMS.g:275:36: STARS unaryExpression
         {
-        	Match(input,STARS,FOLLOW_STARS_in_synpred46_GAMS1306); if (state.failed) return ;
-        	PushFollow(FOLLOW_unaryExpression_in_synpred46_GAMS1309);
+        	Match(input,STARS,FOLLOW_STARS_in_synpred46_GAMS1358); if (state.failed) return ;
+        	PushFollow(FOLLOW_unaryExpression_in_synpred46_GAMS1361);
         	unaryExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6180,14 +6531,14 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred48_GAMS"
     public void synpred48_GAMS_fragment() {
-        // GAMS.g:286:9: ( primaryExpression conditional )
-        // GAMS.g:286:9: primaryExpression conditional
+        // GAMS.g:287:9: ( primaryExpression conditional )
+        // GAMS.g:287:9: primaryExpression conditional
         {
-        	PushFollow(FOLLOW_primaryExpression_in_synpred48_GAMS1368);
+        	PushFollow(FOLLOW_primaryExpression_in_synpred48_GAMS1420);
         	primaryExpression();
         	state.followingStackPointer--;
         	if (state.failed) return ;
-        	PushFollow(FOLLOW_conditional_in_synpred48_GAMS1370);
+        	PushFollow(FOLLOW_conditional_in_synpred48_GAMS1422);
         	conditional();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6198,10 +6549,10 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred59_GAMS"
     public void synpred59_GAMS_fragment() {
-        // GAMS.g:301:6: ( sum )
-        // GAMS.g:301:6: sum
+        // GAMS.g:302:6: ( sum )
+        // GAMS.g:302:6: sum
         {
-        	PushFollow(FOLLOW_sum_in_synpred59_GAMS1576);
+        	PushFollow(FOLLOW_sum_in_synpred59_GAMS1626);
         	sum();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6212,10 +6563,10 @@ public partial class GAMSParser : Parser
 
     // $ANTLR start "synpred60_GAMS"
     public void synpred60_GAMS_fragment() {
-        // GAMS.g:302:6: ( function )
-        // GAMS.g:302:6: function
+        // GAMS.g:303:6: ( function )
+        // GAMS.g:303:6: function
         {
-        	PushFollow(FOLLOW_function_in_synpred60_GAMS1613);
+        	PushFollow(FOLLOW_function_in_synpred60_GAMS1663);
         	function();
         	state.followingStackPointer--;
         	if (state.failed) return ;
@@ -6555,37 +6906,37 @@ public partial class GAMSParser : Parser
     const string DFA2_eofS =
         "\x34\uffff";
     const string DFA2_minS =
-        "\x01\x45\x01\x56\x03\x45\x01\x56\x01\uffff\x03\x00\x03\uffff\x02"+
-        "\x00\x01\uffff\x03\x00\x04\uffff\x03\x00\x08\uffff\x03\x00\x07\uffff"+
-        "\x03\x00\x05\uffff";
+        "\x01\x46\x01\x57\x03\x46\x01\x57\x01\uffff\x03\x00\x03\uffff\x03"+
+        "\x00\x01\uffff\x02\x00\x07\uffff\x03\x00\x07\uffff\x03\x00\x04\uffff"+
+        "\x03\x00\x06\uffff";
     const string DFA2_maxS =
-        "\x01\x70\x01\x67\x03\x70\x01\x67\x01\uffff\x03\x00\x03\uffff\x02"+
-        "\x00\x01\uffff\x03\x00\x04\uffff\x03\x00\x08\uffff\x03\x00\x07\uffff"+
-        "\x03\x00\x05\uffff";
+        "\x01\x71\x01\x68\x03\x71\x01\x68\x01\uffff\x03\x00\x03\uffff\x03"+
+        "\x00\x01\uffff\x02\x00\x07\uffff\x03\x00\x07\uffff\x03\x00\x04\uffff"+
+        "\x03\x00\x06\uffff";
     const string DFA2_acceptS =
-        "\x06\uffff\x01\x02\x05\uffff\x01\x01\x10\uffff\x01\x05\x0a\uffff"+
-        "\x01\x06\x09\uffff\x01\x03\x01\x04";
+        "\x06\uffff\x01\x02\x05\uffff\x01\x01\x09\uffff\x01\x05\x0a\uffff"+
+        "\x01\x06\x10\uffff\x01\x03\x01\x04";
     const string DFA2_specialS =
         "\x07\uffff\x01\x00\x01\x01\x01\x02\x03\uffff\x01\x03\x01\x04\x01"+
-        "\uffff\x01\x05\x01\x06\x01\x07\x04\uffff\x01\x08\x01\x09\x01\x0a"+
-        "\x08\uffff\x01\x0b\x01\x0c\x01\x0d\x07\uffff\x01\x0e\x01\x0f\x01"+
-        "\x10\x05\uffff}>";
+        "\x05\x01\uffff\x01\x06\x01\x07\x07\uffff\x01\x08\x01\x09\x01\x0a"+
+        "\x07\uffff\x01\x0b\x01\x0c\x01\x0d\x04\uffff\x01\x0e\x01\x0f\x01"+
+        "\x10\x06\uffff}>";
     static readonly string[] DFA2_transitionS = {
             "\x0c\x05\x01\x03\x01\x04\x01\x05\x01\x02\x01\x05\x1a\uffff"+
             "\x01\x01",
             "\x01\x0c\x02\uffff\x01\x06\x02\uffff\x01\x06\x01\x07\x01\uffff"+
             "\x01\x08\x01\uffff\x01\x09\x05\uffff\x01\x06",
-            "\x11\x0e\x01\x0c\x02\uffff\x01\x06\x02\uffff\x01\x06\x01\x10"+
-            "\x01\uffff\x01\x11\x01\uffff\x01\x12\x05\uffff\x01\x06\x08\uffff"+
-            "\x01\x0d",
-            "\x11\x1d\x01\x0c\x01\uffff\x01\x1d\x01\x06\x01\uffff\x01\x1d"+
-            "\x01\x06\x01\x17\x01\uffff\x01\x18\x01\uffff\x01\x19\x05\uffff"+
-            "\x01\x06\x08\uffff\x01\x1d",
-            "\x11\x28\x01\x0c\x01\uffff\x01\x28\x01\x06\x02\uffff\x01\x06"+
-            "\x01\x22\x01\uffff\x01\x23\x01\uffff\x01\x24\x05\uffff\x01\x06"+
-            "\x08\uffff\x01\x28",
-            "\x01\x0c\x02\uffff\x01\x06\x02\uffff\x01\x06\x01\x2c\x01\uffff"+
-            "\x01\x2d\x01\uffff\x01\x2e\x05\uffff\x01\x06",
+            "\x11\x12\x01\x0c\x02\uffff\x01\x06\x02\uffff\x01\x06\x01\x0d"+
+            "\x01\uffff\x01\x0e\x01\uffff\x01\x0f\x05\uffff\x01\x06\x08\uffff"+
+            "\x01\x11",
+            "\x11\x16\x01\x0c\x01\uffff\x01\x16\x01\x06\x01\uffff\x01\x16"+
+            "\x01\x06\x01\x1a\x01\uffff\x01\x1b\x01\uffff\x01\x1c\x05\uffff"+
+            "\x01\x06\x08\uffff\x01\x16",
+            "\x11\x21\x01\x0c\x01\uffff\x01\x21\x01\x06\x02\uffff\x01\x06"+
+            "\x01\x24\x01\uffff\x01\x25\x01\uffff\x01\x26\x05\uffff\x01\x06"+
+            "\x08\uffff\x01\x21",
+            "\x01\x0c\x02\uffff\x01\x06\x02\uffff\x01\x06\x01\x2b\x01\uffff"+
+            "\x01\x2c\x01\uffff\x01\x2d\x05\uffff\x01\x06",
             "",
             "\x01\uffff",
             "\x01\uffff",
@@ -6595,18 +6946,10 @@ public partial class GAMSParser : Parser
             "",
             "\x01\uffff",
             "\x01\uffff",
+            "\x01\uffff",
             "",
             "\x01\uffff",
             "\x01\uffff",
-            "\x01\uffff",
-            "",
-            "",
-            "",
-            "",
-            "\x01\uffff",
-            "\x01\uffff",
-            "\x01\uffff",
-            "",
             "",
             "",
             "",
@@ -6627,6 +6970,14 @@ public partial class GAMSParser : Parser
             "\x01\uffff",
             "\x01\uffff",
             "\x01\uffff",
+            "",
+            "",
+            "",
+            "",
+            "\x01\uffff",
+            "\x01\uffff",
+            "\x01\uffff",
+            "",
             "",
             "",
             "",
@@ -6660,7 +7011,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "196:1: expr : ( equ | vardef | variables | equations | model | solve );"; }
+            get { return "197:1: expr : ( equ -> ^( ASTEXPRESSION equ ) | vardef -> ^( ASTEXPRESSION vardef ) | variables -> ^( ASTEXPRESSION variables ) | equations -> ^( ASTEXPRESSION equations ) | model -> ^( ASTEXPRESSION model ) | solve -> ^( ASTEXPRESSION solve ) );"; }
         }
 
     }
@@ -6724,9 +7075,9 @@ public partial class GAMSParser : Parser
                    	int index2_13 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (synpred20_GAMS()) ) { s = 50; }
+                   	if ( (synpred18_GAMS()) ) { s = 12; }
 
-                   	else if ( (synpred21_GAMS()) ) { s = 51; }
+                   	else if ( (synpred19_GAMS()) ) { s = 6; }
 
                    	 
                    	input.Seek(index2_13);
@@ -6739,19 +7090,19 @@ public partial class GAMSParser : Parser
                    	int index2_14 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (synpred20_GAMS()) ) { s = 50; }
+                   	if ( (synpred18_GAMS()) ) { s = 12; }
 
-                   	else if ( (synpred21_GAMS()) ) { s = 51; }
+                   	else if ( (synpred19_GAMS()) ) { s = 6; }
 
                    	 
                    	input.Seek(index2_14);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 5 : 
-                   	int LA2_16 = input.LA(1);
+                   	int LA2_15 = input.LA(1);
 
                    	 
-                   	int index2_16 = input.Index();
+                   	int index2_15 = input.Index();
                    	input.Rewind();
                    	s = -1;
                    	if ( (synpred18_GAMS()) ) { s = 12; }
@@ -6759,7 +7110,7 @@ public partial class GAMSParser : Parser
                    	else if ( (synpred19_GAMS()) ) { s = 6; }
 
                    	 
-                   	input.Seek(index2_16);
+                   	input.Seek(index2_15);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 6 : 
@@ -6769,9 +7120,9 @@ public partial class GAMSParser : Parser
                    	int index2_17 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (synpred18_GAMS()) ) { s = 12; }
+                   	if ( (synpred20_GAMS()) ) { s = 50; }
 
-                   	else if ( (synpred19_GAMS()) ) { s = 6; }
+                   	else if ( (synpred21_GAMS()) ) { s = 51; }
 
                    	 
                    	input.Seek(index2_17);
@@ -6784,19 +7135,19 @@ public partial class GAMSParser : Parser
                    	int index2_18 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (synpred18_GAMS()) ) { s = 12; }
+                   	if ( (synpred20_GAMS()) ) { s = 50; }
 
-                   	else if ( (synpred19_GAMS()) ) { s = 6; }
+                   	else if ( (synpred21_GAMS()) ) { s = 51; }
 
                    	 
                    	input.Seek(index2_18);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 8 : 
-                   	int LA2_23 = input.LA(1);
+                   	int LA2_26 = input.LA(1);
 
                    	 
-                   	int index2_23 = input.Index();
+                   	int index2_26 = input.Index();
                    	input.Rewind();
                    	s = -1;
                    	if ( (synpred18_GAMS()) ) { s = 12; }
@@ -6804,14 +7155,14 @@ public partial class GAMSParser : Parser
                    	else if ( (synpred19_GAMS()) ) { s = 6; }
 
                    	 
-                   	input.Seek(index2_23);
+                   	input.Seek(index2_26);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 9 : 
-                   	int LA2_24 = input.LA(1);
+                   	int LA2_27 = input.LA(1);
 
                    	 
-                   	int index2_24 = input.Index();
+                   	int index2_27 = input.Index();
                    	input.Rewind();
                    	s = -1;
                    	if ( (synpred18_GAMS()) ) { s = 12; }
@@ -6819,14 +7170,14 @@ public partial class GAMSParser : Parser
                    	else if ( (synpred19_GAMS()) ) { s = 6; }
 
                    	 
-                   	input.Seek(index2_24);
+                   	input.Seek(index2_27);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 10 : 
-                   	int LA2_25 = input.LA(1);
+                   	int LA2_28 = input.LA(1);
 
                    	 
-                   	int index2_25 = input.Index();
+                   	int index2_28 = input.Index();
                    	input.Rewind();
                    	s = -1;
                    	if ( (synpred18_GAMS()) ) { s = 12; }
@@ -6834,40 +7185,10 @@ public partial class GAMSParser : Parser
                    	else if ( (synpred19_GAMS()) ) { s = 6; }
 
                    	 
-                   	input.Seek(index2_25);
+                   	input.Seek(index2_28);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 11 : 
-                   	int LA2_34 = input.LA(1);
-
-                   	 
-                   	int index2_34 = input.Index();
-                   	input.Rewind();
-                   	s = -1;
-                   	if ( (synpred18_GAMS()) ) { s = 12; }
-
-                   	else if ( (synpred19_GAMS()) ) { s = 6; }
-
-                   	 
-                   	input.Seek(index2_34);
-                   	if ( s >= 0 ) return s;
-                   	break;
-               	case 12 : 
-                   	int LA2_35 = input.LA(1);
-
-                   	 
-                   	int index2_35 = input.Index();
-                   	input.Rewind();
-                   	s = -1;
-                   	if ( (synpred18_GAMS()) ) { s = 12; }
-
-                   	else if ( (synpred19_GAMS()) ) { s = 6; }
-
-                   	 
-                   	input.Seek(index2_35);
-                   	if ( s >= 0 ) return s;
-                   	break;
-               	case 13 : 
                    	int LA2_36 = input.LA(1);
 
                    	 
@@ -6882,7 +7203,52 @@ public partial class GAMSParser : Parser
                    	input.Seek(index2_36);
                    	if ( s >= 0 ) return s;
                    	break;
+               	case 12 : 
+                   	int LA2_37 = input.LA(1);
+
+                   	 
+                   	int index2_37 = input.Index();
+                   	input.Rewind();
+                   	s = -1;
+                   	if ( (synpred18_GAMS()) ) { s = 12; }
+
+                   	else if ( (synpred19_GAMS()) ) { s = 6; }
+
+                   	 
+                   	input.Seek(index2_37);
+                   	if ( s >= 0 ) return s;
+                   	break;
+               	case 13 : 
+                   	int LA2_38 = input.LA(1);
+
+                   	 
+                   	int index2_38 = input.Index();
+                   	input.Rewind();
+                   	s = -1;
+                   	if ( (synpred18_GAMS()) ) { s = 12; }
+
+                   	else if ( (synpred19_GAMS()) ) { s = 6; }
+
+                   	 
+                   	input.Seek(index2_38);
+                   	if ( s >= 0 ) return s;
+                   	break;
                	case 14 : 
+                   	int LA2_43 = input.LA(1);
+
+                   	 
+                   	int index2_43 = input.Index();
+                   	input.Rewind();
+                   	s = -1;
+                   	if ( (synpred18_GAMS()) ) { s = 12; }
+
+                   	else if ( (synpred19_GAMS()) ) { s = 6; }
+
+                   	 
+                   	input.Seek(index2_43);
+                   	if ( s >= 0 ) return s;
+                   	break;
+               	case 15 : 
                    	int LA2_44 = input.LA(1);
 
                    	 
@@ -6897,7 +7263,7 @@ public partial class GAMSParser : Parser
                    	input.Seek(index2_44);
                    	if ( s >= 0 ) return s;
                    	break;
-               	case 15 : 
+               	case 16 : 
                    	int LA2_45 = input.LA(1);
 
                    	 
@@ -6912,21 +7278,6 @@ public partial class GAMSParser : Parser
                    	input.Seek(index2_45);
                    	if ( s >= 0 ) return s;
                    	break;
-               	case 16 : 
-                   	int LA2_46 = input.LA(1);
-
-                   	 
-                   	int index2_46 = input.Index();
-                   	input.Rewind();
-                   	s = -1;
-                   	if ( (synpred18_GAMS()) ) { s = 12; }
-
-                   	else if ( (synpred19_GAMS()) ) { s = 6; }
-
-                   	 
-                   	input.Seek(index2_46);
-                   	if ( s >= 0 ) return s;
-                   	break;
         }
         if (state.backtracking > 0) {state.failed = true; return -1;}
         NoViableAltException nvae2 =
@@ -6939,9 +7290,9 @@ public partial class GAMSParser : Parser
     const string DFA8_eofS =
         "\x01\x02\x13\uffff";
     const string DFA8_minS =
-        "\x01\x46\x13\uffff";
+        "\x01\x47\x13\uffff";
     const string DFA8_maxS =
-        "\x01\x6e\x13\uffff";
+        "\x01\x6f\x13\uffff";
     const string DFA8_acceptS =
         "\x01\uffff\x01\x01\x01\x02\x11\uffff";
     const string DFA8_specialS =
@@ -6996,7 +7347,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "224:34: ( DOT variable )?"; }
+            get { return "225:34: ( DOT variable )?"; }
         }
 
     }
@@ -7006,9 +7357,9 @@ public partial class GAMSParser : Parser
     const string DFA9_eofS =
         "\x01\x04\x12\uffff";
     const string DFA9_minS =
-        "\x01\x46\x12\uffff";
+        "\x01\x47\x12\uffff";
     const string DFA9_maxS =
-        "\x01\x6e\x12\uffff";
+        "\x01\x6f\x12\uffff";
     const string DFA9_acceptS =
         "\x01\uffff\x01\x01\x02\uffff\x01\x02\x0e\uffff";
     const string DFA9_specialS =
@@ -7062,7 +7413,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "224:50: ( idx )?"; }
+            get { return "225:50: ( idx )?"; }
         }
 
     }
@@ -7072,9 +7423,9 @@ public partial class GAMSParser : Parser
     const string DFA10_eofS =
         "\x01\x02\x1b\uffff";
     const string DFA10_minS =
-        "\x01\x46\x01\x45\x0e\uffff\x0b\x00\x01\uffff";
+        "\x01\x47\x01\x46\x0e\uffff\x0b\x00\x01\uffff";
     const string DFA10_maxS =
-        "\x01\x6e\x01\x70\x0e\uffff\x0b\x00\x01\uffff";
+        "\x01\x6f\x01\x71\x0e\uffff\x0b\x00\x01\uffff";
     const string DFA10_acceptS =
         "\x02\uffff\x01\x02\x18\uffff\x01\x01";
     const string DFA10_specialS =
@@ -7141,7 +7492,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "224:55: ( conditional )?"; }
+            get { return "225:55: ( conditional )?"; }
         }
 
     }
@@ -7330,9 +7681,9 @@ public partial class GAMSParser : Parser
     const string DFA13_eofS =
         "\x02\uffff\x02\x05\x0e\uffff";
     const string DFA13_minS =
-        "\x01\x45\x01\uffff\x02\x5a\x0e\uffff";
+        "\x01\x46\x01\uffff\x02\x5b\x0e\uffff";
     const string DFA13_maxS =
-        "\x01\x70\x01\uffff\x02\x66\x0e\uffff";
+        "\x01\x71\x01\uffff\x02\x67\x0e\uffff";
     const string DFA13_acceptS =
         "\x01\uffff\x01\x01\x02\uffff\x01\x03\x01\x04\x04\uffff\x01\x02"+
         "\x07\uffff";
@@ -7387,7 +7738,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "237:1: variableLagLead : ( StringInQuotes -> ^( ASTVARIABLEANDLEAD StringInQuotes ) | variable PLUS Integer -> ^( ASTVARIABLEANDLEAD variable PLUS Integer ) | variable MINUS Integer -> ^( ASTVARIABLEANDLEAD variable MINUS Integer ) | variable -> ^( ASTVARIABLEANDLEAD variable ) );"; }
+            get { return "238:1: variableLagLead : ( StringInQuotes -> ^( ASTVARIABLEANDLEAD StringInQuotes ) | variable PLUS Integer -> ^( ASTVARIABLEANDLEAD variable PLUS Integer ) | variable MINUS Integer -> ^( ASTVARIABLEANDLEAD variable MINUS Integer ) | variable -> ^( ASTVARIABLEANDLEAD variable ) );"; }
         }
 
     }
@@ -7397,9 +7748,9 @@ public partial class GAMSParser : Parser
     const string DFA14_eofS =
         "\x01\x01\x1b\uffff";
     const string DFA14_minS =
-        "\x01\x46\x09\uffff\x01\x00\x11\uffff";
+        "\x01\x47\x09\uffff\x01\x00\x11\uffff";
     const string DFA14_maxS =
-        "\x01\x6e\x09\uffff\x01\x00\x11\uffff";
+        "\x01\x6f\x09\uffff\x01\x00\x11\uffff";
     const string DFA14_acceptS =
         "\x01\uffff\x01\x02\x19\uffff\x01\x01";
     const string DFA14_specialS =
@@ -7462,7 +7813,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "()* loopback of 261:27: ( OR andExpression )*"; }
+            get { return "()* loopback of 262:27: ( OR andExpression )*"; }
         }
 
     }
@@ -7501,9 +7852,9 @@ public partial class GAMSParser : Parser
     const string DFA15_eofS =
         "\x01\x01\x1b\uffff";
     const string DFA15_minS =
-        "\x01\x46\x09\uffff\x01\x00\x11\uffff";
+        "\x01\x47\x09\uffff\x01\x00\x11\uffff";
     const string DFA15_maxS =
-        "\x01\x6e\x09\uffff\x01\x00\x11\uffff";
+        "\x01\x6f\x09\uffff\x01\x00\x11\uffff";
     const string DFA15_acceptS =
         "\x01\uffff\x01\x02\x19\uffff\x01\x01";
     const string DFA15_specialS =
@@ -7566,7 +7917,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "()* loopback of 263:30: ( AND notExpression )*"; }
+            get { return "()* loopback of 264:30: ( AND notExpression )*"; }
         }
 
     }
@@ -7605,10 +7956,10 @@ public partial class GAMSParser : Parser
     const string DFA16_eofS =
         "\x01\uffff\x01\x02\x24\uffff";
     const string DFA16_minS =
-        "\x02\x45\x0b\uffff\x03\x00\x03\uffff\x01\x00\x01\uffff\x02\x00"+
+        "\x02\x46\x0b\uffff\x03\x00\x03\uffff\x01\x00\x01\uffff\x02\x00"+
         "\x0f\uffff";
     const string DFA16_maxS =
-        "\x02\x70\x0b\uffff\x03\x00\x03\uffff\x01\x00\x01\uffff\x02\x00"+
+        "\x02\x71\x0b\uffff\x03\x00\x03\uffff\x01\x00\x01\uffff\x02\x00"+
         "\x0f\uffff";
     const string DFA16_acceptS =
         "\x02\uffff\x01\x02\x1d\uffff\x01\x01\x05\uffff";
@@ -7685,7 +8036,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "265:1: notExpression : ( NOT logicalExpression -> ^( NOT logicalExpression ) | logicalExpression );"; }
+            get { return "266:1: notExpression : ( NOT logicalExpression -> ^( NOT logicalExpression ) | logicalExpression );"; }
         }
 
     }
@@ -7799,9 +8150,9 @@ public partial class GAMSParser : Parser
     const string DFA17_eofS =
         "\x01\x01\x25\uffff";
     const string DFA17_minS =
-        "\x01\x46\x04\uffff\x01\x00\x04\uffff\x01\x00\x1b\uffff";
+        "\x01\x47\x04\uffff\x01\x00\x04\uffff\x01\x00\x1b\uffff";
     const string DFA17_maxS =
-        "\x01\x6e\x04\uffff\x01\x00\x04\uffff\x01\x00\x1b\uffff";
+        "\x01\x6f\x04\uffff\x01\x00\x04\uffff\x01\x00\x1b\uffff";
     const string DFA17_acceptS =
         "\x01\uffff\x01\x02\x19\uffff\x01\x01\x0a\uffff";
     const string DFA17_specialS =
@@ -7875,7 +8226,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "()* loopback of 268:40: ( logical additiveExpression )*"; }
+            get { return "()* loopback of 269:40: ( logical additiveExpression )*"; }
         }
 
     }
@@ -7929,9 +8280,9 @@ public partial class GAMSParser : Parser
     const string DFA18_eofS =
         "\x01\x01\x1a\uffff";
     const string DFA18_minS =
-        "\x01\x46\x09\uffff\x01\x00\x10\uffff";
+        "\x01\x47\x09\uffff\x01\x00\x10\uffff";
     const string DFA18_maxS =
-        "\x01\x6e\x09\uffff\x01\x00\x10\uffff";
+        "\x01\x6f\x09\uffff\x01\x00\x10\uffff";
     const string DFA18_acceptS =
         "\x01\uffff\x01\x02\x18\uffff\x01\x01";
     const string DFA18_specialS =
@@ -7994,7 +8345,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "()* loopback of 270:46: ( ( PLUS | MINUS ) multiplicativeExpression )*"; }
+            get { return "()* loopback of 271:46: ( ( PLUS | MINUS ) multiplicativeExpression )*"; }
         }
 
     }
@@ -8033,9 +8384,9 @@ public partial class GAMSParser : Parser
     const string DFA19_eofS =
         "\x01\x01\x1a\uffff";
     const string DFA19_minS =
-        "\x01\x46\x09\uffff\x01\x00\x10\uffff";
+        "\x01\x47\x09\uffff\x01\x00\x10\uffff";
     const string DFA19_maxS =
-        "\x01\x6e\x09\uffff\x01\x00\x10\uffff";
+        "\x01\x6f\x09\uffff\x01\x00\x10\uffff";
     const string DFA19_acceptS =
         "\x01\uffff\x01\x02\x18\uffff\x01\x01";
     const string DFA19_specialS =
@@ -8098,7 +8449,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "()* loopback of 272:43: ( ( MULT | DIV ) powerExpression )*"; }
+            get { return "()* loopback of 273:43: ( ( MULT | DIV ) powerExpression )*"; }
         }
 
     }
@@ -8137,9 +8488,9 @@ public partial class GAMSParser : Parser
     const string DFA20_eofS =
         "\x01\x01\x1a\uffff";
     const string DFA20_minS =
-        "\x01\x46\x09\uffff\x01\x00\x10\uffff";
+        "\x01\x47\x09\uffff\x01\x00\x10\uffff";
     const string DFA20_maxS =
-        "\x01\x6e\x09\uffff\x01\x00\x10\uffff";
+        "\x01\x6f\x09\uffff\x01\x00\x10\uffff";
     const string DFA20_acceptS =
         "\x01\uffff\x01\x02\x18\uffff\x01\x01";
     const string DFA20_specialS =
@@ -8202,7 +8553,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "()* loopback of 274:34: ( STARS unaryExpression )*"; }
+            get { return "()* loopback of 275:34: ( STARS unaryExpression )*"; }
         }
 
     }
@@ -8241,9 +8592,9 @@ public partial class GAMSParser : Parser
     const string DFA21_eofS =
         "\x0b\uffff";
     const string DFA21_minS =
-        "\x01\x45\x0a\uffff";
+        "\x01\x46\x0a\uffff";
     const string DFA21_maxS =
-        "\x01\x70\x0a\uffff";
+        "\x01\x71\x0a\uffff";
     const string DFA21_acceptS =
         "\x01\uffff\x01\x01\x01\x02\x08\uffff";
     const string DFA21_specialS =
@@ -8289,7 +8640,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "276:1: unaryExpression : ( MINUS dollarExpression -> ^( NEGATE dollarExpression ) | dollarExpression );"; }
+            get { return "277:1: unaryExpression : ( MINUS dollarExpression -> ^( NEGATE dollarExpression ) | dollarExpression );"; }
         }
 
     }
@@ -8299,9 +8650,9 @@ public partial class GAMSParser : Parser
     const string DFA22_eofS =
         "\u0097\uffff";
     const string DFA22_minS =
-        "\x04\x45\x27\x00\x6c\uffff";
+        "\x04\x46\x27\x00\x6c\uffff";
     const string DFA22_maxS =
-        "\x04\x70\x27\x00\x6c\uffff";
+        "\x04\x71\x27\x00\x6c\uffff";
     const string DFA22_acceptS =
         "\x3a\uffff\x01\x01\x01\x02\x5b\uffff";
     const string DFA22_specialS =
@@ -8499,7 +8850,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "285:1: dollarExpression : ( primaryExpression conditional -> ^( ASTDOLLAREXPRESSION primaryExpression conditional ) | primaryExpression );"; }
+            get { return "286:1: dollarExpression : ( primaryExpression conditional -> ^( ASTDOLLAREXPRESSION primaryExpression conditional ) | primaryExpression );"; }
         }
 
     }
@@ -9108,9 +9459,9 @@ public partial class GAMSParser : Parser
     const string DFA23_eofS =
         "\x0a\uffff";
     const string DFA23_minS =
-        "\x01\x45\x09\uffff";
+        "\x01\x46\x09\uffff";
     const string DFA23_maxS =
-        "\x01\x70\x09\uffff";
+        "\x01\x71\x09\uffff";
     const string DFA23_acceptS =
         "\x01\uffff\x01\x01\x01\x02\x01\x03\x01\x04\x05\uffff";
     const string DFA23_specialS =
@@ -9155,7 +9506,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "290:1: primaryExpression : ( L1 expression R1 -> ^( ASTEXPRESSION1 expression ) | L2 expression R2 -> ^( ASTEXPRESSION2 expression ) | L3 expression R3 -> ^( ASTEXPRESSION3 expression ) | value );"; }
+            get { return "291:1: primaryExpression : ( L1 expression R1 -> ^( ASTEXPRESSION1 expression ) | L2 expression R2 -> ^( ASTEXPRESSION2 expression ) | L3 expression R3 -> ^( ASTEXPRESSION3 expression ) | value );"; }
         }
 
     }
@@ -9165,17 +9516,17 @@ public partial class GAMSParser : Parser
     const string DFA24_eofS =
         "\x03\uffff\x02\x05\x2a\uffff";
     const string DFA24_minS =
-        "\x01\x45\x02\uffff\x02\x46\x02\uffff\x03\x00\x10\uffff\x01\x00"+
-        "\x01\uffff\x02\x00\x11\uffff";
+        "\x01\x46\x02\uffff\x02\x47\x02\uffff\x03\x00\x10\uffff\x03\x00"+
+        "\x12\uffff";
     const string DFA24_maxS =
-        "\x01\x70\x02\uffff\x02\x6e\x02\uffff\x03\x00\x10\uffff\x01\x00"+
-        "\x01\uffff\x02\x00\x11\uffff";
+        "\x01\x71\x02\uffff\x02\x6f\x02\uffff\x03\x00\x10\uffff\x03\x00"+
+        "\x12\uffff";
     const string DFA24_acceptS =
         "\x01\uffff\x01\x01\x01\x02\x02\uffff\x01\x05\x27\uffff\x01\x03"+
         "\x01\x04";
     const string DFA24_specialS =
-        "\x07\uffff\x01\x00\x01\x01\x01\x02\x10\uffff\x01\x03\x01\uffff"+
-        "\x01\x04\x01\x05\x11\uffff}>";
+        "\x07\uffff\x01\x00\x01\x01\x01\x02\x10\uffff\x01\x03\x01\x04\x01"+
+        "\x05\x12\uffff}>";
     static readonly string[] DFA24_transitionS = {
             "\x01\x03\x03\x05\x08\x04\x02\x05\x01\x04\x02\x05\x0f\uffff"+
             "\x01\x01\x09\uffff\x01\x02\x01\x05",
@@ -9183,8 +9534,8 @@ public partial class GAMSParser : Parser
             "",
             "\x02\x05\x0f\uffff\x06\x05\x01\x07\x01\x05\x01\x08\x01\x05"+
             "\x01\x09\x01\x05\x01\uffff\x01\x05\x01\uffff\x09\x05",
-            "\x02\x05\x0f\uffff\x06\x05\x01\x1c\x01\x05\x01\x1d\x01\x05"+
-            "\x01\x1a\x01\x05\x01\uffff\x01\x05\x01\uffff\x09\x05",
+            "\x02\x05\x0f\uffff\x06\x05\x01\x1b\x01\x05\x01\x1a\x01\x05"+
+            "\x01\x1c\x01\x05\x01\uffff\x01\x05\x01\uffff\x09\x05",
             "",
             "",
             "\x01\uffff",
@@ -9207,9 +9558,9 @@ public partial class GAMSParser : Parser
             "",
             "",
             "\x01\uffff",
+            "\x01\uffff",
+            "\x01\uffff",
             "",
-            "\x01\uffff",
-            "\x01\uffff",
             "",
             "",
             "",
@@ -9255,7 +9606,7 @@ public partial class GAMSParser : Parser
 
         override public string Description
         {
-            get { return "298:1: value : ( Integer -> ^( ASTVALUE Integer ) | Double -> ^( ASTVALUE Double ) | sum -> ^( ASTVALUE sum ) | function -> ^( ASTVALUE function ) | variableWithIndexerEtc -> ^( ASTVALUE variableWithIndexerEtc ) );"; }
+            get { return "299:1: value : ( integer2 -> ^( ASTVALUE integer2 ) | double2 -> ^( ASTVALUE double2 ) | sum -> ^( ASTVALUE sum ) | function -> ^( ASTVALUE function ) | variableWithIndexerEtc -> ^( ASTVALUE variableWithIndexerEtc ) );"; }
         }
 
     }
@@ -9328,6 +9679,21 @@ public partial class GAMSParser : Parser
                    	if ( s >= 0 ) return s;
                    	break;
                	case 4 : 
+                   	int LA24_27 = input.LA(1);
+
+                   	 
+                   	int index24_27 = input.Index();
+                   	input.Rewind();
+                   	s = -1;
+                   	if ( (synpred60_GAMS()) ) { s = 46; }
+
+                   	else if ( (true) ) { s = 5; }
+
+                   	 
+                   	input.Seek(index24_27);
+                   	if ( s >= 0 ) return s;
+                   	break;
+               	case 5 : 
                    	int LA24_28 = input.LA(1);
 
                    	 
@@ -9342,21 +9708,6 @@ public partial class GAMSParser : Parser
                    	input.Seek(index24_28);
                    	if ( s >= 0 ) return s;
                    	break;
-               	case 5 : 
-                   	int LA24_29 = input.LA(1);
-
-                   	 
-                   	int index24_29 = input.Index();
-                   	input.Rewind();
-                   	s = -1;
-                   	if ( (synpred60_GAMS()) ) { s = 46; }
-
-                   	else if ( (true) ) { s = 5; }
-
-                   	 
-                   	input.Seek(index24_29);
-                   	if ( s >= 0 ) return s;
-                   	break;
         }
         if (state.backtracking > 0) {state.failed = true; return -1;}
         NoViableAltException nvae24 =
@@ -9367,186 +9718,188 @@ public partial class GAMSParser : Parser
  
 
     public static readonly BitSet FOLLOW_set_in_extraTokens0 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_expr_in_gams493 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000003FFFE0UL});
-    public static readonly BitSet FOLLOW_EOF_in_gams496 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_equ_in_expr517 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_vardef_in_expr527 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variables_in_expr534 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_equations_in_expr541 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_model_in_expr548 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_solve_in_expr555 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_equ569 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_DOUBLEDOT_in_equ571 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_equ573 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000800000UL});
-    public static readonly BitSet FOLLOW_EEQUAL_in_equ575 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_equ577 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000001000000UL});
-    public static readonly BitSet FOLLOW_SEMI_in_equ579 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variableWithIndexerEtc_in_vardef627 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
-    public static readonly BitSet FOLLOW_EQUAL_in_vardef629 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_vardef631 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000001000000UL});
-    public static readonly BitSet FOLLOW_SEMI_in_vardef633 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VARIABLES_in_variables669 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000003FFFE0UL});
-    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_variables671 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000005000000UL});
-    public static readonly BitSet FOLLOW_COMMA_in_variables674 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000003FFFE0UL});
-    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_variables676 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000005000000UL});
-    public static readonly BitSet FOLLOW_SEMI_in_variables680 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VARIABLES_in_equations692 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000003FFFE0UL});
-    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_equations694 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000005000000UL});
-    public static readonly BitSet FOLLOW_COMMA_in_equations697 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000003FFFE0UL});
-    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_equations699 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000005000000UL});
-    public static readonly BitSet FOLLOW_SEMI_in_equations703 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_MODEL_in_model715 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000093FFFE0UL});
-    public static readonly BitSet FOLLOW_ident_in_model718 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000093FFFE0UL});
-    public static readonly BitSet FOLLOW_DIV_in_model722 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000093FFFE0UL});
-    public static readonly BitSet FOLLOW_SEMI_in_model726 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SOLVE_in_solve736 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000013FFFE0UL});
-    public static readonly BitSet FOLLOW_ident_in_solve738 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000013FFFE0UL});
-    public static readonly BitSet FOLLOW_SEMI_in_solve741 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variable_in_variableWithIndexerSimple755 = new BitSet(new ulong[]{0x0000000000000002UL,0x00000002A0000000UL});
-    public static readonly BitSet FOLLOW_idx_in_variableWithIndexerSimple757 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variable_in_variableWithIndexerEtc776 = new BitSet(new ulong[]{0x0000000000000002UL,0x00000082B0000000UL});
-    public static readonly BitSet FOLLOW_DOT_in_variableWithIndexerEtc779 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010000003FFFE0UL});
-    public static readonly BitSet FOLLOW_variable_in_variableWithIndexerEtc781 = new BitSet(new ulong[]{0x0000000000000002UL,0x00000082A0000000UL});
-    public static readonly BitSet FOLLOW_idx_in_variableWithIndexerEtc785 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000008000000000UL});
-    public static readonly BitSet FOLLOW_conditional_in_variableWithIndexerEtc788 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_ident_in_variable839 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L1_in_idx846 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010008003FFFE0UL});
-    public static readonly BitSet FOLLOW_indexerElements_in_idx848 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000040000000UL});
-    public static readonly BitSet FOLLOW_R1_in_idx850 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L2_in_idx873 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010008003FFFE0UL});
-    public static readonly BitSet FOLLOW_indexerElements_in_idx875 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000100000000UL});
-    public static readonly BitSet FOLLOW_R2_in_idx877 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L3_in_idx900 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010008003FFFE0UL});
-    public static readonly BitSet FOLLOW_indexerElements_in_idx902 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_R3_in_idx904 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variableLagLead_in_indexerElements928 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000004000000UL});
-    public static readonly BitSet FOLLOW_COMMA_in_indexerElements931 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010008003FFFE0UL});
-    public static readonly BitSet FOLLOW_variableLagLead_in_indexerElements933 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000004000000UL});
-    public static readonly BitSet FOLLOW_StringInQuotes_in_variableLagLead965 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variable_in_variableLagLead1014 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000001000000000UL});
-    public static readonly BitSet FOLLOW_PLUS_in_variableLagLead1016 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000002000000000UL});
-    public static readonly BitSet FOLLOW_Integer_in_variableLagLead1018 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variable_in_variableLagLead1064 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000004000000000UL});
-    public static readonly BitSet FOLLOW_MINUS_in_variableLagLead1066 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000002000000000UL});
-    public static readonly BitSet FOLLOW_Integer_in_variableLagLead1068 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variable_in_variableLagLead1104 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_DOLLAR_in_conditional1148 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_conditional1150 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_andExpression_in_expression1183 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000080UL});
-    public static readonly BitSet FOLLOW_OR_in_expression1186 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_andExpression_in_expression1189 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000080UL});
-    public static readonly BitSet FOLLOW_notExpression_in_andExpression1198 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000040UL});
-    public static readonly BitSet FOLLOW_AND_in_andExpression1201 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_notExpression_in_andExpression1204 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000040UL});
-    public static readonly BitSet FOLLOW_NOT_in_notExpression1215 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_logicalExpression_in_notExpression1217 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_logicalExpression_in_notExpression1237 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_additiveExpression_in_logicalExpression1245 = new BitSet(new ulong[]{0x0000000000000002UL,0x00007C0002000000UL});
-    public static readonly BitSet FOLLOW_logical_in_logicalExpression1248 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_additiveExpression_in_logicalExpression1251 = new BitSet(new ulong[]{0x0000000000000002UL,0x00007C0002000000UL});
-    public static readonly BitSet FOLLOW_multiplicativeExpression_in_additiveExpression1260 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000005000000000UL});
-    public static readonly BitSet FOLLOW_set_in_additiveExpression1264 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_multiplicativeExpression_in_additiveExpression1271 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000005000000000UL});
-    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression1281 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000010008000000UL});
-    public static readonly BitSet FOLLOW_set_in_multiplicativeExpression1285 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression1292 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000010008000000UL});
-    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression1302 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000020000000000UL});
-    public static readonly BitSet FOLLOW_STARS_in_powerExpression1306 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression1309 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000020000000000UL});
-    public static readonly BitSet FOLLOW_MINUS_in_unaryExpression1320 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_dollarExpression_in_unaryExpression1322 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_dollarExpression_in_unaryExpression1343 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_primaryExpression_in_dollarExpression1368 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000008000000000UL});
-    public static readonly BitSet FOLLOW_conditional_in_dollarExpression1370 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_primaryExpression_in_dollarExpression1390 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L1_in_primaryExpression1411 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_primaryExpression1413 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000040000000UL});
-    public static readonly BitSet FOLLOW_R1_in_primaryExpression1415 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L2_in_primaryExpression1430 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_primaryExpression1432 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000100000000UL});
-    public static readonly BitSet FOLLOW_R2_in_primaryExpression1434 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L3_in_primaryExpression1451 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_primaryExpression1453 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_R3_in_primaryExpression1455 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_value_in_primaryExpression1470 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_expr_in_gams497 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000007FFFC0UL});
+    public static readonly BitSet FOLLOW_EOF_in_gams500 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_equ_in_expr521 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_vardef_in_expr539 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variables_in_expr554 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_equations_in_expr569 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_model_in_expr584 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_solve_in_expr599 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_equ621 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000800000UL});
+    public static readonly BitSet FOLLOW_DOUBLEDOT_in_equ623 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_equ625 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000001000000UL});
+    public static readonly BitSet FOLLOW_EEQUAL_in_equ627 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_equ629 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
+    public static readonly BitSet FOLLOW_SEMI_in_equ631 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variableWithIndexerEtc_in_vardef679 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004000000UL});
+    public static readonly BitSet FOLLOW_EQUAL_in_vardef681 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_vardef683 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
+    public static readonly BitSet FOLLOW_SEMI_in_vardef685 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VARIABLES_in_variables721 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000007FFFC0UL});
+    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_variables723 = new BitSet(new ulong[]{0x0000000000000000UL,0x000000000A000000UL});
+    public static readonly BitSet FOLLOW_COMMA_in_variables726 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000007FFFC0UL});
+    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_variables728 = new BitSet(new ulong[]{0x0000000000000000UL,0x000000000A000000UL});
+    public static readonly BitSet FOLLOW_SEMI_in_variables732 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VARIABLES_in_equations744 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000007FFFC0UL});
+    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_equations746 = new BitSet(new ulong[]{0x0000000000000000UL,0x000000000A000000UL});
+    public static readonly BitSet FOLLOW_COMMA_in_equations749 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000007FFFC0UL});
+    public static readonly BitSet FOLLOW_variableWithIndexerSimple_in_equations751 = new BitSet(new ulong[]{0x0000000000000000UL,0x000000000A000000UL});
+    public static readonly BitSet FOLLOW_SEMI_in_equations755 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_MODEL_in_model767 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000127FFFC0UL});
+    public static readonly BitSet FOLLOW_ident_in_model770 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000127FFFC0UL});
+    public static readonly BitSet FOLLOW_DIV_in_model774 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000127FFFC0UL});
+    public static readonly BitSet FOLLOW_SEMI_in_model778 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SOLVE_in_solve788 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000027FFFC0UL});
+    public static readonly BitSet FOLLOW_ident_in_solve790 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000027FFFC0UL});
+    public static readonly BitSet FOLLOW_SEMI_in_solve793 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variable_in_variableWithIndexerSimple807 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000540000000UL});
+    public static readonly BitSet FOLLOW_idx_in_variableWithIndexerSimple809 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variable_in_variableWithIndexerEtc828 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000010560000000UL});
+    public static readonly BitSet FOLLOW_DOT_in_variableWithIndexerEtc831 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020000007FFFC0UL});
+    public static readonly BitSet FOLLOW_variable_in_variableWithIndexerEtc833 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000010540000000UL});
+    public static readonly BitSet FOLLOW_idx_in_variableWithIndexerEtc837 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000010000000000UL});
+    public static readonly BitSet FOLLOW_conditional_in_variableWithIndexerEtc840 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_ident_in_variable891 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L1_in_idx898 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020010007FFFC0UL});
+    public static readonly BitSet FOLLOW_indexerElements_in_idx900 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000080000000UL});
+    public static readonly BitSet FOLLOW_R1_in_idx902 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L2_in_idx925 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020010007FFFC0UL});
+    public static readonly BitSet FOLLOW_indexerElements_in_idx927 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_R2_in_idx929 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L3_in_idx952 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020010007FFFC0UL});
+    public static readonly BitSet FOLLOW_indexerElements_in_idx954 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000800000000UL});
+    public static readonly BitSet FOLLOW_R3_in_idx956 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variableLagLead_in_indexerElements980 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_COMMA_in_indexerElements983 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020010007FFFC0UL});
+    public static readonly BitSet FOLLOW_variableLagLead_in_indexerElements985 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_StringInQuotes_in_variableLagLead1017 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variable_in_variableLagLead1066 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000002000000000UL});
+    public static readonly BitSet FOLLOW_PLUS_in_variableLagLead1068 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000004000000000UL});
+    public static readonly BitSet FOLLOW_Integer_in_variableLagLead1070 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variable_in_variableLagLead1116 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000008000000000UL});
+    public static readonly BitSet FOLLOW_MINUS_in_variableLagLead1118 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000004000000000UL});
+    public static readonly BitSet FOLLOW_Integer_in_variableLagLead1120 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variable_in_variableLagLead1156 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_DOLLAR_in_conditional1200 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_conditional1202 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_andExpression_in_expression1235 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000100UL});
+    public static readonly BitSet FOLLOW_OR_in_expression1238 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_andExpression_in_expression1241 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000100UL});
+    public static readonly BitSet FOLLOW_notExpression_in_andExpression1250 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000080UL});
+    public static readonly BitSet FOLLOW_AND_in_andExpression1253 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_notExpression_in_andExpression1256 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000080UL});
+    public static readonly BitSet FOLLOW_NOT_in_notExpression1267 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_logicalExpression_in_notExpression1269 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_logicalExpression_in_notExpression1289 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_additiveExpression_in_logicalExpression1297 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000F80004000000UL});
+    public static readonly BitSet FOLLOW_logical_in_logicalExpression1300 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_additiveExpression_in_logicalExpression1303 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000F80004000000UL});
+    public static readonly BitSet FOLLOW_multiplicativeExpression_in_additiveExpression1312 = new BitSet(new ulong[]{0x0000000000000002UL,0x000000A000000000UL});
+    public static readonly BitSet FOLLOW_set_in_additiveExpression1316 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_multiplicativeExpression_in_additiveExpression1323 = new BitSet(new ulong[]{0x0000000000000002UL,0x000000A000000000UL});
+    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression1333 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000020010000000UL});
+    public static readonly BitSet FOLLOW_set_in_multiplicativeExpression1337 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression1344 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000020010000000UL});
+    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression1354 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000040000000000UL});
+    public static readonly BitSet FOLLOW_STARS_in_powerExpression1358 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression1361 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000040000000000UL});
+    public static readonly BitSet FOLLOW_MINUS_in_unaryExpression1372 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_dollarExpression_in_unaryExpression1374 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_dollarExpression_in_unaryExpression1395 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_primaryExpression_in_dollarExpression1420 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000010000000000UL});
+    public static readonly BitSet FOLLOW_conditional_in_dollarExpression1422 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_primaryExpression_in_dollarExpression1442 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L1_in_primaryExpression1463 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_primaryExpression1465 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000080000000UL});
+    public static readonly BitSet FOLLOW_R1_in_primaryExpression1467 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L2_in_primaryExpression1482 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_primaryExpression1484 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_R2_in_primaryExpression1486 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L3_in_primaryExpression1503 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_primaryExpression1505 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000800000000UL});
+    public static readonly BitSet FOLLOW_R3_in_primaryExpression1507 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_value_in_primaryExpression1522 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_set_in_logical0 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_Integer_in_value1511 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_Double_in_value1542 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_sum_in_value1576 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_function_in_value1613 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variableWithIndexerEtc_in_value1661 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_functionName_in_function1693 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000020000000UL});
-    public static readonly BitSet FOLLOW_L1_in_function1695 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_functionElements_in_function1697 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000040000000UL});
-    public static readonly BitSet FOLLOW_R1_in_function1699 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_functionName_in_function1741 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000080000000UL});
-    public static readonly BitSet FOLLOW_L2_in_function1743 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_functionElements_in_function1745 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000100000000UL});
-    public static readonly BitSet FOLLOW_R2_in_function1747 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_functionName_in_function1789 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000200000000UL});
-    public static readonly BitSet FOLLOW_L3_in_function1791 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_functionElements_in_function1793 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_R3_in_function1795 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_integer2_in_value1563 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_double2_in_value1593 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_sum_in_value1626 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_function_in_value1663 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variableWithIndexerEtc_in_value1711 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_Integer_in_integer21735 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_Double_in_double21749 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_functionName_in_function1772 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000040000000UL});
+    public static readonly BitSet FOLLOW_L1_in_function1774 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_functionElements_in_function1776 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000080000000UL});
+    public static readonly BitSet FOLLOW_R1_in_function1778 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_functionName_in_function1820 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000100000000UL});
+    public static readonly BitSet FOLLOW_L2_in_function1822 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_functionElements_in_function1824 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_R2_in_function1826 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_functionName_in_function1868 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000400000000UL});
+    public static readonly BitSet FOLLOW_L3_in_function1870 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_functionElements_in_function1872 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000800000000UL});
+    public static readonly BitSet FOLLOW_R3_in_function1874 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_set_in_functionName0 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_expression_in_functionElements1870 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000004000000UL});
-    public static readonly BitSet FOLLOW_COMMA_in_functionElements1873 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_functionElements1875 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000004000000UL});
-    public static readonly BitSet FOLLOW_SUM_in_sum1908 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000020000000UL});
-    public static readonly BitSet FOLLOW_L1_in_sum1910 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010002A03FFFE0UL});
-    public static readonly BitSet FOLLOW_sumControlled_in_sum1912 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000008004000000UL});
-    public static readonly BitSet FOLLOW_conditional_in_sum1914 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004000000UL});
-    public static readonly BitSet FOLLOW_COMMA_in_sum1917 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_sum1919 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000040000000UL});
-    public static readonly BitSet FOLLOW_R1_in_sum1921 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SUM_in_sum1965 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000080000000UL});
-    public static readonly BitSet FOLLOW_L2_in_sum1967 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010002A03FFFE0UL});
-    public static readonly BitSet FOLLOW_sumControlled_in_sum1969 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000008004000000UL});
-    public static readonly BitSet FOLLOW_conditional_in_sum1971 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004000000UL});
-    public static readonly BitSet FOLLOW_COMMA_in_sum1974 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_sum1976 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000100000000UL});
-    public static readonly BitSet FOLLOW_R2_in_sum1978 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SUM_in_sum2022 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000200000000UL});
-    public static readonly BitSet FOLLOW_L3_in_sum2024 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010002A03FFFE0UL});
-    public static readonly BitSet FOLLOW_sumControlled_in_sum2026 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000008004000000UL});
-    public static readonly BitSet FOLLOW_conditional_in_sum2028 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004000000UL});
-    public static readonly BitSet FOLLOW_COMMA_in_sum2031 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_expression_in_sum2033 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_R3_in_sum2035 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variable_in_sumControlled2090 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L1_in_sumControlled2117 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010008003FFFE0UL});
-    public static readonly BitSet FOLLOW_indexerElements_in_sumControlled2119 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000040000000UL});
-    public static readonly BitSet FOLLOW_R1_in_sumControlled2121 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L2_in_sumControlled2147 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010008003FFFE0UL});
-    public static readonly BitSet FOLLOW_indexerElements_in_sumControlled2149 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000100000000UL});
-    public static readonly BitSet FOLLOW_R2_in_sumControlled2151 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_L3_in_sumControlled2177 = new BitSet(new ulong[]{0x0000000000000000UL,0x00010008003FFFE0UL});
-    public static readonly BitSet FOLLOW_indexerElements_in_sumControlled2179 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_R3_in_sumControlled2181 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_Ident_in_ident2217 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_extraTokens_in_ident2221 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_equ_in_synpred18_GAMS517 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_vardef_in_synpred19_GAMS527 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variables_in_synpred20_GAMS534 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_equations_in_synpred21_GAMS541 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_conditional_in_synpred31_GAMS788 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_OR_in_synpred38_GAMS1186 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_andExpression_in_synpred38_GAMS1189 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_AND_in_synpred39_GAMS1201 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_notExpression_in_synpred39_GAMS1204 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_NOT_in_synpred40_GAMS1215 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_logicalExpression_in_synpred40_GAMS1217 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_logical_in_synpred41_GAMS1248 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_additiveExpression_in_synpred41_GAMS1251 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_set_in_synpred43_GAMS1264 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_multiplicativeExpression_in_synpred43_GAMS1271 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_set_in_synpred45_GAMS1285 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_powerExpression_in_synpred45_GAMS1292 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_STARS_in_synpred46_GAMS1306 = new BitSet(new ulong[]{0x0000000000000000UL,0x00018062A03FFFE0UL});
-    public static readonly BitSet FOLLOW_unaryExpression_in_synpred46_GAMS1309 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_primaryExpression_in_synpred48_GAMS1368 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000008000000000UL});
-    public static readonly BitSet FOLLOW_conditional_in_synpred48_GAMS1370 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_sum_in_synpred59_GAMS1576 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_function_in_synpred60_GAMS1613 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_expression_in_functionElements1949 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_COMMA_in_functionElements1952 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_functionElements1954 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_SUM_in_sum1987 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000040000000UL});
+    public static readonly BitSet FOLLOW_L1_in_sum1989 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020005407FFFC0UL});
+    public static readonly BitSet FOLLOW_sumControlled_in_sum1991 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000010008000000UL});
+    public static readonly BitSet FOLLOW_conditional_in_sum1993 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_COMMA_in_sum1996 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_sum1998 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000080000000UL});
+    public static readonly BitSet FOLLOW_R1_in_sum2000 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SUM_in_sum2044 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000100000000UL});
+    public static readonly BitSet FOLLOW_L2_in_sum2046 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020005407FFFC0UL});
+    public static readonly BitSet FOLLOW_sumControlled_in_sum2048 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000010008000000UL});
+    public static readonly BitSet FOLLOW_conditional_in_sum2050 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_COMMA_in_sum2053 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_sum2055 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_R2_in_sum2057 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SUM_in_sum2101 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000400000000UL});
+    public static readonly BitSet FOLLOW_L3_in_sum2103 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020005407FFFC0UL});
+    public static readonly BitSet FOLLOW_sumControlled_in_sum2105 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000010008000000UL});
+    public static readonly BitSet FOLLOW_conditional_in_sum2107 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_COMMA_in_sum2110 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_expression_in_sum2112 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000800000000UL});
+    public static readonly BitSet FOLLOW_R3_in_sum2114 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variable_in_sumControlled2169 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L1_in_sumControlled2196 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020010007FFFC0UL});
+    public static readonly BitSet FOLLOW_indexerElements_in_sumControlled2198 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000080000000UL});
+    public static readonly BitSet FOLLOW_R1_in_sumControlled2200 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L2_in_sumControlled2226 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020010007FFFC0UL});
+    public static readonly BitSet FOLLOW_indexerElements_in_sumControlled2228 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_R2_in_sumControlled2230 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_L3_in_sumControlled2256 = new BitSet(new ulong[]{0x0000000000000000UL,0x00020010007FFFC0UL});
+    public static readonly BitSet FOLLOW_indexerElements_in_sumControlled2258 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000800000000UL});
+    public static readonly BitSet FOLLOW_R3_in_sumControlled2260 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_Ident_in_ident2296 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_extraTokens_in_ident2300 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_equ_in_synpred18_GAMS521 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_vardef_in_synpred19_GAMS539 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variables_in_synpred20_GAMS554 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_equations_in_synpred21_GAMS569 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_conditional_in_synpred31_GAMS840 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_OR_in_synpred38_GAMS1238 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_andExpression_in_synpred38_GAMS1241 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_AND_in_synpred39_GAMS1253 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_notExpression_in_synpred39_GAMS1256 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_NOT_in_synpred40_GAMS1267 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_logicalExpression_in_synpred40_GAMS1269 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_logical_in_synpred41_GAMS1300 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_additiveExpression_in_synpred41_GAMS1303 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_set_in_synpred43_GAMS1316 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_multiplicativeExpression_in_synpred43_GAMS1323 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_set_in_synpred45_GAMS1337 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_powerExpression_in_synpred45_GAMS1344 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_STARS_in_synpred46_GAMS1358 = new BitSet(new ulong[]{0x0000000000000000UL,0x000300C5407FFFC0UL});
+    public static readonly BitSet FOLLOW_unaryExpression_in_synpred46_GAMS1361 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_primaryExpression_in_synpred48_GAMS1420 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000010000000000UL});
+    public static readonly BitSet FOLLOW_conditional_in_synpred48_GAMS1422 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_sum_in_synpred59_GAMS1626 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_function_in_synpred60_GAMS1663 = new BitSet(new ulong[]{0x0000000000000002UL});
 
 }
 }

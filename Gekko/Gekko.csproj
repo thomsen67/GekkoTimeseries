@@ -368,6 +368,7 @@
     <Compile Include="ListViewDragDropManager.cs" />
     <Compile Include="Lookup.cs" />
     <Compile Include="LruCache.cs" />
+    <Compile Include="M.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="Model.cs" />

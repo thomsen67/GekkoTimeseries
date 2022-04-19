@@ -169,7 +169,7 @@ namespace Gekko
 
     public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static void ParserGAMSCreateASTHelper(string textInput, string[] eqsDict, string[] varsDict)
+        public static void ParserGAMSCreateASTHelper(string textInput, string[] dictEqs, string[] dictVars)
         {
             DateTime dt0 = DateTime.Now;
 
@@ -213,11 +213,12 @@ namespace Gekko
             }
 
             WalkHelper wh = new WalkHelper();
-            wh.eqssDict = eqsDict;
-            wh.varsDict = varsDict;            
+            wh.dictEqs = dictEqs;
+            wh.dictVars = dictVars;
+            wh.time0 = new GekkoTime(EFreq.A, 2027, 1);
             Controlled controlled = new Controlled();
             WalkASTAndEmit(root, 0, wh, controlled);
-
+            int n = wh.a.Count;
             return;
         }
 
@@ -319,9 +320,35 @@ namespace Gekko
         {
             switch (node.Text?.ToUpper())
             {
-
-                case "ASTEQU":
+                case "ASTGAMS":
                     {
+                        foreach (ASTNodeGAMS child in node.ChildrenIterator())
+                        {
+                            node.Code.A(child.Code).End();
+                        }
+                    }
+                    break;
+                case "ASTEXPRESSION":
+                    {
+                        node.Code.A(node[0].Code);
+                    }
+                    break;
+                case "ASTEQU":
+                    {                        
+                        node.Code.A("r[" + wh.eqNames.Count + "] = " + node[2].Code + "-(" + node[3].Code + ")");
+                        wh.eqNames.Add(node[1][0].Text);
+                    }
+                    break;
+                case "ASTEQU2":
+                    {
+                        //LHS
+                        node.Code.A(node[0].Code);
+                    }
+                    break;
+                case "ASTEQU3":
+                    {
+                        //RHS
+                        node.Code.A(node[0].Code);
                     }
                     break;
                 case "ASTVARWI":
@@ -367,69 +394,83 @@ namespace Gekko
                         {
                             //defining a variable or parameter (or even set condition like tx0(t))
                             string varname = node[1][0].Text.Trim();
-                            if (wh.varsDict != null)
+                            string varname2 = varname;
+                            if (wh.dictVars != null)
                             {
-                                string varname2 = wh.varsDict[int.Parse(varname.Substring(1))];
-                                string[] indexes = null;
+                                varname2 = wh.dictVars[int.Parse(varname.Substring(1))];
+                            }                            
 
-                                GekkoTime time = GekkoTime.tNull;
-                                string resultingFullName = null;
-                                int i = varname2.IndexOf('(');
-                                if (i >= 1)
+                            GekkoTime time = GekkoTime.tNull;
+                            string resultingFullName = null;
+                            int i = varname2.IndexOf('(');
+                            if (i >= 1)
+                            {
+                                //with index (...)                                    
+                                string start = varname2.Substring(0, i).Trim();
+                                string rest = varname2.Substring(i).Trim();
+                                string rest2 = rest.Substring(1, rest.Length - 2);
+                                string[] ss = rest2.Split(',');
+                                int int2 = -12345;
+                                List<string> fullName = new List<string>();
+                                for (int j = 0; j < ss.Length; j++)
                                 {
-                                    //with index (...)                                    
-                                    string start = varname2.Substring(0, i).Trim();
-                                    string rest = varname2.Substring(i).Trim();
-                                    string rest2 = rest.Substring(1, rest.Length - 2);
-                                    string[] ss = rest2.Split(',');
-                                    int int2 = -12345;
-                                    List<string> fullName = new List<string>();
-                                    for (int j = 0; j < ss.Length; j++)
-                                    {                                        
-                                        string s = ss[j].Trim();
-                                        if (G.IsInteger(s))
+                                    string s = ss[j].Trim();
+                                    if (G.IsInteger(s))
+                                    {
+                                        int2 = int.Parse(s);
+                                        if (int2 > 1900 && int2 < 4000)  //!!!!! is this a water tight test???
                                         {
-                                            int2 = int.Parse(s);
-                                            if (int2 > 1900 && int2 < 4000)  //!!!!! is this a water tight test???
-                                            {
-                                                //Time is in this index
-                                                if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname2 + "'");
-                                                time = new GekkoTime(EFreq.A, int2, 1);
-                                            }
-                                        }
-                                        if (time.IsNull())
-                                        {
-                                            fullName.Add(s);
-                                        }
-                                        else
-                                        {
-
-                                            //not part of indexes
+                                            //Time is in this index
+                                            if (!time.IsNull()) new Error("Variable '" + start + "' seems to have > 1 time indexes: '" + varname2 + "'");
+                                            time = new GekkoTime(EFreq.A, int2, 1);
                                         }
                                     }
-                                    resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+                                    if (time.IsNull())
+                                    {
+                                        fullName.Add(s);
+                                    }
+                                    else
+                                    {
+
+                                        //not part of indexes
+                                    }
+                                }
+
+                                if (time.IsNull()) new Error("Unexpected");
+
+                                resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+
+                                int number = wh.a.Count;
+                                if (!wh.a.ContainsKey(resultingFullName))
+                                {
+                                    wh.a.Add(resultingFullName, number);
                                 }
                                 else
                                 {
-                                    //without index
-                                    resultingFullName = varname2;
+                                    number = wh.a[resultingFullName];
                                 }
 
+                                if (wh.time1.IsNull() || (time.StrictlySmallerThan(wh.time1))) wh.time1 = time;
+                                if (wh.time2.IsNull() || (time.StrictlyLargerThan(wh.time2))) wh.time2 = time;
+
+                                node.Code.A("a[" + (GekkoTime.Observations(wh.time0, time) - 1) + "][" + number + "]");  //time can be tNull for timeless
                             }
                             else
                             {
-                                new Error("TODO");
-                                //todo
+                                //without index
+                                new Error("Unexpected");
                             }
                         }
                     }
                     break;
                 case "ASTIDX":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTIDXELEMENTS":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTVARIABLEANDLEAD":
@@ -455,105 +496,137 @@ namespace Gekko
                     break;
                 case "ASTCONDITIONAL":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "OR":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "AND":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "NOT":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "NONEQUAL":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "LESSTHANOREQUAL":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "GREATERTHANOREQUAL":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "EQUAL":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "LESSTHAN":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "GREATERTHAN":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "+":
                     {
-                        //node.Code.A("GAMS.Add(" + node[0].Code + ", " + node[1].Code + ")");
-                        //node.GAMS.A(node[0].Code + "+" + node[1].Code);
-                        //node.Gekko.A(node[0].Code + "+" + node[1].Code);
+                        node.Code.A("M.Add(" + node[0].Code + ", " + node[1].Code + ")");
                     }
                     break;
                 case "-":
                     {
+                        node.Code.A("M.Subtract(" + node[0].Code + ", " + node[1].Code + ")");
                     }
                     break;
                 case "*":
                     {
+                        node.Code.A("M.Multiply(" + node[0].Code + ", " + node[1].Code + ")");
                     }
                     break;
                 case "/":
                     {
+                        node.Code.A("M.Divide(" + node[0].Code + ", " + node[1].Code + ")");
                     }
                     break;
                 case "**":
                     {
+                        node.Code.A("M.Power(" + node[0].Code + ", " + node[1].Code + ")");
                     }
                     break;
                 case "NEGATE":
                     {
+                        node.Code.A("M.Negate(" + node[0].Code + ")");
                     }
                     break;
                 case "ASTDOLLAREXPRESSION":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTEXPRESSION1":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTEXPRESSION2":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTEXPRESSION3":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTVALUE":
                     {
+                        node.Code.A(node[0].Code);
                     }
                     break;
                 case "ASTFUNCTION":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTFUNCTIONELEMENTS":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTSUM":
                     {
+                        new Error("Not implemented");
                     }
                     break;
                 case "ASTSUMCONTROLLED":
                     {
+                        new Error("Not implemented");
+                    }
+                    break;
+                case "ASTDOUBLE":
+                    {
+                        node.Code.A(node[0].Text);
+                    }
+                    break;
+                case "ASTINTEGER":
+                    {
+                        node.Code.A(node[0].Text);
                     }
                     break;
 
@@ -2568,9 +2641,13 @@ namespace Gekko
 
         public class WalkHelper
         {
-            public Dictionary<string, int> a = new Dictionary<string, int>();
-            public string[] eqssDict = null;
-            public string[] varsDict = null;            
+            public List<string> eqNames = new List<string>();
+            public GekkoDictionary<string, int> a = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            public string[] dictEqs = null;
+            public string[] dictVars = null;
+            public GekkoTime time0 = GekkoTime.tNull;  //corresponds to index 0, a[0][...]
+            public GekkoTime time1 = GekkoTime.tNull;  //lowest time encounterede in variable
+            public GekkoTime time2 = GekkoTime.tNull;  //highest time encounterede in variable
         }
     }
 
