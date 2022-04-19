@@ -485,45 +485,7 @@ namespace Gekko
                     }
                 }
                 WriteHtml(sb, sb4.ToString());  //for instance: Endogen: Årlige data fra 1966 til 2030 (opdateret: 23-09-2021)
-
-                //// --------------------------------
-                //// html print label
-                //// --------------------------------
-
-                //if (ts1.meta.label != null) WriteHtml(sb, "Label: " + ts1.meta.label);
-
-                //// --------------------------------
-                //// html print source
-                //// --------------------------------
-
-                //if (settings_show_source)
-                //{
-                //    if (ts1.meta.source != null)
-                //    {                        
-                //        string src2 = ts1.meta.source.Trim();
-                //        if (src2 != "")
-                //        {
-                //            int i = src2.IndexOf("(hash ");
-                //            if (i > -1) src2 = src2.Substring(0, i);
-                //            WriteHtml(sb, "Seneste beregning: " + src2);
-                //        }
-                //    }
-                //}
-
-                //// --------------------------------
-                //// html print units
-                //// --------------------------------
-
-                //if (ts1.meta.units != null)
-                //{
-                //    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                //    string src2 = ts1.meta.units.Trim();
-                //    if (src2 != "")
-                //    {
-                //        WriteHtml(sb, "Enheder: " + src2);
-                //    }
-                //}
-
+                
                 // --------------------------------
                 // print link(s) to possible external documentation files
                 // --------------------------------

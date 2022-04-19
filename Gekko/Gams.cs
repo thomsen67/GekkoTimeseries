@@ -599,14 +599,27 @@ namespace Gekko
                     break;
                 case "ASTFUNCTION":
                     {
-                        new Error("Not implemented");
+                        string fname = node[1][0].Text;
+                        string code = null;
+                        if (G.Equal(fname, "log")) code = "M.Log(";
+                        else if (G.Equal(fname, "exp")) code = "M.Exp(";
+                        else if (G.Equal(fname, "abs")) code = "M.Abs(";
+                        else if (G.Equal(fname, "max")) code = "M.Max(";
+                        else if (G.Equal(fname, "min")) code = "M.Min(";
+                        else if (G.Equal(fname, "power")) code = "M.Power(";
+                        else if (G.Equal(fname, "sqr")) code = "M.Sqr(";
+                        else if (G.Equal(fname, "tanh")) code = "M.Tanh(";
+
+                        ASTNodeGAMS elements = node[2][0][1];
+                        foreach (ASTNodeGAMS child in elements.ChildrenIterator())
+                        {
+                            code += child.Code.ToString() + ", ";
+                        }
+                        code = code.Substring(0, code.Length - ", ".Length);
+                        code += ")";
+                        node.Code.A(code);
                     }
-                    break;
-                case "ASTFUNCTIONELEMENTS":
-                    {
-                        new Error("Not implemented");
-                    }
-                    break;
+                    break;                
                 case "ASTSUM":
                     {
                         new Error("Not implemented");
@@ -693,8 +706,8 @@ namespace Gekko
                 
                 //about 20 s for only equation (..) part of gams.gms
                 DateTime dt0 = DateTime.Now;
-                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
-                string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
+                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
+                string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
                 GekkoTime time0 = new GekkoTime(EFreq.A, 2027, 1);
 
                 string s = Program.GetTextFromFileWithWait(file);
