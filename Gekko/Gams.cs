@@ -173,8 +173,32 @@ namespace Gekko
 
     public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static Assembly ParserGAMSCreateASTHelper(string textInput, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
+        public static Assembly ParserGAMSCreateASTHelper(List<string> eqs, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
         {
+            int chunkLines = 1000;  //min number of lines in a chunk
+            List<List<string>> chunks = new List<List<string>>();
+            int counter = 0;
+            int counterMax = counter + chunkLines;
+            List<string> currentChunk = new List<string>();
+            foreach (string eqline in eqs)
+            {
+                counter++;
+                if (eqline.Contains("..") && counter >= counterMax)
+                {                    
+                    chunks.Add(currentChunk);
+                    currentChunk = new List<string>();
+                    counterMax = counter + chunkLines;
+                }
+                currentChunk.Add(eqline);
+            }
+            chunks.Add(currentChunk);
+
+            int tjek = 0;
+            foreach (List<string> x in chunks) tjek += x.Count;
+            if (tjek != eqs.Count) new Error("Mismatch of chunks");
+
+            string textInput = Stringlist.ExtractTextFromLines(eqs).ToString();
+
             DateTime dt0 = DateTime.Now;
 
             ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
@@ -694,7 +718,7 @@ namespace Gekko
 
         public static void Xxx()
         {
-            if (true)
+            if (false)
             {
                 DateTime dt0 = DateTime.Now;
 
@@ -918,7 +942,7 @@ namespace Gekko
                 new Writeln("Dict: " + G.Seconds(dt0));
 
                 GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                Assembly assembly = ParserGAMSCreateASTHelper(Stringlist.ExtractTextFromLines(eqs).ToString(), dictEqs, dictVars, dictA, time0);
+                Assembly assembly = ParserGAMSCreateASTHelper(eqs, dictEqs, dictVars, dictA, time0);
                 new Writeln("Eqs: " + G.Seconds(dt0));
 
                 double[][] a = new double[3][];

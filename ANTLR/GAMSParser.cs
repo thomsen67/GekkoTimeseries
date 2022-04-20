@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-04-20 12:47:06
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 GAMS.g 2022-04-20 16:58:18
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -978,7 +978,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, variableWithIndexerSimple, EEQUAL, expression, SEMI, DOUBLEDOT
+            	// elements:          expression, expression, SEMI, DOUBLEDOT, variableWithIndexerSimple, EEQUAL
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1128,7 +1128,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, SEMI, EQUAL, variableWithIndexerEtc
+            	// elements:          EQUAL, variableWithIndexerEtc, SEMI, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1835,7 +1835,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          idx, variable
+            	// elements:          variable, idx
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2006,7 +2006,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          idx, DOT, conditional, variable, variable
+            	// elements:          conditional, DOT, variable, idx, variable
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2291,7 +2291,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          L1, R1, indexerElements
+                    	// elements:          R1, indexerElements, L1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -2346,7 +2346,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          L2, R2, indexerElements
+                    	// elements:          R2, indexerElements, L2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -2401,7 +2401,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          indexerElements, R3, L3
+                    	// elements:          indexerElements, L3, R3
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -2548,7 +2548,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          variableLagLead, COMMA
+            	// elements:          COMMA, variableLagLead
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -2785,7 +2785,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          MINUS, variable, Integer
+                    	// elements:          variable, Integer, MINUS
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -3916,7 +3916,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          primaryExpression, conditional
+                    	// elements:          conditional, primaryExpression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -4868,7 +4868,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionElements, R1, L1, functionName
+                    	// elements:          functionName, R1, functionElements, L1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -4945,7 +4945,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionName, functionElements, L2, R2
+                    	// elements:          L2, functionElements, R2, functionName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5022,7 +5022,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionName, L3, functionElements, R3
+                    	// elements:          functionElements, R3, functionName, L3
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5262,7 +5262,7 @@ public partial class GAMSParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, COMMA
+            	// elements:          COMMA, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -5519,7 +5519,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sumControlled, COMMA, R1, expression, conditional, L1
+                    	// elements:          conditional, L1, R1, sumControlled, expression, COMMA
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5642,7 +5642,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sumControlled, expression, conditional, L2, R2, COMMA
+                    	// elements:          conditional, expression, COMMA, L2, sumControlled, R2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -5765,7 +5765,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          conditional, COMMA, sumControlled, L3, expression, R3
+                    	// elements:          expression, R3, conditional, COMMA, L3, sumControlled
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -6087,7 +6087,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          R2, indexerElements, L2
+                    	// elements:          L2, indexerElements, R2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -6150,7 +6150,7 @@ public partial class GAMSParser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          R3, indexerElements, L3
+                    	// elements:          L3, indexerElements, R3
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
