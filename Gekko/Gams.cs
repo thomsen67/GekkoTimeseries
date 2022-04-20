@@ -173,10 +173,12 @@ namespace Gekko
 
     public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static Assembly ParserGAMSCreateASTHelper(List<string> eqs, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
+        public static List<Assembly> ParserGAMSCreateASTHelper(List<string> eqs, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
         {
-            int chunkLines = 1000;  //min number of lines in a chunk
+            DateTime dt2 = DateTime.Now;
+            int chunkLines = 5000;  //seems to be a good number, not too small and not too large, around 5:22 min.
             List<List<string>> chunks = new List<List<string>>();
+
             int counter = 0;
             int counterMax = counter + chunkLines;
             List<string> currentChunk = new List<string>();
@@ -191,63 +193,87 @@ namespace Gekko
                 }
                 currentChunk.Add(eqline);
             }
-            chunks.Add(currentChunk);
+            chunks.Add(currentChunk);            
 
             int tjek = 0;
             foreach (List<string> x in chunks) tjek += x.Count;
             if (tjek != eqs.Count) new Error("Mismatch of chunks");
 
-            string textInput = Stringlist.ExtractTextFromLines(eqs).ToString();
+            eqs = null;
 
-            DateTime dt0 = DateTime.Now;
+            List<Assembly> assemblies = new List<Assembly>();
 
-            ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
-
-            List<string> errors = null;
-            CommonTree t = null;
-
-            // Create a lexer attached to that input
-            GAMSLexer lexer = new GAMSLexer(input);
-            // Create a stream of tokens pulled from the lexer
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            // Create a parser attached to the token stream
-            GAMSParser parser = new GAMSParser(tokens);
-            // Invoke the program rule in get return value
-            GAMSParser.gams_return gams = null;
-            DateTime t0 = DateTime.Now;
-
-            bool print = false;
-            ASTNodeGAMS root = new ASTNodeGAMS(null);
-
-            try
+            for (int ichunk = 0; ichunk < chunks.Count; ichunk++)
             {
-                DateTime tt0 = DateTime.Now;
-                new Writeln("START PARSE ANTLR");
-                gams = parser.gams();
-                new Writeln("END PARSE ANTLR -- " + G.Seconds(tt0));
-                errors = parser.GetErrors();
-                t = (CommonTree)gams.Tree;
-                CreateASTNodesForGAMS(t, root, 0, tokens, print);                
-                if (errors.Count > 0)
+                List<string> chunk = chunks[ichunk];
+
+                DateTime dt3 = DateTime.Now;
+
+                string textInput = Stringlist.ExtractTextFromLines(chunk).ToString();
+
+                DateTime dt0 = DateTime.Now;
+
+                ANTLRStringStream input = new ANTLRStringStream(textInput);
+
+                List<string> errors = null;
+                CommonTree t = null;
+
+                // Create a lexer attached to that input
+                GAMSLexer lexer = new GAMSLexer(input);
+                // Create a stream of tokens pulled from the lexer
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                // Create a parser attached to the token stream
+                GAMSParser parser = new GAMSParser(tokens);
+                // Invoke the program rule in get return value
+                GAMSParser.gams_return gams = null;
+                DateTime t0 = DateTime.Now;
+
+                bool print = false;
+                ASTNodeGAMS root = new ASTNodeGAMS(null);
+
+                try
                 {
-                    new Warning("GAMS parse error");
-                }
-            }
-            catch (Exception e)
-            {
-                new Warning("GAMS other error");
-            }
+                    DateTime tt0 = DateTime.Now;
+                    //new Writeln("START PARSE ANTLR");
+                    gams = parser.gams();
+                    //new Writeln("END PARSE ANTLR -- " + G.Seconds(tt0));
+                    errors = parser.GetErrors();
+                    t = (CommonTree)gams.Tree;
+                    CreateASTNodesForGAMS(t, root, 0, tokens, print);
 
-            WalkHelper wh = new WalkHelper();
-            wh.dictEqs = dictEqs;
-            wh.dictVars = dictVars;
-            wh.time0 = time0;
-            wh.dictA = dictA;
-            Controlled controlled = new Controlled();
-            WalkASTAndEmit(root, 0, wh, controlled);
-            int n = wh.dictA.Count;
-            Assembly assembly = EmitCsCodeAndCompile(root.Code.ToString());
-            return assembly;
+                    if (true)
+                    {
+                        lexer = null; tokens = null; parser = null; gams = null; t = null;
+                        chunks[ichunk] = null;
+                    }
+
+                    if (errors.Count > 0)
+                    {
+                        new Warning("GAMS parse error");
+                    }
+                }
+                catch (Exception e)
+                {
+                    new Warning("GAMS other error");
+                }
+
+                if (true)
+                {
+                    WalkHelper wh = new WalkHelper();
+                    wh.dictEqs = dictEqs;
+                    wh.dictVars = dictVars;
+                    wh.time0 = time0;
+                    wh.dictA = dictA;
+                    Controlled controlled = new Controlled();
+                    WalkASTAndEmit(root, 0, wh, controlled);
+                    int n = wh.dictA.Count;
+                    Assembly assembly = EmitCsCodeAndCompile(root.Code.ToString());
+                    assemblies.Add(assembly);
+                }
+                new Writeln("Chunk #" + (ichunk + 1) + " (" + chunk.Count + ") of " + chunks.Count + " (" + G.Seconds(dt3) + ")");
+            }
+            new Writeln("All chunks done: " + G.Seconds(dt2));
+            return assemblies;       
         }
 
         private static Assembly EmitCsCodeAndCompile(string eqs)
@@ -598,17 +624,17 @@ namespace Gekko
                     break;
                 case "ASTEXPRESSION1":
                     {
-                        new Error("Not implemented");
+                        node.Code.A(node[0].Code);
                     }
                     break;
                 case "ASTEXPRESSION2":
                     {
-                        new Error("Not implemented");
+                        node.Code.A(node[0].Code);
                     }
                     break;
                 case "ASTEXPRESSION3":
                     {
-                        new Error("Not implemented");
+                        node.Code.A(node[0].Code);
                     }
                     break;
                 case "ASTVALUE":
@@ -942,14 +968,18 @@ namespace Gekko
                 new Writeln("Dict: " + G.Seconds(dt0));
 
                 GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                Assembly assembly = ParserGAMSCreateASTHelper(eqs, dictEqs, dictVars, dictA, time0);
+                List<Assembly> assemblies = ParserGAMSCreateASTHelper(eqs, dictEqs, dictVars, dictA, time0);
                 new Writeln("Eqs: " + G.Seconds(dt0));
 
-                double[][] a = new double[3][];
-                a[0] = new double[1];
-                a[1] = new double[1];
-                a[2] = new double[1];
+                int periods = 200;  //TODO
+                double[][] a = new double[periods][];  //TODO
+                for (int i = 0; i < a.GetLength(0); i++)
+                {
+                    a[i] = new double[eqCounts + 1];
+                }
 
+                DateTime dt4 = DateTime.Now;
+                new Writeln("GETTING STARTING VALUES");
                 foreach (string line in values)
                 {
                     if (line.Trim() == "" || line.StartsWith("*")) continue;
@@ -974,19 +1004,24 @@ namespace Gekko
                     }
                     a[i1][i2] = d;
                 }
-                new Writeln("Values: " + G.Seconds(dt0));                                                
+                new Writeln("GETTING STARTING VALUES END " + G.Seconds(dt4));                            
 
                 new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts+ ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
                 if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
                 if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
                 if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
+                
+                double[] r = new double[eqCounts + 1];
+                for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
 
-                Object[] args = new Object[2];                
-                double[] r = new double[3];
-                args[0] = a;
-                args[1] = r;
-                Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
-                tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
+                DateTime dt5 = DateTime.Now;
+                Object[] args = new Object[2]; args[0] = a; args[1] = r;                
+                foreach (Assembly assembly in assemblies)
+                {
+                    Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
+                    tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
+                }
+                new Writeln("INVOKE " + G.Seconds(dt5));
 
                 //36 sec in all
 
