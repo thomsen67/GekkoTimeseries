@@ -1,4 +1,5 @@
 using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -196,19 +197,20 @@ namespace Gekko
 
             try
             {
-                gams = parser.gams();                
+                DateTime tt0 = DateTime.Now;
+                new Writeln("START PARSE ANTLR");
+                gams = parser.gams();
+                new Writeln("END PARSE ANTLR -- " + G.Seconds(tt0));
                 errors = parser.GetErrors();
                 t = (CommonTree)gams.Tree;
                 CreateASTNodesForGAMS(t, root, 0, tokens, print);                
                 if (errors.Count > 0)
                 {
-                    new Writeln(textInput);
                     new Warning("GAMS parse error");
                 }
             }
             catch (Exception e)
             {
-                new Writeln(textInput);
                 new Warning("GAMS other error");
             }
 
@@ -692,6 +694,50 @@ namespace Gekko
 
         public static void Xxx()
         {
+            if (true)
+            {
+                DateTime dt0 = DateTime.Now;
+
+                ANTLRStringStream input = new ANTLRStringStream(Program.GetTextFromFileWithWait(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\cut.gms"));  //a newline for ease of use of ANTLR
+
+                List<string> errors = null;
+                CommonTree t = null;
+
+                // Create a lexer attached to that input
+                GAMSLexer lexer = new GAMSLexer(input);
+                // Create a stream of tokens pulled from the lexer
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                // Create a parser attached to the token stream
+                GAMSParser parser = new GAMSParser(tokens);
+                // Invoke the program rule in get return value
+                GAMSParser.gams_return gams = null;
+                DateTime t0 = DateTime.Now;
+
+                bool print = false;
+                ASTNodeGAMS root = new ASTNodeGAMS(null);
+
+                try
+                {
+                    DateTime tt0 = DateTime.Now;
+                    new Writeln("START CUT PARSE ANTLR");
+                    gams = parser.gams();
+                    new Writeln("END BUT PARSE ANTLR -- " + G.Seconds(tt0));
+                    errors = parser.GetErrors();
+                    t = (CommonTree)gams.Tree;
+                    CreateASTNodesForGAMS(t, root, 0, tokens, print);
+                    new Writeln("END ASTNODES -- " + G.Seconds(tt0));
+                    if (errors.Count > 0)
+                    {
+                        new Warning("GAMS parse error");
+                    }
+                }
+                catch (Exception e)
+                {
+                    new Warning("GAMS other error");
+                }
+                return;
+            }
+
             if (true)
             {
                 //TODO: Maybe loop line by line without putting into RAM! Like px reader.
