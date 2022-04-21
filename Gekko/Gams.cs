@@ -173,11 +173,14 @@ namespace Gekko
 
     public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static List<Assembly> ParserGAMSCreateASTHelper(List<string> eqs, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
+        public static List<Assembly> ParserGAMSCreateASTHelper(List<string> eqs, List<string> eqNames, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
         {
             DateTime dt2 = DateTime.Now;
             int chunkLines = 5000;  //seems to be a good number, not too small and not too large, around 5:22 min.
+            int chunksCs = 100;     //how many cs assemblies?
             List<List<string>> chunks = new List<List<string>>();
+
+            StringBuilder DELETEME = new StringBuilder();
 
             int counter = 0;
             int counterMax = counter + chunkLines;
@@ -202,22 +205,17 @@ namespace Gekko
             eqs = null;
 
             List<Assembly> assemblies = new List<Assembly>();
+            List<Parser.Gek.GekkoSB> codes = new List<Parser.Gek.GekkoSB>();            
 
             for (int ichunk = 0; ichunk < chunks.Count; ichunk++)
             {
                 List<string> chunk = chunks[ichunk];
-
                 DateTime dt3 = DateTime.Now;
-
                 string textInput = Stringlist.ExtractTextFromLines(chunk).ToString();
-
                 DateTime dt0 = DateTime.Now;
-
                 ANTLRStringStream input = new ANTLRStringStream(textInput);
-
                 List<string> errors = null;
                 CommonTree t = null;
-
                 // Create a lexer attached to that input
                 GAMSLexer lexer = new GAMSLexer(input);
                 // Create a stream of tokens pulled from the lexer
@@ -239,7 +237,7 @@ namespace Gekko
                     //new Writeln("END PARSE ANTLR -- " + G.Seconds(tt0));
                     errors = parser.GetErrors();
                     t = (CommonTree)gams.Tree;
-                    CreateASTNodesForGAMS(t, root, 0, tokens, print);
+                    CreateASTNodesForGAMS(t, root, 0, tokens, print);                    
 
                     if (true)
                     {
@@ -256,23 +254,32 @@ namespace Gekko
                 {
                     new Warning("GAMS other error");
                 }
-
+                
                 if (true)
                 {
                     WalkHelper wh = new WalkHelper();
+                    wh.eqNames = eqNames;
                     wh.dictEqs = dictEqs;
                     wh.dictVars = dictVars;
                     wh.time0 = time0;
                     wh.dictA = dictA;
                     Controlled controlled = new Controlled();
                     WalkASTAndEmit(root, 0, wh, controlled);
-                    int n = wh.dictA.Count;
-                    Assembly assembly = EmitCsCodeAndCompile(root.Code.ToString());
-                    assemblies.Add(assembly);
+                    codes.Add(root.Code);
                 }
                 new Writeln("Chunk #" + (ichunk + 1) + " (" + chunk.Count + ") of " + chunks.Count + " (" + G.Seconds(dt3) + ")");
             }
+
+            foreach (Parser.Gek.GekkoSB code in codes)
+            {                
+                string code2 = code.ToString();
+                Assembly assembly = EmitCsCodeAndCompile(code2);
+                DELETEME.AppendLine(code2);
+                assemblies.Add(assembly);
+            }
+
             new Writeln("All chunks done: " + G.Seconds(dt2));
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", DELETEME.ToString());
             return assemblies;       
         }
 
@@ -892,8 +899,9 @@ namespace Gekko
                     }
                 }
 
-                string[] dictEqs = new string[eqCounts + 1];    //slot [0] is not used!
-                string[] dictVars = new string[eqCounts + 1];   //slot [0] is not used!
+                List<string> eqNames = new List<string>(eqCounts);  //slot [0] is used
+                string[] dictEqs = new string[eqCounts + 1];        //slot [0] is not used!
+                string[] dictVars = new string[eqCounts + 1];       //slot [0] is not used!
 
                 string s2 = Program.GetTextFromFileWithWait(file2);
                 List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
@@ -968,7 +976,7 @@ namespace Gekko
                 new Writeln("Dict: " + G.Seconds(dt0));
 
                 GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                List<Assembly> assemblies = ParserGAMSCreateASTHelper(eqs, dictEqs, dictVars, dictA, time0);
+                List<Assembly> assemblies = ParserGAMSCreateASTHelper(eqs, eqNames, dictEqs, dictVars, dictA, time0);
                 new Writeln("Eqs: " + G.Seconds(dt0));
 
                 int periods = 200;  //TODO
@@ -1013,12 +1021,25 @@ namespace Gekko
                 
                 double[] r = new double[eqCounts + 1];
                 for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
+                                
+                Object[] args = new Object[2]; args[0] = a; args[1] = r;
 
-                DateTime dt5 = DateTime.Now;
-                Object[] args = new Object[2]; args[0] = a; args[1] = r;                
+                List<Type> types = new List<Type>();
                 foreach (Assembly assembly in assemblies)
                 {
-                    Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
+                    Type tpe = assembly.GetType("Gekko.Equations");  //the class      
+                    types.Add(tpe);
+                }
+
+                //foreach (Assembly assembly in assemblies)
+                //{
+                //    Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
+                //    tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
+                //}
+
+                DateTime dt5 = DateTime.Now;
+                foreach (Type tpe in types)
+                {                    
                     tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
                 }
                 new Writeln("INVOKE " + G.Seconds(dt5));

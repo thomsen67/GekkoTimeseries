@@ -8411,10 +8411,10 @@ namespace Gekko
             {
 
                 if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless)
-                {
-                    string label_string = "Label: ";
+                {                    
+                    string label_string = "";  //DGR asked to omit "Label: ", and it is typically pretty obvious anyway.
                     string source_string = "Source: "; if (danish) source_string = "Kilde: ";
-                    string units_string = "Units: "; if (danish) units_string = "Enhed: ";
+                    string units_string = "Units: "; if (danish) units_string = "Enhed: ";  //DGR asked to change from Enheder --> Enhed.
 
                     if (!G.NullOrBlanks(ts.meta.label))
                     {
