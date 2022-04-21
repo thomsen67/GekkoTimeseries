@@ -173,14 +173,14 @@ namespace Gekko
 
     public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static List<Assembly> ParserGAMSCreateASTHelper(List<string> eqs, List<string> eqNames, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
+        public static Assembly ParserGAMSCreateASTHelper(List<string> eqs, List<string> eqNames, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
         {
             DateTime dt2 = DateTime.Now;
             int chunkLines = 5000;  //seems to be a good number, not too small and not too large, around 5:22 min.
-            int chunksCs = 100;     //how many cs assemblies?
+            int eqsPerMethod = 10000;  //like ADAM, gives around 100 batches
             List<List<string>> chunks = new List<List<string>>();
 
-            StringBuilder DELETEME = new StringBuilder();
+            //StringBuilder DELETEME = new StringBuilder();
 
             int counter = 0;
             int counterMax = counter + chunkLines;
@@ -203,8 +203,7 @@ namespace Gekko
             if (tjek != eqs.Count) new Error("Mismatch of chunks");
 
             eqs = null;
-
-            List<Assembly> assemblies = new List<Assembly>();
+            
             List<Parser.Gek.GekkoSB> codes = new List<Parser.Gek.GekkoSB>();            
 
             for (int ichunk = 0; ichunk < chunks.Count; ichunk++)
@@ -269,26 +268,37 @@ namespace Gekko
                 }
                 new Writeln("Chunk #" + (ichunk + 1) + " (" + chunk.Count + ") of " + chunks.Count + " (" + G.Seconds(dt3) + ")");
             }
+            
+            Assembly assembly = EmitCsCodeAndCompile(codes, eqsPerMethod);            
 
-            foreach (Parser.Gek.GekkoSB code in codes)
-            {                
-                string code2 = code.ToString();
-                Assembly assembly = EmitCsCodeAndCompile(code2);
-                DELETEME.AppendLine(code2);
-                assemblies.Add(assembly);
-            }
-
-            new Writeln("All chunks done: " + G.Seconds(dt2));
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", DELETEME.ToString());
-            return assemblies;       
+            new Writeln("All chunks done: " + G.Seconds(dt2));            
+            return assembly;
         }
 
-        private static Assembly EmitCsCodeAndCompile(string eqs)
+        private static Assembly EmitCsCodeAndCompile(List<Parser.Gek.GekkoSB> eqs, int eqsPerMethod)
         {
             DateTime t0 = DateTime.Now;
             bool failSafe = false;
                         
             StringBuilder code = new StringBuilder();
+            StringBuilder code2 = new StringBuilder();
+
+            List<List<int>> numbers = new List<List<int>>();
+            List<int> n = null;
+            int counter = -1;
+            foreach (Parser.Gek.GekkoSB eq in eqs)
+            {
+                counter++;
+                if (counter % eqsPerMethod == 0)
+                {
+                    if (n != null) numbers.Add(n);
+                    n = new List<int>();
+                }
+                n.Add(counter);
+            }
+
+            int tjek = 0; foreach (var xx in numbers) tjek += xx.Count;
+            if (tjek != eqs.Count) new Error("Mismatch");
 
             code.AppendLine("using System;");
             code.AppendLine("using System.Collections.Generic;");
@@ -297,12 +307,30 @@ namespace Gekko
             code.AppendLine("{");
             code.AppendLine("public class Equations");
             code.AppendLine("{");
-            code.AppendLine("public static void Residuals(double[][] a, double[] r)");
+            code.AppendLine("public static void Residuals(double[] r, double[][] a)");
             code.AppendLine("{");
-            code.AppendLine(eqs);
-            code.AppendLine("}");
-            code.AppendLine("}");
-            code.AppendLine("}");
+            for (int i = 0; i < numbers.Count; i++)
+            {
+                code.AppendLine("Residuals" + i + "(r, a);");
+            }
+            code.AppendLine("}");  //end method
+            for (int i = 0; i < numbers.Count; i++)
+            {
+                code.AppendLine("public static void Residuals" + i + "(double[] r, double[][] a)");
+                code.AppendLine("{");
+                code.AppendLine(eqs[i].ToString());
+                code.AppendLine("}"); //end method
+            }
+            code.AppendLine("}");  //end class
+            code.AppendLine("}");  //end namespace
+
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!  remove this
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", code.ToString());
 
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
@@ -314,12 +342,12 @@ namespace Gekko
             Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
             compilerParams.GenerateExecutable = false;
             string s = code.ToString();
+            DateTime t = DateTime.Now;
+            new Writeln("Start compile");
             CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
+            new Writeln("End compile "+G.Seconds(t));
             Assembly assembly = cr.CompiledAssembly;
             return assembly;
-            
-            
-
         }
 
         private static bool DetectNullNode(CommonTree ast)
@@ -976,7 +1004,7 @@ namespace Gekko
                 new Writeln("Dict: " + G.Seconds(dt0));
 
                 GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                List<Assembly> assemblies = ParserGAMSCreateASTHelper(eqs, eqNames, dictEqs, dictVars, dictA, time0);
+                Assembly assembly = ParserGAMSCreateASTHelper(eqs, eqNames, dictEqs, dictVars, dictA, time0);
                 new Writeln("Eqs: " + G.Seconds(dt0));
 
                 int periods = 200;  //TODO
@@ -1020,29 +1048,17 @@ namespace Gekko
                 if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
                 
                 double[] r = new double[eqCounts + 1];
-                for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
-                                
-                Object[] args = new Object[2]; args[0] = a; args[1] = r;
+                for (int i = 0; i < r.Length; i++) r[i] = double.NaN;                                
+                Object[] args = new Object[2]; args[0] = r; args[1] = a;                
+                Type tpe = assembly.GetType("Gekko.Equations");  //the class                      
+                DateTime dt5 = DateTime.Now;                
+                tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
+                new Writeln("INVOKE " + G.Seconds(dt5));  //1.5 min
 
-                List<Type> types = new List<Type>();
-                foreach (Assembly assembly in assemblies)
-                {
-                    Type tpe = assembly.GetType("Gekko.Equations");  //the class      
-                    types.Add(tpe);
-                }
-
-                //foreach (Assembly assembly in assemblies)
-                //{
-                //    Type tpe = assembly.GetType("Gekko.Equations");  //the class                       
-                //    tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
-                //}
-
-                DateTime dt5 = DateTime.Now;
-                foreach (Type tpe in types)
-                {                    
-                    tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
-                }
-                new Writeln("INVOKE " + G.Seconds(dt5));
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < r.Length; i++) sb.AppendLine("" + i + ";     " + r[i]);
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Residuals.txt", sb.ToString());
+                
 
                 //36 sec in all
 
