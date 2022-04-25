@@ -944,11 +944,88 @@ namespace Gekko
                 
                 //about 20 s for only equation (..) part of gams.gms
                 DateTime dt0 = DateTime.Now;
+                new Writeln("Start read lines");
                 //string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
                 //string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
                 string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
                 string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
                 GekkoTime time0 = new GekkoTime(EFreq.A, 2027, 1);
+
+                //Read lines took: 19.92 sec   count = 1063359   hits = 784210
+                //Read lines took: 18.29 sec   count = 1063359   hits = 1037284   26075
+
+
+                string line2 = null;
+                TokenList tokensLast = null;
+                int hits = 0;
+                int count = 0;
+                using (FileStream fs = Program.WaitForFileStream(file, Program.GekkoFileReadOrWrite.Read))
+                using (StreamReader sr = new StreamReader(fs))
+                {
+                    while ((line2 = sr.ReadLine()) != null)
+                    {
+
+                        if (line2.Contains(".."))
+                        {
+                            count++;
+                            int more = 1;
+                            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(line2, more);  //1 empty "" token
+                            if (tokensLast != null)
+                            {
+                                bool good = true;
+                                for (int i = 0; i < tokens.Count() - more; i++)
+                                {
+                                    if (i >= tokensLast.Count() - more)
+                                    {
+                                        good = false;
+                                        break;  //no good
+                                    }
+                                    TokenHelper th1 = tokens[i];
+                                    TokenHelper th1Next = tokens[i + 1];
+                                    TokenHelper th2 = tokensLast[i];
+                                    TokenHelper th2Next = tokensLast[i + 1];
+                                    if (th1.type != th2.type)
+                                    {
+                                        good = false;
+                                        break;  //no good
+                                    }                                    
+                                    if (IsXOrEVariable(th1, th1Next))
+                                    {
+                                        if (IsXOrEVariable(th2, th2Next))
+                                        {
+                                            //good
+                                        }
+                                        else
+                                        {
+                                            good = false;
+                                            break;  //no good
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //not equation or variable
+                                        if (th1.type == ETokenType.Number && th2.type == ETokenType.Number)
+                                        {
+                                            //good
+                                        }
+                                        else
+                                        {
+                                            if (th1.s != th2.s)
+                                            {
+                                                good = false;
+                                                break;  //no good
+                                            }
+                                        }
+                                    }                                    
+                                }
+                                if (good) hits++;
+                            }
+                            tokensLast = tokens;
+                        }
+                    }
+                }
+                new Writeln("Read lines took: " + G.Seconds(dt0) + "   count = " + count + "   hits = " + hits + "   " + (count - hits));
+                return;
 
                 string s = Program.GetTextFromFileWithWait(file);
                 string[] split = new string[] { ".l", "=", ";" };
@@ -1020,6 +1097,7 @@ namespace Gekko
                         }
                         else
                         {
+                            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(line);
                             eqs.Add(line);
                         }
                     }
@@ -1040,6 +1118,8 @@ namespace Gekko
                         end.Add(line);
                     }
                 }
+                new Writeln("Read lines took: " + G.Seconds(dt0));
+                return;
 
                 List<string> eqNames = new List<string>(eqCounts);  //slot [0] is used
                 string[] dictEqs = new string[eqCounts + 1];        //slot [0] is not used!
@@ -1293,6 +1373,11 @@ namespace Gekko
                     string eqname = gmo.gmoGetEquNameOne(i);
                 }
             }
+        }
+
+        private static bool IsXOrEVariable(TokenHelper th, TokenHelper thNext)
+        {
+            return th.type == ETokenType.Word && (th.s.StartsWith("x") || th.s.StartsWith("e")) && !(thNext.s == "(" || thNext.s == "[" || thNext.s == "{");
         }
 
         private static void TraverseNodes(XmlNodeList nodes)
