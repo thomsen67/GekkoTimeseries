@@ -945,15 +945,14 @@ namespace Gekko
                 //about 20 s for only equation (..) part of gams.gms
                 DateTime dt0 = DateTime.Now;
                 new Writeln("Start read lines");
-                //string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
-                //string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
-                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
-                string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
+                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
+                string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
+                //string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
+                //string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
                 GekkoTime time0 = new GekkoTime(EFreq.A, 2027, 1);
 
                 //Read lines took: 19.92 sec   count = 1063359   hits = 784210
                 //Read lines took: 18.29 sec   count = 1063359   hits = 1037284   26075
-
 
                 string line2 = null;
                 TokenList tokensLast = null;
@@ -964,7 +963,6 @@ namespace Gekko
                 {
                     while ((line2 = sr.ReadLine()) != null)
                     {
-
                         if (line2.Contains(".."))
                         {
                             count++;
@@ -1027,10 +1025,10 @@ namespace Gekko
                 new Writeln("Read lines took: " + G.Seconds(dt0) + "   count = " + count + "   hits = " + hits + "   " + (count - hits));
                 return;
 
-                string s = Program.GetTextFromFileWithWait(file);
+                //string s = Program.GetTextFromFileWithWait(file);
                 string[] split = new string[] { ".l", "=", ";" };
                 string[] split2 = new string[] { " " };
-                List<string> lines = Stringlist.ExtractLinesFromText(s);
+                //List<string> lines = Stringlist.ExtractLinesFromText(s);
                 List<string> start = new List<string>();    //0
                 List<string> eqs = new List<string>();      //1
                 List<string> values = new List<string>();   //2
@@ -1039,83 +1037,88 @@ namespace Gekko
                 int substatus = 0;
                 int eqCounts = -12345;
                 int varCounts = -12345;
-
-                foreach (string line in lines)
+                                
+                using (FileStream fs = Program.WaitForFileStream(file, Program.GekkoFileReadOrWrite.Read))
+                using (StreamReader sr = new StreamReader(fs))
                 {
-                    if (status == 0)
+                    string line = null;
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        if (line.Contains(".."))
+                        if (status == 0)
                         {
-                            eqs.Add(line);
-                            status = 1;
-                        }
-                        else
-                        {
-                            start.Add(line);
-                            if (line.ToLower().Contains("equation counts"))
+                            if (line.Contains(".."))
                             {
-                                substatus = 1;
+                                //eqs.Add(line);
+                                status = 1;
                             }
-                            else if (line.ToLower().Contains("variable counts"))
+                            else
                             {
-                                substatus = 2;
-                            }
-                            if (substatus == 1)
-                            {
-                                string[] ss= line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                                foreach (string sx in ss)
+                                start.Add(line);
+                                if (line.ToLower().Contains("equation counts"))
                                 {
-                                    if (G.IsInteger(sx))
+                                    substatus = 1;
+                                }
+                                else if (line.ToLower().Contains("variable counts"))
+                                {
+                                    substatus = 2;
+                                }
+                                if (substatus == 1)
+                                {
+                                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                                    foreach (string sx in ss)
                                     {
-                                        eqCounts = int.Parse(sx);
-                                        substatus = 0;
-                                        break;
+                                        if (G.IsInteger(sx))
+                                        {
+                                            eqCounts = int.Parse(sx);
+                                            substatus = 0;
+                                            break;
+                                        }
                                     }
-                                }                                
-                            }
-                            else if (substatus == 2)
-                            {
-                                string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                                foreach (string sx in ss)
+                                }
+                                else if (substatus == 2)
                                 {
-                                    if (G.IsInteger(sx))
+                                    string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                                    foreach (string sx in ss)
                                     {
-                                        varCounts = int.Parse(sx);
-                                        substatus = 0;
-                                        break;
+                                        if (G.IsInteger(sx))
+                                        {
+                                            varCounts = int.Parse(sx);
+                                            substatus = 0;
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    else if (status == 1)
-                    {
-                        if (line.ToLower().StartsWith("* set")) //* set non-default levels
+                        else if (status == 1)
                         {
-                            values.Add(line);
-                            status = 2;
+                            if (line.ToLower().StartsWith("* set")) //* set non-default levels
+                            {
+                                values.Add(line);
+                                status = 2;
+                            }
+                            else
+                            {
+                                TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(line);
+                                //eqs.Add(line);
+                            }
+                        }
+                        else if (status == 2)
+                        {
+                            if (line.ToLower().StartsWith("model ")) //model m / all /;
+                            {
+                                end.Add(line);
+                                status = 3;
+                            }
+                            else
+                            {
+                                values.Add(line);
+                            }
                         }
                         else
-                        {
-                            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(line);
-                            eqs.Add(line);
-                        }
-                    }
-                    else if (status == 2)
-                    {
-                        if (line.ToLower().StartsWith("model ")) //model m / all /;
                         {
                             end.Add(line);
-                            status = 3;
                         }
-                        else
-                        {
-                            values.Add(line);
-                        }
-                    }
-                    else
-                    {
-                        end.Add(line);
                     }
                 }
                 new Writeln("Read lines took: " + G.Seconds(dt0));
