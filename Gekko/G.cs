@@ -1277,8 +1277,16 @@ namespace Gekko
         public static string SecondsFormat(double milliseconds)
         {
             double total = milliseconds / 1000d;
-            string s = total.ToString("0.00") + " sec";
-            if (total >= 60d)
+            string s = null;
+            if (total < 1d)
+            {
+                s = total.ToString("0.0000") + " sec";
+            }
+            else if (total < 60d)
+            {
+                s = total.ToString("0.00") + " sec";
+            }
+            else
             {
                 string min = "";
                 string sec = "";

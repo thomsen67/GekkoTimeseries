@@ -23,6 +23,74 @@ using System.Reflection;
 
 namespace Gekko
 {
+
+    interface IFoo
+    {
+        int Foo(int x);
+    }
+
+    public class Program2 : IFoo
+    {
+        const int Iterations = 1000000000;
+
+        public int Foo(int x)
+        {
+            return x * 3;
+        }
+
+        public static int Tre(int x)
+        {
+            return x * 3;
+        }
+
+        public static void Main2()
+        {
+            //https://stackoverflow.com/questions/2082735/performance-of-calling-delegates-vs-methods
+            int x = 3;
+            IFoo ifoo = new Program2();
+            List<Func<int, int>> dels = new List<Func<int, int>>();
+            Func<int, int> del = ifoo.Foo;
+            dels.Add(del);
+            // Make sure everything's JITted:
+            ifoo.Foo(3);
+            del(3);
+            Program2.Tre(3);
+
+            DateTime t0 = DateTime.Now;
+            for (int i = 0; i < Iterations; i++)
+            {
+                x = ifoo.Foo(x);
+            }
+            new Writeln(G.Seconds(t0) + " interface " + x);
+
+            x = 3;
+            t0 = DateTime.Now;
+            for (int i = 0; i < Iterations; i++)
+            {
+                x = del(x);
+            }
+            new Writeln(G.Seconds(t0) + " delegate " + x);
+
+            x = 3;
+            t0 = DateTime.Now;
+            for (int i = 0; i < Iterations; i++)
+            {
+                x = dels[0](x);
+            }
+            new Writeln(G.Seconds(t0) + " delegate[] " + x);
+
+            x = 3;
+            t0 = DateTime.Now;
+            for (int i = 0; i < Iterations; i++)
+            {
+                x = Program2.Tre(x);
+            }
+            new Writeln(G.Seconds(t0) + " raw " + x);
+
+            throw new Exception();
+        }        
+    }
+
     public class ASTNodeGAMS
     {
         /// <summary>
@@ -171,17 +239,16 @@ namespace Gekko
         }
     }
 
-    public  static class GamsModel  //The rest of this class is in GamsWrappers.cs
+    public static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
-        public static Assembly ParserGAMSCreateASTHelper(List<string> eqs, List<string> eqNames, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0)
+        public static Assembly Compile1(List<string> eqs, List<string> eqNames, string[] dictEqs, string[] dictVars, GekkoDictionary<string, int> dictA, GekkoTime time0, bool sw)
         {
+            int eqsPerMethod = 1000;  //10000 is like ADAM, gives around 100 batches            
             DateTime dt2 = DateTime.Now;
+            List<string> eqs2 = null;
+
             int chunkLines = 5000;  //seems to be a good number, not too small and not too large, around 5:22 min.
-            int eqsPerMethod = 10000;  //like ADAM, gives around 100 batches
             List<List<string>> chunks = new List<List<string>>();
-
-            //StringBuilder DELETEME = new StringBuilder();
-
             int counter = 0;
             int counterMax = counter + chunkLines;
             List<string> currentChunk = new List<string>();
@@ -189,22 +256,22 @@ namespace Gekko
             {
                 counter++;
                 if (eqline.Contains("..") && counter >= counterMax)
-                {                    
+                {
                     chunks.Add(currentChunk);
                     currentChunk = new List<string>();
                     counterMax = counter + chunkLines;
                 }
                 currentChunk.Add(eqline);
             }
-            chunks.Add(currentChunk);            
+            chunks.Add(currentChunk);
 
             int tjek = 0;
             foreach (List<string> x in chunks) tjek += x.Count;
             if (tjek != eqs.Count) new Error("Mismatch of chunks");
 
             eqs = null;
-            
-            List<Parser.Gek.GekkoSB> codes = new List<Parser.Gek.GekkoSB>();            
+
+            List<Parser.Gek.GekkoSB> codes = new List<Parser.Gek.GekkoSB>();
 
             for (int ichunk = 0; ichunk < chunks.Count; ichunk++)
             {
@@ -236,7 +303,7 @@ namespace Gekko
                     //new Writeln("END PARSE ANTLR -- " + G.Seconds(tt0));
                     errors = parser.GetErrors();
                     t = (CommonTree)gams.Tree;
-                    CreateASTNodesForGAMS(t, root, 0, tokens, print);                    
+                    Compile2(t, root, 0, tokens, print);
 
                     if (true)
                     {
@@ -253,7 +320,7 @@ namespace Gekko
                 {
                     new Warning("GAMS other error");
                 }
-                
+
                 if (true)
                 {
                     WalkHelper wh = new WalkHelper();
@@ -262,20 +329,31 @@ namespace Gekko
                     wh.dictVars = dictVars;
                     wh.time0 = time0;
                     wh.dictA = dictA;
+                    wh.useMFunctions = false;
                     Controlled controlled = new Controlled();
-                    WalkASTAndEmit(root, 0, wh, controlled);
-                    codes.Add(root.Code);
+                    Compile3(root, 0, wh, controlled);
+                    foreach (ASTNodeGAMS child in root.ChildrenIterator())
+                    {
+                        codes.Add(child.Code);
+                    }
                 }
                 new Writeln("Chunk #" + (ichunk + 1) + " (" + chunk.Count + ") of " + chunks.Count + " (" + G.Seconds(dt3) + ")");
             }
-            
-            Assembly assembly = EmitCsCodeAndCompile(codes, eqsPerMethod);            
 
-            new Writeln("All chunks done: " + G.Seconds(dt2));            
+            new Writeln("All chunks done: " + G.Seconds(dt2));
+
+            eqs2 = new List<string>();
+            foreach (Parser.Gek.GekkoSB sb in codes)
+            {
+                eqs2.Add(sb.ToString());
+            }
+            //File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Eqs.cs", Stringlist.ExtractTextFromLines(eqs2).ToString());
+            
+            Assembly assembly = Compile4(eqs2, eqsPerMethod, sw);
             return assembly;
         }
 
-        private static Assembly EmitCsCodeAndCompile(List<Parser.Gek.GekkoSB> eqs, int eqsPerMethod)
+        private static Assembly Compile4(List<string> eqs, int eqsPerMethod, bool sw)
         {
             DateTime t0 = DateTime.Now;
             bool failSafe = false;
@@ -286,7 +364,7 @@ namespace Gekko
             List<List<int>> numbers = new List<List<int>>();
             List<int> n = null;
             int counter = -1;
-            foreach (Parser.Gek.GekkoSB eq in eqs)
+            foreach (string eq in eqs)
             {
                 counter++;
                 if (counter % eqsPerMethod == 0)
@@ -296,9 +374,13 @@ namespace Gekko
                 }
                 n.Add(counter);
             }
+            if (n != null) numbers.Add(n);
 
             int tjek = 0; foreach (var xx in numbers) tjek += xx.Count;
             if (tjek != eqs.Count) new Error("Mismatch");
+
+            bool printTime = false;
+            
 
             code.AppendLine("using System;");
             code.AppendLine("using System.Collections.Generic;");
@@ -307,20 +389,54 @@ namespace Gekko
             code.AppendLine("{");
             code.AppendLine("public class Equations");
             code.AppendLine("{");
-            code.AppendLine("public static void Residuals(double[] r, double[][] a)");
-            code.AppendLine("{");
-            for (int i = 0; i < numbers.Count; i++)
+
+            if (sw)
             {
-                code.AppendLine("Residuals" + i + "(r, a);");
-            }
-            code.AppendLine("}");  //end method
-            for (int i = 0; i < numbers.Count; i++)
-            {
-                code.AppendLine("public static void Residuals" + i + "(double[] r, double[][] a)");
+                code.AppendLine("public static void Residual(int i, double[] r, double[][] a)");
                 code.AppendLine("{");
-                code.AppendLine(eqs[i].ToString());
-                code.AppendLine("}"); //end method
+                code.AppendLine("switch(i) {");
+                for (int j = 0; j < eqs.Count; j++)
+                {
+                    string s2 = eqs[j].ToString();
+                    //string rhs = s2.Substring(s2.IndexOf('=') + 1);  //hack
+                    code.AppendLine("case " + j + ":" + s2 + "; break;");
+                }
+                code.AppendLine("default:; break;");
+                code.AppendLine("}");  //switch
+                code.AppendLine("}");  //method
             }
+            else
+            {
+                code.AppendLine("public static void Residuals(double[] r, double[][] a)");
+                code.AppendLine("{");
+                if (printTime)
+                {
+                    code.AppendLine("new Writeln(\"Starting Residuals() in dynamic code \" + DateTime.Now.ToString());");
+                }
+
+                for (int i = 0; i < numbers.Count; i++)
+                {
+                    code.AppendLine("Residuals" + i + "(r, a);");
+                }
+
+                if (printTime)
+                {
+                    code.AppendLine("new Writeln(\"Ending Residuals() in dynamic code \" + DateTime.Now.ToString());");
+                }
+                code.AppendLine("}");  //end method
+
+                for (int i = 0; i < numbers.Count; i++)
+                {
+                    code.AppendLine("public static void Residuals" + i + "(double[] r, double[][] a)");
+                    code.AppendLine("{");
+                    for (int j = 0; j < numbers[i].Count; j++)
+                    {                        
+                        code.AppendLine(eqs[numbers[i][j]].ToString() + ";");
+                    }
+                    code.AppendLine("}"); //end method
+                }
+            }
+
             code.AppendLine("}");  //end class
             code.AppendLine("}");  //end namespace
 
@@ -344,7 +460,15 @@ namespace Gekko
             string s = code.ToString();
             DateTime t = DateTime.Now;
             new Writeln("Start compile");
-            CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
+            CompilerResults cr = null;
+            try
+            {
+                cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
+            }
+            catch (Exception e)
+            {
+
+            }
             new Writeln("End compile "+G.Seconds(t));
             Assembly assembly = cr.CompiledAssembly;
             return assembly;
@@ -355,7 +479,7 @@ namespace Gekko
             return ast.Text == null && !(ast.Children != null && ast.Children.Count > 0);
         }
 
-        public static void CreateASTNodesForGAMS(CommonTree ast, ASTNodeGAMS cmdNode, int depth, CommonTokenStream tokens, bool print)
+        public static void Compile2(CommonTree ast, ASTNodeGAMS cmdNode, int depth, CommonTokenStream tokens, bool print)
         {
             if (DetectNullNode(ast))
             {
@@ -405,48 +529,30 @@ namespace Gekko
                 ASTNodeGAMS cmdNodeChild = new ASTNodeGAMS(null);  //unknown text
                 cmdNodeChild.Parent = cmdNode;
                 cmdNode.Add(cmdNodeChild);
-                CreateASTNodesForGAMS(d, cmdNodeChild, depth + 1, tokens, print);
+                Compile2(d, cmdNodeChild, depth + 1, tokens, print);
             }
         }        
 
-        public static void WalkASTAndEmit(ASTNodeGAMS node, int depth, WalkHelper wh, Controlled controlled)
-        {
-            WalkASTAndEmitBefore(node, wh, controlled);
-            
+        public static void Compile3(ASTNodeGAMS node, int depth, WalkHelper wh, Controlled controlled)
+        {            
             foreach (ASTNodeGAMS child in node.ChildrenIterator())
             {
-                WalkASTAndEmit(child, depth + 1, wh, controlled);
+                Compile3(child, depth + 1, wh, controlled);
             }
+            Compile3After(node, wh, controlled);
+        }        
 
-            WalkASTAndEmitAfter(node, wh, controlled);
-
-        }
-
-        private static void WalkASTAndEmitBefore(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
-        {
-
-            //Before sub-nodes
-            switch (node.Text?.ToUpper())
-            {
-
-                case "XXXXXXX":
-                    {
-                        //w.wh.seriesHelper = WalkHelper.seriesType.SeriesLhs;
-                    }
-                    break;
-            }
-        }
-
-        private static void WalkASTAndEmitAfter(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
+        private static void Compile3After(ASTNodeGAMS node, WalkHelper wh, Controlled controlled)
         {
             switch (node.Text?.ToUpper())
             {
                 case "ASTGAMS":
                     {
-                        foreach (ASTNodeGAMS child in node.ChildrenIterator())
-                        {
-                            node.Code.A(child.Code).End();
-                        }
+                        //No need to gather GAMS statements in one lump, we take it from the children
+                        //foreach (ASTNodeGAMS child in node.ChildrenIterator())
+                        //{
+                        //    node.Code.A(child.Code).End();
+                        //}
                     }
                     break;
                 case "ASTEXPRESSION":
@@ -624,22 +730,26 @@ namespace Gekko
                     break;
                 case "+":
                     {
-                        node.Code.A("M.Add(" + node[0].Code + ", " + node[1].Code + ")");
+                        if (wh.useMFunctions) node.Code.A("M.Add(" + node[0].Code + ", " + node[1].Code + ")");
+                        else node.Code.A("(" + node[0].Code + " + " + node[1].Code + ")");
                     }
                     break;
                 case "-":
                     {
-                        node.Code.A("M.Subtract(" + node[0].Code + ", " + node[1].Code + ")");
+                        if (wh.useMFunctions) node.Code.A("M.Subtract(" + node[0].Code + ", " + node[1].Code + ")");
+                        else node.Code.A("(" + node[0].Code + " - " + node[1].Code + ")");
                     }
                     break;
                 case "*":
                     {
-                        node.Code.A("M.Multiply(" + node[0].Code + ", " + node[1].Code + ")");
+                        if (wh.useMFunctions) node.Code.A("M.Multiply(" + node[0].Code + ", " + node[1].Code + ")");
+                        else node.Code.A("(" + node[0].Code + " * " + node[1].Code + ")");
                     }
                     break;
                 case "/":
                     {
-                        node.Code.A("M.Divide(" + node[0].Code + ", " + node[1].Code + ")");
+                        if (wh.useMFunctions) node.Code.A("M.Divide(" + node[0].Code + ", " + node[1].Code + ")");
+                        else node.Code.A("(" + node[0].Code + " / " + node[1].Code + ")");
                     }
                     break;
                 case "**":
@@ -649,7 +759,8 @@ namespace Gekko
                     break;
                 case "NEGATE":
                     {
-                        node.Code.A("M.Negate(" + node[0].Code + ")");
+                        if (wh.useMFunctions) node.Code.A("M.Negate(" + node[0].Code + ")");
+                        else node.Code.A("(-" + node[0].Code + ")");
                     }
                     break;
                 case "ASTDOLLAREXPRESSION":
@@ -777,8 +888,9 @@ namespace Gekko
         }
 
 
-        public static void Xxx()
-        {
+        public static void Compile0()
+        {           
+
             if (false)
             {
                 DateTime dt0 = DateTime.Now;
@@ -809,7 +921,7 @@ namespace Gekko
                     new Writeln("END BUT PARSE ANTLR -- " + G.Seconds(tt0));
                     errors = parser.GetErrors();
                     t = (CommonTree)gams.Tree;
-                    CreateASTNodesForGAMS(t, root, 0, tokens, print);
+                    Compile2(t, root, 0, tokens, print);
                     new Writeln("END ASTNODES -- " + G.Seconds(tt0));
                     if (errors.Count > 0)
                     {
@@ -825,6 +937,8 @@ namespace Gekko
 
             if (true)
             {
+                if (false) Program2.Main2();
+                
                 //TODO: Maybe loop line by line without putting into RAM! Like px reader.
                 //      But prepare for parallel...
                 
@@ -1002,9 +1116,9 @@ namespace Gekko
                     }
                 }
                 new Writeln("Dict: " + G.Seconds(dt0));
-
+                bool sw = true;
                 GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                Assembly assembly = ParserGAMSCreateASTHelper(eqs, eqNames, dictEqs, dictVars, dictA, time0);
+                Assembly assembly = Compile1(eqs, eqNames, dictEqs, dictVars, dictA, time0, sw);
                 new Writeln("Eqs: " + G.Seconds(dt0));
 
                 int periods = 200;  //TODO
@@ -1049,11 +1163,42 @@ namespace Gekko
                 
                 double[] r = new double[eqCounts + 1];
                 for (int i = 0; i < r.Length; i++) r[i] = double.NaN;                                
-                Object[] args = new Object[2]; args[0] = r; args[1] = a;                
+                Object[] args1 = new Object[3]; args1[0] = -12345; args1[1] = r; args1[2] = a;
+                Object[] args2 = new Object[2]; args2[0] = r; args2[1] = a;
                 Type tpe = assembly.GetType("Gekko.Equations");  //the class                      
-                DateTime dt5 = DateTime.Now;                
-                tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args);  //the method 
-                new Writeln("INVOKE " + G.Seconds(dt5));  //1.5 min
+                DateTime dt5 = DateTime.Now;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    DateTime t7 = DateTime.Now;
+                    if (sw)
+                    {
+                        for (int j = 0; j < eqCounts; j++)
+                        {
+                            args1[0] = j;
+                            tpe.InvokeMember("Residual", BindingFlags.InvokeMethod, null, null, args1);  //the method 
+
+                            if (false)
+                            {
+                                MethodInfo mi = tpe.GetMethod("Residual");
+                                Delegate d = Delegate.CreateDelegate(tpe, mi);
+                                d.DynamicInvoke(args1);
+                                List<Delegate> ds = new List<Delegate>();
+                                ds.Add(d);
+                                ds[0].DynamicInvoke(args1);
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        
+                        //new Writeln("Calling Residuals() via dynamic code " + DateTime.Now.ToString());
+                        tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args2);  //the method 
+                                                                                                     //new Writeln("INVOKE " + G.Seconds(dt5));  //1.5 min
+                    }
+                    new Writeln("Invoke #" + i + " took " + G.Seconds(t7));
+                }
 
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < r.Length; i++) sb.AppendLine("" + i + ";     " + r[i]);
@@ -2861,6 +3006,7 @@ namespace Gekko
 
         public class WalkHelper
         {
+            public bool useMFunctions = false;
             public List<string> eqNames = new List<string>();
             public GekkoDictionary<string, int> dictA = null;
             public string[] dictEqs = null;
