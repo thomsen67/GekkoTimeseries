@@ -22,222 +22,7 @@ using System.CodeDom.Compiler;
 using System.Reflection;
 
 namespace Gekko
-{
-
-    interface IFoo
-    {
-        int Foo(int x);
-    }
-
-    public class Program2 : IFoo
-    {
-        const int Iterations = 1000000000;
-
-        public int Foo(int x)
-        {
-            return x * 3;
-        }
-
-        public static int Tre(int x)
-        {
-            return x * 3;
-        }
-
-        public static void Main2()
-        {
-            //https://stackoverflow.com/questions/2082735/performance-of-calling-delegates-vs-methods
-            int x = 3;
-            IFoo ifoo = new Program2();
-            List<Func<int, int>> dels = new List<Func<int, int>>();
-            Func<int, int> del = ifoo.Foo;
-            dels.Add(del);
-            // Make sure everything's JITted:
-            ifoo.Foo(3);
-            del(3);
-            Program2.Tre(3);
-
-            DateTime t0 = DateTime.Now;
-            for (int i = 0; i < Iterations; i++)
-            {
-                x = ifoo.Foo(x);
-            }
-            new Writeln(G.Seconds(t0) + " interface " + x);
-
-            x = 3;
-            t0 = DateTime.Now;
-            for (int i = 0; i < Iterations; i++)
-            {
-                x = del(x);
-            }
-            new Writeln(G.Seconds(t0) + " delegate " + x);
-
-            x = 3;
-            t0 = DateTime.Now;
-            for (int i = 0; i < Iterations; i++)
-            {
-                x = dels[0](x);
-            }
-            new Writeln(G.Seconds(t0) + " delegate[] " + x);
-
-            x = 3;
-            t0 = DateTime.Now;
-            for (int i = 0; i < Iterations; i++)
-            {
-                x = Program2.Tre(x);
-            }
-            new Writeln(G.Seconds(t0) + " raw " + x);
-
-            throw new Exception();
-        }        
-    }
-
-    public class ASTNodeGAMS
-    {
-        /// <summary>
-        /// See comments for very similar and more complicated ASTNode class for .gcm file reading.
-        /// </summary>
-        /// <returns></returns>
-
-        private List<ASTNodeGAMS> children = null; //private so that the implementation might change (for instance LinkedList etc.)
-        public Parser.Gek.GekkoSB Code = new Parser.Gek.GekkoSB(); //the C# code produced while walking the tree
-        public Parser.Gek.GekkoSB Gekko = new Parser.Gek.GekkoSB(); //the Gekko code produced while walking the tree
-        public Parser.Gek.GekkoSB GAMS = new Parser.Gek.GekkoSB(); //the unfolded GAMS code produced while walking the tree
-        public ASTNodeGAMS Parent = null;
-        public string Text = null;  //ANTLR decoration of the node (for instance 'ASTPRT' or '1.45').
-        public int Line = 0;
-        public int Number = 0;  //used to check position among siblings
-        public string leftBlanks = null;
-
-        public IEnumerable ChildrenIterator()
-        {
-            if (this.children != null)
-            {
-                foreach (ASTNodeGAMS child in this.children)
-                {
-                    yield return child;
-                }
-            }
-        }
-
-        public void RemoveLast()
-        {
-            this.children.RemoveAt(this.children.Count - 1);
-        }
-
-        public ASTNodeGAMS GetChild(string s)
-        {
-            foreach (ASTNodeGAMS child in this.ChildrenIterator())
-            {
-                if (child.Text == s) return child;
-            }
-            return null;
-        }
-
-        public ASTNodeGAMS this[int i]
-        {
-            get
-            {
-                return this.GetChild(i);
-            }
-            set
-            {
-                this.children[i] = value;
-            }
-        }
-
-        public int ChildrenCount()
-        {
-            if (children == null) return 0;
-            return children.Count;
-        }
-
-        //Gets the C# code of child i.
-        public Parser.Gek.GekkoSB GetChildCode(int i)
-        {
-            ASTNodeGAMS child = this.GetChild(i);
-            if (child == null)
-            {
-                Parser.Gek.GekkoSB xx = new Parser.Gek.GekkoSB();
-                return xx;
-            }
-            else return child.Code;
-        }
-
-        //Prepares an AST node to have children
-        public void CreateChildren(int n)
-        {
-            this.children = new List<ASTNodeGAMS>(n);
-        }
-
-        public bool IsLastChild()
-        {
-            if (this.Parent == null) return true;
-            if (this.Number == this.Parent.ChildrenCount() - 1) return true;  //should not be possible to be >
-            return false;
-        }
-
-        public bool IsFirstChild()
-        {
-            if (this.Parent == null) return true;
-            if (this.Number == 0) return true;
-            return false;
-        }
-
-        //Sets the text of the AST node
-        public ASTNodeGAMS(string text)
-        {
-            this.Text = text;
-        }
-
-        //Sets the text of the AST node
-        public ASTNodeGAMS(string text, string leftBlanks)
-        {
-            this.Text = text;
-            this.leftBlanks = leftBlanks;
-        }
-
-        //Sets the text of the AST node, and augments with children.
-        public ASTNodeGAMS(string text, bool withChildren)
-        {
-            this.Text = text;
-            if (withChildren)
-            {
-                this.children = new List<ASTNodeGAMS>();
-            }
-        }
-
-        public ASTNodeGAMS GetChild(int i)
-        {
-            if (this.children == null) return null;
-            if (i >= this.children.Count) return null;  //does not exist
-            return this.children[i];
-        }
-
-        public void Add(ASTNodeGAMS child)
-        {
-            this.children.Add(child);
-            child.Parent = this;
-            child.Number = children.Count - 1;
-        }
-
-        public string ToString()
-        {
-            return this.Text;
-        }
-
-        public void PrintAST2(ASTNodeGAMS node, int depth)
-        {
-            G.Writeln(G.Blanks(depth * 2) + node.Text);
-            if (node.children != null)
-            {
-                for (int i = 0; i < node.children.Count; ++i)
-                {
-                    ASTNodeGAMS child = (ASTNodeGAMS)(node.children[i]);
-                    PrintAST2(child, depth + 1);
-                }
-            }
-        }
-    }
+{    
 
     public static class GamsModel  //The rest of this class is in GamsWrappers.cs
     {
@@ -398,7 +183,6 @@ namespace Gekko
                 for (int j = 0; j < eqs.Count; j++)
                 {
                     string s2 = eqs[j].ToString();
-                    //string rhs = s2.Substring(s2.IndexOf('=') + 1);  //hack
                     code.AppendLine("case " + j + ":" + s2 + "; break;");
                 }
                 code.AppendLine("default:; break;");
@@ -446,7 +230,7 @@ namespace Gekko
             // !!!!!!!!!!!!!!!!
             // !!!!!!!!!!!!!!!!
             // !!!!!!!!!!!!!!!!
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", code.ToString());
+            //File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", code.ToString());
 
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams = new CompilerParameters();
@@ -472,6 +256,72 @@ namespace Gekko
             new Writeln("End compile "+G.Seconds(t));
             Assembly assembly = cr.CompiledAssembly;
             return assembly;
+        }
+
+        private static Assembly Compile5(List<string> eqs)
+        {            
+            StringBuilder code = new StringBuilder();            
+
+            code.AppendLine("using System;");
+            code.AppendLine("using System.Collections.Generic;");
+            code.AppendLine("using System.Text;");
+            code.AppendLine("namespace Gekko");
+            code.AppendLine("{");
+            code.AppendLine("public class Equations");
+            code.AppendLine("{");
+
+            code.AppendLine("public static void Residuals(Func<int, double[], double[][], double[], int[][], int[][], double>[] functions)");
+            code.AppendLine("{");
+            for (int i = 0; i < eqs.Count; i++)
+            {
+                code.AppendLine("functions[" + i + "] = (i, r, a, c, bb, dd) =>");
+                code.AppendLine("{"); //start dynamic function
+                code.AppendLine("int[] b = bb[i];");
+                code.AppendLine("int[] d = dd[i];");
+                code.AppendLine("double sum = 0d;");                
+                code.AppendLine(eqs[i]);
+                code.AppendLine("return sum;");
+                code.AppendLine("};");  //end dynamic function
+                code.AppendLine();
+            }
+            code.AppendLine("}");  //method
+            code.AppendLine("}");  //end class
+            code.AppendLine("}");  //end namespace
+
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!  remove this
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!
+            //File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", code.ToString());
+
+            CompilerParameters compilerParams = new CompilerParameters();
+            compilerParams = new CompilerParameters();
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();
+            compilerParams.GenerateInMemory = true;
+            compilerParams.IncludeDebugInformation = false;
+            compilerParams.ReferencedAssemblies.Add("system.dll");
+            //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);  --> no need to reference Gekko?
+            Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
+            compilerParams.GenerateExecutable = false;
+            string s = code.ToString();
+            DateTime t = DateTime.Now;
+            new Writeln("Start compile");
+            CompilerResults cr = null;
+            try
+            {
+                cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
+                //File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Gams.cs", s);
+            }
+            catch (Exception e)
+            {
+
+            }
+            new Writeln("End compile " + G.Seconds(t));
+            Assembly assembly = cr.CompiledAssembly;
+            return assembly;
+
         }
 
         private static bool DetectNullNode(CommonTree ast)
@@ -799,6 +649,7 @@ namespace Gekko
                         else if (G.Equal(fname, "min")) code = "M.Min(";
                         else if (G.Equal(fname, "power")) code = "M.Power(";
                         else if (G.Equal(fname, "sqr")) code = "M.Sqr(";
+                        else if (G.Equal(fname, "sqrt")) code = "M.Sqrt(";
                         else if (G.Equal(fname, "tanh")) code = "M.Tanh(";
 
                         ASTNodeGAMS elements = node[2][0][1];
@@ -933,101 +784,109 @@ namespace Gekko
                 }
                 return;
             }
-
+            
             if (true)
             {
                 if (false) Program2.Main2();
-                
-                //TODO: Maybe loop line by line without putting into RAM! Like px reader.
-                //      But prepare for parallel...
-                
-                //about 20 s for only equation (..) part of gams.gms
-                DateTime dt0 = DateTime.Now;
-                new Writeln("Start read lines");
+
                 //string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
                 //string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
                 string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
                 string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
+
+                DateTime dt0 = DateTime.Now;
+
+                string[] split = new string[] { ".l", "=", ";" };
+                string[] split2 = new string[] { " " };
+                                
+                string[] dictEqs = null;
+                string[] dictVars = null;
+
+                string s2 = Program.GetTextFromFileWithWait(file2);
+                List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
+                int status2 = 0;
+                int substatus2 = 0;
+                int eqCounts2 = -12345;
+                int varCounts2 = -12345;
+                foreach (string line in lines2)
+                {
+                    if (line.Trim() == "") continue;
+                    if (line.ToLower().Contains("equation counts"))
+                    {
+                        substatus2 = 1;
+                    }
+                    else if (line.ToLower().Contains("variable counts"))
+                    {
+                        substatus2 = 2;
+                    }
+
+                    if (substatus2 == 1)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string sx in ss)
+                        {
+                            if (G.IsInteger(sx))
+                            {
+                                eqCounts2 = int.Parse(sx);
+                                substatus2 = 0;
+                                dictEqs = new string[eqCounts2];
+                                dictVars = new string[eqCounts2];
+                                break;
+                            }
+                        }
+                    }
+                    else if (substatus2 == 2)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string sx in ss)
+                        {
+                            if (G.IsInteger(sx))
+                            {
+                                varCounts2 = int.Parse(sx);
+                                substatus2 = 0;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (line.ToLower().StartsWith("equations "))
+                    {
+                        status2 = 1;
+                        continue;
+                    }
+                    else if (line.ToLower().StartsWith("variables "))
+                    {
+                        status2 = 2;
+                        continue;
+                    }
+                    if (status2 == 1)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                        string ss2 = ss[1];
+                        dictEqs[n] = ss2;
+                    }
+                    else if (status2 == 2)
+                    {
+                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
+                        int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
+                        string ss2 = ss[1];
+                        dictVars[n] = ss2;
+                    }
+                }
+                new Writeln("Dict: " + G.Seconds(dt0));
+                bool sw = true;
+                new Writeln("Start read lines");
+                dt0 = DateTime.Now;
+                
                 GekkoTime time0 = new GekkoTime(EFreq.A, 2027, 1);
 
                 //Read lines took: 19.92 sec   count = 1063359   hits = 784210
                 //Read lines took: 18.29 sec   count = 1063359   hits = 1037284   26075
-
-                //string line2 = null;
-                //TokenList tokensLast = null;
-                //int hits = 0;
-                //int count = 0;
-                //using (FileStream fs = Program.WaitForFileStream(file, Program.GekkoFileReadOrWrite.Read))
-                //using (StreamReader sr = new StreamReader(fs))
-                //{
-                //    while ((line2 = sr.ReadLine()) != null)
-                //    {
-                //        if (line2.Contains(".."))
-                //        {
-                //            count++;
-                //            int more = 1;
-                //            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(line2, more);  //1 empty "" token
-                //            if (tokensLast != null)
-                //            {
-                //                bool good = true;
-                //                for (int i = 0; i < tokens.Count() - more; i++)
-                //                {
-                //                    if (i >= tokensLast.Count() - more)
-                //                    {
-                //                        good = false;
-                //                        break;  //no good
-                //                    }
-                //                    TokenHelper th1 = tokens[i];
-                //                    TokenHelper th1Next = tokens[i + 1];
-                //                    TokenHelper th2 = tokensLast[i];
-                //                    TokenHelper th2Next = tokensLast[i + 1];
-                //                    if (th1.type != th2.type)
-                //                    {
-                //                        good = false;
-                //                        break;  //no good
-                //                    }                                    
-                //                    if (IsXOrEVariable(th1, th1Next))
-                //                    {
-                //                        if (IsXOrEVariable(th2, th2Next))
-                //                        {
-                //                            //good
-                //                        }
-                //                        else
-                //                        {
-                //                            good = false;
-                //                            break;  //no good
-                //                        }
-                //                    }
-                //                    else
-                //                    {
-                //                        //not equation or variable
-                //                        if (th1.type == ETokenType.Number && th2.type == ETokenType.Number)
-                //                        {
-                //                            //good
-                //                        }
-                //                        else
-                //                        {
-                //                            if (th1.s != th2.s)
-                //                            {
-                //                                good = false;
-                //                                break;  //no good
-                //                            }
-                //                        }
-                //                    }                                    
-                //                }
-                //                if (good) hits++;
-                //            }
-                //            tokensLast = tokens;
-                //        }
-                //    }
-                //}
-                //new Writeln("Read lines took: " + G.Seconds(dt0) + "   count = " + count + "   hits = " + hits + "   " + (count - hits));
-
-                //string s = Program.GetTextFromFileWithWait(file);
+                //Read lines took: 30.15 sec   Count 1063359 hits 1050609 dif 12750
 
                 TokenList tokensLast = null;
-                string[] split = new string[] { ".l", "=", ";" };
-                string[] split2 = new string[] { " " };
+                
                 //List<string> lines = Stringlist.ExtractLinesFromText(s);
                 List<string> start = new List<string>();    //0
                 List<string> eqs = new List<string>();      //1
@@ -1036,10 +895,19 @@ namespace Gekko
                 int status = 0;
                 int substatus = 0;
                 int eqCounts = -12345;
-                int varCounts = -12345;
-                int count = 0;
-                int hits = 0;
+                int varCounts = -12345;                
+                int semis = 0;
 
+                EqLineHelper helper = new EqLineHelper();
+                helper.dictE_eqs = dictEqs;
+                helper.dictX_vars = dictVars;
+                helper.time0 = time0;
+
+                int periods = 200;  //TODO //TODO //TODO //TODO //TODO //TODO //TODO //TODO                
+
+                List<string> codeLines = new List<string>();
+
+                List<string> equationDefs = new List<string>();
                 StringBuilder eqLine = null;
                 using (FileStream fs = Program.WaitForFileStream(file, Program.GekkoFileReadOrWrite.Read))
                 using (StreamReader sr = new StreamReader(fs))
@@ -1053,9 +921,12 @@ namespace Gekko
                             {
                                 eqLine = new StringBuilder(line);
                                 if (line.EndsWith(";"))
-                                {                                    
-                                    tokensLast = HandleEqLine(eqLine, tokensLast, ref count, ref hits);
-                                    eqLine = new StringBuilder();
+                                {
+                                    semis++;
+                                    int hits2 = helper.known;
+                                    tokensLast = HandleEqLine(eqLine, tokensLast, helper);
+                                    if (helper.known == hits2) RemoveDoubleDots(helper, codeLines);
+                                    eqLine = new StringBuilder();                                    
                                 }
                                 status = 1;
                             }
@@ -1078,6 +949,13 @@ namespace Gekko
                                         if (G.IsInteger(sx))
                                         {
                                             eqCounts = int.Parse(sx);
+
+                                            helper.a = new double[periods][];
+                                            for (int i = 0; i < helper.a.GetLength(0); i++)
+                                            {
+                                                helper.a[i] = new double[eqCounts];  //beware: 0-based
+                                            }
+
                                             substatus = 0;
                                             break;
                                         }
@@ -1110,8 +988,11 @@ namespace Gekko
                             {
                                 if (line.EndsWith(";"))
                                 {
+                                    semis++;
                                     eqLine.Append(line);
-                                    tokensLast = HandleEqLine(eqLine, tokensLast, ref count, ref hits);
+                                    int hits2 = helper.known;
+                                    tokensLast = HandleEqLine(eqLine, tokensLast, helper);
+                                    if (helper.known == hits2) RemoveDoubleDots(helper, codeLines);
                                     eqLine = new StringBuilder();
                                 }
                                 else
@@ -1139,91 +1020,12 @@ namespace Gekko
                     }
                 }
                 new Writeln("Read lines took: " + G.Seconds(dt0));
-                new Writeln("Count " + count + " hits " + hits + " dif " + (count - hits));
-                return;
+                new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
+                
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(codeLines).ToString());                
 
-                List<string> eqNames = new List<string>(eqCounts);  //slot [0] is used
-                string[] dictEqs = new string[eqCounts + 1];        //slot [0] is not used!
-                string[] dictVars = new string[eqCounts + 1];       //slot [0] is not used!
-
-                string s2 = Program.GetTextFromFileWithWait(file2);
-                List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
-                int status2 = 0;
-                int substatus2 = 0;
-                int eqCounts2 = -12345;
-                int varCounts2 = -12345;
-                foreach (string line in lines2)
-                {
-                    if (line.Trim() == "") continue;
-                    if (line.ToLower().Contains("equation counts"))
-                    {
-                        substatus2 = 1;
-                    }
-                    else if (line.ToLower().Contains("variable counts"))
-                    {
-                        substatus2 = 2;
-                    }
-
-                    if (substatus2 == 1)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string sx in ss)
-                        {
-                            if (G.IsInteger(sx))
-                            {
-                                eqCounts2 = int.Parse(sx);
-                                substatus2 = 0;
-                                break;
-                            }
-                        }
-                    }
-                    else if (substatus2 == 2)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string sx in ss)
-                        {
-                            if (G.IsInteger(sx))
-                            {
-                                varCounts2 = int.Parse(sx);
-                                substatus2 = 0;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (line.ToLower().StartsWith("equations "))
-                    {
-                        status2 = 1;
-                        continue;
-                    }
-                    else if (line.ToLower().StartsWith("variables "))
-                    {
-                        status2 = 2;
-                        continue;
-                    }
-                    if (status2 == 1)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        int n = int.Parse(ss[0].Substring(1));
-                        string ss2 = ss[1];
-                        dictEqs[n] = ss2;
-                    }
-                    else if (status2 == 2)
-                    {
-                        string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
-                        int n = int.Parse(ss[0].Substring(1));
-                        string ss2 = ss[1];
-                        dictVars[n] = ss2;
-                    }
-                }
-                new Writeln("Dict: " + G.Seconds(dt0));
-                bool sw = true;
-                GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                Assembly assembly = Compile1(eqs, eqNames, dictEqs, dictVars, dictA, time0, sw);
-                new Writeln("Eqs: " + G.Seconds(dt0));
-
-                int periods = 200;  //TODO
-                double[][] a = new double[periods][];  //TODO
+                int periods2 = 200;  //TODO  //TODO  //TODO  //TODO  //TODO  //TODO  //TODO
+                double[][] a = new double[periods2][];
                 for (int i = 0; i < a.GetLength(0); i++)
                 {
                     a[i] = new double[eqCounts + 1];
@@ -1235,12 +1037,12 @@ namespace Gekko
                 {
                     if (line.Trim() == "" || line.StartsWith("*")) continue;
                     string[] ss = line.Split(split, StringSplitOptions.None);
-                    int id = int.Parse(ss[0].Substring(1));
+                    int id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
                     string inputName = dictVars[id];
                     GekkoTime t = GekkoTime.tNull;
                     string outputName = null;
                     ExtractTimeDimension(inputName, ref t, ref outputName);
-                    int aNumber = dictA[outputName];
+                    int aNumber = helper.dictA[outputName];
                     int i1 = GekkoTime.Observations(time0, t) - 1;
                     int i2 = aNumber;
                     double d;
@@ -1261,91 +1063,52 @@ namespace Gekko
                 if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
                 if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
                 if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
-                
-                double[] r = new double[eqCounts + 1];
-                for (int i = 0; i < r.Length; i++) r[i] = double.NaN;                                
-                Object[] args1 = new Object[3]; args1[0] = -12345; args1[1] = r; args1[2] = a;
-                Object[] args2 = new Object[2]; args2[0] = r; args2[1] = a;
-                Type tpe = assembly.GetType("Gekko.Equations");  //the class                      
-                DateTime dt5 = DateTime.Now;
 
-                for (int i = 0; i < 10; i++)
+                List<string> eqNames = null;
+                Assembly assembly = Compile5(codeLines);
+
+                if (true)
                 {
-                    DateTime t7 = DateTime.Now;
-                    if (sw)
-                    {
-                        for (int j = 0; j < eqCounts; j++)
-                        {
-                            args1[0] = j;
-                            tpe.InvokeMember("Residual", BindingFlags.InvokeMethod, null, null, args1);  //the method 
-
-                            if (false)
-                            {
-                                MethodInfo mi = tpe.GetMethod("Residual");
-                                Delegate d = Delegate.CreateDelegate(tpe, mi);
-                                d.DynamicInvoke(args1);
-                                List<Delegate> ds = new List<Delegate>();
-                                ds.Add(d);
-                                ds[0].DynamicInvoke(args1);
-                            }
-
-                        }
-                    }
-                    else
-                    {
-                        
-                        //new Writeln("Calling Residuals() via dynamic code " + DateTime.Now.ToString());
-                        tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args2);  //the method 
-                                                                                                     //new Writeln("INVOKE " + G.Seconds(dt5));  //1.5 min
-                    }
-                    new Writeln("Invoke #" + i + " took " + G.Seconds(t7));
-                }
-
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < r.Length; i++) sb.AppendLine("" + i + ";     " + r[i]);
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\Residuals.txt", sb.ToString());
-                
-
-                //36 sec in all
-
-            }
-
-            if (false)
-            {
-                string file = @"c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\gams.gms";
-            }
-
-            if (false)
-            {
-                //about 20 s to read the xml file
-                //Probably has to be XmlDocument, not XmlReader if we need to walk the nodes easily 
-                DateTime dt0 = DateTime.Now;
-                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\osil.xml";
-                var doc = new XmlDocument();
-                doc.Load(file);
-                // Load xml document.
-                new Writeln(G.Seconds(dt0));
-                TraverseNodes(doc.ChildNodes);
-                new Writeln(G.Seconds(dt0));
-            }
-
-            if (false)
-            {
-                //2.3 seconds not even understanding anything... :-(
-                string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\osil.xml";
-                using (FileStream fs = Program.WaitForFileStream(file, Program.GekkoFileReadOrWrite.Read))
-                {
-                    DateTime dt0 = DateTime.Now;
-                    new Writeln("START");
-                    XmlReader reader = XmlReader.Create(fs);
-                    while (reader.Read())
-                    {
-
-                    }
-                    new Writeln("END " + G.Seconds(dt0));
+                    double[] r = new double[eqCounts];
+                    for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
+                    Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.count - helper.known];
+                    Object[] args1 = new Object[1]; args1[0] = functions;
+                    double[] cc = helper.c.ToArray();
+                    int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
+                    int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
+                    int[] ee = helper.eqPointers.ToArray();
                     
+                    Type tpe = assembly.GetType("Gekko.Equations");  //the class                      
+                    tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args1);  //the method                     
+
+                    for (int j1 = 0; j1 < 10; j1++)
+                    {
+                        dt0 = DateTime.Now;
+                        for (int j2 = 0; j2 < 100; j2++)
+                        {
+                            for (int i = 0; i < eqCounts; i++)
+                            {
+                                //1063359 evaluations x 100 took 29.62 sec
+                                //1063359 evaluations x 100 took 8.39 sec
+                                //1063359 evaluations x 100 took 7.40 sec
+                                //1063359 evaluations x 100 took 5.83 sec
+                                //1063359 evaluations x 100 took 5.51 sec
+                                //1063359 evaluations x 100 took 5.47 sec
+                                //1063359 evaluations x 100 took 5.99 sec
+                                //1063359 evaluations x 100 took 6.14 sec
+                                //1063359 evaluations x 100 took 5.93 sec
+                                //1063359 evaluations x 100 took 6.53 sec
+                                //So after warmup about 5 sec for 1e8 evals, or 20 mio evals per second.
+
+                                double sumx = functions[ee[i]](i, r, a, cc, bb, dd);
+                                double x = r[i];
+                                //if (G.isNumericalError(x) || Math.Abs(x) > 1e-10) { }
+                            }
+                        }
+                        new Writeln(eqCounts + " evaluations x 100 took " + G.Seconds(dt0));
+                    }
                 }
-            }
+            }                        
 
             if (false)
             {
@@ -1396,68 +1159,230 @@ namespace Gekko
             }
         }
 
-        private static TokenList HandleEqLine(StringBuilder eqLine, TokenList tokensLast, ref int count, ref int hits)
+        private static void RemoveDoubleDots(EqLineHelper helper, List<string> deleteme)
         {
-            int more = 1;
+            string s = helper.helper2.sb.ToString();
+            s = "r[i] = " + s.Replace("..", "").Replace("=E=", "-(").Replace(";", ");");            
+            deleteme.Add(s);
+        }
+
+        private static TokenList HandleEqLine(StringBuilder eqLine, TokenList tokensLast, EqLineHelper helper)
+        {            
+            helper.helper2 = new EqLineHelper2();
+            int more = 2;
             TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(eqLine.ToString(), more);  //1 empty "" token
 
-            if (tokensLast != null)
+            if (eqLine.ToString().Contains("**"))
             {
-                bool good = true;
+                //probe, checking for **
                 for (int i = 0; i < tokens.Count() - more; i++)
                 {
-                    if (i >= tokensLast.Count() - more)
+
+                    if (tokens[i].s == "*" && tokens[i + 1].s == "*" && tokens[i + 1].leftblanks == 0)
                     {
-                        good = false;
-                        break;  //no good
-                    }
-                    TokenHelper th1 = tokens[i];
-                    TokenHelper th1Next = tokens[i + 1];
-                    TokenHelper th2 = tokensLast[i];
-                    TokenHelper th2Next = tokensLast[i + 1];
-                    if (th1.type != th2.type)
-                    {
-                        good = false;
-                        break;  //no good
-                    }
-                    if (IsXOrEVariable(th1, th1Next))
-                    {
-                        if (IsXOrEVariable(th2, th2Next))
+
+                        //Left
+                        int lefttype = int.MaxValue;  //-100 for word, positive for parenthesis
+                        if (i > 0 && (tokens[i - 1].type == ETokenType.Word || tokens[i - 1].type == ETokenType.Number))
                         {
-                            //good
+                            lefttype = -100;
                         }
-                        else
+                        else if (i > 0 && tokens[i - 1].s == ")")
                         {
-                            good = false;
-                            break;  //no good
+                            int counter = 1;
+                            for (int i2 = i - 2; i2 > 0; i2--)
+                            {
+                                if (tokens[i2].s == ")") counter++;
+                                else if (tokens[i2].s == "(") counter--;
+                                if (counter == 0)
+                                {
+                                    lefttype = i2;
+                                    break;
+                                }
+                            }
                         }
+
+                        //Right
+                        int righttype = int.MaxValue;  //-100 for word, positive for parenthesis
+                        if (i < tokens.Count() && (tokens[i + 2].type == ETokenType.Word || tokens[i + 2].type == ETokenType.Number))
+                        {
+                            righttype = -100;
+                        }
+                        else if (i < tokens.Count() && tokens[i + 2].s == "(")
+                        {
+                            int counter = 1;
+                            for (int i2 = i + 3; i2 < tokens.Count(); i2++)
+                            {
+                                if (tokens[i2].s == "(") counter++;
+                                else if (tokens[i2].s == ")") counter--;
+                                if (counter == 0)
+                                {
+                                    righttype = i2;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (lefttype == int.MaxValue || righttype == int.MaxValue)
+                            new Error("Problem resolving '**' power");
+
+                        helper.helper2.remove.Add(i, "");
+                        helper.helper2.remove.Add(i + 1, "");
+                        helper.helper2.addBefore.Add(i, ",");
+                        if (lefttype == -100) helper.helper2.addBefore.Add(i - 1, "M.Power(");
+                        else if (lefttype > 0) helper.helper2.addBefore.Add(lefttype, "M.Power(");
+                        if (righttype == -100) helper.helper2.addBefore.Add(i + 3, ")");
+                        else if (righttype > 0) helper.helper2.addBefore.Add(righttype + 1, ")");
+                    }
+                }
+            }
+
+            bool knownPattern = true;
+            for (int i = 0; i < tokens.Count() - more; i++)
+            {
+                TokenHelper th2 = null;
+                TokenHelper th2Next = null;
+                if (tokensLast == null || i >= tokensLast.Count() - more)
+                {
+                    knownPattern = false;
+                }
+                else
+                {
+                    th2 = tokensLast[i];
+                    th2Next = tokensLast[i + 1];
+                }
+                TokenHelper th1 = tokens[i];
+                TokenHelper th1Next = tokens[i + 1];
+                if (th1.type == ETokenType.Number)
+                {
+                    if (th2 != null && th2.type == ETokenType.Number)
+                    {
                     }
                     else
                     {
-                        //not equation or variable
-                        if (th1.type == ETokenType.Number && th2.type == ETokenType.Number)
-                        {
-                            //good
-                        }
-                        else
-                        {
-                            if (th1.s != th2.s)
-                            {
-                                good = false;
-                                break;  //no good
-                            }
-                        }
+                        knownPattern = false;
                     }
+                    int i1 = helper.dictC.Count;
+                    if (helper.dictC.ContainsKey(th1.s))
+                    {
+                        i1 = helper.dictC[th1.s];
+                    }
+                    else
+                    {
+                        helper.dictC.Add(th1.s, i1);
+                        helper.helper2.exoValues.Add(double.Parse(th1.ToString()));
+                    }                    
+                    HandleEqLineAppend(helper.helper2, i, "c[d[" + helper.helper2.exo.Count + "]]");
+                    helper.helper2.exo.Add(i1);
                 }
-                if (good) hits++;                
+                else if (IsEVariable(th1, th1Next))
+                {
+                    if (th2 != null && IsEVariable(th2, th2Next))
+                    {                        
+                    }
+                    else
+                    {
+                        knownPattern = false;
+                    }
+                    int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
+                    string eqname = helper.dictE_eqs[number];                    
+                    HandleEqLineAppend(helper.helper2, i, "/* " + eqname + " */  ");
+                }
+                else if (IsXVariable(th1, th1Next))
+                {
+                    if (th2 != null && IsXVariable(th2, th2Next))
+                    {                        
+                    }
+                    else
+                    {
+                        knownPattern = false;
+                    }
+                    int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
+                    string varname = helper.dictX_vars[number];
+                    GekkoTime time = GekkoTime.tNull;
+                    string resultingFullName = null;
+                    ExtractTimeDimension(varname, ref time, ref resultingFullName);
+                    if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
+                    if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
+                    int i1 = (GekkoTime.Observations(helper.time0, time) - 1);
+                    int i2 = helper.dictA.Count;
+                    if (helper.dictA.ContainsKey(resultingFullName))
+                    {
+                        i2 = helper.dictA[resultingFullName];
+                    }
+                    else
+                    {                        
+                        helper.dictA.Add(resultingFullName, i2);
+                    }                                        
+                    HandleEqLineAppend(helper.helper2, i, "a[b[" + helper.helper2.endo.Count + "]][b[" + (helper.helper2.endo.Count + 1) + "]]");
+                    helper.helper2.endo.Add(i1);
+                    helper.helper2.endo.Add(i2);
+                }
+                else
+                {
+                    if (th2 != null && th1.s != th2.s) knownPattern = false;
+
+                    string s = th1.s;
+                    if (th1.type == ETokenType.Word && th1Next.s == "(")
+                    {
+                        //can be a function:                    
+                        if (G.Equal(th1.s, "log")) s = "M.Log";
+                        else if (G.Equal(th1.s, "exp")) s = "M.Exp";
+                        else if (G.Equal(th1.s, "abs")) s = "M.Abs";
+                        else if (G.Equal(th1.s, "max")) s = "M.Max";
+                        else if (G.Equal(th1.s, "min")) s = "M.Min";
+                        else if (G.Equal(th1.s, "power")) s = "M.Power";
+                        else if (G.Equal(th1.s, "sqr")) s = "M.Sqr";
+                        else if (G.Equal(th1.s, "sqrt")) s = "M.Sqrt";
+                        else if (G.Equal(th1.s, "tanh")) s = "M.Tanh";
+                    }
+
+                    HandleEqLineAppend(helper.helper2, i, s);
+                }
+            }  //end of tokens loop
+            
+            if (knownPattern)
+            {
+                helper.known++;
             }
-            count++;
+            else
+            {
+                //unseen equation type
+                helper.unique++;
+            }            
+            helper.count++;
+            helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
+            helper.c.AddRange(helper.helper2.exoValues);
+            helper.b.Add(helper.helper2.endo);
+            helper.d.Add(helper.helper2.exo);
             return tokens;  //to compare with next
         }
 
-        private static bool IsXOrEVariable(TokenHelper th, TokenHelper thNext)
+        private static void HandleEqLineAppend(EqLineHelper2 helper2, int i, string s)
         {
-            return th.type == ETokenType.Word && (th.s.StartsWith("x") || th.s.StartsWith("e")) && !(thNext.s == "(" || thNext.s == "[" || thNext.s == "{");
+            if (helper2.addBefore.ContainsKey(i))
+            {
+                helper2.sb.Append(helper2.addBefore[i]);
+            }
+            if (helper2.remove.ContainsKey(i))
+            {
+            }
+            else
+            {
+                helper2.sb.Append(s);
+            }
+        }
+
+        private static bool IsXVariable(TokenHelper th, TokenHelper thNext)
+        {
+            //must be word starting with "x", these may differ. There cannot be a parenthesis following (then it could be a function call).
+            return th.type == ETokenType.Word && th.s.StartsWith("x") && !(thNext.s == "(" || thNext.s == "[" || thNext.s == "{");
+        }
+
+        private static bool IsEVariable(TokenHelper th, TokenHelper thNext)
+        {
+            //must be word starting with "e", these may differ. There cannot be a parenthesis following (then it could be a function call).
+            return th.type == ETokenType.Word && th.s.StartsWith("e") && !(thNext.s == "(" || thNext.s == "[" || thNext.s == "{");
         }
 
         private static void TraverseNodes(XmlNodeList nodes)
@@ -4255,6 +4180,184 @@ namespace Gekko
 
             return timeDimNr;
         }
-    }    
+    }
+
+    public class ASTNodeGAMS
+    {
+        /// <summary>
+        /// See comments for very similar and more complicated ASTNode class for .gcm file reading.
+        /// </summary>
+        /// <returns></returns>
+
+        private List<ASTNodeGAMS> children = null; //private so that the implementation might change (for instance LinkedList etc.)
+        public Parser.Gek.GekkoSB Code = new Parser.Gek.GekkoSB(); //the C# code produced while walking the tree
+        public Parser.Gek.GekkoSB Gekko = new Parser.Gek.GekkoSB(); //the Gekko code produced while walking the tree
+        public Parser.Gek.GekkoSB GAMS = new Parser.Gek.GekkoSB(); //the unfolded GAMS code produced while walking the tree
+        public ASTNodeGAMS Parent = null;
+        public string Text = null;  //ANTLR decoration of the node (for instance 'ASTPRT' or '1.45').
+        public int Line = 0;
+        public int Number = 0;  //used to check position among siblings
+        public string leftBlanks = null;
+
+        public IEnumerable ChildrenIterator()
+        {
+            if (this.children != null)
+            {
+                foreach (ASTNodeGAMS child in this.children)
+                {
+                    yield return child;
+                }
+            }
+        }
+
+        public void RemoveLast()
+        {
+            this.children.RemoveAt(this.children.Count - 1);
+        }
+
+        public ASTNodeGAMS GetChild(string s)
+        {
+            foreach (ASTNodeGAMS child in this.ChildrenIterator())
+            {
+                if (child.Text == s) return child;
+            }
+            return null;
+        }
+
+        public ASTNodeGAMS this[int i]
+        {
+            get
+            {
+                return this.GetChild(i);
+            }
+            set
+            {
+                this.children[i] = value;
+            }
+        }
+
+        public int ChildrenCount()
+        {
+            if (children == null) return 0;
+            return children.Count;
+        }
+
+        //Gets the C# code of child i.
+        public Parser.Gek.GekkoSB GetChildCode(int i)
+        {
+            ASTNodeGAMS child = this.GetChild(i);
+            if (child == null)
+            {
+                Parser.Gek.GekkoSB xx = new Parser.Gek.GekkoSB();
+                return xx;
+            }
+            else return child.Code;
+        }
+
+        //Prepares an AST node to have children
+        public void CreateChildren(int n)
+        {
+            this.children = new List<ASTNodeGAMS>(n);
+        }
+
+        public bool IsLastChild()
+        {
+            if (this.Parent == null) return true;
+            if (this.Number == this.Parent.ChildrenCount() - 1) return true;  //should not be possible to be >
+            return false;
+        }
+
+        public bool IsFirstChild()
+        {
+            if (this.Parent == null) return true;
+            if (this.Number == 0) return true;
+            return false;
+        }
+
+        //Sets the text of the AST node
+        public ASTNodeGAMS(string text)
+        {
+            this.Text = text;
+        }
+
+        //Sets the text of the AST node
+        public ASTNodeGAMS(string text, string leftBlanks)
+        {
+            this.Text = text;
+            this.leftBlanks = leftBlanks;
+        }
+
+        //Sets the text of the AST node, and augments with children.
+        public ASTNodeGAMS(string text, bool withChildren)
+        {
+            this.Text = text;
+            if (withChildren)
+            {
+                this.children = new List<ASTNodeGAMS>();
+            }
+        }
+
+        public ASTNodeGAMS GetChild(int i)
+        {
+            if (this.children == null) return null;
+            if (i >= this.children.Count) return null;  //does not exist
+            return this.children[i];
+        }
+
+        public void Add(ASTNodeGAMS child)
+        {
+            this.children.Add(child);
+            child.Parent = this;
+            child.Number = children.Count - 1;
+        }
+
+        public string ToString()
+        {
+            return this.Text;
+        }
+
+        public void PrintAST2(ASTNodeGAMS node, int depth)
+        {
+            G.Writeln(G.Blanks(depth * 2) + node.Text);
+            if (node.children != null)
+            {
+                for (int i = 0; i < node.children.Count; ++i)
+                {
+                    ASTNodeGAMS child = (ASTNodeGAMS)(node.children[i]);
+                    PrintAST2(child, depth + 1);
+                }
+            }
+        }
+    }
+
+    public class EqLineHelper
+    {
+        public int count = 0;
+        public int known = 0;
+        public int unique = 0;
+        public GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, int> dictC = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public double[][] a = null;
+        public List<List<int>> b = new List<List<int>>();
+        public List<double> c = new List<double>();        
+        public List<List<int>> d = new List<List<int>>();
+        public List<int> eqPointers = new List<int>();
+        public string[] dictE_eqs = null;
+        public string[] dictX_vars = null;        
+        public GekkoTime time0 = GekkoTime.tNull;
+        public GekkoTime time1 = GekkoTime.tNull;
+        public GekkoTime time2 = GekkoTime.tNull;
+        public EqLineHelper2 helper2 = null;
+    }
+
+    public class EqLineHelper2
+    {
+        public List<int> endo = new List<int>();  //comes in pairs (time, variable)
+        public List<int> exo = new List<int>();
+        public List<double> exoValues = new List<double>();
+        public StringBuilder sb = new StringBuilder();
+        public Dictionary<int, string> addBefore = new Dictionary<int, string>();
+        public Dictionary<int, string> remove = new Dictionary<int, string>();
+    }
 }
 
