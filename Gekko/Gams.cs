@@ -306,8 +306,8 @@ namespace Gekko
             Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
             compilerParams.GenerateExecutable = false;
             string s = code.ToString();
-            DateTime t = DateTime.Now;
-            new Writeln("Start compile");
+            //DateTime t = DateTime.Now;
+            //new Writeln("Start compile");
             CompilerResults cr = null;
             try
             {
@@ -318,7 +318,7 @@ namespace Gekko
             {
 
             }
-            new Writeln("End compile " + G.Seconds(t));
+            //new Writeln("End compile " + G.Seconds(t));
             Assembly assembly = cr.CompiledAssembly;
             return assembly;
 
@@ -746,13 +746,32 @@ namespace Gekko
         }
 
         private static void GAMSEquations()
-        {
+        {            
+            //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
+            //    c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt
+            //Import dictionary: 8.53 sec
+            //GAMS equations read: 48.44 sec-- > count 1063359 unique 12750
+            //Starting values read: 3.64 sec
+            //Compile finished: 14.54 sec
+            //Data preparation finished: 0.4667 sec
+            //======================================================================
+            //===> Setting up everything took:  (1:15 min), all included
+            //======================================================================
+            //Loading Func<>'s took: 1.04 sec
+            //1063359 evaluations x 100 took 25.60 sec
+            //1063359 evaluations x 100 took 5.90 sec
+            //1063359 evaluations x 100 took 5.75 sec
+            //1063359 evaluations x 100 took 5.49 sec            
+            //So after warmup about 5 sec for 1e8 evals, or 20 mio evals per second.
+            //Release version can do around 4.2 sec for this.
+
             //string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
             //string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
             string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms";
             string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt";
 
-            DateTime dt0 = DateTime.Now;
+            DateTime dt0 = DateTime.Now;  //everything
+            DateTime dt1 = DateTime.Now;  //sub tasks
 
             string[] split = new string[] { ".l", "=", ";" };
             string[] split2 = new string[] { " " };
@@ -832,10 +851,11 @@ namespace Gekko
                     dictVars[n] = ss2;
                 }
             }
-            new Writeln("Dict: " + G.Seconds(dt0));
+            new Writeln("Import dictionary: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
+
             bool sw = true;
-            new Writeln("Start read lines");
-            dt0 = DateTime.Now;
+            //new Writeln("Start read lines");            
 
             GekkoTime time0 = new GekkoTime(EFreq.A, 2027, 1);
 
@@ -977,8 +997,12 @@ namespace Gekko
                     }
                 }
             }
-            new Writeln("Read lines took: " + G.Seconds(dt0));
-            new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
+            new Writeln("GAMS equations read: " + G.Seconds(dt1) + "   -->   " + "count " + helper.count + " unique " + helper.unique);
+            dt1 = DateTime.Now;
+
+            //new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
+            if (helper.count != helper.known + helper.unique) new Error("Not summing up");
+            if (helper.count != semis) new Error("Not summing up");
 
             File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(codeLines).ToString());
 
@@ -989,8 +1013,7 @@ namespace Gekko
                 a[i] = new double[eqCounts + 1];
             }
 
-            DateTime dt4 = DateTime.Now;
-            new Writeln("GETTING STARTING VALUES");
+            //new Writeln("GETTING STARTING VALUES");
             foreach (string line in values)
             {
                 if (line.Trim() == "" || line.StartsWith("*")) continue;
@@ -1015,57 +1038,62 @@ namespace Gekko
                 }
                 a[i1][i2] = d;
             }
-            new Writeln("GETTING STARTING VALUES END " + G.Seconds(dt4));
+            new Writeln("Starting values read: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
 
-            new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
+            //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
             if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
             if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
             if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
 
             List<string> eqNames = null;
+
             Assembly assembly = Compile5(codeLines);
+            new Writeln("Compile finished: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
 
-            if (true)
+            double[] r = new double[eqCounts];
+            for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
+            Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.count - helper.known];
+            Object[] args1 = new Object[1]; args1[0] = functions;
+            double[] cc = helper.c.ToArray();
+            int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
+            int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
+            int[] ee = helper.eqPointers.ToArray();
+
+            new Writeln("Data preparation finished: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
+
+            using (var txt = new Writeln())
             {
-                double[] r = new double[eqCounts];
-                for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
-                Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.count - helper.known];
-                Object[] args1 = new Object[1]; args1[0] = functions;
-                double[] cc = helper.c.ToArray();
-                int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
-                int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
-                int[] ee = helper.eqPointers.ToArray();
+                txt.MainAdd("======================================================================");
+                txt.MainNewLineTight();
+                txt.MainAdd("===> Setting up everything took: " + G.Seconds(dt0) + ", all included");
+                txt.MainNewLineTight();
+                txt.MainAdd("======================================================================");
+            }
 
-                Type tpe = assembly.GetType("Gekko.Equations");  //the class                      
-                tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args1);  //the method                     
+            //new Writeln("Start solving");
 
-                for (int j1 = 0; j1 < 10; j1++)
+            Type tpe = assembly.GetType("Gekko.Equations");  //the class                      
+            tpe.InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, args1);  //the method                     
+
+            new Writeln("Loading Func<>'s took: " + G.Seconds(dt1));
+            dt1 = DateTime.Now;
+
+            for (int j1 = 0; j1 < 10; j1++)
+            {
+                dt0 = DateTime.Now;
+                for (int j2 = 0; j2 < 100; j2++)
                 {
-                    dt0 = DateTime.Now;
-                    for (int j2 = 0; j2 < 100; j2++)
+                    for (int i = 0; i < eqCounts; i++)
                     {
-                        for (int i = 0; i < eqCounts; i++)
-                        {
-                            //1063359 evaluations x 100 took 29.62 sec
-                            //1063359 evaluations x 100 took 8.39 sec
-                            //1063359 evaluations x 100 took 7.40 sec
-                            //1063359 evaluations x 100 took 5.83 sec
-                            //1063359 evaluations x 100 took 5.51 sec
-                            //1063359 evaluations x 100 took 5.47 sec
-                            //1063359 evaluations x 100 took 5.99 sec
-                            //1063359 evaluations x 100 took 6.14 sec
-                            //1063359 evaluations x 100 took 5.93 sec
-                            //1063359 evaluations x 100 took 6.53 sec
-                            //So after warmup about 5 sec for 1e8 evals, or 20 mio evals per second.
-                            //Release version can do around 4.2 sec.
-
-                            double sumx = functions[ee[i]](i, r, a, cc, bb, dd);
-                            double x = r[i];
-                            //if (G.isNumericalError(x) || Math.Abs(x) > 1e-10) { }
-                        }
+                        double sumx = functions[ee[i]](i, r, a, cc, bb, dd);
+                        double x = r[i];
+                        //if (G.isNumericalError(x) || Math.Abs(x) > 1e-10) { }
                     }
-                    new Writeln(eqCounts + " evaluations x 100 took " + G.Seconds(dt0));
                 }
+                new Writeln(eqCounts + " evaluations x 100 took " + G.Seconds(dt0));
             }
         }
 
