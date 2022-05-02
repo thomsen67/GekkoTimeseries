@@ -12465,8 +12465,24 @@ namespace UnitTests
             Assert.AreEqual(15162, output.evals);
             Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-6);            
         }
-        
 
+        [TestMethod]
+        public void _Test_GAMSEquations()
+        {
+            GamsTestInput input = new GamsTestInput();
+            input.testForZeroResiduals = false;
+            input.file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
+            input.file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
+            input.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
+            input.rep1 = 10;
+            input.rep2 = 100;
+            GamsTestOutput output = GamsModel.GAMSEquations(input);
+            Assert.AreEqual(output.count, 8);
+            Assert.AreEqual(output.known, 6);
+            Assert.AreEqual(output.unique, 2);
+            Assert.IsTrue(output.rss < 1e-14);
+        }
+        
         [TestMethod]
         public void _Test_SolverConjugateGradientRosenbrock()
         {
@@ -14892,7 +14908,7 @@ namespace UnitTests
                 I("option model type = gams;");
                 I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
                 I("read <first> d3a;");
-                I("read <gdx first merge> sets\\sets;");
+                I("read <gdx first merge> Sets\\sets;");
                 I("work:%tBase = work:#tBase[1].val();");  //else it becomes a string which is bad
                 I("option series array calc missing = zero;");
                 I("model <gms> small.gms;");
