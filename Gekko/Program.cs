@@ -1684,7 +1684,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer) GamsModel.GamsTest();
+            //if (false && Globals.runningOnTTComputer) GamsModel.GamsTest();
 
             if (false && Globals.runningOnTTComputer)
             {
@@ -15144,69 +15144,19 @@ namespace Gekko
             else if (modelType == EModelType.GAMSRaw)
             {
                 string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
-                GamsModel.ReadGamsModel(textInputRaw, ffh.realPathAndFileName, o);
+                GamsModel.ReadGamsRawModel(textInputRaw, ffh.realPathAndFileName, o);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
             }
             else if (modelType == EModelType.GAMSScalarModel)
-            {
-                //TODO                
-                FindFileHelper ffh2 = FindFile(ffh.realPathAndFileName + "\\" + "ModelInfo.json", folders, true, true, o.p);
-                string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
-                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                Dictionary<string, object> jsonTree = null;
-                try
-                {
-                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
-                }
-                catch (Exception e)
-                {
-                    using (Error txt = new Error())
-                    {
-                        txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
-                        txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
-                        txt.MoreNewLine();
-                        txt.MoreAdd("The technical error message is the following: " + e.Message);
-                    }
-                }
-
-                GAMSScalarModelSettings settings = new GAMSScalarModelSettings();                
-
-                try {settings.unfoldedModel = (string)jsonTree["unfoldedModel"]; } catch { }
-                if (settings.unfoldedModel == null)
-                {
-                    new Error("JSON: setting unfoldedModel not found");
-                }
-                
-                try { settings.unfoldedNames = (string)jsonTree["unfoldedNames"]; } catch { }
-                if (settings.unfoldedNames == null)
-                {
-                    new Error("JSON: setting unfoldedNames not found");
-                }
-
-                try { settings.referenceData = (string)jsonTree["referenceData"]; } catch { }
-                if (settings.referenceData == null)
-                {
-                    new Error("JSON: setting referenceData not found");
-                }
-
-                try { settings.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
-                if (settings.multiplierData == null)
-                {
-                    new Error("JSON: setting multiplierData not found");
-                }
-
-                //
-                // remember:
+            {                   
+                GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
             }
         }
-
+        
         /// <summary>
         /// Read a Gekko model from .frm file.
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="dt0"></param>
-        /// <param name="textInputRaw"></param>
         private static void ReadGekkoModel(string fileName, string fileNamePretty, DateTime dt0, string textInputRaw, P p)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
@@ -30148,5 +30098,12 @@ namespace Gekko
         public string unfoldedNames = null; //Translation of x1, x2, x3, ... into "normal" variables
         public string referenceData = null; //Baseline/reference scenario
         public string multiplierData = null; //Shock/multiplier scenario (optional)
+        // ------
+        public bool testForZeroResiduals = false;
+        public string file = null;
+        public string file2 = null;
+        public GekkoTime time0 = GekkoTime.tNull;
+        public int rep1 = 1;
+        public int rep2 = 1;
     }
 }

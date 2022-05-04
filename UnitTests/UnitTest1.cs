@@ -12469,7 +12469,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_GAMSEquations()
         {
-            GamsTestInput input = new GamsTestInput();
+            GAMSScalarModelSettings input = new GAMSScalarModelSettings();
             input.testForZeroResiduals = false;
             input.file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
             input.file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";

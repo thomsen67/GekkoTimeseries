@@ -732,24 +732,7 @@ namespace Gekko
             }
         }        
 
-        public static void GamsTest()
-        {
-            if (true)
-            {
-                GamsTestInput input = new GamsTestInput();
-                input.testForZeroResiduals = false;
-                input.file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
-                input.file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
-                input.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
-                input.rep1 = 10;
-                input.rep2 = 100;
-                GamsTestOutput output = GAMSEquations(input);
-            }
-            if (false) GAMSParser();                       
-            if (false) GamsGMO();
-        }
-
-        public static GamsTestOutput GAMSEquations(GamsTestInput input)
+        public static GamsTestOutput GAMSEquations(GAMSScalarModelSettings input)
         {
             //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
             //    c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt
@@ -1451,12 +1434,9 @@ namespace Gekko
         }        
 
         /// <summary>
-        /// Read a GAMS model from a .gms/.gmy model. No real reading done here: deals with possible cached version etc.
+        /// Read a raw GAMS model from a .gms/.gmy model. Deals with possible cached version etc. See also ReadGamsScalarModel().
         /// </summary>
-        /// <param name="textInputRaw"></param>
-        /// <param name="fileName"></param>
-        /// <param name="o"></param>
-        public static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
+        public static void ReadGamsRawModel(string textInputRaw, string fileName, O.Model o)
         {
             //these objects typically get overridden soon
             Program.model = new Model();
@@ -1535,11 +1515,76 @@ namespace Gekko
                     //do nothing, not the end of the world if it fails
                 }
             }
-
         }
 
         /// <summary>
-        /// Read (parse) a .gms/.gmy GAMS model, transforming it into Gekko-understandable equations.
+        /// Read/load a GAMS scalar model from a suitable zip file. See also ReadGamsRawModel().
+        /// </summary>
+        public static void ReadGAMSScalarModel(O.Model o, List<string> folders, string fileName)
+        {
+            FindFileHelper ffh2 = Program.FindFile(fileName + "\\" + "ModelInfo.json", folders, true, true, o.p);
+            string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
+            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            Dictionary<string, object> jsonTree = null;
+            try
+            {
+                jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+            }
+            catch (Exception e)
+            {
+                using (Error txt = new Error())
+                {
+                    txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
+                    txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
+                    txt.MoreNewLine();
+                    txt.MoreAdd("The technical error message is the following: " + e.Message);
+                }
+            }
+
+            GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
+
+            try { settings.unfoldedModel = (string)jsonTree["unfoldedModel"]; } catch { }
+            if (settings.unfoldedModel == null)
+            {
+                new Error("JSON: setting unfoldedModel not found");
+            }
+
+            try { settings.unfoldedNames = (string)jsonTree["unfoldedNames"]; } catch { }
+            if (settings.unfoldedNames == null)
+            {
+                new Error("JSON: setting unfoldedNames not found");
+            }
+
+            try { settings.referenceData = (string)jsonTree["referenceData"]; } catch { }
+            if (settings.referenceData == null)
+            {
+                new Error("JSON: setting referenceData not found");
+            }
+
+            try { settings.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
+            if (settings.multiplierData == null)
+            {
+                new Error("JSON: setting multiplierData not found");
+            }
+
+            if (true)
+            {                
+                settings.testForZeroResiduals = false;
+                settings.file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
+                settings.file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
+                settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
+                settings.rep1 = 10;
+                settings.rep2 = 100;
+                GamsTestOutput output = GAMSEquations(settings);
+            }
+            if (false) GAMSParser();
+            if (false) GamsGMO();
+
+        }
+
+
+        /// <summary>
+        /// Read (parse) a .gms GAMS model, transforming it into Gekko-understandable equations.
         /// Calls ReadGamsEquation() for each equation.
         /// </summary>
         /// <param name="textInputRaw"></param>
@@ -4410,15 +4455,15 @@ namespace Gekko
         }
     }    
 
-    public class GamsTestInput
-    {
-        public bool testForZeroResiduals = false;
-        public string file = null;
-        public string file2 = null;
-        public GekkoTime time0 = GekkoTime.tNull;
-        public int rep1 = 1;
-        public int rep2 = 1;
-    }
+    //public class GamsTestInput
+    //{
+    //    public bool testForZeroResiduals = false;
+    //    public string file = null;
+    //    public string file2 = null;
+    //    public GekkoTime time0 = GekkoTime.tNull;
+    //    public int rep1 = 1;
+    //    public int rep2 = 1;
+    //}
 
     public class GamsTestOutput
     {
