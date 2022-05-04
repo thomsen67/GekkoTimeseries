@@ -30117,7 +30117,7 @@ namespace Gekko
         public string multiplierData = null; //raw filename without path
         // ------
         public bool testForZeroResiduals = false;        
-        public GekkoTime time0 = GekkoTime.tNull;
+        //public GekkoTime time0 = GekkoTime.tNull;
         public int rep1 = 1;
         public int rep2 = 1;
     }

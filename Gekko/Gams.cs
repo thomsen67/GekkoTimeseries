@@ -756,14 +756,15 @@ namespace Gekko
                         
             GamsTestOutput output = new GamsTestOutput();
 
+            EqLineHelper helper = new EqLineHelper();
+            helper.dictE_eqs = null;
+            helper.dictX_vars = null;            
+
             DateTime dt0 = DateTime.Now;  //everything
             DateTime dt1 = DateTime.Now;  //sub tasks
 
             string[] split = new string[] { ".l", "=", ";" };
-            string[] split2 = new string[] { " " };
-
-            string[] dictEqs = null;
-            string[] dictVars = null;
+            string[] split2 = new string[] { " " };            
 
             //string s2 = Program.GetTextFromFileWithWait(file2);
             //List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
@@ -797,8 +798,8 @@ namespace Gekko
                             {
                                 eqCounts2 = int.Parse(sx);
                                 substatus2 = 0;
-                                dictEqs = new string[eqCounts2];
-                                dictVars = new string[eqCounts2];
+                                helper.dictE_eqs = new string[eqCounts2];
+                                helper.dictX_vars = new string[eqCounts2];
                                 break;
                             }
                         }
@@ -832,14 +833,27 @@ namespace Gekko
                         string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                         int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
                         string ss2 = ss[1];
-                        dictEqs[n] = ss2;
+                        helper.dictE_eqs[n] = ss2;
                     }
                     else if (status2 == 2)
                     {
                         string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                         int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
                         string ss2 = ss[1];
-                        dictVars[n] = ss2;
+                        helper.dictX_vars[n] = ss2;
+
+                        if (true)
+                        {
+                            GekkoTime time = GekkoTime.tNull;
+                            string resultingFullName = null;
+                            ExtractTimeDimension(ss2, ref time, ref resultingFullName);
+                            if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
+                            if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;                                                        
+                            if (!helper.dictA.ContainsKey(resultingFullName))
+                            {                                
+                                helper.dictA.Add(resultingFullName, helper.dictA.Count);
+                            }
+                        }
                     }
                 }
             }
@@ -860,12 +874,13 @@ namespace Gekko
             int varCounts = -12345;
             int semis = 0;
 
-            EqLineHelper helper = new EqLineHelper();
-            helper.dictE_eqs = dictEqs;
-            helper.dictX_vars = dictVars;
-            helper.time0 = input.time0;
-
-            int periods = 200;  //TODO //TODO //TODO //TODO //TODO //TODO //TODO //TODO                
+            helper.time0 = helper.time1;  //could perhaps lag this later on... ?
+            int periods = GekkoTime.Observations(helper.time1, helper.time2);
+            helper.a = new double[periods][];
+            for (int i = 0; i < helper.a.GetLength(0); i++)
+            {
+                helper.a[i] = new double[helper.dictA.Count];  //beware: 0-based
+            }
 
             List<string> codeLines = new List<string>();
 
@@ -911,18 +926,6 @@ namespace Gekko
                                     if (G.IsInteger(sx))
                                     {
                                         eqCounts = int.Parse(sx);
-
-                                        helper.a = new double[periods][];  //BAD //BAD //BAD //BAD
-                                        for (int i = 0; i < helper.a.GetLength(0); i++)
-                                        {
-                                            //BAD
-                                            //BAD
-                                            //BAD
-                                            //BAD
-                                            //BAD
-                                            helper.a[i] = new double[eqCounts];  //beware: 0-based
-                                        }
-
                                         substatus = 0;
                                         break;
                                     }
@@ -1001,24 +1004,24 @@ namespace Gekko
                 File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(codeLines).ToString());
             }
 
-            int periods2 = 200;  //TODO  //TODO  //TODO  //TODO  //TODO  //TODO  //TODO
-            double[][] a = new double[periods2][];
-            for (int i = 0; i < a.GetLength(0); i++)
-            {
-                a[i] = new double[eqCounts];
-            }
+            //int periods2 = 200;  //BAD
+            //double[][] a = new double[periods2][];
+            //for (int i = 0; i < a.GetLength(0); i++)
+            //{
+            //    a[i] = new double[eqCounts];
+            //}
                         
             foreach (string line in values)
             {
                 if (line.Trim() == "" || line.StartsWith("*")) continue;
                 string[] ss = line.Split(split, StringSplitOptions.None);
                 int id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
-                string inputName = dictVars[id];
+                string inputName = helper.dictX_vars[id];
                 GekkoTime t = GekkoTime.tNull;
                 string outputName = null;
                 ExtractTimeDimension(inputName, ref t, ref outputName);
                 int aNumber = helper.dictA[outputName];
-                int i1 = GekkoTime.Observations(input.time0, t) - 1;
+                int i1 = GekkoTime.Observations(helper.time0, t) - 1;
                 int i2 = aNumber;
                 double d;
                 if (ss[1].Trim() == "")
@@ -1030,7 +1033,7 @@ namespace Gekko
                 {
                     d = double.Parse(ss[1]);
                 }
-                a[i1][i2] = d;
+                helper.a[i1][i2] = d;
             }
             new Writeln("Endogenous values read: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
@@ -1048,11 +1051,12 @@ namespace Gekko
 
             double[] r = new double[eqCounts];
             for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
-            Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];            
-            double[] cc = helper.c.ToArray();
+            Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];                        
+            double[][] a = helper.a;
             int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
+            double[] cc = helper.c.ToArray();
             int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
-            int[] ee = helper.eqPointers.ToArray();
+            int[] ee = helper.eqPointers.ToArray();            
 
             new Writeln("Data preparation finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
@@ -1344,18 +1348,18 @@ namespace Gekko
                     GekkoTime time = GekkoTime.tNull;
                     string resultingFullName = null;
                     ExtractTimeDimension(varname, ref time, ref resultingFullName);
-                    if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
-                    if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
+                    //if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
+                    //if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
                     int i1 = (GekkoTime.Observations(helper.time0, time) - 1);
-                    int i2 = helper.dictA.Count;
-                    if (helper.dictA.ContainsKey(resultingFullName))
-                    {
-                        i2 = helper.dictA[resultingFullName];
-                    }
-                    else
-                    {                        
-                        helper.dictA.Add(resultingFullName, i2);
-                    }                                        
+                    int i2 = i2 = helper.dictA[resultingFullName];
+                    //if (helper.dictA.ContainsKey(resultingFullName))
+                    //{
+                    //    i2 = helper.dictA[resultingFullName];
+                    //}
+                    //else
+                    //{                        
+                    //    helper.dictA.Add(resultingFullName, i2);
+                    //}                                        
                     HandleEqLineAppend(helper, i, "a[b[" + helper.endo.Count + "]][b[" + (helper.endo.Count + 1) + "]]");
                     helper.endo.Add(i1);
                     helper.endo.Add(i2);
@@ -1576,7 +1580,7 @@ namespace Gekko
             settings.ffh_multiplierData = Program.FindFile(fileName + "\\" + settings.multiplierData, folders, true, true, o.p);
             
             settings.testForZeroResiduals = false;
-            settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
+            //settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
             settings.rep1 = 10;
             settings.rep2 = 100;
             GamsTestOutput output = GAMSEquations(settings);
