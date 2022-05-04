@@ -912,9 +912,14 @@ namespace Gekko
                                     {
                                         eqCounts = int.Parse(sx);
 
-                                        helper.a = new double[periods][];
+                                        helper.a = new double[periods][];  //BAD //BAD //BAD //BAD
                                         for (int i = 0; i < helper.a.GetLength(0); i++)
                                         {
+                                            //BAD
+                                            //BAD
+                                            //BAD
+                                            //BAD
+                                            //BAD
                                             helper.a[i] = new double[eqCounts];  //beware: 0-based
                                         }
 
