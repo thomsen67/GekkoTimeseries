@@ -154,8 +154,8 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Helper for FindFile(). Note: uglyPathAndFileName --> the real file that may be an unzipped file put in a temp folder. May be same as prettyPathAndFileName.
-    /// Note: prettyPathAndFileName --> the pretty path that may "go through" a zip file. May be same as uglyPathAndFileName.      
+    /// Helper for FindFile(). Note: realPathAndFileName --> the real file that may be an unzipped file put in a temp folder. May be same as prettyPathAndFileName.
+    /// Note: prettyPathAndFileName --> the pretty path that may "go through" a zip file. May be same as realPathAndFileName.      
     /// </summary>
     public class FindFileHelper
     {
@@ -15113,12 +15113,11 @@ namespace Gekko
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder            
             FindFileHelper ffh = FindFile(fileName, folders, true, true, o.p);  //calls CreateFullPathAndFileName()
-            fileName = ffh.realPathAndFileName;
 
             Globals.modelPathAndFileName = ffh.prettyPathAndFileName;  //always contains a path            
             Globals.modelFileName = Path.GetFileName(ffh.prettyPathAndFileName);
 
-            if (!File.Exists(fileName))
+            if (!File.Exists(ffh.realPathAndFileName))
             {
                 using (Error e = new Error())
                 {
@@ -15132,25 +15131,47 @@ namespace Gekko
             EModelType modelType = EModelType.Gekko;
             if (isGms)
             {                
-                if (G.Equal(Path.GetExtension(fileName), ".zip")) modelType = EModelType.GAMSScalarModel;
+                if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalarModel;
                 else modelType = EModelType.GAMSRaw;
             }
 
             if (modelType == EModelType.Gekko)
             {
-                string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$
-                ReadGekkoModel(fileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
+                string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);  //textInputRaw is without any VARLIST$
+                ReadGekkoModel(ffh.realPathAndFileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
                 Program.options.model_type = "default";  //will not be set if something crashes above
             }
             else if (modelType == EModelType.GAMSRaw)
             {
-                string textInputRaw = Program.GetTextFromFileWithWait(fileName);
-                GamsModel.ReadGamsModel(textInputRaw, fileName, o);
+                string textInputRaw = Program.GetTextFromFileWithWait(ffh.realPathAndFileName);
+                GamsModel.ReadGamsModel(textInputRaw, ffh.realPathAndFileName, o);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
             }
             else if (modelType == EModelType.GAMSScalarModel)
             {
-                //TODO
+                //TODO                
+                FindFileHelper ffh2 = FindFile(ffh.realPathAndFileName + "\\xyz\\" + "ModelInfo.json", folders, true, true, o.p);                
+                string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
+                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                Dictionary<string, object> jsonTree = null;
+                try
+                {
+                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                }
+                catch (Exception e)
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
+                        txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
+                        txt.MoreNewLine();
+                        txt.MoreAdd("The technical error message is the following: " + e.Message);
+                    }
+                }
+
+
+                //
+                // remember:
                 Program.options.model_type = "gams";  //will not be set if something crashes above
             }            
         }
@@ -16120,12 +16141,32 @@ namespace Gekko
                 string pathInsideZip = G.Substring(fileNameWithPath, tup.Item2 + 2, fileNameWithPath.Length - 1);
                 if (!File.Exists(zipFileWithPath)) new Error("The zip file '" + zipFileWithoutPath + "' does not seem to exist. Gekko is trying to unzip this file, because it is part of the path '" + fileNameWithPath + "'.");
                 ZipArchive zFile = ZipFile.OpenRead(zipFileWithPath);
-                ZipArchiveEntry entry = zFile.GetEntry(pathInsideZip.Replace("\\", "/"));
+
+                ZipArchiveEntry entry = null;
+                string fileToFind = pathInsideZip.Replace("\\", "/");
+
+                if (true)
+                {                   
+                    //Case-insensitive, just like Window normally is. Probably only way to do it, .GetEntry() is case-sensitive.
+                    foreach (ZipArchiveEntry zipEntry in zFile.Entries)
+                    {                        
+                        if (G.Equal(zipEntry.FullName, fileToFind))
+                        {
+                            entry = zipEntry;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    entry = zFile.GetEntry(fileToFind);
+                }
+
                 if (entry == null)
                 {
                     string s = null;
-                    if (pathInsideZip.ToLower().Contains(Globals.zip)) s = ". Note that nested zip files are not yet supported.";
-                    new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "'" + s);
+                    if (pathInsideZip.ToLower().Contains(Globals.zip)) s = "Note that nested zip files are not yet supported. ";
+                    new Error("Could not find file '" + pathInsideZip + "' inside '" + zipFileWithPath + "' (the zip file has " + zFile.Entries.Count + " entries). " + s);
                 }
                 string tempFileNameWithPath = WaitForExtractZipFileEntryToTempFile(entry, zipFileWithPath);
                 //cannot yet be recursive, like c:\Thomas\Desktop\gekko\testing\lib1.zip\data\sub\nested.zip\data\sub\zz2.csv

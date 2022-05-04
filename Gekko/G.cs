@@ -4229,7 +4229,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Used for JSON
+        /// Used to remove comments inside a JSON file (they officially do not allow comments, even though comments in JavaScript are as in C#)
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>

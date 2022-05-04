@@ -28,7 +28,6 @@ namespace Gekko
 
             string pathAndFile = Program.options.folder_working + "\\" + "browser.json";
             string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(pathAndFile));
-
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
             Dictionary<string, object> jsonTree = null;
             try
@@ -38,7 +37,6 @@ namespace Gekko
             catch (Exception e)
             {
                 new Warning("The .json file does not seem correctly formatted. " + e.Message);
-                //throw;
             }
 
             // -------------------------------------------------------------
