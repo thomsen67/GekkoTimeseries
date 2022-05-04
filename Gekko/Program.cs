@@ -71,6 +71,13 @@ namespace Gekko
         Note
     }
 
+    public enum EModelType
+    {
+        Gekko,             //normal
+        GAMSRaw,           //rough translating
+        GAMSScalarModel    //excact scalar model
+    } 
+
     public enum EEquationType
     {
         D,
@@ -15069,12 +15076,17 @@ namespace Gekko
         }
 
         /// <summary>
-        /// MODEL command.
+        /// MODEL command, loads Gekko or GAMS models (the latter requires MODEL&lt;gms&gt;)
         /// </summary>
         /// <param name="o"></param>
         public static void Model(O.Model o)
         {
-            bool isGms = G.Equal(o.opt_gms, "yes");
+            //Three possibilities:
+            //1. MODEL adam.frm;        EModelType.Gekko           --> Normal Gekko model, .frm extension is default
+            //2. MODEL<gms> makro.gms;  EModelType.GAMSRaw         --> GAMS model, .gms extension is default. Tries to translate equations GAMS --> Gekko.
+            //3. MODEL<gms> makro.zip;  EModelType.GAMSScalarModel --> GAMS model, files are in a zip file (and config.json describes files). Equations are excact, because unfolded GAMS eqs are transferred.
+            
+            bool isGms = G.Equal(o.opt_gms, "yes");  //later on, Program.options.model_type is set to "default" or "gams" depending upon this value.
 
             string fileName = o.fileName;
             P p = o.p;
@@ -15111,27 +15123,36 @@ namespace Gekko
                 using (Error e = new Error())
                 {
                     e.MainAdd("Could not find model file '" + ffh.prettyPathAndFileName + "'");
-                    //e.MainNextSection(); // "aaa                        
                     e.MoreAdd("To run and solve a model, Gekko needs a model file in a suitable format (cf. the description {a{here¤model.htm}a}).");
                     e.MoreAdd("The model file must have extension .frm. For a guided tour of modeling, see {a{this¤guided_tour_modeling.htm}a} guide.");
                     e.MoreAdd("You may use 'model *;' to look for model files in the current working folder.");
-                    //e.MoreNextSection();
                 }
-
             }
 
-            string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$
-
+            EModelType modelType = EModelType.Gekko;
             if (isGms)
             {                
-                GamsModel.ReadGamsModel(textInputRaw, fileName, o);
-                Program.options.model_type = "gams";  //will not be set if something crashes above
+                if (G.Equal(Path.GetExtension(fileName), ".zip")) modelType = EModelType.GAMSScalarModel;
+                else modelType = EModelType.GAMSRaw;
             }
-            else
+
+            if (modelType == EModelType.Gekko)
             {
+                string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$
                 ReadGekkoModel(fileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
                 Program.options.model_type = "default";  //will not be set if something crashes above
             }
+            else if (modelType == EModelType.GAMSRaw)
+            {
+                string textInputRaw = Program.GetTextFromFileWithWait(fileName);
+                GamsModel.ReadGamsModel(textInputRaw, fileName, o);
+                Program.options.model_type = "gams";  //will not be set if something crashes above
+            }
+            else if (modelType == EModelType.GAMSScalarModel)
+            {
+                //TODO
+                Program.options.model_type = "gams";  //will not be set if something crashes above
+            }            
         }
 
         /// <summary>
