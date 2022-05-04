@@ -93,7 +93,7 @@ namespace Gekko.Parser.Frm
                 //Directory.CreateDirectory(outputPath);
                 string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + ".mdl";
                 string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                 {
                     //Serializer.Serialize(fs, m);
                     serializer.Serialize(fs, Program.model.modelGekko);
@@ -888,7 +888,7 @@ namespace Gekko.Parser.Frm
 
                 for (int i = 0; i < files.Count; i++)
                 {
-                    using (FileStream temp = Program.WaitForFileStream(Program.GetModelInfoPath() + "\\" + files[i] + ".lst", Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream temp = Program.WaitForFileStream(Program.GetModelInfoPath() + "\\" + files[i] + ".lst", null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter tempFs = G.GekkoStreamWriter(temp))
                     {
                         List<string> oneList = lists[i];

@@ -497,7 +497,7 @@ namespace Gekko
                         {
                             try
                             {                                
-                                using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, Program.GekkoFileReadOrWrite.Read))
+                                using (FileStream fs = Program.WaitForFileStream(libFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
                                 {
                                     library = Serializer.Deserialize<Library>(fs);
                                     loadedFromProtobuf = true;
@@ -541,7 +541,7 @@ namespace Gekko
                             // ----- SERIALIZE                    
                             string protobufFileName = Globals.gekkoVersion + "_" + "lib" + "_" + libHash + Libraries.libCacheExtension;
                             string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                             {
                                 serializer.Serialize(fs, library);
                             }

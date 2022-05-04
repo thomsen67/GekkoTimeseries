@@ -756,9 +756,6 @@ namespace Gekko
                         
             GamsTestOutput output = new GamsTestOutput();
 
-            //string file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
-            //string file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";            
-
             DateTime dt0 = DateTime.Now;  //everything
             DateTime dt1 = DateTime.Now;  //sub tasks
 
@@ -775,7 +772,7 @@ namespace Gekko
             int eqCounts2 = -12345;
             int varCounts2 = -12345;
 
-            using (FileStream fs = Program.WaitForFileStream(input.file2, Program.GekkoFileReadOrWrite.Read))
+            using (FileStream fs = Program.WaitForFileStream(input.ffh_unfoldedNames.realPathAndFileName, input.ffh_unfoldedNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 string line = null;
@@ -874,7 +871,7 @@ namespace Gekko
 
             List<string> equationDefs = new List<string>();
             StringBuilder eqLine = null;
-            using (FileStream fs = Program.WaitForFileStream(input.file, Program.GekkoFileReadOrWrite.Read))
+            using (FileStream fs = Program.WaitForFileStream(input.ffh_unfoldedModel.realPathAndFileName, input.ffh_unfoldedModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 string line = null;
@@ -1456,7 +1453,7 @@ namespace Gekko
                     try
                     {
                         DateTime dt1 = DateTime.Now;
-                        using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, Program.GekkoFileReadOrWrite.Read))
+                        using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
                         {
                             Program.model.modelGams = Serializer.Deserialize<ModelGams>(fs);
                             Program.model.modelGams.modelInfo.loadedFromMdlFile = true;
@@ -1504,7 +1501,7 @@ namespace Gekko
                     // ----- SERIALIZE
                     string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
                     string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
-                    using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                     {
                         serializer.Serialize(fs, Program.model.modelGams);
                     }
@@ -1542,41 +1539,43 @@ namespace Gekko
             }
 
             GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
+            settings.zipFilePathAndName = fileName;
 
             try { settings.unfoldedModel = (string)jsonTree["unfoldedModel"]; } catch { }
             if (settings.unfoldedModel == null)
             {
                 new Error("JSON: setting unfoldedModel not found");
             }
+            settings.ffh_unfoldedModel = Program.FindFile(fileName + "\\" + settings.unfoldedModel, folders, true, true, o.p);
+
 
             try { settings.unfoldedNames = (string)jsonTree["unfoldedNames"]; } catch { }
             if (settings.unfoldedNames == null)
             {
                 new Error("JSON: setting unfoldedNames not found");
             }
+            settings.ffh_unfoldedNames = Program.FindFile(fileName + "\\" + settings.unfoldedNames, folders, true, true, o.p);
 
             try { settings.referenceData = (string)jsonTree["referenceData"]; } catch { }
             if (settings.referenceData == null)
             {
                 new Error("JSON: setting referenceData not found");
             }
+            settings.ffh_referenceData = Program.FindFile(fileName + "\\" + settings.referenceData, folders, true, true, o.p);
 
             try { settings.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
             if (settings.multiplierData == null)
             {
                 new Error("JSON: setting multiplierData not found");
             }
+            settings.ffh_multiplierData = Program.FindFile(fileName + "\\" + settings.multiplierData, folders, true, true, o.p);
+            
+            settings.testForZeroResiduals = false;
+            settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
+            settings.rep1 = 10;
+            settings.rep2 = 100;
+            GamsTestOutput output = GAMSEquations(settings);
 
-            if (true)
-            {                
-                settings.testForZeroResiduals = false;
-                settings.file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
-                settings.file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
-                settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
-                settings.rep1 = 10;
-                settings.rep2 = 100;
-                GamsTestOutput output = GAMSEquations(settings);
-            }
             if (false) GAMSParser();
             if (false) GamsGMO();
 
@@ -1653,13 +1652,13 @@ namespace Gekko
 
             if (G.Equal(o.opt_dump, "yes"))
             {
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gcm", Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gcm", null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     sw.Write(sb1);
                 }
 
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gms", Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gms", null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     sw.Write(sb2);

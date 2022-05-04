@@ -321,7 +321,7 @@ namespace Gekko
 
             if (check)
             {
-                if (Globals.sw == null) Globals.sw = G.GekkoStreamWriter(Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\cg.txt", Program.GekkoFileReadOrWrite.Write));
+                if (Globals.sw == null) Globals.sw = G.GekkoStreamWriter(Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\cg.txt", null, Program.GekkoFileReadOrWrite.Write));
 
                 for (int i = 0; i < residuals.Length; i++)
                 {
@@ -3528,7 +3528,7 @@ namespace Gekko
                 Directory.CreateDirectory(path);
             }
 
-            using (FileStream fs = Program.WaitForFileStream(path + "\\" + Globals.modelFileName.Replace(".frm", "") + ".ordering", Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(path + "\\" + Globals.modelFileName.Replace(".frm", "") + ".ordering", null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
                 res.WriteLine("Number of endogenous  = " + G.IntFormat(rowsIndexes.Count, 7));

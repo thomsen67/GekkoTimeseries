@@ -599,7 +599,7 @@ namespace Gekko
                     Program.GekkoFileReadOrWrite option = Program.GekkoFileReadOrWrite.Write;
                     if (append) option = Program.GekkoFileReadOrWrite.WriteAppend;
 
-                    using (FileStream fs = Program.WaitForFileStream(Program.CreateFullPathAndFileName(fileName), option))
+                    using (FileStream fs = Program.WaitForFileStream(Program.CreateFullPathAndFileName(fileName), null, option))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         sw.WriteLine(s);

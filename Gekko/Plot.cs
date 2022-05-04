@@ -197,7 +197,7 @@ namespace Gekko
                 max = Math.Max(max, plotTable.dates[j].Count);
             }
 
-            using (FileStream fs = Program.WaitForFileStream(fileData, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(fileData, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
                 //TODO:
@@ -737,7 +737,7 @@ namespace Gekko
 
             txt.AppendLine(plotline);
 
-            using (FileStream fs = Program.WaitForFileStream(fileGp, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(fileGp, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
                 tw.WriteLine(txt);

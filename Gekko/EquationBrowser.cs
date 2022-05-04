@@ -659,7 +659,7 @@ namespace Gekko
                 x.AppendLine("</html>");
 
                 string pathAndFilename = subFolder + "\\" + varnameWithoutFreq.ToLower() + ".html";
-                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     sw.Write(x.Replace('`', '\"'));
@@ -719,7 +719,7 @@ namespace Gekko
             x2.AppendLine("  </body>");
             x2.AppendLine("</html>");
             string pathAndFilename2 = rootFolder + "\\" + settings_list_filename;
-            using (FileStream fs = Program.WaitForFileStream(pathAndFilename2, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename2, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.Write(x2.Replace('`', '\"'));
@@ -892,7 +892,7 @@ namespace Gekko
             x3.AppendLine("</html>");
 
             string pathAndFilename3 = rootFolder + "\\" + settings_find_filename;
-            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename3, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.Write(x3.Replace('`', '\"'));

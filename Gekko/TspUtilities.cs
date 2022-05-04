@@ -42,7 +42,7 @@ namespace Gekko
         {
             int allCounter = 0;
 
-            using (FileStream fs = Program.WaitForFileStream(tsdOutputFile, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(tsdOutputFile, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
                 List<string> al = new List<string>(5000);
@@ -522,7 +522,7 @@ namespace Gekko
 
             }
 
-            using (FileStream fs = Program.WaitForFileStream(frmOutputFile, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(frmOutputFile, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
                 for (int i = 0; i < al1.Count; i++)

@@ -1819,7 +1819,7 @@ namespace Gekko
 
             string s = s2.ToString() + xh.s.ToString() + xh.sEnd.ToString() + s3.ToString();
 
-            using (FileStream fs2 = Program.WaitForFileStream(tempfile, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs2 = Program.WaitForFileStream(tempfile, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter tempfile2 = G.GekkoStreamWriter(fs2))
             {
                 tempfile2.Write(s);
@@ -2917,7 +2917,7 @@ namespace Gekko
                             Directory.CreateDirectory(path);
                         }
 
-                        using (FileStream fs = Program.WaitForFileStream(newfile, Program.GekkoFileReadOrWrite.Write))
+                        using (FileStream fs = Program.WaitForFileStream(newfile, null, Program.GekkoFileReadOrWrite.Write))
                         using (StreamWriter sw = G.GekkoStreamWriter(fs))
                         {
                             sw.Write(x);

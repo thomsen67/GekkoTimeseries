@@ -1145,7 +1145,7 @@ namespace Gekko
             if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
             double[] tempArray = new double[100000]; //we don't expect series with more than 100000 obs.
             int counter = 0;
-            using (FileStream fs = Program.WaitForFileStream(file, Program.GekkoFileReadOrWrite.Read))
+            using (FileStream fs = Program.WaitForFileStream(file, null, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 //file should not contain æøå, so no need to use GetTextFromFileWithWait()
@@ -1416,7 +1416,7 @@ namespace Gekko
 
             if (type == 1)
             {
-                using (FileStream fs = Program.WaitForFileStream(file2, Program.GekkoFileReadOrWrite.Read))
+                using (FileStream fs = Program.WaitForFileStream(file2, null, Program.GekkoFileReadOrWrite.Read))
                 {
 
                     //Databank_1_1 temp = null;

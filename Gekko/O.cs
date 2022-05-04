@@ -3393,7 +3393,7 @@ namespace Gekko
                 //throw new GekkoException();
             }
 
-            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
                 //This is quite strict, only names like a38 will be interpreted as 
@@ -9655,7 +9655,7 @@ namespace Gekko
                     string ss = Translate_2_4_to_3_0.Translate(originalCode, info);
 
 
-                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(zz, null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         sw.Write(ss);
@@ -9683,7 +9683,7 @@ namespace Gekko
                 else if (G.Equal(opt_remove, "yes"))
                 {
                     string ss = Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE.Remove(originalCode);
-                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(zz, null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         sw.Write(ss);
@@ -9696,7 +9696,7 @@ namespace Gekko
                 else if (G.Equal(opt_move, "yes"))
                 {
                     string ss = Translator_Gekko20_Gekko30_ALMOST_NOT_USED_ANYMORE.Move(originalCode);
-                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(zz, null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         sw.Write(ss);
@@ -9709,7 +9709,7 @@ namespace Gekko
                 else if (G.Equal(opt_aremos, "yes"))
                 {
                     string ss = Translator_AREMOS_Gekko30.Translate(originalCode);
-                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(zz, null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         if (Globals.runningOnTTComputer) sw.WriteLine("// +++++ TTH check +++++");

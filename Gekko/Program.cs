@@ -1765,7 +1765,7 @@ namespace Gekko
                     }
                     else if (i == 8)
                     {
-                        using (var stream = Program.WaitForFileStream(file, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
+                        using (var stream = Program.WaitForFileStream(file, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
                         {
                             SHA256Managed sha = new SHA256Managed();
                             byte[] checksum = sha.ComputeHash(stream);
@@ -1775,7 +1775,7 @@ namespace Gekko
                 }
                 else
                 {
-                    using (var stream = Program.WaitForFileStream(file, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
+                    using (var stream = Program.WaitForFileStream(file, null, GekkoFileReadOrWrite.Read, Globals.goodBufferSizeForShaHashCode))  //1200000
                     {
                         SHA256Managed sha = new SHA256Managed();
                         byte[] checksum = sha.ComputeHash(stream);
@@ -3722,7 +3722,7 @@ namespace Gekko
             //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
             //So no need to use GetTextFromFile()
             string fileXml = tempTsdxPath + "\\" + "DatabankInfo.xml";
-            using (FileStream fs = WaitForFileStream(fileXml, GekkoFileReadOrWrite.Read))
+            using (FileStream fs = WaitForFileStream(fileXml, null, GekkoFileReadOrWrite.Read))
             {
                 try
                 {
@@ -3839,7 +3839,7 @@ namespace Gekko
                     //throw new GekkoException();
                 }
 
-                using (FileStream fs = WaitForFileStream(fileName, GekkoFileReadOrWrite.Read))
+                using (FileStream fs = WaitForFileStream(fileName, null, GekkoFileReadOrWrite.Read))
                 {
                     ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                     //RuntimeTypeModel serializer = TypeModel.Create();
@@ -4326,7 +4326,7 @@ namespace Gekko
             if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
             double[] tempArray = new double[100000]; //we don't expect series with more than 100000 obs.
             int counter = 0;
-            using (FileStream fs = WaitForFileStream(file, GekkoFileReadOrWrite.Read))
+            using (FileStream fs = WaitForFileStream(file, null, GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 //file should not contain זרו, so no need to use GetTextFromFileWithWait()
@@ -4626,7 +4626,7 @@ namespace Gekko
             int year2 = int.MinValue;
 
             //Is all code without זרו, so no need to use GetTextFromFile() to handle ANSI
-            using (FileStream fs = WaitForFileStream(fileLocal, GekkoFileReadOrWrite.Read))
+            using (FileStream fs = WaitForFileStream(fileLocal, null, GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 while (sr.Peek() >= 0)
@@ -5129,7 +5129,7 @@ namespace Gekko
                 int variableCounter = 0;
 
                 //Is all code without זרו, so no need to use GetTextFromFile() to handle ANSI
-                using (FileStream fs = WaitForFileStream(fileLocal, GekkoFileReadOrWrite.Read))
+                using (FileStream fs = WaitForFileStream(fileLocal, null, GekkoFileReadOrWrite.Read))
                 using (BinaryReader binreader = new BinaryReader(fs))
                 {
                     float ver = binreader.ReadSingle();
@@ -7582,7 +7582,7 @@ namespace Gekko
                 }
             }
 
-            using (FileStream fs = WaitForFileStream(RFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(RFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))  //using new StreamWriter() not good here, then problem with chars like (c) copyright in filename. See also #7284242898
             {
                 sw.Write(f);
@@ -7596,7 +7596,7 @@ namespace Gekko
             }
 
             //Make r2gekko.txt file that R later on fills into
-            using (FileStream fs = WaitForFileStream(RExportFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(RExportFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.WriteLine("R2Gekko version 1.0");
@@ -7814,7 +7814,7 @@ namespace Gekko
                 Program.ROrPythonExport(o.names, o.opt_target, 1);
             }
 
-            using (FileStream fs = WaitForFileStream(pythonFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pythonFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = new StreamWriter(fs))    //using G.GekkoStreamWriter() not good here, then problem with chars like (c) copyright in filename. See also #7284242898
             {
                 sw.Write(f);
@@ -7828,7 +7828,7 @@ namespace Gekko
             }
 
             //Make python2gekko.txt file that Python later on fills into
-            using (FileStream fs = WaitForFileStream(pythonExportFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pythonExportFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.WriteLine("Python2Gekko version 1.0");
@@ -7990,7 +7990,7 @@ namespace Gekko
                 }
                 //Create data files
                 meta += tempName + counter + ".dat" + G.NL;
-                using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + counter + ".dat", GekkoFileReadOrWrite.Write))
+                using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + counter + ".dat", null, GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     sw.Write(data);
@@ -7999,7 +7999,7 @@ namespace Gekko
                 }
             }
 
-            using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + ".dta", GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(Globals.localTempFilesLocation + "\\" + tempName + ".dta", null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.Write(meta);
@@ -8015,7 +8015,7 @@ namespace Gekko
             s2 += "x11{ " + parameters + " }" + G.NL;
 
             //Create tempX12aFile.spc
-            using (FileStream fs = WaitForFileStream(spcFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(spcFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 sw.Write(s2);
@@ -9135,7 +9135,7 @@ namespace Gekko
                     string s1 = Globals.htmlFileStart1 + Program.GetHtmlHeaderCssStyles() + Globals.htmlFileStart2;
                     string s2 = Globals.htmlFileEnd;
 
-                    using (FileStream fs = Program.WaitForFileStream(fullFileNameAndPath, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(fullFileNameAndPath, null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         sw.Write(s1);
@@ -11043,7 +11043,7 @@ namespace Gekko
 
                         newfile = Path.ChangeExtension(newfile, ".txt");
 
-                        using (FileStream fs = WaitForFileStream(newfile, GekkoFileReadOrWrite.Write))
+                        using (FileStream fs = WaitForFileStream(newfile, null, GekkoFileReadOrWrite.Write))
                         using (StreamWriter sw = G.GekkoStreamWriter(fs))
                         {
                             sw.Write(x);
@@ -11063,7 +11063,7 @@ namespace Gekko
 
                     string s = GetTextFromFileWithWait(file);
                     s = s.Replace("." + Globals.extensionTable + "\"", ".txt\"");
-                    using (FileStream fs = WaitForFileStream(newfile, GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = WaitForFileStream(newfile, null, GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
                         sw.Write(s);
@@ -11195,7 +11195,7 @@ namespace Gekko
                             Directory.CreateDirectory(path);
                         }
 
-                        using (FileStream fs = WaitForFileStream(newfile, GekkoFileReadOrWrite.Write))
+                        using (FileStream fs = WaitForFileStream(newfile, null, GekkoFileReadOrWrite.Write))
                         using (StreamWriter sw = G.GekkoStreamWriter(fs))
                         {
                             sw.Write(x);
@@ -12092,7 +12092,7 @@ namespace Gekko
             Encoding current = null;
 
             bool utf8checker = false;
-            using (FileStream fs = WaitForFileStream(filenameMaybeWithoutPath, GekkoFileReadOrWrite.Read))
+            using (FileStream fs = WaitForFileStream(filenameMaybeWithoutPath, null, GekkoFileReadOrWrite.Read))
             {
                 if (convertAnyAnsiToUtf8) utf8checker = Utf8Checker.IsUtf8(fs);  //NOTE: tastes the file: this may be slow on very large files. So avoid GetTextFromFileWithWait() on databank reading etc. //previously, sr.CurrentEncoding was used, but it is not precise enough to detect UTF8 without BOM mark at start (TextPad for instance)
                 fs.Position = 0;  //to rewind
@@ -15335,7 +15335,7 @@ namespace Gekko
                 //DeleteFolder(outputPath);
                 //Directory.CreateDirectory(outputPath);
                 //WaitForZipRead(outputPath, mdlFileNameAndPath);
-                using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
+                using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, null, GekkoFileReadOrWrite.Read))
                 {
                     Program.model.modelGekko = Serializer.Deserialize<ModelGekko>(fs);
                 }
@@ -15746,7 +15746,7 @@ namespace Gekko
 
             if (append && exists && !mustDeleteFileFirst) option = GekkoFileReadOrWrite.WriteAppend;  //only for append in text files, html will have will have mustDeleteFileFirst = true. Should be ok if the file does not exist, then it is just created with no warning issued
 
-            FileStream fs = WaitForFileStream(fileName, option);
+            FileStream fs = WaitForFileStream(fileName, null, option);
             Globals.pipeFileHelper.pipeFile = G.GekkoStreamWriter(fs);
             Globals.pipeFileHelper.pipeFileTypeIsHtml = html;
             Globals.pipeFileHelper.pipeFileFileWithPath = fileName;
@@ -17077,7 +17077,7 @@ namespace Gekko
             {
                 new Error("The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists. Please remove it, for instance with SYS 'del <filename>'. This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " command file.");
             }
-            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
                 for (int j = 0; j < vars.Count; j++)
@@ -17659,7 +17659,7 @@ namespace Gekko
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
                 foreach (IVariable iv2 in o.list1.list)
@@ -17706,7 +17706,7 @@ namespace Gekko
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
                 foreach (IVariable iv2 in o.list1.list)
@@ -17982,7 +17982,7 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
-                using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
+                using (FileStream fs = WaitForFileStream(pathAndFilename2, null, GekkoFileReadOrWrite.Write))
                 {
 
                     try
@@ -18128,7 +18128,7 @@ namespace Gekko
         {
             StringBuilder sb = new StringBuilder();
 
-            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
                 foreach (ToFrom var in list)
@@ -18152,7 +18152,7 @@ namespace Gekko
             string file = O.ConvertToString(file2);
             string x = O.ConvertToString(x1);
             string[] xx = x.Split(new string[] { "\\n" }, StringSplitOptions.None);
-            using (FileStream fs = WaitForFileStream(file, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(file, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
 
@@ -18168,7 +18168,7 @@ namespace Gekko
 
         private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<ToFrom> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)
         {
-            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
                 foreach (ToFrom var in list)
@@ -18267,7 +18267,7 @@ namespace Gekko
             }
 
             string xmlOutput = doc.OuterXml;
-            using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + "DatabankInfo.xml", GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + "DatabankInfo.xml", null, GekkoFileReadOrWrite.Write))
             {
                 doc.Save(fs);
             }
@@ -18329,7 +18329,7 @@ namespace Gekko
 
                 int sleepMs = 10;
 
-                using (FileStream fs = Program.WaitForFileStream(zipFileName, Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(zipFileName, null, Program.GekkoFileReadOrWrite.Write))
                 {
                     //fs is not actually used, but this way we wait for blocked files
                     Thread.Sleep(sleepMs);  //to make sure the file is released
@@ -18461,43 +18461,43 @@ namespace Gekko
         }
 
         /// <summary>
-        /// See called method
+        /// See called method. Note: prettyPathAndFilename may be = null if it is not a zip-extracted file.
         /// </summary>
-        /// <param name="pathAndFilename"></param>
+        /// <param name="realPathAndFilename"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type)
+        public static FileStream WaitForFileStream(string realPathAndFilename, string prettyPathAndFilename, GekkoFileReadOrWrite type)
         {
-            return WaitForFileStream(pathAndFilename, type, false, -12345);
+            return WaitForFileStream(realPathAndFilename, prettyPathAndFilename, type, false, -12345);
         }
 
         /// <summary>
-        /// /// See called method
+        /// See called method. Note: prettyPathAndFilename may be = null if it is not a zip-extracted file.
         /// </summary>
-        /// <param name="pathAndFilename"></param>
+        /// <param name="realPathAndFilename"></param>
         /// <param name="type"></param>
         /// <param name="bufferSize"></param>
         /// <returns></returns>
-        public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, int bufferSize)
+        public static FileStream WaitForFileStream(string realPathAndFilename, string prettyPathAndFilename, GekkoFileReadOrWrite type, int bufferSize)
         {
-            return WaitForFileStream(pathAndFilename, type, false, bufferSize);
+            return WaitForFileStream(realPathAndFilename, prettyPathAndFilename, type, false, bufferSize);
         }
 
         /// <summary>
         /// Set bufferSize to -12345 to make it default (4096 at the moment). For a lot of file reading, 4096 (bytes) is probably fine
         /// and small and fits cache etc. But when the Stream is fed to a hash code generator like SHA256, using 
-        /// 1200000 bytes for bufferSize (1.2 MB) may speed up around 20%.
+        /// 1200000 bytes for bufferSize (1.2 MB) may speed up around 20%. Note: prettyPathAndFilename may be = null if it is not a zip-extracted file.
         /// </summary>
-        /// <param name="pathAndFilename"></param>
+        /// <param name="realPathAndFilename"></param>
         /// <param name="type"></param>
         /// <param name="printAnyExceptionOnScreen"></param>
         /// <param name="bufferSize"></param>
         /// <returns></returns>
-        public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen, int bufferSize)
+        public static FileStream WaitForFileStream(string realPathAndFilename, string prettyPathAndFilename, GekkoFileReadOrWrite type, bool printAnyExceptionOnScreen, int bufferSize)
         {
             if (type != GekkoFileReadOrWrite.Read)
             {
-                PossibleLibraryOrZipWriteError(pathAndFilename, "write");
+                PossibleLibraryOrZipWriteError(realPathAndFilename, "write");
             }
 
             FileStream fs = null;
@@ -18523,30 +18523,41 @@ namespace Gekko
             {
                 if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
 
-                string pathName = Path.GetDirectoryName(pathAndFilename);
+                string realFilePathName = Path.GetDirectoryName(realPathAndFilename);
 
                 if (type == GekkoFileReadOrWrite.Read)
                 {
 
                     //checking if the file is there at all for reading
-                    if (!File.Exists(pathAndFilename))
+                    if (!File.Exists(realPathAndFilename))
                     {
                         using (Error e = new Error())
                         {
-                            e.MainAdd("Could not find file '" + pathAndFilename + "' for reading.");
-                            if (!Directory.Exists(pathName)) e.MainAdd("The directory '" + pathName + "' does not seem to exist.");
+                            string f = null;
+                            if (prettyPathAndFilename == null)
+                            {
+                                //normal: not from inside zipped file
+                                e.MainAdd("Could not find file '" + realPathAndFilename + "' for reading.");
+                                if (!Directory.Exists(realFilePathName)) e.MainAdd("The directory '" + realFilePathName + "' does not seem to exist.");
+                            }
+                            else
+                            {
+                                //from inside zipped file
+                                e.MainAdd("Could not find file '" + prettyPathAndFilename + "' for reading.");
+                                e.MainAdd("The file has been unzipped, but cannot be read from the following temporary file: '" + realPathAndFilename + "'");
+                            }                            
                         }
                     }
                 }
                 else if (type == GekkoFileReadOrWrite.WriteAppend)
                 {
                     //checking if the file is there at all for appending
-                    if (!File.Exists(pathAndFilename))
+                    if (!File.Exists(realPathAndFilename))
                     {
                         using (Error e = new Error())
                         {
-                            e.MainAdd("Could not find file '" + pathAndFilename + "' for appending.");
-                            if (!Directory.Exists(pathName)) e.MainAdd("The directory '" + pathName + "' does not seem to exist.");
+                            e.MainAdd("Could not find file '" + realPathAndFilename + "' for appending.");
+                            if (!Directory.Exists(realFilePathName)) e.MainAdd("The directory '" + realFilePathName + "' does not seem to exist.");
                         }
                     }
                 }
@@ -18555,16 +18566,16 @@ namespace Gekko
                     //checking if the path exists for writing the file
                     //string extension = Path.GetExtension(pathAndFilename);
 
-                    if (Directory.Exists(pathAndFilename))
+                    if (Directory.Exists(realPathAndFilename))
                     {
-                        new Error("There exists a folder with the same name: " + pathAndFilename);
+                        new Error("There exists a folder with the same name: " + realPathAndFilename);
                     }
 
-                    if (pathName != "")  //sometimes pathAndFilename may be just the filename??
+                    if (realFilePathName != "")  //sometimes pathAndFilename may be just the filename??
                     {
-                        if (!Directory.Exists(pathName))
+                        if (!Directory.Exists(realFilePathName))
                         {
-                            new Error("Could not find directory '" + pathName + "' for writing");
+                            new Error("Could not find directory '" + realFilePathName + "' for writing");
                         }
                     }
                 }
@@ -18577,22 +18588,22 @@ namespace Gekko
                     //we can use FileStream to also set a buffer
                     if (bufferSize == -12345)
                     {
-                        fs = new FileStream(pathAndFilename, fm, fa, fsh); //default: 4096
+                        fs = new FileStream(realPathAndFilename, fm, fa, fsh); //default: 4096
                     }
                     else
                     {
-                        fs = new FileStream(pathAndFilename, fm, fa, fsh, bufferSize); //default: 4096
+                        fs = new FileStream(realPathAndFilename, fm, fa, fsh, bufferSize); //default: 4096
                     }
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    new Warning("File '" + pathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
+                    new Warning("File '" + realPathAndFilename + "' seems read-only. Retrying... (" + (i * gap) + " seconds)");
                     Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
                 }
                 catch (Exception e)
                 {
-                    new Warning("File '" + pathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                    new Warning("File '" + realPathAndFilename + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     Thread.Sleep(gap * 1000);  //1 seconds
                     continue;
                 }
@@ -18600,7 +18611,7 @@ namespace Gekko
             }
             if (fs == null)
             {
-                new Error("Gave up on file '" + pathAndFilename + "'. Is it blocked by another program?");
+                new Error("Gave up on file '" + realPathAndFilename + "'. Is it blocked by another program?");
             }
             return fs;
         }
@@ -18936,7 +18947,7 @@ namespace Gekko
                 new Warning("Using comma both as decimal separator and field delimiter is not advised");
             }
 
-            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
                 for (int ii = 1; ii <= tab.GetRowMaxNumber(); ii++)
@@ -19047,7 +19058,7 @@ namespace Gekko
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
             int counter = 0;
-            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
                 //Writing to csv/prn file
@@ -19131,7 +19142,7 @@ namespace Gekko
             filename = G.AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
             int counter = 0;
-            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
                 string fileName = Path.GetFileName(pathAndFilename);
@@ -22583,7 +22594,7 @@ namespace Gekko
                 //if exception, these will be reset somewhere else, so no need to have a try-catch-finally regarding the file stream
                 Globals.pipe2 = true;
                 Globals.pipeFileHelper2.pipeFileFileWithPath = CreateFullPathAndFileName(fileName);
-                Globals.pipeFileHelper2.pipeFile = G.GekkoStreamWriter(WaitForFileStream(Globals.pipeFileHelper2.pipeFileFileWithPath, GekkoFileReadOrWrite.Write));
+                Globals.pipeFileHelper2.pipeFile = G.GekkoStreamWriter(WaitForFileStream(Globals.pipeFileHelper2.pipeFileFileWithPath, null, GekkoFileReadOrWrite.Write));
             }
         }
 
@@ -27043,7 +27054,7 @@ namespace Gekko
 
             string fullFileNameAndPath = CreateFullPathAndFileName("compare.txt");
 
-            using (FileStream fs = WaitForFileStream(fullFileNameAndPath, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(fullFileNameAndPath, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter compareFile = G.GekkoStreamWriter(fs))
             {
 
@@ -27632,7 +27643,7 @@ namespace Gekko
 
             int pcounter = 0;
             string fullPathAndFileName = path;
-            using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(fullPathAndFileName + "\\" + samFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter samFile = G.GekkoStreamWriter(fs))
             {
 
@@ -30094,14 +30105,18 @@ namespace Gekko
 
     public class GAMSScalarModelSettings
     {
-        public string unfoldedModel = null; //GAMS scalar model, with variables x1, x2, x3, ...
-        public string unfoldedNames = null; //Translation of x1, x2, x3, ... into "normal" variables
-        public string referenceData = null; //Baseline/reference scenario
-        public string multiplierData = null; //Shock/multiplier scenario (optional)
+        // --- these can be loaded from ModelInfo.json file
+        public string zipFilePathAndName = null;  //the file that contains it all
+        public FindFileHelper ffh_unfoldedModel = null; //GAMS scalar model, with variables x1, x2, x3, ...
+        public FindFileHelper ffh_unfoldedNames = null; //Translation of x1, x2, x3, ... into "normal" variables
+        public FindFileHelper ffh_referenceData = null; //Baseline/reference scenario
+        public FindFileHelper ffh_multiplierData = null; //Shock/multiplier scenario (optional)
+        public string unfoldedModel = null; //raw filename without path
+        public string unfoldedNames = null; //raw filename without path
+        public string referenceData = null; //raw filename without path
+        public string multiplierData = null; //raw filename without path
         // ------
-        public bool testForZeroResiduals = false;
-        public string file = null;
-        public string file2 = null;
+        public bool testForZeroResiduals = false;        
         public GekkoTime time0 = GekkoTime.tNull;
         public int rep1 = 1;
         public int rep2 = 1;

@@ -2303,7 +2303,7 @@ namespace Gekko
             new Writeln("The old files are renamed from *.gcm til *" + ext + ".");
             new Writeln("Remember to insert a root.ini at the root of the new system.");
 
-            using (FileStream fs = Program.WaitForFileStream(logfile, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(logfile, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter file2 = G.GekkoStreamWriter(fs))
             {
                 foreach (string s in log)
@@ -2341,7 +2341,7 @@ namespace Gekko
             new Writeln("... cloning ended");
             new Writeln(log.Count + " files were cloned, cf. clone_log.txt");
 
-            using (FileStream fs = Program.WaitForFileStream(logfile, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(logfile, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter file2 = G.GekkoStreamWriter(fs))
             {
                 foreach (string s in log)
@@ -2402,7 +2402,7 @@ namespace Gekko
             new Writeln("... cloning ended");
             new Writeln(log.Count + " files were cloned, cf. clone2_log.txt");
 
-            using (FileStream fs = Program.WaitForFileStream(logfile, Program.GekkoFileReadOrWrite.Write))
+            using (FileStream fs = Program.WaitForFileStream(logfile, null, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter file2 = G.GekkoStreamWriter(fs))
             {
                 foreach (string s in log)

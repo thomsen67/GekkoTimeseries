@@ -139,7 +139,7 @@ namespace Gekko
                 if (aremos)
                 {
                     m_strFileName = dlgSaveFile.FileName;
-                    using (FileStream fs = Program.WaitForFileStream(m_strFileName, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(m_strFileName, null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter m_sw = G.GekkoStreamWriter(fs))
                     {
                         m_sw.WriteLine("@echo off");
@@ -153,7 +153,7 @@ namespace Gekko
                 else
                 {
                     m_strFileName = dlgSaveFile.FileName;
-                    using (FileStream fs = Program.WaitForFileStream(m_strFileName, Program.GekkoFileReadOrWrite.Write))
+                    using (FileStream fs = Program.WaitForFileStream(m_strFileName, null, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter m_sw = G.GekkoStreamWriter(fs))
                     {
                         m_sw.WriteLine("@echo off");

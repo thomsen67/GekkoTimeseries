@@ -12471,8 +12471,8 @@ namespace UnitTests
         {
             GAMSScalarModelSettings input = new GAMSScalarModelSettings();
             input.testForZeroResiduals = false;
-            input.file = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
-            input.file2 = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
+            input.unfoldedModel = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams_small.gms";
+            input.unfoldedNames = @"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict_small.txt";
             input.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
             input.rep1 = 10;
             input.rep2 = 100;

@@ -172,7 +172,7 @@ namespace Gekko
                     try
                     {
                         fileName = Program.CreateFullPathAndFileName(G.AddExtension(o1.fileName2, "." + "px"));
-                        using (FileStream fs = Program.WaitForFileStream(fileName, Program.GekkoFileReadOrWrite.Write))
+                        using (FileStream fs = Program.WaitForFileStream(fileName, null, Program.GekkoFileReadOrWrite.Write))
                         using (StreamWriter sw = G.GekkoStreamWriter(fs))
                         {
                             sw.Write(pxLinesText);
@@ -289,7 +289,7 @@ namespace Gekko
 
                 string source = o1.dbUrl + ", " + o1.fileName;
 
-                using (FileStream fs = Program.WaitForFileStream(o1.fileName2, Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(o1.fileName2, null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter res = G.GekkoStreamWriter(fs))
                 {
                     res.Write(outputLines);
