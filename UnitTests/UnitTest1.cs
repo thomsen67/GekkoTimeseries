@@ -12474,13 +12474,13 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
             I("MODEL <gms> small.zip;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("8 evaluations x 100 took"));
-
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.10011561985681E-15"));
             //TODO
             //TODO
             //TODO Do a better test of the resulting model object
             //TODO
             //TODO
-            
+
             //Assert.AreEqual(output.count, 8);
             //Assert.AreEqual(output.known, 6);
             //Assert.AreEqual(output.unique, 2);
@@ -12494,14 +12494,15 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
             I("MODEL <gms> makro.zip;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("8 evaluations x 100 took"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));            
 
             //TODO
             //TODO
             //TODO Do a better test of the resulting model object
             //TODO
             //TODO
-            
+
         }
 
         [TestMethod]

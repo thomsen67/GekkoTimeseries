@@ -841,19 +841,16 @@ namespace Gekko
                         int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
                         string ss2 = ss[1];
                         helper.dictX_vars[n] = ss2;
-
-                        if (true)
+                        GekkoTime time = GekkoTime.tNull;
+                        string resultingFullName = null;
+                        ExtractTimeDimension(ss2, ref time, ref resultingFullName);
+                        if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
+                        if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
+                        if (!helper.dictA.ContainsKey(resultingFullName))
                         {
-                            GekkoTime time = GekkoTime.tNull;
-                            string resultingFullName = null;
-                            ExtractTimeDimension(ss2, ref time, ref resultingFullName);
-                            if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
-                            if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;                                                        
-                            if (!helper.dictA.ContainsKey(resultingFullName))
-                            {                                
-                                helper.dictA.Add(resultingFullName, helper.dictA.Count);
-                            }
+                            helper.dictA.Add(resultingFullName, helper.dictA.Count);
                         }
+
                     }
                 }
             }
@@ -1584,6 +1581,7 @@ namespace Gekko
             settings.rep1 = 10;
             settings.rep2 = 100;
             GamsTestOutput output = GAMSEquations(settings);
+            new Writeln("RSS = " + output.rss);
 
             if (false) GAMSParser();
             if (false) GamsGMO();
