@@ -27,6 +27,7 @@ namespace Gekko
             DateTime dt0 = DateTime.Now;
 
             string pathAndFile = Program.options.folder_working + "\\" + "browser.json";
+
             string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(pathAndFile));
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
             Dictionary<string, object> jsonTree = null;
