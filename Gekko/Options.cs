@@ -112,7 +112,7 @@ namespace Gekko
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "lhs";  //lhs|eqname
         public string model_infofile = "yes";  //yes/no/temp
-        public string model_type = "default";  //normal | gams
+        public string model_type = "default";  //default | gams
         // ---
         public string plot_decimalseparator = "period";  //comma|period
         public int plot_elements_max = 200;

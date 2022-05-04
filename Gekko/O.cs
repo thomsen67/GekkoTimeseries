@@ -1196,7 +1196,6 @@ namespace Gekko
                         if (gts == null)
                         {
                             new Error("No time period given for variable '" + s + "'");
-                            //throw new GekkoException();
                         }
 
                         Series ts2 = null;
@@ -1211,7 +1210,6 @@ namespace Gekko
                                 if (!Program.options.databank_create_auto)
                                 {
                                     //The following xx is not used, just used to check existence
-                                    //IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
                                     IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
                                 }
 
@@ -1247,9 +1245,7 @@ namespace Gekko
                             //Normal 0-dim timeseries
                             //What about timeless??
 
-
                             //The following xx is not used, just used to check existence
-                            //IVariable xx = O.GetIVariableFromString(null, s, null, null, ECreatePossibilities.NoneReportError);
                             IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
 
                             ts2 = ts;

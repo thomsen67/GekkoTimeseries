@@ -15080,8 +15080,7 @@ namespace Gekko
             P p = o.p;
 
             fileName = G.StripQuotes(fileName);
-
-            //Random random = new Random();
+                        
             Globals.modelRandomID = Program.RandomInt(11111111, 99999999);  //used in GetModelInfoPath()
 
             string type = "frm";
@@ -15124,12 +15123,14 @@ namespace Gekko
             string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$
 
             if (isGms)
-            {
+            {                
                 GamsModel.ReadGamsModel(textInputRaw, fileName, o);
+                Program.options.model_type = "gams";  //will not be set if something crashes above
             }
             else
             {
                 ReadGekkoModel(fileName, ffh.prettyPathAndFileName, dt0, textInputRaw, o.p);
+                Program.options.model_type = "default";  //will not be set if something crashes above
             }
         }
 

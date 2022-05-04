@@ -1448,21 +1448,7 @@ namespace Gekko
                 // Do something with the node.
                 TraverseNodes(node.ChildNodes);
             }
-        }
-
-        public static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
-        {
-
-            if (G.Equal(Path.GetExtension(fileName), ".csv"))
-            {
-                new Error("The former .csv reader for GAMS models is obsolete");
-                //throw new GekkoException();
-            }
-            else
-            {
-                ReadGamsModelNormal(textInputRaw, fileName, o);
-            }
-        }
+        }        
 
         /// <summary>
         /// Read a GAMS model from a .gms/.gmy model. No real reading done here: deals with possible cached version etc.
@@ -1470,7 +1456,7 @@ namespace Gekko
         /// <param name="textInputRaw"></param>
         /// <param name="fileName"></param>
         /// <param name="o"></param>
-        private static void ReadGamsModelNormal(string textInputRaw, string fileName, O.Model o)
+        public static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
         {
             //these objects typically get overridden soon
             Program.model = new Model();
@@ -1522,9 +1508,8 @@ namespace Gekko
             }
             else
             {
-
                 ReadGamsModelHelper(textInputRaw, fileName, dependents, o);
-                if (false && Globals.runningOnTTComputer) Sniff2();
+                if (Globals.runningOnTTComputer) Sniff2();
 
                 DateTime t1 = DateTime.Now;
 
