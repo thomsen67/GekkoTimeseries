@@ -32,8 +32,11 @@ namespace Gekko
     public class CrossThreadStuff
     {
 
-        //weird delegate pattern, but it works!
-        delegate void Decomp2Callback(DecompOptions2 o);
+        /// <summary>
+        /// Just because of threads, calls DecompGetFuncExpressionsAndRecalc()
+        /// </summary>
+        /// <param name="o"></param>        
+        delegate void Decomp2Callback(DecompOptions2 o); //weird delegate pattern, but it works!
         public static void Decomp2(DecompOptions2 o)
         {
             if (Gui.gui != null && Gui.gui.InvokeRequired)

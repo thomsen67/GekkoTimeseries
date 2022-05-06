@@ -8013,6 +8013,8 @@ namespace Gekko
 
         public class Decomp1
         {
+            //OLD DECOMP, will be obsolete
+
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             //public GekkoSmpl smplForFunc = null;
@@ -8022,8 +8024,7 @@ namespace Gekko
             public string opt_prtcode = null;
             public string label = null;
             public IVariable name = null;  //name given from ASTDECOMPITEMS2, is only active if DECOMP x, DECOM x[a] and the like (a name, no expression)
-            
-            
+                        
             public void Exe()
             {
                 Globals.lastDecompTable = null;
@@ -8037,7 +8038,7 @@ namespace Gekko
 
         public class Decomp2
         {
-            //See source code documentation
+            //New DECOMP, see source code documentation
 
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set  

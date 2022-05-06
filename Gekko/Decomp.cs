@@ -41,9 +41,12 @@ namespace Gekko
             M
         }
 
+        /// <summary>
+        /// The starting point of DECOMP, collecting decomp options etc.
+        /// </summary>
+        /// <param name="o"></param>
         public static void DecompStart(O.Decomp2 o)
         {
-
             //In general, uncontrolled sets produce a list of equations. Hard to prune these, it is a bit like the lag problem, only lazy 
             //  eval might help.
             //In an equation like y[#a] = x[#a] + 5, there will be 100 equations if #a is 1..100. For each of these, lags are tried. So
@@ -120,110 +123,123 @@ namespace Gekko
             G.CheckLegalPeriod(o.t1, o.t2);
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "n";
 
-            if (true)
-            {                
 
-                DecompOptions2 decompOptions2 = new DecompOptions2();
-                decompOptions2.decompTablesFormat.showErrors = true; //
-                decompOptions2.t1 = o.t1;
-                decompOptions2.t2 = o.t2;
-                decompOptions2.expressionOld = o.label;
-                decompOptions2.expression = o.expression;
-                decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
-                decompOptions2.name = o.name;
-                decompOptions2.isNew = true;
 
-                if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
-                if (o.cols.Count > 0) decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);
+            DecompOptions2 decompOptions2 = new DecompOptions2();
+            decompOptions2.decompTablesFormat.showErrors = true; //
+            decompOptions2.t1 = o.t1;
+            decompOptions2.t2 = o.t2;
+            decompOptions2.expressionOld = o.label;
+            decompOptions2.expression = o.expression;
+            decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
+            decompOptions2.name = o.name;
+            decompOptions2.isNew = true;
 
-                decompOptions2.type = o.type;
+            if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
+            if (o.cols.Count > 0) decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);
 
-                foreach (List<IVariable> liv in o.where)
-                {
-                    //pivotfix 
-                    //'a' in #i
-                    string x1 = O.ConvertToString(liv[0]);
-                    List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
-                    decompOptions2.where.Add(new List<string>() { x1, x2[0] });
-                }
+            decompOptions2.type = o.type;
 
-                foreach (List<IVariable> liv in o.group)
-                {
-                    //
-                    List<string> x1 = O.Restrict(liv[0] as List, false, true, false, false);
-                    List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
-                    string x3 = O.ConvertToString(liv[2]);
-                    string x4 = O.ConvertToString(liv[3]);
-                    decompOptions2.group.Add(new List<string>() { x1[0], x2[0], x3, x4 });
-                }
-
-                foreach (DecompItems liv in o.decompItems)
-                {
-                    //
-                    List<string> x1 = O.Restrict(liv.varnames as List, false, true, false, true);
-                    List<string> x2 = O.Restrict(liv.eqname as List, false, true, false, false);
-                    Link temp = new Link();
-                    if (x1 != null)
-                    {
-                        temp.varnames = new List<string>();
-                        temp.varnames.AddRange(x1);
-                    }
-                    if (x2 != null) temp.eqname = x2[0];
-                    temp.expressions = new List<Func<GekkoSmpl, IVariable>>() { liv.expression };
-                    if (liv.option != null) temp.option = liv.option.ConvertToString(); //"lead"
-                    decompOptions2.link.Add(temp);
-                }
-
-                if (decompOptions2.type == "ASTDECOMP3")
-                {
-                    
-                    decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
-                    decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, false);
-                    decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
-
-                    int counter = -1;
-                    foreach (string s in decompOptions2.new_from)
-                    {
-                        counter++;
-                        Link link = new Link();
-                        link.eqname = s;
-                        if (counter == 0)
-                        {
-                            link.endo = new List<string>();
-                            link.endo.AddRange(decompOptions2.new_endo);
-                            link.varnames = new List<string>();
-                            link.varnames.AddRange(decompOptions2.new_select);
-                        }
-                        else
-                        {
-                            link.varnames = new List<string>();
-                            link.varnames.Add("<not used>"); //strange but necessary further on
-                        }
-                        link.expressions = new List<Func<GekkoSmpl, IVariable>>();
-                        link.expressions.Add(null); //strange but necessary further on
-                        decompOptions2.link.Add(link);
-                    }
-                }
-
-                CrossThreadStuff.Decomp2(decompOptions2);
-                
-                //Also see #9237532567
-                //This stuff makes sure we wait for the window to open, before we move on with the code.
-                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-                {
-                    System.Threading.Thread.Sleep(10);  //0.01s
-                    if (decompOptions2.numberOfRecalcs > 0)
-                    {
-                        break;
-                    }
-                }
-
+            foreach (List<IVariable> liv in o.where)
+            {
+                //pivotfix 
+                //'a' in #i
+                string x1 = O.ConvertToString(liv[0]);
+                List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
+                decompOptions2.where.Add(new List<string>() { x1, x2[0] });
             }
+
+            foreach (List<IVariable> liv in o.group)
+            {
+                //
+                List<string> x1 = O.Restrict(liv[0] as List, false, true, false, false);
+                List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
+                string x3 = O.ConvertToString(liv[2]);
+                string x4 = O.ConvertToString(liv[3]);
+                decompOptions2.group.Add(new List<string>() { x1[0], x2[0], x3, x4 });
+            }
+
+            foreach (DecompItems liv in o.decompItems)
+            {
+                //
+                List<string> x1 = O.Restrict(liv.varnames as List, false, true, false, true);
+                List<string> x2 = O.Restrict(liv.eqname as List, false, true, false, false);
+                Link temp = new Link();
+                if (x1 != null)
+                {
+                    temp.varnames = new List<string>();
+                    temp.varnames.AddRange(x1);
+                }
+                if (x2 != null) temp.eqname = x2[0];
+                temp.expressions = new List<Func<GekkoSmpl, IVariable>>() { liv.expression };
+                if (liv.option != null) temp.option = liv.option.ConvertToString(); //"lead"
+                decompOptions2.link.Add(temp);
+            }
+
+            if (decompOptions2.type == "ASTDECOMP3")
+            {
+                //newest decomp
+
+                decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
+                decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, false);
+                decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+
+                int counter = -1;
+                foreach (string s in decompOptions2.new_from)
+                {
+                    counter++;
+                    Link link = new Link();
+                    link.eqname = s;
+                    if (counter == 0)
+                    {
+                        link.endo = new List<string>();
+                        link.endo.AddRange(decompOptions2.new_endo);
+                        link.varnames = new List<string>();
+                        link.varnames.AddRange(decompOptions2.new_select);
+                    }
+                    else
+                    {
+                        link.varnames = new List<string>();
+                        link.varnames.Add("<not used>"); //strange but necessary further on
+                    }
+                    link.expressions = new List<Func<GekkoSmpl, IVariable>>();
+                    link.expressions.Add(null); //strange but necessary further on
+                    decompOptions2.link.Add(link);
+                }
+            }
+
+            CrossThreadStuff.Decomp2(decompOptions2);
+
+            //Also see #9237532567
+            //This stuff makes sure we wait for the window to open, before we move on with the code.
+            for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+            {
+                System.Threading.Thread.Sleep(10);  //0.01s
+                if (decompOptions2.numberOfRecalcs > 0)
+                {
+                    break;
+                }
+            }
+
         }
 
+        /// <summary>
+        /// Main entry to the math part of decomposition. Performs a lot of the hard stuff, including
+        /// matrix inversion etc. Calls DecompLowLevel() a lot, where gradients etc. are calculated.
+        /// The table returned is a pivot table.
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="per1"></param>
+        /// <param name="per2"></param>
+        /// <param name="operator1"></param>
+        /// <param name="isShares"></param>
+        /// <param name="decompOptions2"></param>
+        /// <param name="frame"></param>
+        /// <param name="refresh"></param>
+        /// <param name="decompDatas"></param>
+        /// <returns></returns>
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
-        {           
-
+        {
             DateTime t0 = DateTime.Now;  
 
             EContribType operatorOneOf3Types = DecompContribTypeHelper(decompOptions2.prtOptionLower);
@@ -545,7 +561,7 @@ namespace Gekko
                 }
                 else
                 {
-                    // not ASTDECOMP3
+                    //DECOMP2 (ASTDECOMP2), so non-simultaneous decomposition. Will be obsolete.
 
                     //Takes the link equations, skipping the first one (which is the "normal" equation)
                     //Example: decomp y in e1 link c in e2
@@ -847,6 +863,12 @@ namespace Gekko
             return isZero;
         }
 
+        /// <summary>
+        /// Kind of an entry point for decomposition, also called when buttons are clicked etc.
+        /// For a GAMS model, this calls DecompEvalGams(), and for a Gekko model, this calls 
+        /// DecompEvalGekko().
+        /// </summary>
+        /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
         {
             DecompOptions2 decompOptions = (DecompOptions2)o;
@@ -861,43 +883,49 @@ namespace Gekko
                 count++;
                 if (Program.model.modelGams != null)
                 {
+                    //GAMS model
+                    //GAMS model
+                    //GAMS model
+                    //GAMS model
+                    //GAMS model
                     if (link.expressions.Count == 1 && link.expressions[0] == null)
                     {
+                        //
+                        // NEW GAMS MODEL DECOMP
+                        //
                         ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
                         link.expressions = found.expressions;
                         link.expressionText = found.lhs + " = " + found.rhs;
                     }
                     else
                     {
-                        //fix this...
+                        new Error("Expected 1 link expression");
                     }
                 }
                 else
                 {
+                    //Gekko model
+                    //Gekko model
+                    //Gekko model
+                    //Gekko model
+                    //Gekko model
                     if (!G.HasModelGekko())
                     {
                         new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
-                        //throw new GekkoException();
                     }
-                    if (true)
+
+                    if (link.expressions.Count == 1 && link.expressions[0] == null)
                     {
-                        if (link.expressions.Count == 1 && link.expressions[0] == null)
-                        {
-                            EquationHelper found = DecompEvalGekko(link.varnames[0]);
-                            //decompOptions.expression = Globals.expressions[0];
-                            link.expressions = found.expressions;
-                            decompOptions.expressionOld = found.equationText;
-                        }
-                        else
-                        {
-                            //fix this...
-                        }
+                        // NEW GEKKO MODEL DECOMP
+                        // NEW GEKKO MODEL DECOMP
+                        // NEW GEKKO MODEL DECOMP
+                        EquationHelper found = DecompEvalGekko(link.varnames[0]);
+                        link.expressions = found.expressions;
+                        decompOptions.expressionOld = found.equationText;
                     }
                     else
                     {
-                        EquationHelper found = Program.DecompEval(decompOptions.variable);
-                        decompOptions.expression = Globals.expressions[0];
-                        decompOptions.expressionOld = found.equationText;
+                        new Error("Expected 1 link expression");
                     }
                 }
             }
@@ -942,12 +970,22 @@ namespace Gekko
                     {
                         Globals.showDecompTable = false;
                         new Error("Debug, tables aborted. Set Globals.showDecompTable = false.");
-                        //throw new GekkoException();
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Called by DecompMain() and performs the low-level math, obtaining and preparing data and
+        /// calculating gradients.
+        /// </summary>
+        /// <param name="tt1"></param>
+        /// <param name="tt2"></param>
+        /// <param name="expression"></param>
+        /// <param name="workOrRefOrBoth"></param>
+        /// <param name="residualName"></param>
+        /// <param name="funcCounter"></param>
+        /// <returns></returns>
         public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {            
 
@@ -1379,6 +1417,23 @@ namespace Gekko
             if (d.cellsContribM == null) d.cellsContribM = new DecompDict();
         }
 
+        /// <summary>
+        /// Transforms a pivot table from DecompMain() into a table suitable for showing in the Gekko GUI.
+        /// </summary>
+        /// <param name="main_varnames"></param>
+        /// <param name="per1"></param>
+        /// <param name="per2"></param>
+        /// <param name="decompDatasSupremeClone"></param>
+        /// <param name="format"></param>
+        /// <param name="operator1"></param>
+        /// <param name="isShares"></param>
+        /// <param name="smpl"></param>
+        /// <param name="lhs"></param>
+        /// <param name="expressionText"></param>
+        /// <param name="decompOptions2"></param>
+        /// <param name="frame"></param>
+        /// <param name="operatorOneOf3Types"></param>
+        /// <returns></returns>
         public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupremeClone, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
         {
             int parentI = 0;

@@ -850,7 +850,6 @@ namespace Gekko
                         {
                             helper.dictA.Add(resultingFullName, helper.dictA.Count);
                         }
-
                     }
                 }
             }
@@ -859,9 +858,7 @@ namespace Gekko
             dt1 = DateTime.Now;            
 
             TokenList tokensLast = null;
-
-            //List<string> lines = Stringlist.ExtractLinesFromText(s);
-            //List<string> start = new List<string>();    //0
+                        
             List<string> eqs = new List<string>();      //1
             List<string> values = new List<string>();   //2
             List<string> end = new List<string>();      //3
@@ -874,10 +871,7 @@ namespace Gekko
             helper.time0 = helper.time1;  //could perhaps lag this later on... ?
             int periods = GekkoTime.Observations(helper.time1, helper.time2);
             helper.a = new double[periods][];
-            for (int i = 0; i < helper.a.GetLength(0); i++)
-            {
-                helper.a[i] = new double[helper.dictA.Count];  //beware: 0-based
-            }
+            for (int i = 0; i < helper.a.GetLength(0); i++) helper.a[i] = new double[helper.dictA.Count]; //beware: 0-based            
 
             List<string> codeLines = new List<string>();
 
@@ -1000,14 +994,7 @@ namespace Gekko
             {
                 File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(codeLines).ToString());
             }
-
-            //int periods2 = 200;  //BAD
-            //double[][] a = new double[periods2][];
-            //for (int i = 0; i < a.GetLength(0); i++)
-            //{
-            //    a[i] = new double[eqCounts];
-            //}
-                        
+            
             foreach (string line in values)
             {
                 if (line.Trim() == "" || line.StartsWith("*")) continue;
@@ -1065,9 +1052,7 @@ namespace Gekko
                 txt.MainAdd("===> Setting up everything took: " + G.Seconds(dt0) + ", all included");
                 txt.MainNewLineTight();
                 txt.MainAdd("======================================================================");
-            }
-
-            //new Writeln("Start solving");
+            }            
                         
             Object[] o = new Object[1] { functions };
             assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                     
@@ -1082,7 +1067,7 @@ namespace Gekko
                 {
                     for (int i = 0; i < eqCounts; i++)
                     {
-                        functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum
+                        functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
                         //double x = r[i];                        
                     }
                 }
@@ -2087,10 +2072,18 @@ namespace Gekko
             return varnameFound;
         }
 
+        /// <summary>
+        /// Finds the GAMS quation, either looking up eqname or varname.
+        /// These equations are already translated, so they are in Gekko form (no explicit time).
+        /// Uses Program.CallEval() internally to convert the eqs into suitable C# Func&lt;&gt; code.
+        /// And the Func&lt;&gt; code is later on used to find precedents (which variables with which lags
+        /// affect the equation).
+        /// </summary>
+        /// <param name="eqname"></param>
+        /// <param name="varname"></param>
+        /// <returns></returns>
         public static ModelGamsEquation DecompEvalGams(string eqname, string varname)
         {
-            //find the equation, either looking up eqname or varname
-
             List<ModelGamsEquation> eqs = null;
             ModelGamsEquation found = null;
             if (eqname != null)

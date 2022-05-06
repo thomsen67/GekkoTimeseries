@@ -15381,6 +15381,7 @@ namespace Gekko
 
         /// <summary>
         /// Helper for eval function that transforms a statement (as a string) into a Func with the C# code.
+        /// This method is also used by the "new" DECOMP.
         /// </summary>
         /// <param name="conditionals"></param>
         /// <param name="statement"></param>

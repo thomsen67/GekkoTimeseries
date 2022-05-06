@@ -11493,12 +11493,8 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(6, 2).number, 5.5556d, 0.0001);
                     Assert.AreEqual(table.Get(7, 2).number, 0d, 0.0001);
                 }
-
             }
-            
-
         }
-
 
         [TestMethod]
         public void _Test_DecompOperators()

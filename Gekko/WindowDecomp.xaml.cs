@@ -1706,6 +1706,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// When something in the Gekko decomp GUI is changed (for instance, a field is dragged), this method is called.
+        /// </summary>
+        /// <param name="refresh"></param>
         public void RecalcCellsWithNewType(bool refresh)
         {
             try

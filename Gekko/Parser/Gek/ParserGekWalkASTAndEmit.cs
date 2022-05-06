@@ -4611,6 +4611,9 @@ ASTPLACEHOLDER [0]
                     break;
                 case "ASTDECOMP":
                     {
+                        //
+                        // Old DECOMP, will be obsolete
+                        //
                         node.Code.A("O.Decomp1 o" + Num(node) + " = new O.Decomp1();" + G.NL);
                         node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                         GetCodeFromAllChildren(node);
