@@ -732,7 +732,7 @@ namespace Gekko
             }
         }        
 
-        public static void GAMSEquations(GAMSScalarModelSettings input)
+        public static void ReadGamsScalarModelEquations(GAMSScalarModelSettings input)
         {
             //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
             //    c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt
@@ -1547,17 +1547,21 @@ namespace Gekko
                 input.ffh_multiplierData = Program.FindFile(fileName + "\\" + input.multiplierData, folders, true, true, o.p);
             }
 
-            input.testForZeroResiduals = false;
-            //settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
-            input.rep1 = 10;
-            input.rep2 = 100;
-            GAMSEquations(input);
-            double rss = double.NaN;
+            ReadGamsScalarModelEquations(input);
 
-            for (int j1 = 0; j1 < input.rep1; j1++)
+            // test the scalar model
+            // test the scalar model
+            // test the scalar model
+
+            bool testForZeroResiduals = false;
+            //settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
+            int rep1 = 10;
+            int rep2 = 100;            
+            double rss = double.NaN;
+            for (int j1 = 0; j1 < rep1; j1++)
             {
                 DateTime dt0 = DateTime.Now;
-                for (int j2 = 0; j2 < input.rep2; j2++)
+                for (int j2 = 0; j2 < rep2; j2++)
                 {
                     Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = Program.model.modelGamsScalar.functions;
                     double[][] a = Program.model.modelGamsScalar.a;
@@ -1573,7 +1577,7 @@ namespace Gekko
                         //double x = r[i];                        
                     }
                 }
-                new Writeln(Program.model.modelGamsScalar.eqCounts + " evaluations x " + input.rep2 + " took " + G.Seconds(dt0));
+                new Writeln(Program.model.modelGamsScalar.eqCounts + " evaluations x " + rep2 + " took " + G.Seconds(dt0));
 
                 if (j1 == 0)
                 {
@@ -1583,7 +1587,7 @@ namespace Gekko
                         rss += d * d;
                     }
                     rss = Math.Sqrt(rss);
-                    if (input.testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
+                    if (testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
                     rss = rss;
                 }
             }
