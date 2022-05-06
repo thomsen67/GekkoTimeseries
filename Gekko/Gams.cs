@@ -773,7 +773,7 @@ namespace Gekko
             int eqCounts2 = -12345;
             int varCounts2 = -12345;
 
-            using (FileStream fs = Program.WaitForFileStream(input.ffh_unfoldedNames.realPathAndFileName, input.ffh_unfoldedNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
+            using (FileStream fs = Program.WaitForFileStream(input.ffh_unrolledNames.realPathAndFileName, input.ffh_unrolledNames.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 string line = null;
@@ -877,7 +877,7 @@ namespace Gekko
 
             List<string> equationDefs = new List<string>();
             StringBuilder eqLine = null;
-            using (FileStream fs = Program.WaitForFileStream(input.ffh_unfoldedModel.realPathAndFileName, input.ffh_unfoldedModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
+            using (FileStream fs = Program.WaitForFileStream(input.ffh_unrolledModel.realPathAndFileName, input.ffh_unrolledModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
             using (StreamReader sr = new StreamReader(fs))
             {
                 string line = null;
@@ -1059,6 +1059,9 @@ namespace Gekko
 
             new Writeln("Loading funcs took: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
+
+            Program.model = new Model();
+            Program.model.modelGamsScalar = new ModelGamsScalar();
 
             for (int j1 = 0; j1 < input.rep1; j1++)
             {
@@ -1532,35 +1535,38 @@ namespace Gekko
             GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
             settings.zipFilePathAndName = fileName;
 
-            try { settings.unfoldedModel = (string)jsonTree["unfoldedModel"]; } catch { }
-            if (settings.unfoldedModel == null)
+            try { settings.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
+            if (settings.unrolledModel == null)
             {
-                new Error("JSON: setting unfoldedModel not found");
+                new Error("JSON: setting unrolledModel not found");
             }
-            settings.ffh_unfoldedModel = Program.FindFile(fileName + "\\" + settings.unfoldedModel, folders, true, true, o.p);
+            settings.ffh_unrolledModel = Program.FindFile(fileName + "\\" + settings.unrolledModel, folders, true, true, o.p);
 
 
-            try { settings.unfoldedNames = (string)jsonTree["unfoldedNames"]; } catch { }
-            if (settings.unfoldedNames == null)
+            try { settings.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
+            if (settings.unrolledNames == null)
             {
-                new Error("JSON: setting unfoldedNames not found");
+                new Error("JSON: setting unrolledNames not found");
             }
-            settings.ffh_unfoldedNames = Program.FindFile(fileName + "\\" + settings.unfoldedNames, folders, true, true, o.p);
+            settings.ffh_unrolledNames = Program.FindFile(fileName + "\\" + settings.unrolledNames, folders, true, true, o.p);
 
-            try { settings.referenceData = (string)jsonTree["referenceData"]; } catch { }
-            if (settings.referenceData == null)
+            if (false)
             {
-                new Error("JSON: setting referenceData not found");
-            }
-            settings.ffh_referenceData = Program.FindFile(fileName + "\\" + settings.referenceData, folders, true, true, o.p);
+                try { settings.referenceData = (string)jsonTree["referenceData"]; } catch { }
+                if (settings.referenceData == null)
+                {
+                    new Error("JSON: setting referenceData not found");
+                }
+                settings.ffh_referenceData = Program.FindFile(fileName + "\\" + settings.referenceData, folders, true, true, o.p);
 
-            try { settings.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
-            if (settings.multiplierData == null)
-            {
-                new Error("JSON: setting multiplierData not found");
+                try { settings.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
+                if (settings.multiplierData == null)
+                {
+                    new Error("JSON: setting multiplierData not found");
+                }
+                settings.ffh_multiplierData = Program.FindFile(fileName + "\\" + settings.multiplierData, folders, true, true, o.p);
             }
-            settings.ffh_multiplierData = Program.FindFile(fileName + "\\" + settings.multiplierData, folders, true, true, o.p);
-            
+
             settings.testForZeroResiduals = false;
             //settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
             settings.rep1 = 10;

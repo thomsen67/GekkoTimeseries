@@ -30108,12 +30108,12 @@ namespace Gekko
     {
         // --- these can be loaded from ModelInfo.json file
         public string zipFilePathAndName = null;  //the file that contains it all
-        public FindFileHelper ffh_unfoldedModel = null; //GAMS scalar model, with variables x1, x2, x3, ...
-        public FindFileHelper ffh_unfoldedNames = null; //Translation of x1, x2, x3, ... into "normal" variables
+        public FindFileHelper ffh_unrolledModel = null; //GAMS scalar model, with variables x1, x2, x3, ...
+        public FindFileHelper ffh_unrolledNames = null; //Translation of x1, x2, x3, ... into "normal" variables
         public FindFileHelper ffh_referenceData = null; //Baseline/reference scenario
         public FindFileHelper ffh_multiplierData = null; //Shock/multiplier scenario (optional)
-        public string unfoldedModel = null; //raw filename without path
-        public string unfoldedNames = null; //raw filename without path
+        public string unrolledModel = null; //raw filename without path
+        public string unrolledNames = null; //raw filename without path
         public string referenceData = null; //raw filename without path
         public string multiplierData = null; //raw filename without path
         // ------

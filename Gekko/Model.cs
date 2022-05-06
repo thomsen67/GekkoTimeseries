@@ -101,6 +101,7 @@ namespace Gekko
     {
         public ModelGekko modelGekko = null;
         public ModelGams modelGams = null;
+        public ModelGamsScalar modelGamsScalar = null;
     }
 
     [ProtoContract]
@@ -403,6 +404,17 @@ namespace Gekko
 
     [ProtoContract]
     public class ModelGams
+    {
+        [ProtoMember(1)]
+        public ModelInfoGams modelInfo = new ModelInfoGams();
+        [ProtoMember(2)]
+        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+        [ProtoMember(3)]
+        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
+    }
+
+    [ProtoContract]
+    public class ModelGamsScalar
     {
         [ProtoMember(1)]
         public ModelInfoGams modelInfo = new ModelInfoGams();
