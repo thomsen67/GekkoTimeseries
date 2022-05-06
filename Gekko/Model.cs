@@ -415,23 +415,18 @@ namespace Gekko
 
     [ProtoContract]
     public class ModelGamsScalar
-    {
-        [ProtoMember(1)]
-        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;
-        [ProtoMember(2)]
+    {        
+        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;     
         public double[] r = null;
-        [ProtoMember(3)]
         public double[][] a = null;
-        [ProtoMember(4)]
         public int[][] bb = null;
-        [ProtoMember(5)]
         public double[] cc = null;
-        [ProtoMember(6)]
         public int[][] dd = null;
-        [ProtoMember(7)]
         public int[] ee = null;
-        [ProtoMember(8)]
         public int eqCounts = -12345;
+        public int count = -12345;
+        public int known = -12345;
+        public int unique = -12345;
     }
 
     [ProtoContract]

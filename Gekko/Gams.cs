@@ -732,7 +732,7 @@ namespace Gekko
             }
         }        
 
-        public static GamsTestOutput GAMSEquations(GAMSScalarModelSettings input)
+        public static void GAMSEquations(GAMSScalarModelSettings input)
         {
             //for c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\gams.gms and
             //    c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\dict.txt
@@ -753,9 +753,7 @@ namespace Gekko
             //  --> Sometimes seen it around 4.1 in debug mode (best release mode: around 3.52).
 
             //Note: cf. these interfaces from Python or Julia to GAMS: https://www.gams.com/blog/2020/06/new-and-improved-gams-links-for-pyomo-and-jump/
-                        
-            GamsTestOutput output = new GamsTestOutput();
-
+            
             EqLineHelper helper = new EqLineHelper();
             helper.dictE_eqs = null;
             helper.dictX_vars = null;            
@@ -984,11 +982,7 @@ namespace Gekko
 
             //new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
             if (helper.count != helper.known + helper.unique) new Error("Not summing up");
-            if (helper.count != semis) new Error("Not summing up");
-
-            output.count = helper.count;
-            output.known = helper.known;
-            output.unique = helper.unique;
+            if (helper.count != semis) new Error("Not summing up");            
 
             if (false)
             {
@@ -1072,36 +1066,11 @@ namespace Gekko
                 Program.model.modelGamsScalar.dd = dd;
                 Program.model.modelGamsScalar.ee = ee;
                 Program.model.modelGamsScalar.eqCounts = eqCounts;
+                Program.model.modelGamsScalar.count = helper.count;
+                Program.model.modelGamsScalar.known = helper.known;
+                Program.model.modelGamsScalar.unique = helper.unique;
             }
-
-            //for (int j1 = 0; j1 < input.rep1; j1++)
-            //{
-            //    dt0 = DateTime.Now;
-            //    for (int j2 = 0; j2 < input.rep2; j2++)
-            //    {
-            //        for (int i = 0; i < eqCounts; i++)
-            //        {
-            //            functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
-            //            //double x = r[i];                        
-            //        }
-            //    }
-            //    new Writeln(eqCounts + " evaluations x " + input.rep2 + " took " + G.Seconds(dt0));
-
-            //    if (j1 == 0)
-            //    {
-            //        double rss = 0d;
-            //        foreach (double d in r)
-            //        {                        
-            //            rss += d * d;
-            //        }
-            //        rss = Math.Sqrt(rss);
-            //        if (input.testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
-            //        output.rss = rss;
-            //        output.r = r;
-            //    }
-            //}
-
-            return output;
+            return;
         }
 
         /// <summary>
@@ -1582,7 +1551,8 @@ namespace Gekko
             //settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
             input.rep1 = 10;
             input.rep2 = 100;
-            GamsTestOutput output = GAMSEquations(input);
+            GAMSEquations(input);
+            double rss = double.NaN;
 
             for (int j1 = 0; j1 < input.rep1; j1++)
             {
@@ -1607,19 +1577,18 @@ namespace Gekko
 
                 if (j1 == 0)
                 {
-                    double rss = 0d;
+                    rss = 0d;
                     foreach (double d in Program.model.modelGamsScalar.r)
                     {
                         rss += d * d;
                     }
                     rss = Math.Sqrt(rss);
                     if (input.testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
-                    output.rss = rss;
-                    output.r = Program.model.modelGamsScalar.r;
+                    rss = rss;
                 }
             }
 
-            new Writeln("RSS = " + output.rss);
+            new Writeln("RSS = " + rss);
 
             if (false) GAMSParser();
             if (false) GamsGMO();
@@ -4517,13 +4486,13 @@ namespace Gekko
     //    public int rep2 = 1;
     //}
 
-    public class GamsTestOutput
-    {
-        public int count;
-        public int known;
-        public int unique;
-        public double rss;  //sqrt
-        public double[] r;
-    }
+    //public class GamsTestOutput
+    //{
+    //    public int count;
+    //    public int known;
+    //    public int unique;
+    //    public double rss;  //sqrt
+    //    public double[] r;
+    //}
 }
 
