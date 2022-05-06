@@ -1060,36 +1060,47 @@ namespace Gekko
             new Writeln("Loading funcs took: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
-            Program.model = new Model();
-            Program.model.modelGamsScalar = new ModelGamsScalar();
-
-            for (int j1 = 0; j1 < input.rep1; j1++)
+            if (true)
             {
-                dt0 = DateTime.Now;
-                for (int j2 = 0; j2 < input.rep2; j2++)
-                {
-                    for (int i = 0; i < eqCounts; i++)
-                    {
-                        functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
-                        //double x = r[i];                        
-                    }
-                }
-                new Writeln(eqCounts + " evaluations x " + input.rep2 + " took " + G.Seconds(dt0));
-                                
-                if (j1 == 0)
-                {
-                    double rss = 0d;
-                    foreach (double d in r)
-                    {                        
-                        rss += d * d;
-                    }
-                    rss = Math.Sqrt(rss);
-                    if (input.testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
-                    output.rss = rss;
-                    output.r = r;
-                }
+                Program.model = new Model();
+                Program.model.modelGamsScalar = new ModelGamsScalar();
+                Program.model.modelGamsScalar.functions = functions;
+                Program.model.modelGamsScalar.a = a;
+                Program.model.modelGamsScalar.r = r;
+                Program.model.modelGamsScalar.bb = bb;
+                Program.model.modelGamsScalar.cc = cc;
+                Program.model.modelGamsScalar.dd = dd;
+                Program.model.modelGamsScalar.ee = ee;
+                Program.model.modelGamsScalar.eqCounts = eqCounts;
             }
-            
+
+            //for (int j1 = 0; j1 < input.rep1; j1++)
+            //{
+            //    dt0 = DateTime.Now;
+            //    for (int j2 = 0; j2 < input.rep2; j2++)
+            //    {
+            //        for (int i = 0; i < eqCounts; i++)
+            //        {
+            //            functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
+            //            //double x = r[i];                        
+            //        }
+            //    }
+            //    new Writeln(eqCounts + " evaluations x " + input.rep2 + " took " + G.Seconds(dt0));
+
+            //    if (j1 == 0)
+            //    {
+            //        double rss = 0d;
+            //        foreach (double d in r)
+            //        {                        
+            //            rss += d * d;
+            //        }
+            //        rss = Math.Sqrt(rss);
+            //        if (input.testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
+            //        output.rss = rss;
+            //        output.r = r;
+            //    }
+            //}
+
             return output;
         }
 
@@ -1532,46 +1543,82 @@ namespace Gekko
                 }
             }
 
-            GAMSScalarModelSettings settings = new GAMSScalarModelSettings();
-            settings.zipFilePathAndName = fileName;
+            GAMSScalarModelSettings input = new GAMSScalarModelSettings();
+            input.zipFilePathAndName = fileName;
 
-            try { settings.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
-            if (settings.unrolledModel == null)
+            try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
+            if (input.unrolledModel == null)
             {
                 new Error("JSON: setting unrolledModel not found");
             }
-            settings.ffh_unrolledModel = Program.FindFile(fileName + "\\" + settings.unrolledModel, folders, true, true, o.p);
+            input.ffh_unrolledModel = Program.FindFile(fileName + "\\" + input.unrolledModel, folders, true, true, o.p);
 
 
-            try { settings.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
-            if (settings.unrolledNames == null)
+            try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
+            if (input.unrolledNames == null)
             {
                 new Error("JSON: setting unrolledNames not found");
             }
-            settings.ffh_unrolledNames = Program.FindFile(fileName + "\\" + settings.unrolledNames, folders, true, true, o.p);
+            input.ffh_unrolledNames = Program.FindFile(fileName + "\\" + input.unrolledNames, folders, true, true, o.p);
 
             if (false)
             {
-                try { settings.referenceData = (string)jsonTree["referenceData"]; } catch { }
-                if (settings.referenceData == null)
+                try { input.referenceData = (string)jsonTree["referenceData"]; } catch { }
+                if (input.referenceData == null)
                 {
                     new Error("JSON: setting referenceData not found");
                 }
-                settings.ffh_referenceData = Program.FindFile(fileName + "\\" + settings.referenceData, folders, true, true, o.p);
+                input.ffh_referenceData = Program.FindFile(fileName + "\\" + input.referenceData, folders, true, true, o.p);
 
-                try { settings.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
-                if (settings.multiplierData == null)
+                try { input.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
+                if (input.multiplierData == null)
                 {
                     new Error("JSON: setting multiplierData not found");
                 }
-                settings.ffh_multiplierData = Program.FindFile(fileName + "\\" + settings.multiplierData, folders, true, true, o.p);
+                input.ffh_multiplierData = Program.FindFile(fileName + "\\" + input.multiplierData, folders, true, true, o.p);
             }
 
-            settings.testForZeroResiduals = false;
+            input.testForZeroResiduals = false;
             //settings.time0 = new GekkoTime(EFreq.A, 2027, 1);  //TODO TODO TODO
-            settings.rep1 = 10;
-            settings.rep2 = 100;
-            GamsTestOutput output = GAMSEquations(settings);
+            input.rep1 = 10;
+            input.rep2 = 100;
+            GamsTestOutput output = GAMSEquations(input);
+
+            for (int j1 = 0; j1 < input.rep1; j1++)
+            {
+                DateTime dt0 = DateTime.Now;
+                for (int j2 = 0; j2 < input.rep2; j2++)
+                {
+                    Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = Program.model.modelGamsScalar.functions;
+                    double[][] a = Program.model.modelGamsScalar.a;
+                    double[] r = Program.model.modelGamsScalar.r;
+                    int[][] bb = Program.model.modelGamsScalar.bb;
+                    double[] cc = Program.model.modelGamsScalar.cc;
+                    int[][] dd = Program.model.modelGamsScalar.dd;
+                    int[] ee = Program.model.modelGamsScalar.ee;
+
+                    for (int i = 0; i < Program.model.modelGamsScalar.eqCounts; i++)
+                    {
+                        functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
+                        //double x = r[i];                        
+                    }
+                }
+                new Writeln(Program.model.modelGamsScalar.eqCounts + " evaluations x " + input.rep2 + " took " + G.Seconds(dt0));
+
+                if (j1 == 0)
+                {
+                    double rss = 0d;
+                    foreach (double d in Program.model.modelGamsScalar.r)
+                    {
+                        rss += d * d;
+                    }
+                    rss = Math.Sqrt(rss);
+                    if (input.testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
+                    output.rss = rss;
+                    output.r = Program.model.modelGamsScalar.r;
+                }
+            }
+
             new Writeln("RSS = " + output.rss);
 
             if (false) GAMSParser();

@@ -417,11 +417,21 @@ namespace Gekko
     public class ModelGamsScalar
     {
         [ProtoMember(1)]
-        public ModelInfoGams modelInfo = new ModelInfoGams();
+        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;
         [ProtoMember(2)]
-        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+        public double[] r = null;
         [ProtoMember(3)]
-        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
+        public double[][] a = null;
+        [ProtoMember(4)]
+        public int[][] bb = null;
+        [ProtoMember(5)]
+        public double[] cc = null;
+        [ProtoMember(6)]
+        public int[][] dd = null;
+        [ProtoMember(7)]
+        public int[] ee = null;
+        [ProtoMember(8)]
+        public int eqCounts = -12345;
     }
 
     [ProtoContract]
