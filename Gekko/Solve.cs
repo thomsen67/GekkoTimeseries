@@ -726,6 +726,60 @@ namespace Gekko
 
         public static void Sim(O.Sim o)
         {
+            if (Program.model.modelGamsScalar != null)
+            {
+                if (true)
+                {
+
+                    // test the scalar model
+                    // test the scalar model
+                    // test the scalar model
+
+                    bool testForZeroResiduals = false;
+                    int rep1 = 10;
+                    int rep2 = 100;
+                    double rss = double.NaN;
+                    for (int j1 = 0; j1 < rep1; j1++)
+                    {
+                        DateTime dt0 = DateTime.Now;
+                        for (int j2 = 0; j2 < rep2; j2++)
+                        {
+                            Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = Program.model.modelGamsScalar.functions;
+                            double[][] a = Program.model.modelGamsScalar.a;
+                            double[] r = Program.model.modelGamsScalar.r;
+                            int[][] bb = Program.model.modelGamsScalar.bb;
+                            double[] cc = Program.model.modelGamsScalar.cc;
+                            int[][] dd = Program.model.modelGamsScalar.dd;
+                            int[] ee = Program.model.modelGamsScalar.ee;
+
+                            for (int i = 0; i < Program.model.modelGamsScalar.eqCounts; i++)
+                            {
+                                functions[ee[i]](i, r, a, cc, bb, dd);  //can return a sum (illegals signal)
+                                                                        //double x = r[i];                        
+                            }
+                        }
+                        new Writeln(Program.model.modelGamsScalar.eqCounts + " evaluations x " + rep2 + " took " + G.Seconds(dt0));
+
+                        if (j1 == 0)
+                        {
+                            rss = 0d;
+                            foreach (double d in Program.model.modelGamsScalar.r)
+                            {
+                                rss += d * d;
+                            }
+                            rss = Math.Sqrt(rss);
+                            if (testForZeroResiduals && (G.isNumericalError(rss) || Math.Abs(rss) > 2e-10)) new Error("Bad evaluation");
+                            rss = rss;
+                        }
+                    }
+
+                    new Writeln("RSS = " + rss);
+
+                    
+                }
+                return;
+            }
+
             if (!G.HasModelGekko())
             {                
                 new Error("No model seems to be defined (cf. {a{MODEL¤model.htm}a} statement)");

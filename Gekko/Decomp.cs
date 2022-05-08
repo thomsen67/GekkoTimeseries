@@ -123,8 +123,6 @@ namespace Gekko
             G.CheckLegalPeriod(o.t1, o.t2);
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "n";
 
-
-
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.decompTablesFormat.showErrors = true; //
             decompOptions2.t1 = o.t1;

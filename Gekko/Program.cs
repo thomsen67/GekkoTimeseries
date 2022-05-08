@@ -15151,6 +15151,8 @@ namespace Gekko
             {                   
                 GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
+                if (false) GamsModel.GAMSParser();
+                if (false) GamsModel.GamsGMO();
             }
         }
         

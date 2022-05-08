@@ -12499,6 +12499,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
             I("MODEL <gms> small.zip;");
+            I("SIM;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("8 evaluations x 100 took"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.10011561985681E-15"));
             //TODO
@@ -12520,6 +12521,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
             I("MODEL <gms> makro.zip;");
+            I("SIM;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));            
 
