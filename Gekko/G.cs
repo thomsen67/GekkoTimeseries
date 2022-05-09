@@ -3893,9 +3893,9 @@ namespace Gekko
         /// <returns>Output string</returns>
         public static string GetUpperLowerCase(string var)
         {
-            if (HasModelGekko() && Program.model.modelGekko.varsAType != null)
+            if (G.GetModelType()==EModelType.Gekko && Program.model.modelGekko.varsAType != null)
             {
-                //a model is loaded
+                //a Gekko model is loaded
                 //ATypeData temp = (ATypeData)Program.model.modelGekko.varsAType[var];
                 ATypeData temp = null; Program.model.modelGekko.varsAType.TryGetValue(var, out temp);
                 if (temp != null)
@@ -3907,23 +3907,23 @@ namespace Gekko
             return var;
         }
 
-        /// <summary>
-        /// Whether a Gekko model is loaded with MODEL
-        /// </summary>
-        /// <returns></returns>
-        public static bool HasModelGekko()
-        {
-            return Program.model != null && Program.model.modelGekko != null;
-        }
+        ///// <summary>
+        ///// Whether a Gekko model is loaded with MODEL
+        ///// </summary>
+        ///// <returns></returns>
+        //public static bool HasModelGekko()
+        //{
+        //    return Program.model != null && Program.model.modelGekko != null;
+        //}
 
-        /// <summary>
-        /// Whether a model is loaded with MODEL
-        /// </summary>
-        /// <returns></returns>
-        public static bool HasModel()
-        {
-            return Program.model != null && (Program.model.modelGekko != null || Program.model.modelGams != null || Program.model.modelGamsScalar != null);
-        }
+        ///// <summary>
+        ///// Whether a model is loaded with MODEL
+        ///// </summary>
+        ///// <returns></returns>
+        //public static bool HasModel()
+        //{
+        //    return Program.model != null && (Program.model.modelGekko != null || Program.model.modelGams != null || Program.model.modelGamsScalar != null);
+        //}
 
         /// <summary>
         /// Gets model type, looking at the global Program.model object. Normally returns .Gekko, .GAMSRaw or GAMSScalarModel. 

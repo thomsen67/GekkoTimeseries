@@ -1923,7 +1923,7 @@ namespace Gekko
             }
             else
             {
-                if (G.HasModelGekko())
+                if (G.GetModelType() == EModelType.Gekko)
                 {
                     if (Program.model.modelGekko.exogenized.Count == 0 && Program.model.modelGekko.endogenized.Count == 0)
                     {
@@ -2437,9 +2437,9 @@ namespace Gekko
         public static void Sign()
         {
             StringBuilder sb = new StringBuilder();
-            if (!G.HasModelGekko())
+            if (G.GetModelType() != EModelType.Gekko)
             {
-                new Error("It seems no model is defined. See MODEL command.");
+                new Error("It seems no Gekko model is defined. See MODEL command.");
                 //throw new GekkoException();
             }
             if (Program.model.modelGekko.signatureStatus == ESignatureStatus.SignatureNotFoundInModelFile)
@@ -6828,7 +6828,7 @@ namespace Gekko
                         //isSimple can never be true with READ ... TO ...
                         //Do not do this with READ<first> or READ<ref>, only with READ.                    
                         Program.MulbkClone();
-                        if (G.HasModelGekko() && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
+                        if (G.GetModelType() == EModelType.Gekko && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
                         {
                             //only in sim or mixed mode, if a model is existing
                             CreateMissingModelVariables();
@@ -7861,7 +7861,7 @@ namespace Gekko
                 G.CheckLegalPeriod(this.t1, this.t2);
                 List<string> vars = O.Restrict(this.iv, false, false, false, false);
 
-                if (!G.HasModelGekko())
+                if (G.GetModelType() != EModelType.Gekko)
                 {
                     new Error("PREDICT does not work without a Gekko model (cf. MODEL)");
                     //throw new GekkoException();

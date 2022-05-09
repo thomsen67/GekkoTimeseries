@@ -726,7 +726,7 @@ namespace Gekko
 
         public static void Sim(O.Sim o)
         {
-            if (Program.model.modelGamsScalar != null)
+            if (G.GetModelType() == EModelType.GAMSScalarModel)
             {
                 if (true)
                 {
@@ -775,21 +775,21 @@ namespace Gekko
 
                     new Writeln("RSS = " + rss);
 
-                    
+
                 }
                 return;
             }
 
-            if (!G.HasModelGekko())
+            if (G.GetModelType() != EModelType.Gekko)
             {                
-                new Error("No model seems to be defined (cf. {a{MODEL¤model.htm}a} statement)");
+                new Error("No Gekko model seems to be defined (cf. {a{MODEL¤model.htm}a} statement)");
             }
 
-            if (G.HasModelGekko() && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
+            if (G.GetModelType() == EModelType.Gekko && Program.model.modelGekko.subPeriods != -12345 && Program.model.modelGekko.subPeriods != O.CurrentSubperiods())
             {
                 using (Error e = new Error())
                 {
-                    e.MainAdd("The model was not compiled/loaded with the current frequency.");
+                    e.MainAdd("The Gekko model was not compiled/loaded with the current frequency.");
                     e.MainAdd("This applies to the pchy(), dify(), diffy(), dlogy() functions. Please put");
                     e.MainAdd("the MODEL statement after your 'OPTION freq ... ' statement.");
                 }
@@ -852,9 +852,9 @@ namespace Gekko
 
             Globals.simCounter = 0;
             //ErrorIfDatabanksSwapped();
-            if (!G.HasModelGekko())
+            if (G.GetModelType() != EModelType.Gekko)
             {
-                new Error("It seems no model is defined -- simulation cannot be performed");
+                new Error("It seems no Gekko model is defined -- simulation cannot be performed");
                 //throw new GekkoException();
             }
 
@@ -916,9 +916,9 @@ namespace Gekko
             ECompiledModelType modelType = GetModelTypeFromOptions(so);  //6 types, including Reverted (for EFTER command)
 
             //only used with ANTLR
-            if (!G.HasModelGekko() || Program.model.modelGekko.equations.Count == 0)
+            if ((G.GetModelType() != EModelType.Gekko) || Program.model.modelGekko.equations.Count == 0)
             {
-                new Error("It seems no model is defined: did you forget a MODEL statement?");
+                new Error("It seems no Gekko model is defined: did you forget a MODEL statement?");
                 //throw new GekkoException();
             }
             Globals.mayPrintConvergenceCheckVariableMissing = true;  //so that there is only 1 warning regarding this

@@ -275,6 +275,8 @@ namespace Gekko
                 else if (operatorOneOf3Types == EContribType.M && !decompDatas.hasM) shouldRecalc = true;
             }
 
+            EModelType modelType = G.GetModelType();
+
             if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse
             {                
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
@@ -869,7 +871,7 @@ namespace Gekko
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
         {
-            if (!G.HasModel())
+            if ( G.GetModelType() == EModelType.Unknown)
             {
                 new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
             }
@@ -887,7 +889,7 @@ namespace Gekko
             {
                 count++;
 
-                if (Program.model.modelGekko != null)
+                if (modelType == EModelType.Gekko)
                 {
                     //Gekko model
                     //Gekko model
@@ -909,7 +911,7 @@ namespace Gekko
                         new Error("Expected 1 link expression");
                     }
                 }
-                else if (Program.model.modelGams != null)
+                else if (modelType == EModelType.GAMSRaw)
                 {
                     //GAMS model
                     //GAMS model
@@ -930,7 +932,7 @@ namespace Gekko
                         new Error("Expected 1 link expression");
                     }
                 }
-                else if (Program.model.modelGamsScalar != null)
+                else if (modelType == EModelType.GAMSScalarModel)
                 {
                     //GAMS scalar model
                     //GAMS scalar model
