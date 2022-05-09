@@ -875,8 +875,6 @@ namespace Gekko
                 helper.dict_FromEqChunkNumberToEqName[kvp.Value] = kvp.Key;
             }
 
-
-
             new Writeln("Import dictionary finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
