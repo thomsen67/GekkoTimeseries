@@ -730,7 +730,7 @@ namespace Gekko
                 //without index
                 new Error("Unexpected");
             }
-        }        
+        }
 
         public static void ReadGamsScalarModelEquations(GAMSScalarModelSettings input)
         {
@@ -753,16 +753,16 @@ namespace Gekko
             //  --> Sometimes seen it around 4.1 in debug mode (best release mode: around 3.52).
 
             //Note: cf. these interfaces from Python or Julia to GAMS: https://www.gams.com/blog/2020/06/new-and-improved-gams-links-for-pyomo-and-jump/
-            
+
             EqLineHelper helper = new EqLineHelper();
             helper.dict_FromEqNumberToEqName = null;
-            helper.dict_FromVarNumberToVarName = null;            
+            helper.dict_FromVarNumberToVarName = null;
 
             DateTime dt0 = DateTime.Now;  //everything
             DateTime dt1 = DateTime.Now;  //sub tasks
 
             string[] split = new string[] { ".fx", ".l", "=", ";" };
-            string[] split2 = new string[] { " " };            
+            string[] split2 = new string[] { " " };
 
             //string s2 = Program.GetTextFromFileWithWait(file2);
             //List<string> lines2 = Stringlist.ExtractLinesFromText(s2);
@@ -797,6 +797,7 @@ namespace Gekko
                                 eqCounts2 = int.Parse(sx);
                                 substatus2 = 0;
                                 helper.dict_FromEqNumberToEqName = new string[eqCounts2];
+                                helper.dict_FromEqNumberToEqChunkNumber = new int[eqCounts2];
                                 break;
                             }
                         }
@@ -831,8 +832,16 @@ namespace Gekko
                         string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                         int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
                         string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+                        string eqName = ss2;
+                        int idx = ss2.IndexOf("[");
+                        if (idx >= 0) eqName = ss2.Substring(0, idx);
                         helper.dict_FromEqNumberToEqName[n] = ss2;
                         helper.dict_FromEqNameToEqNumber.Add(ss2, n);  //filling this out could be postponed until decomp if loading is slow
+                        if (!helper.dict_FromEqNameToEqChunkNumber.ContainsKey(eqName))
+                        {
+                            helper.dict_FromEqNameToEqChunkNumber.Add(eqName, helper.dict_FromEqNameToEqChunkNumber.Count);
+                        }
+                        helper.dict_FromEqNumberToEqChunkNumber[n] = helper.dict_FromEqNameToEqChunkNumber.Count - 1;
                     }
                     else if (status2 == 2)
                     {
@@ -860,11 +869,19 @@ namespace Gekko
                 helper.dict_FromANumberToVarName[kvp.Value] = kvp.Key;
             }
 
+            helper.dict_FromEqChunkNumberToEqName = new string[helper.dict_FromEqNameToEqChunkNumber.Count];
+            foreach (KeyValuePair<string, int> kvp in helper.dict_FromEqNameToEqChunkNumber)
+            {
+                helper.dict_FromEqChunkNumberToEqName[kvp.Value] = kvp.Key;
+            }
+
+
+
             new Writeln("Import dictionary finished: " + G.Seconds(dt1));
-            dt1 = DateTime.Now;            
+            dt1 = DateTime.Now;
 
             TokenList tokensLast = null;
-                        
+
             List<string> eqs = new List<string>();      //1
             List<string> values = new List<string>();   //2
             List<string> end = new List<string>();      //3
@@ -945,7 +962,7 @@ namespace Gekko
                     }
                     else if (status == 1)
                     {
-                        if (line.StartsWith("* set non-default bounds", StringComparison.OrdinalIgnoreCase) || line.StartsWith("* set non-default levels", StringComparison.OrdinalIgnoreCase)) 
+                        if (line.StartsWith("* set non-default bounds", StringComparison.OrdinalIgnoreCase) || line.StartsWith("* set non-default levels", StringComparison.OrdinalIgnoreCase))
                         {
                             values.Add(line);
                             status = 2;
@@ -990,13 +1007,13 @@ namespace Gekko
 
             //new Writeln("Count " + helper.count + " hits " + helper.known + " unique " + helper.unique + " semis " + semis);
             if (helper.count != helper.known + helper.unique) new Error("Not summing up");
-            if (helper.count != semis) new Error("Not summing up");            
+            if (helper.count != semis) new Error("Not summing up");
 
             if (false)
             {
                 File.WriteAllText(@"c:\Thomas\Gekko\regres\MAKRO\test3\klon\Model\deleteme.gms", Stringlist.ExtractTextFromLines(codeLines).ToString());
             }
-            
+
             foreach (string line in values)
             {
                 if (line.Trim() == "" || line.StartsWith("*")) continue;
@@ -1037,12 +1054,12 @@ namespace Gekko
 
             double[] r = new double[eqCounts2];
             for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
-            Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];                        
+            Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];
             double[][] a = helper.a;
             int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
             double[] cc = helper.c.ToArray();
             int[][] dd = helper.d.Select(x => x.ToArray()).ToArray();
-            int[] ee = helper.eqPointers.ToArray();            
+            int[] ee = helper.eqPointers.ToArray();
 
             new Writeln("Data preparation finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
@@ -1054,8 +1071,8 @@ namespace Gekko
                 txt.MainAdd("===> Setting up everything took: " + G.Seconds(dt0) + ", all included");
                 txt.MainNewLineTight();
                 txt.MainAdd("======================================================================");
-            }            
-                        
+            }
+
             Object[] o = new Object[1] { functions };
             assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                     
 
@@ -1085,7 +1102,10 @@ namespace Gekko
                 Program.model.modelGamsScalar.dict_FromEqNumberToEqName = helper.dict_FromEqNumberToEqName;
                 Program.model.modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;
                 Program.model.modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
-                Program.model.modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;       
+                Program.model.modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;
+                Program.model.modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
+                Program.model.modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;
+                Program.model.modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
             }
             return;
         }
@@ -4428,9 +4448,11 @@ namespace Gekko
 
         public string[] dict_FromEqNumberToEqName = null;
         public GekkoDictionary<string, int> dict_FromEqNameToEqNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
         public string[] dict_FromVarNumberToVarName = null;
         public GekkoDictionary<string, int> dict_FromVarNameToVarNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public string[] dict_FromEqChunkNumberToEqName = null;
+        public GekkoDictionary<string, int> dict_FromEqNameToEqChunkNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         public GekkoTime time0 = GekkoTime.tNull;
         public GekkoTime time1 = GekkoTime.tNull;

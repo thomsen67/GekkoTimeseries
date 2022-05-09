@@ -178,6 +178,28 @@ namespace Gekko
             {
                 //newest decomp
 
+                //TODO
+                //TODO
+                //TODO
+                //Here, for scalar we need to assemble the equations like this:
+                //
+                // e1[a, 2001]
+                // e1[a, 2001]
+                // e1[b, 2002]
+                // e1[b, 2002]
+                // e2[x, 2001]
+                // e2[x, 2001]
+                // e2[y, 2002]
+                // e2[y, 2002]
+                //
+                // Produces 2 Link objects, each consisting of a list of 2 sub-objects.
+                // These sub-objects should provide params that makes it possible to call
+                //       the for instance e1[a] by GekkoTime, so it can call
+                //       e1[a][2001a1], e1[a][2002a1], etc.
+                // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
+
+
+
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
@@ -295,7 +317,7 @@ namespace Gekko
                     if (G.GetModelType() == EModelType.GAMSScalarModel)
                     {
                         jj++;  //will be = 0
-                        DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, link.i, DecompBanks(operator1), residualName, ref funcCounter);
+                        DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, link.eqNumber, DecompBanks(operator1), residualName, ref funcCounter);
                         DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
                     }
                     else
@@ -959,9 +981,9 @@ namespace Gekko
                         // NEW GAMS SCALAR MODEL DECOMP
                         //
                         
-                        int i = Program.model.modelGamsScalar.GetEqNumber(link.eqname);
+                        int eqNumber = Program.model.modelGamsScalar.GetEqNumber(link.eqname);
                         link.expressionText = link.eqname + " --> y = x [TODO]";
-                        link.i = i; //Inside Program.model.modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
+                        link.eqNumber = eqNumber; //Inside Program.model.modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
 
                     }
                     else

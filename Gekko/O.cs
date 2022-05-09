@@ -35,6 +35,11 @@ namespace Gekko
 
     public class Link
     {
+        //TODO TODO
+        //TODO TODO
+        //TODO TODO probably better to do as an Interface, non-scalar or scalar?
+        //TODO TODO
+        //TODO TODO
         public string expressionText = null;
         public List<Func<GekkoSmpl, IVariable>> expressions = null;
         public List<string> varnames = null;
@@ -42,7 +47,10 @@ namespace Gekko
         public string eqname = null;
         public string option = null;
         // ---------------------------- scalar model -------------------
-        public int i = -12345;  //the equation number
+        public int eqNumber = -12345;  //the equation number
+        //number1
+        //number2
+        //number3
     }
 
     public class DecompItems

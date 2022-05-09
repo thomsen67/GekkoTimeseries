@@ -428,12 +428,25 @@ namespace Gekko
         public int known = -12345;
         public int unique = -12345;
         // ---------- dicts etc. ------------
+
+        //variable names without time dimension 
         public string[] dict_FromANumberToVarName = null;
         public GekkoDictionary<string, int> dict_FromVarNameToANumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);        
+
+        //eq numbers in folded model, corresponds to i/ii dimension
+        public string[] dict_FromEqChunkNumberToEqName = null;
+        public GekkoDictionary<string, int> dict_FromEqNameToEqChunkNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        //lowest level equation numbers (in unfolded/unrolled model), corresponds to j/jj dimension (but do not start over at each i/ii, so these numbers are global).
         public string[] dict_FromEqNumberToEqName = null;
         public GekkoDictionary<string, int> dict_FromEqNameToEqNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        //lowest level variable numbers (in unfolded/unrolled model)
         public string[] dict_FromVarNumberToVarName = null;
         public GekkoDictionary<string, int> dict_FromVarNameToVarNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        //from lowest level equation number to chunk equations number
+        public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         public int GetEqNumber(string eqName)
         {
