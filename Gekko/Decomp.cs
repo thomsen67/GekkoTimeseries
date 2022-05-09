@@ -954,7 +954,8 @@ namespace Gekko
                     //GAMS model
                     //GAMS model
                     //GAMS model
-                    if (link.expressions.Count == 1 && link.expressions[0] == null)
+                    if(link.expressions.Count != 1) new Error("Expected 1 link expression");
+                    if (link.expressions[0] == null)
                     {
                         //
                         // NEW GAMS MODEL DECOMP
@@ -962,11 +963,7 @@ namespace Gekko
                         ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
                         link.expressions = found.expressions;
                         link.expressionText = found.lhs + " = " + found.rhs;
-                    }
-                    else
-                    {
-                        new Error("Expected 1 link expression");
-                    }
+                    }                    
                 }
                 else if (modelType == EModelType.GAMSScalarModel)
                 {
@@ -975,7 +972,8 @@ namespace Gekko
                     //GAMS scalar model
                     //GAMS scalar model
                     //GAMS scalar model
-                    if (link.expressions.Count == 1 && link.expressions[0] == null)
+                    if (link.expressions.Count != 1) new Error("Expected 1 link expression");
+                    if (link.expressions[0] == null)
                     {
                         //
                         // NEW GAMS SCALAR MODEL DECOMP
@@ -985,10 +983,6 @@ namespace Gekko
                         link.expressionText = link.eqname + " --> y = x [TODO]";
                         link.eqNumber = eqNumber; //Inside Program.model.modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
 
-                    }
-                    else
-                    {
-                        new Error("Expected 1 link expression");
                     }
                 }
                 else new Error("Model type error");
