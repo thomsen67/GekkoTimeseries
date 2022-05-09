@@ -944,9 +944,11 @@ namespace Gekko
                         //
                         // NEW GAMS SCALAR MODEL DECOMP
                         //
-                        ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
-                        link.expressions = found.expressions;
-                        link.expressionText = found.lhs + " = " + found.rhs;
+                        
+                        int i = Program.model.modelGamsScalar.GetEqNumber(link.eqname);
+                        link.expressionText = link.eqname + " --> y = x [TODO]";
+                        link.i = i; //Inside Program.model.modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
+
                     }
                     else
                     {

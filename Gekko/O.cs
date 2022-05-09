@@ -41,6 +41,8 @@ namespace Gekko
         public List<string> endo = null; //for links item after the first one, varnames may be 
         public string eqname = null;
         public string option = null;
+        // ---------------------------- scalar model -------------------
+        public int i = -12345;  //the equation number
     }
 
     public class DecompItems

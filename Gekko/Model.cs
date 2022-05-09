@@ -427,6 +427,27 @@ namespace Gekko
         public int count = -12345;
         public int known = -12345;
         public int unique = -12345;
+        // ---------- dicts etc. ------------
+        public string[] dict_FromANumberToVarName = null;
+        public GekkoDictionary<string, int> dict_FromVarNameToANumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);        
+        public string[] dict_FromEqNumberToEqName = null;
+        public GekkoDictionary<string, int> dict_FromEqNameToEqNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public string[] dict_FromVarNumberToVarName = null;
+        public GekkoDictionary<string, int> dict_FromVarNameToVarNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        public int GetEqNumber(string eqName)
+        {
+            //TODO: handle errors
+            return this.dict_FromEqNameToEqNumber[eqName];
+        }
+
+        public string GetEqName(int eqNumber)
+        {
+            //TODO: handle errors
+            return this.dict_FromEqNumberToEqName[eqNumber];
+        }
+
+
     }
 
     [ProtoContract]
@@ -495,5 +516,12 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public List<string> equationVariables = new List<string>();
+    }
+
+    [ProtoContract]
+    public class ModelGamsScalarEquation
+    {
+        
+
     }
 }

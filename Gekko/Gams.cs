@@ -687,7 +687,7 @@ namespace Gekko
         /// <param name="resultingFullName"></param>
         private static void ExtractTimeDimension(string varname2, ref GekkoTime time, ref string resultingFullName)
         {
-            int i = varname2.IndexOf('(');
+            int i = varname2.IndexOf('[');
             if (i >= 1)
             {
                 //with index (...)                                    
@@ -755,8 +755,8 @@ namespace Gekko
             //Note: cf. these interfaces from Python or Julia to GAMS: https://www.gams.com/blog/2020/06/new-and-improved-gams-links-for-pyomo-and-jump/
             
             EqLineHelper helper = new EqLineHelper();
-            helper.dictE_eqs = null;
-            helper.dictX_vars = null;            
+            helper.dict_FromEqNumberToEqName = null;
+            helper.dict_FromVarNumberToVarName = null;            
 
             DateTime dt0 = DateTime.Now;  //everything
             DateTime dt1 = DateTime.Now;  //sub tasks
@@ -796,7 +796,7 @@ namespace Gekko
                             {
                                 eqCounts2 = int.Parse(sx);
                                 substatus2 = 0;
-                                helper.dictE_eqs = new string[eqCounts2];
+                                helper.dict_FromEqNumberToEqName = new string[eqCounts2];
                                 break;
                             }
                         }
@@ -810,7 +810,7 @@ namespace Gekko
                             {
                                 varCounts2 = int.Parse(sx);
                                 substatus2 = 0;
-                                helper.dictX_vars = new string[varCounts2];
+                                helper.dict_FromVarNumberToVarName = new string[varCounts2];
                                 break;
                             }
                         }
@@ -830,26 +830,34 @@ namespace Gekko
                     {
                         string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                         int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
-                        string ss2 = ss[1];
-                        helper.dictE_eqs[n] = ss2;
+                        string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+                        helper.dict_FromEqNumberToEqName[n] = ss2;
+                        helper.dict_FromEqNameToEqNumber.Add(ss2, n);  //filling this out could be postponed until decomp if loading is slow
                     }
                     else if (status2 == 2)
                     {
                         string[] ss = line.Split(split2, StringSplitOptions.RemoveEmptyEntries);
                         int n = int.Parse(ss[0].Substring(1)) - 1; //so it is 0-based
-                        string ss2 = ss[1];
-                        helper.dictX_vars[n] = ss2;
+                        string ss2 = ss[1].Replace("(", "[").Replace(")", "]");
+                        helper.dict_FromVarNumberToVarName[n] = ss2;
+                        helper.dict_FromVarNameToVarNumber.Add(ss2, n);
                         GekkoTime time = GekkoTime.tNull;
                         string resultingFullName = null;
                         ExtractTimeDimension(ss2, ref time, ref resultingFullName);
                         if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
                         if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
-                        if (!helper.dictA.ContainsKey(resultingFullName))
+                        if (!helper.dict_FromVarNameToANumber.ContainsKey(resultingFullName))
                         {
-                            helper.dictA.Add(resultingFullName, helper.dictA.Count);
+                            helper.dict_FromVarNameToANumber.Add(resultingFullName, helper.dict_FromVarNameToANumber.Count);
                         }
                     }
                 }
+            }
+
+            helper.dict_FromANumberToVarName = new string[helper.dict_FromVarNameToANumber.Count];
+            foreach (KeyValuePair<string, int> kvp in helper.dict_FromVarNameToANumber)
+            {
+                helper.dict_FromANumberToVarName[kvp.Value] = kvp.Key;
             }
 
             new Writeln("Import dictionary finished: " + G.Seconds(dt1));
@@ -869,7 +877,7 @@ namespace Gekko
             helper.time0 = helper.time1;  //could perhaps lag this later on... ?
             int periods = GekkoTime.Observations(helper.time1, helper.time2);
             helper.a = new double[periods][];
-            for (int i = 0; i < helper.a.GetLength(0); i++) helper.a[i] = new double[helper.dictA.Count]; //beware: 0-based            
+            for (int i = 0; i < helper.a.GetLength(0); i++) helper.a[i] = new double[helper.dict_FromVarNameToANumber.Count]; //beware: 0-based            
 
             List<string> codeLines = new List<string>();
 
@@ -994,11 +1002,11 @@ namespace Gekko
                 if (line.Trim() == "" || line.StartsWith("*")) continue;
                 string[] ss = line.Split(split, StringSplitOptions.None);
                 int id = int.Parse(ss[0].Substring(1)) - 1;  //0-based
-                string inputName = helper.dictX_vars[id];
+                string inputName = helper.dict_FromVarNumberToVarName[id];
                 GekkoTime t = GekkoTime.tNull;
                 string outputName = null;
                 ExtractTimeDimension(inputName, ref t, ref outputName);
-                int aNumber = helper.dictA[outputName];
+                int aNumber = helper.dict_FromVarNameToANumber[outputName];
                 int i1 = GekkoTime.Observations(helper.time0, t) - 1;
                 int i2 = aNumber;
                 double d;
@@ -1058,6 +1066,7 @@ namespace Gekko
             {
                 Program.model = new Model();
                 Program.model.modelGamsScalar = new ModelGamsScalar();
+                // -------------- these can evaluate an equation ---------
                 Program.model.modelGamsScalar.functions = functions;
                 Program.model.modelGamsScalar.a = a;
                 Program.model.modelGamsScalar.r = r;
@@ -1065,10 +1074,18 @@ namespace Gekko
                 Program.model.modelGamsScalar.cc = cc;
                 Program.model.modelGamsScalar.dd = dd;
                 Program.model.modelGamsScalar.ee = ee;
+                // -------------- helpers, counts -----------------------
                 Program.model.modelGamsScalar.eqCounts = eqCounts;
                 Program.model.modelGamsScalar.count = helper.count;
                 Program.model.modelGamsScalar.known = helper.known;
                 Program.model.modelGamsScalar.unique = helper.unique;
+                // -------------- helpers dictionaries ---------
+                Program.model.modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
+                Program.model.modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;
+                Program.model.modelGamsScalar.dict_FromEqNumberToEqName = helper.dict_FromEqNumberToEqName;
+                Program.model.modelGamsScalar.dict_FromEqNameToEqNumber = helper.dict_FromEqNameToEqNumber;
+                Program.model.modelGamsScalar.dict_FromVarNumberToVarName = helper.dict_FromVarNumberToVarName;
+                Program.model.modelGamsScalar.dict_FromVarNameToVarNumber = helper.dict_FromVarNameToVarNumber;       
             }
             return;
         }
@@ -1271,14 +1288,14 @@ namespace Gekko
                     {
                         knownPattern = false;
                     }
-                    int i1 = helper.dictC.Count;
-                    if (helper.dictC.ContainsKey(th1.s))
+                    int i1 = helper.dict_Constants.Count;
+                    if (helper.dict_Constants.ContainsKey(th1.s))
                     {
-                        i1 = helper.dictC[th1.s];
+                        i1 = helper.dict_Constants[th1.s];
                     }
                     else
                     {
-                        helper.dictC.Add(th1.s, i1);
+                        helper.dict_Constants.Add(th1.s, i1);
                         helper.exoValues.Add(double.Parse(th1.ToString()));
                     }                    
                     HandleEqLineAppend(helper, i, "c[d[" + helper.exo.Count + "]]");
@@ -1295,7 +1312,7 @@ namespace Gekko
                         knownPattern = false;
                     }
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
-                    string eqname = helper.dictE_eqs[number];                    
+                    string eqname = helper.dict_FromEqNumberToEqName[number];                    
                     HandleEqLineAppend(helper, i, "/* " + eqname + " */  ");
                 }
                 else if (IsXVariable(th1, th1Next))
@@ -1309,14 +1326,14 @@ namespace Gekko
                         knownPattern = false;
                     }
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
-                    string varname = helper.dictX_vars[number];
+                    string varname = helper.dict_FromVarNumberToVarName[number];
                     GekkoTime time = GekkoTime.tNull;
                     string resultingFullName = null;
                     ExtractTimeDimension(varname, ref time, ref resultingFullName);
                     //if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
                     //if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
                     int i1 = (GekkoTime.Observations(helper.time0, time) - 1);
-                    int i2 = i2 = helper.dictA[resultingFullName];
+                    int i2 = helper.dict_FromVarNameToANumber[resultingFullName];
                     //if (helper.dictA.ContainsKey(resultingFullName))
                     //{
                     //    i2 = helper.dictA[resultingFullName];
@@ -4398,15 +4415,23 @@ namespace Gekko
         public int count = 0;
         public int known = 0;
         public int unique = 0;
-        public GekkoDictionary<string, int> dictA = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, int> dictC = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        public string[] dict_FromANumberToVarName = null;
+        public GekkoDictionary<string, int> dict_FromVarNameToANumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        public GekkoDictionary<string, int> dict_Constants = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public double[][] a = null;
         public List<List<int>> b = new List<List<int>>();
         public List<double> c = new List<double>();
         public List<List<int>> d = new List<List<int>>();
         public List<int> eqPointers = new List<int>();
-        public string[] dictE_eqs = null;
-        public string[] dictX_vars = null;
+
+        public string[] dict_FromEqNumberToEqName = null;
+        public GekkoDictionary<string, int> dict_FromEqNameToEqNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        public string[] dict_FromVarNumberToVarName = null;
+        public GekkoDictionary<string, int> dict_FromVarNameToVarNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
         public GekkoTime time0 = GekkoTime.tNull;
         public GekkoTime time1 = GekkoTime.tNull;
         public GekkoTime time2 = GekkoTime.tNull;
