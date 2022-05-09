@@ -933,7 +933,8 @@ namespace Gekko
                     //Gekko model
                     //Gekko model                    
 
-                    if (link.expressions.Count == 1 && link.expressions[0] == null)
+                    if (link.expressions.Count != 1) new Error("Expected 1 link expression");
+                    if (link.expressions[0] == null)
                     {
                         // NEW GEKKO MODEL DECOMP
                         // NEW GEKKO MODEL DECOMP
