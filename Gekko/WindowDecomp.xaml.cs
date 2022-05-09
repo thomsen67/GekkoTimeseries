@@ -2387,7 +2387,8 @@ namespace Gekko
     }
 
     public class DecompOptions2
-    {
+    {        
+
         public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
 
         //-------- tranformation start --------------

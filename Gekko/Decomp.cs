@@ -179,7 +179,7 @@ namespace Gekko
                 //newest decomp
 
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
-                decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, false);
+                decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
 
                 int counter = -1;
@@ -290,7 +290,7 @@ namespace Gekko
                     List<DecompData> temp = new List<DecompData>();
 
                     int jj = -1;
-                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
+                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
                     {
                         jj++;
                         DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName, ref funcCounter);
@@ -869,17 +869,47 @@ namespace Gekko
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
         {
+            if (!G.HasModel())
+            {
+                new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
+            }
+
             DecompOptions2 decompOptions = (DecompOptions2)o;
             WindowDecomp w = null;
             w = new WindowDecomp(decompOptions);
             Globals.windowsDecomp2.Add(w);
+
+            EModelType modelType = G.GetModelType();
 
             G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
             int count = -1;
             foreach (Link link in decompOptions.link)
             {
                 count++;
-                if (Program.model.modelGams != null)
+
+                if (Program.model.modelGekko != null)
+                {
+                    //Gekko model
+                    //Gekko model
+                    //Gekko model
+                    //Gekko model
+                    //Gekko model                    
+
+                    if (link.expressions.Count == 1 && link.expressions[0] == null)
+                    {
+                        // NEW GEKKO MODEL DECOMP
+                        // NEW GEKKO MODEL DECOMP
+                        // NEW GEKKO MODEL DECOMP
+                        EquationHelper found = DecompEvalGekko(link.varnames[0]);
+                        link.expressions = found.expressions;
+                        decompOptions.expressionOld = found.equationText;
+                    }
+                    else
+                    {
+                        new Error("Expected 1 link expression");
+                    }
+                }
+                else if (Program.model.modelGams != null)
                 {
                     //GAMS model
                     //GAMS model
@@ -900,32 +930,28 @@ namespace Gekko
                         new Error("Expected 1 link expression");
                     }
                 }
-                else
+                else if (Program.model.modelGamsScalar != null)
                 {
-                    //Gekko model
-                    //Gekko model
-                    //Gekko model
-                    //Gekko model
-                    //Gekko model
-                    if (!G.HasModelGekko())
-                    {
-                        new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
-                    }
-
+                    //GAMS scalar model
+                    //GAMS scalar model
+                    //GAMS scalar model
+                    //GAMS scalar model
+                    //GAMS scalar model
                     if (link.expressions.Count == 1 && link.expressions[0] == null)
                     {
-                        // NEW GEKKO MODEL DECOMP
-                        // NEW GEKKO MODEL DECOMP
-                        // NEW GEKKO MODEL DECOMP
-                        EquationHelper found = DecompEvalGekko(link.varnames[0]);
+                        //
+                        // NEW GAMS SCALAR MODEL DECOMP
+                        //
+                        ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
                         link.expressions = found.expressions;
-                        decompOptions.expressionOld = found.equationText;
+                        link.expressionText = found.lhs + " = " + found.rhs;
                     }
                     else
                     {
                         new Error("Expected 1 link expression");
                     }
                 }
+                else new Error("Model type error");
             }
             G.Writeln2(">>>getexpressions end " + DateTime.Now.ToLongTimeString());
 

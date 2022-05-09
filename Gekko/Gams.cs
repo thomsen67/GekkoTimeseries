@@ -761,7 +761,7 @@ namespace Gekko
             DateTime dt0 = DateTime.Now;  //everything
             DateTime dt1 = DateTime.Now;  //sub tasks
 
-            string[] split = new string[] { ".l", "=", ";" };
+            string[] split = new string[] { ".fx", ".l", "=", ";" };
             string[] split2 = new string[] { " " };            
 
             //string s2 = Program.GetTextFromFileWithWait(file2);
@@ -797,7 +797,6 @@ namespace Gekko
                                 eqCounts2 = int.Parse(sx);
                                 substatus2 = 0;
                                 helper.dictE_eqs = new string[eqCounts2];
-                                helper.dictX_vars = new string[eqCounts2];
                                 break;
                             }
                         }
@@ -811,6 +810,7 @@ namespace Gekko
                             {
                                 varCounts2 = int.Parse(sx);
                                 substatus2 = 0;
+                                helper.dictX_vars = new string[varCounts2];
                                 break;
                             }
                         }
@@ -937,7 +937,7 @@ namespace Gekko
                     }
                     else if (status == 1)
                     {
-                        if (line.StartsWith("* set non-default levels", StringComparison.OrdinalIgnoreCase)) //* set non-default levels
+                        if (line.StartsWith("* set non-default bounds", StringComparison.OrdinalIgnoreCase) || line.StartsWith("* set non-default levels", StringComparison.OrdinalIgnoreCase)) 
                         {
                             values.Add(line);
                             status = 2;
@@ -1017,9 +1017,9 @@ namespace Gekko
             dt1 = DateTime.Now;
 
             //new Writeln("eqCounts = " + eqCounts + ", varCounts = " + varCounts + ", eqCounts2 = " + eqCounts2 + ", varCounts2 = " + varCounts2);
-            if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
-            if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
-            if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
+            //if (eqCounts != varCounts) new Writeln("ERROR: counts do not match.");
+            //if (eqCounts2 != varCounts2) new Writeln("ERROR: counts do not match.");
+            //if (eqCounts != eqCounts2) new Writeln("ERROR: counts do not match.");
 
             List<string> eqNames = null;
 
@@ -1027,7 +1027,7 @@ namespace Gekko
             new Writeln("Compile finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
-            double[] r = new double[eqCounts];
+            double[] r = new double[eqCounts2];
             for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
             Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];                        
             double[][] a = helper.a;
@@ -2223,7 +2223,7 @@ namespace Gekko
         }
 
         private static List<ModelGamsEquation> GetGamsEquationsByEqname(string variable)
-        {
+        {            
             if (Program.model.modelGams.equationsByEqname == null || Program.model.modelGams.equationsByEqname.Count == 0)
             {
                 new Error("No GAMS equations found");

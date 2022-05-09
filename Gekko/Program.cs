@@ -73,6 +73,7 @@ namespace Gekko
 
     public enum EModelType
     {
+        Unknown,           //No MODEL command
         Gekko,             //normal
         GAMSRaw,           //rough translating
         GAMSScalarModel    //excact scalar model
@@ -15129,11 +15130,7 @@ namespace Gekko
             }
 
             EModelType modelType = EModelType.Gekko;
-            if (isGms)
-            {
-                if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalarModel;
-                else modelType = EModelType.GAMSRaw;
-            }
+            if (isGms) { if (G.Equal(Path.GetExtension(ffh.realPathAndFileName), ".zip")) modelType = EModelType.GAMSScalarModel; else modelType = EModelType.GAMSRaw; }
 
             if (modelType == EModelType.Gekko)
             {
@@ -15148,12 +15145,13 @@ namespace Gekko
                 Program.options.model_type = "gams";  //will not be set if something crashes above
             }
             else if (modelType == EModelType.GAMSScalarModel)
-            {                   
+            {
                 GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                 Program.options.model_type = "gams";  //will not be set if something crashes above
                 if (false) GamsModel.GAMSParser();
                 if (false) GamsModel.GamsGMO();
             }
+            else new Error("No model defined");
         }
         
         /// <summary>
