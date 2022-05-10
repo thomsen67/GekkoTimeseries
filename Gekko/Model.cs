@@ -472,7 +472,7 @@ namespace Gekko
         /// at the slot i.
         /// </summary>
         /// <param name="i"></param>
-        public double Predict(int i, bool isRef)
+        public double Eval(int i, bool isRef)
         {
             //NOTE: this.functions() can return a sum (with illegals signal).
             if (isRef)
@@ -485,6 +485,44 @@ namespace Gekko
                 this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd);
                 return this.r[i];
             }            
+        }
+
+        /// <summary>
+        /// Get data in GAMS scalar model.
+        /// </summary>
+        /// <param name="period"></param>
+        /// <param name="variable"></param>
+        /// <param name="isRef"></param>
+        /// <returns></returns>
+        public double GetData(int period, int variable, bool isRef)
+        {
+            if (isRef)
+            {
+                return this.a_ref[period][variable];
+            }
+            else
+            {
+                return this.a[period][variable];
+            }
+        }
+
+        /// <summary>
+        /// Set data in GAMS scalar model.
+        /// </summary>
+        /// <param name="period"></param>
+        /// <param name="variable"></param>
+        /// <param name="isRef"></param>
+        /// <param name="value"></param>
+        public void SetData(int period, int variable, bool isRef, double value)
+        {
+            if (isRef)
+            {
+                this.a_ref[period][variable] = value;
+            }
+            else
+            {
+                this.a[period][variable] = value;
+            }
         }
     }
 

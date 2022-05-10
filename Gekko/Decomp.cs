@@ -1587,8 +1587,8 @@ namespace Gekko
             {
                 DecompInitDict(d);                
 
-                double v = Program.model.modelGamsScalar.Predict(eqNumber, false);
-                y0a.SetData(ttt000, v); // expression(smpl); funcCounter++; 
+                double y0 = Program.model.modelGamsScalar.Eval(eqNumber, false);
+                y0a.SetData(ttt000, y0); // expression(smpl); funcCounter++; 
                 
                 Series y0a_series = y0a as Series;
                 Series y0_series = y0a_series;
@@ -1628,34 +1628,34 @@ namespace Gekko
 
                 double eps = Globals.newtonSmallNumber;
 
-                if (decompPrecedents.Count > 0)
+                //TODO TODO look up precedents in the right way
+                //TODO TODO look up precedents in the right way
+                //TODO TODO look up precedents in the right way
+                //TODO TODO look up precedents in the right way
+                //TODO TODO look up precedents in the right way
+
+                int ip = 0;
+                if (1 == 0) ip = 1;
+                if (1 == 0) ip = 2;
+                if (pre[ip].Count > 0) 
                 {
                     GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                     int iVar = -1;
 
-                    foreach (DecompPrecedent dp in decompPrecedents)
+                    foreach (TwoInts dp in pre[ip])
                     {
                         iVar++;
+                        bool isRef = false;                        
 
-                        Series xRef_series = null;
-                        IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
-
-                        if (dpx.Type() == EVariableType.Series)
-                        {
-                            if ((dpx as Series).type == ESeriesType.Timeless) continue;  //skip timeless series, #2983473298472
-                                                                                         //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe
+                                                    
                             if (mm.Contains(1))
                             {
-                                xRef_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
+                                isRef = true;
                             }
-                        }
-                        else
-                        {
-                            //else what?
-                        }
+                                                
 
-                        foreach (GekkoTime t1 in new GekkoTimeIterator(tt1.Add(-O.MaxLag()), tt2.Add(O.MaxLead())))
+                        foreach (GekkoTime t1 in new GekkoTimeIterator(ttt000, ttt000))
                         {
 
                             // --------------------------------------------
@@ -1664,50 +1664,22 @@ namespace Gekko
 
                             foreach (int j in mm)
                             {
-                                if (dpx.Type() == EVariableType.Series)
+                                if (true)
                                 {
-                                    Series x_series = null;
-                                    Series y_series = null;
-                                    if (j == 0)
-                                    {
-                                        x_series = dpx as Series;
-                                        y_series = y0_series;
-                                    }
-                                    else
-                                    {
-                                        x_series = xRef_series;
-                                        y_series = y0Ref_series;
-                                    }
-                                    double x_before = x_series.GetDataSimple(t1);
+
+                                    double x_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, isRef);
 
                                     try
                                     {
                                         double x_after = x_before + eps;
-                                        x_series.SetData(t1, x_after);
-
-                                        //Function call start --------------
-                                        O.AdjustSmplForDecomp(smpl, 0);  //no reason to enlarge this smpl with 10 pers at both ends, since it is only t2 that is written afterwards
-                                        if (j == 1) smpl.bankNumber = 1;
-                                        IVariable y1 = null;
-
-                                        if (true)  //this is what takes most of the time in DECOMP
-                                        {
-                                            y1 = new ScalarVal(123454321d); //expression(smpl); funcCounter++;  // <============================ THIS TAKES TIME!
-                                        }
-
-                                        if (j == 1) smpl.bankNumber = 0;
-                                        O.AdjustSmplForDecomp(smpl, 1);
-                                        //Function call end   --------------
-
-                                        Series y1_series = y1 as Series;
-                                        string nameOriginal = G.Chop_RemoveFreq(dp.s, tt1.freq);
+                                        Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
 
                                         if (true)  //this does not seem to cost any time...?
                                         {
-                                            foreach (GekkoTime t2 in new GekkoTimeIterator(tt1.Add(Globals.decompPerLag), tt2.Add(0)))
+                                            foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
                                             {
-                                                double y0_double = y_series.GetDataSimple(t2);
-                                                double y1_double = y1_series.GetDataSimple(t2);
+                                                double y0_double = y0;
+                                                double y1_double = Program.model.modelGamsScalar.Eval(eqNumber, isRef);
                                                 double grad = (y1_double - y0_double) / eps;
 
                                                 if (!G.isNumericalError(grad) && grad != 0d)
@@ -1716,19 +1688,10 @@ namespace Gekko
                                                     //before shock (y0) in the year considered (t2)
                                                     //If it does evaluate, but there is no effect, it is skipped too.
 
-                                                    int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                                                                        
-                                                    string lag2 = null;
-                                                    if (lag >= 1)
-                                                    {
-                                                        lag2 = "+" + lag.ToString();
-                                                    }
-                                                    else
-                                                    {
-                                                        lag2 = lag.ToString();
-                                                    }
-                                                    string name = nameOriginal + "¤[" + lag2 + "]";
+                                                    int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO 
+                                                    string name = dsh.name + "¤[" + lag2 + "]";
 
-                                                    if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
+                                                    if (true)
                                                     {
 
                                                         if (j == 0)
@@ -1761,20 +1724,9 @@ namespace Gekko
                                         }
                                     }
                                     finally
-                                    {
-                                        x_series.SetData(t1, x_before);
+                                    {                                        
+                                        Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_before);
                                     }
-                                }
-                                else if (dpx.Type() == EVariableType.Val)
-                                {
-                                    //TODO
-                                }
-                                else
-                                {
-                                    //skip other types, this includes matrices
-                                    //so an expression with a matrix that changes from Work to Ref is
-                                    //not decomoposed as regards to this matrix
-                                    //(we would have to shock each cell in the matrix...)
                                 }
                             }
                         }
@@ -1828,7 +1780,7 @@ namespace Gekko
 
             return d;
 
-        }
+        }        
 
         private static void DecompInitDict(DecompData d)
         {
