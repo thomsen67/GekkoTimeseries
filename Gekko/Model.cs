@@ -464,7 +464,17 @@ namespace Gekko
             return this.dict_FromEqNumberToEqName[eqNumber];
         }
 
-
+        /// <summary>
+        /// Predict GAMS scalar model equation i, and returns the evaluation. As a side-effect also puts the result into Program.model.modelGamsScalar.r array,
+        /// at the slot i.
+        /// </summary>
+        /// <param name="i"></param>
+        public double Predict(int i)
+        {
+            //NOTE: this.functions() can return a sum (with illegals signal).
+            this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd);  
+            return this.r[i];
+        }
     }
 
     [ProtoContract]

@@ -1547,6 +1547,21 @@ namespace Gekko
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
             GekkoTime ttt000 = new GekkoTime(EFreq.A, 2001, 1);  //TODO TODO TODO TODO TODO TODOTODO TODO
             int iii000 = 0;                                      //TODO TODO TODO TODO TODO TODOTODO TODO
+            int eqNumber = dsh.periods[iii000].eqNumber;
+            List<TwoInts> pre0 = new List<TwoInts>();
+            pre0.Add(new TwoInts(0, 0));
+            pre0.Add(new TwoInts(1, 0));
+            pre0.Add(new TwoInts(2, 0));
+            List<TwoInts> pre1 = new List<TwoInts>();
+            pre1.Add(new TwoInts(0, 0));
+            pre1.Add(new TwoInts(1, 0));
+            List<TwoInts> pre2 = new List<TwoInts>();
+            pre1.Add(new TwoInts(1, 0));
+            pre1.Add(new TwoInts(2, 0));
+            List<List<TwoInts>> pre = new List<List<TwoInts>>();
+            pre.Add(pre0);
+            pre.Add(pre1);
+            pre.Add(pre2);
             // ------------------------------------------------------------------------
 
             List<int> mm = new List<int>();
@@ -1565,60 +1580,17 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(tt1, tt2);
             EFreq freq = Program.model.modelGamsScalar.t0.freq;
 
-            Series y0a = new Series(freq, null);  //would it make sense to make it light??
-            Series y0aRef = new Series(freq, null);
+            Series y0a = new Series(ESeriesType.Light, ttt000, ttt000);
+            Series y0aRef = new Series(ESeriesType.Light, ttt000, ttt000);
 
             try
             {
-                DecompInitDict(d);
+                DecompInitDict(d);                
 
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-                //Function call start --------------
-                //O.AdjustSmplForDecomp(smpl, 0);
-                //TODO: can be deleted, #p24234oi32
-                //string s5 = Globals.expressionText;
-
-
-                y0a.SetData(ttt000, 123454321d); // expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
-                //O.AdjustSmplForDecomp(smpl, 1);
-                //Function call end   --------------
-
-                List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
-
-                List<string> ss = Globals.precedents.Keys.ToList<string>();
-                ss.Sort(StringComparer.OrdinalIgnoreCase);
-                foreach (string s in ss)
-                {
-                    IVariable x = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
-
-                    if (x.Type() == EVariableType.Series)
-                    {
-                        Series ivTemp_series = x as Series;
-                        if (ivTemp_series.type == ESeriesType.ArraySuper) continue;  //skipped: we are only looking at sub-series
-                        decompPrecedents.Add(new DecompPrecedent(s, x));
-                    }
-                    else if (x.Type() == EVariableType.Val)
-                    {
-                        decompPrecedents.Add(new DecompPrecedent(s, x));
-                    }
-                }
-
-
-                //IMPORTANT
-                //IMPORTANT
-                //IMPORTANT
-                Globals.precedents = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary
-                //IMPORTANT
-                //IMPORTANT
-                //IMPORTANT
-
+                double v = Program.model.modelGamsScalar.Predict(eqNumber);
+                y0a.SetData(ttt000, v); // expression(smpl); funcCounter++; 
+                
                 Series y0a_series = y0a as Series;
-                if (y0a == null)
-                {
-                    new Error("DECOMP expects the expression to be of series type");
-                    //throw new GekkoException();
-                }
                 Series y0_series = y0a_series;
                 if (y0a_series.type != ESeriesType.Light)
                 {

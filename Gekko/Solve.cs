@@ -744,6 +744,7 @@ namespace Gekko
                         DateTime dt0 = DateTime.Now;
                         for (int j2 = 0; j2 < rep2; j2++)
                         {
+                            //This must run fast, else see PredictScalarModel()
                             Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = Program.model.modelGamsScalar.functions;
                             double[][] a = Program.model.modelGamsScalar.a;
                             double[] r = Program.model.modelGamsScalar.r;
