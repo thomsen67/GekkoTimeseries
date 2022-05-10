@@ -2941,7 +2941,9 @@ namespace Gekko
 
         public string GetName()
         {
-            return this.parent.name + "[" + this.ToString() + "]";
+            string s = null;
+            if (this.parent != null) s = this.parent.name;
+            return s + "[" + this.ToString() + "]";
         }
 
         public override int GetHashCode()

@@ -223,17 +223,26 @@ namespace Gekko
 
                         if (true)
                         {
+                            MultidimItem mmi = new MultidimItem(indexes.ToArray());
+                            DecompStartHelper element = null;
+                            elements.TryGetValue(mmi, out element);
+                            if (element == null)
+                            {
+                                element = new DecompStartHelper();                                
+                                element.name = equationName;
+                                element.indexes = mmi;
+                                element.periods = new DecompStartHelperPeriod[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
+                                elements.Add(mmi, element);
+                            }
 
-                            DecompStartHelper element = new DecompStartHelper();
-                            element.name = equationName;
-                            element.indexes = indexes;
-                            element.periods = new DecompStartHelperPeriods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
-                            DecompStartHelperPeriods elementPeriods = new DecompStartHelperPeriods();
-                            elementPeriods.eqNumber = 123454321;
-                            elementPeriods.t = time;
-                            element.periods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, time)] = elementPeriods;
-                            elements.Add(new MultidimItem(indexes.ToArray()), element);
-
+                            int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
+                            if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
+                            if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
+                            DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
+                            elementPeriod.eqNumber = 123454321;
+                            elementPeriod.t = time;                            
+                            element.periods[i] = elementPeriod;
+                            //elements.Add(mmi), element);
                             //Dictionary<MultidimItem, DecompStartHelper> list2 = new Dictionary<MultidimItem, DecompStartHelper>();
                             //list2.Add(new MultidimItem(indexes.ToArray()), element);
                         }
@@ -2902,11 +2911,11 @@ namespace Gekko
     public class DecompStartHelper
     {
         public string name = null; //the "x" in "x[a, b, <time>]"
-        public List<string> indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
-        public DecompStartHelperPeriods[] periods = null; //all the <time> periods found        
+        public MultidimItem indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
+        public DecompStartHelperPeriod[] periods = null; //all the <time> periods found        
     }
 
-    public class DecompStartHelperPeriods
+    public class DecompStartHelperPeriod
     {
         public GekkoTime t = GekkoTime.tNull;
         public int eqNumber = -12345;
