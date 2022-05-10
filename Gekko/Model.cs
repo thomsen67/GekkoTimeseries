@@ -468,6 +468,17 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Here, varNumber is number without time dimension, used in the a array.
+        /// </summary>
+        /// <param name="varNumber"></param>
+        /// <returns></returns>
+        public string GetVarNameA(int varNumber)
+        {
+            //TODO: handle errors
+            return this.dict_FromANumberToVarName[varNumber];
+        }
+
+        /// <summary>
         /// Predict GAMS scalar model equation i, and returns the evaluation. As a side-effect also puts the result into Program.model.modelGamsScalar.r array,
         /// at the slot i.
         /// </summary>

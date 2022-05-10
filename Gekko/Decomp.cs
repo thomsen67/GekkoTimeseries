@@ -1551,19 +1551,19 @@ namespace Gekko
             int eqNumber = dsh.periods[iii000].eqNumber;
             List<TwoInts> pre0 = new List<TwoInts>();
             pre0.Add(new TwoInts(0, 0));
-            pre0.Add(new TwoInts(1, 0));
-            pre0.Add(new TwoInts(2, 0));
+            pre0.Add(new TwoInts(0, 1));
+            pre0.Add(new TwoInts(0, 2));
             List<TwoInts> pre1 = new List<TwoInts>();
             pre1.Add(new TwoInts(0, 0));
-            pre1.Add(new TwoInts(1, 0));
+            pre1.Add(new TwoInts(0, 1));
             List<TwoInts> pre2 = new List<TwoInts>();
-            pre1.Add(new TwoInts(1, 0));
-            pre1.Add(new TwoInts(2, 0));
+            pre1.Add(new TwoInts(0, 1));
+            pre1.Add(new TwoInts(0, 2));
             List<List<TwoInts>> pre = new List<List<TwoInts>>();
             pre.Add(pre0);
             pre.Add(pre1);
             pre.Add(pre2);
-            // ------------------------------------------------------------------------
+            // ------------------------------------------------------------------------            
 
             List<int> mm = new List<int>();
             if (workOrRefOrBoth == EDecompBanks.Work) mm.Add(0);
@@ -1633,148 +1633,150 @@ namespace Gekko
             //TODO TODO look up precedents in the right way
             //TODO TODO look up precedents in the right way
             //TODO TODO look up precedents in the right way
+            int ip = -12345;
+            if (dsh.name.Contains("e1")) ip = 0;
+            else if (dsh.name.Contains("e2")) ip = 0;
+            else if (dsh.name.Contains("e3")) ip = 0;
 
-            int ip = 0;
-            if (1 == 0) ip = 1;
-            if (1 == 0) ip = 2;
-            if (pre[ip].Count > 0)
+            if (pre[ip].Count == 0) return d;
+
+            GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            int iVar = -1;
+
+            foreach (TwoInts dp in pre[ip])
             {
-                GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                iVar++;
+                bool isRef = false;
 
-                int iVar = -1;
+                string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
 
-                foreach (TwoInts dp in pre[ip])
+                if (mm.Contains(1))
                 {
-                    iVar++;
-                    bool isRef = false;
+                    isRef = true;
+                }
 
 
-                    if (mm.Contains(1))
+                foreach (GekkoTime t1 in new GekkoTimeIterator(ttt000, ttt000))
+                {
+
+                    // --------------------------------------------
+                    // This is where the decomposition takes place
+                    // --------------------------------------------
+
+                    foreach (int j in mm)
                     {
-                        isRef = true;
-                    }
-
-
-                    foreach (GekkoTime t1 in new GekkoTimeIterator(ttt000, ttt000))
-                    {
-
-                        // --------------------------------------------
-                        // This is where the decomposition takes place
-                        // --------------------------------------------
-
-                        foreach (int j in mm)
+                        if (true)
                         {
-                            if (true)
+
+                            double x_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, isRef);
+
+                            try
                             {
+                                double x_after = x_before + eps;
+                                Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
 
-                                double x_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, isRef);
-
-                                try
+                                if (true)  //this does not seem to cost any time...?
                                 {
-                                    double x_after = x_before + eps;
-                                    Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
-
-                                    if (true)  //this does not seem to cost any time...?
+                                    foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
                                     {
-                                        foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
+                                        double y0_double = y0;
+                                        double y1_double = Program.model.modelGamsScalar.Eval(eqNumber, isRef);
+                                        double grad = (y1_double - y0_double) / eps;
+
+                                        if (!G.isNumericalError(grad) && grad != 0d)
                                         {
-                                            double y0_double = y0;
-                                            double y1_double = Program.model.modelGamsScalar.Eval(eqNumber, isRef);
-                                            double grad = (y1_double - y0_double) / eps;
+                                            //For the gradient to be a real number <> 0, the expression must evaluate
+                                            //before shock (y0) in the year considered (t2)
+                                            //If it does evaluate, but there is no effect, it is skipped too.
 
-                                            if (!G.isNumericalError(grad) && grad != 0d)
+                                            int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                 
+
+                                            string name = varName + "¤[" + lag2 + "]";
+
+                                            if (true)
                                             {
-                                                //For the gradient to be a real number <> 0, the expression must evaluate
-                                                //before shock (y0) in the year considered (t2)
-                                                //If it does evaluate, but there is no effect, it is skipped too.
 
-                                                int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO 
-                                                string name = dsh.fullName + "¤[" + lag2 + "]";
-
-                                                if (true)
+                                                if (j == 0)
                                                 {
-
-                                                    if (j == 0)
-                                                    {
-                                                        d.cellsQuo[name].SetData(t2, x_before);
-                                                    }
-                                                    else
-                                                    {
-                                                        d.cellsRef[name].SetData(t2, x_before);  // for j != 0, x_before is from Ref bank.
-                                                    }
-
-                                                    if (j == 0)
-                                                    {
-                                                        d.cellsGradQuo[name].SetData(t2, grad);
-                                                    }
-                                                    else
-                                                    {
-                                                        d.cellsGradRef[name].SetData(t2, grad);
-                                                    }
+                                                    d.cellsQuo[name].SetData(t2, x_before);
+                                                }
+                                                else
+                                                {
+                                                    d.cellsRef[name].SetData(t2, x_before);  // for j != 0, x_before is from Ref bank.
                                                 }
 
-                                                if (!vars.ContainsKey(name))
+                                                if (j == 0)
                                                 {
-                                                    //list of relevant variables to handle later on
-                                                    //in decomp pivot
-                                                    vars.Add(name, 0);
+                                                    d.cellsGradQuo[name].SetData(t2, grad);
                                                 }
+                                                else
+                                                {
+                                                    d.cellsGradRef[name].SetData(t2, grad);
+                                                }
+                                            }
+
+                                            if (!vars.ContainsKey(name))
+                                            {
+                                                //list of relevant variables to handle later on
+                                                //in decomp pivot
+                                                vars.Add(name, 0);
                                             }
                                         }
                                     }
                                 }
-                                finally
-                                {
-                                    Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_before);
-                                }
+                            }
+                            finally
+                            {
+                                Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_before);
                             }
                         }
                     }
                 }
+            }
 
-                //Here, cellsQuo + cellsRef + cellsGradQuo + cellsGradRef are calculated.
-                //Grad tells us which lags are actually active.
-                //If we know that lags beforehand, we could limit the lag loop and save time here.
+            //Here, cellsQuo + cellsRef + cellsGradQuo + cellsGradRef are calculated.
+            //Grad tells us which lags are actually active.
+            //If we know that lags beforehand, we could limit the lag loop and save time here.
 
-                int i = 0;
-                foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
+            int i = 0;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
+            {
+                i++;
+                int j = 0;
+                foreach (string s in vars.Keys)
                 {
-                    i++;
-                    int j = 0;
-                    foreach (string s in vars.Keys)
+                    j++;
+
+                    double vQuo = d.cellsQuo[s].GetDataSimple(t2);
+                    double vQuoLag = d.cellsQuo[s].GetDataSimple(t2.Add(-1));
+                    double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t2.Add(-1));
+                    //double vGradQuo = d.cellsGradQuo[s].GetData(smpl, t2); --> not used at the moment
+                    double dContribD = vGradQuoLag * (vQuo - vQuoLag);
+                    d.cellsContribD[s].SetData(t2, dContribD);
+
+                    if (Globals.runningOnTTComputer && false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
+
+                    if (mm.Contains(1))
                     {
-                        j++;
-
-                        double vQuo = d.cellsQuo[s].GetDataSimple(t2);
-                        double vQuoLag = d.cellsQuo[s].GetDataSimple(t2.Add(-1));
-                        double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t2.Add(-1));
-                        //double vGradQuo = d.cellsGradQuo[s].GetData(smpl, t2); --> not used at the moment
-                        double dContribD = vGradQuoLag * (vQuo - vQuoLag);
-                        d.cellsContribD[s].SetData(t2, dContribD);
-
-                        if (Globals.runningOnTTComputer && false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
-
-                        if (mm.Contains(1))
-                        {
-                            double vRef = d.cellsRef[s].GetDataSimple(t2);
-                            double vRefLag = d.cellsRef[s].GetDataSimple(t2.Add(-1));
-                            double vGradRef = d.cellsGradRef[s].GetDataSimple(t2);
-                            double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t2.Add(-1));
-                            double dContribM = vGradRef * (vQuo - vRef);
-                            double dContribDRef = vGradRefLag * (vRef - vRefLag);
-                            d.cellsContribM[s].SetData(t2, dContribM);
-                            d.cellsContribDRef[s].SetData(t2, dContribDRef);
-                        }
+                        double vRef = d.cellsRef[s].GetDataSimple(t2);
+                        double vRefLag = d.cellsRef[s].GetDataSimple(t2.Add(-1));
+                        double vGradRef = d.cellsGradRef[s].GetDataSimple(t2);
+                        double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t2.Add(-1));
+                        double dContribM = vGradRef * (vQuo - vRef);
+                        double dContribDRef = vGradRefLag * (vRef - vRefLag);
+                        d.cellsContribM[s].SetData(t2, dContribM);
+                        d.cellsContribDRef[s].SetData(t2, dContribDRef);
                     }
-                    d.cellsContribD[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsQuo[residualName].GetDataSimple(t2.Add(-1))));
-                    d.cellsContribDRef[residualName].SetData(t2, -(d.cellsRef[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2.Add(-1))));
-                    d.cellsContribM[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2)));
                 }
+                d.cellsContribD[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsQuo[residualName].GetDataSimple(t2.Add(-1))));
+                d.cellsContribDRef[residualName].SetData(t2, -(d.cellsRef[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2.Add(-1))));
+                d.cellsContribM[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2)));
             }
 
             return d;
 
-        }     
+        }  
 
         private static void DecompInitDict(DecompData d)
         {

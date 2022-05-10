@@ -2935,7 +2935,7 @@ namespace Gekko
             {
                 first += s + ", ";
             }
-            first = first.Substring(0, first.Length - ", ".Length);
+            if (this.storage.Length > 0) first = first.Substring(0, first.Length - ", ".Length);
             return first;
         }
 
