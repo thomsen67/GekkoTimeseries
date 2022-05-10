@@ -855,8 +855,8 @@ namespace Gekko
                         string resultingFullName = null;
                         List<string> notUsed = null;
                         ExtractTimeDimension(ss2, ref name, ref time, ref resultingFullName, out notUsed);
-                        if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
-                        if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
+                        if (helper.t1.IsNull() || (time.StrictlySmallerThan(helper.t1))) helper.t1 = time;
+                        if (helper.t2.IsNull() || (time.StrictlyLargerThan(helper.t2))) helper.t2 = time;
                         if (!helper.dict_FromVarNameToANumber.ContainsKey(resultingFullName))
                         {
                             helper.dict_FromVarNameToANumber.Add(resultingFullName, helper.dict_FromVarNameToANumber.Count);
@@ -891,8 +891,8 @@ namespace Gekko
             int varCounts = -12345;
             int semis = 0;
 
-            helper.time0 = helper.time1;  //could perhaps lag this later on... ?
-            int periods = GekkoTime.Observations(helper.time1, helper.time2);
+            helper.t0 = helper.t1;  //could perhaps lag this later on... ?
+            int periods = GekkoTime.Observations(helper.t1, helper.t2);
             helper.a = new double[periods][];
             for (int i = 0; i < helper.a.GetLength(0); i++) helper.a[i] = new double[helper.dict_FromVarNameToANumber.Count]; //beware: 0-based            
 
@@ -1026,7 +1026,7 @@ namespace Gekko
                 List<string> notUsed = null;
                 ExtractTimeDimension(inputName, ref name, ref t, ref outputName, out notUsed);
                 int aNumber = helper.dict_FromVarNameToANumber[outputName];
-                int i1 = GekkoTime.Observations(helper.time0, t) - 1;
+                int i1 = GekkoTime.Observations(helper.t0, t) - 1;
                 int i2 = aNumber;
                 double d;
                 if (ss[1].Trim() == "")
@@ -1098,6 +1098,10 @@ namespace Gekko
                 Program.model.modelGamsScalar.count = helper.count;
                 Program.model.modelGamsScalar.known = helper.known;
                 Program.model.modelGamsScalar.unique = helper.unique;
+                Program.model.modelGamsScalar.t0 = helper.t0;
+                Program.model.modelGamsScalar.t1 = helper.t1;
+                Program.model.modelGamsScalar.t2 = helper.t2;
+
                 // -------------- helpers dictionaries ---------
                 Program.model.modelGamsScalar.dict_FromANumberToVarName = helper.dict_FromANumberToVarName;
                 Program.model.modelGamsScalar.dict_FromVarNameToANumber = helper.dict_FromVarNameToANumber;
@@ -1356,7 +1360,7 @@ namespace Gekko
                     ExtractTimeDimension(varname, ref name, ref time, ref resultingFullName, out notUsed);
                     //if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
                     //if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
-                    int i1 = (GekkoTime.Observations(helper.time0, time) - 1);
+                    int i1 = (GekkoTime.Observations(helper.t0, time) - 1);
                     int i2 = helper.dict_FromVarNameToANumber[resultingFullName];
                     //if (helper.dictA.ContainsKey(resultingFullName))
                     //{
@@ -4458,9 +4462,9 @@ namespace Gekko
         public GekkoDictionary<string, int> dict_FromEqNameToEqChunkNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
-        public GekkoTime time0 = GekkoTime.tNull;
-        public GekkoTime time1 = GekkoTime.tNull;
-        public GekkoTime time2 = GekkoTime.tNull;
+        public GekkoTime t0 = GekkoTime.tNull;
+        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime t2 = GekkoTime.tNull;
 
         // ================================ fields below are cleared for each new equation ==========
 

@@ -212,21 +212,38 @@ namespace Gekko
                         string resultingFullName = null;
                         List<string> indexes = null;
                         GamsModel.ExtractTimeDimension(s, ref name, ref time, ref resultingFullName, out indexes);
-                        
+
                         List<DecompStartHelper> list = null;
                         d.TryGetValue(name, out list);
 
-                        DecompStartHelper dh = new DecompStartHelper();
-                        dh.name = name;
-                        dh.indexes = indexes;
-                        dh.t = time;
+                        //dh.name = name;
+                        //dh.indexes = indexes;
+                        //dh.t0 = time;
 
                         if (list == null)
                         {
-                            d.Add(name, new List<DecompStartHelper>() { dh });
+                            DecompStartHelper dh = new DecompStartHelper();
+                            dh.name = name;
+                            dh.indexes = indexes;
+                            dh.subs = new DecompStartHelperPeriods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
+                            DecompStartHelperPeriods dhp = new DecompStartHelperPeriods();
+                            dhp.eqNumber = 123454321;
+                            dhp.t = time;
+                            dh.subs[GekkoTime.Observations(Program.model.modelGamsScalar.t0, time)] = dhp;
+                            List<DecompStartHelper> list2 = new List<DecompStartHelper>();
+                            list2.Add(dh);
+                            d.Add(name, list2);
                         }
                         else
                         {
+                            DecompStartHelper dh = new DecompStartHelper();
+                            dh.name = name;
+                            dh.indexes = indexes;
+                            dh.subs = new DecompStartHelperPeriods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
+                            DecompStartHelperPeriods dhp = new DecompStartHelperPeriods();
+                            dhp.eqNumber = 123454321;
+                            dhp.t = time;
+                            dh.subs[GekkoTime.Observations(Program.model.modelGamsScalar.t0, time)] = dhp;                            
                             list.Add(dh);
                         }
                     }
@@ -306,7 +323,7 @@ namespace Gekko
         /// <returns></returns>
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
         {
-            DateTime t0 = DateTime.Now;  
+            DateTime t0 = DateTime.Now;
 
             EContribType operatorOneOf3Types = DecompContribTypeHelper(decompOptions2.prtOptionLower);
 
@@ -346,7 +363,7 @@ namespace Gekko
             EModelType modelType = G.GetModelType();
 
             if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse
-            {                
+            {
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
                 bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
@@ -388,16 +405,16 @@ namespace Gekko
                 else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
 
                 G.Writeln2(">>>After low level " + DateTime.Now.ToLongTimeString());
-                
+
                 if (decompOptions2.link[parentI].varnames == null)
                 {
                     decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
-                }                                
+                }
 
                 if (false)
                 {
                     DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
-                }                
+                }
 
                 bool[] used = new bool[decompDatas.storage.Count];
                 used[0] = true;  //primary equation
@@ -489,7 +506,7 @@ namespace Gekko
                                 {
                                     double d = kvp.Value.GetDataSimple(t);
                                     if (endo.ContainsKey(kvp.Key))
-                                    {                                        
+                                    {
                                         int col = endo[kvp.Key];
                                         if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
                                         {
@@ -499,7 +516,7 @@ namespace Gekko
                                         mEndo[row, col] = d;
                                     }
                                     else if (exo.ContainsKey(kvp.Key))
-                                    {                                     
+                                    {
                                         int col = exo[kvp.Key];
                                         if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
                                         {
@@ -575,8 +592,8 @@ namespace Gekko
                                 new Error("The matrix contains missing or infinite values", false);
                             }
                             throw new GekkoException();
-                        }                        
-                        
+                        }
+
                         double[,] effect = Program.MultiplyMatrices(inverse, mExo);
 
                         //the effect matrix is #endo x #exo
@@ -617,9 +634,9 @@ namespace Gekko
                             }
                         }
                     }   //foreach t
-                    
+
                     DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
-                
+
                 }
                 else
                 {
@@ -808,7 +825,7 @@ namespace Gekko
             List<DecompData> decompDatasSupremeClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.MAIN_data) decompDatasSupremeClone.Add(dd.DeepClone());
 
-            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);  
+            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
 
             if (false)
             {
@@ -902,9 +919,9 @@ namespace Gekko
                     for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
                     {
                         e.MainNewLineTight();
-                        e.MainAdd("Equation #" + (i + 1) + " has " + decompDatas.storage[i].Count + " unrolled equations");                        
+                        e.MainAdd("Equation #" + (i + 1) + " has " + decompDatas.storage[i].Count + " unrolled equations");
                     }
-                }                
+                }
             }
         }
 
@@ -956,7 +973,7 @@ namespace Gekko
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
         {
-            if ( G.GetModelType() == EModelType.Unknown)
+            if (G.GetModelType() == EModelType.Unknown)
             {
                 new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
             }
@@ -1004,7 +1021,7 @@ namespace Gekko
                     //GAMS model
                     //GAMS model
                     //GAMS model
-                    if(link.expressions.Count != 1) new Error("Expected 1 link expression");
+                    if (link.expressions.Count != 1) new Error("Expected 1 link expression");
                     if (link.expressions[0] == null)
                     {
                         //
@@ -1013,7 +1030,7 @@ namespace Gekko
                         ModelGamsEquation found = GamsModel.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
                         link.expressions = found.expressions;
                         link.expressionText = found.lhs + " = " + found.rhs;
-                    }                    
+                    }
                 }
                 else if (modelType == EModelType.GAMSScalarModel)
                 {
@@ -1028,7 +1045,7 @@ namespace Gekko
                     //    //
                     //    // NEW GAMS SCALAR MODEL DECOMP
                     //    //
-                        
+
                     //    int eqNumber = Program.model.modelGamsScalar.GetEqNumber(link.eqname);
                     //    link.expressionText = link.eqname + " --> y = x [TODO]";
                     //    link.GAMS_eqNumber = eqNumber; //Inside Program.model.modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
@@ -1220,13 +1237,13 @@ namespace Gekko
             }
 
             DecompData d = new DecompData();
-            
+
             DateTime dt = DateTime.Now;
 
             GekkoSmpl smpl = new GekkoSmpl(tt1, tt2);
             IVariable y0a = null;
             IVariable y0aRef = null;
-            
+
             try
             {  //resets Globals.precedents afterwards
                 DecompInitDict(d);
@@ -1508,7 +1525,7 @@ namespace Gekko
             {
                 //Important: makes sure is is *always* nulled after a DECOMP
                 Globals.precedents = null;
-            }            
+            }
 
             return d;
 
@@ -1528,7 +1545,7 @@ namespace Gekko
         public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
             //See #kljaf89usafasdf for Gekko  model
-            
+
             List<int> mm = new List<int>();
             if (workOrRefOrBoth == EDecompBanks.Work) mm.Add(0);
             else if (workOrRefOrBoth == EDecompBanks.Ref) mm.Add(1);
@@ -2007,8 +2024,8 @@ namespace Gekko
                         double dLevel = double.NaN;
                         double dLevelLag = double.NaN;
                         double dLevelRef = double.NaN;
-                        double dLevelRefLag = double.NaN;                        
-                        
+                        double dLevelRefLag = double.NaN;
+
                         if (true || operator1.StartsWith("x"))
                         {
                             if (varname.Contains(Globals.decompResidualName))
@@ -2044,10 +2061,10 @@ namespace Gekko
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
                                 }
                             }
-                        }                        
+                        }
 
                         double d = DecomposePutIntoTable2HelperOperators(decompDatasSupremeClone[super], operator1, smpl, lhs, t2, varname);
-                        
+
                         FrameLightRow dr = new FrameLightRow(frame);
                         dr.Set(frame, col_equ, new CellLight(super.ToString()));
                         dr.Set(frame, col_t, new CellLight(t2.ToString()));
@@ -2092,7 +2109,7 @@ namespace Gekko
                         dr.Set(frame, col_valueLevelRef, new CellLight(dLevelRef));
                         dr.Set(frame, col_valueLevelRefLag, new CellLight(dLevelRefLag));
 
-                        frame.rows.Add(dr); 
+                        frame.rows.Add(dr);
                     }
                 }
             }
@@ -2196,7 +2213,7 @@ namespace Gekko
 
                 if (!rownames3.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames3.Add(s1);
                 if (!colnames3.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames3.Add(s2);
-                                
+
                 double d = row.Get(frame, col_value).data;
                 double dLevel = row.Get(frame, col_valueLevel).data;
                 double dLevelLag = row.Get(frame, col_valueLevelLag).data;
@@ -2215,7 +2232,7 @@ namespace Gekko
                     td.level += dLevel;
                     td.levelLag += dLevelLag;
                     td.levelRef += dLevelRef;
-                    td.levelRefLag += dLevelRefLag;                    
+                    td.levelRefLag += dLevelRefLag;
                 }
             }
 
@@ -2278,7 +2295,7 @@ namespace Gekko
                 }
             }
 
-            
+
 
             for (int i = 0; i < rownames.Count; i++)
             {
@@ -2286,7 +2303,7 @@ namespace Gekko
                 for (int j = 0; j < colnames.Count; j++)
                 {
                     string key = rownames[i] + "¤" + colnames[j];
-                    
+
                     FiveDouble td = null;
                     agg.TryGetValue(key, out td);
                     double d = 0d;
@@ -2348,12 +2365,12 @@ namespace Gekko
                         }
                         else if (operator1 == "xd")
                         {
-                            d = dLevel - dLevelLag;                            
+                            d = dLevel - dLevelLag;
                         }
                         else if (operator1 == "xp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
-                        }                        
+                        }
                         else if (operator1 == "xm")
                         {
                             d = dLevel - dLevelRef;
@@ -2364,13 +2381,13 @@ namespace Gekko
                         }
                         // -----------------
                         else if (operator1 == "rd")
-                        {                         
+                        {
                             d = td.change;
                         }
                         else if (operator1 == "rp")
                         {
                             d = td.change / dFirstLevelRefLag * 100d;
-                        }                        
+                        }
                         else if (operator1 == "xrd")
                         {
                             d = dLevelRef - dLevelRefLag;
@@ -2381,11 +2398,11 @@ namespace Gekko
                         }
 
                     }
-                    
+
                     int decimals = 0;
                     if (decompOptions2.decompTablesFormat.isPercentageType) decimals = decompOptions2.decompTablesFormat.decimalsPch;
                     else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
-                    string format2 = "f16." + decimals.ToString();                    
+                    string format2 = "f16." + decimals.ToString();
                     tab.SetNumber(i + 2, j + 2, d, format2);
 
 
@@ -2441,7 +2458,7 @@ namespace Gekko
                             //just keep lhsReal/lhsRealRef = null
                         }
                         else
-                        {                            
+                        {
                             if (edb == EDecompBanks.Work)
                             {
                                 lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
@@ -2482,7 +2499,7 @@ namespace Gekko
                                 //So for now, we allow it to be fetched from the databank
                                 //Series temp = decompDatasSupremeClone[j].cellsQuo.storage[name1];
                                 //double d2 = temp.GetDataSimple(t) - temp.GetDataSimple(t.Add(-1));        
-                                
+
                                 double d2 = double.NaN;
 
                                 if (operatorOneOf3Types == EContribType.D)
@@ -2581,7 +2598,7 @@ namespace Gekko
         }
 
         private static bool OrderNormalize(DecompOptions2 decompOptions2, List<string> varnames)
-        {            
+        {
             bool orderNormalize = false;
             if (decompOptions2.decompTablesFormat.showErrors)
             {
@@ -2670,17 +2687,17 @@ namespace Gekko
                 }
                 if (s != null) s = s.Substring(0, s.Length - "; ".Length);
                 sb.AppendLine(s);
-            }            
+            }
             //File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
             File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
 
-        
+
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
-        {            
+        {
             double d = double.NaN;
-            
+
             if (code1 == "d" || code1 == "p")
             {
                 d = decompTables.cellsContribD[colname].GetData(smpl, t2);
@@ -2688,11 +2705,11 @@ namespace Gekko
             else if (code1 == "rd" || code1 == "rp")
             {
                 d = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
-            }            
+            }
             else if (code1 == "m" || code1 == "q")
             {
                 d = decompTables.cellsContribM[colname].GetData(smpl, t2);
-            }           
+            }
             else
             {
                 //do nothing
@@ -2772,7 +2789,7 @@ namespace Gekko
 
         public static Series FindLinkSeries(List<List<DecompData>> decompDatas, int i, int j, string linkVariable, EContribType operatorOneOf3Types)
         {
-            return FindLinkSeries(decompDatas[i], j, linkVariable, operatorOneOf3Types);            
+            return FindLinkSeries(decompDatas[i], j, linkVariable, operatorOneOf3Types);
         }
 
         public static EquationHelper DecompEvalGekko(string variable)
@@ -2874,7 +2891,7 @@ namespace Gekko
                 }
 
                 Globals.expressions = null;  //maybe not necessary
-                
+
                 Program.CallEval(null, tmp);
 
                 found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
@@ -2892,8 +2909,14 @@ namespace Gekko
 
     public class DecompStartHelper
     {
-        public string name = null;
-        public List<string> indexes = null;
+        public string name = null; //the "x" in "x[a, b, <time>]"
+        public List<string> indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
+        public DecompStartHelperPeriods[] subs = null; //all the <time> periods found        
+    }
+
+    public class DecompStartHelperPeriods
+    {
         public GekkoTime t = GekkoTime.tNull;
+        public int eqNumber = -12345;
     }
 }

@@ -423,10 +423,14 @@ namespace Gekko
         public double[] cc = null;
         public int[][] dd = null;
         public int[] ee = null;
+        // ------------------------------------
         public int eqCounts = -12345;
         public int count = -12345;
         public int known = -12345;
         public int unique = -12345;
+        public GekkoTime t0 = GekkoTime.tNull;
+        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime t2 = GekkoTime.tNull;
         // ---------- dicts etc. ------------
 
         //variable names without time dimension 
