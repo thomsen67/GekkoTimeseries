@@ -47,7 +47,10 @@ namespace Gekko
         public string eqname = null;
         public string option = null;
         // ---------------------------- scalar model -------------------
-        public int eqNumber = -12345;  //the equation number
+        // ---------------------------- scalar model -------------------
+        // ---------------------------- scalar model -------------------
+        public int GAMS_eqNumber = -12345;  //the equation number
+        public List<DecompStartHelper> GAMS_dsh = null;
         //number1
         //number2
         //number3

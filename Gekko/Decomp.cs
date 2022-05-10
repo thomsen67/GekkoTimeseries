@@ -198,33 +198,75 @@ namespace Gekko
                 //       e1[a][2001a1], e1[a][2002a1], etc.
                 // Maybe use an array with distance from t0, and .Observations(...). Faster than dict lookup.
 
-
-
                 decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
 
-                int counter = -1;
-                foreach (string s in decompOptions2.new_from)
+                if (G.GetModelType() == EModelType.GAMSScalarModel)
                 {
-                    counter++;
-                    Link link = new Link();
-                    link.eqname = s;
-                    if (counter == 0)
+                    Dictionary<string, List<DecompStartHelper>> d = new Dictionary<string, List<DecompStartHelper>>();
+                    foreach (string s in decompOptions2.new_from)
                     {
-                        link.endo = new List<string>();
-                        link.endo.AddRange(decompOptions2.new_endo);
-                        link.varnames = new List<string>();
-                        link.varnames.AddRange(decompOptions2.new_select);
+                        string name = null;
+                        GekkoTime time = GekkoTime.tNull;
+                        string resultingFullName = null;
+                        List<string> indexes = null;
+                        GamsModel.ExtractTimeDimension(s, ref name, ref time, ref resultingFullName, out indexes);
+                        DecompStartHelper dh = new DecompStartHelper();
+                        dh.indexes = indexes;
+                        dh.t = time;
+                        List<DecompStartHelper> list = null;
+                        d.TryGetValue(name, out list);
+                        if (list == null)
+                        {
+                            d.Add(name, new List<DecompStartHelper>() { dh });
+                        }
+                        else
+                        {
+                            list.Add(dh);
+                        }
                     }
-                    else
+
+                    int counter = -1;
+                    foreach (KeyValuePair<string, List<DecompStartHelper>> kvp in d)
                     {
-                        link.varnames = new List<string>();
-                        link.varnames.Add("<not used>"); //strange but necessary further on
+                        //for each equation name
+                        counter++;
+                        Link link = new Link();
+                        link.GAMS_dsh = new List<DecompStartHelper>();
+                        foreach (DecompStartHelper dh in kvp.Value)
+                        {
+                            //for each index combination
+                            link.GAMS_dsh.Add(dh);
+                            link.GAMS_eqNumber = counter;
+                        }
+                        decompOptions2.link.Add(link);
                     }
-                    link.expressions = new List<Func<GekkoSmpl, IVariable>>();
-                    link.expressions.Add(null); //strange but necessary further on
-                    decompOptions2.link.Add(link);
+                }
+                else
+                {
+                    int counter = -1;
+                    foreach (string s in decompOptions2.new_from)
+                    {
+                        counter++;
+                        Link link = new Link();
+                        link.eqname = s;
+                        if (counter == 0)
+                        {
+                            link.endo = new List<string>();
+                            link.endo.AddRange(decompOptions2.new_endo);
+                            link.varnames = new List<string>();
+                            link.varnames.AddRange(decompOptions2.new_select);
+                        }
+                        else
+                        {
+                            link.varnames = new List<string>();
+                            link.varnames.Add("<not used>"); //strange but necessary further on
+                        }
+                        link.expressions = new List<Func<GekkoSmpl, IVariable>>();
+                        link.expressions.Add(null); //strange but necessary further on
+                        decompOptions2.link.Add(link);
+                    }
                 }
             }
 
@@ -316,9 +358,12 @@ namespace Gekko
                     int jj = -1;
                     if (G.GetModelType() == EModelType.GAMSScalarModel)
                     {
-                        jj++;  //will be = 0
-                        DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, link.eqNumber, DecompBanks(operator1), residualName, ref funcCounter);
-                        DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
+                        foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                        {
+                            jj++;  //will be = 0
+                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, dsh, DecompBanks(operator1), residualName, ref funcCounter);
+                            DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
+                        }
                     }
                     else
                     {
@@ -970,21 +1015,21 @@ namespace Gekko
                 {
                     //GAMS scalar model
                     //GAMS scalar model
+                    //GAMS scalar model ----> no need to do anything??
                     //GAMS scalar model
                     //GAMS scalar model
-                    //GAMS scalar model
-                    if (link.expressions.Count != 1) new Error("Expected 1 link expression");
-                    if (link.expressions[0] == null)
-                    {
-                        //
-                        // NEW GAMS SCALAR MODEL DECOMP
-                        //
+                    //if (link.expressions.Count != 1) new Error("Expected 1 link expression");
+                    //if (link.expressions[0] == null)
+                    //{
+                    //    //
+                    //    // NEW GAMS SCALAR MODEL DECOMP
+                    //    //
                         
-                        int eqNumber = Program.model.modelGamsScalar.GetEqNumber(link.eqname);
-                        link.expressionText = link.eqname + " --> y = x [TODO]";
-                        link.eqNumber = eqNumber; //Inside Program.model.modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
+                    //    int eqNumber = Program.model.modelGamsScalar.GetEqNumber(link.eqname);
+                    //    link.expressionText = link.eqname + " --> y = x [TODO]";
+                    //    link.GAMS_eqNumber = eqNumber; //Inside Program.model.modelGamsScalar.functions, this i points to the right Func<int, double[], double[][], double[], int[][], int[][], double> expression.
 
-                    }
+                    //}
                 }
                 else new Error("Model type error");
             }
@@ -1476,7 +1521,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, int eq, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
             //See #kljaf89usafasdf for Gekko  model
             
@@ -2839,5 +2884,11 @@ namespace Gekko
 
             return found;
         }
+    }
+
+    public class DecompStartHelper
+    {
+        public List<string> indexes = null;
+        public GekkoTime t = GekkoTime.tNull;
     }
 }
