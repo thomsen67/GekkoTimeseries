@@ -331,7 +331,7 @@ namespace Gekko
                 if (i1 == -1) break;
                 int i2 = s.IndexOf(Globals.linkActionEnd, i1 + 1);
                 if (i2 == -1) break;  //strange
-                links.Add(new TwoInts() { int1 = i1, int2 = i2 });
+                links.Add(new TwoInts(i1, i2));
                 i1 = i2 + 1;
             }
 

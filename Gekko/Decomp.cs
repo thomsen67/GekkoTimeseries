@@ -1587,7 +1587,7 @@ namespace Gekko
             {
                 DecompInitDict(d);                
 
-                double v = Program.model.modelGamsScalar.Predict(eqNumber);
+                double v = Program.model.modelGamsScalar.Predict(eqNumber, false);
                 y0a.SetData(ttt000, v); // expression(smpl); funcCounter++; 
                 
                 Series y0a_series = y0a as Series;

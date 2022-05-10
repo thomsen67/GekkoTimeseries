@@ -416,13 +416,16 @@ namespace Gekko
     [ProtoContract]
     public class ModelGamsScalar
     {        
-        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;     
-        public double[] r = null;
-        public double[][] a = null;
+        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;             
         public int[][] bb = null;
         public double[] cc = null;
         public int[][] dd = null;
         public int[] ee = null;
+        public double[] r = null;
+        public double[][] a = null;
+        // ------------------------------------
+        public double[] r_ref = null;
+        public double[][] a_ref = null;
         // ------------------------------------
         public int eqCounts = -12345;
         public int count = -12345;
@@ -469,11 +472,19 @@ namespace Gekko
         /// at the slot i.
         /// </summary>
         /// <param name="i"></param>
-        public double Predict(int i)
+        public double Predict(int i, bool isRef)
         {
             //NOTE: this.functions() can return a sum (with illegals signal).
-            this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd);  
-            return this.r[i];
+            if (isRef)
+            {
+                this.functions[this.ee[i]](i, this.r_ref, this.a_ref, this.cc, this.bb, this.dd);
+                return this.r_ref[i];
+            }
+            else
+            {
+                this.functions[this.ee[i]](i, this.r, this.a, this.cc, this.bb, this.dd);
+                return this.r[i];
+            }            
         }
     }
 

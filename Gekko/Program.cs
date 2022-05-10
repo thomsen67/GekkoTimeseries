@@ -3858,7 +3858,7 @@ namespace Gekko
 
                         deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
 
-                        TwoInts yearMinMax = new TwoInts(); yearMinMax.int1 = int.MaxValue; yearMinMax.int2 = int.MinValue;
+                        TwoInts yearMinMax = new TwoInts(int.MaxValue, int.MinValue);
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {
                             iv.DeepCleanup(yearMinMax);  //fixes maps and lists with 0 elements, also binds MultiDim.parent
@@ -10696,9 +10696,7 @@ namespace Gekko
                 return sequence[k - 1] + d * (sequence[k] - sequence[k - 1]);
             }
         }
-
-        //What is this, a test?
-        public static TwoInts f(int x) { return new TwoInts(); }
+        
 
         /// <summary>
         /// These are internal developer "commands" that can be issued from the Gekko command window (GUI). But only on the developer
