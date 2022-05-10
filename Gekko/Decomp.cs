@@ -212,11 +212,15 @@ namespace Gekko
                         string resultingFullName = null;
                         List<string> indexes = null;
                         GamsModel.ExtractTimeDimension(s, ref name, ref time, ref resultingFullName, out indexes);
-                        DecompStartHelper dh = new DecompStartHelper();
-                        dh.indexes = indexes;
-                        dh.t = time;
+                        
                         List<DecompStartHelper> list = null;
                         d.TryGetValue(name, out list);
+
+                        DecompStartHelper dh = new DecompStartHelper();
+                        dh.name = name;
+                        dh.indexes = indexes;
+                        dh.t = time;
+
                         if (list == null)
                         {
                             d.Add(name, new List<DecompStartHelper>() { dh });
@@ -2888,6 +2892,7 @@ namespace Gekko
 
     public class DecompStartHelper
     {
+        public string name = null;
         public List<string> indexes = null;
         public GekkoTime t = GekkoTime.tNull;
     }
