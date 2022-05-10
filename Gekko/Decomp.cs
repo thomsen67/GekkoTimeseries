@@ -242,11 +242,7 @@ namespace Gekko
                             elementPeriod.eqNumber = 123454321;
                             elementPeriod.t = time;                            
                             element.periods[i] = elementPeriod;
-                            //elements.Add(mmi), element);
-                            //Dictionary<MultidimItem, DecompStartHelper> list2 = new Dictionary<MultidimItem, DecompStartHelper>();
-                            //list2.Add(new MultidimItem(indexes.ToArray()), element);
-                        }
-                        
+                        }                        
                     }
 
                     int counter = -1;
