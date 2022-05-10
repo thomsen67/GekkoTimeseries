@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Gekko
 {
     /// <summary>
-    /// This class acts as an interface that all method calls from dynamic code goes through. 
+    /// The O class acts as an interface that all method calls from dynamic code goes through. 
     /// The purpose is to make the calls more transparent, and to make refactoring easier.
     /// For instance, changing the name of "Prt()" here would entail searching for all "O.Prt" strings
     /// in the code.    

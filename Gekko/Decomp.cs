@@ -221,28 +221,28 @@ namespace Gekko
                             equations.Add(equationName, elements);
                         }
 
-                        if (true)
-                        {
-                            MultidimItem mmi = new MultidimItem(indexes.ToArray());
-                            DecompStartHelper element = null;
-                            elements.TryGetValue(mmi, out element);
-                            if (element == null)
-                            {
-                                element = new DecompStartHelper();                                
-                                element.name = equationName;
-                                element.indexes = mmi;
-                                element.periods = new DecompStartHelperPeriod[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
-                                elements.Add(mmi, element);
-                            }
 
-                            int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
-                            if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
-                            if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
-                            DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
-                            elementPeriod.eqNumber = 123454321;
-                            elementPeriod.t = time;                            
-                            element.periods[i] = elementPeriod;
-                        }                        
+                        MultidimItem mmi = new MultidimItem(indexes.ToArray());
+                        DecompStartHelper element = null;
+                        elements.TryGetValue(mmi, out element);
+                        if (element == null)
+                        {
+                            element = new DecompStartHelper();
+                            element.name = equationName;
+                            element.indexes = mmi;
+                            element.periods = new DecompStartHelperPeriod[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
+                            elements.Add(mmi, element);
+                        }
+
+                        int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
+                        if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
+                        if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
+                        DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
+                        //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
+                        int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s];
+                        elementPeriod.eqNumber = eqNumber;
+                        elementPeriod.t = time;
+                        element.periods[i] = elementPeriod;
                     }
 
                     int counter = -1;
@@ -1543,6 +1543,12 @@ namespace Gekko
         {
             //See #kljaf89usafasdf for Gekko  model
 
+            // ------------------------------------------------------------------------
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            GekkoTime ttt000 = new GekkoTime(EFreq.A, 2001, 1);  //TODO TODO TODO TODO TODO TODOTODO TODO
+            int iii000 = 0;                                      //TODO TODO TODO TODO TODO TODOTODO TODO
+            // ------------------------------------------------------------------------
+
             List<int> mm = new List<int>();
             if (workOrRefOrBoth == EDecompBanks.Work) mm.Add(0);
             else if (workOrRefOrBoth == EDecompBanks.Ref) mm.Add(1);
@@ -1557,21 +1563,25 @@ namespace Gekko
             DateTime dt = DateTime.Now;
 
             GekkoSmpl smpl = new GekkoSmpl(tt1, tt2);
-            IVariable y0a = null;
-            IVariable y0aRef = null;
+            EFreq freq = Program.model.modelGamsScalar.t0.freq;
+
+            Series y0a = new Series(freq, null);  //would it make sense to make it light??
+            Series y0aRef = new Series(freq, null);
 
             try
-            {  //resets Globals.precedents afterwards
+            {
                 DecompInitDict(d);
 
                 Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                 //Function call start --------------
-                O.AdjustSmplForDecomp(smpl, 0);
+                //O.AdjustSmplForDecomp(smpl, 0);
                 //TODO: can be deleted, #p24234oi32
-                string s5 = Globals.expressionText;
-                y0a = new ScalarVal(123454321d); // expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
-                O.AdjustSmplForDecomp(smpl, 1);
+                //string s5 = Globals.expressionText;
+
+
+                y0a.SetData(ttt000, 123454321d); // expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
+                //O.AdjustSmplForDecomp(smpl, 1);
                 //Function call end   --------------
 
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
@@ -1624,7 +1634,8 @@ namespace Gekko
                     //Function call start --------------
                     O.AdjustSmplForDecomp(smpl, 0);
                     smpl.bankNumber = 1;
-                    y0aRef = new ScalarVal(123454321d); //expression(smpl); funcCounter++;
+                    y0aRef.SetData(ttt000, 123454321d); //expression(smpl); funcCounter++;                    
+
                     smpl.bankNumber = 0;
                     O.AdjustSmplForDecomp(smpl, 1);
                     //Function call end   --------------

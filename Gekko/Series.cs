@@ -2929,7 +2929,7 @@ namespace Gekko
         }
 
         public override string ToString()
-        {
+        {            
             string first = null;
             foreach (string s in this.storage)
             {
