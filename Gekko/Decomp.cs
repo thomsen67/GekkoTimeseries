@@ -1635,8 +1635,8 @@ namespace Gekko
             //TODO TODO look up precedents in the right way
             int ip = -12345;
             if (dsh.name.Contains("e1")) ip = 0;
-            else if (dsh.name.Contains("e2")) ip = 0;
-            else if (dsh.name.Contains("e3")) ip = 0;
+            else if (dsh.name.Contains("e2")) ip = 1;
+            else if (dsh.name.Contains("e3")) ip = 2;
 
             if (pre[ip].Count == 0) return d;
 

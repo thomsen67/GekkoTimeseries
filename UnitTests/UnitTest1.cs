@@ -10992,7 +10992,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompSimul()
         {
-            for (int i = 1; i < 2; i++)  //0:scalar model, 1:raw gams
+            for (int i = 0; i < 2; i++)  //0:scalar model, 1:raw gams
             {
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
