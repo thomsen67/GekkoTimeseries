@@ -204,61 +204,53 @@ namespace Gekko
 
                 if (G.GetModelType() == EModelType.GAMSScalarModel)
                 {
-                    Dictionary<string, List<DecompStartHelper>> d = new Dictionary<string, List<DecompStartHelper>>();
+                    GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in decompOptions2.new_from)
                     {
-                        string name = null;
+                        string equationName = null;
                         GekkoTime time = GekkoTime.tNull;
                         string resultingFullName = null;
                         List<string> indexes = null;
-                        GamsModel.ExtractTimeDimension(s, ref name, ref time, ref resultingFullName, out indexes);
+                        GamsModel.ExtractTimeDimension(s, ref equationName, ref time, ref resultingFullName, out indexes);
 
-                        List<DecompStartHelper> list = null;
-                        d.TryGetValue(name, out list);
-
-                        //dh.name = name;
-                        //dh.indexes = indexes;
-                        //dh.t0 = time;
-
-                        if (list == null)
+                        Dictionary<MultidimItem, DecompStartHelper> elements = null;
+                        equations.TryGetValue(equationName, out elements);
+                        if (elements == null)
                         {
-                            DecompStartHelper dh = new DecompStartHelper();
-                            dh.name = name;
-                            dh.indexes = indexes;
-                            dh.subs = new DecompStartHelperPeriods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
-                            DecompStartHelperPeriods dhp = new DecompStartHelperPeriods();
-                            dhp.eqNumber = 123454321;
-                            dhp.t = time;
-                            dh.subs[GekkoTime.Observations(Program.model.modelGamsScalar.t0, time)] = dhp;
-                            List<DecompStartHelper> list2 = new List<DecompStartHelper>();
-                            list2.Add(dh);
-                            d.Add(name, list2);
+                            elements = new Dictionary<MultidimItem, DecompStartHelper>();
+                            equations.Add(equationName, elements);
                         }
-                        else
+
+                        if (true)
                         {
-                            DecompStartHelper dh = new DecompStartHelper();
-                            dh.name = name;
-                            dh.indexes = indexes;
-                            dh.subs = new DecompStartHelperPeriods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
-                            DecompStartHelperPeriods dhp = new DecompStartHelperPeriods();
-                            dhp.eqNumber = 123454321;
-                            dhp.t = time;
-                            dh.subs[GekkoTime.Observations(Program.model.modelGamsScalar.t0, time)] = dhp;                            
-                            list.Add(dh);
+
+                            DecompStartHelper element = new DecompStartHelper();
+                            element.name = equationName;
+                            element.indexes = indexes;
+                            element.periods = new DecompStartHelperPeriods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
+                            DecompStartHelperPeriods elementPeriods = new DecompStartHelperPeriods();
+                            elementPeriods.eqNumber = 123454321;
+                            elementPeriods.t = time;
+                            element.periods[GekkoTime.Observations(Program.model.modelGamsScalar.t0, time)] = elementPeriods;
+                            elements.Add(new MultidimItem(indexes.ToArray()), element);
+
+                            //Dictionary<MultidimItem, DecompStartHelper> list2 = new Dictionary<MultidimItem, DecompStartHelper>();
+                            //list2.Add(new MultidimItem(indexes.ToArray()), element);
                         }
+                        
                     }
 
                     int counter = -1;
-                    foreach (KeyValuePair<string, List<DecompStartHelper>> kvp in d)
+                    foreach (KeyValuePair<string, Dictionary<MultidimItem, DecompStartHelper>> kvp in equations)
                     {
                         //for each equation name
                         counter++;
                         Link link = new Link();
                         link.GAMS_dsh = new List<DecompStartHelper>();
-                        foreach (DecompStartHelper dh in kvp.Value)
-                        {
+                        foreach (KeyValuePair<MultidimItem, DecompStartHelper> kvp2 in kvp.Value)
+                        {                            
                             //for each index combination
-                            link.GAMS_dsh.Add(dh);
+                            link.GAMS_dsh.Add(kvp2.Value);
                             link.GAMS_eqNumber = counter;
                         }
                         decompOptions2.link.Add(link);
@@ -2911,7 +2903,7 @@ namespace Gekko
     {
         public string name = null; //the "x" in "x[a, b, <time>]"
         public List<string> indexes = null; //the ["a", "b"] in "x[a, b, <time>]"
-        public DecompStartHelperPeriods[] subs = null; //all the <time> periods found        
+        public DecompStartHelperPeriods[] periods = null; //all the <time> periods found        
     }
 
     public class DecompStartHelperPeriods
