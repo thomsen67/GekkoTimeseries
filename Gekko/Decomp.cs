@@ -1661,51 +1661,49 @@ namespace Gekko
                             double x_after = x_before + eps;
                             Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
 
-                            foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
+
+                            double y0_double = y0;
+                            double y1_double = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, isRef);
+                            double grad = (y1_double - y0_double) / eps;
+
+                            if (!G.isNumericalError(grad) && grad != 0d)
                             {
-                                double y0_double = y0;
-                                double y1_double = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, isRef);
-                                double grad = (y1_double - y0_double) / eps;
+                                //For the gradient to be a real number <> 0, the expression must evaluate
+                                //before shock (y0) in the year considered (t2)
+                                //If it does evaluate, but there is no effect, it is skipped too.
 
-                                if (!G.isNumericalError(grad) && grad != 0d)
+                                int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                 
+
+                                //string name = varName + "¤[" + lag2 + "]";
+                                string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
+
+                                if (true)
                                 {
-                                    //For the gradient to be a real number <> 0, the expression must evaluate
-                                    //before shock (y0) in the year considered (t2)
-                                    //If it does evaluate, but there is no effect, it is skipped too.
 
-                                    int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                 
-
-                                    //string name = varName + "¤[" + lag2 + "]";
-                                    string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
-
-                                    if (true)
+                                    if (j == 0)
                                     {
-
-                                        if (j == 0)
-                                        {
-                                            d.cellsQuo[name].SetData(t2, x_before);
-                                        }
-                                        else
-                                        {
-                                            d.cellsRef[name].SetData(t2, x_before);  // for j != 0, x_before is from Ref bank.
-                                        }
-
-                                        if (j == 0)
-                                        {
-                                            d.cellsGradQuo[name].SetData(t2, grad);
-                                        }
-                                        else
-                                        {
-                                            d.cellsGradRef[name].SetData(t2, grad);
-                                        }
+                                        d.cellsQuo[name].SetData(t, x_before);
+                                    }
+                                    else
+                                    {
+                                        d.cellsRef[name].SetData(t, x_before);  // for j != 0, x_before is from Ref bank.
                                     }
 
-                                    if (!vars.ContainsKey(name))
+                                    if (j == 0)
                                     {
-                                        //list of relevant variables to handle later on
-                                        //in decomp pivot
-                                        vars.Add(name, 0);
+                                        d.cellsGradQuo[name].SetData(t, grad);
                                     }
+                                    else
+                                    {
+                                        d.cellsGradRef[name].SetData(t, grad);
+                                    }
+                                }
+
+                                if (!vars.ContainsKey(name))
+                                {
+                                    //list of relevant variables to handle later on
+                                    //in decomp pivot
+                                    vars.Add(name, 0);
                                 }
                             }
                         }
