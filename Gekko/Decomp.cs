@@ -1624,7 +1624,7 @@ namespace Gekko
 
                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
 
-                foreach (GekkoTime t1 in new GekkoTimeIterator(tt1.Add(-deduct), tt2))
+                foreach (GekkoTime t in new GekkoTimeIterator(tt1.Add(-deduct), tt2))
                 {
                     // --------------------------------------------
                     // This is where the decomposition takes place
@@ -1638,12 +1638,12 @@ namespace Gekko
                     int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), ttt000) - 1; 
 
                     double y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
-                    d.cellsQuo[residualName].SetData(t1, y0);
+                    d.cellsQuo[residualName].SetData(t, y0);
 
                     if (mm.Contains(1))
                     {
                         double y0Ref = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
-                        d.cellsRef[residualName].SetData(t1, y0Ref);
+                        d.cellsRef[residualName].SetData(t, y0Ref);
                     }
 
                     foreach (int j in mm)
@@ -1722,7 +1722,7 @@ namespace Gekko
             //If we know that lags beforehand, we could limit the lag loop and save time here.
 
             int i = 0;
-            foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
+            foreach (GekkoTime t in new GekkoTimeIterator(tt1, tt2))
             {
                 i++;
                 int j = 0;
@@ -1730,30 +1730,30 @@ namespace Gekko
                 {
                     j++;
 
-                    double vQuo = d.cellsQuo[s].GetDataSimple(t2);
-                    double vQuoLag = d.cellsQuo[s].GetDataSimple(t2.Add(-1));
-                    double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t2.Add(-1));
+                    double vQuo = d.cellsQuo[s].GetDataSimple(t);
+                    double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
+                    double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
                     //double vGradQuo = d.cellsGradQuo[s].GetData(smpl, t2); --> not used at the moment
                     double dContribD = vGradQuoLag * (vQuo - vQuoLag);
-                    d.cellsContribD[s].SetData(t2, dContribD);
+                    d.cellsContribD[s].SetData(t, dContribD);
 
                     if (Globals.runningOnTTComputer && false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
 
                     if (mm.Contains(1))
                     {
-                        double vRef = d.cellsRef[s].GetDataSimple(t2);
-                        double vRefLag = d.cellsRef[s].GetDataSimple(t2.Add(-1));
-                        double vGradRef = d.cellsGradRef[s].GetDataSimple(t2);
-                        double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t2.Add(-1));
+                        double vRef = d.cellsRef[s].GetDataSimple(t);
+                        double vRefLag = d.cellsRef[s].GetDataSimple(t.Add(-1));
+                        double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
+                        double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t.Add(-1));
                         double dContribM = vGradRef * (vQuo - vRef);
                         double dContribDRef = vGradRefLag * (vRef - vRefLag);
-                        d.cellsContribM[s].SetData(t2, dContribM);
-                        d.cellsContribDRef[s].SetData(t2, dContribDRef);
+                        d.cellsContribM[s].SetData(t, dContribM);
+                        d.cellsContribDRef[s].SetData(t, dContribDRef);
                     }
                 }
-                d.cellsContribD[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsQuo[residualName].GetDataSimple(t2.Add(-1))));
-                d.cellsContribDRef[residualName].SetData(t2, -(d.cellsRef[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2.Add(-1))));
-                d.cellsContribM[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2)));
+                d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
+                d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
+                d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
             }
 
             return d;
