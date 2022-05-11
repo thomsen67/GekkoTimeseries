@@ -1580,8 +1580,7 @@ namespace Gekko
             List<List<TwoInts>> precedents = new List<List<TwoInts>>();
             precedents.Add(pre0);
             precedents.Add(pre1);
-            precedents.Add(pre2);
-            GekkoTime ttt000 = tt2;
+            precedents.Add(pre2);            
             // ------------------------------------------------------------------------            
             
             double eps = Globals.newtonSmallNumber;
@@ -1632,10 +1631,10 @@ namespace Gekko
 
                     //TODO TODO TODO TODO TODO TODOTODO TODO                        
                     //TODO TODO TODO TODO TODO TODOTODO TODO                        
+                    //TODO TODO TODO TODO TODO TODOTODO TODO   why tt2 below???                      
                     //TODO TODO TODO TODO TODO TODOTODO TODO                        
                     //TODO TODO TODO TODO TODO TODOTODO TODO                        
-                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
-                    int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), ttt000) - 1; 
+                    int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), tt2) - 1; 
 
                     double y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
                     d.cellsQuo[residualName].SetData(t, y0);
