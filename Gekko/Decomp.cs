@@ -1634,10 +1634,7 @@ namespace Gekko
                     // --------------------------------------------
                                         
                     int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), ttt000) - 1;  //TODO TODO TODO TODO TODO TODOTODO TODO                        
-
-                    //Series y0_series = new Series(ESeriesType.Light, tt0, tt2);
-                    //Series y0Ref_series = new Series(ESeriesType.Light, tt0, tt1);
-
+                    
                     double y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);                    
                     d.cellsQuo[residualName].SetData(t1, y0);
 

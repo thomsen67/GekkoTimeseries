@@ -485,8 +485,7 @@ namespace Gekko
             {
                 Series ts = null; storage.TryGetValue(s, out ts);
                 if (ts == null)
-                {
-                    //string s2 = G.Chop_AddFreq(s, "");
+                {                    
                     ts = new Series(Program.options.freq, G.Chop_AddFreq("decomptemp", G.ConvertFreq(Program.options.freq)));
                     storage.Add(s, ts);
                 }

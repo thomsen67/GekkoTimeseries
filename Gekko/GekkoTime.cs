@@ -1477,10 +1477,15 @@ namespace Gekko
 
             if (addedPeriods == 0) return this;
 
-            if (this.freq == EFreq.D)
+            if (this.freq == EFreq.A)
+            {
+                //Simple: make it run fast!                
+                return new GekkoTime(this.freq, this.super + addedPeriods, this.sub, false);  //call the fast constructor
+            }
+            else if (this.freq == EFreq.D)
             {
                 //see also #98032743029847
-                DateTime dt1 = new DateTime(this.super, this.sub, this.subsub);  
+                DateTime dt1 = new DateTime(this.super, this.sub, this.subsub);
                 DateTime dt2 = dt1.AddDays(addedPeriods);
                 GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(this.freq, dt2);
                 return gt;
@@ -1496,13 +1501,8 @@ namespace Gekko
             }
             else
             {
-                int subPeriods = 1;
-                if (this.freq == EFreq.A)
-                {
-                    //Simple: make it run fast!                
-                    return new GekkoTime(this.freq, this.super + addedPeriods, this.sub, false);  //call the fast constructor
-                }
-                else if (this.freq == EFreq.Q) subPeriods = 4;
+                int subPeriods = 1;                
+                if (this.freq == EFreq.Q) subPeriods = 4;
                 else if (this.freq == EFreq.M) subPeriods = 12;
                 else if (this.freq == EFreq.U) subPeriods = 1;
                 else new Error("Error regarding frequencies");
