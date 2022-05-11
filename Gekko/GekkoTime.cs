@@ -818,7 +818,12 @@ namespace Gekko
 
             EFreq efreq = t1.freq;
 
-            if (efreq == EFreq.D)
+            if (efreq == EFreq.A)
+            {
+                //for a fast return in case of A freq
+                return t2.super - t1.super + 1;  //Subpers are ignored. It is tacitly assumed that the subperiods are = 1 here, else this is nonsense
+            }
+            else if (efreq == EFreq.D)
             {
                 //see also #98032743029847
                 if (t1.super < 1 || t1.super > 9999 || t2.super < 1 || t2.super > 9999)
@@ -833,7 +838,7 @@ namespace Gekko
                 }
             }
             else if (efreq == EFreq.W)
-            {                
+            {
                 if (t1.super < 1 || t1.super > 9999 || t2.super < 1 || t2.super > 9999)
                 {
                     return int.MaxValue;  //does not make any sense anyhow
@@ -851,24 +856,14 @@ namespace Gekko
             else
             {
                 int subPeriods = 1;
-                if (efreq == EFreq.A)
-                {
-                    //fast return
-                    return t2.super - t1.super + 1;  //Subpers are ignored. It is tacitly assumed that the subperiods are = 1 here, else this is nonsense
-                }
-                else if (efreq == EFreq.Q) subPeriods = 4;
+                if (efreq == EFreq.Q) subPeriods = 4;
                 else if (efreq == EFreq.M) subPeriods = 12;
                 else if (efreq == EFreq.U) subPeriods = 1;
                 else
                 {
                     new Error("Error regarding frequency");
                 }
-
-                int obs = subPeriods * (t2.super - t1.super) + t2.sub - t1.sub + 1;
-                if (obs < 0)
-                {
-                    //This should not normally be possible, maybe with PRT<2010 2009> or the like?
-                }
+                int obs = subPeriods * (t2.super - t1.super) + t2.sub - t1.sub + 1;  //can be 0 or negative                
                 return obs;
             }
         }

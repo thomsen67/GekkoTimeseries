@@ -1131,7 +1131,7 @@ namespace Gekko
             //
             //
             //
-            //                 Ref   -- m -->      Work
+            //                  Ref     -- m -->     Work
             //
             //                   ^                    ^
             //                   |                    |
@@ -1562,9 +1562,11 @@ namespace Gekko
 
             // ------------------------------------------------------------------------
             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            GekkoTime ttt000 = new GekkoTime(EFreq.A, 2001, 1);  //TODO TODO TODO TODO TODO TODOTODO TODO
-            int iii000 = 0;                                      //TODO TODO TODO TODO TODO TODOTODO TODO
-            int eqNumber = dsh.periods[iii000].eqNumber;
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            GekkoTime ttt000 = tt2;  //TODO TODO TODO TODO TODO TODOTODO TODO
+            int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), ttt000) - 1;  //TODO TODO TODO TODO TODO TODOTODO TODO                        
             List<TwoInts> pre0 = new List<TwoInts>();
             pre0.Add(new TwoInts(0, 0));
             pre0.Add(new TwoInts(0, 1));
@@ -1576,10 +1578,10 @@ namespace Gekko
             pre2.Add(new TwoInts(0, 1));
             pre2.Add(new TwoInts(0, 2));
             pre2.Add(new TwoInts(0, 3));
-            List<List<TwoInts>> pre = new List<List<TwoInts>>();
-            pre.Add(pre0);
-            pre.Add(pre1);
-            pre.Add(pre2);
+            List<List<TwoInts>> precedents = new List<List<TwoInts>>();
+            precedents.Add(pre0);
+            precedents.Add(pre1);
+            precedents.Add(pre2);
             // ------------------------------------------------------------------------            
 
             List<int> mm = new List<int>();
@@ -1598,21 +1600,13 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(tt1, tt2);
             EFreq freq = Program.model.modelGamsScalar.t0.freq;
 
-            Series y0a = new Series(ESeriesType.Light, ttt000, ttt000);
+            Series y0_series = new Series(ESeriesType.Light, ttt000, ttt000);            
             Series y0aRef = new Series(ESeriesType.Light, ttt000, ttt000);
-
 
             DecompInitDict(d);
 
-            double y0 = Program.model.modelGamsScalar.Eval(eqNumber, false);
-            y0a.SetData(ttt000, y0); // expression(smpl); funcCounter++; 
-
-            Series y0a_series = y0a as Series;
-            Series y0_series = y0a_series;
-            if (y0a_series.type != ESeriesType.Light)
-            {
-                y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
-            }
+            double y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
+            y0_series.SetData(ttt000, y0); // expression(smpl); funcCounter++;             
 
             d.cellsQuo.storage.Add(residualName, y0_series);
 
@@ -1621,7 +1615,7 @@ namespace Gekko
             if (mm.Contains(1))
             {
 
-                double y0Ref = Program.model.modelGamsScalar.Eval(eqNumber, true);                
+                double y0Ref = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);                
                 y0aRef.SetData(ttt000, y0Ref); //expression(smpl); funcCounter++;                                    
 
                 y0aRef_series = y0aRef as Series;
@@ -1650,16 +1644,15 @@ namespace Gekko
             else if (dsh.name.Contains("e2")) ip = 1;
             else if (dsh.name.Contains("e3")) ip = 2;
 
-            if (pre[ip].Count == 0) return d;
+            if (precedents[ip].Count == 0) return d;
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             int iVar = -1;
 
-            foreach (TwoInts dp in pre[ip])
+            foreach (TwoInts dp in precedents[ip])
             {
-                iVar++;
-                
+                iVar++;                
 
                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
 
@@ -1693,7 +1686,7 @@ namespace Gekko
                                     foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
                                     {
                                         double y0_double = y0;
-                                        double y1_double = Program.model.modelGamsScalar.Eval(eqNumber, isRef);
+                                        double y1_double = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, isRef);
                                         double grad = (y1_double - y0_double) / eps;
 
                                         if (!G.isNumericalError(grad) && grad != 0d)

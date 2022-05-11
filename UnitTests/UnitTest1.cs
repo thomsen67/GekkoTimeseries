@@ -10990,13 +10990,14 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSimul()
+        public void _Test_DecompSimul1()
         {
+            bool easy = true;
+
             for (int i = 0; i < 2; i++)  //0:scalar model, 1:raw gams
             {
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                //I("option model type = gams;"); <-- not necessary anymore
                 if (i == 0) I("model <gms> simul.zip;");
                 else I("model <gms> simul.gms;");
                 I("time 2001 2002;");
@@ -11009,6 +11010,7 @@ namespace UnitTests
                 I("c = 20, 40;");
                 I("g = 5, 10;");
                 I("g0 = 1, 2;");
+                Gekko.Table table = null;
 
                 //e1[t].. y[t]  =E=  c[t] + g[t];
                 //e2[t].. c[t] = E = 0.8 * y[t];
@@ -11047,26 +11049,128 @@ namespace UnitTests
                     // x7 g0(2001)
                     // x8 g0(2002)
                     //I("decomp3 <2002 2002 d> y[2001] from e1[2001], e2[2001], e3[2001] endo y[2001], c[2001], g[2001];");
+                    if (!easy)
+                    {
+                        I("decomp3 <2002 2002 d> y from e1[2002], e2[2002],e3[2002] endo y, c, g;");
+                        table = Globals.lastDecompTable;
+                        Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
+                        Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                        Assert.AreEqual(table.Get(2, 2).number, 25.0000d, 0.0001);
+                        Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
+                        Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
+                    }
                     I("decomp3 <2001 2001 m> y from e1[2001], e2[2001],e3[2001] endo y, c, g;");                    
-                    Gekko.Table table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
-                    //TODO: a_residual row 2 (residual)              
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");                    
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
                     Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
                     Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
                     Assert.AreEqual(table.Get(3, 2).number, -50.0000d, 0.0001);
+                    I("decomp3 <2001 2001 m> y from e1[2001] endo y;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "c");
+                    Assert.AreEqual(table.Get(3, 2).number, -40.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g");
+                    Assert.AreEqual(table.Get(4, 2).number, -10.0000d, 0.0001);
                 }
                 else
                 {
                     I("decomp3 <2002 2002 d> y from e1, e2, e3 endo y, c, g;");
-                    Gekko.Table table = Globals.lastDecompTable;
+                    table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
-                    //TODO: a_residual row 2 (residual)              
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
                     Assert.AreEqual(table.Get(2, 2).number, 25.0000d, 0.0001);
                     Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
                     Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
+                    I("decomp3 <2001 2001 m> y from e1, e2, e3 endo y, c, g;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
+                    Assert.AreEqual(table.Get(3, 2).number, -50.0000d, 0.0001);
+                    I("decomp3 <2001 2001 m> y from e1 endo y;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "c");
+                    Assert.AreEqual(table.Get(3, 2).number, -40.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g");
+                    Assert.AreEqual(table.Get(4, 2).number, -10.0000d, 0.0001);
                 }                
+            }
+        }
+
+        [TestMethod]
+        public void _Test_DecompSimul2()
+        {            
+            for (int i = 0; i < 1; i++)  //0:scalar model, 1:raw gams
+            {
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                if (i == 0) I("model <gms> simul.zip;");
+                else I("model <gms> simul.gms;");
+                I("time 2001 2002;");
+                I("y = 75, 100;");
+                I("c = 60, 80;");
+                I("g = 15, 20;");
+                I("g0 = 3, 4;");
+                I("clone;");  //ref
+                I("y = 25, 50;");
+                I("c = 20, 40;");
+                I("g = 5, 10;");
+                I("g0 = 1, 2;");
+                Gekko.Table table = null;
+
+                //e1[t].. y[t]  =E=  c[t] + g[t];
+                //e2[t].. c[t] = E = 0.8 * y[t];
+                //e3[t].. g[t] = E = 0.2 * c[t] + g0[t];
+                // ---> y[t]  =E=  25 * g0[t]
+
+
+
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+                //for scalar model, it is in reality translated into the following:
+                //decomp3 <2002 2002 d> y[2001], y[2002] 
+                //                      from e1[2001], e1[2002], e2[2001], e2[2002], e3[2001], e3[2002]
+                //                      endo y[2001], y[2002], c[2001], c[2002], g[2001], g[2002];
+                //
+                if (i == 0)
+                {
+                    //Equations 1 to 6
+                    // e1 e1(2001)
+                    // e2 e1(2002)
+                    // e3 e2(2001)
+                    // e4 e2(2002)
+                    // e5 e3(2001)
+                    // e6 e3(2002)
+                    //Variables 1 to 8
+                    // x1 y(2001)
+                    // x2 y(2002)
+                    // x3 c(2001)
+                    // x4 c(2002)
+                    // x5 g(2001)
+                    // x6 g(2002)
+                    // x7 g0(2001)
+                    // x8 g0(2002)
+                    //I("decomp3 <2002 2002 d> y[2001] from e1[2001], e2[2001], e3[2001] endo y[2001], c[2001], g[2001];");
+                    I("decomp3 <2002 2002 d> y from e1[2002], e2[2002],e3[2002] endo y, c, g;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(2, 2).number, 25.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
+                    Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
+                }
             }
         }
 
