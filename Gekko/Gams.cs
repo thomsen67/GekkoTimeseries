@@ -1089,6 +1089,34 @@ namespace Gekko
                 Program.model.modelGamsScalar.functions = functions;
                 Program.model.modelGamsScalar.a = a;
                 Program.model.modelGamsScalar.r = r;
+
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                if (true)
+                {
+                    Program.model.modelGamsScalar.r_ref = new double[Program.model.modelGamsScalar.r.Length];
+                    for (int i = 0; i < Program.model.modelGamsScalar.r_ref.Length; i++) Program.model.modelGamsScalar.r_ref[i] = double.NaN;
+                    Program.model.modelGamsScalar.a_ref = new double[2][];
+                    Program.model.modelGamsScalar.a_ref[0] = new double[4];
+                    Program.model.modelGamsScalar.a_ref[1] = new double[4];
+                    Program.model.modelGamsScalar.a_ref[0][0] = 75;
+                    Program.model.modelGamsScalar.a_ref[0][1] = 60;
+                    Program.model.modelGamsScalar.a_ref[0][2] = 15;
+                    Program.model.modelGamsScalar.a_ref[0][3] = 3;
+                    Program.model.modelGamsScalar.a_ref[1][0] = 100;
+                    Program.model.modelGamsScalar.a_ref[1][1] = 80;
+                    Program.model.modelGamsScalar.a_ref[1][2] = 20;
+                    Program.model.modelGamsScalar.a_ref[1][3] = 4;                    
+                }
+
                 Program.model.modelGamsScalar.bb = bb;
                 Program.model.modelGamsScalar.cc = cc;
                 Program.model.modelGamsScalar.dd = dd;

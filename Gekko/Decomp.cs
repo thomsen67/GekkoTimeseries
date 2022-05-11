@@ -1603,14 +1603,9 @@ namespace Gekko
             Series y0Ref_series = null;
             if (mm.Contains(1))
             {
-                //Function call start --------------
-                O.AdjustSmplForDecomp(smpl, 0);
-                smpl.bankNumber = 1;
-                y0aRef.SetData(ttt000, 123454321d); //expression(smpl); funcCounter++;                    
 
-                smpl.bankNumber = 0;
-                O.AdjustSmplForDecomp(smpl, 1);
-                //Function call end   --------------
+                double y0Ref = Program.model.modelGamsScalar.Eval(eqNumber, true);                
+                y0aRef.SetData(ttt000, y0Ref); //expression(smpl); funcCounter++;                                    
 
                 y0aRef_series = y0aRef as Series;
                 if (y0aRef == null)
@@ -1647,15 +1642,9 @@ namespace Gekko
             foreach (TwoInts dp in pre[ip])
             {
                 iVar++;
-                bool isRef = false;
+                
 
                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
-
-                if (mm.Contains(1))
-                {
-                    isRef = true;
-                }
-
 
                 foreach (GekkoTime t1 in new GekkoTimeIterator(ttt000, ttt000))
                 {
@@ -1666,6 +1655,12 @@ namespace Gekko
 
                     foreach (int j in mm)
                     {
+                        bool isRef = false;
+                        if (j == 1)
+                        {
+                            isRef = true;
+                        }
+
                         if (true)
                         {
 
