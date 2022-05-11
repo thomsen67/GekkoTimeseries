@@ -1573,8 +1573,9 @@ namespace Gekko
             pre1.Add(new TwoInts(0, 0));
             pre1.Add(new TwoInts(0, 1));
             List<TwoInts> pre2 = new List<TwoInts>();
-            pre1.Add(new TwoInts(0, 1));
-            pre1.Add(new TwoInts(0, 2));
+            pre2.Add(new TwoInts(0, 1));
+            pre2.Add(new TwoInts(0, 2));
+            pre2.Add(new TwoInts(0, 3));
             List<List<TwoInts>> pre = new List<List<TwoInts>>();
             pre.Add(pre0);
             pre.Add(pre1);
@@ -2542,13 +2543,28 @@ namespace Gekko
             bool orderNormalize = false;
             if (decompOptions2.decompTablesFormat.showErrors)
             {
-                if (varnames.Count == decompOptions2.link[0].expressions.Count)
+                if (G.GetModelType() == EModelType.GAMSScalarModel)
                 {
-                    orderNormalize = true;
+                    //HMMMMM not sure about this and what it does, or if .GAMS_dsh.Count should be used
+                    if (varnames.Count == decompOptions2.link[0].GAMS_dsh.Count)
+                    {
+                        orderNormalize = true;
+                    }
+                    else
+                    {
+                        new Warning("Normalization ordering not implemented for sets of equations");
+                    }
                 }
                 else
                 {
-                    new Warning("Normalization ordering not implemented for sets of equations");
+                    if (varnames.Count == decompOptions2.link[0].expressions.Count)
+                    {
+                        orderNormalize = true;
+                    }
+                    else
+                    {
+                        new Warning("Normalization ordering not implemented for sets of equations");
+                    }
                 }
             }
 
