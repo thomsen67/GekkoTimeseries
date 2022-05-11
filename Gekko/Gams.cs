@@ -721,7 +721,8 @@ namespace Gekko
                 }
 
                 if (time.IsNull()) new Error("Unexpected");
-                resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
+                if (fullName.Count == 0) resultingFullName = start;  //avoid an empty "x[]" name.
+                else resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
             }
             else
             {

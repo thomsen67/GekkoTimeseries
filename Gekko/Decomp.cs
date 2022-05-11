@@ -259,6 +259,21 @@ namespace Gekko
                             link.GAMS_dsh.Add(kvp2.Value);
                             link.GAMS_eqNumber = counter;
                         }
+
+                        if (counter == 0)
+                        {
+                            link.endo = new List<string>();
+                            link.endo.AddRange(decompOptions2.new_endo);
+                            link.varnames = new List<string>();
+                            link.varnames.AddRange(decompOptions2.new_select);
+                        }
+                        else
+                        {
+                            //is this still necessary?
+                            link.varnames = new List<string>();
+                            link.varnames.Add("<not used>"); //strange but necessary further on
+                        }
+
                         decompOptions2.link.Add(link);
                     }
                 }
@@ -279,6 +294,7 @@ namespace Gekko
                         }
                         else
                         {
+                            //is this still necessary?
                             link.varnames = new List<string>();
                             link.varnames.Add("<not used>"); //strange but necessary further on
                         }
@@ -1687,7 +1703,8 @@ namespace Gekko
 
                                             int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                 
 
-                                            string name = varName + "¤[" + lag2 + "]";
+                                            //string name = varName + "¤[" + lag2 + "]";
+                                            string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
 
                                             if (true)
                                             {
