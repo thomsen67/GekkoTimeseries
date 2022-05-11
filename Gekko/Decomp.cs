@@ -1601,7 +1601,7 @@ namespace Gekko
             EFreq freq = Program.model.modelGamsScalar.t0.freq;
 
             Series y0_series = new Series(ESeriesType.Light, ttt000, ttt000);            
-            Series y0aRef = new Series(ESeriesType.Light, ttt000, ttt000);
+            Series y0Ref_series = new Series(ESeriesType.Light, ttt000, ttt000);
 
             DecompInitDict(d);
 
@@ -1609,26 +1609,12 @@ namespace Gekko
             y0_series.SetData(ttt000, y0); // expression(smpl); funcCounter++;             
 
             d.cellsQuo.storage.Add(residualName, y0_series);
-
-            Series y0aRef_series = null;
-            Series y0Ref_series = null;
+            
             if (mm.Contains(1))
             {
 
                 double y0Ref = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);                
-                y0aRef.SetData(ttt000, y0Ref); //expression(smpl); funcCounter++;                                    
-
-                y0aRef_series = y0aRef as Series;
-                if (y0aRef == null)
-                {
-                    new Error("DECOMP expects the expression to be of series type");
-                    //throw new GekkoException();
-                }
-                y0Ref_series = y0aRef_series;
-                if (y0aRef_series.type != ESeriesType.Light)
-                {
-                    y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
-                }
+                y0Ref_series.SetData(ttt000, y0Ref); //expression(smpl); funcCounter++;                                    
                 d.cellsRef.storage.Add(residualName, y0Ref_series);
             }
 
@@ -1644,7 +1630,7 @@ namespace Gekko
             else if (dsh.name.Contains("e2")) ip = 1;
             else if (dsh.name.Contains("e3")) ip = 2;
 
-            if (precedents[ip].Count == 0) return d;
+            if (precedents[ip].Count == 0) return d; //empty return
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
@@ -1671,71 +1657,65 @@ namespace Gekko
                             isRef = true;
                         }
 
-                        if (true)
+                        double x_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, isRef);
+
+                        try
                         {
+                            double x_after = x_before + eps;
+                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
 
-                            double x_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, isRef);
 
-                            try
+                            foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
                             {
-                                double x_after = x_before + eps;
-                                Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
+                                double y0_double = y0;
+                                double y1_double = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, isRef);
+                                double grad = (y1_double - y0_double) / eps;
 
-                                if (true)  //this does not seem to cost any time...?
+                                if (!G.isNumericalError(grad) && grad != 0d)
                                 {
-                                    foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
+                                    //For the gradient to be a real number <> 0, the expression must evaluate
+                                    //before shock (y0) in the year considered (t2)
+                                    //If it does evaluate, but there is no effect, it is skipped too.
+
+                                    int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                 
+
+                                    //string name = varName + "¤[" + lag2 + "]";
+                                    string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
+
+                                    if (true)
                                     {
-                                        double y0_double = y0;
-                                        double y1_double = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, isRef);
-                                        double grad = (y1_double - y0_double) / eps;
 
-                                        if (!G.isNumericalError(grad) && grad != 0d)
+                                        if (j == 0)
                                         {
-                                            //For the gradient to be a real number <> 0, the expression must evaluate
-                                            //before shock (y0) in the year considered (t2)
-                                            //If it does evaluate, but there is no effect, it is skipped too.
-
-                                            int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                 
-
-                                            //string name = varName + "¤[" + lag2 + "]";
-                                            string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
-
-                                            if (true)
-                                            {
-
-                                                if (j == 0)
-                                                {
-                                                    d.cellsQuo[name].SetData(t2, x_before);
-                                                }
-                                                else
-                                                {
-                                                    d.cellsRef[name].SetData(t2, x_before);  // for j != 0, x_before is from Ref bank.
-                                                }
-
-                                                if (j == 0)
-                                                {
-                                                    d.cellsGradQuo[name].SetData(t2, grad);
-                                                }
-                                                else
-                                                {
-                                                    d.cellsGradRef[name].SetData(t2, grad);
-                                                }
-                                            }
-
-                                            if (!vars.ContainsKey(name))
-                                            {
-                                                //list of relevant variables to handle later on
-                                                //in decomp pivot
-                                                vars.Add(name, 0);
-                                            }
+                                            d.cellsQuo[name].SetData(t2, x_before);
                                         }
+                                        else
+                                        {
+                                            d.cellsRef[name].SetData(t2, x_before);  // for j != 0, x_before is from Ref bank.
+                                        }
+
+                                        if (j == 0)
+                                        {
+                                            d.cellsGradQuo[name].SetData(t2, grad);
+                                        }
+                                        else
+                                        {
+                                            d.cellsGradRef[name].SetData(t2, grad);
+                                        }
+                                    }
+
+                                    if (!vars.ContainsKey(name))
+                                    {
+                                        //list of relevant variables to handle later on
+                                        //in decomp pivot
+                                        vars.Add(name, 0);
                                     }
                                 }
                             }
-                            finally
-                            {
-                                Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_before);
-                            }
+                        }
+                        finally
+                        {
+                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_before);
                         }
                     }
                 }
