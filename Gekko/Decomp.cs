@@ -1583,9 +1583,7 @@ namespace Gekko
             precedents.Add(pre2);
             GekkoTime ttt000 = tt2;
             // ------------------------------------------------------------------------            
-
-            GekkoTime tt0 = tt1.Add(-1);
-
+            
             double eps = Globals.newtonSmallNumber;
 
             List<int> mm = new List<int>();
@@ -1597,11 +1595,10 @@ namespace Gekko
                 mm.Add(1);
             }
 
-            DecompData d = new DecompData();
+            int deduct = 0;
+            if (mm.Contains(0)) deduct = 1;  //deduct a lag if we are time-decomposing, else not
 
-            DateTime dt = DateTime.Now;
-                        
-            EFreq freq = Program.model.modelGamsScalar.t0.freq;
+            DecompData d = new DecompData();
 
             DecompInitDict(d);                        
 
@@ -1623,24 +1620,29 @@ namespace Gekko
 
             foreach (TwoInts dp in precedents[ip])
             {
-                iVar++;                
+                iVar++;
 
                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
 
-                foreach (GekkoTime t1 in new GekkoTimeIterator(tt1, tt2))
+                foreach (GekkoTime t1 in new GekkoTimeIterator(tt1.Add(-deduct), tt2))
                 {
                     // --------------------------------------------
                     // This is where the decomposition takes place
                     // --------------------------------------------
-                                        
-                    int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), ttt000) - 1;  //TODO TODO TODO TODO TODO TODOTODO TODO                        
-                    
-                    double y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);                    
+
+                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
+                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
+                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
+                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
+                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
+                    int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), ttt000) - 1; 
+
+                    double y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
                     d.cellsQuo[residualName].SetData(t1, y0);
 
                     if (mm.Contains(1))
                     {
-                        double y0Ref = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);                        
+                        double y0Ref = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
                         d.cellsRef[residualName].SetData(t1, y0Ref);
                     }
 
@@ -1658,7 +1660,6 @@ namespace Gekko
                         {
                             double x_after = x_before + eps;
                             Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
-
 
                             foreach (GekkoTime t2 in new GekkoTimeIterator(ttt000, ttt000))
                             {
