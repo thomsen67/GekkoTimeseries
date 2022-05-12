@@ -397,7 +397,7 @@ namespace Gekko
                     decompOptions2.data.dataCellsGradRef = new Series(per1.freq, null);
                     if (operator1 == "m" || operator1 == "q")
                     {
-                        extra.type = EDecompBanks.Both;
+                        extra.type = EDecompBanks.Multiplier;
                         extra.dataCellsGradRef = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
@@ -1305,7 +1305,7 @@ namespace Gekko
             List<int> mm = new List<int>();
             if (workOrRefOrBoth == EDecompBanks.Work) mm.Add(0);
             else if (workOrRefOrBoth == EDecompBanks.Ref) mm.Add(1);
-            else if (workOrRefOrBoth == EDecompBanks.Both)
+            else if (workOrRefOrBoth == EDecompBanks.Multiplier)
             {
                 mm.Add(0);
                 mm.Add(1);
@@ -1648,7 +1648,7 @@ namespace Gekko
             List<int> mm = new List<int>();
             if (workOrRefOrBoth == EDecompBanks.Work) mm.Add(0);
             else if (workOrRefOrBoth == EDecompBanks.Ref) mm.Add(1);
-            else if (workOrRefOrBoth == EDecompBanks.Both)
+            else if (workOrRefOrBoth == EDecompBanks.Multiplier)
             {
                 mm.Add(0);
                 mm.Add(1);
@@ -1676,14 +1676,18 @@ namespace Gekko
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             int iVar = -1;
+            
+            Series pattern = extra.dataCellsGradRef;
+            if (extra.type == EDecompBanks.Work) pattern = extra.dataCellsGradQuo;
+            GekkoTime extrat1 = pattern.GetRealDataPeriodFirst();
+            GekkoTime extrat2 = pattern.GetRealDataPeriodLast();
 
             foreach (TwoInts dp in precedents[ip])
             {
                 iVar++;
 
                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
-
-                foreach (GekkoTime t in new GekkoTimeIterator(tt1.Add(-deduct), tt2))
+                foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))
                 {
                     // --------------------------------------------
                     // This is where the decomposition takes place
@@ -1694,64 +1698,36 @@ namespace Gekko
                     //TODO TODO TODO TODO TODO TODOTODO TODO   why tt2 below???                      
                     //TODO TODO TODO TODO TODO TODOTODO TODO                        
                     //TODO TODO TODO TODO TODO TODOTODO TODO                        
-                    int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), tt2) - 1; 
+                    int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), t) - 1;
 
-                    double y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
-                    d.cellsQuo[residualName].SetData(t, y0);
-
-                    if (mm.Contains(1))
+                    double y0 = double.NaN;
+                    if (extra.type == EDecompBanks.Multiplier)
                     {
-                        double y0Ref = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
-                        d.cellsRef[residualName].SetData(t, y0Ref);
-                    }
-
-                    foreach (int j in mm)
-                    {
-                        bool isRef = false;
-                        if (j == 1)
-                        {
-                            isRef = true;
-                        }
-
-                        double x_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, isRef);
+                        //normal multiplier like <m>
+                        y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
+                        d.cellsRef[residualName].SetData(t, y0);
+                        double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
+                        d.cellsQuo[residualName].SetData(t, y1);
+                        double x0_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, true);
+                        double x1 = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, false);
 
                         try
                         {
-                            double x_after = x_before + eps;
-                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
-                            double y0_double = y0;
-                            double y1_double = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, isRef);
-                            double grad = (y1_double - y0_double) / eps;
+                            double x0_after = x0_before + eps;
+                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, true, x0_after);
+                            double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
+                            double grad = (y0_after - y0) / eps;
 
                             if (!G.isNumericalError(grad) && grad != 0d)
                             {
                                 //For the gradient to be a real number <> 0, the expression must evaluate
                                 //before shock (y0) in the year considered (t2)
                                 //If it does evaluate, but there is no effect, it is skipped too.
-
-                                int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                 
-
-                                //string name = varName + "¤[" + lag2 + "]";
+                                int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
-
-                                if (j == 0)
-                                {
-                                    d.cellsQuo[name].SetData(t, x_before);
-                                }
-                                else
-                                {
-                                    d.cellsRef[name].SetData(t, x_before);  // for j != 0, x_before is from Ref bank.
-                                }
-
-                                if (j == 0)
-                                {
-                                    d.cellsGradQuo[name].SetData(t, grad);
-                                }
-                                else
-                                {
-                                    d.cellsGradRef[name].SetData(t, grad);
-                                }
-
+                                d.cellsRef[name].SetData(t, x0_before);
+                                d.cellsQuo[name].SetData(t, x1);
+                                d.cellsGradRef[name].SetData(t, grad);
 
                                 if (!vars.ContainsKey(name))
                                 {
@@ -1763,9 +1739,18 @@ namespace Gekko
                         }
                         finally
                         {
-                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_before);
+                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, true, x0_before);
                         }
                     }
+                    else if (extra.type == EDecompBanks.Ref)
+                    {
+                        //ref difference like <rd>                            
+                    }
+                    else if (extra.type == EDecompBanks.Work)
+                    {
+                        //work difference like <d>
+                    }
+                    else new Error("Decomp problem");
                 }
             }
 
@@ -1774,21 +1759,20 @@ namespace Gekko
             //If we know that lags beforehand, we could limit the lag loop and save time here.
 
             int i = 0;
-            foreach (GekkoTime t in new GekkoTimeIterator(tt1, tt2))
+            foreach (GekkoTime t2 in new GekkoTimeIterator(extrat1, extrat2))
             {
+                GekkoTime t = t2;
                 i++;
                 int j = 0;
                 foreach (string s in vars.Keys)
                 {
                     j++;
-
                     double vQuo = d.cellsQuo[s].GetDataSimple(t);
                     double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
                     double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
                     //double vGradQuo = d.cellsGradQuo[s].GetData(smpl, t2); --> not used at the moment
                     double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                     d.cellsContribD[s].SetData(t, dContribD);
-
                     if (Globals.runningOnTTComputer && false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
 
                     if (mm.Contains(1))
@@ -1807,9 +1791,7 @@ namespace Gekko
                 d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
                 d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
             }
-
             return d;
-
         }  
 
         private static void DecompInitDict(DecompData d)
@@ -2429,7 +2411,7 @@ namespace Gekko
                             {
                                 lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
                             }
-                            else if (edb == EDecompBanks.Both)
+                            else if (edb == EDecompBanks.Multiplier)
                             {
                                 lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
                                 lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
@@ -2699,7 +2681,7 @@ namespace Gekko
         {
             EDecompBanks banks = EDecompBanks.Work;
             if (operator1 == "r" || operator1 == "xr" || operator1 == "xrn" || operator1 == "rd" || operator1 == "xrd" || operator1 == "rp" || operator1 == "xrp" || operator1 == "rdp" || operator1 == "xrdp") banks = EDecompBanks.Ref;
-            if (operator1 == "m" || operator1 == "xm" || operator1 == "q" || operator1 == "xq" || operator1 == "mp" || operator1 == "xmp") banks = EDecompBanks.Both;
+            if (operator1 == "m" || operator1 == "xm" || operator1 == "q" || operator1 == "xq" || operator1 == "mp" || operator1 == "xmp") banks = EDecompBanks.Multiplier;
             return banks;
         }
 

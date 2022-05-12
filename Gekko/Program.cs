@@ -125,7 +125,7 @@ namespace Gekko
     {
         Work,
         Ref,
-        Both
+        Multiplier
     }
 
     public enum assignmantTypeLhs

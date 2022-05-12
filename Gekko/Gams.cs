@@ -4522,7 +4522,7 @@ namespace Gekko
     /// </summary>
     public class Data
     {
-        public EDecompBanks type = EDecompBanks.Both;
+        public EDecompBanks type = EDecompBanks.Multiplier;
         public Series dataCellsGradQuo = null;
         public Series dataCellsGradRef = null;
     }
