@@ -4521,9 +4521,9 @@ namespace Gekko
     /// This is to avoid doing too much work when calling DECOMP several times.
     /// </summary>
     public class Data
-    {        
+    {
+        public EDecompBanks type = EDecompBanks.Both;
         public Series dataCellsGradQuo = null;
-        // -------------------------------------     
         public Series dataCellsGradRef = null;
     }
 

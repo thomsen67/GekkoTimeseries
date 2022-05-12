@@ -382,10 +382,10 @@ namespace Gekko
 
                 bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
 
-                Data extra = new Data();
-                extra.dataCellsGradQuo = new Series(per1.freq, null);
-                extra.dataCellsGradRef = new Series(per1.freq, null);
 
+
+
+                Data extra = new Data();                
                 if (decompOptions2.data == null)
                 {
                     //if cellsQuo or cellsRef contain missing for the period that is part
@@ -397,9 +397,11 @@ namespace Gekko
                     decompOptions2.data.dataCellsGradRef = new Series(per1.freq, null);
                     if (operator1 == "m" || operator1 == "q")
                     {
+                        extra.type = EDecompBanks.Both;
+                        extra.dataCellsGradRef = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
-                            if (decompOptions2.data.dataCellsGradRef.GetDataSimple(t) == double.NaN)
+                            if (double.IsNaN(decompOptions2.data.dataCellsGradRef.GetDataSimple(t)))
                             {
                                 decompOptions2.data.dataCellsGradRef.SetData(t, 1d);
                                 extra.dataCellsGradRef.SetData(t, 1d);
@@ -408,11 +410,13 @@ namespace Gekko
                     }
                     else if (operator1 == "d" || operator1 == "p")
                     {
+                        extra.type = EDecompBanks.Work;
+                        extra.dataCellsGradQuo = new Series(per1.freq, null);                        
                         foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
                         {
                             decompOptions2.data.dataCellsGradQuo.SetData(t, 1d);
 
-                            if (decompOptions2.data.dataCellsGradQuo.GetDataSimple(t) == double.NaN)
+                            if (double.IsNaN(decompOptions2.data.dataCellsGradQuo.GetDataSimple(t)))
                             {
                                 decompOptions2.data.dataCellsGradQuo.SetData(t, 1d);
                                 extra.dataCellsGradQuo.SetData(t, 1d);
@@ -421,9 +425,11 @@ namespace Gekko
                     }
                     else if (operator1 == "rd" || operator1 == "rp")
                     {
+                        extra.type = EDecompBanks.Ref;
+                        extra.dataCellsGradRef = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
                         {                            
-                            if (decompOptions2.data.dataCellsGradRef.GetDataSimple(t) == double.NaN)
+                            if (double.IsNaN(decompOptions2.data.dataCellsGradRef.GetDataSimple(t)))
                             {
                                 decompOptions2.data.dataCellsGradRef.SetData(t, 1d);
                                 extra.dataCellsGradRef.SetData(t, 1d);
@@ -1713,8 +1719,6 @@ namespace Gekko
                         {
                             double x_after = x_before + eps;
                             Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, isRef, x_after);
-
-
                             double y0_double = y0;
                             double y1_double = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, isRef);
                             double grad = (y1_double - y0_double) / eps;
@@ -1730,27 +1734,24 @@ namespace Gekko
                                 //string name = varName + "¤[" + lag2 + "]";
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
 
-                                if (true)
+                                if (j == 0)
                                 {
-
-                                    if (j == 0)
-                                    {
-                                        d.cellsQuo[name].SetData(t, x_before);
-                                    }
-                                    else
-                                    {
-                                        d.cellsRef[name].SetData(t, x_before);  // for j != 0, x_before is from Ref bank.
-                                    }
-
-                                    if (j == 0)
-                                    {
-                                        d.cellsGradQuo[name].SetData(t, grad);
-                                    }
-                                    else
-                                    {
-                                        d.cellsGradRef[name].SetData(t, grad);
-                                    }
+                                    d.cellsQuo[name].SetData(t, x_before);
                                 }
+                                else
+                                {
+                                    d.cellsRef[name].SetData(t, x_before);  // for j != 0, x_before is from Ref bank.
+                                }
+
+                                if (j == 0)
+                                {
+                                    d.cellsGradQuo[name].SetData(t, grad);
+                                }
+                                else
+                                {
+                                    d.cellsGradRef[name].SetData(t, grad);
+                                }
+
 
                                 if (!vars.ContainsKey(name))
                                 {

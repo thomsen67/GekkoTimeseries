@@ -480,7 +480,8 @@ namespace Gekko
 
         /// <summary>
         /// Predict GAMS scalar model equation i, and returns the evaluation. As a side-effect also puts the result into Program.model.modelGamsScalar.r array,
-        /// at the slot i.
+        /// at the slot i. Note that this is slightly slower than calling functions[...] directly, so beware
+        /// if calling it in a tight loop.
         /// </summary>
         /// <param name="i"></param>
         public double Eval(int i, bool isRef)
