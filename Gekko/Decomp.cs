@@ -1653,18 +1653,6 @@ namespace Gekko
             
             double eps = Globals.newtonSmallNumber;
 
-            List<int> mm = new List<int>();
-            if (workOrRefOrBoth == EDecompBanks.Work) mm.Add(0);
-            else if (workOrRefOrBoth == EDecompBanks.Ref) mm.Add(1);
-            else if (workOrRefOrBoth == EDecompBanks.Multiplier)
-            {
-                mm.Add(0);
-                mm.Add(1);
-            }
-
-            int deduct = 0;
-            if (mm.Contains(0)) deduct = 1;  //deduct a lag if we are time-decomposing, else not
-
             DecompData d = new DecompData();
 
             DecompInitDict(d);                        
@@ -1682,8 +1670,6 @@ namespace Gekko
             if (precedents[ip].Count == 0) return d; //empty return
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-            int iVar = -1;
             
             Series pattern = extra.dataCellsGradRef;
             if (extra.type == EDecompBanks.Work) pattern = extra.dataCellsGradQuo;
@@ -1691,8 +1677,7 @@ namespace Gekko
             GekkoTime extrat2 = pattern.GetRealDataPeriodLast();
 
             foreach (TwoInts dp in precedents[ip])
-            {
-                iVar++;
+            {               
 
                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
                 foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))
@@ -1722,16 +1707,12 @@ namespace Gekko
                             double grad = (y0_after - y0) / eps;
 
                             if (!G.isNumericalError(grad) && grad != 0d)
-                            {
-                                //For the gradient to be a real number <> 0, the expression must evaluate
-                                //before shock (y0) in the year considered (t2)
-                                //If it does evaluate, but there is no effect, it is skipped too.
+                            {                                
                                 int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
                                 d.cellsRef[name].SetData(t, x0_before);
                                 d.cellsQuo[name].SetData(t, x1);
                                 d.cellsGradRef[name].SetData(t, grad);
-
                                 if (!vars.ContainsKey(name))  //for decomp pivot
                                 {                                    
                                     vars.Add(name, 0);
@@ -1758,18 +1739,13 @@ namespace Gekko
             //Here, cellsQuo + cellsRef + cellsGradQuo + cellsGradRef are calculated.
             //Grad tells us which lags are actually active.
             //If we know that lags beforehand, we could limit the lag loop and save time here.
-
-            int i = 0;
+                        
             foreach (GekkoTime t2 in new GekkoTimeIterator(extrat1, extrat2))
             {
                 int add = 1; if (extra.type == EDecompBanks.Multiplier) add = 0;
                 GekkoTime t = t2.Add(add);
-                i++;
-                int j = 0;
                 foreach (string s in vars.Keys)
-                {
-                    j++;                   
-                    
+                {                    
                     if (extra.type == EDecompBanks.Work)
                     {
                         double vQuo = d.cellsQuo[s].GetDataSimple(t);
