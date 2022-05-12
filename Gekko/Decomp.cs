@@ -2641,6 +2641,18 @@ namespace Gekko
 
         public static EDecompBanks DecompBanks(string operator1)
         {
+            //     ref         work
+            // --------------------------
+            //     R2001       W2001
+            //     R2002       W2002
+            //     R2003       W2003
+            //
+            // M<2002> uses grad(R2002) + (W2002-R2002)
+            // MP<2002> probably 
+            // D<2002> uses grad(W2001) + (W2002-W2001)
+            // DP<2002> probably   grad(W2001), grad(W2000), (W2002-W2001)-(W2001-W2000)
+
+
             EDecompBanks banks = EDecompBanks.Work;
             if (operator1 == "r" || operator1 == "xr" || operator1 == "xrn" || operator1 == "rd" || operator1 == "xrd" || operator1 == "rp" || operator1 == "xrp" || operator1 == "rdp" || operator1 == "xrdp") banks = EDecompBanks.Ref;
             if (operator1 == "m" || operator1 == "xm" || operator1 == "q" || operator1 == "xq" || operator1 == "mp" || operator1 == "xmp") banks = EDecompBanks.Both;
