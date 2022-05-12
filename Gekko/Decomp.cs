@@ -1619,6 +1619,14 @@ namespace Gekko
         /// <returns></returns>
         public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, Data extra, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
+            //
+            //
+            // NB: Perhaps use this when migrating "old" ADAM-like DECOMP for models
+            //     We can keep DecompLowLevel() for decomp of arbitrary Gekko expression like movavg(...) etc.
+            //     and sums over sets and the like.
+            //
+            //
+
             //See #kljaf89usafasdf for Gekko  model
 
             // ------------------------------------------------------------------------
@@ -1692,12 +1700,7 @@ namespace Gekko
                     // --------------------------------------------
                     // This is where the decomposition takes place
                     // --------------------------------------------
-
-                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
-                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
-                    //TODO TODO TODO TODO TODO TODOTODO TODO   why tt2 below???                      
-                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
-                    //TODO TODO TODO TODO TODO TODOTODO TODO                        
+                 
                     int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), t) - 1;
 
                     double y0 = double.NaN;
@@ -1729,10 +1732,8 @@ namespace Gekko
                                 d.cellsQuo[name].SetData(t, x1);
                                 d.cellsGradRef[name].SetData(t, grad);
 
-                                if (!vars.ContainsKey(name))
-                                {
-                                    //list of relevant variables to handle later on
-                                    //in decomp pivot
+                                if (!vars.ContainsKey(name))  //for decomp pivot
+                                {                                    
                                     vars.Add(name, 0);
                                 }
                             }
@@ -1767,30 +1768,47 @@ namespace Gekko
                 int j = 0;
                 foreach (string s in vars.Keys)
                 {
-                    j++;
-                    double vQuo = d.cellsQuo[s].GetDataSimple(t);
-                    double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
-                    double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
-                    //double vGradQuo = d.cellsGradQuo[s].GetData(smpl, t2); --> not used at the moment
-                    double dContribD = vGradQuoLag * (vQuo - vQuoLag);
-                    d.cellsContribD[s].SetData(t, dContribD);
-                    if (Globals.runningOnTTComputer && false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
-
-                    if (mm.Contains(1))
+                    j++;                   
+                    
+                    if (extra.type == EDecompBanks.Work)
                     {
+                        double vQuo = d.cellsQuo[s].GetDataSimple(t);
+                        double vQuoLag = d.cellsQuo[s].GetDataSimple(t.Add(-1));
+                        double vGradQuoLag = d.cellsGradQuo[s].GetDataSimple(t.Add(-1));
+                        double dContribD = vGradQuoLag * (vQuo - vQuoLag);
+                        d.cellsContribD[s].SetData(t, dContribD);
+                    }
+                    else if (extra.type == EDecompBanks.Ref)
+                    {                        
                         double vRef = d.cellsRef[s].GetDataSimple(t);
                         double vRefLag = d.cellsRef[s].GetDataSimple(t.Add(-1));
-                        double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
                         double vGradRefLag = d.cellsGradRef[s].GetDataSimple(t.Add(-1));
-                        double dContribM = vGradRef * (vQuo - vRef);
                         double dContribDRef = vGradRefLag * (vRef - vRefLag);
-                        d.cellsContribM[s].SetData(t, dContribM);
                         d.cellsContribDRef[s].SetData(t, dContribDRef);
                     }
+                    else if (extra.type == EDecompBanks.Multiplier)
+                    {
+                        double vQuo = d.cellsQuo[s].GetDataSimple(t);
+                        double vRef = d.cellsRef[s].GetDataSimple(t);
+                        double vGradRef = d.cellsGradRef[s].GetDataSimple(t);
+                        double dContribM = vGradRef * (vQuo - vRef);
+                        d.cellsContribM[s].SetData(t, dContribM);
+                    }
+                    else new Error("Decomp error");                    
                 }
-                d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
-                d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
-                d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
+                if (extra.type == EDecompBanks.Work)
+                {
+                    d.cellsContribD[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsQuo[residualName].GetDataSimple(t.Add(-1))));
+                }
+                else if (extra.type == EDecompBanks.Ref)
+                {
+                    d.cellsContribDRef[residualName].SetData(t, -(d.cellsRef[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t.Add(-1))));
+                }
+                else if (extra.type == EDecompBanks.Multiplier)
+                {
+                    d.cellsContribM[residualName].SetData(t, -(d.cellsQuo[residualName].GetDataSimple(t) - d.cellsRef[residualName].GetDataSimple(t)));
+                }
+                else new Error("Decomp error");
             }
             return d;
         }  
