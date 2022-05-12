@@ -2255,7 +2255,7 @@ namespace Gekko
                             GekkoTime per2 = new GekkoTime(EFreq.A, 2020, 1);
                             string residualName = "residual___";
                             int funcCounter = 0;
-                            DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, expression, Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
+                            DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, null, expression, Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
 
                             List<string> m1 = new List<string>();
                             List<string> m2 = new List<string>();
@@ -4515,6 +4515,17 @@ namespace Gekko
             this.remove.Clear();
         }
     }    
+
+    /// <summary>
+    /// Info on which gradients have been already computed, for which periods, and for which databanks.
+    /// This is to avoid doing too much work when calling DECOMP several times.
+    /// </summary>
+    public class Data
+    {        
+        public Series dataCellsGradQuo = null;
+        // -------------------------------------     
+        public Series dataCellsGradRef = null;
+    }
 
     //public class GamsTestInput
     //{

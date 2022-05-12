@@ -2396,30 +2396,20 @@ namespace Gekko
 
         public bool isNew = false;
 
-        //public bool isSubst = false;
-        //public bool isPool = false;
-        //public bool isSort = false;
-
-        //public bool onlyTable = false;
-        //public Table table = null;
-
         public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
         public string variable = null;
-        public List<string> variable_subelement = null;
+        public List<string> variable_subelement = null;        
         
-        //public bool isExpression = false; //true for UDVALG fy+1 etc.
         public string expressionOld = null;  //only != null for expressions
         public Func<GekkoSmpl, IVariable> expression = null;
         public List<Dictionary<string, string>> precedents;  //only != null for expressions
         public string type;  //not used yet (UDVALG or DECOMP)
-        //public GekkoParserTimePeriod tp;
+        
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
         public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
-        //public List<string> vars;
-        public bool isSubWindow = false;  //when browsing/clicking, opening a new window
         
-        //public GekkoSmpl smplForFunc = null;
+        public bool isSubWindow = false;  //when browsing/clicking, opening a new window
 
         public List<string> subst = new List<string>();
 
@@ -2472,6 +2462,8 @@ namespace Gekko
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = null;
 
+        public Data data = null;
+
         public DecompOptions2 Clone()
         {
             //clones relevant parts for new window
@@ -2492,13 +2484,13 @@ namespace Gekko
             d.operatorHelper.guiDecompOperator = this.operatorHelper.guiDecompOperator;
             d.operatorHelper.guiDecompIsShares = this.operatorHelper.guiDecompIsShares;
             d.operatorHelper.guiDecompIsRaw = this.operatorHelper.guiDecompIsRaw;
-            d.operatorHelper.guiDecompIsRef = this.operatorHelper.guiDecompIsRef;            
+            d.operatorHelper.guiDecompIsRef = this.operatorHelper.guiDecompIsRef;
 
             d.modelHash = this.modelHash;
             d.type = this.type;
-            
+
             //d.decimalsLevel = this.decimalsLevel;
-            
+
             d.dream = this.dream;
 
             foreach (string s in this.subst)
@@ -2569,6 +2561,10 @@ namespace Gekko
                 tempEndo.Add(s);
             }
             d.new_endo = tempEndo;
+
+            d.data = new Data();
+            d.data.dataCellsGradQuo = (Series)this.data.dataCellsGradQuo.DeepClone(null);
+            d.data.dataCellsGradRef = (Series)this.data.dataCellsGradRef.DeepClone(null);
 
             return d;
         }

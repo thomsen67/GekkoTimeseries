@@ -1859,10 +1859,10 @@ namespace Gekko
             windowNew2 = GekkoTime.tNull;
         }
 
-        private static void FindCommonWindow(ref GekkoTime window1, ref GekkoTime window2, GekkoTime windowNew1, GekkoTime windowNew2)
+        public static void FindCommonWindow(ref GekkoTime existingT1, ref GekkoTime existingT2, GekkoTime newT1, GekkoTime newT2)
         {
-            if (windowNew1.StrictlySmallerThan(window1)) window1 = windowNew1;
-            if (windowNew2.StrictlyLargerThan(window2)) window2 = windowNew2;
+            if (newT1.StrictlySmallerThan(existingT1)) existingT1 = newT1;
+            if (newT2.StrictlyLargerThan(existingT2)) existingT2 = newT2;
         }
 
         public void PrepareInput(GekkoSmpl smpl, IVariable input, out Series x1, out Series x2_series, out double x2_val)

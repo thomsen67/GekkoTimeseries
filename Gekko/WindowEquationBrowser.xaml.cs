@@ -175,7 +175,7 @@ namespace Gekko
                 }
 
                 //fixme: [0] must be counter
-                DecompData dd = Gekko.Decomp.DecompLowLevel(_t1, _t1, equation.expressions[0], Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
+                DecompData dd = Gekko.Decomp.DecompLowLevel(_t1, _t1, null, equation.expressions[0], Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
 
                 double max = 0d;
                 foreach (KeyValuePair<string, Series> kvp in dd.cellsContribD.storage)

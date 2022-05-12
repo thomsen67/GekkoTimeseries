@@ -382,6 +382,61 @@ namespace Gekko
 
                 bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
 
+                Data extra = new Data();
+                extra.dataCellsGradQuo = new Series(per1.freq, null);
+                extra.dataCellsGradRef = new Series(per1.freq, null);
+
+                if (decompOptions2.data == null)
+                {
+                    //if cellsQuo or cellsRef contain missing for the period that is part
+                    //of decomposition, just try to fill these missings in again (may be missing again).
+
+                    decompOptions2.data = new Data();
+
+                    decompOptions2.data.dataCellsGradQuo = new Series(per1.freq, null);
+                    decompOptions2.data.dataCellsGradRef = new Series(per1.freq, null);
+                    if (operator1 == "m" || operator1 == "q")
+                    {
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                        {
+                            if (decompOptions2.data.dataCellsGradRef.GetDataSimple(t) == double.NaN)
+                            {
+                                decompOptions2.data.dataCellsGradRef.SetData(t, 1d);
+                                extra.dataCellsGradRef.SetData(t, 1d);
+                            }
+                        }
+                    }
+                    else if (operator1 == "d" || operator1 == "p")
+                    {
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
+                        {
+                            decompOptions2.data.dataCellsGradQuo.SetData(t, 1d);
+
+                            if (decompOptions2.data.dataCellsGradQuo.GetDataSimple(t) == double.NaN)
+                            {
+                                decompOptions2.data.dataCellsGradQuo.SetData(t, 1d);
+                                extra.dataCellsGradQuo.SetData(t, 1d);
+                            }
+                        }
+                    }
+                    else if (operator1 == "rd" || operator1 == "rp")
+                    {
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
+                        {                            
+                            if (decompOptions2.data.dataCellsGradRef.GetDataSimple(t) == double.NaN)
+                            {
+                                decompOptions2.data.dataCellsGradRef.SetData(t, 1d);
+                                extra.dataCellsGradRef.SetData(t, 1d);
+                            }
+                        }
+                    }
+                }  
+                
+
+
+
+
+
                 List<string> expressionTexts = new List<string>();
                 int ii = -1;
                 foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
@@ -396,7 +451,7 @@ namespace Gekko
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;  //will be = 0
-                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, dsh, DecompBanks(operator1), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, extra, dsh, DecompBanks(operator1), residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
                         }
                     }
@@ -405,7 +460,7 @@ namespace Gekko
                         foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;
-                            DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevel(per1, per2, extra, expression, DecompBanks(operator1), residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
                         }
                     }
@@ -1125,7 +1180,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Data extra, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
             //See #kljaf89usafasdf for scalar model
             //
@@ -1556,7 +1611,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, Data extra, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
             //See #kljaf89usafasdf for Gekko  model
 
@@ -2641,18 +2696,6 @@ namespace Gekko
 
         public static EDecompBanks DecompBanks(string operator1)
         {
-            //     ref         work
-            // --------------------------
-            //     R2001       W2001
-            //     R2002       W2002
-            //     R2003       W2003
-            //
-            // M<2002> uses grad(R2002) + (W2002-R2002)
-            // MP<2002> probably 
-            // D<2002> uses grad(W2001) + (W2002-W2001)
-            // DP<2002> probably   grad(W2001), grad(W2000), (W2002-W2001)-(W2001-W2000)
-
-
             EDecompBanks banks = EDecompBanks.Work;
             if (operator1 == "r" || operator1 == "xr" || operator1 == "xrn" || operator1 == "rd" || operator1 == "xrd" || operator1 == "rp" || operator1 == "xrp" || operator1 == "rdp" || operator1 == "xrdp") banks = EDecompBanks.Ref;
             if (operator1 == "m" || operator1 == "xm" || operator1 == "q" || operator1 == "xq" || operator1 == "mp" || operator1 == "xmp") banks = EDecompBanks.Both;

@@ -1329,6 +1329,18 @@ namespace Gekko
             }
         }
 
+        // Regarding GekkoTime comparisons, remember that all these are False in C#:
+        // In Gekko we have these:
+        // (double.NaN > double.NaN)
+        // (double.NaN > 100d)
+        // (100d > double.NaN)
+        // (double.NaN <double.NaN)
+        // (double.NaN < 100d)
+        // (100d < double.NaN)
+        // (double.NaN == double.NaN)
+        // (double.NaN == 100d)         
+        // (100d == double.NaN)         
+
         public bool StrictlyLargerThan(GekkoTime gt2)
         {
             return StrictlyLargerThan(gt2, true);
@@ -1341,7 +1353,7 @@ namespace Gekko
             //========================================================================================================
 
             if(check) CheckSameFreq(gt2);
-            if (gt2.IsNull()) return true;
+            if (gt2.IsNull()) return true;  //what if this.IsNull() is true??
             if (this.super > gt2.super) return true; //gt1 har larger year
             else if (this.super == gt2.super)
             {
@@ -1376,7 +1388,7 @@ namespace Gekko
             //========================================================================================================
 
             if (check) CheckSameFreq(gt2);
-            if (gt2.IsNull()) return true;
+            if (gt2.IsNull()) return true;  //what if this.IsNull() is true??
             if (EqualsGekkoTime(gt2, false)) return true;
             if (StrictlyLargerThan(gt2, false)) return true;
             return false;
@@ -1394,8 +1406,8 @@ namespace Gekko
             //========================================================================================================
 
             if (check) CheckSameFreq(gt2);
-            if (gt2.IsNull()) return true;
-            if(EqualsGekkoTime(gt2, false)) return true;
+            if (gt2.IsNull()) return true;  //what if this.IsNull() is true??
+            if (EqualsGekkoTime(gt2, false)) return true;
             if (StrictlySmallerThan(gt2, false)) return true;
             return false;
         }
@@ -1412,7 +1424,7 @@ namespace Gekko
             //========================================================================================================
 
             if (check) CheckSameFreq(gt2);
-            if (gt2.IsNull()) return true;
+            if (gt2.IsNull()) return true;  //what if this.IsNull() is true??
             if (this.super < gt2.super) return true; //gt1 har smaller year
             else if (this.super == gt2.super)
             {
