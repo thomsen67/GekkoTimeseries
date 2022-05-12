@@ -413,9 +413,7 @@ namespace Gekko
                         extra.type = EDecompBanks.Work;
                         extra.dataCellsGradQuo = new Series(per1.freq, null);                        
                         foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
-                        {
-                            decompOptions2.data.dataCellsGradQuo.SetData(t, 1d);
-
+                        {                            
                             if (double.IsNaN(decompOptions2.data.dataCellsGradQuo.GetDataSimple(t)))
                             {
                                 decompOptions2.data.dataCellsGradQuo.SetData(t, 1d);
@@ -1687,6 +1685,7 @@ namespace Gekko
                     // --------------------------------------------
                  
                     int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), t) - 1;
+                    int iii111 = iii000 + 1;
 
                     double y0 = double.NaN;
                     if (extra.type == EDecompBanks.Multiplier)
@@ -1731,6 +1730,39 @@ namespace Gekko
                     else if (extra.type == EDecompBanks.Work)
                     {
                         //work difference like <d>
+
+                        //normal multiplier like <m>
+                        y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
+                        d.cellsQuo[residualName].SetData(t, y0);
+                        double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[iii111].eqNumber, false);
+                        d.cellsQuo[residualName].SetData(t.Add(1), y1);
+                        double x0_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, false);
+                        double x1 = Program.model.modelGamsScalar.GetData(dp.int1 + 1, dp.int2, false);
+
+                        try
+                        {
+                            double x0_after = x0_before + eps;
+                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, false, x0_after);
+                            double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
+                            double grad = (y0_after - y0) / eps;
+
+                            if (!G.isNumericalError(grad) && grad != 0d)
+                            {
+                                int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
+                                string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
+                                d.cellsQuo[name].SetData(t.Add(-1), x0_before);
+                                d.cellsQuo[name].SetData(t, x1);
+                                d.cellsGradQuo[name].SetData(t, grad);
+                                if (!vars.ContainsKey(name))  //for decomp pivot
+                                {
+                                    vars.Add(name, 0);
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, false, x0_before);
+                        }
                     }
                     else new Error("Decomp problem");
                 }

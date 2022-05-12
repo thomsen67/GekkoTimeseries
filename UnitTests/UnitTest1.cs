@@ -10992,7 +10992,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompSimul1()
         {
-            bool easy = false;
+            bool easy = true;
 
             for (int i = 0; i < 2; i++)  //0:scalar model, 1:raw gams
             {
