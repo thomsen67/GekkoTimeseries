@@ -1761,7 +1761,8 @@ namespace Gekko
             int i = 0;
             foreach (GekkoTime t2 in new GekkoTimeIterator(extrat1, extrat2))
             {
-                GekkoTime t = t2;
+                int add = 1; if (extra.type == EDecompBanks.Multiplier) add = 0;
+                GekkoTime t = t2.Add(add);
                 i++;
                 int j = 0;
                 foreach (string s in vars.Keys)
