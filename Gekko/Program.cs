@@ -121,11 +121,15 @@ namespace Gekko
         Plot
     }
 
+    /// <summary>
+    /// Type of decomp. You may often understand Work/Ref as temporal difference in these banks.
+    /// </summary>
     public enum EDecompBanks
     {
-        Work,
-        Ref,
-        Multiplier
+        Unknown,
+        Work,        //in some contexts this is understood as "TemporalDifferenceWork"
+        Ref,         //in some contexts this is understood as "TemporalDifferenceRef"
+        Multiplier   //both banks used
     }
 
     public enum assignmantTypeLhs

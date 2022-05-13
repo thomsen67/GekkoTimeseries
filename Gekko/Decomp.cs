@@ -241,6 +241,17 @@ namespace Gekko
                             elements.Add(mmi, element);
                         }
 
+                        EDecompBanks type = EDecompBanks.Unknown;
+                        if (true)
+                        {
+                            //This is a bit convoluted, and the type is determined again later on.
+                            //The type ought to be determined here 1 time, and reused later on.
+                            //But we are using some commmon methods, so it is not completely spaghetti code (just double work)
+                            string operator1 = o.opt_prtcode.ToLower();
+                            Decomp.DecompIsSharesOrPercentageTypeHelper(ref operator1);  //removes any prefix "s"
+                            type = DecompGetType(operator1);
+                        }
+
                         foreach (GekkoTime time in new GekkoTimeIterator(o.t1, o.t2))
                         {
                             int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
@@ -339,6 +350,18 @@ namespace Gekko
 
         }
 
+        public static string DecompIsSharesOrPercentageTypeHelper(ref string operator1)
+        {
+            string isShares = null;
+            if (operator1.StartsWith("s"))
+            {
+                operator1 = operator1.Substring(1);
+                isShares = "s";
+            }
+
+            return isShares;
+        }
+
         /// <summary>
         /// Main entry to the math part of decomposition. Performs a lot of the hard stuff, including
         /// matrix inversion etc. Calls DecompLowLevel() a lot, where gradients etc. are calculated.
@@ -400,11 +423,9 @@ namespace Gekko
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
                 bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
-
-
-
-
-                Data extra = new Data();                
+                                
+                Data extra = new Data();
+                extra.type = DecompGetType(operator1);
                 if (decompOptions2.data == null)
                 {
                     //if cellsQuo or cellsRef contain missing for the period that is part
@@ -414,9 +435,8 @@ namespace Gekko
 
                     decompOptions2.data.dataCellsGradQuo = new Series(per1.freq, null);
                     decompOptions2.data.dataCellsGradRef = new Series(per1.freq, null);
-                    if (operator1 == "m" || operator1 == "q")
-                    {
-                        extra.type = EDecompBanks.Multiplier;
+                    if (extra.type == EDecompBanks.Multiplier)
+                    {                        
                         extra.dataCellsGradRef = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
@@ -427,12 +447,11 @@ namespace Gekko
                             }
                         }
                     }
-                    else if (operator1 == "d" || operator1 == "p")
-                    {
-                        extra.type = EDecompBanks.Work;
-                        extra.dataCellsGradQuo = new Series(per1.freq, null);                        
+                    else if (extra.type == EDecompBanks.Work)
+                    {                        
+                        extra.dataCellsGradQuo = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
-                        {                            
+                        {
                             if (double.IsNaN(decompOptions2.data.dataCellsGradQuo.GetDataSimple(t)))
                             {
                                 decompOptions2.data.dataCellsGradQuo.SetData(t, 1d);
@@ -440,12 +459,11 @@ namespace Gekko
                             }
                         }
                     }
-                    else if (operator1 == "rd" || operator1 == "rp")
-                    {
-                        extra.type = EDecompBanks.Ref;
+                    else if (extra.type == EDecompBanks.Ref)
+                    {                        
                         extra.dataCellsGradRef = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
-                        {                            
+                        {
                             if (double.IsNaN(decompOptions2.data.dataCellsGradRef.GetDataSimple(t)))
                             {
                                 decompOptions2.data.dataCellsGradRef.SetData(t, 1d);
@@ -453,8 +471,8 @@ namespace Gekko
                             }
                         }
                     }
-                }  
-                
+                }
+
 
 
 
@@ -928,6 +946,21 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        /// <summary>
+        /// Get DECOMP type. Not for "x" type options, and not for stuff like dp or mp --
+        /// these return .Unknown. Handles types m, q, d, p, rd, rp.
+        /// </summary>
+        /// <param name="operator1"></param>
+        /// <returns></returns>
+        private static EDecompBanks DecompGetType(string operator1)
+        {            
+            EDecompBanks type = EDecompBanks.Unknown;
+            if (operator1 == "m" || operator1 == "q") type = EDecompBanks.Multiplier;
+            else if (operator1 == "d" || operator1 == "p") type = EDecompBanks.Work;
+            else if (operator1 == "rd" || operator1 == "rp") type = EDecompBanks.Ref;
+            return type;
         }
 
         private static void DecompMainMergeOrAdd(DecompDatas decompDatas, List<DecompData> temp, DecompData dd, EContribType operatorOneOf3Types, bool shouldMerge, int ii, int jj)

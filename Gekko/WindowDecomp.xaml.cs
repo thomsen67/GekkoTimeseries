@@ -1795,22 +1795,16 @@ namespace Gekko
             }
         }
          
-        private void DecompIsSharesOrPercentageType(out string operator1, out string isShares)
+        public void DecompIsSharesOrPercentageType(out string operator1, out string isShares)
         {
             operator1 = this.decompOptions2.prtOptionLower;
-            isShares = null;
-            if (operator1.StartsWith("s"))
-            {
-                operator1 = operator1.Substring(1);
-                isShares = "s";
-            }
-
+            isShares = Decomp.DecompIsSharesOrPercentageTypeHelper(ref operator1);
             this.decompOptions2.decompTablesFormat.isPercentageType = false;
             if (operator1.Contains("p") || operator1.Contains("q") || isShares == "s")
             {
                 this.decompOptions2.decompTablesFormat.isPercentageType = true;
             }
-        }
+        }        
 
         private void SetRadioButtonsDefaults()
         {
