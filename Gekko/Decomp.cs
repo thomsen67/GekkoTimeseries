@@ -1686,42 +1686,12 @@ namespace Gekko
             //   there is no model calculation, but only data retrieving.
 
             //See #kljaf89usafasdf for Gekko  model
-
-            //// ------------------------------------------------------------------------
-            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO            
-            //List<PeriodAndVariable> pre0 = new List<PeriodAndVariable>();
-            //pre0.Add(new PeriodAndVariable(0, 0));
-            //pre0.Add(new PeriodAndVariable(0, 1));
-            //pre0.Add(new PeriodAndVariable(0, 2));
-            //List<PeriodAndVariable> pre1 = new List<PeriodAndVariable>();
-            //pre1.Add(new PeriodAndVariable(0, 0));
-            //pre1.Add(new PeriodAndVariable(0, 1));
-            //List<PeriodAndVariable> pre2 = new List<PeriodAndVariable>();
-            //pre2.Add(new PeriodAndVariable(0, 1));
-            //pre2.Add(new PeriodAndVariable(0, 2));
-            //pre2.Add(new PeriodAndVariable(0, 3));
-            //List<List<PeriodAndVariable>> precedents = new List<List<PeriodAndVariable>>();
-            //precedents.Add(pre0);
-            //precedents.Add(pre1);
-            //precedents.Add(pre2);            
-            //// ------------------------------------------------------------------------            
             
             double eps = Globals.newtonSmallNumber;
 
             DecompData d = new DecompData();
 
-            DecompInitDict(d);                        
-
-            //TODO TODO look up precedents in the right way
-            //TODO TODO look up precedents in the right way
-            //TODO TODO look up precedents in the right way only works because only 2001 time t is used
-            //TODO TODO look up precedents in the right way
-            //TODO TODO look up precedents in the right way            
-                        
-            //if (precedents[ip].Count == 0) return d; //empty return
+            DecompInitDict(d);                                    
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             
@@ -1733,25 +1703,21 @@ namespace Gekko
             //foreach time period
             foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))            
             {
-                int ip = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];
-
-                //int ip = -12345;
-                //if (dsh.name.Contains("e1")) ip = 0;
-                //else if (dsh.name.Contains("e2")) ip = 2;
-                //else if (dsh.name.Contains("e3")) ip = 4;
-                //if (Program.model.modelGamsScalar.bb[ip].Length == 0) continue; //can this happen??
-                //int dif = ip2 - ip;
-
+                int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];
+                
                 //foreach precedent variable
-                for (int i = 0; i < Program.model.modelGamsScalar.bb[ip].Length; i += 2)
+                for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
                 {
                     // --------------------------------------------
                     // This is where the decomposition takes place
                     // --------------------------------------------
 
-                    PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[ip][i], Program.model.modelGamsScalar.bb[ip][i + 1]);
+                    PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
                     string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
 
+                    //TODO
+                    //TODO   this is not pretty
+                    //TODO
                     int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), t) - 1;
                     int iii111 = iii000 + 1;
 
