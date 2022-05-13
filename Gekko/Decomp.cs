@@ -252,7 +252,10 @@ namespace Gekko
                             type = DecompGetType(operator1);
                         }
 
-                        foreach (GekkoTime time in new GekkoTimeIterator(o.t1, o.t2))
+                        int deduct = -1;
+                        if (type == EDecompBanks.Multiplier) deduct = 0;
+
+                        foreach (GekkoTime time in new GekkoTimeIterator(o.t1.Add(deduct), o.t2))
                         {
                             int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
                             if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
