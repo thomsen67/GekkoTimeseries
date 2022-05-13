@@ -1717,7 +1717,7 @@ namespace Gekko
 
             //TODO TODO look up precedents in the right way
             //TODO TODO look up precedents in the right way
-            //TODO TODO look up precedents in the right way
+            //TODO TODO look up precedents in the right way only works because only 2001 time t is used
             //TODO TODO look up precedents in the right way
             //TODO TODO look up precedents in the right way
             int ip = -12345;
@@ -1735,12 +1735,13 @@ namespace Gekko
             GekkoTime extrat1 = pattern.GetRealDataPeriodFirst();
             GekkoTime extrat2 = pattern.GetRealDataPeriodLast();
 
-            //foreach (PeriodAndVariable dp in precedents[ip])
+            //foreach precedent variable
             for (int i = 0; i < Program.model.modelGamsScalar.bb[ip].Length; i += 2)
             {
                 PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[ip][i], Program.model.modelGamsScalar.bb[ip][i + 1]);
-
                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
+
+                //foreach time period
                 foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))
                 {
                     // --------------------------------------------
