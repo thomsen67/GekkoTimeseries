@@ -1719,13 +1719,8 @@ namespace Gekko
             //TODO TODO look up precedents in the right way
             //TODO TODO look up precedents in the right way only works because only 2001 time t is used
             //TODO TODO look up precedents in the right way
-            //TODO TODO look up precedents in the right way
-            int ip = -12345;
-            if (dsh.name.Contains("e1")) ip = 0;
-            else if (dsh.name.Contains("e2")) ip = 2;
-            else if (dsh.name.Contains("e3")) ip = 4;
-
-            if (Program.model.modelGamsScalar.bb[ip].Length == 0) return d; //empty return
+            //TODO TODO look up precedents in the right way            
+                        
             //if (precedents[ip].Count == 0) return d; //empty return
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -1737,7 +1732,12 @@ namespace Gekko
 
             //foreach time period
             foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))            
-            {                
+            {
+                int ip = -12345;
+                if (dsh.name.Contains("e1")) ip = 0;
+                else if (dsh.name.Contains("e2")) ip = 2;
+                else if (dsh.name.Contains("e3")) ip = 4;
+                if (Program.model.modelGamsScalar.bb[ip].Length == 0) continue; //can this happen??
 
                 //foreach precedent variable
                 for (int i = 0; i < Program.model.modelGamsScalar.bb[ip].Length; i += 2)
