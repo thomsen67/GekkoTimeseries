@@ -10990,24 +10990,43 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompSimul1()
+        public void _Test_DecompSimultaneous()
         {
             for (int i = 0; i < 2; i++)  //0:scalar model, 1:raw gams
             {
+                // -------------------------
+                // Maybe augment model to this, and have z's <> 0.
+                // Effect via z2 is a good test. For now, we have z1 and z2 = 0
+                // which is a bit boring for simultaneous decomp.
+                //
+                // y = c + g + z1
+                // c = 0.8 * y + z2
+                // g = 0.2 * c + z3
+                //
+                // --> y = 25 * (z1 + 1.2 * z2 + z3))
+                // --> c and g follows
+                // -------------------------
+                //
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                //
+                //
+                // NOTE: inside simul.zip there is a new .gms file for 3 periods and more exogenous
+                //       but gams problem with scalar model...
+                //
+                //
                 if (i == 0) I("model <gms> simul.zip;");
                 else I("model <gms> simul.gms;");
-                I("time 2001 2002;");
-                I("y = 75, 100;");
-                I("c = 60, 80;");
-                I("g = 15, 20;");
-                I("g0 = 3, 4;");
+                I("time 2001 2003;");
+                I("y = 75, 100, 25;");
+                I("c = 60, 80, 20;");
+                I("g = 15, 20, 5;");
+                I("g0 = 3, 4, 1;");
                 I("clone;");  //ref
-                I("y = 25, 50;");
-                I("c = 20, 40;");
-                I("g = 5, 10;");
-                I("g0 = 1, 2;");
+                I("y = 25, 50, 125;");
+                I("c = 20, 40, 100;");
+                I("g = 5, 10, 25;");
+                I("g0 = 1, 2, 5;");
                 Gekko.Table table = null;
 
                 //e1[t].. y[t]  =E=  c[t] + g[t];
