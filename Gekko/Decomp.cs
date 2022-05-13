@@ -1677,8 +1677,13 @@ namespace Gekko
             // NB: Perhaps use this when migrating "old" ADAM-like DECOMP for models
             //     We can keep DecompLowLevel() for decomp of arbitrary Gekko expression like movavg(...) etc.
             //     and sums over sets and the like.
-            //
-            //
+            //     Maybe simply generate an ADAM scalar model as C# Funcs, and use this interface. Makes a lot of stuff easier.
+            //       
+            // Performance: when looping over time, for <d> and <rd> types, there is some overlap 
+            //   regarding write of "raw" data, for instance (because of overlapping lags/leads)
+            //   d.cellsQuo[name].SetData(t, x0_before); d.cellsQuo[name].SetData(t.Add(1), x1);
+            //   The gradients are only calculated one, however, and this is probably a minor issue, since
+            //   there is no model calculation, but only data retrieving.
 
             //See #kljaf89usafasdf for Gekko  model
 
@@ -1805,9 +1810,9 @@ namespace Gekko
                             {
                                 int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
-                                d.cellsQuo[name].SetData(t.Add(-1), x0_before);
-                                d.cellsQuo[name].SetData(t, x1);
-                                d.cellsGradQuo[name].SetData(t, grad);
+                                d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
+                                d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
+                                d.cellsGradQuo[name].SetData(t, grad);  //for decomp period <2002 2002>, this will be 2001
                                 if (!vars.ContainsKey(name))  //for decomp pivot
                                 {
                                     vars.Add(name, 0);
