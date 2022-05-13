@@ -207,23 +207,17 @@ namespace Gekko
                     GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in decompOptions2.new_from)
                     {
+                        //For each equation stated
+
                         string equationName = null;
-                        GekkoTime time = GekkoTime.tNull;
-
-
-                        //!!!!!!!!!!
-                        //!!!!!!!!!!
-                        //!!!!!!!!!!
-                        time = new GekkoTime(EFreq.A, 2001, 1);
-                        //!!!!!!!!!!
-                        //!!!!!!!!!!
-                        //!!!!!!!!!!
-
-
+                        //GekkoTime time = GekkoTime.tNull;
 
                         string resultingFullName = null;
                         List<string> indexes = null;
-                        GamsModel.ExtractTimeDimension(s, false, ref equationName, ref time, ref resultingFullName, out indexes);
+                        //Actually there is no time extracted below: the s string hos no time element
+                        GekkoTime trash = GekkoTime.tNull;
+                        GamsModel.ExtractTimeDimension(s, false, ref equationName, ref trash, ref resultingFullName, out indexes);
+                        
 
                         Dictionary<MultidimItem, DecompStartHelper> elements = null;
                         equations.TryGetValue(equationName, out elements);
@@ -247,25 +241,28 @@ namespace Gekko
                             elements.Add(mmi, element);
                         }
 
-                        int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
-                        if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
-                        if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
-                        DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
-                        //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
+                        foreach (GekkoTime time in new GekkoTimeIterator(o.t1, o.t2))
+                        {
+                            int i = GekkoTime.Observations(Program.model.modelGamsScalar.t0, time) - 1;
+                            if (i < 0 || i > element.periods.Length - 1) new Error("Time outside GAMS scalar model period");
+                            if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
+                            DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
+                            //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
 
-                        //!!!!!!!!!!
-                        //!!!!!!!!!!
-                        //!!!!!!!!!! add time properly like x[a,b] --> x[a,b,2001]...
-                        //!!!!!!!!!!
-                        string s2 = s + "[" + time.ToString() + "]";
-                        //!!!!!!!!!!
-                        //!!!!!!!!!!
-                        //!!!!!!!!!!
+                            //!!!!!!!!!!
+                            //!!!!!!!!!!
+                            //!!!!!!!!!! add time properly like x[a,b] --> x[a,b,2001]...
+                            //!!!!!!!!!!
+                            string s2 = s + "[" + time.ToString() + "]";
+                            //!!!!!!!!!!
+                            //!!!!!!!!!!
+                            //!!!!!!!!!!
 
-                        int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s2];
-                        elementPeriod.eqNumber = eqNumber;
-                        elementPeriod.t = time;
-                        element.periods[i] = elementPeriod;
+                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s2];
+                            elementPeriod.eqNumber = eqNumber;
+                            elementPeriod.t = time;
+                            element.periods[i] = elementPeriod;
+                        }
                     }
 
                     int counter = -1;

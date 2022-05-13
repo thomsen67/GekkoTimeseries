@@ -11163,7 +11163,7 @@ namespace UnitTests
                     // x7 g0(2001)
                     // x8 g0(2002)
                     //I("decomp3 <2002 2002 d> y[2001] from e1[2001], e2[2001], e3[2001] endo y[2001], c[2001], g[2001];");
-                    I("decomp3 <2002 2002 d> y from e1[2001], e2[2001],e3[2001] endo y, c, g;");
+                    I("decomp3 <2002 2002 d> y from e1, e2,e3 endo y, c, g;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
