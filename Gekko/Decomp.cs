@@ -1687,27 +1687,27 @@ namespace Gekko
 
             //See #kljaf89usafasdf for Gekko  model
 
-            // ------------------------------------------------------------------------
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO            
-            List<TwoInts> pre0 = new List<TwoInts>();
-            pre0.Add(new TwoInts(0, 0));
-            pre0.Add(new TwoInts(0, 1));
-            pre0.Add(new TwoInts(0, 2));
-            List<TwoInts> pre1 = new List<TwoInts>();
-            pre1.Add(new TwoInts(0, 0));
-            pre1.Add(new TwoInts(0, 1));
-            List<TwoInts> pre2 = new List<TwoInts>();
-            pre2.Add(new TwoInts(0, 1));
-            pre2.Add(new TwoInts(0, 2));
-            pre2.Add(new TwoInts(0, 3));
-            List<List<TwoInts>> precedents = new List<List<TwoInts>>();
-            precedents.Add(pre0);
-            precedents.Add(pre1);
-            precedents.Add(pre2);            
-            // ------------------------------------------------------------------------            
+            //// ------------------------------------------------------------------------
+            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+            ////TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO            
+            //List<PeriodAndVariable> pre0 = new List<PeriodAndVariable>();
+            //pre0.Add(new PeriodAndVariable(0, 0));
+            //pre0.Add(new PeriodAndVariable(0, 1));
+            //pre0.Add(new PeriodAndVariable(0, 2));
+            //List<PeriodAndVariable> pre1 = new List<PeriodAndVariable>();
+            //pre1.Add(new PeriodAndVariable(0, 0));
+            //pre1.Add(new PeriodAndVariable(0, 1));
+            //List<PeriodAndVariable> pre2 = new List<PeriodAndVariable>();
+            //pre2.Add(new PeriodAndVariable(0, 1));
+            //pre2.Add(new PeriodAndVariable(0, 2));
+            //pre2.Add(new PeriodAndVariable(0, 3));
+            //List<List<PeriodAndVariable>> precedents = new List<List<PeriodAndVariable>>();
+            //precedents.Add(pre0);
+            //precedents.Add(pre1);
+            //precedents.Add(pre2);            
+            //// ------------------------------------------------------------------------            
             
             double eps = Globals.newtonSmallNumber;
 
@@ -1722,10 +1722,11 @@ namespace Gekko
             //TODO TODO look up precedents in the right way
             int ip = -12345;
             if (dsh.name.Contains("e1")) ip = 0;
-            else if (dsh.name.Contains("e2")) ip = 1;
-            else if (dsh.name.Contains("e3")) ip = 2;
+            else if (dsh.name.Contains("e2")) ip = 2;
+            else if (dsh.name.Contains("e3")) ip = 4;
 
-            if (precedents[ip].Count == 0) return d; //empty return
+            if (Program.model.modelGamsScalar.bb[ip].Length == 0) return d; //empty return
+            //if (precedents[ip].Count == 0) return d; //empty return
 
             GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             
@@ -1734,16 +1735,18 @@ namespace Gekko
             GekkoTime extrat1 = pattern.GetRealDataPeriodFirst();
             GekkoTime extrat2 = pattern.GetRealDataPeriodLast();
 
-            foreach (TwoInts dp in precedents[ip])
-            {               
+            //foreach (PeriodAndVariable dp in precedents[ip])
+            for (int i = 0; i < Program.model.modelGamsScalar.bb[ip].Length; i += 2)
+            {
+                PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[ip][i], Program.model.modelGamsScalar.bb[ip][i + 1]);
 
-                string varName = Program.model.modelGamsScalar.GetVarNameA(dp.int2);
+                string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
                 foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))
                 {
                     // --------------------------------------------
                     // This is where the decomposition takes place
                     // --------------------------------------------
-                 
+
                     int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), t) - 1;
                     int iii111 = iii000 + 1;
 
@@ -1755,37 +1758,38 @@ namespace Gekko
                         d.cellsRef[residualName].SetData(t, y0);
                         double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
                         d.cellsQuo[residualName].SetData(t, y1);
-                        double x0_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, true);
-                        double x1 = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, false);
+                        double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, true);
+                        double x1 = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, false);
 
                         try
                         {
                             double x0_after = x0_before + eps;
-                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, true, x0_after);
+                            Program.model.modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
                             double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
                             double grad = (y0_after - y0) / eps;
 
                             if (!G.isNumericalError(grad) && grad != 0d)
-                            {                                
+                            {
                                 int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
                                 d.cellsRef[name].SetData(t, x0_before);
                                 d.cellsQuo[name].SetData(t, x1);
                                 d.cellsGradRef[name].SetData(t, grad);
                                 if (!vars.ContainsKey(name))  //for decomp pivot
-                                {                                    
+                                {
                                     vars.Add(name, 0);
                                 }
                             }
                         }
                         finally
                         {
-                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, true, x0_before);
+                            Program.model.modelGamsScalar.SetData(dp.date, dp.variable, true, x0_before);
                         }
                     }
                     else if (extra.type == EDecompBanks.Ref)
                     {
-                        //ref difference like <rd>                            
+                        //ref difference like <rd>   
+                        MessageBox.Show("Not implemented yet...");
                     }
                     else if (extra.type == EDecompBanks.Work)
                     {
@@ -1796,13 +1800,13 @@ namespace Gekko
                         d.cellsQuo[residualName].SetData(t, y0);
                         double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[iii111].eqNumber, false);
                         d.cellsQuo[residualName].SetData(t.Add(1), y1);
-                        double x0_before = Program.model.modelGamsScalar.GetData(dp.int1, dp.int2, false);
-                        double x1 = Program.model.modelGamsScalar.GetData(dp.int1 + 1, dp.int2, false);
+                        double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, false);
+                        double x1 = Program.model.modelGamsScalar.GetData(dp.date + 1, dp.variable, false);
 
                         try
                         {
                             double x0_after = x0_before + eps;
-                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, false, x0_after);
+                            Program.model.modelGamsScalar.SetData(dp.date, dp.variable, false, x0_after);
                             double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
                             double grad = (y0_after - y0) / eps;
 
@@ -1821,7 +1825,7 @@ namespace Gekko
                         }
                         finally
                         {
-                            Program.model.modelGamsScalar.SetData(dp.int1, dp.int2, false, x0_before);
+                            Program.model.modelGamsScalar.SetData(dp.date, dp.variable, false, x0_before);
                         }
                     }
                     else new Error("Decomp problem");
@@ -2965,5 +2969,20 @@ namespace Gekko
     {
         public GekkoTime t = GekkoTime.tNull;
         public int eqNumber = -12345;
+    }
+
+    /// <summary>
+    /// Simple helper class
+    /// </summary>
+    public class PeriodAndVariable
+    {
+        public int date;
+        public int variable;
+
+        public PeriodAndVariable(int date, int variable)
+        {
+            this.date = date;
+            this.variable = variable;
+        }
     }
 }

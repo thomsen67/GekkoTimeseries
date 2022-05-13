@@ -2381,8 +2381,8 @@ namespace Gekko
     }
 
     public class DecompOptions2
-    {        
-
+    {
+        //public List<List<PeriodAndVariable>> precedentsScalar = null;
         public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
 
         //-------- tranformation start --------------
@@ -2467,7 +2467,7 @@ namespace Gekko
             d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
             d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
             d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
-
+            
             //d.tp = this.tp;
             d.variable = this.variable;
             d.t1 = this.t1;

@@ -417,7 +417,7 @@ namespace Gekko
     public class ModelGamsScalar
     {        
         public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;             
-        public int[][] bb = null;
+        public int[][] bb = null;  //precedents, one array per equation. For each equation the values come in pairs (period, variable)
         public double[] cc = null;
         public int[][] dd = null;
         public int[] ee = null;

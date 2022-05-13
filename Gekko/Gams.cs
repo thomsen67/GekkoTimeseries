@@ -1404,6 +1404,7 @@ namespace Gekko
                     HandleEqLineAppend(helper, i, "a[b[" + helper.endo.Count + "]][b[" + (helper.endo.Count + 1) + "]]");
                     helper.endo.Add(i1);
                     helper.endo.Add(i2);
+
                 }
                 else
                 {
@@ -1437,9 +1438,19 @@ namespace Gekko
             }            
             helper.count++;
             helper.eqPointers.Add(helper.unique - 1);  //unique is 1 for the first equation. For the second, it may be 1 or 2. So 0 points to 0, 1 points to 0 or 1.
-            helper.b.Add(helper.endo);
+            helper.b.Add(helper.endo);  //also works as precedents
             helper.c.AddRange(helper.exoValues);            
             helper.d.Add(helper.exo);
+
+            ////Precedents are taken from helper.endo that comes in (period, variable) pairs
+            //List<PeriodAndVariable> pre = new List<PeriodAndVariable>();
+            //for (int i = 0; i < helper.endo.Count; i += 2)
+            //{
+            //    PeriodAndVariable pav = new PeriodAndVariable(helper.endo[i], helper.endo[i + 1]);
+            //    pre.Add(pav);
+            //}
+            //helper.precedentsScalar.Add(pre);
+
             return tokens;  //to compare with next
         }
 
@@ -4492,6 +4503,8 @@ namespace Gekko
         public string[] dict_FromEqChunkNumberToEqName = null;
         public GekkoDictionary<string, int> dict_FromEqNameToEqChunkNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public int[] dict_FromEqNumberToEqChunkNumber = null;
+
+        //public List<List<PeriodAndVariable>> precedentsScalar = new List<List<PeriodAndVariable>>();
 
         public GekkoTime t0 = GekkoTime.tNull;
         public GekkoTime t1 = GekkoTime.tNull;
