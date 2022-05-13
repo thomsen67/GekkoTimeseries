@@ -209,9 +209,21 @@ namespace Gekko
                     {
                         string equationName = null;
                         GekkoTime time = GekkoTime.tNull;
+
+
+                        //!!!!!!!!!!
+                        //!!!!!!!!!!
+                        //!!!!!!!!!!
+                        time = new GekkoTime(EFreq.A, 2001, 1);
+                        //!!!!!!!!!!
+                        //!!!!!!!!!!
+                        //!!!!!!!!!!
+
+
+
                         string resultingFullName = null;
                         List<string> indexes = null;
-                        GamsModel.ExtractTimeDimension(s, ref equationName, ref time, ref resultingFullName, out indexes);
+                        GamsModel.ExtractTimeDimension(s, false, ref equationName, ref time, ref resultingFullName, out indexes);
 
                         Dictionary<MultidimItem, DecompStartHelper> elements = null;
                         equations.TryGetValue(equationName, out elements);
@@ -240,7 +252,17 @@ namespace Gekko
                         if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
                         DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
                         //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
-                        int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s];
+
+                        //!!!!!!!!!!
+                        //!!!!!!!!!!
+                        //!!!!!!!!!! add time properly like x[a,b] --> x[a,b,2001]...
+                        //!!!!!!!!!!
+                        string s2 = s + "[" + time.ToString() + "]";
+                        //!!!!!!!!!!
+                        //!!!!!!!!!!
+                        //!!!!!!!!!!
+
+                        int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[s2];
                         elementPeriod.eqNumber = eqNumber;
                         elementPeriod.t = time;
                         element.periods[i] = elementPeriod;

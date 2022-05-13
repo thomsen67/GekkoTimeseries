@@ -474,7 +474,7 @@ namespace Gekko
                             GekkoTime time = GekkoTime.tNull;
                             string resultingFullName = null;
                             List<string> notUsed = null;
-                            ExtractTimeDimension(varname2, ref name, ref time, ref resultingFullName, out notUsed);
+                            ExtractTimeDimension(varname2, true, ref name, ref time, ref resultingFullName, out notUsed);
 
                             if (wh.time1.IsNull() || (time.StrictlySmallerThan(wh.time1))) wh.time1 = time;
                             if (wh.time2.IsNull() || (time.StrictlyLargerThan(wh.time2))) wh.time2 = time;
@@ -684,7 +684,7 @@ namespace Gekko
         /// <summary>
         /// From a varname like x(i,j,2025) it extracts name "x", GekkoTime 2025a1, the resulting full name x[i,j], and the indexes ["i", "j"].
         /// </summary>
-        public static void ExtractTimeDimension(string varname, ref string name, ref GekkoTime time, ref string resultingFullName, out List<string>indexes)
+        public static void ExtractTimeDimension(string varname, bool errorIfTimeNotFound, ref string name, ref GekkoTime time, ref string resultingFullName, out List<string>indexes)
         {
             List<string> fullName = new List<string>();
             string start = null;
@@ -720,14 +720,16 @@ namespace Gekko
                     }
                 }
 
-                if (time.IsNull()) new Error("Unexpected");
+                if (errorIfTimeNotFound && time.IsNull()) new Error("Unexpected");
                 if (fullName.Count == 0) resultingFullName = start;  //avoid an empty "x[]" name.
                 else resultingFullName = start + "[" + Stringlist.GetListWithCommas(fullName) + "]";
             }
             else
             {
                 //without index
-                new Error("Unexpected");
+                if (errorIfTimeNotFound) new Error("Unexpected");
+                start = varname;
+                resultingFullName = varname;
             }
             indexes = fullName;
             name = start;
@@ -855,7 +857,7 @@ namespace Gekko
                         GekkoTime time = GekkoTime.tNull;
                         string resultingFullName = null;
                         List<string> notUsed = null;
-                        ExtractTimeDimension(ss2, ref name, ref time, ref resultingFullName, out notUsed);
+                        ExtractTimeDimension(ss2, true, ref name, ref time, ref resultingFullName, out notUsed);
                         if (helper.t1.IsNull() || (time.StrictlySmallerThan(helper.t1))) helper.t1 = time;
                         if (helper.t2.IsNull() || (time.StrictlyLargerThan(helper.t2))) helper.t2 = time;
                         if (!helper.dict_FromVarNameToANumber.ContainsKey(resultingFullName))
@@ -1025,7 +1027,7 @@ namespace Gekko
                 GekkoTime t = GekkoTime.tNull;
                 string outputName = null;
                 List<string> notUsed = null;
-                ExtractTimeDimension(inputName, ref name, ref t, ref outputName, out notUsed);
+                ExtractTimeDimension(inputName, true, ref name, ref t, ref outputName, out notUsed);
                 int aNumber = helper.dict_FromVarNameToANumber[outputName];
                 int i1 = GekkoTime.Observations(helper.t0, t) - 1;
                 int i2 = aNumber;
@@ -1386,7 +1388,7 @@ namespace Gekko
                     GekkoTime time = GekkoTime.tNull;
                     string resultingFullName = null;
                     List<string> notUsed = null;
-                    ExtractTimeDimension(varname, ref name, ref time, ref resultingFullName, out notUsed);
+                    ExtractTimeDimension(varname, true, ref name, ref time, ref resultingFullName, out notUsed);
                     //if (helper.time1.IsNull() || (time.StrictlySmallerThan(helper.time1))) helper.time1 = time;
                     //if (helper.time2.IsNull() || (time.StrictlyLargerThan(helper.time2))) helper.time2 = time;
                     int i1 = (GekkoTime.Observations(helper.t0, time) - 1);
