@@ -1733,11 +1733,14 @@ namespace Gekko
             //foreach time period
             foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))            
             {
-                int ip = -12345;
-                if (dsh.name.Contains("e1")) ip = 0;
-                else if (dsh.name.Contains("e2")) ip = 2;
-                else if (dsh.name.Contains("e3")) ip = 4;
-                if (Program.model.modelGamsScalar.bb[ip].Length == 0) continue; //can this happen??
+                int ip = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];
+
+                //int ip = -12345;
+                //if (dsh.name.Contains("e1")) ip = 0;
+                //else if (dsh.name.Contains("e2")) ip = 2;
+                //else if (dsh.name.Contains("e3")) ip = 4;
+                //if (Program.model.modelGamsScalar.bb[ip].Length == 0) continue; //can this happen??
+                //int dif = ip2 - ip;
 
                 //foreach precedent variable
                 for (int i = 0; i < Program.model.modelGamsScalar.bb[ip].Length; i += 2)
