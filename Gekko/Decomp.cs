@@ -1735,18 +1735,19 @@ namespace Gekko
             GekkoTime extrat1 = pattern.GetRealDataPeriodFirst();
             GekkoTime extrat2 = pattern.GetRealDataPeriodLast();
 
-            //foreach precedent variable
-            for (int i = 0; i < Program.model.modelGamsScalar.bb[ip].Length; i += 2)
-            {
-                PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[ip][i], Program.model.modelGamsScalar.bb[ip][i + 1]);
-                string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
+            //foreach time period
+            foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))            
+            {                
 
-                //foreach time period
-                foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))
+                //foreach precedent variable
+                for (int i = 0; i < Program.model.modelGamsScalar.bb[ip].Length; i += 2)
                 {
                     // --------------------------------------------
                     // This is where the decomposition takes place
                     // --------------------------------------------
+
+                    PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[ip][i], Program.model.modelGamsScalar.bb[ip][i + 1]);
+                    string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
 
                     int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), t) - 1;
                     int iii111 = iii000 + 1;
