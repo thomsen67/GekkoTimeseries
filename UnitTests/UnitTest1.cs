@@ -11110,7 +11110,7 @@ namespace UnitTests
         {            
             for (int i = 0; i < 1; i++)  //0:scalar model, 1:raw gams
             {
-                I("reset;");
+                I("reset;"); 
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 if (i == 0) I("model <gms> simul.zip;");
                 else I("model <gms> simul.gms;");
