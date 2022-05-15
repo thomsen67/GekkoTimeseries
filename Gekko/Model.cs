@@ -545,45 +545,114 @@ namespace Gekko
         /// <returns></returns>
         public void FromDatabankToA(Databank db, bool isRef)
         {
+            //Beware of OPTION series data missing, if it is set.
+            //Beware of timeless series -- not handled...
+
             int n = GekkoTime.Observations(this.t0, this.t2);
-            double[][] a = new double[n][];
-            for (int t = 0; t < n; t++)
+            double[][] a = null;
+            if (isRef) a = this.a_ref;
+            else a = this.a;
+
+            if (a == null)
             {
-                //beware: OPTION series data missing --> if set, change NaN into 0.                        
-                a[t] = G.CreateNaN(this.dict_FromANumberToVarName.Length);
+                a = new double[n][];
+                //This is necessary because of the "new" above
+                if (isRef)
+                {
+                    this.a_ref = a;
+                    this.r_ref = G.CreateNaN(this.CountN());
+                }
+                else
+                {
+                    this.a = a;                    
+                    this.r = G.CreateNaN(this.CountN());
+                }
+                for (int i = 0; i < a.GetLength(0); i++)
+                {
+                    a[i] = G.CreateNaN(this.CountA());
+                }
             }
-            string freq = G.ConvertFreq(Program.options.freq);
-            for (int i = 0; i < this.dict_FromANumberToVarName.Length; i++)
+            else
+            {
+                for (int i = 0; i < a.Length; i++) G.SetNaN(a[i]);  //wipe it completely
+            }
+            
+            for (int i = 0; i < this.CountA(); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                string nameWithFreq = G.Chop_AddFreq(name, freq);
-                Series ts = (Series)db.GetIVariable(nameWithFreq);
-                if (ts == null)
-                {
-                    IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                    IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                    IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                    string temp = "first-position";
-                    if (isRef) temp = "reference";
-                    string s = null;
-                    if (iva != null) s += "Beware: '" + name + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
-                    if (ivq != null) s += "Beware: '" + name + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
-                    if (ivm != null) s += "Beware: '" + name + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
-                    new Error("Could not find model variable " + name + " in the " + temp + " databank. " + s);
-                }
+                Series ts = DatabankAHelper(db, name, true);
 
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
+                //
+                // NB: beware of OPTION series data missing, if it is set.
                 int index1 = -12345;
-                int index2 = -12345;
-                double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, this.t0, this.t2);
+                int index2 = -12345;                
+                double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, this.t0, this.t2);
                 for (int t = 0; t < n; t++)
                 {
                     a[t][i] = data[index1 + t];
                 }
             }
-            if (isRef) this.a_ref = a;
-            else this.a = a;
+
+
+            //int n = GekkoTime.Observations(this.t0, this.t2);
+            //double[][] a = new double[n][];
+            //for (int t = 0; t < n; t++)
+            //{
+            //    //beware: OPTION series data missing --> if set, change NaN into 0.                        
+            //    a[t] = G.CreateNaN(this.dict_FromANumberToVarName.Length);
+            //}
+            //string freq = G.ConvertFreq(Program.options.freq);
+            //for (int i = 0; i < this.dict_FromANumberToVarName.Length; i++)
+            //{
+            //    string name = this.dict_FromANumberToVarName[i];
+            //    string nameWithFreq = G.Chop_AddFreq(name, freq);
+            //    Series ts = (Series)db.GetIVariable(nameWithFreq);
+            //    if (ts == null)
+            //    {
+            //        IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+            //        IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+            //        IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+            //        string temp = "first-position";
+            //        if (isRef) temp = "reference";
+            //        string s = null;
+            //        if (iva != null) s += "Beware: '" + name + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
+            //        if (ivq != null) s += "Beware: '" + name + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
+            //        if (ivm != null) s += "Beware: '" + name + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
+            //        new Error("Could not find model variable " + name + " in the " + temp + " databank. " + s);
+            //    }
+
+            //    //This runs pretty fast, operating directly on the internal timeseries array
+            //    //Cannot use array copy, because a has time dimension first.
+            //    int index1 = -12345;
+            //    int index2 = -12345;
+            //    double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, this.t0, this.t2);
+            //    for (int t = 0; t < n; t++)
+            //    {
+            //        a[t][i] = data[index1 + t];
+            //    }
+            //}
+            //if (isRef) this.a_ref = a;
+            //else this.a = a;
+        }
+
+        /// <summary>
+        /// Biggest count.
+        /// </summary>
+        /// <returns></returns>
+        public int CountN()
+        {
+            return this.dict_FromEqNumberToEqName.Length;
+        }
+
+        /// <summary>
+        /// Count of eqs/vars with time removed.
+        /// </summary>
+        /// <returns></returns>
+        public int CountA()
+        {
+            return this.dict_FromANumberToVarName.Length;
         }
 
         /// <summary>
@@ -594,97 +663,106 @@ namespace Gekko
         /// <returns></returns>
         public void FromAToDatabank(Databank db, bool isRef)
         {
+            //Beware of OPTION series data missing, if it is set.
+            //Beware of timeless series -- not handled...
             int n = GekkoTime.Observations(this.t0, this.t2);
             double[][] a = null;
             if (isRef) a = this.a_ref;
             else a = this.a;
             
             string freq = G.ConvertFreq(Program.options.freq);
-            for (int i = 0; i < this.dict_FromANumberToVarName.Length; i++)
+            for (int i = 0; i < this.CountA(); i++)
             {
-                //See also #asf87aufkdh where similar loading is done regarding reading gdx files
-
-                //int dimensionsWithoutTime = codes.Count;
-
-                //put in the array-timeseries container
-                
                 string name = this.dict_FromANumberToVarName[i];
-                List<string> dims = G.Chop_GetIndex(name);
-                string varNameWithFreqAndIndexes = G.Chop_AddFreq(name, freq);
-                string varNameWithFreq = G.Chop_GetNameAndFreq(varNameWithFreqAndIndexes);
-                int gdxDimensions = dims.Count + 1;
-                int gekkoDimensions; bool isMultiDim;
-                int hasTimeDimension = 1;
-                GamsData.IsMultiDim(gdxDimensions, hasTimeDimension, out gekkoDimensions, out isMultiDim);  //calling this is overkill, but binds neatly with other use of the method
-
-                Series ts = null;
-                if (isMultiDim)
-                {
-                    //Multi-dim timeseries
-                    string[] domains = new string[gekkoDimensions];
-                    int counter = 0;
-                    //for (int d = 0; d < gdxDimensions; d++)
-                    //{
-                    //    if (d == timeDimNr) continue; //skipping time dimension
-                    //    if (domainStrings[counter] == "*") domains[counter] = domainStrings[d];
-                    //    else domains[counter] = Globals.symbolCollection + domainStrings[d];
-                    //    counter++;
-                    //}
-                    if (db.ContainsIVariable(varNameWithFreq)) db.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                    Series ats = new Series(G.ConvertFreq(freq), varNameWithFreq);
-                    ats.meta.domains = domains;
-                    //if (hasTimeDimension == 0) ts.type = ESeriesType.Timeless;
-                    ats.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
-                    db.AddIVariable(ats.name, ats);
-
-                    MultidimItem mmi = new MultidimItem(dims.ToArray(), ats);
-                    IVariable iv = null; ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
-                    if (iv == null)
-                    {
-                        ts = new Series(ESeriesType.Normal, G.ConvertFreq(freq), Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
-                        //if (timeDimNr == -12345) ts2.type = ESeriesType.Timeless;
-                        ats.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
-                    }
-
-                }
-                else
-                {
-                    //Zero-dimensional timeseries (that is, normal timeseries)
-                    if (db.ContainsIVariable(varNameWithFreq)) db.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
-                    ts = new Series(G.ConvertFreq(freq), varNameWithFreq);
-                    if (hasTimeDimension == 0) ts.type = ESeriesType.Timeless;
-                    db.AddIVariable(ts.name, ts);
-                }
-
-                //string bank = null;
-                //if (isRef) bank = "ref";
-                //else bank = "first";
-                //string bankVarNameWithFreq = G.Chop_AddBank(nameWithFreq, bank);
-                //Series ts = (Series)O.GetIVariableFromString(bankVarNameWithFreq, O.ECreatePossibilities.Can);
-                //if (ts == null)
-                //{
-                //    IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_ReplaceFreq(bankVarNameWithFreq, freq, "a"));
-                //    IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_ReplaceFreq(bankVarNameWithFreq, freq, "q"));
-                //    IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_ReplaceFreq(bankVarNameWithFreq, freq, "m"));
-                //    string temp = "first-position";
-                //    if (isRef) temp = "reference";
-                //    string s = null;
-                //    if (iva != null) s += "Beware: '" + bankVarNameWithFreq + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
-                //    if (ivq != null) s += "Beware: '" + bankVarNameWithFreq + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
-                //    if (ivm != null) s += "Beware: '" + bankVarNameWithFreq + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
-                //    new Error("Could not find model variable " + name + " in the " + temp + " databank. " + s);
-                //}
-
+                Series ts = DatabankAHelper(db, name, false);
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
+                // NB: beware of OPTION series data missing, if it is set.
                 int index1 = -12345;
-                int index2 = -12345;
-                double[] data = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, this.t0, this.t2);
+                int index2 = -12345;                
+                double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, this.t0, this.t2);
                 for (int t = 0; t < n; t++)
                 {
                     data[index1 + t] = a[t][i];
                 }
             }
+        }
+
+        /// <summary>
+        /// Helper that gets a timeseries from a databank and a name. 
+        /// With read, nothing is created. With !read, 
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="name"></param>
+        /// <param name="fromDatabankToA"></param>
+        /// <returns></returns>
+        private Series DatabankAHelper(Databank db, string name, bool fromDatabankToA)
+        {
+            //See also #asf87aufkdh where similar loading is done regarding reading gdx files  
+            string freq = G.ConvertFreq(Program.options.freq);
+            List<string> dims = G.Chop_GetIndex(name);
+            string varNameWithFreqAndIndexes = G.Chop_AddFreq(name, freq);
+            string varNameWithFreq = G.Chop_GetNameAndFreq(varNameWithFreqAndIndexes);
+            int gdxDimensions = dims.Count + 1;
+            int gekkoDimensions; bool isMultiDim;
+            int hasTimeDimension = 1;
+            GamsData.IsMultiDim(gdxDimensions, hasTimeDimension, out gekkoDimensions, out isMultiDim);  //calling this is overkill, but binds neatly with other use of the method
+
+            Series ts = null;
+            if (isMultiDim)
+            {
+                Series ats = null;
+                if (fromDatabankToA)
+                {
+                    //only reading
+                    if (!db.ContainsIVariable(varNameWithFreq)) new Error("Could not find array-series '" + varNameWithFreq + "'.");
+                    ats = (Series)db.GetIVariable(varNameWithFreq);
+                }
+                else
+                {
+                    if (!db.ContainsIVariable(varNameWithFreq))
+                    {
+                        string[] domains = new string[gekkoDimensions];
+                        ats = new Series(G.ConvertFreq(freq), varNameWithFreq);
+                        ats.meta.domains = domains;
+                        ats.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
+                        db.AddIVariable(ats.name, ats);
+                    }
+                    else
+                    {
+                        ats = (Series)db.GetIVariable(varNameWithFreq);
+                    }
+                }
+                
+                MultidimItem mmi = new MultidimItem(dims.ToArray(), ats);
+                IVariable iv = null; ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                if (iv == null)
+                {
+                    if (fromDatabankToA) new Error("In array-series '" + varNameWithFreq + "', could not find sub-series '" + varNameWithFreqAndIndexes + "'");
+                    ts = new Series(ESeriesType.Normal, G.ConvertFreq(freq), Globals.seriesArraySubName + Globals.freqIndicator + freq);
+                    ats.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
+                }
+                else
+                {
+                    ts = (Series)iv;
+                }
+            }
+            else
+            {
+                //Zero-dimensional timeseries (that is, normal timeseries)
+                if (db.ContainsIVariable(varNameWithFreq))
+                {
+                    ts = (Series)db.GetIVariable(varNameWithFreq);
+                }
+                else
+                {
+                    if (fromDatabankToA) new Error("Could not find series '" + varNameWithFreq + "'.");
+                    ts = new Series(G.ConvertFreq(freq), varNameWithFreq);
+                    db.AddIVariable(ts.name, ts);
+                }                
+            }
+
+            return ts;
         }
     }
 

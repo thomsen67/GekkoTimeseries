@@ -11063,19 +11063,32 @@ namespace UnitTests
                     // x6 g(2002)
                     // x7 g0(2001)
                     // x8 g0(2002)
-                    //I("decomp3 <2002 2002 d> y[2001] from e1[2001], e2[2001], e3[2001] endo y[2001], c[2001], g[2001];");
+                    //I("decomp3 <2002 2002 d> y[2001] from e1[2001], e2[2001], e3[2001] endo y[2001], c[2001], g[2001];");                    
 
-                    //Wiping out data
                     if (true)
                     {
-                        //FLUSH!
-                        Program.model.modelGamsScalar.a = null;
-                        Program.model.modelGamsScalar.a_ref = null;
-                        Program.model.modelGamsScalar.r = null;
-                        Program.model.modelGamsScalar.r_ref = null;
-
+                        //FLUSH! We flush a and r arrays taken from GAMS scalar model zip.
+                        if (Program.model.modelGamsScalar.a != null)
+                        {
+                            for (int j = 0; j < Program.model.modelGamsScalar.a.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a[j]);
+                        }
+                        if (Program.model.modelGamsScalar.a_ref != null)
+                        {
+                            for (int j = 0; j < Program.model.modelGamsScalar.a_ref.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a_ref[j]);
+                        }
+                        if (Program.model.modelGamsScalar.r != null)
+                        {
+                            G.SetNaN(Program.model.modelGamsScalar.r);
+                        }
+                        if (Program.model.modelGamsScalar.r_ref != null)
+                        {
+                            G.SetNaN(Program.model.modelGamsScalar.r_ref);
+                        }
                     }
 
+                    Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+                    Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+                    
                     I("decomp3 <2002 2002 d> y from e1,e2,e3 endo y, c, g;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
@@ -12578,6 +12591,11 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
             I("MODEL <gms> small.zip;");
+                        
+            //A good test of reading and writing from GAMS scalar model a array.
+            Program.model.modelGamsScalar.FromAToDatabank(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+
             I("SIM;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("8 evaluations x 100 took"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.10011561985681E-15"));
@@ -12585,17 +12603,7 @@ namespace UnitTests
             //TODO
             //TODO Do a better test of the resulting model object
             //TODO
-            //TODO
-
-            for (int i = 0; i < 100; i++)
-            {
-                DateTime t = DateTime.Now;
-                Program.model.modelGamsScalar.FromAToDatabank(Program.databanks.GetFirst(), false);
-                new Writeln("from a to db: " + G.Seconds(t));
-                t = DateTime.Now;
-                Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-                new Writeln("from db to a: " + G.Seconds(t));
-            }
+            //TODO            
 
             //Assert.AreEqual(output.count, 8);
             //Assert.AreEqual(output.known, 6);
@@ -12610,11 +12618,16 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
             I("MODEL <gms> makro.zip;");
+
+            //1 time back and forth takes about 0.3s in debug mode
+            //A good test of reading and writing from GAMS scalar model a array.
+            Program.model.modelGamsScalar.FromAToDatabank(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+
             I("SIM;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));                       
             
-
             //TODO
             //TODO
             //TODO Do a better test of the resulting model object

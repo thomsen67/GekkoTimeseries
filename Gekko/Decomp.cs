@@ -119,20 +119,20 @@ namespace Gekko
             // is that it will be switch between looking at e1a or e1b since everything is pre-calculated.
             //
 
-            if (G.GetModelType() == EModelType.GAMSScalar)
-            {
-                ModelGamsScalar model = Program.model.modelGamsScalar;
-                if (model.a == null)
-                {
-                    model.FromDatabankToA(Program.databanks.GetFirst(), false);
-                    model.r = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
-                }
-                if (model.a_ref == null)
-                {
-                    model.FromDatabankToA(Program.databanks.GetRef(), true);
-                    model.r_ref = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
-                }
-            }
+            //if (G.GetModelType() == EModelType.GAMSScalar)
+            //{
+            //    ModelGamsScalar model = Program.model.modelGamsScalar;
+            //    if (model.a == null)
+            //    {
+            //        model.FromDatabankToA(Program.databanks.GetFirst(), false);
+            //        model.r = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
+            //    }
+            //    if (model.a_ref == null)
+            //    {
+            //        model.FromDatabankToA(Program.databanks.GetRef(), true);
+            //        model.r_ref = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
+            //    }
+            //}
 
             Globals.lastDecompTable = null;
             G.CheckLegalPeriod(o.t1, o.t2);
