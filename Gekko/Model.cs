@@ -638,7 +638,7 @@ namespace Gekko
                     db.AddIVariable(ats.name, ats);
 
                     MultidimItem mmi = new MultidimItem(dims.ToArray(), ats);
-                    IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
+                    IVariable iv = null; ats.dimensionsStorage.TryGetValue(mmi, out iv); //probably never present, if merging is not allowed
                     if (iv == null)
                     {
                         ts = new Series(ESeriesType.Normal, G.ConvertFreq(freq), Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(freq));
