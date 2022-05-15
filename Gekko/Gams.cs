@@ -1057,8 +1057,7 @@ namespace Gekko
             new Writeln("Compile finished: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
-            double[] r = new double[eqCounts2];
-            for (int i = 0; i < r.Length; i++) r[i] = double.NaN;
+            double[] r = G.CreateNaN(eqCounts2);
             Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[helper.unique];
             double[][] a = helper.a;
             int[][] bb = helper.b.Select(x => x.ToArray()).ToArray();
@@ -3280,7 +3279,7 @@ namespace Gekko
             //3                 gdim = 3           gdim = 2
             //                  timeless
 
-            // gdxdim = gdim + (1-istimeless)
+            // gdxdim = gdim + (1 - istimeless)
 
             // only complication is that Gekko may mix timeless and non-timeless
             // subseries, maybe that should not be allowed?
@@ -3472,11 +3471,6 @@ namespace Gekko
 
                             string varNameWithFreq = varName + Globals.freqIndicator + G.ConvertFreq(freq);
 
-                            //if (varName.ToLower().Contains("d10"))
-                            //{
-
-                            //}
-
                             //always fetched, since we use it for domains
                             gdx.gdxSymbolGetDomainX(i, ref domainStrings);
                             int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, domainStrings, gdxDimensions, gdx, timeIndex, i);
@@ -3484,19 +3478,15 @@ namespace Gekko
                             if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                             {
                                 new Error("gdx error");
-                                //throw new GekkoException();
                             }
 
                             int hasTimeDimension = 0;
                             if (timeDimNr != -12345) hasTimeDimension = 1;
 
-                            int gekkoDimensions = gdxDimensions - hasTimeDimension;
+                            int gekkoDimensions; bool isMultiDim;
+                            IsMultiDim(gdxDimensions, hasTimeDimension, out gekkoDimensions, out isMultiDim);
 
-                            bool isMultiDim = true;
-                            if (gekkoDimensions == 0)
-                            {
-                                isMultiDim = false;
-                            }
+                            //See also #asf87aufkdh where similar loading is done regarding data from GAMS scalar model
 
                             Series ts = null;
                             if (isMultiDim)
@@ -3723,6 +3713,22 @@ namespace Gekko
                 new Error("GDX import failed with an unexpected error.");
             }
         }
+
+        /// <summary>
+        /// Finds out if this is a Gekko array-series, and how many dimensions in Gekko. Parameter
+        /// gdxDimensions contains all dimensions possibly including time. Parameter
+        /// hasTimeDimension can be 0 or 1.
+        /// </summary>
+        /// <param name="gdxDimensions"></param>
+        /// <param name="hasTimeDimension"></param>
+        /// <param name="gekkoDimensions"></param>
+        /// <param name="isMultiDim"></param>
+        public static void IsMultiDim(int gdxDimensions, int hasTimeDimension, out int gekkoDimensions, out bool isMultiDim)
+        {
+            gekkoDimensions = gdxDimensions - hasTimeDimension;
+            isMultiDim = true;
+            if (gekkoDimensions == 0) isMultiDim = false;
+        }        
 
         public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list)
         {

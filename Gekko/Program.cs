@@ -3926,7 +3926,7 @@ namespace Gekko
             string[] GetArrayTimeseriesName_1_1(string s)
             {
                 return s.Split(new string[] { Globals.symbolTurtle }, StringSplitOptions.None);
-            }
+            }            
 
             Databank deserializedDatabank;
             int nanCounter = 0;
@@ -5835,6 +5835,8 @@ namespace Gekko
             if (isArray)
             {
                 // ------------------------------ array-series ---------------------------------------
+
+                //See also #asf87aufkdh
 
                 int dimensionsWithoutTime = codes.Count;
 

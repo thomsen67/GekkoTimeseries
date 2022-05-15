@@ -1095,8 +1095,7 @@ namespace Gekko
             int vars = Program.model.modelGekko.varsAType.Count; //FIX: plus minus 1??
             //GC.Collect();
             double[,] a = new double[vars, obsWithLagsIncludingLeadsAtEnd]; //these zeroes will be overwritten with data or NaN.
-            double[] NAN = new double[obsWithLagsIncludingLeadsAtEnd];
-            for (int i = 0; i < NAN.Length; i++) NAN[i] = double.NaN;
+            double[] NAN = G.CreateNaN(obsWithLagsIncludingLeadsAtEnd);
             FillAWithNaN(vars, a, NAN);  //small speed penalty, but better safe (NaN) than sorry (0d)
 
             SolveDataInOut.FromDatabankToA(tStart0, tEnd_withRE, work, obsWithLagsIncludingLeadsAtEnd, a, NAN);

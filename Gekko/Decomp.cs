@@ -124,15 +124,13 @@ namespace Gekko
                 ModelGamsScalar model = Program.model.modelGamsScalar;
                 if (model.a == null)
                 {
-                    model.a = GetAFromDatabank(model, Program.databanks.GetFirst());
-                    model.r = new double[model.dict_FromEqNumberToEqName.Length];
-                    for (int i = 0; i < model.r.Length; i++) model.r[i] = double.NaN;
+                    model.FromDatabankToA(Program.databanks.GetFirst(), false);
+                    model.r = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
                 }
                 if (model.a_ref == null)
                 {
-                    model.a_ref = GetAFromDatabank(model, Program.databanks.GetRef());
-                    model.r_ref = new double[model.dict_FromEqNumberToEqName.Length];
-                    for (int i = 0; i < model.r_ref.Length; i++) model.r_ref[i] = double.NaN;
+                    model.FromDatabankToA(Program.databanks.GetRef(), true);
+                    model.r_ref = G.CreateNaN(model.dict_FromEqNumberToEqName.Length);
                 }
             }
 
@@ -367,49 +365,7 @@ namespace Gekko
                     break;
                 }
             }
-
-        }
-
-        private static double[][] GetAFromDatabank(ModelGamsScalar model, Databank db)
-        {
-            int n = GekkoTime.Observations(model.t0, model.t2);
-            double[][] a = new double[n][];
-            for (int t = 0; t < n; t++)
-            {
-                //beware: OPTION series data missing --> if set, change NaN into 0.                        
-                a[t] = new double[model.dict_FromANumberToVarName.Length];
-                for (int i = 0; i < a[t].Length; i++) a[t][i] = double.NaN;  //init with NaN
-            }
-            string freq = G.ConvertFreq(Program.options.freq);
-            for (int i = 0; i < model.dict_FromANumberToVarName.Length; i++)
-            {
-                string name = model.dict_FromANumberToVarName[i];
-                string nameWithFreq = G.Chop_AddFreq(name, freq);
-                Series ts = (Series)db.GetIVariable(nameWithFreq);
-                if (ts == null)
-                {
-                    IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                    IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                    IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                    string s = null;
-                    if (iva != null) s += "Beware: '" + name + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
-                    if (ivq != null) s += "Beware: '" + name + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
-                    if (ivm != null) s += "Beware: '" + name + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
-                    new Error("Could not find model variable " + name + " in the first-position databank. " + s);
-                }
-
-                int index1 = -12345;
-                int index2 = -12345;
-                double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, model.t0, model.t2);
-
-                for (int t = 0; t < n; t++)
-                {
-                    a[t][i] = data[index1 + t];
-                }
-            }
-
-            return a;
-        }
+        }                
 
         public static string DecompIsSharesOrPercentageTypeHelper(ref string operator1)
         {

@@ -431,6 +431,11 @@ namespace Gekko
             return this.meta.firstPeriodPositionInArray == Globals.firstPeriodPositionInArrayNull && this.meta.lastPeriodPositionInArray == Globals.lastPeriodPositionInArrayNull;
         }
 
+        /// <summary>
+        /// Set a timeseries as an array-timeseries. Note that the dimension includes time dimension (if present).
+        /// </summary>
+        /// <param name="dimensionsIncludingTimeDimension"></param>
+        /// <param name="hasTimeDimension"></param>
         public void SetArrayTimeseries(int dimensionsIncludingTimeDimension, bool hasTimeDimension)
         {
             int tDim = 0;
@@ -1154,10 +1159,7 @@ namespace Gekko
             //Fill it with NaN's.
             if (Globals.initializeDataArrayWithNaN)
             {
-                for (int i = 0; i < dataArray.Length; i++)
-                {
-                    dataArray[i] = double.NaN;
-                }
+                G.SetNaN(dataArray);
             }
         }
 

@@ -12587,6 +12587,16 @@ namespace UnitTests
             //TODO
             //TODO
 
+            for (int i = 0; i < 100; i++)
+            {
+                DateTime t = DateTime.Now;
+                Program.model.modelGamsScalar.FromAToDatabank(Program.databanks.GetFirst(), false);
+                new Writeln("from a to db: " + G.Seconds(t));
+                t = DateTime.Now;
+                Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+                new Writeln("from db to a: " + G.Seconds(t));
+            }
+
             //Assert.AreEqual(output.count, 8);
             //Assert.AreEqual(output.known, 6);
             //Assert.AreEqual(output.unique, 2);
@@ -12602,7 +12612,8 @@ namespace UnitTests
             I("MODEL <gms> makro.zip;");
             I("SIM;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));            
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("RSS = 1.92045218981909E-10"));                       
+            
 
             //TODO
             //TODO

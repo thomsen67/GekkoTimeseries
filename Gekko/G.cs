@@ -234,6 +234,26 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Sets all elements of an array to NaN
+        /// </summary>
+        /// <param name="x"></param>
+        public static void SetNaN(double[] x)
+        {
+            for (int i = 0; i < x.Length; i++) x[i] = double.NaN;
+        }
+
+        /// <summary>
+        /// Creates a double[n] array with all elements set to NaN
+        /// </summary>
+        /// <param name="x"></param>
+        public static double[] CreateNaN(int n)
+        {
+            double[] x = new double[n];
+            G.SetNaN(x);
+            return x;
+        }
+
+        /// <summary>
         /// Converts bool true/false into string
         /// </summary>
         /// <param name="x"></param>
