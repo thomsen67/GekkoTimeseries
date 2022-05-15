@@ -122,8 +122,18 @@ namespace Gekko
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
                 ModelGamsScalar model = Program.model.modelGamsScalar;
-                if (model.a == null) model.a = GetAFromDatabank(model, Program.databanks.GetFirst());
-                if (model.a_ref == null) model.a_ref = GetAFromDatabank(model, Program.databanks.GetRef());
+                if (model.a == null)
+                {
+                    model.a = GetAFromDatabank(model, Program.databanks.GetFirst());
+                    model.r = new double[model.dict_FromEqNumberToEqName.Length];
+                    for (int i = 0; i < model.r.Length; i++) model.r[i] = double.NaN;
+                }
+                if (model.a_ref == null)
+                {
+                    model.a_ref = GetAFromDatabank(model, Program.databanks.GetRef());
+                    model.r_ref = new double[model.dict_FromEqNumberToEqName.Length];
+                    for (int i = 0; i < model.r_ref.Length; i++) model.r_ref[i] = double.NaN;
+                }
             }
 
             Globals.lastDecompTable = null;

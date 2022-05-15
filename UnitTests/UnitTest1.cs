@@ -11071,6 +11071,9 @@ namespace UnitTests
                         //FLUSH!
                         Program.model.modelGamsScalar.a = null;
                         Program.model.modelGamsScalar.a_ref = null;
+                        Program.model.modelGamsScalar.r = null;
+                        Program.model.modelGamsScalar.r_ref = null;
+
                     }
 
                     I("decomp3 <2002 2002 d> y from e1,e2,e3 endo y, c, g;");
