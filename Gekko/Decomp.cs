@@ -122,46 +122,8 @@ namespace Gekko
             if (G.GetModelType() == EModelType.GAMSScalar)
             {
                 ModelGamsScalar model = Program.model.modelGamsScalar;
-                if (model.a == null)
-                {
-                    int n = GekkoTime.Observations(model.t0, model.t2);
-                    model.a = new double[n][];
-                    //double[][] a = model.a;
-                    for (int t = 0; t < n; t++)
-                    {
-                        //beware: OPTION series data missing --> if set, change NaN into 0.                        
-                        model.a[t] = new double[model.dict_FromANumberToVarName.Length];
-                        double[] temp = model.a[t];
-                        for (int i = 0; i < temp.Length; i++) temp[i] = double.NaN;  //init with NaN
-                    }
-                    string freq = G.ConvertFreq(Program.options.freq);
-                    for (int i = 0; i < model.dict_FromANumberToVarName.Length; i++)
-                    {
-                        string name = model.dict_FromANumberToVarName[i];
-                        string nameWithFreq = G.Chop_AddFreq(name, freq);
-                        Series ts = (Series)Program.databanks.GetFirst().GetIVariable(nameWithFreq);
-                        if (ts == null)
-                        {
-                            IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                            IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                            IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-                            string s = null;
-                            if (iva != null) s += "Beware: '" + name + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
-                            if (ivq != null) s += "Beware: '" + name + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
-                            if (ivm != null) s += "Beware: '" + name + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
-                            new Error("Could not find model variable " + name + " in the first-position databank. " + s);
-                        }
-                        
-                        int index1 = -12345;
-                        int index2 = -12345;
-                        double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, model.t0, model.t2);
-                        
-                        for (int t = 0; t < n; t++)
-                        {                            
-                            model.a[t][i] = data[index1 + t];
-                        }
-                    }
-                }
+                if (model.a == null) model.a = GetAFromDatabank(model, Program.databanks.GetFirst());
+                if (model.a_ref == null) model.a_ref = GetAFromDatabank(model, Program.databanks.GetRef());
             }
 
             Globals.lastDecompTable = null;
@@ -396,6 +358,47 @@ namespace Gekko
                 }
             }
 
+        }
+
+        private static double[][] GetAFromDatabank(ModelGamsScalar model, Databank db)
+        {
+            int n = GekkoTime.Observations(model.t0, model.t2);
+            double[][] a = new double[n][];
+            for (int t = 0; t < n; t++)
+            {
+                //beware: OPTION series data missing --> if set, change NaN into 0.                        
+                a[t] = new double[model.dict_FromANumberToVarName.Length];
+                for (int i = 0; i < a[t].Length; i++) a[t][i] = double.NaN;  //init with NaN
+            }
+            string freq = G.ConvertFreq(Program.options.freq);
+            for (int i = 0; i < model.dict_FromANumberToVarName.Length; i++)
+            {
+                string name = model.dict_FromANumberToVarName[i];
+                string nameWithFreq = G.Chop_AddFreq(name, freq);
+                Series ts = (Series)db.GetIVariable(nameWithFreq);
+                if (ts == null)
+                {
+                    IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+                    IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+                    IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+                    string s = null;
+                    if (iva != null) s += "Beware: '" + name + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
+                    if (ivq != null) s += "Beware: '" + name + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
+                    if (ivm != null) s += "Beware: '" + name + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
+                    new Error("Could not find model variable " + name + " in the first-position databank. " + s);
+                }
+
+                int index1 = -12345;
+                int index2 = -12345;
+                double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, model.t0, model.t2);
+
+                for (int t = 0; t < n; t++)
+                {
+                    a[t][i] = data[index1 + t];
+                }
+            }
+
+            return a;
         }
 
         public static string DecompIsSharesOrPercentageTypeHelper(ref string operator1)
