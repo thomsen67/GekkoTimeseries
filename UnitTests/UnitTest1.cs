@@ -11034,8 +11034,6 @@ namespace UnitTests
                 //e3[t].. g[t] = E = 0.2 * c[t] + g0[t];
                 // ---> y[t]  =E=  25 * g0[t]
 
-
-
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // Globals.showDecompTable = true;  //will show the following decomp table and then abort
@@ -11067,7 +11065,15 @@ namespace UnitTests
                     // x8 g0(2002)
                     //I("decomp3 <2002 2002 d> y[2001] from e1[2001], e2[2001], e3[2001] endo y[2001], c[2001], g[2001];");
 
-                    I("decomp3 <2002 2002 d> y from e1, e2,e3 endo y, c, g;");
+                    //Wiping out data
+                    if (true)
+                    {
+                        //FLUSH!
+                        Program.model.modelGamsScalar.a = null;
+                        Program.model.modelGamsScalar.a_ref = null;
+                    }
+
+                    I("decomp3 <2002 2002 d> y from e1,e2,e3 endo y, c, g;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
@@ -11075,7 +11081,7 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
                     Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
 
-                    I("decomp3 <2001 2001 m> y from e1, e2,e3 endo y, c, g;");
+                    I("decomp3 <2001 2001 m> y from e1,e2,e3 endo y, c, g;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");

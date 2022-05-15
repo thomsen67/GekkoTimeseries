@@ -3935,7 +3935,7 @@ namespace Gekko
             if (Program.model == null) return EModelType.Unknown;
             else if (Program.model.modelGekko != null) return EModelType.Gekko;
             else if (Program.model.modelGams != null) return EModelType.GAMSRaw;
-            else if (Program.model.modelGamsScalar != null) return EModelType.GAMSScalarModel;
+            else if (Program.model.modelGamsScalar != null) return EModelType.GAMSScalar;
             else return EModelType.Unknown;
         }
 

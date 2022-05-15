@@ -119,6 +119,51 @@ namespace Gekko
             // is that it will be switch between looking at e1a or e1b since everything is pre-calculated.
             //
 
+            if (G.GetModelType() == EModelType.GAMSScalar)
+            {
+                ModelGamsScalar model = Program.model.modelGamsScalar;
+                if (model.a == null)
+                {
+                    int n = GekkoTime.Observations(model.t0, model.t2);
+                    model.a = new double[n][];
+                    //double[][] a = model.a;
+                    for (int t = 0; t < n; t++)
+                    {
+                        //beware: OPTION series data missing --> if set, change NaN into 0.                        
+                        model.a[t] = new double[model.dict_FromANumberToVarName.Length];
+                        double[] temp = model.a[t];
+                        for (int i = 0; i < temp.Length; i++) temp[i] = double.NaN;  //init with NaN
+                    }
+                    string freq = G.ConvertFreq(Program.options.freq);
+                    for (int i = 0; i < model.dict_FromANumberToVarName.Length; i++)
+                    {
+                        string name = model.dict_FromANumberToVarName[i];
+                        string nameWithFreq = G.Chop_AddFreq(name, freq);
+                        Series ts = (Series)Program.databanks.GetFirst().GetIVariable(nameWithFreq);
+                        if (ts == null)
+                        {
+                            IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+                            IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+                            IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
+                            string s = null;
+                            if (iva != null) s += "Beware: '" + name + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
+                            if (ivq != null) s += "Beware: '" + name + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
+                            if (ivm != null) s += "Beware: '" + name + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
+                            new Error("Could not find model variable " + name + " in the first-position databank. " + s);
+                        }
+                        
+                        int index1 = -12345;
+                        int index2 = -12345;
+                        double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, model.t0, model.t2);
+                        
+                        for (int t = 0; t < n; t++)
+                        {                            
+                            model.a[t][i] = data[index1 + t];
+                        }
+                    }
+                }
+            }
+
             Globals.lastDecompTable = null;
             G.CheckLegalPeriod(o.t1, o.t2);
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "n";
@@ -202,7 +247,7 @@ namespace Gekko
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
 
-                if (G.GetModelType() == EModelType.GAMSScalarModel)
+                if (G.GetModelType() == EModelType.GAMSScalar)
                 {
                     GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in decompOptions2.new_from)
@@ -490,7 +535,7 @@ namespace Gekko
                     List<DecompData> temp = new List<DecompData>();
 
                     int jj = -1;
-                    if (G.GetModelType() == EModelType.GAMSScalarModel)
+                    if (G.GetModelType() == EModelType.GAMSScalar)
                     {
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
@@ -1160,7 +1205,7 @@ namespace Gekko
                         link.expressionText = found.lhs + " = " + found.rhs;
                     }
                 }
-                else if (modelType == EModelType.GAMSScalarModel)
+                else if (modelType == EModelType.GAMSScalar)
                 {
                     //GAMS scalar model
                     //GAMS scalar model
@@ -2608,7 +2653,7 @@ namespace Gekko
             bool orderNormalize = false;
             if (decompOptions2.decompTablesFormat.showErrors)
             {
-                if (G.GetModelType() == EModelType.GAMSScalarModel)
+                if (G.GetModelType() == EModelType.GAMSScalar)
                 {
                     //HMMMMM not sure about this and what it does, or if .GAMS_dsh.Count should be used
                     if (varnames.Count == decompOptions2.link[0].GAMS_dsh.Count)
