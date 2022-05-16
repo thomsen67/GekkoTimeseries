@@ -10993,28 +10993,10 @@ namespace UnitTests
         public void _Test_DecompSimultaneous()
         {
             for (int i = 0; i < 2; i++)  //0:scalar model, 1:raw gams
-            {
-                // -------------------------
-                // Maybe augment model to this, and have z's <> 0.
-                // Effect via z2 is a good test. For now, we have z1 and z2 = 0
-                // which is a bit boring for simultaneous decomp.
-                //
-                // y = c + g + z1
-                // c = 0.8 * y + z2
-                // g = 0.2 * c + z3
-                //
-                // --> y = 25 * (z1 + 1.2 * z2 + z3))
-                // --> c and g follows
-                // -------------------------
+            {                
                 //
                 I("reset;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                //
-                //
-                // NOTE: inside simul.zip there is a new .gms file for 3 periods and more exogenous
-                //       but gams problem with scalar model...
-                //
-                //
                 if (i == 0) I("model <gms> simul.zip;");
                 else I("model <gms> simul.gms;");
                 I("time 2001 2003;");
@@ -11039,52 +11021,10 @@ namespace UnitTests
                 // Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                //for scalar model, it is in reality translated into the following:
-                //decomp3 <2002 2002 d> y[2001], y[2002] 
-                //                      from e1[2001], e1[2002], e2[2001], e2[2002], e3[2001], e3[2002]
-                //                      endo y[2001], y[2002], c[2001], c[2002], g[2001], g[2002];
-                //
+                                
                 if (i == 0)
-                {
-                    //Equations 1 to 6
-                    // e1 e1(2001)
-                    // e2 e1(2002)
-                    // e3 e2(2001)
-                    // e4 e2(2002)
-                    // e5 e3(2001)
-                    // e6 e3(2002)
-                    //Variables 1 to 8
-                    // x1 y(2001)
-                    // x2 y(2002)
-                    // x3 c(2001)
-                    // x4 c(2002)
-                    // x5 g(2001)
-                    // x6 g(2002)
-                    // x7 g0(2001)
-                    // x8 g0(2002)
-                    //I("decomp3 <2002 2002 d> y[2001] from e1[2001], e2[2001], e3[2001] endo y[2001], c[2001], g[2001];");                    
-
-                    if (true)
-                    {
-                        //FLUSH! We flush a and r arrays taken from GAMS scalar model zip.
-                        if (Program.model.modelGamsScalar.a != null)
-                        {
-                            for (int j = 0; j < Program.model.modelGamsScalar.a.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a[j]);
-                        }
-                        if (Program.model.modelGamsScalar.a_ref != null)
-                        {
-                            for (int j = 0; j < Program.model.modelGamsScalar.a_ref.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a_ref[j]);
-                        }
-                        if (Program.model.modelGamsScalar.r != null)
-                        {
-                            G.SetNaN(Program.model.modelGamsScalar.r);
-                        }
-                        if (Program.model.modelGamsScalar.r_ref != null)
-                        {
-                            G.SetNaN(Program.model.modelGamsScalar.r_ref);
-                        }
-                    }
+                {                    
+                    ModelGamsScalar.FlushAAndRArrays();
 
                     Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
                     Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
@@ -11096,7 +11036,6 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(2, 2).number, 25.0000d, 0.0001);
                     Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
                     Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
-
                     I("decomp3 <2001 2001 m> y from e1,e2,e3 endo y, c, g;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
@@ -11141,6 +11080,93 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(4, 2).number, -10.0000d, 0.0001);
                 }                
             }
+        }
+
+        [TestMethod]
+        public void _Test_DecompSimultaneous3()
+        {
+
+            // -------------------------
+            // y = c + g + z1
+            // c = 0.8 * y + z2
+            // g = 0.2 * c + z3
+            //
+            // --> y = 25 * (z1 + 1.2 * z2 + z3))
+            // --> c and g follows
+            // -------------------------
+            //
+            //equation e1[t], e2[t], e3[t];
+            //--> over 3 periods 2001-2003.
+            //e1[t].. y[t] = E = c[t] + g[t] + z1[t];
+            //e2[t].. c[t] = E = 0.8 * y[t] + z2[t];
+            //e3[t].. g[t] = E = 0.2 * c[t] + z3[t];
+            //
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("model <gms> simul3.zip;");
+            I("time 2001 2003;");
+            I("y = 75, 100, 25;");
+            I("c = 60, 80, 20;");
+            I("g = 15, 20, 5;");
+            I("z1 = 0, 0, 0;");
+            I("z2 = 0, 0, 0;");
+            I("z3 = 3, 4, 1;");
+            I("clone;");  //ref
+            I("y = 25, 50, 125;");
+            I("c = 20, 40, 100;");
+            I("g = 5, 10, 25;");
+            I("z1 = 0, 0, 0;");
+            I("z2 = 0, 0, 0;");
+            I("z3 = 1, 2, 5;");
+            Gekko.Table table = null;            
+
+            ModelGamsScalar.FlushAAndRArrays();
+            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+                        
+            I("decomp3 <2002 2003 d> y from e1, e2, e3 endo y, c, g;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2003");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+            Assert.AreEqual(table.Get(2, 2).number, 25.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, 75.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "z3");
+            Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 75.0000d, 0.0001);
+                        
+            I("decomp3 <2001 2003 m> y from e1, e2, e3 endo y, c, g;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+            Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 4).number, 100.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "z3");
+            Assert.AreEqual(table.Get(3, 2).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 4).number, 100.0000d, 0.0001);
+
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            I("decomp3 <2001 2003 m> y from e1 endo y;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+            Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 4).number, 100.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "c");
+            Assert.AreEqual(table.Get(3, 2).number, -40.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, -40.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 4).number, 80.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g");
+            Assert.AreEqual(table.Get(4, 2).number, -10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, -10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 4).number, 20.0000d, 0.0001);
         }
         
         [TestMethod]

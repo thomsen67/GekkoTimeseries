@@ -764,6 +764,31 @@ namespace Gekko
 
             return ts;
         }
+
+        /// <summary>
+        /// Sets all elements in a, a_ref, r and r_ref to NaN (unless they are already == null).
+        /// </summary>
+        public static void FlushAAndRArrays()
+        {
+            //FLUSH! We flush a and r arrays taken from GAMS scalar model zip.
+            if (Program.model.modelGamsScalar.a != null)
+            {
+                for (int j = 0; j < Program.model.modelGamsScalar.a.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a[j]);
+            }
+            if (Program.model.modelGamsScalar.a_ref != null)
+            {
+                for (int j = 0; j < Program.model.modelGamsScalar.a_ref.Length; j++) G.SetNaN(Program.model.modelGamsScalar.a_ref[j]);
+            }
+            if (Program.model.modelGamsScalar.r != null)
+            {
+                G.SetNaN(Program.model.modelGamsScalar.r);
+            }
+            if (Program.model.modelGamsScalar.r_ref != null)
+            {
+                G.SetNaN(Program.model.modelGamsScalar.r_ref);
+            }
+        }
+
     }
 
     [ProtoContract]
