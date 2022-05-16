@@ -11025,7 +11025,6 @@ namespace UnitTests
                 if (i == 0)
                 {                    
                     ModelGamsScalar.FlushAAndRArrays();
-
                     Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
                     Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
                     
@@ -11091,7 +11090,7 @@ namespace UnitTests
             // c = 0.8 * y + z2
             // g = 0.2 * c + z3
             //
-            // --> y = 25 * (z1 + 1.2 * z2 + z3))
+            // --> y = 25 * (z1 + 1.2 * z2 + z3))  --> dy/dz1 = 25, dy/dz2 = 30.
             // --> c and g follows
             // -------------------------
             //
@@ -11112,29 +11111,37 @@ namespace UnitTests
             I("z2 = 0, 0, 0;");
             I("z3 = 3, 4, 1;");
             I("clone;");  //ref
-            I("y = 25, 50, 125;");
-            I("c = 20, 40, 100;");
-            I("g = 5, 10, 25;");
+            I("y = 25, 80, 125;");
+            I("c = 20, 65, 100;");
+            I("g = 5, 15, 25;");
             I("z1 = 0, 0, 0;");
-            I("z2 = 0, 0, 0;");
+            I("z2 = 0, 1, 0;");
             I("z3 = 1, 2, 5;");
             Gekko.Table table = null;            
 
             ModelGamsScalar.FlushAAndRArrays();
             Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
             Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
-                        
+
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2003 d> y from e1, e2, e3 endo y, c, g;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2003");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
-            Assert.AreEqual(table.Get(2, 2).number, 25.0000d, 0.0001);
-            Assert.AreEqual(table.Get(2, 3).number, 75.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "z3");
-            Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 3).number, 75.0000d, 0.0001);
-                        
+            Assert.AreEqual(table.Get(2, 2).number, 55.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, 45.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "z1");
+            Assert.AreEqual(table.Get(3, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "z2");
+            Assert.AreEqual(table.Get(4, 2).number, 30.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, -30.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "z3");
+            Assert.AreEqual(table.Get(5, 2).number, 25.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 3).number, 75.0000d, 0.0001);
+
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2001 2003 m> y from e1, e2, e3 endo y, c, g;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
@@ -11142,12 +11149,20 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
             Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
-            Assert.AreEqual(table.Get(2, 3).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, -20.0000d, 0.0001);
             Assert.AreEqual(table.Get(2, 4).number, 100.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "z3");
-            Assert.AreEqual(table.Get(3, 2).number, -50.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 3).number, -50.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 4).number, 100.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "z1");
+            Assert.AreEqual(table.Get(3, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 4).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "z2");
+            Assert.AreEqual(table.Get(4, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, 30.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 4).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "z3");
+            Assert.AreEqual(table.Get(5, 2).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 3).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 4).number, 100.0000d, 0.0001);
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2001 2003 m> y from e1 endo y;");
@@ -11157,16 +11172,20 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
             Assert.AreEqual(table.Get(2, 2).number, -50.0000d, 0.0001);
-            Assert.AreEqual(table.Get(2, 3).number, -50.0000d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, -20.0000d, 0.0001);
             Assert.AreEqual(table.Get(2, 4).number, 100.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "c");
             Assert.AreEqual(table.Get(3, 2).number, -40.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 3).number, -40.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, -15.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 4).number, 80.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g");
             Assert.AreEqual(table.Get(4, 2).number, -10.0000d, 0.0001);
-            Assert.AreEqual(table.Get(4, 3).number, -10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, -5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 4).number, 20.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "z1");
+            Assert.AreEqual(table.Get(5, 2).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 3).number, 0.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 4).number, 0.0000d, 0.0001);
         }
         
         [TestMethod]

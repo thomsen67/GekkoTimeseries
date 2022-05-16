@@ -747,7 +747,9 @@ namespace Gekko
                             int i = endo[s3];  //row
                             for (int j = 0; j < effect.GetLength(1); j++)
                             {
-                                if (effect[i, j] != 0d)
+                                //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
+                                //see also #sf94lkjsdjæ
+                                if (G.GetModelType() == EModelType.GAMSScalar || effect[i, j] != 0d)
                                 {
                                     foreach (KeyValuePair<string, int> kvp in exo)
                                     {
@@ -1753,7 +1755,9 @@ namespace Gekko
                             double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
                             double grad = (y0_after - y0) / eps;
 
-                            if (!G.isNumericalError(grad) && grad != 0d)
+                            //if (!G.isNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                            //see also #sf94lkjsdjæ
+                            if (!G.isNumericalError(grad))
                             {
                                 int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
@@ -1779,7 +1783,6 @@ namespace Gekko
                     else if (extra.type == EDecompBanks.Work)
                     {
                         //work difference like <d>
-
                         //normal multiplier like <m>
                         y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
                         d.cellsQuo[residualName].SetData(t, y0);
@@ -1795,7 +1798,9 @@ namespace Gekko
                             double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
                             double grad = (y0_after - y0) / eps;
 
-                            if (!G.isNumericalError(grad) && grad != 0d)
+                            //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
+                            //see also #sf94lkjsdjæ
+                            if (!G.isNumericalError(grad))
                             {
                                 int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
