@@ -252,7 +252,8 @@ namespace Gekko
                             element.name = equationName;                            
                             element.indexes = mmi;
                             element.fullName = element.name + element.indexes.GetName();
-                            element.periods = new DecompStartHelperPeriod[GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2)];
+                            int periods = GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2);                                                        
+                            element.periods = new DecompStartHelperPeriod[periods];
                             elements.Add(mmi, element);
                         }
 
