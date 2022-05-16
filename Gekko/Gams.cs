@@ -1101,6 +1101,10 @@ namespace Gekko
                 Program.model.modelGamsScalar.count = helper.count;
                 Program.model.modelGamsScalar.known = helper.known;
                 Program.model.modelGamsScalar.unique = helper.unique;
+                //
+                // Note that GAMS equation periods are not very useful.
+                // In principle, e1[2020] .. may designate an equation with
+                // variables from 2025, so there are no guarantees.
                 Program.model.modelGamsScalar.t0 = helper.t0;
                 Program.model.modelGamsScalar.t1 = helper.t1;
                 Program.model.modelGamsScalar.t2 = helper.t2;
