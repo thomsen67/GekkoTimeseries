@@ -11314,10 +11314,33 @@ namespace UnitTests
             // y2 = c2 + g2
             // c2 = 0.3 * y1 + 0.3 * y2 + 0.3 * y3 
             //
+            //         y1      c1     y2     c2    |    y0     y3     g1      g2
+            //                                     |
+            // [y1]  [ -1       1                  |                   1         ]
+            // [c1]  [0.3      -1     0.3          |   0.3                       ]
+            // [y2]  [                -1       1   |                           1 ]
+            // [c2]  [0.3            0.3      -1   |           0.3               ]
+            //
+            //
+            //         Contributions
+            //
+            //         y1      c1     y2     c2    |    y0     y3     g1      g2
+            //                                     |
+            // [y1]  [ -5       3                  |                   2         ]
+            // [c1]  [1.5      -3    1.5           |   0.0                       ]
+            // [y2]  [                -5       3   |                           2 ]
+            // [c2]  [1.5            1.5      -3   |           0.0               ]
+            //
+            //
+            //
             // [y1]   =   [ 0.21/0.4       0.09/0.4       0.7/0.4      0.3/0.4   ]  [y0]
             // [y2]   =   [ 0.21/0.4-0.3   0.09/0.4+0.3   0.7/0.4-1    0.3/0.4+1 ]  [y3]
             //                                                                      [g1]
             //                                                                      [g2]
+            // Hvis kun g1 og g2 ændrer sig:
+            //
+            // y1 = 1.75 * g1 + 0.75 * g2
+            // y2 = 0.75 * g1 + 1.75 * g2
             //
             double[,] a = new double[2, 4];
             a[0, 0] = 0.21d / 0.4d;
@@ -11331,19 +11354,19 @@ namespace UnitTests
             double[,] x = new double[4, 1];
             x[0, 0] = 500d;  //y0
             x[1, 0] = 540d;  //y3
-            x[2, 0] = 42d;  //g1   ... 42 in multiplier
-            x[3, 0] = 62d;  //g2   ... 62 in multiplier
+            x[2, 0] = 40d;  //g1   ... 42 in multiplier
+            x[3, 0] = 60d;  //g2   ... 62 in multiplier
             double[,] y = Program.MultiplyMatrices(a, x);
-            // y[0, 0] = y1 ---------> 499
-            // y[1, 0] = y2 ---------> 531
-            double c1 = 0.3 * x[0, 0] + 0.3 * y[0, 0] + 0.3 * y[1, 0]; // --------> 459          
-            double c2 = 0.3 * y[0, 0] + 0.3 * y[1, 0] + 0.3 * x[1, 0]; // --------> 471
+            // y[0, 0] = y1 ---------> 499 in ref
+            // y[1, 0] = y2 ---------> 531 in ref
+            double c1 = 0.3 * x[0, 0] + 0.3 * y[0, 0] + 0.3 * y[1, 0]; // --------> 459 in ref
+            double c2 = 0.3 * y[0, 0] + 0.3 * y[1, 0] + 0.3 * x[1, 0]; // --------> 471 in ref
             double y1_tjek = c1 + x[2, 0] - y[0, 0];
             double y2_tjek = c2 + x[3, 0] - y[1, 0];
 
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-            I("model <gms> simulLagLead.zip;");
+            I("model <gms> simul2.zip;");
             // ----------------            
             I("y <2000 2003> = 500, 499, 531, 540;"); 
             I("c <2001 2002> = 459, 471;"); 

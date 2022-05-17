@@ -554,213 +554,14 @@ namespace Gekko
 
                 if (decompOptions2.type == "ASTDECOMP3")
                 {
-                    GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in decompOptions2.link[0].endo)
+                    if (decompOptions2.modelType == EModelType.GAMSScalar)
                     {
-                        string s2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
-                        if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
+                        DecompMainHelperInvert(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI);
                     }
-
-                    DecompCheckNumberOfEqsAndEndo(decompDatas, endo);
-
-                    GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
+                    else
                     {
-                        for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
-                        {
-                            foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
-                            {
-                                if (exo.ContainsKey(kvp.Key) || endo.ContainsKey(kvp.Key))
-                                {
-                                }
-                                else
-                                {
-                                    exo.Add(kvp.Key, exo.Count);
-                                }
-                            }
-                        }
+                        DecompMainHelperInvert(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI);
                     }
-
-                    int n = endo.Count + exo.Count;
-
-                    //now we have ENDO = decompOptions2.link[parentI].varnames, and EXO = exo
-
-                    //consider this: 
-                    //1 x1 + 2 x2 + 3 x3 + 4 x4 + 5 x5 = 0 
-                    //2 x1 + 3 x2 + 4 x3 + 5 x4 + 6 x5 = 0
-
-                    //now if x2, x4, x5 are exo, we skip these in Jacobi, getting:
-                    //
-                    // [1 3] [x1]  +  [2 4 5] [x2]   =   0
-                    // [2 4] [x3]     [3 5 6] [x4]     
-                    //                        [x5]
-                    //
-                    // [x1]  =  - [. .] [2 4 5] [x2]  
-                    // [x3]  =    [. .] [3 5 6] [x4]   
-                    //                          [x5]
-
-                    if (false)
-                    {
-                        DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
-                    }
-                    decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up
-
-                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                    {
-
-                        double[,] mEndo = new double[endo.Count, endo.Count];
-                        double[,] mExo = new double[endo.Count, exo.Count];
-
-                        int row = -1;
-                        for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
-                        {
-                            //In some cases, there is no interaction between the sets, for instance in
-                            //an equation like y[#a] = c[#a] + g[#a]. In that case, we could solve for each age separately,
-                            //but we cannot rule out eqs like y[#a] = (c[#a] + c[#a+1])/2 + g[#a]. This is still recursive,
-                            //if we start to solve for the largest #a, but it illustrates the problem. Perhaps a sparse solver
-                            //would not care anyway. Note that c[#a+1][+1] would be more common, and if this is treated as an
-                            //exogenous, there is no age lead problem. Note also that combinations of #a-1, #a and #a+1 become
-                            //simultaneous (like for time, t).
-                            for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
-                            {
-                                row++;
-                                foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
-                                {
-                                    double d = kvp.Value.GetDataSimple(t);
-                                    if (endo.ContainsKey(kvp.Key))
-                                    {
-                                        int col = endo[kvp.Key];
-                                        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
-                                        {
-                                            new Error("DECOMP matrix invert problem");
-                                            //throw new GekkoException();
-                                        }
-                                        mEndo[row, col] = d;
-                                    }
-                                    else if (exo.ContainsKey(kvp.Key))
-                                    {
-                                        int col = exo[kvp.Key];
-                                        if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
-                                        {
-                                            new Error("DECOMP matrix invert problem");
-                                            //throw new GekkoException();
-                                        }
-                                        mExo[row, col] = d;
-                                    }
-                                    else
-                                    {
-                                        throw new GekkoException();
-                                    }
-                                }
-                            }
-                        }
-
-                        //ENDO  0 -- 0  demand[18]¤[0] 2021 = 8.88890000004245
-                        //ENDO  0 -- 0  supply[18]¤[0] 2021 = -8.88890000004245
-                        //ENDO  0 -- 1  demand[19]¤[0] 2021 = 3.33330000001592
-                        //ENDO  0 -- 1  supply[19]¤[0] 2021 = -3.33330000001592
-
-                        //ENDO  1 -- 0  c[18]¤[0]      2021 = -6.8889000000329
-                        //ENDO  1 -- 0  demand[18]¤[0] 2021 = 8.88890000004245
-                        //      1 -- 0  g[18]¤[0]      2021 = -2.00000000000955
-                        //ENDO  1 -- 1  c[19]¤[0]      2021 = -1.33330000000637
-                        //ENDO  1 -- 1  demand[19]¤[0] 2021 = 3.33330000001592
-                        //      1 -- 1  g[19]¤[0]      2021 = -2.00000000000955
-
-                        //ENDO  2 -- 0  supply[18]¤[0] 2021 = 8.88890000004245
-                        //ENDO  2 -- 0  y[18]¤[0]      2021 = -8.88890000004245
-                        //ENDO  2 -- 1  supply[19]¤[0] 2021 = 3.33330000001592
-                        //ENDO  2 -- 1  y[19]¤[0]      2021 = -3.33330000001592
-
-                        //ENDO  3 -- 0  c[18]¤[0]      2021 = 6.8889000000329
-                        //ENDO  3 -- 0  y[18]¤[0]      2021 = -3.55556000011804
-                        //      3 -- 0  y[19]¤[+1]     2021 = -3.33336000011065
-                        //ENDO  3 -- 1  c[19]¤[0]      2021 = 1.33330000000637
-                        //ENDO  3 -- 1  y[19]¤[0]      2021 = -1.33331999994953
-                        //      3 -- 1  y[20]¤[+1]     2021 = 0
-
-                        //      y18    y19    dem18    dem19   sup18   sup19   c18    c19
-                        // ---------------------------------------------------------------------
-                        //  1                 8.88             -8.88
-                        //  2                           3.33            -3.33
-                        //  3                 8.88                             -6.88                   -2 (g18)
-                        //  4                           3.33                          -1.33            -2 (g19)
-                        //  5 -8.88                              8.88
-                        //  6         -3.33                              3.33
-                        //  7 -3.55                                             6.88                   -3.33 (y19[+1])
-                        //  8         -1.33                                            1.33
-
-                        double[,] inverse = null;
-
-                        try
-                        {
-                            double[,] temp = (double[,])mEndo.Clone();
-                            inverse = Program.InvertMatrix(temp);
-                        }
-                        catch (Exception e)
-                        {
-                            new Error("Matrix inversion for DECOMP failed for period " + t.ToString(), false);
-                            bool nan = false;
-                            foreach (double d in mEndo)
-                            {
-                                if (G.isNumericalError(d))
-                                {
-                                    nan = true;
-                                    break;
-                                }
-                            }
-                            if (nan)
-                            {
-                                new Error("The matrix contains missing or infinite values", false);
-                            }
-                            throw new GekkoException();
-                        }
-
-                        double[,] effect = Program.MultiplyMatrices(inverse, mExo);
-
-                        //the effect matrix is #endo x #exo
-
-                        int varnamesCounter = -1;
-                        foreach (string s in decompOptions2.link[parentI].varnames)
-                        {
-                            //these are the ones being reported. Is a subset of endo.
-
-                            varnamesCounter++;
-
-                            if (t.EqualsGekkoTime(per1))
-                            {
-                                DecompData dd = new DecompData();
-                                DecompInitDict(dd);
-                                decompDatas.MAIN_data.Add(dd);
-                            }
-
-                            string s3 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
-
-                            Series ts = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[s3];
-                            ts.SetData(t, 1d);
-
-                            int i = endo[s3];  //row
-                            for (int j = 0; j < effect.GetLength(1); j++)
-                            {
-                                //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
-                                //see also #sf94lkjsdjæ
-                                if (decompOptions2.modelType == EModelType.GAMSScalar || effect[i, j] != 0d)
-                                {
-                                    foreach (KeyValuePair<string, int> kvp in exo)
-                                    {
-                                        if (kvp.Value == j)
-                                        {
-                                            Series ts2 = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[kvp.Key];
-                                            ts2.SetData(t, effect[i, j]);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }   //foreach t
-
-                    DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
-
                 }
                 else
                 {
@@ -960,6 +761,216 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        private static void DecompMainHelperInvert(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI)
+        {
+            GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s in decompOptions2.link[0].endo)
+            {
+                string s2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
+                if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
+            }
+
+            DecompCheckNumberOfEqsAndEndo(decompDatas, endo);
+
+            GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
+            {
+                for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
+                {
+                    foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
+                    {
+                        if (exo.ContainsKey(kvp.Key) || endo.ContainsKey(kvp.Key))
+                        {
+                        }
+                        else
+                        {
+                            exo.Add(kvp.Key, exo.Count);
+                        }
+                    }
+                }
+            }
+
+            int n = endo.Count + exo.Count;
+
+            //now we have ENDO = decompOptions2.link[parentI].varnames, and EXO = exo
+
+            //consider this: 
+            //1 x1 + 2 x2 + 3 x3 + 4 x4 + 5 x5 = 0 
+            //2 x1 + 3 x2 + 4 x3 + 5 x4 + 6 x5 = 0
+
+            //now if x2, x4, x5 are exo, we skip these in Jacobi, getting:
+            //
+            // [1 3] [x1]  +  [2 4 5] [x2]   =   0
+            // [2 4] [x3]     [3 5 6] [x4]     
+            //                        [x5]
+            //
+            // [x1]  =  - [. .] [2 4 5] [x2]  
+            // [x3]  =    [. .] [3 5 6] [x4]   
+            //                          [x5]
+
+            if (false)
+            {
+                DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+            }
+            decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up
+
+            foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+            {
+
+                double[,] mEndo = new double[endo.Count, endo.Count];
+                double[,] mExo = new double[endo.Count, exo.Count];
+
+                int row = -1;
+                for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
+                {
+                    //In some cases, there is no interaction between the sets, for instance in
+                    //an equation like y[#a] = c[#a] + g[#a]. In that case, we could solve for each age separately,
+                    //but we cannot rule out eqs like y[#a] = (c[#a] + c[#a+1])/2 + g[#a]. This is still recursive,
+                    //if we start to solve for the largest #a, but it illustrates the problem. Perhaps a sparse solver
+                    //would not care anyway. Note that c[#a+1][+1] would be more common, and if this is treated as an
+                    //exogenous, there is no age lead problem. Note also that combinations of #a-1, #a and #a+1 become
+                    //simultaneous (like for time, t).
+                    for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
+                    {
+                        row++;
+                        foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
+                        {
+                            double d = kvp.Value.GetDataSimple(t);
+                            if (endo.ContainsKey(kvp.Key))
+                            {
+                                int col = endo[kvp.Key];
+                                if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
+                                {
+                                    new Error("DECOMP matrix invert problem");
+                                    //throw new GekkoException();
+                                }
+                                mEndo[row, col] = d;
+                            }
+                            else if (exo.ContainsKey(kvp.Key))
+                            {
+                                int col = exo[kvp.Key];
+                                if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
+                                {
+                                    new Error("DECOMP matrix invert problem");
+                                    //throw new GekkoException();
+                                }
+                                mExo[row, col] = d;
+                            }
+                            else
+                            {
+                                throw new GekkoException();
+                            }
+                        }
+                    }
+                }
+
+                //ENDO  0 -- 0  demand[18]¤[0] 2021 = 8.88890000004245
+                //ENDO  0 -- 0  supply[18]¤[0] 2021 = -8.88890000004245
+                //ENDO  0 -- 1  demand[19]¤[0] 2021 = 3.33330000001592
+                //ENDO  0 -- 1  supply[19]¤[0] 2021 = -3.33330000001592
+
+                //ENDO  1 -- 0  c[18]¤[0]      2021 = -6.8889000000329
+                //ENDO  1 -- 0  demand[18]¤[0] 2021 = 8.88890000004245
+                //      1 -- 0  g[18]¤[0]      2021 = -2.00000000000955
+                //ENDO  1 -- 1  c[19]¤[0]      2021 = -1.33330000000637
+                //ENDO  1 -- 1  demand[19]¤[0] 2021 = 3.33330000001592
+                //      1 -- 1  g[19]¤[0]      2021 = -2.00000000000955
+
+                //ENDO  2 -- 0  supply[18]¤[0] 2021 = 8.88890000004245
+                //ENDO  2 -- 0  y[18]¤[0]      2021 = -8.88890000004245
+                //ENDO  2 -- 1  supply[19]¤[0] 2021 = 3.33330000001592
+                //ENDO  2 -- 1  y[19]¤[0]      2021 = -3.33330000001592
+
+                //ENDO  3 -- 0  c[18]¤[0]      2021 = 6.8889000000329
+                //ENDO  3 -- 0  y[18]¤[0]      2021 = -3.55556000011804
+                //      3 -- 0  y[19]¤[+1]     2021 = -3.33336000011065
+                //ENDO  3 -- 1  c[19]¤[0]      2021 = 1.33330000000637
+                //ENDO  3 -- 1  y[19]¤[0]      2021 = -1.33331999994953
+                //      3 -- 1  y[20]¤[+1]     2021 = 0
+
+                //      y18    y19    dem18    dem19   sup18   sup19   c18    c19
+                // ---------------------------------------------------------------------
+                //  1                 8.88             -8.88
+                //  2                           3.33            -3.33
+                //  3                 8.88                             -6.88                   -2 (g18)
+                //  4                           3.33                          -1.33            -2 (g19)
+                //  5 -8.88                              8.88
+                //  6         -3.33                              3.33
+                //  7 -3.55                                             6.88                   -3.33 (y19[+1])
+                //  8         -1.33                                            1.33
+
+                double[,] inverse = null;
+
+                try
+                {
+                    double[,] temp = (double[,])mEndo.Clone();
+                    inverse = Program.InvertMatrix(temp);
+                }
+                catch (Exception e)
+                {
+                    new Error("Matrix inversion for DECOMP failed for period " + t.ToString(), false);
+                    bool nan = false;
+                    foreach (double d in mEndo)
+                    {
+                        if (G.isNumericalError(d))
+                        {
+                            nan = true;
+                            break;
+                        }
+                    }
+                    if (nan)
+                    {
+                        new Error("The matrix contains missing or infinite values", false);
+                    }
+                    throw new GekkoException();
+                }
+
+                double[,] effect = Program.MultiplyMatrices(inverse, mExo);
+
+                //the effect matrix is #endo x #exo
+
+                int varnamesCounter = -1;
+                foreach (string s in decompOptions2.link[parentI].varnames)
+                {
+                    //these are the ones being reported. Is a subset of endo.
+
+                    varnamesCounter++;
+
+                    if (t.EqualsGekkoTime(per1))
+                    {
+                        DecompData dd = new DecompData();
+                        DecompInitDict(dd);
+                        decompDatas.MAIN_data.Add(dd);
+                    }
+
+                    string s3 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
+
+                    Series ts = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[s3];
+                    ts.SetData(t, 1d);
+
+                    int i = endo[s3];  //row
+                    for (int j = 0; j < effect.GetLength(1); j++)
+                    {
+                        //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
+                        //see also #sf94lkjsdjæ
+                        if (decompOptions2.modelType == EModelType.GAMSScalar || effect[i, j] != 0d)
+                        {
+                            foreach (KeyValuePair<string, int> kvp in exo)
+                            {
+                                if (kvp.Value == j)
+                                {
+                                    Series ts2 = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[kvp.Key];
+                                    ts2.SetData(t, effect[i, j]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }   //foreach t
+
+            DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
 
         /// <summary>
@@ -1681,7 +1692,12 @@ namespace Gekko
         /// <returns></returns>
         public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, Data extra, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
-            //
+            // This gets called for each link equation, for instance e5[t]...  Then it is run over t, 
+            // so we are evaluating e5[2001], e5[2002], etc. These t's determine the period of the
+            // contributions, and if e5[2002] depends on x[2001], this will show up
+            // as x[-1] in the 2002-contribution of e5. So if we visualize rows with x[-1], x, x[+1], z, etc.
+            // and cols with 2001, 2002, 2003, etc., each atomic lowest level equation is actually present
+            // separately in these columns.
             //
             // NB: Perhaps use this when migrating "old" ADAM-like DECOMP for models
             //     We can keep DecompLowLevel() for decomp of arbitrary Gekko expression like movavg(...) etc.
