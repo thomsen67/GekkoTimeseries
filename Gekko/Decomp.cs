@@ -1735,16 +1735,15 @@ namespace Gekko
                     //TODO
                     //TODO   this is not pretty
                     //TODO
-                    int iii000 = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
-                    int iii111 = iii000 + 1;
+                    int timeIndex = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
 
                     double y0 = double.NaN;
                     if (extra.type == EDecompBanks.Multiplier)
                     {
                         //normal multiplier like <m>
-                        y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
+                        y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true);
                         d.cellsRef[residualName].SetData(t, y0);
-                        double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
+                        double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false);
                         d.cellsQuo[residualName].SetData(t, y1);
                         double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, true);
                         double x1 = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, false);
@@ -1753,7 +1752,7 @@ namespace Gekko
                         {
                             double x0_after = x0_before + eps;
                             Program.model.modelGamsScalar.SetData(dp.date, dp.variable, true, x0_after);
-                            double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, true);
+                            double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, true);
                             double grad = (y0_after - y0) / eps;
 
                             //if (!G.isNumericalError(grad) && grad != 0d)    //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
@@ -1785,9 +1784,9 @@ namespace Gekko
                     {
                         //work difference like <d>
                         //normal multiplier like <m>
-                        y0 = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
+                        y0 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false);
                         d.cellsQuo[residualName].SetData(t, y0);
-                        double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[iii111].eqNumber, false);
+                        double y1 = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex + 1].eqNumber, false);
                         d.cellsQuo[residualName].SetData(t.Add(1), y1);
                         double x0_before = Program.model.modelGamsScalar.GetData(dp.date, dp.variable, false);
                         double x1 = Program.model.modelGamsScalar.GetData(dp.date + 1, dp.variable, false);
@@ -1796,7 +1795,7 @@ namespace Gekko
                         {
                             double x0_after = x0_before + eps;
                             Program.model.modelGamsScalar.SetData(dp.date, dp.variable, false, x0_after);
-                            double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[iii000].eqNumber, false);
+                            double y0_after = Program.model.modelGamsScalar.Eval(dsh.periods[timeIndex].eqNumber, false);
                             double grad = (y0_after - y0) / eps;
 
                             //if (!G.isNumericalError(grad) && grad != 0d)        //this grad != 0 originates from the Gekko decomp, and only makes sense when excact precedents are not known
