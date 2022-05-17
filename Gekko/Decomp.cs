@@ -1731,10 +1731,7 @@ namespace Gekko
 
                     PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
                     string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
-
-                    //TODO
-                    //TODO   this is not pretty
-                    //TODO
+                                        
                     int timeIndex = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
 
                     double y0 = double.NaN;
@@ -1759,7 +1756,7 @@ namespace Gekko
                             //see also #sf94lkjsdjæ
                             if (!G.isNumericalError(grad))
                             {
-                                int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
+                                int lag2 = dp.date - timeIndex;
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
                                 d.cellsRef[name].SetData(t, x0_before);
                                 d.cellsQuo[name].SetData(t, x1);
@@ -1802,7 +1799,7 @@ namespace Gekko
                             //see also #sf94lkjsdjæ
                             if (!G.isNumericalError(grad))
                             {
-                                int lag2 = 0;  //TODO TODO TODO TODO TODO TODO TODO TODO                                                                        
+                                int lag2 = dp.date - timeIndex;
                                 string name = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, lag2);
                                 d.cellsQuo[name].SetData(t, x0_before); //for decomp period <2002 2002>, this will be 2001
                                 d.cellsQuo[name].SetData(t.Add(1), x1); //for decomp period <2002 2002>, this will be 2002
