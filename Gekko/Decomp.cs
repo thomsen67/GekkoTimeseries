@@ -139,6 +139,7 @@ namespace Gekko
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "n";
 
             DecompOptions2 decompOptions2 = new DecompOptions2();
+            decompOptions2.modelType = G.GetModelType();
             decompOptions2.decompTablesFormat.showErrors = true; //
             decompOptions2.t1 = o.t1;
             decompOptions2.t2 = o.t2;
@@ -217,7 +218,7 @@ namespace Gekko
                 decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, true);  //eqs may be e[a, b] etc.
                 decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
 
-                if (G.GetModelType() == EModelType.GAMSScalar)
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
                     GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in decompOptions2.new_from)
@@ -434,8 +435,6 @@ namespace Gekko
                 else if (operatorOneOf3Types == EContribType.M && !decompDatas.hasM) shouldRecalc = true;
             }
 
-            EModelType modelType = G.GetModelType();
-
             if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse
             {
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
@@ -491,11 +490,6 @@ namespace Gekko
                     }
                 }
 
-
-
-
-
-
                 List<string> expressionTexts = new List<string>();
                 int ii = -1;
                 foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
@@ -505,7 +499,7 @@ namespace Gekko
                     List<DecompData> temp = new List<DecompData>();
 
                     int jj = -1;
-                    if (G.GetModelType() == EModelType.GAMSScalar)
+                    if (decompOptions2.modelType == EModelType.GAMSScalar)
                     {
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
@@ -750,7 +744,7 @@ namespace Gekko
                             {
                                 //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
                                 //see also #sf94lkjsdjæ
-                                if (G.GetModelType() == EModelType.GAMSScalar || effect[i, j] != 0d)
+                                if (decompOptions2.modelType == EModelType.GAMSScalar || effect[i, j] != 0d)
                                 {
                                     foreach (KeyValuePair<string, int> kvp in exo)
                                     {
@@ -1118,7 +1112,7 @@ namespace Gekko
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
         {
-            if (G.GetModelType() == EModelType.Unknown)
+            if (o.modelType == EModelType.Unknown)
             {
                 new Error("DECOMP: A model is not loaded, cf. the MODEL command.");
             }
@@ -1126,9 +1120,7 @@ namespace Gekko
             DecompOptions2 decompOptions = (DecompOptions2)o;
             WindowDecomp w = null;
             w = new WindowDecomp(decompOptions);
-            Globals.windowsDecomp2.Add(w);
-
-            EModelType modelType = G.GetModelType();
+            Globals.windowsDecomp2.Add(w);            
 
             G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
             int count = -1;
@@ -1136,7 +1128,7 @@ namespace Gekko
             {
                 count++;
 
-                if (modelType == EModelType.Gekko)
+                if (decompOptions.modelType == EModelType.Gekko)
                 {
                     //Gekko model
                     //Gekko model
@@ -1159,7 +1151,7 @@ namespace Gekko
                         new Error("Expected 1 link expression");
                     }
                 }
-                else if (modelType == EModelType.GAMSRaw)
+                else if (decompOptions.modelType == EModelType.GAMSRaw)
                 {
                     //GAMS model
                     //GAMS model
@@ -1177,7 +1169,7 @@ namespace Gekko
                         link.expressionText = found.lhs + " = " + found.rhs;
                     }
                 }
-                else if (modelType == EModelType.GAMSScalar)
+                else if (decompOptions.modelType == EModelType.GAMSScalar)
                 {
                     //GAMS scalar model
                     //GAMS scalar model
@@ -2624,7 +2616,7 @@ namespace Gekko
             bool orderNormalize = false;
             if (decompOptions2.decompTablesFormat.showErrors)
             {
-                if (G.GetModelType() == EModelType.GAMSScalar)
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
                     //HMMMMM not sure about this and what it does, or if .GAMS_dsh.Count should be used
                     if (varnames.Count == decompOptions2.link[0].GAMS_dsh.Count)

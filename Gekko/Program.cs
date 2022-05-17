@@ -23457,7 +23457,6 @@ namespace Gekko
             return;
         }
 
-
         public static void Function(double[] arg, ref double func, object obj)
         {
             //Rosenbrock function
@@ -23466,11 +23465,22 @@ namespace Gekko
             func = (a - x) * (a - x) + b * (y - x * x) * (y - x * x);
         }
 
+        /// <summary>
+        /// Invert matrix, may print error. Beware: probably alters the input matrix and returns it as a side-effect?
+        /// </summary>
+        /// <param name="matrix"></param>
+        /// <returns></returns>
         public static double[,] InvertMatrix(double[,] matrix)
         {
             return InvertMatrix(matrix, true);
         }
 
+        /// <summary>
+        /// Inverts matrix. Beware: probably alters the input matrix and returns it as a side-effect?
+        /// </summary>
+        /// <param name="matrix"></param>
+        /// <param name="printError"></param>
+        /// <returns></returns>
         public static double[,] InvertMatrix(double[,] matrix, bool printError)
         {
             int success = 0;
@@ -24511,6 +24521,12 @@ namespace Gekko
             return c;
         }
 
+        /// <summary>
+        /// Multiplies to matrices (arrays)
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static double[,] MultiplyMatrices(double[,] x, double[,] y)
         {
             //  1 2

@@ -2385,6 +2385,8 @@ namespace Gekko
         //public List<List<PeriodAndVariable>> precedentsScalar = null;
         public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
 
+        public EModelType modelType = EModelType.Unknown;
+
         //-------- tranformation start --------------
         public DecompOperatorHelper operatorHelper = new DecompOperatorHelper();
 
@@ -2467,6 +2469,8 @@ namespace Gekko
             d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
             d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
             d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
+
+            d.modelType = this.modelType;
             
             //d.tp = this.tp;
             d.variable = this.variable;
