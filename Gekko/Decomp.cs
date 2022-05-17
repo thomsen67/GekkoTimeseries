@@ -233,7 +233,7 @@ namespace Gekko
                         //Actually there is no time extracted below: the s string hos no time element
                         GekkoTime trash = GekkoTime.tNull;
                         GamsModel.ExtractTimeDimension(s, false, ref equationName, ref trash, ref resultingFullName, out indexes);
-                        
+
 
                         Dictionary<MultidimItem, DecompStartHelper> elements = null;
                         equations.TryGetValue(equationName, out elements);
@@ -250,10 +250,10 @@ namespace Gekko
                         if (element == null)
                         {
                             element = new DecompStartHelper();
-                            element.name = equationName;                            
+                            element.name = equationName;
                             element.indexes = mmi;
                             element.fullName = element.name + element.indexes.GetName();
-                            int periods = GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2);                                                        
+                            int periods = GekkoTime.Observations(Program.model.modelGamsScalar.t0, Program.model.modelGamsScalar.t2);
                             element.periods = new DecompStartHelperPeriod[periods];
                             elements.Add(mmi, element);
                         }
@@ -304,7 +304,7 @@ namespace Gekko
                         Link link = new Link();
                         link.GAMS_dsh = new List<DecompStartHelper>();
                         foreach (KeyValuePair<MultidimItem, DecompStartHelper> kvp2 in kvp.Value)
-                        {                            
+                        {
                             //for each index combination
                             link.GAMS_dsh.Add(kvp2.Value);
                             link.GAMS_eqNumber = counter;
@@ -367,7 +367,7 @@ namespace Gekko
                     break;
                 }
             }
-        }                
+        }
 
         public static string DecompIsSharesOrPercentageTypeHelper(ref string operator1)
         {
@@ -440,7 +440,7 @@ namespace Gekko
                 if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
 
                 bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
-                                
+
                 Data extra = new Data();
                 extra.type = DecompGetType(operator1);
                 if (decompOptions2.data == null)
@@ -453,7 +453,7 @@ namespace Gekko
                     decompOptions2.data.dataCellsGradQuo = new Series(per1.freq, null);
                     decompOptions2.data.dataCellsGradRef = new Series(per1.freq, null);
                     if (extra.type == EDecompBanks.Multiplier)
-                    {                        
+                    {
                         extra.dataCellsGradRef = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
@@ -465,7 +465,7 @@ namespace Gekko
                         }
                     }
                     else if (extra.type == EDecompBanks.Work)
-                    {                        
+                    {
                         extra.dataCellsGradQuo = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
                         {
@@ -477,7 +477,7 @@ namespace Gekko
                         }
                     }
                     else if (extra.type == EDecompBanks.Ref)
-                    {                        
+                    {
                         extra.dataCellsGradRef = new Series(per1.freq, null);
                         foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(-1), per2.Add(-1)))
                         {
@@ -556,7 +556,7 @@ namespace Gekko
                 {
                     if (decompOptions2.modelType == EModelType.GAMSScalar)
                     {
-                        DecompMainHelperInvert(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI);
+                        DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI);
                     }
                     else
                     {
@@ -662,9 +662,9 @@ namespace Gekko
 
                                     if (isLead)
                                     {
-                                        string[] ss = childVariableName.Split('¤');
-                                        int lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
-                                        childVariableName = DecompGetLinkVariableName(ss[0], lag + 1);
+                                        int lag; string name;
+                                        ExtractNameAndLag(childVariableName, out lag, out name);
+                                        childVariableName = DecompGetLinkVariableName(name, lag + 1);
                                     }
 
                                     Series varParent = GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types)[childVariableName];  //will be created
@@ -761,6 +761,13 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        private static void ExtractNameAndLag(string childVariableName, out int lag, out string name)
+        {
+            string[] ss = childVariableName.Split('¤');
+            lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
+            name = ss[0];
         }
 
         private static void DecompMainHelperInvert(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI)
@@ -974,6 +981,206 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Inversion of contributions, for GAMS scalar model
+        /// </summary>
+        /// <param name="per1"></param>
+        /// <param name="per2"></param>
+        /// <param name="decompOptions2"></param>
+        /// <param name="decompDatas"></param>
+        /// <param name="operatorOneOf3Types"></param>
+        /// <param name="parentI"></param>
+        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI)
+        {
+            GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+            {
+                foreach (string s in decompOptions2.link[0].endo)
+                {
+                    string x = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableNameScalar(s, 0, t);
+                    if (!endo.ContainsKey(x))
+                    {
+                        endo.Add(x, endo.Count);
+                    }
+                }
+            }
+
+            //What about residuals here?????
+            //What about residuals here?????  they are not part of precedents
+            //What about residuals here?????
+
+            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+            {
+                foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                {
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    {
+                        int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];
+
+                        //foreach precedent variable
+                        for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                        {
+                            PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                            string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
+                            int date = dp.date;
+                            string x = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableNameScalar(varName, date, Program.model.modelGamsScalar.t0);
+                            if (!(exo.ContainsKey(x) || endo.ContainsKey(x)))
+                            {
+                                //exo
+                                exo.Add(x, exo.Count);
+                            }
+                            else
+                            {
+                                //endo
+                            }
+                        }
+                    }
+                }
+            }
+
+            //TODO: check that number of endo and number of eqs match
+            //TODO: check that number of endo and number of eqs match
+            //TODO: check that number of endo and number of eqs match
+
+            int n = endo.Count + exo.Count;
+
+            decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up
+
+            double[,] mEndo = new double[endo.Count, endo.Count];
+            double[,] mExo = new double[endo.Count, exo.Count];
+
+            int row = -1;
+            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+            {
+                foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                {
+                    row++;
+
+                }
+            }
+
+            //int row = -1;
+            //for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
+            //{
+            //    for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
+            //    {
+            //        //below is individual unrolled ("atomic") equations
+            //        row++;
+            //        DecompDict dd = GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types);
+            //        foreach (KeyValuePair<string, Series> kvp in dd.storage)
+            //        {                        
+            //            int lag; string name;
+            //            ExtractNameAndLag(kvp.Key, out lag, out name);
+            //            foreach (KeyValuePair<string, int> kvp2 in endo)
+            //            {
+
+            //            }
+            //        }
+
+            //        //foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
+            //        //{
+            //        //    double d = kvp.Value.GetDataSimple(t);
+            //        //    if (endo.ContainsKey(kvp.Key))
+            //        //    {
+            //        //        int col = endo[kvp.Key];
+            //        //        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
+            //        //        {
+            //        //            new Error("DECOMP matrix invert problem");
+            //        //            //throw new GekkoException();
+            //        //        }
+            //        //        mEndo[row, col] = d;
+            //        //    }
+            //        //    else if (exo.ContainsKey(kvp.Key))
+            //        //    {
+            //        //        int col = exo[kvp.Key];
+            //        //        if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
+            //        //        {
+            //        //            new Error("DECOMP matrix invert problem");
+            //        //            //throw new GekkoException();
+            //        //        }
+            //        //        mExo[row, col] = d;
+            //        //    }
+            //        //    else
+            //        //    {
+            //        //        throw new GekkoException();
+            //        //    }
+            //        //}
+            //    }
+            //}
+
+            double[,] inverse = null;
+
+            try
+            {
+                double[,] temp = (double[,])mEndo.Clone();
+                inverse = Program.InvertMatrix(temp);
+            }
+            catch (Exception e)
+            {
+                new Error("Matrix inversion for DECOMP failed", false);
+                bool nan = false;
+                foreach (double d in mEndo)
+                {
+                    if (G.isNumericalError(d))
+                    {
+                        nan = true;
+                        break;
+                    }
+                }
+                if (nan)
+                {
+                    new Error("The matrix contains missing or infinite values", false);
+                }
+                throw new GekkoException();
+            }
+
+            double[,] effect = Program.MultiplyMatrices(inverse, mExo);
+
+            //the effect matrix is #endo x #exo
+
+            //int varnamesCounter = -1;
+            //foreach (string s in decompOptions2.link[parentI].varnames)
+            //{
+            //    //these are the ones being reported. Is a subset of endo.
+
+            //    varnamesCounter++;
+
+            //    if (t.EqualsGekkoTime(per1))
+            //    {
+            //        DecompData dd = new DecompData();
+            //        DecompInitDict(dd);
+            //        decompDatas.MAIN_data.Add(dd);
+            //    }
+
+            //    string s3 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
+
+            //    Series ts = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[s3];
+            //    ts.SetData(t, 1d);
+
+            //    int i = endo[s3];  //row
+            //    for (int j = 0; j < effect.GetLength(1); j++)
+            //    {
+            //        //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
+            //        //see also #sf94lkjsdjæ
+            //        if (decompOptions2.modelType == EModelType.GAMSScalar || effect[i, j] != 0d)
+            //        {
+            //            foreach (KeyValuePair<string, int> kvp in exo)
+            //            {
+            //                if (kvp.Value == j)
+            //                {
+            //                    Series ts2 = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[kvp.Key];
+            //                    ts2.SetData(t, effect[i, j]);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
+            DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
+        }
+
+        /// <summary>
         /// Get DECOMP type. Not for "x" type options, and not for stuff like dp or mp --
         /// these return .Unknown. Handles types m, q, d, p, rd, rp.
         /// </summary>
@@ -1073,6 +1280,11 @@ namespace Gekko
                     }
                 }
             }
+        }
+
+        private static string DecompGetLinkVariableNameScalar(string s, int lag, GekkoTime t)
+        {
+            return s + "¤[" + t.Add(lag).ToString() + "]";
         }
 
         private static string DecompGetLinkVariableName(string s, int lag)
