@@ -1735,7 +1735,7 @@ namespace Gekko
                     //TODO
                     //TODO   this is not pretty
                     //TODO
-                    int iii000 = GekkoTime.Observations(new GekkoTime(EFreq.A, 2001, 1), t) - 1;
+                    int iii000 = GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) - 1;
                     int iii111 = iii000 + 1;
 
                     double y0 = double.NaN;

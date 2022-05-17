@@ -895,6 +895,7 @@ namespace Gekko
             int semis = 0;
 
             helper.t0 = helper.t1;  //could perhaps lag this later on... ?
+            helper.t3 = helper.t2;  //could perhaps lead this later on... ?
             int periods = GekkoTime.Observations(helper.t1, helper.t2);
             helper.a = new double[periods][];
             for (int i = 0; i < helper.a.GetLength(0); i++) helper.a[i] = new double[helper.dict_FromVarNameToANumber.Count]; //beware: 0-based            
@@ -4492,6 +4493,7 @@ namespace Gekko
         public GekkoTime t0 = GekkoTime.tNull;
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
+        public GekkoTime t3 = GekkoTime.tNull;
 
         // ================================ fields below are cleared for each new equation ==========
 
