@@ -1010,29 +1010,76 @@ namespace Gekko
             //What about residuals here?????  they are not part of precedents
             //What about residuals here?????
 
-            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+            double[,] mEndo = null;
+            double[,] mExo = null;
+            for (int k = 0; k < 2; k++)  //k=0 just counts endo/exo
             {
-                foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
+                if (k != 0)
                 {
-                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    mEndo = new double[endo.Count, endo.Count];
+                    mExo = new double[endo.Count, exo.Count];
+                }
+                int row = -1;
+                int ii = -1;
+                foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+                {
+                    ii++;
+                    int jj = -1;
+                    foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
-                        int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];
+                        jj++;   //hmmmmmmmm <----------------should jj be here or above??
+                        DecompDict dd = GetDecompDatas(decompDatas.storage[ii][jj], operatorOneOf3Types);
 
-                        //foreach precedent variable
-                        for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
-                            PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
-                            string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
-                            int date = dp.date;
-                            string x = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableNameScalar(varName, date, Program.model.modelGamsScalar.t0);
-                            if (!(exo.ContainsKey(x) || endo.ContainsKey(x)))
+                            row++;
+                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];                            
+
+                            //foreach precedent variable
+                            for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
                             {
-                                //exo
-                                exo.Add(x, exo.Count);
-                            }
-                            else
-                            {
-                                //endo
+                                PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                                string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
+                                int date = dp.date;
+                                string x1 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableNameScalar(varName, date, Program.model.modelGamsScalar.t0);
+                                string x2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(varName, date - GekkoTime.Observations(Program.model.modelGamsScalar.t0, t) + 1);
+
+                                if (k == 0)
+                                {
+                                    if (exo.ContainsKey(x1) || endo.ContainsKey(x1))
+                                    {
+                                        //endo                                
+                                    }
+                                    else
+                                    {
+                                        //exo
+                                        exo.Add(x1, exo.Count);
+                                    }
+                                }
+                                else
+                                {
+                                    //k == 1
+                                    if (endo.ContainsKey(x1))
+                                    {
+                                        int col = endo[x1];
+                                        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1))) new Error("DECOMP matrix invert problem");                                        
+                                        Series ts = dd.storage[x2];
+                                        double d = ts.GetDataSimple(t);
+                                        mEndo[row, col] = d;
+                                    }
+                                    else if (exo.ContainsKey(x1))
+                                    {
+                                        int col = exo[x1];
+                                        if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1))) new Error("DECOMP matrix invert problem");
+                                        Series ts = dd.storage[x2];
+                                        double d = ts.GetDataSimple(t);
+                                        mExo[row, col] = d;
+                                    }
+                                    else
+                                    {
+                                        new Error("Decomp problem");
+                                    }
+                                }
                             }
                         }
                     }
@@ -1047,18 +1094,8 @@ namespace Gekko
 
             decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up
 
-            double[,] mEndo = new double[endo.Count, endo.Count];
-            double[,] mExo = new double[endo.Count, exo.Count];
-
-            int row = -1;
-            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
-            {
-                foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
-                {
-                    row++;
-
-                }
-            }
+            //double[,] mEndo = new double[endo.Count, endo.Count];
+            //double[,] mExo = new double[endo.Count, exo.Count];            
 
             //int row = -1;
             //for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
