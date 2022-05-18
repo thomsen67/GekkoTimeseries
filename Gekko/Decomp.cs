@@ -993,6 +993,8 @@ namespace Gekko
         {
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<int, string> endoReverse = new Dictionary<int, string>();
+            Dictionary<int, string> exoReverse = new Dictionary<int, string>();
 
             foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
             {
@@ -1001,7 +1003,9 @@ namespace Gekko
                     string x = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableNameScalar(s, 0, t);
                     if (!endo.ContainsKey(x))
                     {
-                        endo.Add(x, endo.Count);
+                        int c = endo.Count;
+                        endo.Add(x, c);
+                        endoReverse.Add(c, x);
                     }
                 }
             }
@@ -1012,6 +1016,7 @@ namespace Gekko
 
             double[,] mEndo = null;
             double[,] mExo = null;
+
             for (int k = 0; k < 2; k++)  //k=0 just counts endo/exo
             {
                 if (k != 0)
@@ -1053,7 +1058,9 @@ namespace Gekko
                                     else
                                     {
                                         //exo
-                                        exo.Add(x1, exo.Count);
+                                        int c = exo.Count;
+                                        exo.Add(x1, c);
+                                        exoReverse.Add(c, x1);
                                     }
                                 }
                                 else
@@ -1092,59 +1099,7 @@ namespace Gekko
 
             int n = endo.Count + exo.Count;
 
-            decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up
-
-            //double[,] mEndo = new double[endo.Count, endo.Count];
-            //double[,] mExo = new double[endo.Count, exo.Count];            
-
-            //int row = -1;
-            //for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
-            //{
-            //    for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
-            //    {
-            //        //below is individual unrolled ("atomic") equations
-            //        row++;
-            //        DecompDict dd = GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types);
-            //        foreach (KeyValuePair<string, Series> kvp in dd.storage)
-            //        {                        
-            //            int lag; string name;
-            //            ExtractNameAndLag(kvp.Key, out lag, out name);
-            //            foreach (KeyValuePair<string, int> kvp2 in endo)
-            //            {
-
-            //            }
-            //        }
-
-            //        //foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
-            //        //{
-            //        //    double d = kvp.Value.GetDataSimple(t);
-            //        //    if (endo.ContainsKey(kvp.Key))
-            //        //    {
-            //        //        int col = endo[kvp.Key];
-            //        //        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1)))
-            //        //        {
-            //        //            new Error("DECOMP matrix invert problem");
-            //        //            //throw new GekkoException();
-            //        //        }
-            //        //        mEndo[row, col] = d;
-            //        //    }
-            //        //    else if (exo.ContainsKey(kvp.Key))
-            //        //    {
-            //        //        int col = exo[kvp.Key];
-            //        //        if (!(row < mExo.GetLength(0) && col < mExo.GetLength(1)))
-            //        //        {
-            //        //            new Error("DECOMP matrix invert problem");
-            //        //            //throw new GekkoException();
-            //        //        }
-            //        //        mExo[row, col] = d;
-            //        //    }
-            //        //    else
-            //        //    {
-            //        //        throw new GekkoException();
-            //        //    }
-            //        //}
-            //    }
-            //}
+            decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up            
 
             double[,] inverse = null;
 
@@ -1172,47 +1127,73 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            double[,] effect = Program.MultiplyMatrices(inverse, mExo);
+            double[,] effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
 
             //the effect matrix is #endo x #exo
 
-            //int varnamesCounter = -1;
-            //foreach (string s in decompOptions2.link[parentI].varnames)
-            //{
-            //    //these are the ones being reported. Is a subset of endo.
+            {
 
-            //    varnamesCounter++;
+                DecompData dd2 = new DecompData();
+                DecompInitDict(dd2);
+                decompDatas.MAIN_data.Add(dd2);
 
-            //    if (t.EqualsGekkoTime(per1))
-            //    {
-            //        DecompData dd = new DecompData();
-            //        DecompInitDict(dd);
-            //        decompDatas.MAIN_data.Add(dd);
-            //    }
+                for (int row = 0; row < endo.Count; row++)
+                {
+                    for (int col = 0; col < exo.Count; col++)
+                    {
+                        double d = effect[row, col];
 
-            //    string s3 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
+                        string endoName = endoReverse[row];
+                        int etime; string ename;
+                        ExtractNameAndLag(endoName, out etime, out ename);
 
-            //    Series ts = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[s3];
-            //    ts.SetData(t, 1d);
+                        string exoName = exoReverse[col];
+                        int xtime; string xname;
+                        ExtractNameAndLag(exoName, out xtime, out xname);
 
-            //    int i = endo[s3];  //row
-            //    for (int j = 0; j < effect.GetLength(1); j++)
-            //    {
-            //        //this != 0 originates from the Gekko non-scalar decomp, and only makes sense when excact precedents are not known
-            //        //see also #sf94lkjsdjæ
-            //        if (decompOptions2.modelType == EModelType.GAMSScalar || effect[i, j] != 0d)
-            //        {
-            //            foreach (KeyValuePair<string, int> kvp in exo)
-            //            {
-            //                if (kvp.Value == j)
-            //                {
-            //                    Series ts2 = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[kvp.Key];
-            //                    ts2.SetData(t, effect[i, j]);
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+                        int lag = xtime - etime;
+                        GekkoTime time = new GekkoTime(EFreq.A, etime, 1);
+                        string newName = DecompGetLinkVariableName(xname, lag);
+                        int NUL = 0;
+                        Series ts2 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[newName];
+                        ts2.SetData(time, effect[row, col]);
+                    }
+                }
+
+                //GekkoTime t = GekkoTime.tNull;
+                //int varnamesCounter = -1;
+                //foreach (string s in decompOptions2.link[parentI].varnames)
+                //{
+                //    //these are the ones being reported. Is a subset of endo.
+
+                //    varnamesCounter++;
+
+                //    if (t.EqualsGekkoTime(per1))
+                //    {
+                //        DecompData dd = new DecompData();
+                //        DecompInitDict(dd);
+                //        decompDatas.MAIN_data.Add(dd);
+                //    }
+
+                //    string s3 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
+
+                //    Series ts = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[s3];
+                //    ts.SetData(t, 1d);
+
+                //    int i = endo[s3];  //row
+                //    for (int j = 0; j < effect.GetLength(1); j++)
+                //    {
+                //        foreach (KeyValuePair<string, int> kvp in exo)
+                //        {
+                //            if (kvp.Value == j)
+                //            {
+                //                Series ts2 = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[kvp.Key];
+                //                ts2.SetData(t, effect[i, j]);
+                //            }
+                //        }
+                //    }
+                //}
+            }
 
             DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
         }
