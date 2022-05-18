@@ -750,7 +750,7 @@ namespace Gekko
             List<DecompData> decompDatasSupremeClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.MAIN_data) decompDatasSupremeClone.Add(dd.DeepClone());
 
-            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
+            Table table = Decomp.DecompPivotToTable(per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);
 
             if (false)
             {
@@ -2139,7 +2139,6 @@ namespace Gekko
         /// <summary>
         /// Transforms a pivot table from DecompMain() into a table suitable for showing in the Gekko GUI.
         /// </summary>
-        /// <param name="main_varnames"></param>
         /// <param name="per1"></param>
         /// <param name="per2"></param>
         /// <param name="decompDatasSupremeClone"></param>
@@ -2152,8 +2151,9 @@ namespace Gekko
         /// <param name="decompOptions2"></param>
         /// <param name="frame"></param>
         /// <param name="operatorOneOf3Types"></param>
+        /// 
         /// <returns></returns>
-        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupremeClone, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
+        public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupremeClone, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
         {
             int parentI = 0;
 
