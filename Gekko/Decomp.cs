@@ -1017,6 +1017,9 @@ namespace Gekko
             double[,] mEndo = null;
             double[,] mExo = null;
 
+            //The loop here actually runs 2 times (over k). First time it just gathers elements for exo and exoReverse,
+            //because the size of exo is used the second time.
+            //Maybe a bit inefficient?
             for (int k = 0; k < 2; k++)  //k=0 just counts endo/exo
             {
                 if (k != 0)
@@ -1032,13 +1035,13 @@ namespace Gekko
                     int jj = -1;
                     foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                     {
-                        jj++;   //hmmmmmmmm <----------------should jj be here or above??
+                        jj++;
                         DecompDict dd = GetDecompDatas(decompDatas.storage[ii][jj], operatorOneOf3Types);
 
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
                             row++;
-                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];                            
+                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];
 
                             //foreach precedent variable
                             for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
@@ -1051,6 +1054,10 @@ namespace Gekko
 
                                 if (k == 0)
                                 {
+                                    // -----------
+                                    // First time
+                                    // -----------
+
                                     if (exo.ContainsKey(x1) || endo.ContainsKey(x1))
                                     {
                                         //endo                                
@@ -1065,11 +1072,15 @@ namespace Gekko
                                 }
                                 else
                                 {
+                                    // ------------
+                                    // Second time
+                                    // ------------
+
                                     //k == 1
                                     if (endo.ContainsKey(x1))
                                     {
                                         int col = endo[x1];
-                                        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1))) new Error("DECOMP matrix invert problem");                                        
+                                        if (!(row < mEndo.GetLength(0) && col < mEndo.GetLength(1))) new Error("DECOMP matrix invert problem");
                                         Series ts = dd.storage[x2];
                                         double d = ts.GetDataSimple(t);
                                         mEndo[row, col] = d;
@@ -1131,83 +1142,56 @@ namespace Gekko
 
             //the effect matrix is #endo x #exo
 
+            DecompData dd2 = new DecompData();
+            DecompInitDict(dd2);
+            decompDatas.MAIN_data.Add(dd2);
+
+            //List<string> selected = new List<string>();
+            //foreach (string s in decompOptions2.new_select)
+            //{
+            //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+            //    {                    
+            //        string s = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(decompOptions2.link[i].varnames[n], 0);
+            //    }
+            //}
+
+            for (int row = 0; row < endo.Count; row++)
             {
+                //
+                // Not extremely pretty, but what else to do?
+                // The period of the variable is not checked/matched at all (only the name), 
+                // but that is perhaps not
+                // necessary, since the period has already been filtered by the DECOMP time period.
+                int lag; string name;
+                ExtractNameAndLag(endoReverse[row], out lag, out name);                
+                if (!decompOptions2.new_select.Contains(name.Split(':')[1], StringComparer.OrdinalIgnoreCase)) continue;
 
-                DecompData dd2 = new DecompData();
-                DecompInitDict(dd2);
-                decompDatas.MAIN_data.Add(dd2);
-
-                for (int row = 0; row < endo.Count; row++)
+                for (int col = 0; col < exo.Count; col++)
                 {
-                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
-                    if (!endoReverse[row].Contains(":y")) continue;
+                    string endoName = endoReverse[row];
+                    int etime; string ename;
+                    ExtractNameAndLag(endoName, out etime, out ename);
 
-                    for (int col = 0; col < exo.Count; col++)
+                    string exoName = exoReverse[col];
+                    int xtime; string xname;
+                    ExtractNameAndLag(exoName, out xtime, out xname);
+
+                    string enewName = DecompGetLinkVariableName(ename, 0);
+                    int xlag = xtime - etime;
+                    GekkoTime time = new GekkoTime(EFreq.A, etime, 1);
+                    string xnewName = DecompGetLinkVariableName(xname, xlag);
+
+                    int NUL = 0;
+                    Series ts2 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[xnewName];
+                    ts2.SetData(time, effect[row, col]);
+
+                    if (col == 0)
                     {
-                        string endoName = endoReverse[row];
-                        int etime; string ename;
-                        ExtractNameAndLag(endoName, out etime, out ename);
-                        
-                        string exoName = exoReverse[col];
-                        int xtime; string xname;
-                        ExtractNameAndLag(exoName, out xtime, out xname);
-
-                        string enewName = DecompGetLinkVariableName(ename, 0);
-                        int xlag = xtime - etime;
-                        GekkoTime time = new GekkoTime(EFreq.A, etime, 1);
-                        string xnewName = DecompGetLinkVariableName(xname, xlag);
-
-                        int NUL = 0;
-                        Series ts2 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[xnewName];
-                        ts2.SetData(time, effect[row, col]);
-
-                        if (col == 0)
-                        {
-                            //only do it once
-                            Series ts3 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[enewName];
-                            ts3.SetData(time, 1d);
-                        }
-
+                        //only do it once
+                        Series ts3 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[enewName];
+                        ts3.SetData(time, 1d);
                     }
                 }
-
-                //GekkoTime t = GekkoTime.tNull;
-                //int varnamesCounter = -1;
-                //foreach (string s in decompOptions2.link[parentI].varnames)
-                //{
-                //    //these are the ones being reported. Is a subset of endo.
-
-                //    varnamesCounter++;
-
-                //    if (t.EqualsGekkoTime(per1))
-                //    {
-                //        DecompData dd = new DecompData();
-                //        DecompInitDict(dd);
-                //        decompDatas.MAIN_data.Add(dd);
-                //    }
-
-                //    string s3 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
-
-                //    Series ts = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[s3];
-                //    ts.SetData(t, 1d);
-
-                //    int i = endo[s3];  //row
-                //    for (int j = 0; j < effect.GetLength(1); j++)
-                //    {
-                //        foreach (KeyValuePair<string, int> kvp in exo)
-                //        {
-                //            if (kvp.Value == j)
-                //            {
-                //                Series ts2 = GetDecompDatas(decompDatas.MAIN_data[varnamesCounter], operatorOneOf3Types)[kvp.Key];
-                //                ts2.SetData(t, effect[i, j]);
-                //            }
-                //        }
-                //    }
-                //}
             }
 
             DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
@@ -2338,7 +2322,7 @@ namespace Gekko
                             }
                         }
 
-                        double d = DecomposePutIntoTable2HelperOperators(decompDatasSupremeClone[super], operator1, smpl, lhs, t2, varname);
+                        double d = DecomposePutIntoTable2HelperOperators(decompDatasSupremeClone[super], operator1, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
 
                         FrameLightRow dr = new FrameLightRow(frame);
                         dr.Set(frame, col_equ, new CellLight(super.ToString()));
@@ -2982,7 +2966,7 @@ namespace Gekko
             //File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
 
-        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
+        public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname, bool isScalarModel)
         {
             double d = double.NaN;
 
@@ -3008,7 +2992,7 @@ namespace Gekko
             // TODO TODO TODO is this a hack or not?
             // TODO TODO TODO
             // TODO TODO TODO
-            if (G.GetModelType() == EModelType.GAMSScalar && G.isNumericalError(d)) d = 0d;
+            if (isScalarModel && G.isNumericalError(d)) d = 0d;
 
             return d;
         }
