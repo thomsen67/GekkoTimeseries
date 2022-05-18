@@ -2406,7 +2406,7 @@ namespace Gekko
                 }
             }
 
-            if (Globals.decompUnitCsvPivot)
+            if (false && Globals.decompUnitCsvPivot)
             {
                 WriteDatatableTocsv(frame);
             }
@@ -2978,11 +2978,9 @@ namespace Gekko
                 if (s != null) s = s.Substring(0, s.Length - "; ".Length);
                 sb.AppendLine(s);
             }
-            //File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
-            File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
+            File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
+            //File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
-
-
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
         {
@@ -3004,6 +3002,13 @@ namespace Gekko
             {
                 //do nothing
             }
+
+            // TODO TODO TODO
+            // TODO TODO TODO
+            // TODO TODO TODO is this a hack or not?
+            // TODO TODO TODO
+            // TODO TODO TODO
+            if (G.GetModelType() == EModelType.GAMSScalar && G.isNumericalError(d)) d = 0d;
 
             return d;
         }
