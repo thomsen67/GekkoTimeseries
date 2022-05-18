@@ -1693,7 +1693,143 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            //if (false && Globals.runningOnTTComputer) GamsModel.GamsTest();
+            if (true && Globals.runningOnTTComputer)
+            {
+                string file = @"c:\Thomas\Desktop\gekko\testing\skabelon.xlsx";
+                string sheetName = "Ark2";
+                TableLight matrix = new TableLight();
+
+                if (!File.Exists(file))
+                {
+                    new Error("File " + file + " does not seem to exist");
+                    //throw new GekkoException();
+                }
+
+                WriteXlsError(file);
+
+                try
+                {
+
+                    using (ExcelPackage excel2 = new ExcelPackage(new FileInfo(file)))
+                    {
+                        ExcelWorksheet ws = null;
+                        if (sheetName != null)
+                        {
+                            ws = excel2.Workbook.Worksheets[sheetName];
+                            if (ws == null)
+                            {
+                                new Error("Could not find sheet '" + sheetName + "' inside " + file);
+                                //throw new GekkoException();
+                            }
+                        }
+                        else
+                        {
+                            ws = excel2.Workbook.Worksheets.First<ExcelWorksheet>();
+                        }
+
+                        if (ws.Dimension == null)
+                        {
+                            new Error("It seems the sheet is empty.");
+                        }
+                        ExcelCellAddress start = ws.Dimension.Start;
+                        ExcelCellAddress end = ws.Dimension.End;
+
+                        object[,] intput = (object[,])ws.Cells[1, 1, end.Row, end.Column].Value;
+
+                        ExcelRange zz = ws.Cells[3, 3];
+                        string s = zz.Style.Border.Left.Style.ToString() + " " + zz.Style.Border.Right.Style.ToString() + " " + zz.Style.Border.Top.Style.ToString() + " " + zz.Style.Border.Bottom.Style.ToString();
+                        s = zz.Text;
+
+                        zz = ws.Cells[7, 3];
+                        s = zz.Style.Border.Left.Style.ToString() + " " + zz.Style.Border.Right.Style.ToString() + " " + zz.Style.Border.Top.Style.ToString() + " " + zz.Style.Border.Bottom.Style.ToString();
+
+                        zz = ws.Cells[2, 2];
+                        s = zz.Comment.Text;
+
+                        int rows2 = intput.GetLength(0);
+                        int cols2 = intput.GetLength(1);
+
+                        //beware, this array is 0-based
+                        for (int i = 0; i < end.Row; i++)
+                        { // Row by row...
+                            for (int j = 0; j < end.Column; j++)
+                            { // ... Cell by cell...
+
+                                Object temp = intput[i, j];
+                                if (temp == null) continue;
+                                CellLight cell;
+                                Type t = temp.GetType();
+                                if (t == typeof(double))
+                                {
+                                    cell = new CellLight((double)temp);
+                                }
+                                else if (t == typeof(DateTime))
+                                {
+                                    cell = new CellLight((DateTime)temp);
+                                }
+                                else if (t == typeof(int))
+                                {
+                                    int iData = (int)temp;
+
+                                    //-2146826281 = #Div/0!
+                                    //-2146826246 = #N/A
+                                    //-2146826259 = #Name?
+                                    //-2146826288 = #Null!
+                                    //-2146826252 = #Num!
+                                    //-2146826265 = #Ref!
+                                    //-2146826273 = #Value!
+
+                                    if (iData == -2146826246)
+                                    {
+                                        //just like it is in a csv file. The -2146826246 is really a hexadecimal error code from Excel, stating that the number is N/A.
+                                        cell = new CellLight("#N/A");
+                                    }
+                                    else if (iData == -2146826259)
+                                    {
+                                        cell = new CellLight("#Name?");
+                                    }
+                                    else if (iData == -2146826281)
+                                    {
+                                        cell = new CellLight("#Div/0");
+                                    }
+                                    else
+                                    {
+                                        cell = new CellLight((double)iData);
+                                    }
+                                }
+                                else if (temp.GetType() == typeof(string))
+                                {
+                                    cell = new CellLight((string)temp);
+                                }
+                                else if (temp.GetType() == typeof(OfficeOpenXml.ExcelErrorValue))
+                                {
+                                    cell = new CellLight(double.NaN);
+                                }
+                                else
+                                {
+                                    Type tt = temp.GetType();
+                                    string ttt = temp.GetType().ToString();
+                                    cell = new CellLight("[data not recognized error]");
+                                }
+                                matrix.Add(i + 1, j + 1, cell);  //i and j are 0-based, matrix needs to be 1-based.
+
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (!(e is GekkoException))
+                    {
+                        if (e.Message != null && e.Message != "")
+                        {
+                            new Error(e.Message, false);
+                            WriteExcelError();
+                        }
+                    }
+                    throw;
+                }
+            }
 
             if (false && Globals.runningOnTTComputer)
             {
