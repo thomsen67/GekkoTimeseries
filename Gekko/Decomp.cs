@@ -1139,24 +1139,39 @@ namespace Gekko
 
                 for (int row = 0; row < endo.Count; row++)
                 {
+                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    //HACK HACK HACK HACK HACK HACK HACK HACK HACK
+                    if (!endoReverse[row].Contains(":y")) continue;
+
                     for (int col = 0; col < exo.Count; col++)
                     {
-                        double d = effect[row, col];
-
                         string endoName = endoReverse[row];
                         int etime; string ename;
                         ExtractNameAndLag(endoName, out etime, out ename);
-
+                        
                         string exoName = exoReverse[col];
                         int xtime; string xname;
                         ExtractNameAndLag(exoName, out xtime, out xname);
 
-                        int lag = xtime - etime;
+                        string enewName = DecompGetLinkVariableName(ename, 0);
+                        int xlag = xtime - etime;
                         GekkoTime time = new GekkoTime(EFreq.A, etime, 1);
-                        string newName = DecompGetLinkVariableName(xname, lag);
+                        string xnewName = DecompGetLinkVariableName(xname, xlag);
+
                         int NUL = 0;
-                        Series ts2 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[newName];
+                        Series ts2 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[xnewName];
                         ts2.SetData(time, effect[row, col]);
+
+                        if (col == 0)
+                        {
+                            //only do it once
+                            Series ts3 = GetDecompDatas(decompDatas.MAIN_data[NUL], operatorOneOf3Types)[enewName];
+                            ts3.SetData(time, 1d);
+                        }
+
                     }
                 }
 
