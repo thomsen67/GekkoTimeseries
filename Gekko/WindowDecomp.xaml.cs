@@ -1734,7 +1734,7 @@ namespace Gekko
                         new Error("Cannot show decomposition with both 'raw' and 'shares' option at the same time");
                     }
                     this.decompOptions2.prtOptionLower = transformationCodeAugmented;
-                }                
+                }
 
                 //"x" and "s" are mutually exclusive: in raw mode shares are not meaningful
                 //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used                
@@ -1753,13 +1753,13 @@ namespace Gekko
                 if (this.decompOptions2.prtOptionLower.StartsWith("x")) isRaw = true;
 
                 GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-                
+
                 IVariable y0a = null;
                 IVariable y0aRef = null;
 
                 frame = new FrameLight();
                 Table table = Decomp.DecompMain(smpl, per1, per2, operator1, isShares, this.decompOptions2, frame, refresh, ref this.decompDatas);
-                
+
                 string s = FindEquationText2(this.decompOptions2);
                 equation.Text = s;
                 //
@@ -1781,13 +1781,17 @@ namespace Gekko
                     ClearGrid();
                     MakeGuiTable2(table, this.decompOptions2);
                 }
-                
+
                 return;
 
             }
             catch (Exception e)
             {
-                if (!G.IsUnitTesting())
+                if (G.IsUnitTesting())
+                {
+                    throw e;  //we want that error for unist tests!
+                }
+                else
                 {
                     this.isClosing = true;
                     MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");

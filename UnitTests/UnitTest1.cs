@@ -11186,7 +11186,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(5, 2).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 3).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 4).number, 0.0000d, 0.0001);
-        }        
+        }
 
         [TestMethod]
         public void _Test_DecompSimul3()
@@ -11225,11 +11225,34 @@ namespace UnitTests
             // [y2]   =   [ 0.21/0.4-0.3   0.09/0.4+0.3   0.7/0.4-1    0.3/0.4+1 ]  [y3]
             //                                                                      [g1]
             //                                                                      [g2]
-            // Hvis kun g1 og g2 ændrer sig:
+            // If only g1 and g2 change
             //
             // y1 = 1.75 * g1 + 0.75 * g2
             // y2 = 0.75 * g1 + 1.75 * g2
             //
+            //
+            // Multiplier, one period: 2001
+            // y1 = 1/0.7 * (0.3 * y0 + 0.3 * y2 + g1)
+            // y0 changes 0
+            // y2 changes 5
+            // g1 changes 2
+            // In all = 0.3/0.7 * 5 + 1/0.7 * 2 = 5
+            //
+            // Multiplier, one period: 2002
+            // y2 = 1/0.7 * (0.3 * y1 + 0.3 * y3 + g2)
+            // y1 changes 5
+            // y3 changes 0
+            // g2 changes 2
+            // In all = 0.3/0.7 * 5 + 1/0.7 * 2 = 5
+            //
+            // Difference, one period: 2002
+            // y2 = 1/0.7 * (0.3 * y1 + 0.3 * y3 + g2)
+            // g2 changes 20
+            // y3 changes  4
+            // y1 changes 4
+            // In all = 0.3/0.7 * 4 + 0.3/0.7 * 4 + 1/0.7 * 20 = 32
+
+            int i;
             double[,] a = new double[2, 4];
             a[0, 0] = 0.21d / 0.4d;
             a[0, 1] = 0.09d / 0.4d;
@@ -11258,20 +11281,40 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("model <gms> simul2.zip;");
             // ----------------            
-            I("y <2000 2003> = 500, 499, 531, 540;"); 
-            I("c <2001 2002> = 459, 471;"); 
-            I("g <2001 2002> = 40, 60;"); 
+            I("y <2000 2003> = 500, 499, 531, 540;");
+            I("c <2001 2002> = 459, 471;");
+            I("g <2001 2002> = 40, 60;");
             I("clone;");  //ref
             I("y <2000 2003> = 500, 504, 536, 540;");
             I("c <2001 2002> = 462, 474;");
             I("g <2001 2002> = 42, 62;");
 
-            Gekko.Table table = null;            
+            Gekko.Table table = null;
 
             ModelGamsScalar.FlushAAndRArrays();
             Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
             Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
-                        
+
+            if (false)
+            {
+                // ----------------------------------------
+                // 2002-2002, difference
+                // ----------------------------------------
+
+                Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                I("decomp3 <2002 2002 d> y from e1, e2 endo y, c;");
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                Assert.AreEqual(table.Get(2, 2).number, 32d - 0.3d / 0.7d * 4d - 0.3d / 0.7d * 4d, 0.0001);
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g");
+                Assert.AreEqual(table.Get(3, 2).number, 1d / 0.7d * 20d, 0.0001);
+            }
+
+            // ----------------------------------------
+            // 2001-2002, multiplier
+            // ----------------------------------------
+
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2001 2002 m> y from e1, e2 endo y, c;");
             table = Globals.lastDecompTable;
@@ -11284,10 +11327,14 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
 
+            // ----------------------------------------
+            // 2001-2002,  multiplier, showing lags/leads
+            // ----------------------------------------
+
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2001 2002 m> y from e1, e2 endo y, c rows vars, lags cols time;");
             table = Globals.lastDecompTable;
-            int i = 0;
+            i = 0;
             i++;
             Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2001");
             Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2002");
@@ -11323,6 +11370,70 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-2]");
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
             Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
+
+            // ----------------------------------------
+            // subset of time period, 2001-2001, multiplier, showing lags/leads
+            // ----------------------------------------
+
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            I("decomp3 <2001 2001 m> y from e1, e2 endo y, c rows vars, lags cols time;");
+            table = Globals.lastDecompTable;
+            i = 0;
+            i++;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2001");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 5.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+
+            // ----------------------------------------
+            // subset of time period, 2002-2002, multiplier, showing lags/leads
+            // ----------------------------------------
+
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            I("decomp3 <2002 2002 m> y from e1, e2 endo y, c rows vars, lags cols time;");
+            table = Globals.lastDecompTable;
+            i = 0;
+            i++;
+            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2002");
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 5.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g | [0]");
+            Assert.AreEqual(table.Get(i, 2).number, 1d / 0.7d * 2d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);                       
+
+            // ----------------------------------------
+            // 2002-2002, difference, showing lags/leads
+            // ----------------------------------------
+
+            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            I("decomp3 <2002 2002 d> y from e1, e2 endo y, c rows vars, lags cols time;");            
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | [0]");
+            Assert.AreEqual(table.Get(2, 2).number, 32d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g | [0]");
+            Assert.AreEqual(table.Get(3, 2).number, 1d / 0.7d * 20d, 0.0001);
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "y | [+1]");
+            Assert.AreEqual(table.Get(4, 2).number, 0.3d / 0.7d * 4d, 0.0001);
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | [-1]");
+            Assert.AreEqual(table.Get(5, 2).number, 0.3d / 0.7d * 4d, 0.0001);
+
         }
 
 
