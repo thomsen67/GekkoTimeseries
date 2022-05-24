@@ -1326,9 +1326,17 @@ namespace Gekko
 
         private static void ConvertFromTurtleName(string childVariableName, out int lag, out string name)
         {
-            string[] ss = childVariableName.Split('¤');
-            lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
-            name = ss[0];
+            if (childVariableName == null)
+            {
+                lag = -12345;
+                name = null;
+            }
+            else
+            {
+                string[] ss = childVariableName.Split('¤');
+                lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
+                name = ss[0];
+            }
         }
 
         // ----------------------------
@@ -2429,6 +2437,10 @@ namespace Gekko
             Table tab = new Table();
             tab.writeOnce = true;
 
+            int xlag = 0; string xxname = null;
+            ConvertFromTurtleName(decompDatasSupremeClone[parentI].lhs, out xlag, out xxname);
+            string xname = null; if (xxname != null) xname = G.Chop_RemoveBank(xxname);
+
             DecomposeReplaceVars(decompOptions2.rows, col_t, col_variable, col_lag, col_universe, col_equ);
             DecomposeReplaceVars(decompOptions2.cols, col_t, col_variable, col_lag, col_universe, col_equ);
             DecomposeReplaceVars(decompOptions2.filters, col_t, col_variable, col_lag, col_universe, col_equ);
@@ -2456,7 +2468,13 @@ namespace Gekko
             //Aggregation
 
             List<string> varnames = decompOptions2.link[parentI].varnames;
-            string lhsName = varnames[0];
+            //string lhsName = varnames[0];      
+
+            bool hasLag = false;
+            if (decompOptions2.rows.Contains(col_lag) || decompOptions2.cols.Contains(col_lag))
+            {
+                hasLag = true;
+            }
 
             int i7 = -1;
             foreach (FrameLightRow row in frame.rows)
@@ -2493,10 +2511,10 @@ namespace Gekko
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {                    
                     string rowName = row.Get(frame, col_variable).text;
-                    string rowLag = row.Get(frame, col_lag).text;
-                    if (G.Equal(lhsName, rowName) && rowLag != "[0]")
+                    string rowLag = row.Get(frame, col_lag).text;                    
+                    if (!hasLag && G.Equal(xname, rowName) && rowLag != "[0]")
                     {
-                        //more = " extra";
+                        more = " extra";
                     }
                 }
 
@@ -2929,11 +2947,7 @@ namespace Gekko
             //
             //This is similar to ADAM-style xa = -500 * xb + 1000 * xa[-1]/xb[+1]. Here, aggregating the RHS
             //lags would only aggregate xb and xb[+1], not xa and xa[-1].
-
-
-            //
-            // 
-
+            
             if (decompOptions2.link[parentI].varnames.Count != 1)
             {
                 new Error("Expected 1 variable for decomposition, got " + decompOptions2.link[parentI].varnames.Count);
@@ -2944,22 +2958,13 @@ namespace Gekko
 
             int j = 0;
 
-
-            //if (decompOptions2.link[parentI].varnames.Count != decompDatasSupremeClone.Count)
-            //{
-            //    new Error("The number of variables and equations do not match. For istance, in DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is, it must be defined over one or more sets with 2 elements in all).");
-            //}
-            //for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
-
-            string name = decompOptions2.link[parentI].varnames[j];
-            string s = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);
-
-            Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[s];
-
-            //bool isResidualName = name == Globals.decompResidualName;
-            Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, operatorOneOf3Types, s);
-
             DecompData d = decompDatasSupremeClone[j];
+            string name = decompOptions2.link[parentI].varnames[j];
+            d.lhs = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);  //lag = 0
+            Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[d.lhs];
+            //bool isResidualName = name == Globals.decompResidualName;
+            Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, operatorOneOf3Types, d.lhs);
+            
             foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
             {
                 double d1 = lhs2.GetDataSimple(t);
@@ -2984,7 +2989,7 @@ namespace Gekko
                 bool found = false;
                 foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                 {
-                    if (G.Equal(kvp.Key, s))
+                    if (G.Equal(kvp.Key, d.lhs))
                     {
                         kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
                         found = true;

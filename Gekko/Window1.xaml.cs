@@ -1801,6 +1801,9 @@ namespace Gekko
         public bool showErrors = false;
     }
 
+    /// <summary>
+    /// Stores all equations (non-unrolled)
+    /// </summary>
     public class DecompDatas
     {
         public List<List<DecompData>> storage = null; //untouched decomps of equations
@@ -1810,9 +1813,11 @@ namespace Gekko
         public bool hasRD = false;     
     }
 
+    /// <summary>
+    /// Decomp of 1 unrolled equation
+    /// </summary>
     public class DecompData
-    {
-        
+    {        
         public DecompDict cellsQuo = null;
         public DecompDict cellsGradQuo = null;
         public DecompDict cellsContribD = null;
@@ -1822,6 +1827,9 @@ namespace Gekko
         public DecompDict cellsContribDRef = null;
         // -------------------------------------
         public DecompDict cellsContribM = null;
+        // -------------------------------------
+
+        public string lhs = null;  //name of the LHS variable, for instance "Work:y2¤[0]
 
         public DecompData DeepClone()
         {
@@ -1833,6 +1841,7 @@ namespace Gekko
             dd.cellsGradRef = this.cellsGradRef.DeepClone();
             dd.cellsContribDRef = this.cellsContribDRef.DeepClone();
             dd.cellsContribM = this.cellsContribM.DeepClone();
+            dd.lhs = this.lhs;
             return dd;
         }
     }
