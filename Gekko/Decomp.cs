@@ -42,6 +42,15 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Tells normalize method how to sum up
+        /// </summary>
+        public enum ENormalizeType
+        {
+            Normal,     //only takes y[0]
+            Lags        //will sum up lags like y[-1], y, y[+1]
+        }
+
+        /// <summary>
         /// The starting point of DECOMP, collecting decomp options etc.
         /// </summary>
         /// <param name="o"></param>
@@ -2158,9 +2167,10 @@ namespace Gekko
 
             if (!operator1.StartsWith("x"))
             {
-                if (false && decompOptions2.modelType == EModelType.GAMSScalar)
+                if (true && decompOptions2.modelType == EModelType.GAMSScalar)
                 {
-                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDatasSupremeClone, decompDatas, operatorOneOf3Types);
+                    ENormalizeType normalize = ENormalizeType.Lags;
+                    DecompNormalize(per1, per2, decompOptions2, parentI, decompDatasSupremeClone, decompDatas, operatorOneOf3Types, normalize);
                 }
                 else
                 {
@@ -2324,7 +2334,6 @@ namespace Gekko
                                     if (tsFirst == null)
                                     {
                                         new Error("Decomp #7093473984");
-                                        //throw new GekkoException();
                                     }
                                     dLevel = tsFirst.GetDataSimple(t2);
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
@@ -2337,7 +2346,6 @@ namespace Gekko
                                     if (tsRef == null)
                                     {
                                         new Error("Decomp #7093473985");
-                                        //throw new GekkoException();
                                     }
                                     dLevelRef = tsRef.GetDataSimple(t2);
                                     dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
@@ -2447,8 +2455,13 @@ namespace Gekko
             //Aggregation
             //Aggregation
 
+            List<string> varnames = decompOptions2.link[parentI].varnames;
+            string lhsName = varnames[0];
+
+            int i7 = -1;
             foreach (FrameLightRow row in frame.rows)
             {
+                i7++;
                 if (getFreeValues)
                 {
                     for (int i = 0; i < frame.colnames.Count; i++)
@@ -2476,22 +2489,39 @@ namespace Gekko
                 }
                 if (skip) continue;
 
+                string more = null;
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
+                {                    
+                    string rowName = row.Get(frame, col_variable).text;
+                    string rowLag = row.Get(frame, col_lag).text;
+                    if (G.Equal(lhsName, rowName) && rowLag != "[0]")
+                    {
+                        //more = " extra";
+                    }
+                }
+
                 string s1 = null;
                 foreach (string s in decompOptions2.rows)
-                {
+                {                    
                     s1 = DecompAddText(frame, row, s1, s);
+                    if (s == col_variable) s1 += more;
                 }
                 if (s1 != null)
+                {
                     s1 = s1.Substring(Globals.pivotTableDelimiter.Length);
+                }               
 
                 string s2 = null;
                 foreach (string s in decompOptions2.cols)
                 {
                     s2 = DecompAddText(frame, row, s2, s);
+                    if (s == col_variable) s1 += more;
                 }
                 if (s2 != null)
+                {
                     s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
-                string key = s1 + "¤" + s2;
+                }
+                string key = s1 + "¤" + s2;                
 
                 if (!rownames3.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames3.Add(s1);
                 if (!colnames3.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames3.Add(s2);
@@ -2527,8 +2557,7 @@ namespace Gekko
             List<string> colnames2 = new List<string>();
             foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
             colnames3 = colnames2;
-
-            List<string> varnames = decompOptions2.link[parentI].varnames;
+                        
             bool orderNormalize = OrderNormalize(decompOptions2, varnames);
 
             List<string> rownames = new List<string>();
@@ -2845,7 +2874,26 @@ namespace Gekko
 
             return;
         }
-
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO -----------------------------------------------------------------------------
+        // TODO TODO why seach for these ref/quo timeseries, why not just have them in 1 dictionary?
+        // TODO TODO for unrolled eqs, this searching may take time.
+        // TODO TODO -----------------------------------------------------------------------------
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
         /// <summary>
         /// The decomp provides a linearization where the contributions sum to 0.
         /// Here, this is "translated" into the normal decomp way of showing it.
@@ -2856,10 +2904,35 @@ namespace Gekko
         /// <param name="parentI"></param>
         /// <param name="decompDatasSupremeClone"></param>
         /// <param name="operatorOneOf3Types"></param>
-        private static void DecompNormalize(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, DecompDatas decompDatas, EContribType operatorOneOf3Types)
+        private static void DecompNormalize(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone, DecompDatas decompDatas, EContribType operatorOneOf3Types, ENormalizeType normalize)
         {
             // Decomp provides a linearization where the contributions sum to 0. Here we identify those
             // vars (contributions) that are moved to the LHS.
+            //
+            //Decomp decomposes into "atoms", like x[a], x[b], x[a][-1], x[b][+1], etc.
+            //Regarding the LHS of decompose, this can only meaningfully be an atom, so it makes no
+            //particular sense to aggregate for instance x[a] and x[a][-1], or x[a] and x[b]. Regarding
+            //the latter, these may no even have the same units!
+            //Consider the equation x[a] + 500 * x[b] = 1000 * x[a][-1]/x[b][+1]. 
+            //How would you meaningfully aggregate into x[a] and x[b] on LHS? If we are only decomposing
+            //x[a], we can look at how x[a] - @x[a] can be decomposed, which is easy enough. Burt 
+            //decomposing x[a] and x[b] at the same time on LHS? This would only make sense if the derivatives
+            //of x[a] and x[b] are equal, for instance x[a] + x[b] = 1000 * x[a][-1]/x[b][+1]. Then we could
+            //state the decomposition of x[a] + x[b] - (@x[a] + @x[b]).
+            //If the user wants this, he should add a real equation x = x[a] + x[b] to the system, and then
+            //decompose x, choosing if x[a] or x[b] is considered endogenous. 
+            //Gekko could make an easy interface regarding that. If the equation really is 
+            //x[a] + x[b] = 1000 * x[a][-1]/x[b][+1], the choice of x[a] or x[b] as endogenous will not matter.
+            //Because of all this, we cannot decompose x[a] + 500 * x[b] = 1000 * x[a][-1]/x[b][+1] with
+            //x[a] on the RHS, excluding lags. If we exclude lags, we will get x[a][0] on the LHS, 
+            //and x[a][-1] and x[b] on the LHS, where lags only disappear regarding x[b].
+            //
+            //This is similar to ADAM-style xa = -500 * xb + 1000 * xa[-1]/xb[+1]. Here, aggregating the RHS
+            //lags would only aggregate xb and xb[+1], not xa and xa[-1].
+
+
+            //
+            // 
 
             if (decompOptions2.link[parentI].varnames.Count != 1)
             {
@@ -2871,201 +2944,215 @@ namespace Gekko
 
             int j = 0;
 
-            if (orderNormalize)
+
+            //if (decompOptions2.link[parentI].varnames.Count != decompDatasSupremeClone.Count)
+            //{
+            //    new Error("The number of variables and equations do not match. For istance, in DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is, it must be defined over one or more sets with 2 elements in all).");
+            //}
+            //for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
+
+            string name = decompOptions2.link[parentI].varnames[j];
+            string s = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);
+
+            Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[s];
+
+            //bool isResidualName = name == Globals.decompResidualName;
+            Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, operatorOneOf3Types, s);
+
+            DecompData d = decompDatasSupremeClone[j];
+            foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
             {
-                //if (decompOptions2.link[parentI].varnames.Count != decompDatasSupremeClone.Count)
-                //{
-                //    new Error("The number of variables and equations do not match. For istance, in DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is, it must be defined over one or more sets with 2 elements in all).");
-                //}
-                //for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
-
-                string name = decompOptions2.link[parentI].varnames[j];
-                string s = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);
-
-                Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[s];
-
-                //bool isResidualName = name == Globals.decompResidualName;
-                Series tsQuo = null;
-                Series tsRef = null;
-
-                //Find the real values of the series for normalization
-                if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
+                double d1 = lhs2.GetDataSimple(t);
+                double d2 = double.NaN;
+                if (operatorOneOf3Types == EContribType.D)
                 {
-                    foreach (List<DecompData> temp in decompDatas.storage)
-                    {
-                        foreach (DecompData decompData in temp)
-                        {
-                            decompData.cellsQuo.storage.TryGetValue(s, out tsQuo);
-                            if (tsQuo != null) goto Label1;
-                        }
-                    }
-                Label1:;
+                    d2 = ts.Item1.GetDataSimple(t) - ts.Item1.GetDataSimple(t.Add(-1));
+                }
+                else if (operatorOneOf3Types == EContribType.RD)
+                {
+                    d2 = ts.Item2.GetDataSimple(t) - ts.Item2.GetDataSimple(t.Add(-1));
+                }
+                else if (operatorOneOf3Types == EContribType.M)
+                {
+                    d2 = ts.Item1.GetDataSimple(t) - ts.Item2.GetDataSimple(t);
                 }
 
-                if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
+                // ----------------------------------------------
+
+                double factor = d2 / d1;
+
+                bool found = false;
+                foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
                 {
-                    foreach (List<DecompData> temp in decompDatas.storage)
+                    if (G.Equal(kvp.Key, s))
                     {
-                        foreach (DecompData decompData in temp)
-                        {
-                            decompData.cellsQuo.storage.TryGetValue(s, out tsQuo);
-                            if (tsQuo != null) goto Label2;
-                        }
+                        kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                        found = true;
                     }
-                Label2:;
-                }
-
-                DecompData d = decompDatasSupremeClone[j];
-                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                {
-                    double d1 = lhs2.GetDataSimple(t);
-                    double d2 = double.NaN;
-                    if (operatorOneOf3Types == EContribType.D)
+                    else
                     {
-                        d2 = tsQuo.GetDataSimple(t) - tsQuo.GetDataSimple(t.Add(-1));
-                    }
-                    else if (operatorOneOf3Types == EContribType.RD)
-                    {
-                        d2 = tsRef.GetDataSimple(t) - tsRef.GetDataSimple(t.Add(-1));
-                    }
-                    else if (operatorOneOf3Types == EContribType.M)
-                    {
-                        d2 = tsQuo.GetDataSimple(t) - tsRef.GetDataSimple(t);
-                    }
-
-                    // ----------------------------------------------
-
-                    double factor = d2 / d1;
-
-                    bool found = false;
-                    foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
-                    {
-                        if (G.Equal(kvp.Key, s))
-                        {
-                            kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                            found = true;
-                        }
-                        else
-                        {
-                            //switch sign!
-                            kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-                        }
-                    }
-                    if (found == false)
-                    {
-                        MessageBox.Show("*** ERROR: Did not find " + name + " for normalization");
+                        //switch sign!
+                        kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
                     }
                 }
-
-                       
-
-                //string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-                //string name2 = Program.databanks.GetFirst().name + ":" + name;
-                //string name2Ref = Program.databanks.GetRef().name + ":" + name;
-
-                //if (GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types).ContainsKey(name1))
-                //{
-                //    Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[name1];
-                //    Series lhsReal = null;
-                //    Series lhsRealRef = null;
-                //    if (isResidualName)
-                //    {
-                //        //just keep lhsReal/lhsRealRef = null
-                //    }
-                //    else
-                //    {
-                //        if (decompType == EDecompBanks.Work)
-                //        {
-                //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-                //        }
-                //        else if (decompType == EDecompBanks.Ref)
-                //        {
-                //            lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
-                //        }
-                //        else if (decompType == EDecompBanks.Multiplier)
-                //        {
-                //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-                //            lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
-                //        }
-                //    }
-
-                //    DecompData d = decompDatasSupremeClone[j];
-                //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                //    {
-                //        double d1 = lhs2.GetDataSimple(t);
-                //        double factor = 1d;
-
-                //        if (isResidualName)
-                //        {
-                //            //keep factor = 1
-                //        }
-                //        else
-                //        {
-                //            // --------------------------------------------
-                //            //TODO: other operators
-                //            //TODO: other operators
-                //            //TODO: other operators
-                //            //TODO: other operators, this is <d>
-                //            //TODO: other operators
-                //            //TODO: other operators
-                //            //TODO: other operators
-
-                //            //Stuff below does not always work: the variable to be shown may not even be in the first equation (for instance: DECOMP y[#a] in demand[#a] = supply[#a]...
-                //            //So for now, we allow it to be fetched from the databank
-                //            //Series temp = decompDatasSupremeClone[j].cellsQuo.storage[name1];
-                //            //double d2 = temp.GetDataSimple(t) - temp.GetDataSimple(t.Add(-1));        
-
-                //            double d2 = double.NaN;
-
-                //            if (operatorOneOf3Types == EContribType.D)
-                //            {
-                //                d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-                //            }
-                //            else if (operatorOneOf3Types == EContribType.RD)
-                //            {
-                //                d2 = lhsRealRef.GetDataSimple(t) - lhsRealRef.GetDataSimple(t.Add(-1));
-                //            }
-                //            else if (operatorOneOf3Types == EContribType.M)
-                //            {
-                //                d2 = lhsReal.GetDataSimple(t) - lhsRealRef.GetDataSimple(t);
-                //            }
-
-                //            // ----------------------------------------------
-
-                //            factor = d2 / d1;
-                //        }
-
-                //        if (true)
-                //        {
-                //            bool found = false;
-                //            foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
-                //            {
-                //                if (G.Equal(kvp.Key, name1))
-                //                {
-                //                    kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                //                    found = true;
-                //                }
-                //                else
-                //                {
-                //                    //switch sign!
-                //                    kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-                //                }
-                //            }
-                //            if (found == false)
-                //            {
-                //                MessageBox.Show("*** ERROR: Did not find " + name1 + " for normalization");
-                //            }
-                //        }
-                //    }
-                //}
-                //else
-                //{
-                //    new Error("Could not find variable " + name1 + " in non-linked equation number " + j + ".Beware of alignment: the names and equations must match.");
-                //}
-
+                if (found == false)
+                {
+                    MessageBox.Show("*** ERROR: Did not find " + name + " for normalization");
+                }
             }
 
+
+
+            //string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
+            //string name2 = Program.databanks.GetFirst().name + ":" + name;
+            //string name2Ref = Program.databanks.GetRef().name + ":" + name;
+
+            //if (GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types).ContainsKey(name1))
+            //{
+            //    Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[name1];
+            //    Series lhsReal = null;
+            //    Series lhsRealRef = null;
+            //    if (isResidualName)
+            //    {
+            //        //just keep lhsReal/lhsRealRef = null
+            //    }
+            //    else
+            //    {
+            //        if (decompType == EDecompBanks.Work)
+            //        {
+            //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+            //        }
+            //        else if (decompType == EDecompBanks.Ref)
+            //        {
+            //            lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
+            //        }
+            //        else if (decompType == EDecompBanks.Multiplier)
+            //        {
+            //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+            //            lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
+            //        }
+            //    }
+
+            //    DecompData d = decompDatasSupremeClone[j];
+            //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+            //    {
+            //        double d1 = lhs2.GetDataSimple(t);
+            //        double factor = 1d;
+
+            //        if (isResidualName)
+            //        {
+            //            //keep factor = 1
+            //        }
+            //        else
+            //        {
+            //            // --------------------------------------------
+            //            //TODO: other operators
+            //            //TODO: other operators
+            //            //TODO: other operators
+            //            //TODO: other operators, this is <d>
+            //            //TODO: other operators
+            //            //TODO: other operators
+            //            //TODO: other operators
+
+            //            //Stuff below does not always work: the variable to be shown may not even be in the first equation (for instance: DECOMP y[#a] in demand[#a] = supply[#a]...
+            //            //So for now, we allow it to be fetched from the databank
+            //            //Series temp = decompDatasSupremeClone[j].cellsQuo.storage[name1];
+            //            //double d2 = temp.GetDataSimple(t) - temp.GetDataSimple(t.Add(-1));        
+
+            //            double d2 = double.NaN;
+
+            //            if (operatorOneOf3Types == EContribType.D)
+            //            {
+            //                d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
+            //            }
+            //            else if (operatorOneOf3Types == EContribType.RD)
+            //            {
+            //                d2 = lhsRealRef.GetDataSimple(t) - lhsRealRef.GetDataSimple(t.Add(-1));
+            //            }
+            //            else if (operatorOneOf3Types == EContribType.M)
+            //            {
+            //                d2 = lhsReal.GetDataSimple(t) - lhsRealRef.GetDataSimple(t);
+            //            }
+
+            //            // ----------------------------------------------
+
+            //            factor = d2 / d1;
+            //        }
+
+            //        if (true)
+            //        {
+            //            bool found = false;
+            //            foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
+            //            {
+            //                if (G.Equal(kvp.Key, name1))
+            //                {
+            //                    kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+            //                    found = true;
+            //                }
+            //                else
+            //                {
+            //                    //switch sign!
+            //                    kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+            //                }
+            //            }
+            //            if (found == false)
+            //            {
+            //                MessageBox.Show("*** ERROR: Did not find " + name1 + " for normalization");
+            //            }
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    new Error("Could not find variable " + name1 + " in non-linked equation number " + j + ".Beware of alignment: the names and equations must match.");
+            //}            
+
             return;
+        }
+
+        /// <summary>
+        /// Search for real observed timeseries inside the DecompData objects (so as not having to find them in databanks).
+        /// Returns a tuple with quo (Work) as first element, and ref (Ref) as last element.
+        /// </summary>
+        /// <param name="decompDatas"></param>
+        /// <param name="operatorOneOf3Types"></param>
+        /// <param name="s"></param>
+        /// <param name="tsQuo"></param>
+        /// <param name="tsRef"></param>
+        private static Tuple<Series, Series> GetRealTimeseries(DecompDatas decompDatas, EContribType operatorOneOf3Types, string s)
+        {
+            Series tsQuo = null;
+            Series tsRef = null;            
+
+            //Find the real values of the series for normalization
+            if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
+            {
+                foreach (List<DecompData> temp in decompDatas.storage)
+                {
+                    foreach (DecompData decompData in temp)
+                    {
+                        decompData.cellsQuo.storage.TryGetValue(s, out tsQuo);
+                        if (tsQuo != null) goto Label1;
+                    }
+                }
+            Label1:;
+            }
+
+            if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
+            {
+                foreach (List<DecompData> temp in decompDatas.storage)
+                {
+                    foreach (DecompData decompData in temp)
+                    {
+                        decompData.cellsRef.storage.TryGetValue(s, out tsRef);
+                        if (tsRef != null) goto Label2;
+                    }
+                }
+            Label2:;
+            }
+
+            Tuple<Series, Series> ts = new Tuple<Series, Series>(tsQuo, tsRef);
+            return ts;
         }
 
         public static EContribType DecompContribTypeHelper(string prtOptionLower)

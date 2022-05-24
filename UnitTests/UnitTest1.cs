@@ -11301,6 +11301,23 @@ namespace UnitTests
                 // 2002-2002, difference
                 // ----------------------------------------
 
+                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                //
+                // We have these equations:                
+                // y2 = c2 + g2
+                // c2 = 0.3 * y1 + 0.3 * y2 + 0.3 * y3 
+                // y2 = 1/0.7 * (0.3 * y1 + 0.3 * y3 + g2)
+                // 32 = 1/0.7 * (0.3 *  4 + 0.3 *  4 + 20)
+                //
+                // We are decomposing y2 = y[2002], but even without showing lags, contribs from y1 and y3 
+                // cannot  be merged into y2 (only RHS lag-contribs can be merged). So the result is:
+                //
+                //   y2   32.00            y       32.00
+                //  ------------          ---------------
+                //   g2   28.57            g       28.57
+                //   y1    1.71            y[-1]    1.71
+                //   y3    1.71            y[+2]    1.71
+                //
                 Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 I("decomp3 <2002 2002 d> y from e1, e2 endo y, c;");
                 table = Globals.lastDecompTable;
@@ -11326,6 +11343,8 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g");
             Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
+
+
 
             // ----------------------------------------
             // 2001-2002,  multiplier, showing lags/leads
@@ -11415,14 +11434,14 @@ namespace UnitTests
             Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
             i++;
             Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);                       
+            Assert.AreEqual(table.Get(i, 2).number, 0.3d / 0.7d * 5d, 0.0001);
 
             // ----------------------------------------
             // 2002-2002, difference, showing lags/leads
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2002 2002 d> y from e1, e2 endo y, c rows vars, lags cols time;");            
+            I("decomp3 <2002 2002 d> y from e1, e2 endo y, c rows vars, lags cols time;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | [0]");
