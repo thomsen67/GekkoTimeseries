@@ -2643,7 +2643,6 @@ namespace Gekko
 
             for (int i = 0; i < rownames.Count; i++)
             {
-
                 for (int j = 0; j < colnames.Count; j++)
                 {
                     string key = rownames[i] + "¤" + colnames[j];
@@ -2753,12 +2752,22 @@ namespace Gekko
 
             for (int i = 0; i < rownames.Count; i++)
             {
-                tab.Set(i + 2, 1, rownames[i]);
+                string s = rownames[i];
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
+                {
+                    s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
+                }
+                tab.Set(i + 2, 1, s);
             }
 
             for (int j = 0; j < colnames.Count; j++)
             {
-                tab.Set(1, j + 2, colnames[j]);
+                string s = colnames[j];
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
+                {
+                    s = s.Replace(Globals.pivotHelper1, "").Replace(Globals.pivotHelper2, "");
+                }
+                tab.Set(1, j + 2, s);
             }
 
             return tab;
