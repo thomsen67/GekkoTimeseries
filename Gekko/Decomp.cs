@@ -2229,8 +2229,9 @@ namespace Gekko
             string col_valueLevelLag = Globals.internalColumnIdentifyer + "valueLevelLag";
             string col_valueLevelRef = Globals.internalColumnIdentifyer + "valueLevelRef";
             string col_valueLevelRefLag = Globals.internalColumnIdentifyer + "valueLevelRefLag";
-            string gekko_null = "null";
             string col_equ = Globals.internalColumnIdentifyer + "equ";
+            string col_fullVariableName = Globals.internalColumnIdentifyer + "fullVariableName";
+            string gekko_null = "null";            
 
             frame.AddColName(col_t);
             frame.AddColName(col_value);
@@ -2242,6 +2243,7 @@ namespace Gekko
             frame.AddColName(col_lag);
             frame.AddColName(col_universe);
             frame.AddColName(col_equ);
+            frame.AddColName(col_fullVariableName);
             if (ageHierarchy)
             {
                 frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
@@ -2364,6 +2366,7 @@ namespace Gekko
                         double d = DecomposePutIntoTable2HelperOperators(decompDatasSupremeClone[super], operator1, smpl, lhs, t2, varname, decompOptions2.modelType == EModelType.GAMSScalar);
 
                         FrameLightRow dr = new FrameLightRow(frame);
+                        dr.Set(frame, col_fullVariableName, new CellLight(G.Chop_RemoveBank(fullName)));
                         dr.Set(frame, col_equ, new CellLight(super.ToString()));
                         dr.Set(frame, col_t, new CellLight(t2.ToString()));
                         dr.Set(frame, col_variable, new CellLight(varName));
@@ -2437,9 +2440,10 @@ namespace Gekko
             Table tab = new Table();
             tab.writeOnce = true;
 
-            int xlag = 0; string xxname = null;
-            ConvertFromTurtleName(decompDatasSupremeClone[parentI].lhs, out xlag, out xxname);
-            string xname = null; if (xxname != null) xname = G.Chop_RemoveBank(xxname);
+            int xlag = 0; string temp = null;
+            ConvertFromTurtleName(decompDatasSupremeClone[parentI].lhs, out xlag, out temp);
+            string normalizerVariableWithIndex = null;
+            if (temp != null) normalizerVariableWithIndex = G.Chop_RemoveBank(temp);
 
             DecomposeReplaceVars(decompOptions2.rows, col_t, col_variable, col_lag, col_universe, col_equ);
             DecomposeReplaceVars(decompOptions2.cols, col_t, col_variable, col_lag, col_universe, col_equ);
@@ -2463,23 +2467,32 @@ namespace Gekko
             }
             //get the free values end
 
-            //Aggregation
-            //Aggregation
-            //Aggregation
 
             List<string> varnames = decompOptions2.link[parentI].varnames;
-            //string lhsName = varnames[0];      
 
-            bool hasLag = false;
+            bool decompHasLag = false;
             if (decompOptions2.rows.Contains(col_lag) || decompOptions2.cols.Contains(col_lag))
             {
-                hasLag = true;
+                decompHasLag = true;
             }
 
-            int i7 = -1;
+            // ==============================================================================
+            //Aggregation
+            //Aggregation
+            //Aggregation into table suitable for showing
+            //Aggregation
+            //Aggregation
+            // ==============================================================================
+
             foreach (FrameLightRow row in frame.rows)
-            {
-                i7++;
+            {                
+                ENormalizerType normalizerType = ENormalizerType.None;
+                if (G.Equal(normalizerVariableWithIndex, row.Get(frame, col_fullVariableName).text))
+                {
+                    if (row.Get(frame, col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
+                    else normalizerType = ENormalizerType.NormalizerWithLagOrLead;
+                }
+
                 if (getFreeValues)
                 {
                     for (int i = 0; i < frame.colnames.Count; i++)
@@ -2509,13 +2522,13 @@ namespace Gekko
 
                 string more = null;
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
-                {                    
-                    string rowName = row.Get(frame, col_variable).text;
-                    string rowLag = row.Get(frame, col_lag).text;                    
-                    if (!hasLag && G.Equal(xname, rowName) && rowLag != "[0]")
-                    {
-                        more = " extra";
-                    }
+                {
+                    //if (!decompHasLag && normalizerType == ENormalizerType.NormalizerWithLagOrLead)
+                    //{
+                    //    more = Globals.pivotHelper1;  //so that it is set apart
+                    //}
+                    if (normalizerType == ENormalizerType.NormalizerWithLagOrLead) more = Globals.pivotHelper1;  //so that it is set apart
+                    else if (normalizerType == ENormalizerType.Normalizer) more = Globals.pivotHelper2;
                 }
 
                 string s1 = null;
@@ -2533,13 +2546,13 @@ namespace Gekko
                 foreach (string s in decompOptions2.cols)
                 {
                     s2 = DecompAddText(frame, row, s2, s);
-                    if (s == col_variable) s1 += more;
+                    if (s == col_variable) s2 += more;
                 }
                 if (s2 != null)
                 {
                     s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
                 }
-                string key = s1 + "¤" + s2;                
+                string key = s1 + "¤" + s2;  //row ¤ col                
 
                 if (!rownames3.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames3.Add(s1);
                 if (!colnames3.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames3.Add(s2);
@@ -2584,7 +2597,9 @@ namespace Gekko
             string rownamesFirst = null;
             for (int i = 0; i < rownames3.Count; i++)
             {
-                if (rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames[0]))
+                bool b1 = rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames[0]);
+                bool b2 = rownamesFirst == null && orderNormalize && rownames3[i].Contains(Globals.pivotHelper2);
+                if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
                 {
                     rownamesFirst = rownames3[i];
                 }
@@ -2597,7 +2612,9 @@ namespace Gekko
             string colnamesFirst = null;
             for (int i = 0; i < colnames3.Count; i++)
             {
-                if (colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames[0]))
+                bool b1 = colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames[0]);
+                bool b2 = colnamesFirst == null && orderNormalize && colnames3[i].Contains(Globals.pivotHelper2);
+                if ((decompOptions2.modelType != EModelType.GAMSScalar && b1) || (decompOptions2.modelType == EModelType.GAMSScalar && b2))
                 {
                     colnamesFirst = colnames3[i];
                 }
@@ -2623,8 +2640,6 @@ namespace Gekko
                     MessageBox.Show("*** ERROR: Both row and col are set first for normalization");
                 }
             }
-
-
 
             for (int i = 0; i < rownames.Count; i++)
             {
@@ -2733,10 +2748,6 @@ namespace Gekko
                     else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
                     string format2 = "f16." + decimals.ToString();
                     tab.SetNumber(i + 2, j + 2, d, format2);
-
-
-
-
                 }
             }
 
@@ -3529,6 +3540,13 @@ namespace Gekko
             }
 
             return found;
+        }
+
+        public enum ENormalizerType
+        {
+            None,
+            Normalizer,
+            NormalizerWithLagOrLead
         }
     }
 
