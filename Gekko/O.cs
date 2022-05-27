@@ -3969,7 +3969,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// How does this relate to the G.Chop...() methods?
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (true) or [a,b,c] (false)
         /// </summary>
         /// <param name="bank"></param>
         /// <param name="name"></param>
@@ -3977,7 +3977,7 @@ namespace Gekko
         /// <param name="index"></param>
         /// <returns></returns>
         //See also Chop()
-        public static string UnChop(string bank, string name, string freq, string[] index)
+        public static string UnChop(string bank, string name, string freq, string[] index, bool listBlanks)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -3990,10 +3990,24 @@ namespace Gekko
             if (index != null && index.Length > 0)
             {
                 s += "[";
-                s += Stringlist.GetListWithCommas(index);
+                s += Stringlist.GetListWithCommas(index, listBlanks);
                 s += "]";
             }
             return s;
+        }
+
+        /// <summary>
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Index elements contain blanks like [a, b, c], not [a,b,c].
+        /// Else see overload.
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <param name="name"></param>
+        /// <param name="freq"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string UnChop(string bank, string name, string freq, string[] index)
+        {
+            return UnChop(bank, name, freq, index, true);
         }
 
         /// <summary>

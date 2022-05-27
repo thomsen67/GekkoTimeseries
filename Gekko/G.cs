@@ -774,7 +774,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Produces a bankvarname from chops/chunks/parts.
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Choose if blanks between index elements like [a, b, c] (true) or [a,b,c] (false)
         /// </summary>
         /// <param name="bank"></param>
         /// <param name="name"></param>
@@ -782,9 +782,24 @@ namespace Gekko
         /// <param name="index"></param>
         /// <returns></returns>
         //See equivalent method in Functions.cs
+        public static string Chop_GetFullName(string bank, string name, string freq, string[] index, bool listBlanks)
+        {
+            string s = O.UnChop(bank, name, freq, index, listBlanks);
+            return s;
+        }
+
+        /// <summary>
+        /// Constructs a bankvarname with freq and indexes from its chunks/parts. Index elements contain blanks like [a, b, c], not [a,b,c].
+        /// Else see overload.
+        /// </summary>
+        /// <param name="bank"></param>
+        /// <param name="name"></param>
+        /// <param name="freq"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public static string Chop_GetFullName(string bank, string name, string freq, string[] index)
         {
-            string s = O.UnChop(bank, name, freq, index);
+            string s = O.UnChop(bank, name, freq, index, true);
             return s;
         }
 

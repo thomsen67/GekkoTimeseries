@@ -54,11 +54,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Transform a list of strings to a comma-separated string
+        /// Transform a list of strings to a comma-separated string.
+        /// Choose blanks between elements, "a, b, c" (true) vs. "a,b,c" (false)
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static string GetListWithCommas(List<string> list)
+        public static string GetListWithCommas(List<string> list, bool listBlanks)
         {
             if (list == null) return null;
             StringBuilder sb = new StringBuilder();
@@ -66,9 +67,34 @@ namespace Gekko
             {
                 string s = list[i];
                 sb.Append(s);
-                if (i < list.Count - 1) sb.Append(", ");
+                if (i < list.Count - 1)
+                {
+                    if (listBlanks) sb.Append(", ");
+                    else sb.Append(",");
+                }
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Overload, with blank and comma between elements ("a, b, c" not "a,b,c")
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static string GetListWithCommas(List<string> list)
+        {
+            return GetListWithCommas(list, true);
+        }
+
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static string GetListWithCommas(string[] list, bool listBlanks)
+        {
+            if (list == null) return null;
+            return GetListWithCommas(new List<string>(list), listBlanks);
         }
 
         /// <summary>

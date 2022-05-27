@@ -288,16 +288,7 @@ namespace Gekko
                             if (element.periods[i] != null) new Error("Dublet equation: " + equationName + mmi.GetName() + " in " + time.ToString());
                             DecompStartHelperPeriod elementPeriod = new DecompStartHelperPeriod();
                             //Below: must be string like "e1[2001]" or "e1[a, 2001]", etc.
-
-                            //!!!!!!!!!!
-                            //!!!!!!!!!!
-                            //!!!!!!!!!! add time properly like x[a,b] --> x[a,b,2001]...
-                            //!!!!!!!!!!
-                            string s2 = s + "[" + time.ToString() + "]";
-                            //!!!!!!!!!!
-                            //!!!!!!!!!!
-                            //!!!!!!!!!!
-
+                            string s2 = AddTimeToIndexes(s, time);
                             int eqNumber = -12345;
                             bool b = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s2, out eqNumber);
                             if (!b)
@@ -382,6 +373,36 @@ namespace Gekko
                     break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds time to an index like x[a, b, c] so it becomes x[a,b,c,2020] for instance.
+        /// Note: no blanks used after commas. Particular method only for use in Decomp.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        private static string AddTimeToIndexes(string s, GekkoTime time)
+        {
+            List<string> indexes2 = G.Chop_GetIndex(s);
+            string name2 = G.Chop_GetName(s);
+            indexes2.Add(time.ToString());
+            string s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), false);
+            return s2;
+        }
+
+        /// <summary>
+        /// Overload, using a list of indexes instead.
+        /// </summary>
+        /// <param name="name2"></param>
+        /// <param name="indexes2"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        private static string AddTimeToIndexes(string name2, List<string> indexes2, GekkoTime time)
+        {            
+            indexes2.Add(time.ToString());
+            string s2 = G.Chop_GetFullName(null, name2, null, indexes2.ToArray(), false);
+            return s2;
         }
 
         public static string DecompIsSharesOrPercentageTypeHelper(ref string operator1)
@@ -1984,7 +2005,13 @@ namespace Gekko
             foreach (GekkoTime t in new GekkoTimeIterator(extrat1, extrat2))            
             {
                 int eqNumber = -12345;
-                string s = dsh.name + "[" + t.ToString() + "]";
+                //string s = dsh.name + "[" + t.ToString() + "]";
+                //string temp = dsh.fullName;
+                //temp = temp.Replace("[]", "");  //a hack, because a non-index eq name looks like E_xyz[].
+                //string s = AddTimeToIndexes(temp, t);
+
+                string s = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
+
                 bool b = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber.TryGetValue(s, out eqNumber);
                 if (!b)
                 {
