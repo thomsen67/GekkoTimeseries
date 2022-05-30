@@ -11512,6 +11512,8 @@ namespace UnitTests
             I("MODEL <gms> makro.zip;");
             I("READ <gdx first> makro.zip\\makro1.gdx;");
             I("READ <gdx ref> makro.zip\\makro0.gdx;");
+            I("#a = seq(0, 101).strings();");
+            I("#a0100 = seq(0, 100).strings();");
             ModelGamsScalar.FlushAAndRArrays();
             Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
             Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
@@ -11534,7 +11536,8 @@ namespace UnitTests
             //I("decomp3 <2028 2028 m> vHhx[tot] from E_jvHhx_aTot endo vHhx[tot] rows vars, lags cols time;");
             //I("decomp3 <2028 2028 m> vHhxAfk[tot] from E_vHhxAfk_aTot endo vHhxAfk[tot] rows vars, lags cols time;");                        
             //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_akt[akt, tot] endo vHh[IndlAktier,tot] rows vars, lags cols time;");
-            I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier] endo vHh[IndlAktier,tot] rows vars, lags cols time;");
+            //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a] endo vHh[IndlAktier,tot], vHh[IndlAktier,#a]  rows vars, lags cols time;");
+            I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a], E_vHhx[#a0100]  endo vHh[IndlAktier,tot], vHh[IndlAktier,#a], vHhx[#a0100]  rows vars, lags cols time;");
 
             if (false)
             {

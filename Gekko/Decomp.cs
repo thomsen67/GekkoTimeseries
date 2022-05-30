@@ -1070,7 +1070,10 @@ namespace Gekko
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
                             row++;
-                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[dsh.name + "[" + t.ToString() + "]"];
+
+                            string name1 = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
+                            string name2 = dsh.name + "[" + t.ToString() + "]";
+                            int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[name1];
 
                             //foreach precedent variable
                             for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
