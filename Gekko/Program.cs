@@ -1831,7 +1831,7 @@ namespace Gekko
                 }
             }
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
 
                 //maybe buffer not larger then 1 mio.

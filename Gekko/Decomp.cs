@@ -51,6 +51,17 @@ namespace Gekko
         }
 
         /// <summary>
+        /// For any eval of GAMS scalar model, we must consider loading
+        /// data into the model arrays. For now, it always returns true.
+        /// Later on, keep track of First/Ref databank changes...
+        /// </summary>
+        /// <returns></returns>
+        public static bool MustLoadDataIntoModel()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// The starting point of DECOMP, collecting decomp options etc.
         /// </summary>
         /// <param name="o"></param>
@@ -229,6 +240,13 @@ namespace Gekko
 
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
+                    if (MustLoadDataIntoModel())
+                    {
+                        ModelGamsScalar.FlushAAndRArrays();
+                        Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+                        Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+                    }
+
                     GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
                     foreach (string s in decompOptions2.new_from)
                     {

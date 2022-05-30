@@ -315,7 +315,6 @@ namespace Gekko
             }
             Assembly assembly = cr.CompiledAssembly;
             return assembly;
-
         }
 
         private static bool DetectNullNode(CommonTree ast)
@@ -1590,7 +1589,9 @@ namespace Gekko
             }
 
             GAMSScalarModelSettings input = new GAMSScalarModelSettings();
-            input.zipFilePathAndName = fileName;            
+            input.zipFilePathAndName = fileName;
+
+            DateTime t3 = DateTime.Now;
 
             try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
             if (input.unrolledModel == null)
@@ -1606,11 +1607,15 @@ namespace Gekko
                 new Error("JSON: setting unrolledNames not found");
             }
             input.ffh_unrolledNames = Program.FindFile(fileName + "\\" + input.unrolledNames, folders, true, true, o.p);
-            
+
+            new Writeln("Unzip: " + G.Seconds(t3));
+
+            DateTime t2 = DateTime.Now;
             string h1 = Program.GetShaHash(input.ffh_unrolledModel.realPathAndFileName);
             string h2 = Program.GetShaHash(input.ffh_unrolledNames.realPathAndFileName);
             string h3 = h1 + new System.IO.FileInfo(input.ffh_unrolledModel.realPathAndFileName).Length + h1 + new System.IO.FileInfo(input.ffh_unrolledNames.realPathAndFileName).Length;
             string modelHash = Program.GetMD5Hash(h3);
+            new Writeln("SHA: " + G.Seconds(t2));
 
             //these objects typically get overridden soon
             Program.model = new Model();
@@ -1627,7 +1632,9 @@ namespace Gekko
                         DateTime dt1 = DateTime.Now;
                         using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
                         {
+                            DateTime t0 = DateTime.Now;
                             Program.model.modelGamsScalar = Serializer.Deserialize<ModelGamsScalar>(fs);
+                            new Writeln("Deserialize: " + G.Seconds(t0));
                             Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
                             GAMSScalarModelHelper(true);
                         }
@@ -1717,11 +1724,15 @@ namespace Gekko
                 }
                 Program.model.modelGamsScalar.aTemp = null;
 
+                DateTime t0 = DateTime.Now;
                 //Loading of Func<>s
                 Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines);
+                new Writeln("Compile: " + G.Seconds(t0));
+                DateTime t1 = DateTime.Now;
                 Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
                 Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
                 assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                     
+                new Writeln("Invoke: " + G.Seconds(t1));
             }
             else
             {

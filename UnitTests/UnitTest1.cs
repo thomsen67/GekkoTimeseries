@@ -11457,50 +11457,57 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompSimul5()
         {
-            //
-            // Test of big MAKRO model
-            //
-            Globals.unitTestScreenOutput.Clear();
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");            
-            I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");   //needs to point to a 32-bit GAMS, because unit tests run 32-bit
-            I("MODEL <gms> makro.zip;");            
-            I("READ <gdx first> makro.zip\\makro1.gdx;");
-            I("READ <gdx ref> makro.zip\\makro0.gdx;");
-            ModelGamsScalar.FlushAAndRArrays();
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+            for (int f = 0; f < 2; f++)  //0:flushed, 1:cached
+            {
+                if (f == 0) Program.Flush();  //is probably done anyway before each test
+                //for f == 1, this probably runs ok fast because of caching
+                //and it is a good cache test.
+                
+                //
+                // Test of big MAKRO model
+                //
+                Globals.unitTestScreenOutput.Clear();
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test3\klon\Model';");
+                I("option gams exe folder = 'c:\\Program Files (x86)\\GAMS\\29.1';");   //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+                I("MODEL <gms> makro.zip;");
+                I("READ <gdx first> makro.zip\\makro1.gdx;");
+                I("READ <gdx ref> makro.zip\\makro0.gdx;");
+                ModelGamsScalar.FlushAAndRArrays();
+                Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+                Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
-            Gekko.Table table = null;
+                Gekko.Table table = null;
 
-            //E_qBNP[t]$(tx0[t])..
-            //qBNP[t] * pBNP[t-1] / fp =E= (pC[cTot, t-1] / fp * qC[cTot, t]
-            //                               +pG[gTot, t-1] / fp * qG[gTot, t]
-            //                               +pI[iTot, t-1] / fp * qI[iTot, t]
-            //                               +pX[xTot, t-1] / fp * qX[xTot, t]
-            //                               -pM[sTot, t-1] / fp * qM[sTot, t]);
-            //
-            // Decomp for 2028. For 2027 the equation is different, because
-            // it is the first simulation year, and then the lags (prices) do not show up
-            // in the equation (GAMS considers them fixed).
-            //
-            //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2028 2028 m> qBNP from E_qBNP endo qBNP rows vars, lags cols time;");
-            table = Globals.lastDecompTable;
-            int i = 1;
-            Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2028");
-            i++;            
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "qBNP | [0]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.0358d, 0.0001);
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "pBNP | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, -0.2772d, 0.0001);
-            i++;
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "pC | [-1]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.4795d, 0.0001);
-            i += 8;  //NB NB NB
-            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "qX | [0]");
-            Assert.AreEqual(table.Get(i, 2).number, 0.0461d, 0.0001);
+                //E_qBNP[t]$(tx0[t])..
+                //qBNP[t] * pBNP[t-1] / fp =E= (pC[cTot, t-1] / fp * qC[cTot, t]
+                //                               +pG[gTot, t-1] / fp * qG[gTot, t]
+                //                               +pI[iTot, t-1] / fp * qI[iTot, t]
+                //                               +pX[xTot, t-1] / fp * qX[xTot, t]
+                //                               -pM[sTot, t-1] / fp * qM[sTot, t]);
+                //
+                // Decomp for 2028. For 2027 the equation is different, because
+                // it is the first simulation year, and then the lags (prices) do not show up
+                // in the equation (GAMS considers them fixed).
+                //
+                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                I("decomp3 <2028 2028 m> qBNP from E_qBNP endo qBNP rows vars, lags cols time;");
+                table = Globals.lastDecompTable;
+                int i = 1;
+                Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2028");
+                i++;
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "qBNP | [0]");
+                Assert.AreEqual(table.Get(i, 2).number, 0.0358d, 0.0001);
+                i++;
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "pBNP | [-1]");
+                Assert.AreEqual(table.Get(i, 2).number, -0.2772d, 0.0001);
+                i++;
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "pC | [-1]");
+                Assert.AreEqual(table.Get(i, 2).number, 0.4795d, 0.0001);
+                i += 8;  //NB NB NB
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "qX | [0]");
+                Assert.AreEqual(table.Get(i, 2).number, 0.0461d, 0.0001);
+            }
         }
 
         [TestMethod]
