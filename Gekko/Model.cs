@@ -416,6 +416,7 @@ namespace Gekko
     [ProtoContract]
     public class ModelGamsScalar
     {
+        
         [ProtoMember(1)]
         public ModelInfoGamsScalar modelInfo = new ModelInfoGamsScalar();
         
@@ -423,12 +424,14 @@ namespace Gekko
         public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;
 
         [ProtoMember(2)]
+        public IntArray[] bbTemp = null; //because protobuf does not support jagged arrays
         public int[][] bb = null;  //precedents, one array per equation. For each equation the values come in pairs (period, variable)
 
         [ProtoMember(3)]
         public double[] cc = null;
 
         [ProtoMember(4)]
+        public IntArray[] ddTemp = null; //because protobuf does not support jagged arrays
         public int[][] dd = null;
 
         [ProtoMember(5)]
@@ -439,6 +442,7 @@ namespace Gekko
 
         //this protobuf is often not needed
         [ProtoMember(6)]
+        public DoubleArray[] aTemp = null; //because protobuf does not support jagged arrays
         public double[][] a = null;
         
         // ------------------------------------
@@ -615,12 +619,10 @@ namespace Gekko
                 if (isRef)
                 {
                     this.a_ref = a;
-                    this.r_ref = G.CreateNaN(this.CountN());
                 }
                 else
                 {
-                    this.a = a;                    
-                    this.r = G.CreateNaN(this.CountN());
+                    this.a = a;
                 }
                 for (int i = 0; i < a.GetLength(0); i++)
                 {
@@ -631,7 +633,16 @@ namespace Gekko
             {
                 for (int i = 0; i < a.Length; i++) G.SetNaN(a[i]);  //wipe it completely
             }
-            
+
+            if (isRef)
+            {                
+                this.r_ref = G.CreateNaN(this.CountN());
+            }
+            else
+            {             
+                this.r = G.CreateNaN(this.CountN());
+            }
+
             for (int i = 0; i < this.CountA(); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
@@ -881,7 +892,19 @@ namespace Gekko
     [ProtoContract]
     public class ModelGamsScalarEquation
     {
-        
+    }
 
+    [ProtoContract]
+    public class IntArray
+    {
+        [ProtoMember(1)]
+        public int[] storage = null;
+    }
+
+    [ProtoContract]
+    public class DoubleArray
+    {
+        [ProtoMember(1)]
+        public double[] storage = null;
     }
 }

@@ -1351,8 +1351,10 @@ namespace Gekko
                         knownPattern = false;
                     }
                     int number = int.Parse(th1.s.Substring(1)) - 1;  //0-based
-                    string eqname = helper.dict_FromEqNumberToEqName[number];                    
-                    HandleEqLineAppend(helper, i, "/* " + eqname + " */  ");
+                    string eqname = helper.dict_FromEqNumberToEqName[number];
+                    string helper2 = "";
+                    if (Globals.runningOnTTComputer) helper2 = "/* " + eqname + " */  ";  //only for debugging
+                    HandleEqLineAppend(helper, i, helper2);
                 }
                 else if (IsXVariable(th1, th1Next))
                 {
@@ -1627,6 +1629,7 @@ namespace Gekko
                         {
                             Program.model.modelGamsScalar = Serializer.Deserialize<ModelGamsScalar>(fs);
                             Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                            GAMSScalarModelHelper(true);
                         }
                         G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                     }
@@ -1651,11 +1654,7 @@ namespace Gekko
 
             if (Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile)
             {
-                //no writing of .mdl file of course
-                //Loading of Func<>s
-                Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines);
-                Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
-                assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                     
+                //no writing of .mdl file of course                
             }
             else
             {
@@ -1666,6 +1665,8 @@ namespace Gekko
                 try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                 {
                     DateTime dt1 = DateTime.Now;
+
+                    GAMSScalarModelHelper(false);                    
 
                     //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                     RuntimeTypeModel serializer2 = TypeModel.Create();
@@ -1685,7 +1686,70 @@ namespace Gekko
                     //do nothing, not the end of the world if it fails
                 }
             }
-        }        
+        }
+
+        /// <summary>
+        /// Inflate/deflate objects that mitigate the problem that protobuf does not support jagged arrays.
+        /// </summary>
+        /// <param name="deserialize"></param>
+        private static void GAMSScalarModelHelper(bool deserialize)
+        {
+            if (deserialize)
+            {
+                Program.model.modelGamsScalar.bb = new int[Program.model.modelGamsScalar.bbTemp.Length][];
+                for (int i = 0; i < Program.model.modelGamsScalar.bbTemp.Length; i++)
+                {
+                    Program.model.modelGamsScalar.bb[i] = Program.model.modelGamsScalar.bbTemp[i].storage;
+                }
+                Program.model.modelGamsScalar.bbTemp = null;
+
+                Program.model.modelGamsScalar.dd = new int[Program.model.modelGamsScalar.ddTemp.Length][];
+                for (int i = 0; i < Program.model.modelGamsScalar.ddTemp.Length; i++)
+                {
+                    Program.model.modelGamsScalar.dd[i] = Program.model.modelGamsScalar.ddTemp[i].storage;
+                }
+                Program.model.modelGamsScalar.ddTemp = null;
+
+                Program.model.modelGamsScalar.a = new double[Program.model.modelGamsScalar.aTemp.Length][];
+                for (int i = 0; i < Program.model.modelGamsScalar.aTemp.Length; i++)
+                {
+                    Program.model.modelGamsScalar.a[i] = Program.model.modelGamsScalar.aTemp[i].storage;
+                }
+                Program.model.modelGamsScalar.aTemp = null;
+
+                //Loading of Func<>s
+                Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines);
+                Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
+                Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
+                assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                     
+            }
+            else
+            {
+                //Note: bbTemp, eeTemp and aTemp will never be changed, so we just point to these
+                //      arrays inside the real bb, ee and a objects. This should be safe: protobuf
+                //      does not tamper with these objects.
+                Program.model.modelGamsScalar.bbTemp = new IntArray[Program.model.modelGamsScalar.bb.Length];
+                for (int i = 0; i < Program.model.modelGamsScalar.bb.Length; i++)
+                {
+                    Program.model.modelGamsScalar.bbTemp[i] = new IntArray();
+                    Program.model.modelGamsScalar.bbTemp[i].storage = Program.model.modelGamsScalar.bb[i];
+                }
+
+                Program.model.modelGamsScalar.ddTemp = new IntArray[Program.model.modelGamsScalar.dd.Length];
+                for (int i = 0; i < Program.model.modelGamsScalar.dd.Length; i++)
+                {
+                    Program.model.modelGamsScalar.ddTemp[i] = new IntArray();
+                    Program.model.modelGamsScalar.ddTemp[i].storage = Program.model.modelGamsScalar.dd[i];
+                }
+
+                Program.model.modelGamsScalar.aTemp = new DoubleArray[Program.model.modelGamsScalar.a.Length];
+                for (int i = 0; i < Program.model.modelGamsScalar.a.Length; i++)
+                {
+                    Program.model.modelGamsScalar.aTemp[i] = new DoubleArray();
+                    Program.model.modelGamsScalar.aTemp[i].storage = Program.model.modelGamsScalar.a[i];
+                }
+            }
+        }
 
         /// <summary>
         /// Read (parse) a .gms GAMS model, transforming it into Gekko-understandable equations.
