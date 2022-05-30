@@ -1569,53 +1569,16 @@ namespace Gekko
             //TODO TODO TODO
             //TODO TODO TODO
 
-            FindFileHelper ffh2 = Program.FindFile(fileName + "\\" + "ModelInfo.json", folders, true, true, o.p);
-            string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
-            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-            Dictionary<string, object> jsonTree = null;
-            try
-            {
-                jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
-            }
-            catch (Exception e)
-            {
-                using (Error txt = new Error())
-                {
-                    txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
-                    txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
-                    txt.MoreNewLine();
-                    txt.MoreAdd("The technical error message is the following: " + e.Message);
-                }
-            }
+            DateTime t = DateTime.Now;
+            
+            string timeLoadCache = null;
+            string timeCompile = null;
 
             GAMSScalarModelSettings input = new GAMSScalarModelSettings();
             input.zipFilePathAndName = fileName;
 
-            DateTime t3 = DateTime.Now;
-
-            try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
-            if (input.unrolledModel == null)
-            {
-                new Error("JSON: setting unrolledModel not found");
-            }
-            input.ffh_unrolledModel = Program.FindFile(fileName + "\\" + input.unrolledModel, folders, true, true, o.p);
-
-
-            try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
-            if (input.unrolledNames == null)
-            {
-                new Error("JSON: setting unrolledNames not found");
-            }
-            input.ffh_unrolledNames = Program.FindFile(fileName + "\\" + input.unrolledNames, folders, true, true, o.p);
-
-            new Writeln("Unzip: " + G.Seconds(t3));
-
             DateTime t2 = DateTime.Now;
-            string h1 = Program.GetShaHash(input.ffh_unrolledModel.realPathAndFileName);
-            string h2 = Program.GetShaHash(input.ffh_unrolledNames.realPathAndFileName);
-            string h3 = h1 + new System.IO.FileInfo(input.ffh_unrolledModel.realPathAndFileName).Length + h1 + new System.IO.FileInfo(input.ffh_unrolledNames.realPathAndFileName).Length;
-            string modelHash = Program.GetMD5Hash(h3);
-            new Writeln("SHA: " + G.Seconds(t2));
+            string modelHash = Program.GetShaHash(input.zipFilePathAndName);
 
             //these objects typically get overridden soon
             Program.model = new Model();
@@ -1634,11 +1597,12 @@ namespace Gekko
                         {
                             DateTime t0 = DateTime.Now;
                             Program.model.modelGamsScalar = Serializer.Deserialize<ModelGamsScalar>(fs);
-                            new Writeln("Deserialize: " + G.Seconds(t0));
+                            timeLoadCache = "deflate: " + G.Seconds(t0);
                             Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                            DateTime t1 = DateTime.Now;
                             GAMSScalarModelHelper(true);
+                            timeCompile = "compile: " + G.Seconds(t1);
                         }
-                        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                     }
                     catch (Exception e)
                     {
@@ -1665,6 +1629,44 @@ namespace Gekko
             }
             else
             {
+                FindFileHelper ffh2 = Program.FindFile(input.zipFilePathAndName + "\\" + "ModelInfo.json", folders, true, true, o.p);
+                string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
+                System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                Dictionary<string, object> jsonTree = null;
+                try
+                {
+                    jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);
+                }
+                catch (Exception e)
+                {
+                    using (Error txt = new Error())
+                    {
+                        txt.MainAdd("The ModelInfo.json file does not seem correctly formatted.");
+                        txt.MoreAdd("Gekko needs a suitable ModelInfo.json inside the .zip file to describe the model files. See description in the {a{MODEL¤download.htm}a} commmand.");
+                        txt.MoreNewLine();
+                        txt.MoreAdd("The technical error message is the following: " + e.Message);
+                    }
+                }                
+
+                DateTime t3 = DateTime.Now;
+
+                try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
+                if (input.unrolledModel == null)
+                {
+                    new Error("JSON: setting unrolledModel not found");
+                }
+                input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, o.p);
+
+
+                try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
+                if (input.unrolledNames == null)
+                {
+                    new Error("JSON: setting unrolledNames not found");
+                }
+                input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, o.p);
+
+                new Writeln("Unzip: " + G.Seconds(t3));
+
                 ReadGamsScalarModelEquations(input);                                  
 
                 DateTime t1 = DateTime.Now;
@@ -1692,6 +1694,71 @@ namespace Gekko
                 {
                     //do nothing, not the end of the world if it fails
                 }
+            }
+
+            Table tab = new Table();
+
+            tab.CurRow.SetTopBorder(1, 1);
+
+            tab.CurRow.SetText(1, "MODEL " + Path.GetFileNameWithoutExtension(input.zipFilePathAndName));
+            tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.Next();
+
+            tab.CurRow.SetText(1, "Model   : " + input.zipFilePathAndName);
+            tab.CurRow.Next();
+
+            tab.CurRow.SetText(1, "Periods : " + Program.model.modelGamsScalar.t1.ToString() + "-" + Program.model.modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(Program.model.modelGamsScalar.t1, Program.model.modelGamsScalar.t2) + " periods");
+            //tab.CurRow.Next();                        
+
+            //tab.CurRow.SetText(1, "Lags      : Largest lag = " + 0 + ", largest lead = " + 0);
+            tab.CurRow.SetBottomBorder(1, 1);
+            //tab.CurRow.Next();
+            //tab.CurRow.SetText(1, "Periods         = " + Program.model.modelGamsScalar.t1.ToString() + "-" + Program.model.modelGamsScalar.t2.ToString() + " = " + GekkoTime.Observations(Program.model.modelGamsScalar.t1, Program.model.modelGamsScalar.t2) + " periods");
+            //tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "All eqs         = " + Program.model.modelGamsScalar.CountEqs(1) + " (all dimensions)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Eqs per period  = " + Program.model.modelGamsScalar.CountEqs(2) + " (no time dimension)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Eq names        = " + Program.model.modelGamsScalar.CountEqs(3) + " (no dimensions)");
+            tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "All vars        = " + Program.model.modelGamsScalar.CountVars(1) + " (all dimensions)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Vars per period = " + Program.model.modelGamsScalar.CountVars(2) + " (no time dimension)");
+            tab.CurRow.Next();
+            tab.CurRow.SetText(1, "Var names       = " + Program.model.modelGamsScalar.CountVars(3) + " (no dimensions)");
+            tab.CurRow.SetBottomBorder(1, 1);
+            tab.CurRow.SetLeftBorder(1);
+            tab.CurRow.SetRightBorder(1);
+
+            int widthRemember = Program.options.print_width;
+            Program.options.print_width = int.MaxValue;
+            try
+            {
+                List<string> ss = tab.Print();
+                using (Writeln txt = new Writeln())
+                {
+                    foreach (string s in ss)
+                    {
+                        txt.MainAdd(s);
+                        txt.MainNewLineTight();
+                    }
+                    if (Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile)
+                    {
+                        txt.MainAdd("Cache: " + timeLoadCache + ", " + timeCompile + ", total: " + G.Seconds(t));                        
+                    }
+                    else
+                    {
+                        txt.MainAdd("Extracting from files, total time: " + G.Seconds(t));
+                    }
+                    txt.MainNewLineTight();
+                }
+            }
+            finally
+            {
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
             }
         }
 
@@ -1723,16 +1790,13 @@ namespace Gekko
                     Program.model.modelGamsScalar.a[i] = Program.model.modelGamsScalar.aTemp[i].storage;
                 }
                 Program.model.modelGamsScalar.aTemp = null;
-
-                DateTime t0 = DateTime.Now;
+                
                 //Loading of Func<>s
                 Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines);
-                new Writeln("Compile: " + G.Seconds(t0));
-                DateTime t1 = DateTime.Now;
+                
                 Program.model.modelGamsScalar.functions = new Func<int, double[], double[][], double[], int[][], int[][], double>[Program.model.modelGamsScalar.unique];
                 Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
-                assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                     
-                new Writeln("Invoke: " + G.Seconds(t1));
+                assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                                     
             }
             else
             {

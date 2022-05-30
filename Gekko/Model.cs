@@ -626,7 +626,7 @@ namespace Gekko
                 }
                 for (int i = 0; i < a.GetLength(0); i++)
                 {
-                    a[i] = G.CreateNaN(this.CountA());
+                    a[i] = G.CreateNaN(this.CountVars(2));
                 }
             }
             else
@@ -636,14 +636,14 @@ namespace Gekko
 
             if (isRef)
             {                
-                this.r_ref = G.CreateNaN(this.CountN());
+                this.r_ref = G.CreateNaN(this.CountEqs(1));
             }
             else
             {             
-                this.r = G.CreateNaN(this.CountN());
+                this.r = G.CreateNaN(this.CountEqs(1));
             }
 
-            for (int i = 0; i < this.CountA(); i++)
+            for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
                 Series ts = DatabankAHelper(db, name, true);
@@ -660,24 +660,66 @@ namespace Gekko
                     a[t][i] = data[index1 + t];
                 }
             }            
+        }        
+
+        /// <summary>
+        /// Equations. Type 1 = all (unrolled). Type 2 = omit time dimension. Type 3 = omit all dimensions.
+        /// </summary>
+        /// <returns></returns>
+        public int CountEqs(int type)
+        {
+            if (type == 1) return this.dict_FromEqNumberToEqName.Length;
+            GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s2 in this.dict_FromEqNumberToEqName)
+            {
+                string equationName = null;
+                string resultingFullName = null;
+                List<string> indexes = null;
+                GekkoTime trash = GekkoTime.tNull;
+                GamsModel.ExtractTimeDimension(s2, false, ref equationName, ref trash, ref resultingFullName, out indexes);
+                if (type == 2)
+                {
+                    if (!temp.ContainsKey(resultingFullName)) temp.Add(resultingFullName, 0);
+                }
+                else if (type == 3)
+                {
+                    if (!temp.ContainsKey(equationName)) temp.Add(equationName, 0);
+                }
+                else new Error("Unexpected");
+            }
+            return temp.Count;
         }
 
         /// <summary>
-        /// Biggest count.
+        /// Variables. Type 1 = all. Type 2 = omit time dimension (corresponds to a-array variables). Type 3 = omit all dimensions.
         /// </summary>
         /// <returns></returns>
-        public int CountN()
+        public int CountVars(int type)
         {
-            return this.dict_FromEqNumberToEqName.Length;
-        }
-
-        /// <summary>
-        /// Count of eqs/vars with time removed.
-        /// </summary>
-        /// <returns></returns>
-        public int CountA()
-        {
-            return this.dict_FromANumberToVarName.Length;
+            if (type == 1)
+            {
+                return this.dict_FromVarNumberToVarName.Length;
+            }
+            else if (type == 2)
+            {
+                return this.dict_FromANumberToVarName.Length;
+            }
+            else if (type == 3)
+            {
+                GekkoDictionary<string, int> temp = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                foreach (string s2 in this.dict_FromVarNumberToVarName)
+                {
+                    string name = null;
+                    string resultingFullName = null;
+                    List<string> indexes = null;
+                    GekkoTime trash = GekkoTime.tNull;
+                    GamsModel.ExtractTimeDimension(s2, false, ref name, ref trash, ref resultingFullName, out indexes);
+                    if (!temp.ContainsKey(name)) temp.Add(name, 0);
+                }
+                return temp.Count;
+            }
+            else new Error("Unexpected");
+            return -12345;
         }
 
         /// <summary>
@@ -696,7 +738,7 @@ namespace Gekko
             else a = this.a;
             
             string freq = G.ConvertFreq(Program.options.freq);
-            for (int i = 0; i < this.CountA(); i++)
+            for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
                 Series ts = DatabankAHelper(db, name, false);
