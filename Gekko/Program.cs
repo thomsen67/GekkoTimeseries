@@ -1693,7 +1693,7 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 string file = @"c:\Thomas\Desktop\gekko\testing\skabelon.xlsx";
                 string sheetName = "Ark2";
@@ -1831,7 +1831,7 @@ namespace Gekko
                 }
             }
 
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
 
                 //maybe buffer not larger then 1 mio.
@@ -1849,13 +1849,11 @@ namespace Gekko
                 string file = @"c:\Tools\Nibbler\sletmig.zip";
                 DateTime dt0 = DateTime.Now;
 
-                int buf = 4096;
-                buf = int.Parse(text);
+                //int buf = 4096;
+                //buf = int.Parse(text);
 
-                if (false)
+                if (true)
                 {
-
-
                     if (i == 1)
                     {
                         using (FileStream stream = File.OpenRead(file))
@@ -1876,6 +1874,7 @@ namespace Gekko
                     }
                     else if (i == 3)
                     {
+                        //seems fastest, but i ==1 and i == 2 are almost as fast
                         using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
                         {
                             SHA256Managed sha = new SHA256Managed();
@@ -1885,10 +1884,12 @@ namespace Gekko
                     }
                     else if (i == 4)
                     {
+                        //2.5 x time for i == 3
                         string s = Program.GetMD5Hash(GetTextFromFileWithWait(file, false));
                     }
                     else if (i == 5)
                     {
+                        //7 x time for i == 3
                         string s = Program.GetMD5Hash(GetTextFromFileWithWait(file, true));
                     }
                     else if (i == 6)
@@ -1916,7 +1917,7 @@ namespace Gekko
                             byte[] checksum = sha.ComputeHash(stream);
                             string s = BitConverter.ToString(checksum).Replace("-", String.Empty);
                         }
-                    }
+                    }                    
                 }
                 else
                 {
@@ -12281,7 +12282,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Obtains MD5 hash code from a string input. Some symbols are replaced, so MD5 here is not completely standard.
+        /// Obtains MD5 hash code from a string input. Some symbols in the returned hash are replaced, so MD5 here is not completely standard.
+        /// See also GetShaHash().
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -12289,17 +12291,36 @@ namespace Gekko
         {
             // step 1, calculate MD5 hash from input
             MD5 md5 = System.Security.Cryptography.MD5.Create();
-
             byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);  //UTF8 seems best choice
             byte[] hash = md5.ComputeHash(inputBytes);
             // step 2, convert byte array to hex string
             StringBuilder sb = new StringBuilder();
             string s = Convert.ToBase64String(hash).Replace("=", "").Replace("+", "a").Replace("/", "b");
             //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
-            //a Bas64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
+            //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
             //This is a little better than hex (32 symbols).
             return s;
         }
+
+        /// <summary>
+        /// Obtains SHA256 hash code from a file input (good for large files). Removes "-" separator from the output string (which is in hex).
+        /// Note that there is no waiting for file access: this could be implemented if needed (WaitForFileStream).
+        /// There is a read buffer size of 1.2 MB which may be good for large files. See also GetMD5Hash().
+        /// Some symbols in the returned hash are replaced, so SHA here is not completely standard.
+        /// </summary>
+        /// <param name="fileNameWithPath"></param>
+        /// <returns></returns>
+        public static string GetShaHash(string fileNameWithPath)
+        {
+            using (var stream = new FileStream(fileNameWithPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1200000))
+            {
+                SHA256Managed sha = new SHA256Managed();
+                byte[] hash = sha.ComputeHash(stream);                
+                string s = Convert.ToBase64String(hash).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                return s;
+            }
+        }
+
 
         /// <summary>
         /// RUN command.

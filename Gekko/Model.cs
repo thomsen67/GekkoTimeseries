@@ -415,45 +415,100 @@ namespace Gekko
 
     [ProtoContract]
     public class ModelGamsScalar
-    {        
-        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;             
+    {
+        [ProtoMember(1)]
+        public ModelInfoGamsScalar modelInfo = new ModelInfoGamsScalar();
+        
+        //not protobuffed
+        public Func<int, double[], double[][], double[], int[][], int[][], double>[] functions = null;
+
+        [ProtoMember(2)]
         public int[][] bb = null;  //precedents, one array per equation. For each equation the values come in pairs (period, variable)
+
+        [ProtoMember(3)]
         public double[] cc = null;
+
+        [ProtoMember(4)]
         public int[][] dd = null;
+
+        [ProtoMember(5)]
         public int[] ee = null;
+        
+        //not protobuffed
         public double[] r = null;
+
+        //this protobuf is often not needed
+        [ProtoMember(6)]
         public double[][] a = null;
+        
         // ------------------------------------
+        
+        //not protobuffed
         public double[] r_ref = null;
+        
+        //not protobuffed
         public double[][] a_ref = null;
+
         // ------------------------------------
+
+        [ProtoMember(7)]
         public int eqCounts = -12345;
+
+        [ProtoMember(8)]
         public int count = -12345;
+
+        [ProtoMember(9)]
         public int known = -12345;
+
+        [ProtoMember(10)]
         public int unique = -12345;
+
+        [ProtoMember(11)]
         public GekkoTime t0 = GekkoTime.tNull;
+
+        [ProtoMember(12)]
         public GekkoTime t1 = GekkoTime.tNull;
+
+        [ProtoMember(13)]
         public GekkoTime t2 = GekkoTime.tNull;
+
         // ---------- dicts etc. ------------
 
         //variable names without time dimension 
+
+        [ProtoMember(14)]
         public string[] dict_FromANumberToVarName = null;
-        public GekkoDictionary<string, int> dict_FromVarNameToANumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);        
+
+        [ProtoMember(15)]
+        public GekkoDictionary<string, int> dict_FromVarNameToANumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         //eq numbers in folded model, corresponds to i/ii dimension
+        [ProtoMember(16)]
         public string[] dict_FromEqChunkNumberToEqName = null;
+
+        [ProtoMember(17)]
         public GekkoDictionary<string, int> dict_FromEqNameToEqChunkNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         //lowest level equation numbers (in unfolded/unrolled model), corresponds to j/jj dimension (but do not start over at each i/ii, so these numbers are global).
+        [ProtoMember(18)]
         public string[] dict_FromEqNumberToEqName = null;
+
+        [ProtoMember(19)]
         public GekkoDictionary<string, int> dict_FromEqNameToEqNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         //lowest level variable numbers (in unfolded/unrolled model)
+        [ProtoMember(20)]
         public string[] dict_FromVarNumberToVarName = null;
+
+        [ProtoMember(21)]
         public GekkoDictionary<string, int> dict_FromVarNameToVarNumber = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         //from lowest level equation number to chunk equations number
+        [ProtoMember(22)]
         public int[] dict_FromEqNumberToEqChunkNumber = null;
+
+        [ProtoMember(23)]
+        public List<string> codeLines = null;
 
         public int GetEqNumber(string eqName)
         {
@@ -593,48 +648,7 @@ namespace Gekko
                 {
                     a[t][i] = data[index1 + t];
                 }
-            }
-
-
-            //int n = GekkoTime.Observations(this.t0, this.t2);
-            //double[][] a = new double[n][];
-            //for (int t = 0; t < n; t++)
-            //{
-            //    //beware: OPTION series data missing --> if set, change NaN into 0.                        
-            //    a[t] = G.CreateNaN(this.dict_FromANumberToVarName.Length);
-            //}
-            //string freq = G.ConvertFreq(Program.options.freq);
-            //for (int i = 0; i < this.dict_FromANumberToVarName.Length; i++)
-            //{
-            //    string name = this.dict_FromANumberToVarName[i];
-            //    string nameWithFreq = G.Chop_AddFreq(name, freq);
-            //    Series ts = (Series)db.GetIVariable(nameWithFreq);
-            //    if (ts == null)
-            //    {
-            //        IVariable iva = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-            //        IVariable ivq = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-            //        IVariable ivm = Program.databanks.GetFirst().GetIVariable(G.Chop_AddFreq(name, EFreq.A));
-            //        string temp = "first-position";
-            //        if (isRef) temp = "reference";
-            //        string s = null;
-            //        if (iva != null) s += "Beware: '" + name + "' exists as an annual timeseries, you should perhaps change frequency (option freq)? ";
-            //        if (ivq != null) s += "Beware: '" + name + "' exists as a quarterly timeseries, you should perhaps change frequency (option freq)? ";
-            //        if (ivm != null) s += "Beware: '" + name + "' exists as a monthly timeseries, you should perhaps change frequency (option freq)? ";
-            //        new Error("Could not find model variable " + name + " in the " + temp + " databank. " + s);
-            //    }
-
-            //    //This runs pretty fast, operating directly on the internal timeseries array
-            //    //Cannot use array copy, because a has time dimension first.
-            //    int index1 = -12345;
-            //    int index2 = -12345;
-            //    double[] data = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, this.t0, this.t2);
-            //    for (int t = 0; t < n; t++)
-            //    {
-            //        a[t][i] = data[index1 + t];
-            //    }
-            //}
-            //if (isRef) this.a_ref = a;
-            //else this.a = a;
+            }            
         }
 
         /// <summary>
@@ -788,7 +802,12 @@ namespace Gekko
                 G.SetNaN(Program.model.modelGamsScalar.r_ref);
             }
         }
+    }
 
+    [ProtoContract]
+    public class ModelInfoGamsScalar
+    {
+        public bool loadedFromMdlFile = false;  //do not protobuf
     }
 
     [ProtoContract]

@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace Gekko
 {    
@@ -1120,6 +1121,10 @@ namespace Gekko
                 Program.model.modelGamsScalar.dict_FromEqChunkNumberToEqName = helper.dict_FromEqChunkNumberToEqName;
                 Program.model.modelGamsScalar.dict_FromEqNameToEqChunkNumber = helper.dict_FromEqNameToEqChunkNumber;
                 Program.model.modelGamsScalar.dict_FromEqNumberToEqChunkNumber = helper.dict_FromEqNumberToEqChunkNumber;
+
+                // -------------- raw codelines ---------
+                Program.model.modelGamsScalar.codeLines = codeLines;
+
             }
             return;
         }
@@ -1557,6 +1562,12 @@ namespace Gekko
         /// </summary>
         public static void ReadGAMSScalarModel(O.Model o, List<string> folders, string fileName)
         {
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO in a session, maybe look at file sizes and dates/times for the zip, like done for libraries
+            //TODO TODO TODO
+            //TODO TODO TODO
+
             FindFileHelper ffh2 = Program.FindFile(fileName + "\\" + "ModelInfo.json", folders, true, true, o.p);
             string jsonCode = G.RemoveComments(Program.GetTextFromFileWithWait(ffh2.realPathAndFileName));
             System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
@@ -1577,7 +1588,7 @@ namespace Gekko
             }
 
             GAMSScalarModelSettings input = new GAMSScalarModelSettings();
-            input.zipFilePathAndName = fileName;
+            input.zipFilePathAndName = fileName;            
 
             try { input.unrolledModel = (string)jsonTree["unrolledModel"]; } catch { }
             if (input.unrolledModel == null)
@@ -1593,28 +1604,88 @@ namespace Gekko
                 new Error("JSON: setting unrolledNames not found");
             }
             input.ffh_unrolledNames = Program.FindFile(fileName + "\\" + input.unrolledNames, folders, true, true, o.p);
+            
+            string h1 = Program.GetShaHash(input.ffh_unrolledModel.realPathAndFileName);
+            string h2 = Program.GetShaHash(input.ffh_unrolledNames.realPathAndFileName);
+            string h3 = h1 + new System.IO.FileInfo(input.ffh_unrolledModel.realPathAndFileName).Length + h1 + new System.IO.FileInfo(input.ffh_unrolledNames.realPathAndFileName).Length;
+            string modelHash = Program.GetMD5Hash(h3);
 
-            if (false)
+            //these objects typically get overridden soon
+            Program.model = new Model();
+            Program.model.modelGamsScalar = new ModelGamsScalar();
+            
+            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+
+            if (Program.options.model_cache == true)
             {
-                try { input.referenceData = (string)jsonTree["referenceData"]; } catch { }
-                if (input.referenceData == null)
+                if (File.Exists(mdlFileNameAndPath))
                 {
-                    new Error("JSON: setting referenceData not found");
+                    try
+                    {
+                        DateTime dt1 = DateTime.Now;
+                        using (FileStream fs = Program.WaitForFileStream(mdlFileNameAndPath, null, Program.GekkoFileReadOrWrite.Read))
+                        {
+                            Program.model.modelGamsScalar = Serializer.Deserialize<ModelGamsScalar>(fs);
+                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = true;
+                        }
+                        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                    }
+                    catch (Exception e)
+                    {
+                        if (G.IsUnitTesting())
+                        {
+                            throw;
+                        }
+                        else
+                        {
+                            //do nothing, we then have to parse the file
+                            Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
+                        }
+                    }
                 }
-                input.ffh_referenceData = Program.FindFile(fileName + "\\" + input.referenceData, folders, true, true, o.p);
-
-                try { input.multiplierData = (string)jsonTree["multiplierData"]; } catch { }
-                if (input.multiplierData == null)
-                {
-                    new Error("JSON: setting multiplierData not found");
-                }
-                input.ffh_multiplierData = Program.FindFile(fileName + "\\" + input.multiplierData, folders, true, true, o.p);
+            }
+            else
+            {
+                Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile = false;
             }
 
-            ReadGamsScalarModelEquations(input);           
+            if (Program.model.modelGamsScalar.modelInfo.loadedFromMdlFile)
+            {
+                //no writing of .mdl file of course
+                //Loading of Func<>s
+                Assembly assembly = Compile5(Program.model.modelGamsScalar.codeLines);
+                Object[] o2 = new Object[1] { Program.model.modelGamsScalar.functions };
+                assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o2);  //the method                     
+            }
+            else
+            {
+                ReadGamsScalarModelEquations(input);                                  
 
-        }
+                DateTime t1 = DateTime.Now;
 
+                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                {
+                    DateTime dt1 = DateTime.Now;
+
+                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                    RuntimeTypeModel serializer2 = TypeModel.Create();
+                    serializer2.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+
+                    // ----- SERIALIZE
+                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+                    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                    using (FileStream fs = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+                    {
+                        serializer2.Serialize(fs, Program.model.modelGamsScalar);
+                    }
+                    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                }
+                catch (Exception e)
+                {
+                    //do nothing, not the end of the world if it fails
+                }
+            }
+        }        
 
         /// <summary>
         /// Read (parse) a .gms GAMS model, transforming it into Gekko-understandable equations.
