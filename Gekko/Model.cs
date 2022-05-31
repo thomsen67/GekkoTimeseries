@@ -512,7 +512,10 @@ namespace Gekko
         public int[] dict_FromEqNumberToEqChunkNumber = null;
 
         [ProtoMember(23)]
-        public List<string> codeLines = null;
+        public List<string> codeLines = null; //C# source code
+
+        [ProtoMember(24)]
+        public List<string> rawModel = null;  //in GAMS format
 
         public int GetEqNumber(string eqName)
         {

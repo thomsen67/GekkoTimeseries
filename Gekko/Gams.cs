@@ -1084,6 +1084,21 @@ namespace Gekko
             new Writeln("Loading funcs took: " + G.Seconds(dt1));
             dt1 = DateTime.Now;
 
+            List<string> rawModel = new List<string>();
+            if (input.ffh_rawModel != null)
+            {                
+                using (FileStream fs = Program.WaitForFileStream(input.ffh_rawModel.realPathAndFileName, input.ffh_rawModel.prettyPathAndFileName, Program.GekkoFileReadOrWrite.Read))
+                using (StreamReader sr = new StreamReader(fs))
+                {
+                    string line = null;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        rawModel.Add(line);
+                    }
+                }
+            }
+            
+
             if (true)
             {
                 Program.model = new Model();
@@ -1123,6 +1138,7 @@ namespace Gekko
 
                 // -------------- raw codelines ---------
                 Program.model.modelGamsScalar.codeLines = codeLines;
+                Program.model.modelGamsScalar.rawModel = rawModel;
 
             }
             return;
@@ -1529,7 +1545,7 @@ namespace Gekko
             }
             else
             {
-                ReadGamsModelHelper(textInputRaw, fileName, dependents, o);
+                Program.model.modelGams = ReadGamsModelHelper(textInputRaw, fileName, dependents, G.Equal(o.opt_dump, "yes"), false);
                 if (Globals.runningOnTTComputer) Sniff2();
 
                 DateTime t1 = DateTime.Now;
@@ -1849,7 +1865,7 @@ namespace Gekko
         /// <param name="fileName"></param>
         /// <param name="dependents"></param>
         /// <param name="o"></param>
-        private static void ReadGamsModelHelper(string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, O.Model o)
+        public static ModelGams ReadGamsModelHelper(string textInputRaw, string fileName, GekkoDictionary<string, string> dependents, bool dump, bool silent)
         {
             StringBuilder sb1 = new StringBuilder();
             sb1.AppendLine();
@@ -1861,7 +1877,7 @@ namespace Gekko
 
             //GAMS comments: star as first char, $ontext/offtext, # as end of line, /* */,
 
-            //string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
+            //See also #jkadf773js7s
             string txt = textInputRaw;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "!!", "#" };
@@ -1874,7 +1890,7 @@ namespace Gekko
 
             List<string> problems = new List<string>();
 
-            int counter = 0;
+            int counter = 0;            
 
             foreach (TokenHelper tok in tokens2.subnodes.storage)
             {
@@ -1891,25 +1907,39 @@ namespace Gekko
                     }
                     else
                     {
-                        eqCounter = ReadGamsEquation(sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
+                        eqCounter = ReadGamsEquation(sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, dump);
                     }
                 }
             }
-            Program.model.modelGams = new ModelGams();
-            Program.model.modelGams.equationsByVarname = equationsByVarname;
-            Program.model.modelGams.equationsByEqname = equationsByEqname;
-            Program.model.modelGams.modelInfo = new ModelInfoGams();
+            ModelGams modelGams = new ModelGams();
+            modelGams.equationsByVarname = equationsByVarname;
+            modelGams.equationsByEqname = equationsByEqname;
+            modelGams.modelInfo = new ModelInfoGams();
 
-            G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
-            G.Writeln("Read " + counter + " lines from " + fileName);
-            G.Writeln("Found " + equationsByVarname.Count + " distinct equations (use DISP to display them)");
-            if (problems.Count > 0)
+            if (!silent)
             {
-                G.Writeln("There were the following problems while reading the model:");
-                foreach (string s in problems) G.Writeln("+++ " + s);
+                using (Writeln txt2 = new Writeln())
+                {
+                    txt2.MainAdd("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
+                    txt2.MainNewLineTight();
+                    txt2.MainAdd("Read " + counter + " lines from " + fileName);
+                    txt2.MainNewLineTight();
+                    txt2.MainAdd("Found " + equationsByVarname.Count + " distinct equations (use DISP to display them)");
+                    txt2.MainNewLineTight();
+                    if (problems.Count > 0)
+                    {
+                        txt2.MainAdd("There were the following problems while reading the model:");
+                        txt2.MainNewLineTight();
+                        foreach (string s in problems)
+                        {
+                            txt2.MainAdd("+++  " + s);
+                            txt2.MainNewLineTight();
+                        }
+                    }
+                }
             }
 
-            if (G.Equal(o.opt_dump, "yes"))
+            if (dump)
             {
                 using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gcm", null, Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
@@ -1923,6 +1953,7 @@ namespace Gekko
                     sw.Write(sb2);
                 }
             }
+            return modelGams;
         }
 
         /// <summary>
@@ -2060,7 +2091,7 @@ namespace Gekko
                     }
                     else
                     {
-                        string s7 = tok.Offset(i).ToString();
+                        string s7 = tok.Offset(i).ToStringTrim();
                         if (!G.IsIdent(s7))
                         {
                             new Error("Expected a name instead of '" + s7 + "' , " + tok.Offset(i).LineAndPosText());
@@ -2068,7 +2099,7 @@ namespace Gekko
                         }
                         i++;
 
-                        string s8 = tok.Offset(i).ToString();
+                        string s8 = tok.Offset(i).ToStringTrim();
                         if (!(tok.Offset(i).SubnodesTypeParenthesisStart()))
                         {
                             new Error("Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
@@ -2657,7 +2688,21 @@ namespace Gekko
             if (node.HasNoChildren())
             {
                 //not a sub-node
-                if (node.s != "" && node.type == ETokenType.Word)
+                if (node.type == ETokenType.Comment)
+                {
+                    //handle comments so that they are eatable by Gekko
+                    //TODO: $offtext/$ontext and 
+                    //See also #jkadf773js7s
+                    if (node.s.StartsWith("#") || node.s.StartsWith("*"))
+                    {
+                        node.s = "//" + node.s.Substring(1);
+                    }
+                    else if (node.s.StartsWith("!!"))
+                    {
+                        node.s = "//" + node.s.Substring(2);
+                    }
+                }
+                else if (node.s != "" && node.type == ETokenType.Word)
                 {
                     //an IDENT-type leaf node, not symbols etc.
                     //patterns like "log(" or "exp(" or "sum(" are skipped, also stuff like "*(" is avoided

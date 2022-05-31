@@ -2027,9 +2027,77 @@ namespace Gekko
         public static string FindEquationText2(DecompOptions2 decompOptions)
         {
             string rv = "";
+            List<string> eqNames = new List<string>();
             if (decompOptions.modelType == EModelType.GAMSScalar)
-            {
-                rv = "... get equation here ...";
+            {                
+                StringBuilder sb = new StringBuilder();                
+                List<string> rawModel = Program.model.modelGamsScalar.rawModel;
+                if (rawModel != null)
+                {
+                    int count2 = 0;
+                    foreach (Link link in decompOptions.link)
+                    {
+                        //
+                        // TODO: handle a semicolon in a comment, for instance after # 
+                        //
+                        count2++;
+                        if (count2 == 1)
+                        {
+                            sb.AppendLine("");
+                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb.AppendLine("----------------------------------------  GAMS  ----------------------------------------------------------");
+                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb.AppendLine("");
+                        }
+                        else
+                        {
+                            sb.AppendLine("");
+                            sb.AppendLine("----------------------------------------------------------------------------------------------------------");
+                            sb.AppendLine("");
+                        }
+                        string eqName = link.GAMS_dsh[0].name;  //probably link.GAMS_dsh[1].name is the same, or ....????
+                        for (int i = 0; i < rawModel.Count; i++)
+                        {
+                            int pos = rawModel[i].IndexOf(eqName + "[", StringComparison.OrdinalIgnoreCase);
+                            if (rawModel[i].Trim().StartsWith(eqName + "[", StringComparison.OrdinalIgnoreCase))
+                            {
+                                eqNames.Add(eqName);
+                                int count0 = rawModel[i].TakeWhile(Char.IsWhiteSpace).Count();
+                                for (int j = i; j < rawModel.Count; j++)
+                                {
+                                    string s = rawModel[j];
+                                    int count = s.TakeWhile(Char.IsWhiteSpace).Count();
+                                    if (count >= count0) s = s.Substring(count0);
+                                    else s = s.Substring(count);
+
+                                    sb.AppendLine(s);
+                                    if (rawModel[j].Contains(";"))
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }                        
+                    }
+                }
+                string s2 = sb.ToString();
+                ModelGams g = GamsModel.ReadGamsModelHelper(s2, null, null, false, true);
+
+                StringBuilder sb2 = new StringBuilder();
+                sb2.AppendLine(decompOptions.link.Count + " equation" + G.S(decompOptions.link.Count));
+                foreach (string eqName in eqNames)
+                {
+                    foreach (ModelGamsEquation eq in g.equationsByEqname[eqName])
+                    {
+                        sb2.AppendLine("");
+                        sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
+                        sb2.AppendLine("");
+                        sb2.AppendLine("$-condition: " + eq.conditionals);
+                        sb2.AppendLine("");
+                        sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");                        
+                    }
+                }
+                rv = sb2.ToString() + sb.ToString();
             }
             else
             {

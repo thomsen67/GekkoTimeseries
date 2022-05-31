@@ -564,13 +564,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper method for GAMS. Move to GAMS part.
+        /// Helper method for plural "s", like 0 elefants, 1 elefant, 2 elefants, 3 elefants.
         /// </summary>
-        /// <param name="i"></param>
+        /// <param name="chars"></param>
         /// <returns></returns>
-        public static string S(int i)
+        public static string S(int chars)
         {
-            if (i <= 1) return "";
+            if (chars == 1) return "";
             else return "s";
         }
 
