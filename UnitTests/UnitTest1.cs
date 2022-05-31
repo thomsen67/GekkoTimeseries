@@ -11027,9 +11027,9 @@ namespace UnitTests
 
                     if (i == 0)
                     {
-                        ModelGamsScalar.FlushAAndRArrays();
-                        Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-                        Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+                        //ModelGamsScalar.FlushAAndRArrays();
+                        //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+                        //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
                         I("decomp3 <2002 2002 d> y from e1,e2,e3 endo y, c, g;");
                         table = Globals.lastDecompTable;
@@ -11123,9 +11123,9 @@ namespace UnitTests
             I("z3 = 1, 2, 5;");
             Gekko.Table table = null;            
 
-            ModelGamsScalar.FlushAAndRArrays();
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+            //ModelGamsScalar.FlushAAndRArrays();
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2003 d> y from e1, e2, e3 endo y, c, g;");
@@ -11295,9 +11295,9 @@ namespace UnitTests
 
             Gekko.Table table = null;
 
-            ModelGamsScalar.FlushAAndRArrays();
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+            //ModelGamsScalar.FlushAAndRArrays();
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
             // ----------------------------------------
             // 2002-2002, difference
@@ -11473,9 +11473,9 @@ namespace UnitTests
                 I("MODEL <gms> makro.zip;");
                 I("READ <gdx first> makro.zip\\makro1.gdx;");
                 I("READ <gdx ref> makro.zip\\makro0.gdx;");
-                ModelGamsScalar.FlushAAndRArrays();
-                Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-                Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+                //ModelGamsScalar.FlushAAndRArrays();
+                //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+                //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
                 Gekko.Table table = null;
 
@@ -11525,9 +11525,9 @@ namespace UnitTests
             I("READ <gdx ref> makro.zip\\makro0.gdx;");
             I("#a = seq(0, 101).strings();");
             I("#a0100 = seq(0, 100).strings();");
-            ModelGamsScalar.FlushAAndRArrays();
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+            //ModelGamsScalar.FlushAAndRArrays();
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
             Gekko.Table table = null;
 
@@ -11598,9 +11598,9 @@ namespace UnitTests
 
             Gekko.Table table = null;
 
-            ModelGamsScalar.FlushAAndRArrays();
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+            //ModelGamsScalar.FlushAAndRArrays();
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            //Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2002 d> x[y] from e1, e2 endo x[y], x[c];");

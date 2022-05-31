@@ -475,7 +475,7 @@ namespace Gekko
             // shown as "equ" to choose/pivot from
 
             int funcCounter = 0;
-            G.Writeln2(">>>Before low level " + DateTime.Now.ToLongTimeString());
+            //G.Writeln2(">>>Before low level " + DateTime.Now.ToLongTimeString());
 
             bool shouldRecalc = false;
             if (decompDatas.storage == null)
@@ -580,7 +580,7 @@ namespace Gekko
                 else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
                 else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
 
-                G.Writeln2(">>>After low level " + DateTime.Now.ToLongTimeString());
+                //G.Writeln2(">>>After low level " + DateTime.Now.ToLongTimeString());
 
                 if (decompOptions2.link[parentI].varnames == null)
                 {
@@ -1430,7 +1430,7 @@ namespace Gekko
             w = new WindowDecomp(decompOptions);
             Globals.windowsDecomp2.Add(w);            
 
-            G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
+            //G.Writeln2(">>>getexpressions start " + DateTime.Now.ToLongTimeString());
             int count = -1;
             foreach (Link link in decompOptions.link)
             {
@@ -1499,7 +1499,7 @@ namespace Gekko
                 }
                 else new Error("Model type error");
             }
-            G.Writeln2(">>>getexpressions end " + DateTime.Now.ToLongTimeString());
+            //G.Writeln2(">>>getexpressions end " + DateTime.Now.ToLongTimeString());
 
             if (decompOptions.name == null)
             {
