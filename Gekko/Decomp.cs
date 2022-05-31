@@ -3309,6 +3309,8 @@ namespace Gekko
             {
                 if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
+                    //HAAAAAAACK!
+                    //if (decompOptions2.prtOptionLower.StartsWith("x")) return false;
                     //HMMMMM not sure about this and what it does, or if .GAMS_dsh.Count should be used
                     if (varnames.Count == decompOptions2.link[0].GAMS_dsh.Count)
                     {
