@@ -2241,15 +2241,18 @@ namespace Gekko
         public static Table DecompPivotToTable(GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupremeClone, DecompDatas decompDatas, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
         {
             int parentI = 0;
-
-            if (!operator1.StartsWith("x"))
-            {
-                if (true && decompOptions2.modelType == EModelType.GAMSScalar)
+            
+            
+                if (decompOptions2.modelType == EModelType.GAMSScalar)
                 {
                     ENormalizeType normalize = ENormalizeType.Lags;
                     DecompNormalize(per1, per2, decompOptions2, parentI, decompDatasSupremeClone, decompDatas, operatorOneOf3Types, normalize);
-                }
-                else
+                }                
+            
+
+            if (!operator1.StartsWith("x"))
+            {
+                if (decompOptions2.modelType != EModelType.GAMSScalar)                
                 {
                     //Old and bad method, make it disappear soon!
                     DecompNormalizeOLD(per1, per2, decompOptions2, parentI, decompDatasSupremeClone, operatorOneOf3Types);
@@ -3052,165 +3055,60 @@ namespace Gekko
             {
                 new Error("Expected 1 variable for decomposition, got " + decompOptions2.link[parentI].varnames.Count);
             }
-
-            //EDecompBanks decompType = DecompBanks(decompOptions2.prtOptionLower);
-            bool orderNormalize = true; // OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
-
+            
             int j = 0;
-
             DecompData d = decompDatasSupremeClone[j];
             string name = decompOptions2.link[parentI].varnames[j];
             d.lhs = Program.databanks.GetFirst().name + ":" + ConvertToTurtleName(name, 0);  //lag = 0
-            Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[d.lhs];
-            //bool isResidualName = name == Globals.decompResidualName;
-            Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, operatorOneOf3Types, d.lhs);
-            
-            foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+
+            if (!decompOptions2.prtOptionLower.StartsWith("x"))
             {
-                double d1 = lhs2.GetDataSimple(t);
-                double d2 = double.NaN;
-                if (operatorOneOf3Types == EContribType.D)
-                {
-                    d2 = ts.Item1.GetDataSimple(t) - ts.Item1.GetDataSimple(t.Add(-1));
-                }
-                else if (operatorOneOf3Types == EContribType.RD)
-                {
-                    d2 = ts.Item2.GetDataSimple(t) - ts.Item2.GetDataSimple(t.Add(-1));
-                }
-                else if (operatorOneOf3Types == EContribType.M)
-                {
-                    d2 = ts.Item1.GetDataSimple(t) - ts.Item2.GetDataSimple(t);
-                }
 
-                // ----------------------------------------------
+                Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[d.lhs];
+                //bool isResidualName = name == Globals.decompResidualName;
+                Tuple<Series, Series> ts = GetRealTimeseries(decompDatas, operatorOneOf3Types, d.lhs);
 
-                double factor = d2 / d1;
-
-                bool found = false;
-                foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
+                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
-                    if (G.Equal(kvp.Key, d.lhs))
+                    double d1 = lhs2.GetDataSimple(t);
+                    double d2 = double.NaN;
+                    if (operatorOneOf3Types == EContribType.D)
                     {
-                        kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                        found = true;
+                        d2 = ts.Item1.GetDataSimple(t) - ts.Item1.GetDataSimple(t.Add(-1));
                     }
-                    else
+                    else if (operatorOneOf3Types == EContribType.RD)
                     {
-                        //switch sign!
-                        kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                        d2 = ts.Item2.GetDataSimple(t) - ts.Item2.GetDataSimple(t.Add(-1));
                     }
-                }
-                if (found == false)
-                {
-                    MessageBox.Show("*** ERROR: Did not find " + name + " for normalization");
+                    else if (operatorOneOf3Types == EContribType.M)
+                    {
+                        d2 = ts.Item1.GetDataSimple(t) - ts.Item2.GetDataSimple(t);
+                    }
+
+                    // ----------------------------------------------
+
+                    double factor = d2 / d1;
+
+                    bool found = false;
+                    foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
+                    {
+                        if (G.Equal(kvp.Key, d.lhs))
+                        {
+                            kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                            found = true;
+                        }
+                        else
+                        {
+                            //switch sign!
+                            kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                        }
+                    }
+                    if (found == false)
+                    {
+                        MessageBox.Show("*** ERROR: Did not find " + name + " for normalization");
+                    }
                 }
             }
-
-
-
-            //string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-            //string name2 = Program.databanks.GetFirst().name + ":" + name;
-            //string name2Ref = Program.databanks.GetRef().name + ":" + name;
-
-            //if (GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types).ContainsKey(name1))
-            //{
-            //    Series lhs2 = GetDecompDatas(decompDatasSupremeClone[j], operatorOneOf3Types)[name1];
-            //    Series lhsReal = null;
-            //    Series lhsRealRef = null;
-            //    if (isResidualName)
-            //    {
-            //        //just keep lhsReal/lhsRealRef = null
-            //    }
-            //    else
-            //    {
-            //        if (decompType == EDecompBanks.Work)
-            //        {
-            //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-            //        }
-            //        else if (decompType == EDecompBanks.Ref)
-            //        {
-            //            lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
-            //        }
-            //        else if (decompType == EDecompBanks.Multiplier)
-            //        {
-            //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-            //            lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
-            //        }
-            //    }
-
-            //    DecompData d = decompDatasSupremeClone[j];
-            //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-            //    {
-            //        double d1 = lhs2.GetDataSimple(t);
-            //        double factor = 1d;
-
-            //        if (isResidualName)
-            //        {
-            //            //keep factor = 1
-            //        }
-            //        else
-            //        {
-            //            // --------------------------------------------
-            //            //TODO: other operators
-            //            //TODO: other operators
-            //            //TODO: other operators
-            //            //TODO: other operators, this is <d>
-            //            //TODO: other operators
-            //            //TODO: other operators
-            //            //TODO: other operators
-
-            //            //Stuff below does not always work: the variable to be shown may not even be in the first equation (for instance: DECOMP y[#a] in demand[#a] = supply[#a]...
-            //            //So for now, we allow it to be fetched from the databank
-            //            //Series temp = decompDatasSupremeClone[j].cellsQuo.storage[name1];
-            //            //double d2 = temp.GetDataSimple(t) - temp.GetDataSimple(t.Add(-1));        
-
-            //            double d2 = double.NaN;
-
-            //            if (operatorOneOf3Types == EContribType.D)
-            //            {
-            //                d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-            //            }
-            //            else if (operatorOneOf3Types == EContribType.RD)
-            //            {
-            //                d2 = lhsRealRef.GetDataSimple(t) - lhsRealRef.GetDataSimple(t.Add(-1));
-            //            }
-            //            else if (operatorOneOf3Types == EContribType.M)
-            //            {
-            //                d2 = lhsReal.GetDataSimple(t) - lhsRealRef.GetDataSimple(t);
-            //            }
-
-            //            // ----------------------------------------------
-
-            //            factor = d2 / d1;
-            //        }
-
-            //        if (true)
-            //        {
-            //            bool found = false;
-            //            foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(d, operatorOneOf3Types).storage)
-            //            {
-            //                if (G.Equal(kvp.Key, name1))
-            //                {
-            //                    kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-            //                    found = true;
-            //                }
-            //                else
-            //                {
-            //                    //switch sign!
-            //                    kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-            //                }
-            //            }
-            //            if (found == false)
-            //            {
-            //                MessageBox.Show("*** ERROR: Did not find " + name1 + " for normalization");
-            //            }
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    new Error("Could not find variable " + name1 + " in non-linked equation number " + j + ".Beware of alignment: the names and equations must match.");
-            //}            
 
             return;
         }
