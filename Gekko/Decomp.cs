@@ -11,21 +11,23 @@ using MathNet.Numerics.LinearAlgebra.Sparse.Tests;
 
 namespace Gekko
 {
-    class FiveDouble
+    class AggContainer
     {
         public double change;
         public double level;
         public double levelLag;
         public double levelRef;
         public double levelRefLag;
+        public int n;
 
-        public FiveDouble(double change, double level, double levelLag, double levelRef, double levelRefLag)
+        public AggContainer(double change, double level, double levelLag, double levelRef, double levelRefLag, int n)
         {
             this.change = change;
             this.level = level;
             this.levelLag = levelLag;
             this.levelRef = levelRef;
             this.levelRefLag = levelRefLag;
+            this.n = n;
         }
     }
 
@@ -167,6 +169,7 @@ namespace Gekko
             decompOptions2.expression = o.expression;
             decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
             if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
+            if (G.Equal(o.opt_count, "yes")) decompOptions2.count = true;
             decompOptions2.name = o.name;
             decompOptions2.isNew = true;
 
@@ -2517,7 +2520,7 @@ namespace Gekko
 
             List<string> rownames3 = new List<string>();
             List<string> colnames3 = new List<string>();
-            GekkoDictionary<string, FiveDouble> agg = new GekkoDictionary<string, FiveDouble>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, AggContainer> agg = new GekkoDictionary<string, AggContainer>(StringComparer.OrdinalIgnoreCase);
 
             //get the free values start
             bool getFreeValues = false;
@@ -2629,11 +2632,11 @@ namespace Gekko
                 double dLevelRef = row.Get(frame, col_valueLevelRef).data;
                 double dLevelRefLag = row.Get(frame, col_valueLevelRefLag).data;
 
-                FiveDouble td = null;
+                AggContainer td = null;
                 agg.TryGetValue(key, out td);
                 if (td == null)
                 {
-                    agg.Add(key, new FiveDouble(d, dLevel, dLevelLag, dLevelRef, dLevelRefLag));
+                    agg.Add(key, new AggContainer(d, dLevel, dLevelLag, dLevelRef, dLevelRefLag, 1));
                 }
                 else
                 {
@@ -2642,6 +2645,7 @@ namespace Gekko
                     td.levelLag += dLevelLag;
                     td.levelRef += dLevelRef;
                     td.levelRefLag += dLevelRefLag;
+                    td.n += 1;
                 }
             }
 
@@ -2713,13 +2717,14 @@ namespace Gekko
                 {
                     string key = rownames[i] + "¤" + colnames[j];
 
-                    FiveDouble td = null;
+                    AggContainer td = null;
                     agg.TryGetValue(key, out td);
                     double d = 0d;
                     double dLevel = 0d;
                     double dLevelLag = 0d;
                     double dLevelRef = 0d;
                     double dLevelRefLag = 0d;
+                    int n = 0;
 
                     if (td != null)
                     {
@@ -2728,16 +2733,18 @@ namespace Gekko
                         dLevelLag = td.levelLag;
                         dLevelRef = td.levelRef;
                         dLevelRefLag = td.levelRefLag;
+                        n = td.n;
 
                         // ----- first start -----------------------------------------------
                         double dFirstLevel = double.NaN;
                         double dFirstLevelLag = double.NaN;
                         double dFirstLevelRef = double.NaN;
                         double dFirstLevelRefLag = double.NaN;
+                        int dFirstN = 0;
                         string keyFirst = null;
                         if (rownamesFirst != null) keyFirst = rownamesFirst + "¤" + colnames[j];
                         else if (colnamesFirst != null) keyFirst = rownames[i] + "¤" + colnamesFirst;
-                        FiveDouble tdFirst = null;
+                        AggContainer tdFirst = null;
                         agg.TryGetValue(keyFirst, out tdFirst);
                         if (tdFirst != null)
                         {
@@ -2745,6 +2752,7 @@ namespace Gekko
                             dFirstLevelLag = tdFirst.levelLag;
                             dFirstLevelRef = tdFirst.levelRef;
                             dFirstLevelRefLag = tdFirst.levelRefLag;
+                            dFirstN = tdFirst.n;
                         }
                         // ----- first end --------------------------------------------------
 
@@ -2805,14 +2813,20 @@ namespace Gekko
                         {
                             d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
                         }
-
                     }
 
                     int decimals = 0;
                     if (decompOptions2.decompTablesFormat.isPercentageType) decimals = decompOptions2.decompTablesFormat.decimalsPch;
                     else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
                     string format2 = "f16." + decimals.ToString();
-                    tab.SetNumber(i + 2, j + 2, d, format2);
+                    if(decompOptions2.count)
+                    {
+                        tab.SetNumber(i + 2, j + 2, n, "f16.0");
+                    }
+                    else
+                    {
+                        tab.SetNumber(i + 2, j + 2, d, format2);
+                    }
                 }
             }
 

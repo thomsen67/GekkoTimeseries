@@ -119,6 +119,7 @@ tokens {
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
 	ASTOPT_STRING_DYN;
+	ASTOPT_STRING_COUNT;
 	ASTOPT_STRING_BROWSER;
     ASTOPT_STRING_PRINT;
 	ASTOPT_STRING_TOBANK;
@@ -2920,6 +2921,7 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
 decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
+                          | COUNT (EQUAL yesNo)? -> ^(ASTOPT_STRING_COUNT yesNo?)
                           | name -> ^(ASTOPT_STRING_PRTCODE name)
 						    ;
 

@@ -2358,7 +2358,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions2.decompTablesFormat.showErrors = true;
+                this.decompOptions2.count = true;
                 RecalcCellsWithNewType(false);
             }
         }
@@ -2367,7 +2367,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions2.decompTablesFormat.showErrors = false;
+                this.decompOptions2.count = false;
                 RecalcCellsWithNewType(false);                
             }
         }
@@ -2485,6 +2485,7 @@ namespace Gekko
         public GekkoTime t2 = GekkoTime.tNull;
         public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         public bool dyn = false;
+        public bool count = false;
 
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
 
@@ -2559,6 +2560,7 @@ namespace Gekko
             d.t2 = this.t2;
             d.prtOptionLower = this.prtOptionLower;
             d.dyn = this.dyn;
+            d.count = this.count;
 
             d.operatorHelper = new DecompOperatorHelper();
             d.operatorHelper.guiDecompOperator = this.operatorHelper.guiDecompOperator;
