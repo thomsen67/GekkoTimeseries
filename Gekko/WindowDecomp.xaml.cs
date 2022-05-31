@@ -1486,7 +1486,8 @@ namespace Gekko
                 int x; int y;
                 CoordConversion(out x, out y, dockPanel.type, row, col);
                 Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
-                string s = FindEquationText2(this.decompOptions2);
+                string s = null;               
+                s = FindEquationText2(this.decompOptions2);               
                 //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                 equation.Text = s;
             }
@@ -2026,9 +2027,16 @@ namespace Gekko
         public static string FindEquationText2(DecompOptions2 decompOptions)
         {
             string rv = "";
-            foreach (Link link in decompOptions.link)
+            if (decompOptions.modelType == EModelType.GAMSScalar)
             {
-                rv += EquationText(link.eqname, link.expressionText);
+                rv = "... get equation here ...";
+            }
+            else
+            {
+                foreach (Link link in decompOptions.link)
+                {
+                    rv += EquationText(link.eqname, link.expressionText);
+                }
             }
             return rv;
         }
@@ -2408,7 +2416,8 @@ namespace Gekko
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
         public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
-        
+        public bool dyn = false;
+
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
 
         public List<string> subst = new List<string>();
@@ -2481,6 +2490,7 @@ namespace Gekko
             d.t1 = this.t1;
             d.t2 = this.t2;
             d.prtOptionLower = this.prtOptionLower;
+            d.dyn = this.dyn;
 
             d.operatorHelper = new DecompOperatorHelper();
             d.operatorHelper.guiDecompOperator = this.operatorHelper.guiDecompOperator;

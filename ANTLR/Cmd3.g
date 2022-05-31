@@ -2919,7 +2919,9 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngle2          decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 decompOpt1h*)							
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
-decompOpt1h:				name -> ^(ASTOPT_STRING_PRTCODE name);
+decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
+                          | name -> ^(ASTOPT_STRING_PRTCODE name)
+						    ;
 
 decompOpt2:					ISNOTQUAL
 						  | leftAngle name RIGHTANGLE -> name 

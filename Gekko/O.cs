@@ -8071,6 +8071,7 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set  
             public string type = null;
             public string opt_prtcode = null;
+            public string opt_dyn = null;  //yes|no
             public string variable = null;
             public string expressionCs = null;
             public Func<GekkoSmpl, IVariable> expression = null;            

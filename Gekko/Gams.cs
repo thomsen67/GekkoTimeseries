@@ -1655,15 +1655,30 @@ namespace Gekko
                 {
                     new Error("JSON: setting unrolledModel not found");
                 }
-                input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, o.p);
-
+                else
+                {
+                    input.ffh_unrolledModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledModel, folders, true, true, o.p);
+                }
 
                 try { input.unrolledNames = (string)jsonTree["unrolledNames"]; } catch { }
                 if (input.unrolledNames == null)
                 {
                     new Error("JSON: setting unrolledNames not found");
                 }
-                input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, o.p);
+                else
+                {
+                    input.ffh_unrolledNames = Program.FindFile(input.zipFilePathAndName + "\\" + input.unrolledNames, folders, true, true, o.p);
+                }
+
+                try { input.rawModel = (string)jsonTree["rawModel"]; } catch { }
+                if (input.rawModel == null)
+                {
+                    //ignore
+                }
+                else
+                {
+                    input.ffh_rawModel = Program.FindFile(input.zipFilePathAndName + "\\" + input.rawModel, folders, true, true, o.p);
+                }
 
                 new Writeln("Unzip: " + G.Seconds(t3));
 

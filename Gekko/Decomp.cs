@@ -166,6 +166,7 @@ namespace Gekko
             decompOptions2.expressionOld = o.label;
             decompOptions2.expression = o.expression;
             decompOptions2.prtOptionLower = o.opt_prtcode.ToLower();
+            if (G.Equal(o.opt_dyn, "yes")) decompOptions2.dyn = true;
             decompOptions2.name = o.name;
             decompOptions2.isNew = true;
 
@@ -610,7 +611,22 @@ namespace Gekko
                 {
                     if (decompOptions2.modelType == EModelType.GAMSScalar)
                     {
-                        DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI);
+                        bool dyn = false;
+                        if (decompOptions2.dyn)
+                        {
+                            //decomp over time, resolving lags/leads                            
+                            DecompMainHelperInvertScalar(per1, per2, decompOptions2, decompDatas, operatorOneOf3Types, parentI, true);
+                        }
+                        else
+                        {
+                            //decomp period by period, showing lags/leads.
+                            bool refreshObjects = true;
+                            foreach (GekkoTime gt in new GekkoTimeIterator(per1, per2))
+                            {
+                                DecompMainHelperInvertScalar(gt, gt, decompOptions2, decompDatas, operatorOneOf3Types, parentI, refreshObjects);
+                                refreshObjects = false;
+                            }
+                        }
                     }
                     else
                     {
@@ -1036,7 +1052,7 @@ namespace Gekko
         /// <param name="decompDatas"></param>
         /// <param name="operatorOneOf3Types"></param>
         /// <param name="parentI"></param>
-        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI)
+        private static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects)
         {
             GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -1160,7 +1176,13 @@ namespace Gekko
 
             int n = endo.Count + exo.Count;
 
-            decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up            
+            if (refreshObjects)
+            {
+                decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up            
+                DecompData dd2 = new DecompData();
+                DecompInitDict(dd2);
+                decompDatas.MAIN_data.Add(dd2);
+            }
 
             double[,] inverse = null;
 
@@ -1190,11 +1212,7 @@ namespace Gekko
 
             double[,] effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count
 
-            //the effect matrix is #endo x #exo
-
-            DecompData dd2 = new DecompData();
-            DecompInitDict(dd2);
-            decompDatas.MAIN_data.Add(dd2);
+            //the effect matrix is #endo x #exo            
 
             //List<string> selected = new List<string>();
             //foreach (string s in decompOptions2.new_select)

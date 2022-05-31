@@ -8565,7 +8565,7 @@ namespace Gekko
             try
             {
 
-                if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless)
+                if (ts.type == ESeriesType.Normal || ts.type == ESeriesType.Timeless || ts.type == ESeriesType.ArraySuper)
                 {
                     string label_string = "";  //DGR asked to omit "Label: ", and it is typically pretty obvious anyway.
                     string source_string = "Source: "; if (danish) source_string = "Kilde: ";
@@ -30291,10 +30291,12 @@ namespace Gekko
         public string zipFilePathAndName = null;  //the file that contains it all
         public FindFileHelper ffh_unrolledModel = null; //GAMS scalar model, with variables x1, x2, x3, ...
         public FindFileHelper ffh_unrolledNames = null; //Translation of x1, x2, x3, ... into "normal" variables
+        public FindFileHelper ffh_rawModel = null; //non-unrolled equations
         public FindFileHelper ffh_referenceData = null; //Baseline/reference scenario
         public FindFileHelper ffh_multiplierData = null; //Shock/multiplier scenario (optional)
         public string unrolledModel = null; //raw filename without path
         public string unrolledNames = null; //raw filename without path
+        public string rawModel = null; //raw filename without path
         public string referenceData = null; //raw filename without path
         public string multiplierData = null; //raw filename without path
         // ------

@@ -11318,6 +11318,8 @@ namespace UnitTests
             //   y3    1.71            y[+2]    1.71
             //
 
+
+
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2002 d> y from e1, e2 endo y, c;");
             table = Globals.lastDecompTable;
@@ -11329,12 +11331,13 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "y");  //really y{extra}
             Assert.AreEqual(table.Get(4, 2).number, 32d - 20d / 0.7d, 0.0001);
 
+
             // ----------------------------------------
             // 2001-2002, multiplier
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 m> y from e1, e2 endo y, c;");
+            I("decomp3 <2001 2002 dyn m> y from e1, e2 endo y, c;");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
@@ -11350,7 +11353,7 @@ namespace UnitTests
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 m> y from e1, e2 endo y, c rows vars, lags cols time;");
+            I("decomp3 <2001 2002 dyn m> y from e1, e2 endo y, c rows vars, lags cols time;");
             table = Globals.lastDecompTable;
             i = 0;
             i++;
@@ -11548,7 +11551,7 @@ namespace UnitTests
             //I("decomp3 <2028 2028 m> vHhxAfk[tot] from E_vHhxAfk_aTot endo vHhxAfk[tot] rows vars, lags cols time;");                        
             //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_akt[akt, tot] endo vHh[IndlAktier,tot] rows vars, lags cols time;");
             //I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a] endo vHh[IndlAktier,tot], vHh[IndlAktier,#a]  rows vars, lags cols time;");
-            I("decomp3 <2028 2028 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a], E_vHhx[#a0100]  endo vHh[IndlAktier,tot], vHh[IndlAktier,#a], vHhx[#a0100]  rows vars, lags cols time;");
+            I("decomp3 <2028 2032 m> vHh[IndlAktier,tot] from E_vHh_aTot[IndlAktier], E_vHh_akt[IndlAktier,#a], E_vHhx[#a0100]  endo vHh[IndlAktier,tot], vHh[IndlAktier,#a], vHhx[#a0100]  rows vars, lags cols time;");
 
             if (false)
             {
@@ -11618,7 +11621,7 @@ namespace UnitTests
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 m> x[y] from e1, e2 endo x[y], x[c];");
+            I("decomp3 <2001 2002 dyn m> x[y] from e1, e2 endo x[y], x[c];");
             table = Globals.lastDecompTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
@@ -11637,7 +11640,7 @@ namespace UnitTests
             // ----------------------------------------
 
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-            I("decomp3 <2001 2002 m> x[y] from e1, e2 endo x[y], x[c] rows vars, #uni, lags cols time;");
+            I("decomp3 <2001 2002 dyn m> x[y] from e1, e2 endo x[y], x[c] rows vars, #uni, lags cols time;");
             table = Globals.lastDecompTable;
             i = 0;
             i++;

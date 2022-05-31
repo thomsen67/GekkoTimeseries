@@ -1174,16 +1174,25 @@ namespace Gekko
         /// <returns></returns>
         public static string ExtractOnlyVariableIgnoreLag(string key, string code)
         {
-            if (key == null) return null;
             string variable = null;
-            int indx = key.LastIndexOf(code); //in decomp window, we may have x['a', 'z'][-1], so therefore we look for the last '['       
-            if (indx != -1)
+            if (key == null) return null;
+            if (key.Contains("|"))
             {
-                string rest = key.Substring(indx);
-                if (rest.Contains("'") || rest.Contains(Globals.symbolCollection.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
-                else variable = key.Substring(0, indx - 0);
+                //Total hack here
+                string[] ss = key.Split('|');
+                if (ss.Length >= 1 && G.IsIdent(ss[0].Trim())) variable = ss[0].Trim();
             }
-            else variable = key;
+            else
+            {
+                int indx = key.LastIndexOf(code); //in decomp window, we may have x['a', 'z'][-1], so therefore we look for the last '['       
+                if (indx != -1)
+                {
+                    string rest = key.Substring(indx);
+                    if (rest.Contains("'") || rest.Contains(Globals.symbolCollection.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
+                    else variable = key.Substring(0, indx - 0);
+                }
+                else variable = key;
+            }
             return variable;
         }
 
