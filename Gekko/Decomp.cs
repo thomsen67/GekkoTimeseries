@@ -1269,13 +1269,15 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get DECOMP type. Not for "x" type options, and not for stuff like dp or mp --
-        /// these return .Unknown. Handles types m, q, d, p, rd, rp.
+        /// Get DECOMP type. Not for stuff like dp or mp --
+        /// these return .Unknown. Handles types m, q, d, p, rd, rp. Also handles prefix "x".
         /// </summary>
         /// <param name="operator1"></param>
         /// <returns></returns>
-        private static EDecompBanks DecompGetType(string operator1)
-        {            
+        private static EDecompBanks DecompGetType(string operator1x)
+        {
+            string operator1 = operator1x;
+            if (operator1x.StartsWith("x")) operator1 = operator1x.Substring(1);
             EDecompBanks type = EDecompBanks.Unknown;
             if (operator1 == "m" || operator1 == "q") type = EDecompBanks.Multiplier;
             else if (operator1 == "d" || operator1 == "p") type = EDecompBanks.Work;
