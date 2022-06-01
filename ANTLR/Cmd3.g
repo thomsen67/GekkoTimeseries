@@ -1070,7 +1070,7 @@ Y2                    = 'Y2'                       ;
     COPYLOCAL        = 'COPYLOCAL'       ;
 	LOCAL        = 'LOCAL'       ;
 	GLOBAL        = 'GLOBAL'       ;
-    COUNT = 'COUNT';
+    COUNT = 'COUNT';	
     CPLOT            = 'CPLOT'       ;
     CREATE           = 'CREATE'          ;
     CREATEVARS       = 'CREATEVARS'      ;
@@ -2921,7 +2921,7 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
 decompOpt1h:				DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)
-                          | COUNT (EQUAL yesNo)? -> ^(ASTOPT_STRING_COUNT yesNo?)
+                          | COUNT EQUAL name -> ^(ASTOPT_STRING_COUNT name)  //n | names
                           | name -> ^(ASTOPT_STRING_PRTCODE name)
 						    ;
 

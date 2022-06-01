@@ -546,9 +546,10 @@ namespace Gekko
         /// if calling it in a tight loop.
         /// </summary>
         /// <param name="i"></param>
-        public double Eval(int i, bool isRef)
+        public double Eval(int i, bool isRef, ref int funcCounter)
         {
             //NOTE: this.functions() can return a sum (with illegals signal).
+            funcCounter++;
             if (isRef)
             {
                 this.functions[this.ee[i]](i, this.r_ref, this.a_ref, this.cc, this.bb, this.dd);

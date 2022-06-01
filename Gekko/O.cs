@@ -8072,7 +8072,7 @@ namespace Gekko
             public string type = null;
             public string opt_prtcode = null;
             public string opt_dyn = null;  //yes|no
-            public string opt_count = null;  //yes|no
+            public string opt_count = null;  //n | names
             public string variable = null;
             public string expressionCs = null;
             public Func<GekkoSmpl, IVariable> expression = null;            

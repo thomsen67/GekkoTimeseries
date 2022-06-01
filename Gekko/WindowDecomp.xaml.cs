@@ -45,8 +45,7 @@ namespace Gekko
     /// Interaction logic for Window1.xaml
     /// </summary>
     public partial class WindowDecomp : Window
-    {
-
+    {       
 
         public enum GekkoTableTypes
         {
@@ -2093,7 +2092,7 @@ namespace Gekko
                         sb2.AppendLine("----------------------------------------------------------------------------------------------------------");
                         sb2.AppendLine("");
                         sb2.AppendLine("$-condition: " + eq.conditionals);
-                        sb2.AppendLine("");
+                        //sb2.AppendLine("");
                         sb2.AppendLine(eq.lhs + " = " + eq.rhs + ";");                        
                     }
                 }
@@ -2358,7 +2357,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions2.count = true;
+                this.decompOptions2.count = ECountType.N;
                 RecalcCellsWithNewType(false);
             }
         }
@@ -2367,7 +2366,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions2.count = false;
+                this.decompOptions2.count = ECountType.None;
                 RecalcCellsWithNewType(false);                
             }
         }
@@ -2416,6 +2415,24 @@ namespace Gekko
             taskList.Clear();
             foreach (GekkoTask t in m) taskList.Add(t);
         }
+
+        private void checkBoxErrors2_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompOptions2.count = ECountType.Names;
+                RecalcCellsWithNewType(false);
+            }
+        }
+
+        private void checkBoxErrors2_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!isInitializing)
+            {
+                this.decompOptions2.count = ECountType.None;
+                RecalcCellsWithNewType(false);
+            }
+        }
     }
 
     public class GekkoDockPanel2 : DockPanel
@@ -2460,6 +2477,13 @@ namespace Gekko
         public bool showErrors = false;
     }
 
+    public enum ECountType
+    {
+        None,
+        N,
+        Names
+    }
+
     public class DecompOptions2
     {
         //public List<List<PeriodAndVariable>> precedentsScalar = null;
@@ -2485,7 +2509,7 @@ namespace Gekko
         public GekkoTime t2 = GekkoTime.tNull;
         public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         public bool dyn = false;
-        public bool count = false;
+        public ECountType count = ECountType.None;
 
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
 
@@ -2540,7 +2564,7 @@ namespace Gekko
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = null;
 
-        public Data data = null;
+        public Data dataPattern = null;
 
         public DecompOptions2 Clone()
         {
@@ -2644,9 +2668,9 @@ namespace Gekko
             }
             d.new_endo = tempEndo;
 
-            d.data = new Data();
-            d.data.dataCellsGradQuo = (Series)this.data.dataCellsGradQuo.DeepClone(null);
-            d.data.dataCellsGradRef = (Series)this.data.dataCellsGradRef.DeepClone(null);
+            d.dataPattern = new Data();
+            d.dataPattern.dataCellsGradQuo = (Series)this.dataPattern.dataCellsGradQuo.DeepClone(null);
+            d.dataPattern.dataCellsGradRef = (Series)this.dataPattern.dataCellsGradRef.DeepClone(null);
 
             return d;
         }
