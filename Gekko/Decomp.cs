@@ -1138,6 +1138,7 @@ namespace Gekko
                         {
                             row++;
 
+                            //see also #as7f3læaf9
                             string name1 = AddTimeToIndexes(dsh.name, new List<string>(dsh.indexes.storage), t);
                             string name2 = dsh.name + "[" + t.ToString() + "]";
                             int eqNumber = Program.model.modelGamsScalar.dict_FromEqNameToEqNumber[name1];
@@ -1145,6 +1146,7 @@ namespace Gekko
                             //foreach precedent variable
                             for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
                             {
+                                //see also #as7f3læaf9
                                 PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
                                 string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
                                 int date = dp.date;

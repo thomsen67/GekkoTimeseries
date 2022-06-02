@@ -13174,7 +13174,12 @@ namespace Gekko
             }
             else
             {
-                DispHelperNormalSeries(tStart, tEnd, showAllPeriods, ts, varnameWithoutFreq, isTimeless);
+                DispHelperNormalSeries(tStart, tEnd, showAllPeriods, ts, varnameWithoutFreq, isTimeless);                
+            }
+
+            if (G.GetModelType() == EModelType.GAMSScalar)
+            {
+                //we try to fetch equation names
             }
 
             G.Writeln("==========================================================================================");

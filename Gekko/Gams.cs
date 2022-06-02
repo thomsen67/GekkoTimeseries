@@ -1097,7 +1097,7 @@ namespace Gekko
                     }
                 }
             }
-            
+
 
             if (true)
             {
@@ -1106,7 +1106,7 @@ namespace Gekko
                 // -------------- these can evaluate an equation ---------
                 Program.model.modelGamsScalar.functions = functions;
                 Program.model.modelGamsScalar.a = a;
-                Program.model.modelGamsScalar.r = r;                
+                Program.model.modelGamsScalar.r = r;
 
                 Program.model.modelGamsScalar.bb = bb;
                 Program.model.modelGamsScalar.cc = cc;
@@ -1140,6 +1140,75 @@ namespace Gekko
                 Program.model.modelGamsScalar.codeLines = codeLines;
                 Program.model.modelGamsScalar.rawModel = rawModel;
 
+                if (Globals.runningOnTTComputer)
+                {
+                    //mapping from a varname to the equations it is part of
+                    GekkoDictionary<string, List<string>> varsToEqs = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, List<string>> eqsToVars = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                    for (int eqNumber = 0; eqNumber < Program.model.modelGamsScalar.CountEqs(1); eqNumber++)
+                    {
+                        //foreach precedent variable
+                        for (int i = 0; i < Program.model.modelGamsScalar.bb[eqNumber].Length; i += 2)
+                        {
+                            PeriodAndVariable dp = new PeriodAndVariable(Program.model.modelGamsScalar.bb[eqNumber][i], Program.model.modelGamsScalar.bb[eqNumber][i + 1]);
+                            string varName = Program.model.modelGamsScalar.GetVarNameA(dp.variable);
+                            string eqName2 = Program.model.modelGamsScalar.dict_FromEqNumberToEqName[eqNumber];
+
+                            string eqName = null;
+                            string name = null; GekkoTime time = GekkoTime.tNull; string resultingFullName = null; List<string> notUsed = null;
+                            ExtractTimeDimension(eqName2, true, ref name, ref time, ref eqName, out notUsed);
+
+                            List<string> temp1 = null; varsToEqs.TryGetValue(varName, out temp1);
+                            if (temp1 == null)
+                            {
+                                varsToEqs.Add(varName, new List<string>() { eqName });
+                            }
+                            else
+                            {
+                                if (!temp1.Contains(eqName, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    temp1.Add(eqName);
+                                }
+                            }
+
+                            List<string> temp2 = null; eqsToVars.TryGetValue(eqName, out temp2);
+                            if (temp2 == null)
+                            {
+                                eqsToVars.Add(eqName, new List<string>() { varName });
+                            }
+                            else
+                            {
+                                if (!temp2.Contains(varName, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    temp2.Add(varName);
+                                }
+                            }
+                        }
+                    }
+                    
+                    using (FileStream fs = Program.WaitForFileStream(Program.CreateFullPathAndFileName("varsToEqs.txt"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (KeyValuePair<string, List<string>> kvp in varsToEqs)
+                        {
+                            sw.WriteLine(kvp.Key + "  ==>  " + Stringlist.GetListWithCommas(kvp.Value));
+                        }                        
+                        sw.Flush();
+                        sw.Close();
+                    }
+
+                    using (FileStream fs = Program.WaitForFileStream(Program.CreateFullPathAndFileName("eqsToVars.txt"), null, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        foreach (KeyValuePair<string, List<string>> kvp in eqsToVars)
+                        {
+                            sw.WriteLine(kvp.Key + "  ==>  " + Stringlist.GetListWithCommas(kvp.Value));
+                        }
+                        sw.Flush();
+                        sw.Close();
+                    }
+
+                }
             }
             return;
         }

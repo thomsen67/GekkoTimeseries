@@ -11229,6 +11229,10 @@ namespace UnitTests
             // [y2]   =   [ 0.21/0.4-0.3   0.09/0.4+0.3   0.7/0.4-1    0.3/0.4+1 ]  [y3]
             //                                                                      [g1]
             //                                                                      [g2]
+            //
+            // y1 = 1.75 * g1 + 0.75 * g2 + 0.525 * y0 + 0.225 * y3 
+            // y2 = 0.75 * g1 + 1.75 * g2 + 0.225 * y0 + 0.525 * y3
+            //
             // If only g1 and g2 change
             //
             // y1 = 1.75 * g1 + 0.75 * g2
@@ -11318,8 +11322,7 @@ namespace UnitTests
             //   y3    1.71            y[+2]    1.71
             //
 
-
-
+            
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2002 2002 d> y from e1, e2 endo y, c;");
             table = Globals.lastDecompTable;
@@ -11335,7 +11338,7 @@ namespace UnitTests
             // ----------------------------------------
             // 2001-2002, multiplier
             // ----------------------------------------
-
+            
             //Globals.showDecompTable = true;  //will show the following decomp table and then abort
             I("decomp3 <2001 2002 dyn m> y from e1, e2 endo y, c;");
             table = Globals.lastDecompTable;
