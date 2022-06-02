@@ -11516,6 +11516,41 @@ namespace UnitTests
             }
         }
 
+        
+        [TestMethod]
+        public void _Test_Tracing()
+        {
+            //data lineage is a description of how data flows in its life cycle
+            //traceability is the activity
+            //data origin or provenance: where it comes from originally -->
+            //  how and why has it changed since that?
+            //when data flows, it will pick up some but not all characteristics from its previous states.
+            //"Data traceability is the actual exercise to track access, values, and changes to the data as they flow through their lineage."
+            //data trust
+            try
+            {
+                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                I("reset; time 2021 2023;");
+                I("x = 2, 3, 4;");
+                I("y = 12, 13, 14;");
+                I("y <dyn> = y[-1] + x + 1;");
+                I("xx = series(2);");
+                I("xx[a, b] = 22, 23, 24;");
+                I("xx[c, d] = 32, 33, 34;");
+
+                string s = null;
+                foreach (KeyValuePair<string, int> kvp in Globals.precedents)
+                {
+                    s += kvp.Key + G.NL;
+                }
+            }
+            finally
+            {
+                Globals.precedents = null;
+            }
+
+        }
+
         [TestMethod]
         public void _Test_DecompSimul6()
         {
