@@ -195,7 +195,9 @@ namespace Gekko
 
         public static GekkoDictionary<string, int> precedents = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
-        
+
+        public static GekkoDictionary<string, int> trace = null;  //used for tracing
+
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";
         public const string defaultCommandFileExtension = "gcm";  //merge this with the above...

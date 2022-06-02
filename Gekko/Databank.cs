@@ -153,7 +153,7 @@ namespace Gekko
             {
                 iv.DeepTrim();
             }
-            G.WritelnGray("TRIM: " + G.Seconds(t0));            
+            G.WritelnGray("TRIM: " + G.Seconds(t0));
         }
 
         /// <summary>
@@ -168,7 +168,9 @@ namespace Gekko
             {
                 this.storage.TryGetValue(variable, out iv);
             }
+            //What about 
             Program.PrecedentsHelper(null, iv, this);
+            Program.TraceHelper();  
             return iv;
         }
 
@@ -185,9 +187,15 @@ namespace Gekko
             }
             IVariable iv = null;
             this.storage.TryGetValue(variable, out iv);
+            Program.TraceHelper();
             return iv;
         }        
 
+        /// <summary>
+        /// Overload. May write a list file.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="x"></param>
         public void AddIVariableWithOverwrite(string name, IVariable x)
         {
             if (name != null && Program.IsListfileArtificialName(name))
@@ -209,6 +217,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="x"></param>
         public void AddIVariableWithOverwrite(IVariable x)
         {
             if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -224,11 +236,22 @@ namespace Gekko
             else throw new GekkoException();  //only intended for series            
         }
 
+        /// <summary>
+        /// Overload
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="x"></param>
         public void AddIVariable(string name, IVariable x)
         {
             AddIVariable(name, x, false);
         }
 
+        /// <summary>
+        /// Main central method for adding a new IVariable. The other adding methods here go through this.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="x"></param>
+        /// <param name="isSimpleName"></param>
         public void AddIVariable(string name, IVariable x, bool isSimpleName)
         {
             if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -249,19 +272,34 @@ namespace Gekko
                 ts.name = name;
             }
             AddIvariableHelper(name, x);
+            Program.TraceHelper();
         }
 
+        /// <summary>
+        /// What is the purpose of this method?
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="x"></param>
         private void AddIvariableHelper(string name, IVariable x)
         {
             //See also #0893543895, here the name is set outside this helper method
             this.storage.Add(name, x);
         }
 
+        /// <summary>
+        /// Remove a variable
+        /// </summary>
+        /// <param name="name"></param>
         public void RemoveIVariable(string name)
         {
             if (this.storage.ContainsKey(name)) this.storage.Remove(name);
         }
 
+        /// <summary>
+        /// Check existence of a variable
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public bool ContainsIVariable(string name)
         {
             return this.storage.ContainsKey(name);

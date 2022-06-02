@@ -6967,6 +6967,20 @@ namespace Gekko
             }
         }
 
+        public static void TraceHelper()
+        {
+            IVariable iv = null;
+            Databank db = null;
+            if (Globals.trace != null && iv != null)
+            {
+                Series rv_series = iv as Series;
+                if (rv_series != null)
+                {
+                    //something like AddToPrecedents()...
+                }
+            }
+        }
+
         /// <summary>
         /// Used for playing a sound after long-running jobs.
         /// </summary>

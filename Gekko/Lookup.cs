@@ -348,7 +348,6 @@ namespace Gekko
 
                     }
                 }
-
             }
 
             if (settings.type == ELookupType.LeftHandSide)
