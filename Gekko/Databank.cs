@@ -162,7 +162,9 @@ namespace Gekko
         /// <param name="variable"></param>
         /// <returns></returns>
         public IVariable GetIVariable(string variable)
-        {            
+        {
+            //Most and maybe all variable access goes through here (see also #jslej48djsd9)
+            //Beware that an array-superseries is accessed here, but its sub-series are 
             IVariable iv = null;
             if (this.storage.Count > 0)
             {
@@ -170,24 +172,8 @@ namespace Gekko
             }
             //What about 
             Program.PrecedentsHelper(null, iv, this);
-            Program.TraceHelper();  
-            return iv;
-        }
-
-        /// <summary>
-        /// Get IVariable from databank, possibly adding global frequency to the name. May return null.
-        /// </summary>
-        /// <param name="variable"></param>
-        /// <returns></returns>
-        public IVariable GetIVariableWithAddedFreq(string variable)
-        {
-            if (!G.StartsWithSigil(variable))
-            {
-                variable = G.Chop_AddFreq(variable, Program.options.freq);
-            }
-            IVariable iv = null;
-            this.storage.TryGetValue(variable, out iv);
-            Program.TraceHelper();
+            bool isLhs = true;
+            Program.Trace(variable, this, iv, isLhs);  
             return iv;
         }        
 
@@ -272,7 +258,7 @@ namespace Gekko
                 ts.name = name;
             }
             AddIvariableHelper(name, x);
-            Program.TraceHelper();
+            Program.Trace(name, this, x, true);
         }
 
         /// <summary>

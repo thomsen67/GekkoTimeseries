@@ -273,6 +273,7 @@ namespace Gekko
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
 
+            //Most and maybe all variable access goes through here (see also Databank.GetIVariable(), #jslej48djsd9)
             //only adds freq if not there. No sigil is added for lhs vars here.
             string varnameWithFreq = G.AddFreq(varname, freq, type, settings.type);
 

@@ -2217,6 +2217,15 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
+        /// <summary>
+        /// Find sub-series inside array super-series
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="indexes"></param>
+        /// <param name="isLhs"></param>
+        /// <param name="rhsIsTimeless"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
         public IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs, bool rhsIsTimeless, LookupSettings settings)
         {
             if (indexes.Length == 0)
@@ -2245,164 +2254,170 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Helper method (find sub-series inside array super-series)
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="isLhs"></param>
+        /// <param name="keys"></param>
+        /// <param name="rhsIsTimeless"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
         private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys, bool rhsIsTimeless, LookupSettings settings)
-        {            
+        {
             IVariable rv = null;
-            if (true)
+
+            if (this.dimensionsStorage == null)
+            {
+                string txt = null;
+                foreach (string ss in keys) txt += "'" + ss + "', ";
+                using (Error e = new Error())
+                {
+                    e.MainAdd("The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
+                    e.MainAdd("Indexer used: [" + txt.Substring(0, txt.Length - 2) + "].");
+                    e.MainAdd("You may use '" + this.name + " = series(" + keys.Length + ");' to create it,");
+                    e.MainAdd("perhaps with 'CREATE " + this.name + ";' first.");
+                }
+            }
+
+            IVariable iv = null;
+            if (this.dimensions != keys.Length)
+            {
+                new Error(keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
+            }
+
+            MultidimItem mi = new MultidimItem(keys);
+            this.dimensionsStorage.TryGetValue(mi, out iv);
+            string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(this.freq);
+
+            if (iv == null)
             {
 
-                if (this.dimensionsStorage == null)
+                if (!isLhs)
                 {
-                    string txt = null; foreach (string ss in keys) txt += "'" + ss + "', ";
-                    using (Error e = new Error())
+
+                    //on the RHS
+
+                    if (smpl != null && smpl.command == GekkoSmplCommand.Unfold)
                     {
-                        e.MainAdd("The variable '" + this.meta.parentDatabank.name + ":" + this.name + "' is not an array-timeseries.");
-                        e.MainAdd("Indexer used: [" + txt.Substring(0, txt.Length - 2) + "].");
-                        e.MainAdd("You may use '" + this.name + " = series(" + keys.Length + ");' to create it,");
-                        e.MainAdd("perhaps with 'CREATE " + this.name + ";' first.");
-                    }                    
-                }
-
-                IVariable iv = null;
-                if (this.dimensions != keys.Length)
-                {
-                    new Error(keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
-                }
-                                
-                this.dimensionsStorage.TryGetValue(new MultidimItem(keys), out iv);                
-                string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.ConvertFreq(this.freq);
-
-                if (iv == null)
-                {   
-
-                    if (!isLhs)
-                    {
-
-                        //on the RHS
-
-                        if (smpl != null && smpl.command == GekkoSmplCommand.Unfold)
+                        //print
+                        if (Program.options.series_array_print_missing == ESeriesMissing.Error)
                         {
-                            //print
-                            if (Program.options.series_array_print_missing == ESeriesMissing.Error)
-                            {
-                                FindArraySeriesHelper2(keys);  //error
-                            }
-                            else if (Program.options.series_array_print_missing == ESeriesMissing.M)
-                            {
-                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MultidimItem(keys, this);
-                                ((Series)rv).SetTimelessData(double.NaN);
-                                ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.M;
-                            }
-                            else if (Program.options.series_array_print_missing == ESeriesMissing.Zero)
-                            {
-                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MultidimItem(keys, this);
-                                ((Series)rv).SetTimelessData(0d);
-                                ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Zero;
-                            }
-                            else if (Program.options.series_array_print_missing == ESeriesMissing.Skip)
-                            {
-                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MultidimItem(keys, this);
-                                ((Series)rv).SetTimelessData(0d);  //must be 0 for .isNotFound to work
-                                ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Skip;
-                            }
-                            else throw new GekkoException();
+                            FindArraySeriesHelper2(keys);  //error
                         }
-                        else //GekkoSmplCommand.Sum but also others, like GetIVariableFromString()
+                        else if (Program.options.series_array_print_missing == ESeriesMissing.M)
                         {
-                            //sum and others, non-print
-
-                            //we start checking out settings (may be null). These origin from FindIVariableFromString(), will be null in normal expressions etc.
-
-                            if (settings?.create == O.ECreatePossibilities.NoneReturnNull)
-                            {
-                                rv = null;  //just return null
-                            }
-                            else if (settings?.create == O.ECreatePossibilities.Can || settings?.create == O.ECreatePossibilities.Must)
-                            {
-                                Series ts = new Series(ESeriesType.Normal, this.freq, name2);
-                                this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), ts);
-                                rv = ts;
-                            }
-                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
-                            {
-                                FindArraySeriesHelper2(keys);  //error
-                            }
-                            else if (Program.options.series_array_calc_missing == ESeriesMissing.M)
-                            {
-                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MultidimItem(keys, this);
-                                ((Series)rv).SetTimelessData(double.NaN);
-                            }
-                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Zero)
-                            {
-                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
-                                ((Series)rv).mmi = new MultidimItem(keys, this);
-                                ((Series)rv).SetTimelessData(0d);
-                            }
-                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
-                            {
-                                new Error("Please use 'OPTION series array calc missing = zero' instead of 'skip'");
-                                //throw new GekkoException();
-                            }
-                            else throw new GekkoException();
+                            rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                            ((Series)rv).mmi = new MultidimItem(keys, this);
+                            ((Series)rv).SetTimelessData(double.NaN);
+                            ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.M;
                         }
-
+                        else if (Program.options.series_array_print_missing == ESeriesMissing.Zero)
+                        {
+                            rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                            ((Series)rv).mmi = new MultidimItem(keys, this);
+                            ((Series)rv).SetTimelessData(0d);
+                            ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Zero;
+                        }
+                        else if (Program.options.series_array_print_missing == ESeriesMissing.Skip)
+                        {
+                            rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                            ((Series)rv).mmi = new MultidimItem(keys, this);
+                            ((Series)rv).SetTimelessData(0d);  //must be 0 for .isNotFound to work
+                            ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Skip;
+                        }
+                        else throw new GekkoException();
                     }
-                    else
+                    else //GekkoSmplCommand.Sum but also others, like GetIVariableFromString()
                     {
-                        //lhs variable like the 'a' element in x[a], where x[a] is on LHS
+                        //sum and others, non-print
 
-                        if (Program.options.databank_create_auto || this.name.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
-                        {
-                            //good
-                        }
-                        else
-                        {
-                            //#07549843254
-                            new Error("Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + Stringlist.GetListWithCommas(keys) + "]. You may change the settings with the following option: OPTION databank create auto = yes;.");                      
-                        }
+                        //we start checking out settings (may be null). These origin from FindIVariableFromString(), will be null in normal expressions etc.
 
-                        if (rhsIsTimeless)
+                        if (settings?.create == O.ECreatePossibilities.NoneReturnNull)
                         {
-                            rv = new Series(ESeriesType.Timeless, this.freq, name2, double.NaN);
+                            rv = null;  //just return null
                         }
-                        else
+                        else if (settings?.create == O.ECreatePossibilities.Can || settings?.create == O.ECreatePossibilities.Must)
                         {
-                            rv = new Series(ESeriesType.Normal, this.freq, name2);
-                        }                        
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), rv);
+                            Series ts = new Series(ESeriesType.Normal, this.freq, name2);
+                            this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), ts);
+                            rv = ts;
+                        }
+                        else if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
+                        {
+                            FindArraySeriesHelper2(keys);  //error
+                        }
+                        else if (Program.options.series_array_calc_missing == ESeriesMissing.M)
+                        {
+                            rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                            ((Series)rv).mmi = new MultidimItem(keys, this);
+                            ((Series)rv).SetTimelessData(double.NaN);
+                        }
+                        else if (Program.options.series_array_calc_missing == ESeriesMissing.Zero)
+                        {
+                            rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                            ((Series)rv).mmi = new MultidimItem(keys, this);
+                            ((Series)rv).SetTimelessData(0d);
+                        }
+                        else if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
+                        {
+                            new Error("Please use 'OPTION series array calc missing = zero' instead of 'skip'");
+                            //throw new GekkoException();
+                        }
+                        else throw new GekkoException();
                     }
+
                 }
                 else
                 {
-                    if (settings?.create == O.ECreatePossibilities.Must)
+                    //lhs variable like the 'a' element in x[a], where x[a] is on LHS
+
+                    if (Program.options.databank_create_auto || this.name.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
                     {
-                        //creates a brand new                        
-                        Series ts = new Series(ESeriesType.Normal, this.freq, name2);
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), ts);
-                        rv = ts;
+                        //good
                     }
                     else
                     {
-                        rv = iv as Series;
+                        //#07549843254
+                        new Error("Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + Stringlist.GetListWithCommas(keys) + "]. You may change the settings with the following option: OPTION databank create auto = yes;.");
                     }
-                    if (rv == null)
+
+                    if (rhsIsTimeless)
                     {
-                        //should not be possible
-                        new Error("Array-timeseries element is non-series.");
+                        rv = new Series(ESeriesType.Timeless, this.freq, name2, double.NaN);
                     }
+                    else
+                    {
+                        rv = new Series(ESeriesType.Normal, this.freq, name2);
+                    }
+                    this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), rv);
+                }
+            }
+            else
+            {
+                if (settings?.create == O.ECreatePossibilities.Must)
+                {
+                    //creates a brand new                        
+                    Series ts = new Series(ESeriesType.Normal, this.freq, name2);
+                    this.dimensionsStorage.AddIVariableWithOverwrite(new MultidimItem(keys, this), ts);
+                    rv = ts;
+                }
+                else
+                {
+                    rv = iv as Series;
+                }
+                if (rv == null)
+                {
+                    //should not be possible
+                    new Error("Array-timeseries element is non-series.");
                 }
             }
 
             Program.PrecedentsHelper(null, rv, this.GetParentDatabank());
-
+            Program.Trace("[" + mi.ToString() + "]", this.GetParentDatabank(), rv, isLhs);
             return rv;
-        }
-
-        
+        }        
 
         private void FindArraySeriesHelper2(string[] keys)
         {
@@ -2931,9 +2946,10 @@ namespace Gekko
         }
 
         public override string ToString()
-        {            
+        {
+            //TODO Gekko 4.0: use Stringlist.GetListWithCommas()
             string first = null;
-            foreach (string s in this.storage)
+            foreach (string s in this.storage) 
             {
                 first += s + ", ";
             }

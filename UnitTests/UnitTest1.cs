@@ -11530,31 +11530,31 @@ namespace UnitTests
             try
             {
                 string s = null;
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);                
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("reset; time 2021 2023;");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("x = 2, 3, 4;");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("y = 12, 13, 14;");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("y <dyn> = y[-1] + x + 1;");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("xx = series(2);");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("xx[a, b] = 22, 23, 24;");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("xx[c, d] = 32, 33, 34;");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("yy = series(2);");
                 s += HelperTrace();
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
                 I("yy[c, d] = xx[a, b];");
                 s += HelperTrace();
                 s = s + "";
@@ -11571,7 +11571,7 @@ namespace UnitTests
         private static string HelperTrace()
         {
             string s = null;
-            foreach (KeyValuePair<string, int> kvp in Globals.precedents)
+            foreach (KeyValuePair<string, Trace> kvp in Globals.trace)
             {
                 s += kvp.Key + G.NL;
             }

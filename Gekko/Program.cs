@@ -159,6 +159,14 @@ namespace Gekko
     }
 
     /// <summary>
+    /// Stores information regarding variable tracing
+    /// </summary>
+    public class Trace
+    {
+
+    }
+
+    /// <summary>
     /// Helper for FindFile(). Note: realPathAndFileName --> the real file that may be an unzipped file put in a temp folder. May be same as prettyPathAndFileName.
     /// Note: prettyPathAndFileName --> the pretty path that may "go through" a zip file. May be same as realPathAndFileName.      
     /// </summary>
@@ -6957,27 +6965,31 @@ namespace Gekko
         /// <param name="db"></param>
         public static void PrecedentsHelper(string variableName, IVariable iv, Databank db)
         {
-            if (Globals.precedents != null && iv != null)
+            if (Globals.precedents == null) return;
+            if (iv == null) return;
+            Series rv_series = iv as Series;
+            if (rv_series != null)
             {
-                Series rv_series = iv as Series;
-                if (rv_series != null)
-                {
-                    Program.AddToPrecedents(db, rv_series.GetName());
-                }
+                Program.AddToPrecedents(db, rv_series.GetName());
             }
         }
 
-        public static void TraceHelper()
+        /// <summary>
+        /// Deals with tracing info (metadata)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="ib"></param>
+        /// <param name="iv"></param>
+        public static void Trace(string name, IBank ib, IVariable iv, bool isLhs)
         {
-            IVariable iv = null;
-            Databank db = null;
-            if (Globals.trace != null && iv != null)
+            if (Globals.trace == null) return;
+            if (iv == null) return;
+            Series rv_series = iv as Series;
+            if (rv_series != null)
             {
-                Series rv_series = iv as Series;
-                if (rv_series != null)
-                {
-                    //something like AddToPrecedents()...
-                }
+                //something like AddToPrecedents()...
+                string s = name + " --- " + ib.Message() + " --- " + rv_series.GetName();
+                if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
             }
         }
 
