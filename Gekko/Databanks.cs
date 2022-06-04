@@ -504,5 +504,36 @@ namespace Gekko
             Program.databanks.storage = dbList;
             new Writeln("Moved Work and Ref back to their normal positions in the databank list (F2)");                     
         }
+
+        /// <summary>
+        /// Suggestions in the GUI, when the user presses Ctrl+Space.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static List<string> Suggestions(string s)
+        {
+            List<string> rv = new List<string>();
+            string txt = s;
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };
+            TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
+            
+            string part = null;
+            for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
+            {
+                if (tokens2.subnodes.storage[i].type == ETokenType.Word) part = tokens2.subnodes.storage[i].s;
+            }
+            part += "*";
+
+            //TODO
+            //TODO
+            //TODO If there is already a * or ? or .., just use that. Also allow a bank before :, and also something after !.
+            //TODO
+            //TODO
+            
+            List<string> names = Program.Search(new List(new List<string>() { part }), null, EVariableType.Var);
+            
+            return names;
+        }
     }
 }

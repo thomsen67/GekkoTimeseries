@@ -1449,7 +1449,16 @@ namespace Gekko
                 // Ctrl+L
                 //
                 e.Handled = true;  //ignore -- else will left-justify
-            }            
+            }
+            else if (e.Control && e.KeyCode == Keys.Space)
+            {
+                //
+                // Ctrl+[Space]
+                //
+                //Calls autocomplete
+                StartIntellisense("ctrl-space", null);
+                e.Handled = true;  //ignore -- else may do something in editor
+            }
             else if (isNormalSpace || isLessThanSign)
             {
                 //
@@ -1643,8 +1652,16 @@ namespace Gekko
 
             if (keyword == "space") s2 += " ";
             else if (keyword == "less") s2 += "<";
+            else if (keyword == "ctrl-space")
+            {
+                //do nothing
+            }
 
-            if (G.Equal(type, "none"))
+            if (type == null)
+            {
+                //do nothing
+            }
+            else if (G.Equal(type, "none"))
             {
                 return;
             }
@@ -1685,7 +1702,15 @@ namespace Gekko
                 //do nothing
             }
 
-            List<string> suggestions = Program.options.Intellisense(s2);
+            List<string> suggestions = null;
+            if (keyword == "ctrl-space")
+            {
+                suggestions = Databanks.Suggestions(s2);
+            }
+            else
+            {
+                suggestions = Program.options.Intellisense(s2);
+            }
 
             if (suggestions.Count > 0)
             {

@@ -27,7 +27,6 @@ namespace Gekko
             string txt = input;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
             var tags2 = new List<string>() { "//" };
-
             TokenHelper tokens2 = StringTokenizer.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
 
             int counter = 0;
