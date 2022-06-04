@@ -252,8 +252,8 @@ namespace Gekko
                     if (MustLoadDataIntoModel())
                     {
                         ModelGamsScalar.FlushAAndRArrays();
-                        Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
-                        Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetRef(), true);
+                        Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
+                        Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetRef(), true);
                     }
 
                     GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>> equations = new GekkoDictionary<string, Dictionary<MultidimItem, DecompStartHelper>>(StringComparer.OrdinalIgnoreCase);
@@ -585,7 +585,7 @@ namespace Gekko
                         foreach (DecompStartHelper dsh in link.GAMS_dsh)  //unrolling: for each uncontrolled #i in x[#i]
                         {
                             jj++;  //will be = 0
-                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, extraPattern, dsh, DecompBanks(operator1), residualName, ref funcCounter);
+                            DecompData dd = Decomp.DecompLowLevelScalar(per1, per2, jj, extraPattern, dsh, DecompBanks(operator1), residualName, ref funcCounter);
                             DecompMainMergeOrAdd(decompDatas, temp, dd, operatorOneOf3Types, shouldMerge, ii, jj);
                         }
                     }
@@ -2042,7 +2042,7 @@ namespace Gekko
         /// <param name="residualName"></param>
         /// <param name="funcCounter"></param>
         /// <returns></returns>
-        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, Data extra, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
+        public static DecompData DecompLowLevelScalar(GekkoTime tt1, GekkoTime tt2, int linkNumber, Data extra, DecompStartHelper dsh, EDecompBanks workOrRefOrBoth, string residualName, ref int funcCounter)
         {
             // This gets called for each link equation, for instance e5[t]...  Then it is run over t, 
             // so we are evaluating e5[2001], e5[2002], etc. These t's determine the period of the
@@ -2324,7 +2324,7 @@ namespace Gekko
 
             if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             {
-                decompOptions2.rows = new List<string>() { "vars" };
+                decompOptions2.rows = new List<string>() { "vars", "lags" };
                 decompOptions2.cols = new List<string>() { "time" };
             }
 
@@ -2615,10 +2615,12 @@ namespace Gekko
             //Aggregation
             //Aggregation
             // ==============================================================================
+                       
 
             foreach (FrameLightRow row in frame.rows)
             {                
                 ENormalizerType normalizerType = ENormalizerType.None;
+                
                 if (G.Equal(normalizerVariableWithIndex, row.Get(frame, col_fullVariableName).text))
                 {
                     if (row.Get(frame, col_lag).text == "[0]") normalizerType = ENormalizerType.Normalizer;
@@ -2711,7 +2713,7 @@ namespace Gekko
                     td.levelRefLag += dLevelRefLag;
                     td.n += 1;
                     td.fullVariableNames.Add(fullVariableName);
-                }
+                }            
             }
 
             rownames3.Sort(StringComparer.OrdinalIgnoreCase);
@@ -2897,8 +2899,8 @@ namespace Gekko
                         tab.Set(i + 2, j + 2, Stringlist.GetListWithCommas(fullVariableNames));
                     }
                     else
-                    {
-                        tab.SetNumber(i + 2, j + 2, d, format2);
+                    {                        
+                        tab.SetNumber(i + 2, j + 2, d, format2);                        
                     }
                 }
             }

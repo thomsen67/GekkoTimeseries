@@ -1900,7 +1900,7 @@ namespace Gekko
             {
                 string var = atd.varName;
                 int id = atd.aNumber;
-                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq)) as Series;  //Could have an A-array with Series...
+                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.ConvertFreq(Program.options.freq), true) as Series;  //Could have an A-array with Series... . This is conceptually a RHS variable assignment (Trace())
 
                 if (ts == null && SolveCommon.IsDjz(var))
                 {

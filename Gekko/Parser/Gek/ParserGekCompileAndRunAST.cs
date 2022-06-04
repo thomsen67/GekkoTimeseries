@@ -175,7 +175,6 @@ namespace Gekko.Parser.Gek
                 int lineNumber;
                 string problemLine;
                 List<string> commandLines;
-
                 Program.GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
 
                 if (lineNumber <= 0)

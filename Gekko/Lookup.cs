@@ -403,7 +403,7 @@ namespace Gekko
                     //NOTE: no databank search is allowed!
                     //NOTE: sigils cannot be omitted here. VAL x['v'] = 100 or VAL x.v = 100 will not access a %v variable.
 
-                    IVariable ivar2 = ib.GetIVariable(varnameWithFreq);
+                    IVariable ivar2 = ib.GetIVariable(varnameWithFreq, true);
                     if (ivar2 == null)
                     {
                         new Error("Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq, true) + " for use in dot- or []-indexing");
@@ -734,7 +734,7 @@ namespace Gekko
                 if (ib != null)
                 {
                     //ib can be == null with an indexer on the lhs, like #m.#n.%s
-                    lhs = ib.GetIVariable(varnameWithFreq); //may return null
+                    lhs = ib.GetIVariable(varnameWithFreq, true); //may return null
                 }
 
                 //We divide into three groups depending on LHS name:

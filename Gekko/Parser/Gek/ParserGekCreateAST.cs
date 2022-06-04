@@ -1236,6 +1236,20 @@ namespace Gekko.Parser.Gek
 
                 if (ast.Text.Contains(Globals.parserExpressionSeparator.ToString()))
                 {
+                    if (Globals.useTrace)
+                    {
+                        //if needed, we could decorate ASTREAD... etc with the command.
+                        //maybe not necessary.
+                        //if (ast.Text.StartsWith("ASTREAD" + Globals.parserExpressionSeparator))
+                        //{
+                        //    flag = true;
+                        //}
+                        //else if (ast.Text.StartsWith("ASTCOPY" + Globals.parserExpressionSeparator))
+                        //{
+                        //    flag = true;
+                        //}
+                    }
+
                     if (ast.Text.StartsWith("ASTMETA" + Globals.parserExpressionSeparator))  //Handles SERIES, that is ASTGENR/ASTUPD
                     {
                         flag = true;

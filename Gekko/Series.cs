@@ -2265,7 +2265,7 @@ namespace Gekko
         /// <returns></returns>
         private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys, bool rhsIsTimeless, LookupSettings settings)
         {
-            IVariable rv = null;
+             IVariable rv = null;
 
             if (this.dimensionsStorage == null)
             {
@@ -2832,7 +2832,13 @@ namespace Gekko
         public string stamp;                
         [ProtoMember(6)]        
         public string units;
-            
+
+        /// <summary>
+        /// Stores traces of its composition, cf. Trace() method.
+        /// </summary>
+        [ProtoMember(10)]
+        public List<string> calc = null;
+
         [ProtoMember(7)]
         public string[] domains = null;
 

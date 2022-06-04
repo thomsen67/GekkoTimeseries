@@ -606,7 +606,7 @@ namespace Gekko
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>
-        public void FromDatabankToA(Databank db, bool isRef)
+        public void FromDatabankToAScalarModel(Databank db, bool isRef)
         {
             //Beware of OPTION series data missing, if it is set.
             //Beware of timeless series -- not handled...
@@ -650,7 +650,7 @@ namespace Gekko
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                Series ts = DatabankAHelper(db, name, true);
+                Series ts = DatabankAHelperScalarModel(db, name, true);
 
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
@@ -728,11 +728,11 @@ namespace Gekko
 
         /// <summary>
         /// Takes data from a Databank and puts it into an a[][] data array (this array is from model.a).
-        /// if model is a ModelGamsScalar.
+        /// If model is a ModelGamsScalar.
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>
-        public void FromAToDatabank(Databank db, bool isRef)
+        public void FromAToDatabankScalarModel(Databank db, bool isRef)
         {
             //Beware of OPTION series data missing, if it is set.
             //Beware of timeless series -- not handled...
@@ -745,7 +745,7 @@ namespace Gekko
             for (int i = 0; i < this.CountVars(2); i++)
             {
                 string name = this.dict_FromANumberToVarName[i];
-                Series ts = DatabankAHelper(db, name, false);
+                Series ts = DatabankAHelperScalarModel(db, name, false);
                 //This runs pretty fast, operating directly on the internal timeseries array
                 //Cannot use array copy, because a has time dimension first.
                 // NB: beware of OPTION series data missing, if it is set.
@@ -760,14 +760,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Helper that gets a timeseries from a databank and a name. 
-        /// With read, nothing is created. With !read, 
+        /// Helper that gets a timeseries from a databank and a name.
         /// </summary>
         /// <param name="db"></param>
         /// <param name="name"></param>
         /// <param name="fromDatabankToA"></param>
         /// <returns></returns>
-        private Series DatabankAHelper(Databank db, string name, bool fromDatabankToA)
+        private Series DatabankAHelperScalarModel(Databank db, string name, bool fromDatabankToA)
         {
             //See also #asf87aufkdh where similar loading is done regarding reading gdx files  
             string freq = G.ConvertFreq(Program.options.freq);
@@ -791,6 +790,7 @@ namespace Gekko
                 }
                 else
                 {
+                    //from a array to databank
                     if (!db.ContainsIVariable(varNameWithFreq))
                     {
                         string[] domains = new string[gekkoDimensions];
@@ -801,7 +801,7 @@ namespace Gekko
                     }
                     else
                     {
-                        ats = (Series)db.GetIVariable(varNameWithFreq);
+                        ats = (Series)db.GetIVariable(varNameWithFreq, true);  //for a scalar model, puts simulated data back to a databank
                     }
                 }
                 

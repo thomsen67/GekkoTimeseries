@@ -41,10 +41,27 @@ namespace Gekko
             return this.storage.Count;
         }
 
+        /// <summary>
+        /// Similar to Databank.GetIVariable()
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
         public IVariable GetIVariable(string variable)
+        {
+            return GetIVariable(variable, false);
+        }
+
+        /// <summary>
+        /// Similar to Databank.GetIVariable()
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <param name="isLhs"></param>
+        /// <returns></returns>
+        public IVariable GetIVariable(string variable, bool isLhs)
         {
             IVariable iv = null;
             this.storage.TryGetValue(variable, out iv);
+            Program.Trace(variable, this, iv, isLhs);
             return iv;
         }
 
@@ -159,6 +176,21 @@ namespace Gekko
         public EVariableType Type()
         {
             return EVariableType.Map;
+        }
+
+        public string GetName()
+        {
+            return null;  //has no name
+        }
+
+        public string GetFileNameWithPath()
+        {
+            return null;  //has no filename
+        }
+
+        public string GetStamp()
+        {
+            return null;  //has no stamp
         }
 
         public IVariable Add(GekkoSmpl t, IVariable x)

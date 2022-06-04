@@ -11518,7 +11518,7 @@ namespace UnitTests
 
         
         [TestMethod]
-        public void _Test_Tracing()
+        public void _Test_Trace()
         {
             //data lineage is a description of how data flows in its life cycle
             //traceability is the activity
@@ -11530,35 +11530,66 @@ namespace UnitTests
             try
             {
                 string s = null;
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("reset; time 2021 2023;");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("x = 2, 3, 4;");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("y = 12, 13, 14;");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("y <dyn> = y[-1] + x + 1;");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("xx = series(2);");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("xx[a, b] = 22, 23, 24;");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("xx[c, d] = 32, 33, 34;");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("yy = series(2);");
-                s += HelperTrace();
-                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-                I("yy[c, d] = xx[a, b];");
-                s += HelperTrace();
-                s = s + "";
+                string c = null;
 
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+
+                c = "reset;";
+                s += HelperTrace(c);
+
+                c = "time 2021 2023;";
+                s += HelperTrace(c);
+
+                c = "x = 2, 3, 4;";
+                s += HelperTrace(c);
+                
+                c = "y = 12, 13, 14;";
+                s += HelperTrace(c);
+
+                c = "y <dyn> = y[-1] + x + 1;";
+                s += HelperTrace(c);
+                
+                c = "xx = series(2);";
+                s += HelperTrace(c);
+                
+                c = "xx[a, b] = 22, 23, 24;";
+                s += HelperTrace(c);
+                
+                c = "xx[c, d] = 32, 33, 34;";
+                s += HelperTrace(c);
+                
+                c = "yy = series(2);";
+                s += HelperTrace(c);
+                
+                c = "yy[c, d] = xx[a, b];";
+                s += HelperTrace(c);
+
+                c = "copy x to x2;";
+                s += HelperTrace(c);
+
+                c = "#l = 1, 2, 3;";
+                s += HelperTrace(c);
+
+                c = "#m = map();";
+                s += HelperTrace(c);
+
+                c = "#m.x = x;";
+                s += HelperTrace(c);
+
+                c = "write bank1;";
+                s += HelperTrace(c);
+
+                c = "reset;";
+                s += HelperTrace(c);
+
+                c = "read bank1;";
+                s += HelperTrace(c);
+
+                c = "z = 2 * y;";
+                s += HelperTrace(c);
+
+                Assert.Fail();
 
             }
             finally
@@ -11568,15 +11599,18 @@ namespace UnitTests
 
         }
 
-        private static string HelperTrace()
+        private static string HelperTrace(string command)
         {
+            I(command);            
             string s = null;
+            s += command + G.NL;
             foreach (KeyValuePair<string, Trace> kvp in Globals.trace)
             {
-                s += kvp.Key + G.NL;
+                s += " --> " + kvp.Key + G.NL;
             }
-            s += " ------------------------- ";
+            s += "---------------------------------------------------------------------------";
             s += G.NL;
+            Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
             return s;
         }
 
@@ -13264,8 +13298,8 @@ namespace UnitTests
             I("MODEL <gms> small.zip;");
                         
             //A good test of reading and writing from GAMS scalar model a array.
-            Program.model.modelGamsScalar.FromAToDatabank(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
             I("SIM;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("8 evaluations x 100 took"));
@@ -13292,8 +13326,8 @@ namespace UnitTests
 
             //1 time back and forth takes about 0.3s in debug mode
             //A good test of reading and writing from GAMS scalar model a array.
-            Program.model.modelGamsScalar.FromAToDatabank(Program.databanks.GetFirst(), false);
-            Program.model.modelGamsScalar.FromDatabankToA(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromAToDatabankScalarModel(Program.databanks.GetFirst(), false);
+            Program.model.modelGamsScalar.FromDatabankToAScalarModel(Program.databanks.GetFirst(), false);
 
             I("SIM;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1063359 evaluations x 100 took"));

@@ -196,6 +196,7 @@ namespace Gekko
         public static GekkoDictionary<string, int> precedents = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
 
+        public static bool useTrace = true;
         public static GekkoDictionary<string, Trace> trace = null;  //used for tracing/metadata
 
         public static string extensionPlot = "gpt";

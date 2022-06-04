@@ -2595,7 +2595,7 @@ namespace Gekko
             }
             else
             {
-                ts = databank.GetIVariable(varName) as Series;
+                ts = databank.GetIVariable(varName, true) as Series;
             }
 
             return ts;
@@ -4107,7 +4107,7 @@ namespace Gekko
                     //string ghostName = ss[0];
 
                     string ghostName = ss[0] + Globals.freqIndicator + G.ConvertFreq(ts1.freqEnum);
-                    Series tsGhost = deserializedDatabank.GetIVariable(ghostName) as Series;
+                    Series tsGhost = deserializedDatabank.GetIVariable(ghostName, true) as Series;
                     if (tsGhost == null)
                     {
                         tsGhost = new Series(ts1.freqEnum, ghostName);
@@ -6982,14 +6982,42 @@ namespace Gekko
         /// <param name="iv"></param>
         public static void Trace(string name, IBank ib, IVariable iv, bool isLhs)
         {
-            if (Globals.trace == null) return;
+            if (!Globals.useTrace || Globals.trace == null) return;
+            bool onlyTraceSeries = false;
             if (iv == null) return;
             Series rv_series = iv as Series;
-            if (rv_series != null)
+            string x_lhs = "";
+            if (isLhs) x_lhs = "LHS";
+            string x_objectName = null;
+            if (rv_series != null) x_objectName = rv_series.GetName();
+            string x_bankOrMap = null;
+            
+            if (ib.BankType() == EBankType.Map)
             {
-                //something like AddToPrecedents()...
-                string s = name + " --- " + ib.Message() + " --- " + rv_series.GetName();
+                x_bankOrMap = "map";
+            }
+            else
+            {
+                x_bankOrMap = ib.GetFileNameWithPath() + " " + ib.GetStamp();
+            }
+
+            if (!onlyTraceSeries || rv_series != null)
+            {
+                string x_source = null;
+                if (rv_series != null && rv_series.meta != null) x_source = rv_series.meta.source;
+                string s = "name: " + name + " // " + "bank: " + x_bankOrMap + " // " + "oname: " + x_objectName + " // " + "source: " + x_source + " // " + "lhs?: " + x_lhs;
                 if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
+                if (Globals.useTrace)
+                {
+                    if (rv_series != null && isLhs)
+                    {
+                        if (Globals.trace.Count > 0 && rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
+                        foreach (string ss in Globals.trace.Keys)
+                        {                            
+                            rv_series.meta.calc.Add(ss);
+                        }
+                    }
+                }
             }
         }
 
@@ -15226,11 +15254,9 @@ namespace Gekko
         public static void WriteListItems(string m)
         {
             IVariable iv = null; Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m);
-            //Program.scalars.TryGetValue(Globals.symbolCollection + m, out iv);
             if (iv == null)
             {
                 new Error("List " + Globals.symbolCollection + m + " was not found");
-                //throw new GekkoException();
             }
             List<string> a1 = Stringlist.GetListOfStringsFromList(iv);
 
@@ -19414,7 +19440,7 @@ namespace Gekko
             }
             else
             {
-                ts = databank.GetIVariable(varName2) as Series;
+                ts = databank.GetIVariable(varName2, true) as Series;
             }
             return ts;
         }
@@ -22874,8 +22900,7 @@ namespace Gekko
         }
 
         public static void CreateLeftSideVariableIfNeeded(List<Dictionary<string, string>> precedentsWithLagIndicator, string variable)
-        {
-            //variable = SubstituteAssignVars(variable);
+        {            
             if (Program.databanks.GetFirst().GetIVariable(variable) == null)
             {
                 if (!variable.ToLower().StartsWith("xx"))
@@ -29335,7 +29360,8 @@ namespace Gekko
         }
 
 
-        public bool IsSimple() {
+        public bool IsSimple()
+        {
             if (this.isOneLinerFromGui && this.counter <= 1)
             {
                 return true;

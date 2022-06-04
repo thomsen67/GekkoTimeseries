@@ -15,6 +15,8 @@ namespace Gekko
     {
         IVariable GetIVariable(string variable);
 
+        IVariable GetIVariable(string variable, bool isLhs);
+
         void AddIVariable(string name, IVariable x);
 
         void AddIVariable(string name, IVariable x, bool isSimpleName);
@@ -26,5 +28,11 @@ namespace Gekko
         EBankType BankType();
 
         string Message();
+
+        string GetName();
+
+        string GetFileNameWithPath();
+
+        string GetStamp();
     }
 }

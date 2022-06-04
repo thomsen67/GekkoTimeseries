@@ -157,11 +157,22 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Get IVariable from databank. May return null.
+        /// Default, when it is conceptually a non-LHS (left-hand side) variable, like the x in y = 2 * x.
         /// </summary>
         /// <param name="variable"></param>
         /// <returns></returns>
         public IVariable GetIVariable(string variable)
+        {
+            return GetIVariable(variable, false);
+        }
+
+        /// <summary>
+        /// Get IVariable from databank. May return null.
+        /// Can choose if it is conceptually a LHS (left-hand side) variable, like the y in y = 2 * x.
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <returns></returns>
+        public IVariable GetIVariable(string variable, bool isLhs)
         {
             //Most and maybe all variable access goes through here (see also #jslej48djsd9)
             //Beware that an array-superseries is accessed here, but its sub-series are 
@@ -172,10 +183,9 @@ namespace Gekko
             }
             //What about 
             Program.PrecedentsHelper(null, iv, this);
-            bool isLhs = true;
-            Program.Trace(variable, this, iv, isLhs);  
+            Program.Trace(variable, this, iv, isLhs);
             return iv;
-        }        
+        }    
 
         /// <summary>
         /// Overload. May write a list file.
@@ -294,11 +304,27 @@ namespace Gekko
         public string Message()
         {
             return "databank " + "'" + this.name + "'";
-        }        
-        
+        }
+
+        public string GetName()
+        {
+            return this.name;
+        }
+
         public EBankType BankType()
         {
             return EBankType.Normal;
-        }  
+        }
+        
+
+        public string GetFileNameWithPath()
+        {
+            return this.fileNameWithPathPretty;  //has no filename
+        }
+
+        public string GetStamp()
+        {
+            return this.date;  //has no stamp
+        }
     }
 }
