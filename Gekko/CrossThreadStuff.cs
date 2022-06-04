@@ -67,6 +67,12 @@ namespace Gekko
 
         //weird delegate pattern, but it works!
         delegate void SetTextInputCallback(string text, string type2);
+        /// <summary>
+        /// Replaces for instance "READ * [Enter]" with the found file so it becomes "READ jul05".
+        /// Also does regarding command history. Also add some partially missing paths.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="type2"></param>
         public static void SetTextInput(string text, string type2)
         {
             if (Gui.gui.textBoxMainTabLower.InvokeRequired)
@@ -97,6 +103,7 @@ namespace Gekko
                 string select = textBox.SelectedText;
                 int count = select.Length - select.Replace("*", "").Length;
 
+                //See also #lu89ujksdfgpsdf for var name suggestions
                 if (count != 1)
                 {
                     textBox.Select(startOld, 0);  //do nothing, too difficult to replace the *'s!
@@ -365,6 +372,7 @@ namespace Gekko
                     Gui.gui.textBoxMainTabLower.SelectedText = Globals.windowIntellisense.lastSelected;
                 }
                 Globals.windowIntellisense.IsOpen = false;
+                Globals.windowIntellisenseType = 0;
             }
         }
 

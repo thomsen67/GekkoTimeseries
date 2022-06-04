@@ -521,7 +521,11 @@ namespace Gekko
             string part = null;
             for (int i = 0; i < tokens2.subnodes.storage.Count; i++)
             {
-                if (tokens2.subnodes.storage[i].type == ETokenType.Word) part = tokens2.subnodes.storage[i].s;
+                if (tokens2.subnodes.storage[i].type == ETokenType.Word)
+                {
+                    part = tokens2.subnodes.storage[i].s;
+                    Globals.windowIntellisenseSuggestionsOffset = tokens2.subnodes.storage[i].column - s.Length - 1;
+                }
             }
             part += "*";
 

@@ -1349,8 +1349,57 @@ namespace Gekko
                 //                
                 if (Globals.windowIntellisense != null && Globals.windowIntellisense.IsOpen && Globals.windowIntellisense.listBox1.SelectedItem != null)
                 {
-                    textBoxMainTabLower.SelectedText = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
+
+                    if (Globals.windowIntellisenseType == 1)
+                    {
+                        textBoxMainTabLower.SelectedText = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
+                    }
+                    else if (Globals.windowIntellisenseType == 2)
+                    {
+                        int lineNumber; int positionInAllLines; int positionInLine;
+                        TextInputHelper(out lineNumber, out positionInAllLines, out positionInLine);
+                        string s2 = null;
+                        try
+                        {
+                            //See also #lu89ujksdfgpsdf for * bank name replace
+
+                            RichTextBox textBox = this.textBoxMainTabLower;
+                            int offset = Globals.windowIntellisenseSuggestionsOffset;                            
+                            int startOld = textBox.SelectionStart;
+                            textBox.Select(startOld + offset - 1, -offset);
+                            textBox.SelectedText = "[wwwwwwwwwwwww]";
+
+                            //below here, we are certain there is only one '*'
+                            //string temp = textBox.SelectedText;
+                            //temp = G.ReplaceString(temp, "fk", "fkmnm2", true);
+                            //int oldLength = textBox.SelectedText.Length;
+                            //textBox.SelectedText = "xyz";
+                            //int dif = temp.Length - oldLength;
+                            //textBox.Select(startOld + dif, 0);  //a little bit wrong if cursor is left of '*', but typically it is not.
+                            //textBox.SelectedText = "wwwwwwwwwwwww";
+
+                            //doing the same for commandhistory
+                            string s3 = Globals.commandMemory.storage.ToString();
+                            string select2Start = s3.Substring(0, Globals.commandMemory.lengthWhenLastEnterPressed);
+                            string select2 = s3.Substring(Globals.commandMemory.lengthWhenLastEnterPressed);
+                            int count2 = select2.Length - select2.Replace("*", "").Length;
+                            if (count2 == 1)
+                            {
+                                if (!select2.Contains(" *")) select2 = G.ReplaceString(select2, "*", " *", true);  //READ* --> READ *, otherwise the blank will be lacking when the '*' is substituted
+                                select2 = G.ReplaceString(select2, "*", "xyz", true);
+                                Globals.commandMemory.storage = new StringBuilder(select2Start + select2);
+                                Globals.commandMemory.lengthWhenLastEnterPressed = Globals.commandMemory.storage.ToString().Length;  //probably superfluous, will be set later on
+                            }
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        new Error("Wrong value");
+                    }
+                    
                     Globals.windowIntellisense.IsOpen = false;
+                    Globals.windowIntellisenseType = 0;
                     e.Handled = true;
                 }
                 else
@@ -1456,7 +1505,8 @@ namespace Gekko
                 // Ctrl+[Space]
                 //
                 //Calls autocomplete
-                StartIntellisense("ctrl-space", null);
+                Globals.windowIntellisenseType = 2;
+                StartIntellisense("ctrl-space", null);                
                 e.Handled = true;  //ignore -- else may do something in editor
             }
             else if (isNormalSpace || isLessThanSign)
@@ -1469,7 +1519,11 @@ namespace Gekko
                 if (isNormalSpace) keyword = "space";
                 else if (isLessThanSign) keyword = "less";
                 else ok = false;
-                if (ok) StartIntellisense(keyword, Program.options.interface_suggestions);
+                if (ok)
+                {
+                    Globals.windowIntellisenseType = 1;
+                    StartIntellisense(keyword, Program.options.interface_suggestions);
+                }
             }            
             else if (e.KeyCode == Keys.Down)
             {
@@ -1504,7 +1558,11 @@ namespace Gekko
             }            
             else
             {
-                if (Globals.windowIntellisense != null) Globals.windowIntellisense.IsOpen = false;
+                if (Globals.windowIntellisense != null)
+                {
+                    Globals.windowIntellisense.IsOpen = false;
+                    Globals.windowIntellisenseType = 0;
+                }
             }
         }
 
@@ -1522,7 +1580,11 @@ namespace Gekko
 
         private void GekkoEnter(KeyEventArgs e)
         {
-            if (Globals.windowIntellisense != null) Globals.windowIntellisense.IsOpen = false; //if intellise window was open but nothing was selected before enter was hit
+            if (Globals.windowIntellisense != null)
+            {
+                Globals.windowIntellisense.IsOpen = false; //if intellise window was open but nothing was selected before enter was hit
+                Globals.windowIntellisenseType = 0;
+            }
             HandleEditorNewline(e);
         }
 
@@ -1740,17 +1802,24 @@ namespace Gekko
                 Globals.windowIntellisense.VerticalOffset = yy;
                 Globals.windowIntellisense.HorizontalOffset = xx;
                 Globals.windowIntellisense.IsOpen = true;
+                //Globals.windowIntellisenseType = ...; //is set to 1 or 2 elsewhere
                 Globals.windowIntellisense.listBox1.SelectedIndex = 0;
                 Globals.windowIntellisense.listBox1.ScrollIntoView(Globals.windowIntellisense.listBox1.SelectedItem);                                                                                      
 
             }
         }
 
-        private void TextInputHelper(out int line2, out int firstChar, out int column2)
+        /// <summary>
+        /// Finds position in input text box
+        /// </summary>
+        /// <param name="lineNumberInTextField"></param>
+        /// <param name="positionInAllLinesInTotalFile"></param>
+        /// <param name="positionInLine"></param>
+        private void TextInputHelper(out int lineNumberInTextField, out int positionInAllLinesInTotalFile, out int positionInLine)
         {
-            line2 = textBoxMainTabLower.GetLineFromCharIndex(textBoxMainTabLower.GetFirstCharIndexOfCurrentLine());
-            firstChar = textBoxMainTabLower.GetFirstCharIndexFromLine(line2);
-            column2 = textBoxMainTabLower.SelectionStart - firstChar;
+            lineNumberInTextField = textBoxMainTabLower.GetLineFromCharIndex(textBoxMainTabLower.GetFirstCharIndexOfCurrentLine());
+            positionInAllLinesInTotalFile = textBoxMainTabLower.GetFirstCharIndexFromLine(lineNumberInTextField);
+            positionInLine = textBoxMainTabLower.SelectionStart - positionInAllLinesInTotalFile;
         }
 
         private void richTextBox1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
