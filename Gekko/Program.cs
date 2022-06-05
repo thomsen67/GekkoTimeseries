@@ -6982,7 +6982,8 @@ namespace Gekko
         /// <param name="iv"></param>
         public static void Trace(string name, IBank ib, IVariable iv, bool isLhs)
         {
-            if (!Globals.useTrace || Globals.trace == null) return;
+            if (!Globals.useTrace) return;
+            //if (!Globals.useTrace || Globals.trace2 == null) return;
             bool onlyTraceSeries = false;
             if (iv == null) return;
             Series rv_series = iv as Series;
@@ -7010,19 +7011,33 @@ namespace Gekko
                 {
                     if (rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
                     rv_series.meta.calc.Add(s);
-                }
-                if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
-                if (Globals.useTrace)
-                {
-                    if (rv_series != null && isLhs)
+                    foreach (IVariable iv2 in Globals.trace2)
                     {
-                        if (Globals.trace.Count > 0 && rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
-                        foreach (string ss in Globals.trace.Keys)
-                        {                            
-                            //rv_series.meta.calc.Add(ss);
+                        if (iv2 == iv) continue;
+                        if (iv2.Type() != EVariableType.Series) continue;
+                        Series iv2_series = iv2 as Series;
+                        if (iv2_series.meta == null) continue;
+                        foreach (string s4 in iv2_series.meta.calc)
+                        {
+                            rv_series.meta.calc.Add("--- " + s4);
                         }
                     }
                 }
+
+                if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
+                if (!Globals.trace2.Contains(iv)) Globals.trace2.Add(iv);
+
+                //if (Globals.useTrace)
+                //{
+                //    if (rv_series != null && isLhs)
+                //    {
+                //        if (Globals.trace.Count > 0 && rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();                        
+                //        foreach (string ss in Globals.trace.Keys)
+                //        {                            
+                //            //rv_series.meta.calc.Add(ss);
+                //        }
+                //    }
+                //}
             }
         }
 

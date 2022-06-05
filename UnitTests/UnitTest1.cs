@@ -11535,6 +11535,7 @@ namespace UnitTests
 
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+                Globals.trace2 = new List<IVariable>();
 
                 //TODO: maps, <dyn>
 
@@ -11555,6 +11556,10 @@ namespace UnitTests
                 c = "z = x + 2*y + 1;";
                 s += HelperTrace(c);
                 calc = (Program.databanks.GetFirst().GetIVariable("z!a") as Series).meta.calc;
+
+                c = "w = 3*z + x + 2*y + 1;";
+                s += HelperTrace(c);
+                calc = (Program.databanks.GetFirst().GetIVariable("w!a") as Series).meta.calc;
 
                 c = "xx = series(2);";
                 s += HelperTrace(c);
@@ -11607,17 +11612,20 @@ namespace UnitTests
 
         private static string HelperTrace(string command)
         {
-            I(command);            
-            string s = null;
-            s += command + G.NL;
-            foreach (KeyValuePair<string, Trace> kvp in Globals.trace)
-            {
-                s += " --> " + kvp.Key + G.NL;
-            }
-            s += "---------------------------------------------------------------------------";
-            s += G.NL;
             Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
-            return s;
+            Globals.trace2 = new List<IVariable>();
+            I(command);            
+            //string s = null;
+            //s += command + G.NL;
+            //foreach (KeyValuePair<string, Trace> kvp in Globals.trace)
+            //{
+            //    s += " --> " + kvp.Key + G.NL;
+            //}
+            //s += "---------------------------------------------------------------------------";
+            //s += G.NL;
+            Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+            Globals.trace2 = new List<IVariable>();
+            return "";
         }
 
         [TestMethod]
