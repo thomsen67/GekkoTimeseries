@@ -11531,9 +11531,12 @@ namespace UnitTests
             {
                 string s = null;
                 string c = null;
+                List<string> calc = null;
 
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
                 Globals.trace = new GekkoDictionary<string, Trace>(StringComparer.OrdinalIgnoreCase);
+
+                //TODO: maps, <dyn>
 
                 c = "reset;";
                 s += HelperTrace(c);
@@ -11543,13 +11546,16 @@ namespace UnitTests
 
                 c = "x = 2, 3, 4;";
                 s += HelperTrace(c);
+                calc = (Program.databanks.GetFirst().GetIVariable("x!a") as Series).meta.calc;
                 
                 c = "y = 12, 13, 14;";
                 s += HelperTrace(c);
+                calc = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).meta.calc;
 
-                c = "y <dyn> = y[-1] + x + 1;";
+                c = "z = x + 2*y + 1;";
                 s += HelperTrace(c);
-                
+                calc = (Program.databanks.GetFirst().GetIVariable("z!a") as Series).meta.calc;
+
                 c = "xx = series(2);";
                 s += HelperTrace(c);
                 

@@ -1350,9 +1350,11 @@ namespace Gekko
                 if (Globals.windowIntellisense != null && Globals.windowIntellisense.IsOpen && Globals.windowIntellisense.listBox1.SelectedItem != null)
                 {
 
+                    string chosen = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
+
                     if (Globals.windowIntellisenseType == 1)
                     {
-                        textBoxMainTabLower.SelectedText = ((System.Windows.Controls.ListBoxItem)Globals.windowIntellisense.listBox1.SelectedItem).Content.ToString();
+                        textBoxMainTabLower.SelectedText = chosen;
                     }
                     else if (Globals.windowIntellisenseType == 2)
                     {
@@ -1367,17 +1369,15 @@ namespace Gekko
                             int offset = Globals.windowIntellisenseSuggestionsOffset;                            
                             int startOld = textBox.SelectionStart;
                             textBox.Select(startOld + offset - 1, -offset);
-                            textBox.SelectedText = "[wwwwwwwwwwwww]";
+                            textBox.SelectedText = chosen;
 
-                            //below here, we are certain there is only one '*'
-                            //string temp = textBox.SelectedText;
-                            //temp = G.ReplaceString(temp, "fk", "fkmnm2", true);
-                            //int oldLength = textBox.SelectedText.Length;
-                            //textBox.SelectedText = "xyz";
-                            //int dif = temp.Length - oldLength;
-                            //textBox.Select(startOld + dif, 0);  //a little bit wrong if cursor is left of '*', but typically it is not.
-                            //textBox.SelectedText = "wwwwwwwwwwwww";
-
+                            //TODO TODO TODO TODO
+                            //TODO TODO TODO TODO
+                            //TODO TODO TODO TODO
+                            //TODO TODO TODO TODO
+                            //TODO TODO TODO TODO
+                            //TODO TODO TODO TODO
+                            //TODO TODO TODO TODO
                             //doing the same for commandhistory
                             string s3 = Globals.commandMemory.storage.ToString();
                             string select2Start = s3.Substring(0, Globals.commandMemory.lengthWhenLastEnterPressed);
@@ -1782,13 +1782,16 @@ namespace Gekko
                     Globals.windowIntellisense = new WindowIntellisense();
                 }
                 Globals.windowIntellisense.listBox1.Items.Clear();
+                int i = -1;
                 foreach (string suggest in suggestions)
                 {
+                    i++;
                     System.Windows.Controls.ListBoxItem li = new System.Windows.Controls.ListBoxItem();
                     li.Content = suggest;
                     li.MouseEnter += new System.Windows.Input.MouseEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseEnter);
                     li.PreviewMouseDown += new System.Windows.Input.MouseButtonEventHandler(Globals.windowIntellisense.listBoxItem_PreviewMouseDown);
                     Globals.windowIntellisense.listBox1.Items.Add(li);
+                    li.ToolTip = "Lønsum inkl. imputeret løn til selvstændige i landbrug\nKilde: Danmarks Statistik\nEnhed: Mio. kr.";
                 }
 
                 // Find the position of the caret

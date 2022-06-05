@@ -7006,6 +7006,11 @@ namespace Gekko
                 string x_source = null;
                 if (rv_series != null && rv_series.meta != null) x_source = rv_series.meta.source;
                 string s = "name: " + name + " // " + "bank: " + x_bankOrMap + " // " + "oname: " + x_objectName + " // " + "source: " + x_source + " // " + "lhs?: " + x_lhs;
+                if (isLhs)
+                {
+                    if (rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
+                    rv_series.meta.calc.Add(s);
+                }
                 if (!Globals.trace.ContainsKey(s)) Globals.trace.Add(s, new Trace());
                 if (Globals.useTrace)
                 {
@@ -7014,7 +7019,7 @@ namespace Gekko
                         if (Globals.trace.Count > 0 && rv_series.meta.calc == null) rv_series.meta.calc = new List<string>();
                         foreach (string ss in Globals.trace.Keys)
                         {                            
-                            rv_series.meta.calc.Add(ss);
+                            //rv_series.meta.calc.Add(ss);
                         }
                     }
                 }
