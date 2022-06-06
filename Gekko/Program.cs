@@ -1701,6 +1701,54 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (true && Globals.runningOnTTComputer)
+            {
+                G.Writeln("");
+                G.Writeln("==========================================================================================");
+                G.Writeln("SERIES Work: e");
+                G.Writeln("Annual data from 2021 to 2023 (updated: 06-06-2022)");
+                G.Writeln("Source: Statistics Denmark");
+                G.Write("Calc: read bank1; "); G.WriteLink("(trace)", ""); G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln("Period           value         %");
+                G.Writeln("2021           28.0000    ******");
+                G.Writeln("2022           32.0000     14.29");
+                G.Writeln("2023           36.0000     12.50");
+                G.Writeln("==========================================================================================");
+                G.Writeln("");
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln(@"Work:e!a");
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Write(@"read bank1; --- "); G.Write(@"bank: c:\Gekko\bank1 06-06-2022 9:45:24 --- trace: "); G.WriteLink("Work:e!a", ""); G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln(@"Work:e!a --> Work:e!a");
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Write(@"2021-2023: copy d to e; --- copied Work:e!a from Work:d!a --- trace: "); G.WriteLink("Work:d!a", ""); G.Writeln();
+                G.Writeln(@"2024-2025: e <2024 2025> = 22, 23;");
+                G.Writeln("------------------------------------------------------------------------------------------");                
+                G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln(@"Work:d!a --> Work:e!a --> Work:e!a");
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Write(@"2021-2023: d = a + b + c; --- trace: "); G.WriteLink("Work:a!a", ""); G.Write(", "); G.WriteLink("Work:b!a", ""); G.Write(", "); G.WriteLink("Work:c!a", ""); G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln(@"Work:c!a --> Work:d!a --> Work:e!a --> Work:e!a");
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Write(@"2021-2023: c = a + b; --- trace: "); G.WriteLink("Work:a!a", ""); G.Write(", "); G.WriteLink("Work:b!a", ""); G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln();
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln(@"Work:a!a --> Work:c!a --> Work:d!a --> Work:e!a --> Work:e!a");
+                G.Writeln("------------------------------------------------------------------------------------------");
+                G.Writeln(@"2021-2023:  a = 2, 3, 4;");
+                G.Writeln("------------------------------------------------------------------------------------------");
+
+            }
+
             if (false && Globals.runningOnTTComputer)
             {
                 string file = @"c:\Thomas\Desktop\gekko\testing\skabelon.xlsx";
@@ -3988,9 +4036,7 @@ namespace Gekko
                 else if (File.Exists(tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal)) fileName = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal;  //IF the usual name is changed
                 else
                 {
-                    new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);
-
-                    //throw new GekkoException();
+                    new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);                    
                 }
 
                 using (FileStream fs = WaitForFileStream(fileName, null, GekkoFileReadOrWrite.Read))
@@ -7019,7 +7065,7 @@ namespace Gekko
                         if (iv2_series.meta == null) continue;
                         foreach (string s4 in iv2_series.meta.calc)
                         {
-                            rv_series.meta.calc.Add("--- " + s4);
+                            rv_series.meta.calc.Add("--" + s4);
                         }
                     }
                 }
@@ -14086,7 +14132,14 @@ namespace Gekko
                 if (!injectingToExistingSeries)
                 {
                     IVariable iv_clone = iv.DeepClone(truncate);
+                    Series ts_clone = iv_clone as Series;
+                    if (Globals.useTrace && ts_clone != null) ts_clone.meta.calc = null;  //erase it
                     O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
+                    
+                    if (Globals.useTrace && ts_clone != null)
+                    {
+                        ts_clone.meta.calc[0] += " // Copied " + ts_clone.GetName() + " from " + (iv as Series).GetName();
+                    }
                 }
             }
 

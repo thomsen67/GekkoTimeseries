@@ -11545,48 +11545,60 @@ namespace UnitTests
                 c = "time 2021 2023;";
                 s += HelperTrace(c);
 
-                c = "x = 2, 3, 4;";
+                c = "a = 2, 3, 4;";
                 s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("x!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.calc;
                 
-                c = "y = 12, 13, 14;";
+                c = "b = 12, 13, 14;";
                 s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("y!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.calc;
 
-                c = "z = x + 2*y + 1;";
+                c = "c = a + b;";
                 s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("z!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.calc;
 
-                c = "w = 3*z + x + 2*y + 1;";
+                c = "d = a + b + c;";
                 s += HelperTrace(c);
-                calc = (Program.databanks.GetFirst().GetIVariable("w!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.calc;
 
-                c = "xx = series(2);";
-                s += HelperTrace(c);
-                
-                c = "xx[a, b] = 22, 23, 24;";
-                s += HelperTrace(c);
-                
-                c = "xx[c, d] = 32, 33, 34;";
-                s += HelperTrace(c);
-                
-                c = "yy = series(2);";
-                s += HelperTrace(c);
-                
-                c = "yy[c, d] = xx[a, b];";
-                s += HelperTrace(c);
+                if (false)
+                {
 
-                c = "copy x to x2;";
-                s += HelperTrace(c);
+                    c = "xx = series(2);";
+                    s += HelperTrace(c);
 
-                c = "#l = 1, 2, 3;";
-                s += HelperTrace(c);
+                    c = "xx[a, b] = 22, 23, 24;";
+                    s += HelperTrace(c);
 
-                c = "#m = map();";
-                s += HelperTrace(c);
+                    c = "xx[c, d] = 32, 33, 34;";
+                    s += HelperTrace(c);
 
-                c = "#m.x = x;";
+                    c = "yy = series(2);";
+                    s += HelperTrace(c);
+
+                    c = "yy[c, d] = xx[a, b];";
+                    s += HelperTrace(c);
+                }
+
+                c = "copy d to e;";
                 s += HelperTrace(c);
+                calc = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.calc;
+
+                string ss = Stringlist.ExtractTextFromLines(calc).ToString();
+
+                if (false)
+                {
+
+                    c = "#l = 1, 2, 3;";
+                    s += HelperTrace(c);
+
+                    c = "#m = map();";
+                    s += HelperTrace(c);
+
+                    c = "#m.x = x;";
+                    s += HelperTrace(c);
+
+                }
 
                 c = "write bank1;";
                 s += HelperTrace(c);
@@ -11596,9 +11608,15 @@ namespace UnitTests
 
                 c = "read bank1;";
                 s += HelperTrace(c);
+                calc = (Program.databanks.GetFirst().GetIVariable("a!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("b!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("c!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("d!a") as Series).meta.calc;
+                calc = (Program.databanks.GetFirst().GetIVariable("e!a") as Series).meta.calc;
 
-                c = "z = 2 * y;";
+                c = "f = a + b + c + d + e;";
                 s += HelperTrace(c);
+                calc = (Program.databanks.GetFirst().GetIVariable("f!a") as Series).meta.calc;
 
                 Assert.Fail();
 

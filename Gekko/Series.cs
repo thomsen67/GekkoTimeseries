@@ -2712,6 +2712,14 @@ namespace Gekko
                             tsCopy.meta.fixedNormal.data.Add(new GekkoTimeSpan(gts.tStart, gts.tEnd));
                         }
                     }
+                    if (this.meta.calc != null)
+                    {
+                        tsCopy.meta.calc = new List<string>();
+                        foreach (string s in this.meta.calc)
+                        {
+                            tsCopy.meta.calc.Add(s);
+                        }
+                    }
                 }
                 if (this.mmi != null) tsCopy.mmi = this.mmi;  //only for array sub-series  
             }
